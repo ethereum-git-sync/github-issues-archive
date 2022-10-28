@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26040",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26040/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26040/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26040/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/26040",
+  "id": 1422461656,
+  "node_id": "I_kwDOAOvK985UyQrY",
+  "number": 26040,
+  "title": "potential go routine leak in rpc package",
+  "user": {
+    "login": "9iang22",
+    "id": 48987398,
+    "node_id": "MDQ6VXNlcjQ4OTg3Mzk4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/48987398?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/9iang22",
+    "html_url": "https://github.com/9iang22",
+    "followers_url": "https://api.github.com/users/9iang22/followers",
+    "following_url": "https://api.github.com/users/9iang22/following{/other_user}",
+    "gists_url": "https://api.github.com/users/9iang22/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/9iang22/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/9iang22/subscriptions",
+    "organizations_url": "https://api.github.com/users/9iang22/orgs",
+    "repos_url": "https://api.github.com/users/9iang22/repos",
+    "events_url": "https://api.github.com/users/9iang22/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/9iang22/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-25T13:24:11Z",
+  "updated_at": "2022-10-25T13:24:11Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nOS & Version: Windows 11 & Ubuntu 18.04\r\nCommit hash :  develop\r\n\r\nWhen I run the TestClientCancelWebsocket with goleak, there are some go routine leaks, as mentioned below. Actually I think it blocks at this function.\r\n~~~\r\nfunc (h *handler) startCallProc(fn func(*callProc)) {\r\n\th.callWG.Add(1)\r\n\tvar wg sync.WaitGroup\r\n\tgo func() {\r\n\t\tctx, cancel := context.WithCancel(h.rootCtx)\r\n\t\tdefer h.callWG.Done()\r\n\t\tdefer cancel()\r\n\t\tfn(&callProc{ctx: ctx})\r\n\t}()\r\n}\r\n~~~\r\nIn `TestClientCancelWebsocket` , the `fn` is to test block (`test_block`) so I think it may block forever and the `h.callWG.Done` will never be called. Although it is caused by a client test, it causes leaks in the server part. I wonder if it is normal for this `fn` call without a timeout.\r\n\r\n#### Expected behaviour\r\nPass\r\n\r\n#### Actual behaviour\r\n~~~\r\n         Goroutine 35 in state select, with github.com/ethereum/go-ethereum/rpc.(*Client).dispatch on top of the stack:\r\n        goroutine 35 [select]:\r\n        github.com/ethereum/go-ethereum/rpc.(*Client).dispatch(0xc0001b2000, {0x95b808?, 0xc0001a0000})\r\n                /data/rpc/client.go:587 +0x2cc\r\n        created by github.com/ethereum/go-ethereum/rpc.initClient\r\n                /data/rpc/client.go:251 +0x311\r\n        \r\n         Goroutine 141 in state select, with github.com/ethereum/go-ethereum/rpc.(*Client).Close on top of the stack:\r\n        goroutine 141 [select]:\r\n        github.com/ethereum/go-ethereum/rpc.(*Client).Close(...)\r\n                /data/rpc/client.go:284\r\n        github.com/ethereum/go-ethereum/rpc.(*Server).ServeCodec(0xc000159a10, {0x95b808?, 0xc000270bd0}, 0xc000232700?)\r\n                /data/rpc/server.go:89 +0x1b8\r\n        github.com/ethereum/go-ethereum/rpc.(*Server).WebsocketHandler.func1({0x95a170?, 0xc00026e620?}, 0xc000232700)\r\n                /data/rpc/websocket.go:64 +0xef\r\n        net/http.HandlerFunc.ServeHTTP(0x0?, {0x95a170?, 0xc00026e620?}, 0x46c6ee?)\r\n                /usr/local/go/src/net/http/server.go:2109 +0x2f\r\n        net/http.serverHandler.ServeHTTP({0xc000272fc0?}, {0x95a170, 0xc00026e620}, 0xc000232700)\r\n                /usr/local/go/src/net/http/server.go:2947 +0x30c\r\n        net/http.(*conn).serve(0xc0000015e0, {0x95a6c0, 0xc000272240})\r\n                /usr/local/go/src/net/http/server.go:1991 +0x607\r\n        created by net/http.(*Server).Serve\r\n                /usr/local/go/src/net/http/server.go:3102 +0x4db\r\n        \r\n         Goroutine 13 in state chan receive, with github.com/ethereum/go-ethereum/rpc.(*Server).ServeCodec on top of the stack:\r\n        goroutine 13 [chan receive]:\r\n        github.com/ethereum/go-ethereum/rpc.(*Server).ServeCodec(0xc000159a10, {0x95b808?, 0xc0002706c0}, 0xc000232400?)\r\n                /data/rpc/server.go:88 +0x165\r\n        github.com/ethereum/go-ethereum/rpc.(*Server).WebsocketHandler.func1({0x95a170?, 0xc00026e2a0?}, 0xc000232400)\r\n                /data/rpc/websocket.go:64 +0xef\r\n        net/http.HandlerFunc.ServeHTTP(0x0?, {0x95a170?, 0xc00026e2a0?}, 0x46c6ee?)\r\n                /usr/local/go/src/net/http/server.go:2109 +0x2f\r\n        net/http.serverHandler.ServeHTTP({0xc000272840?}, {0x95a170, 0xc00026e2a0}, 0xc000232400)\r\n                /usr/local/go/src/net/http/server.go:2947 +0x30c\r\n        net/http.(*conn).serve(0xc000001400, {0x95a6c0, 0xc000272240})\r\n                /usr/local/go/src/net/http/server.go:1991 +0x607\r\n        created by net/http.(*Server).Serve\r\n                /usr/local/go/src/net/http/server.go:3102 +0x4db\r\n \r\n         Goroutine 144 in state semacquire, with sync.runtime_Semacquire on top of the stack:\r\n        goroutine 144 [semacquire]:\r\n        sync.runtime_Semacquire(0xc000138ac0?)\r\n                /usr/local/go/src/runtime/sema.go:62 +0x25\r\n        sync.(*WaitGroup).Wait(0x18?)\r\n                /usr/local/go/src/sync/waitgroup.go:139 +0x52\r\n        github.com/ethereum/go-ethereum/rpc.(*handler).startCallProc(0xc000270c60, 0xc000012e58)\r\n                /data/rpc/handler.go:232 +0xd4\r\n        github.com/ethereum/go-ethereum/rpc.(*handler).handleMsg(0xc000270c60, 0xc00025bb20)\r\n                /data/rpc/handler.go:138 +0x85\r\n        github.com/ethereum/go-ethereum/rpc.(*Client).dispatch(0xc000230900, {0x95b808?, 0xc000270bd0})\r\n                /data/rpc/client.go:596 +0x411\r\n        created by github.com/ethereum/go-ethereum/rpc.initClient\r\n                /data/rpc/client.go:251 +0x311\r\n~~~\r\n\r\n#### Steps to reproduce the behaviour\r\nrun TestClientCancelWebsocket with goleak\r\n~~~\r\nfunc TestClientCancelWebsocket(t *testing.T) { \r\n\topts := []goleak.Option{\r\n\t\t// TODO: figure the reason and shorten this list\r\n\t\tgoleak.IgnoreTopFunction(\"github.com/ethereum/go-ethereum/metrics.(*meterArbiter).tick\"),\r\n\t\tgoleak.IgnoreTopFunction(\"github.com/ethereum/go-ethereum/core.(*txSenderCacher).cache\"),\r\n\t\tgoleak.IgnoreTopFunction(\"github.com/ethereum/go-ethereum/consensus/ethash.(*remoteSealer).loop\"),\r\n\t\tgoleak.IgnoreTopFunction(\"github.com/ethereum/go-ethereum/core/txpool.(*TxPool).loop\"),\r\n\t\tgoleak.IgnoreTopFunction(\"github.com/ethereum/go-ethereum/core.(*BlockChain).updateFutureBlocks\"),\r\n\t\tgoleak.IgnoreTopFunction(\"github.com/ethereum/go-ethereum/core/txpool.(*TxPool).scheduleReorgLoop\"),\r\n\t\tgoleak.IgnoreTopFunction(\"github.com/ethereum/go-ethereum/rpc.(*testService).Block\"),\r\n\t}\r\n\tdefer goleak.VerifyNone(t, opts...)\r\n\tdefer time.Sleep(3*time.Second)\r\n\ttestClientCancel(\"ws\", t) \r\n}\r\n~~~\r\n\r\n#### Backtrace\r\n\r\n````\r\nsee above\r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26040/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26040/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

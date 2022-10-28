@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26030",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26030/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26030/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26030/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/26030",
+  "id": 1419412978,
+  "node_id": "I_kwDOAOvK985UmoXy",
+  "number": 26030,
+  "title": "Return sender (and chainId) on `'eth_subscribe', ['newPendingTransactions', true]`",
+  "user": {
+    "login": "geomad",
+    "id": 7707517,
+    "node_id": "MDQ6VXNlcjc3MDc1MTc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7707517?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/geomad",
+    "html_url": "https://github.com/geomad",
+    "followers_url": "https://api.github.com/users/geomad/followers",
+    "following_url": "https://api.github.com/users/geomad/following{/other_user}",
+    "gists_url": "https://api.github.com/users/geomad/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/geomad/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/geomad/subscriptions",
+    "organizations_url": "https://api.github.com/users/geomad/orgs",
+    "repos_url": "https://api.github.com/users/geomad/repos",
+    "events_url": "https://api.github.com/users/geomad/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/geomad/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-22T17:18:32Z",
+  "updated_at": "2022-10-22T17:41:36Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "The new feature added on https://github.com/ethereum/go-ethereum/commit/5b1a04b9c749d804b51159fe12246c56de8515c1 returning the full transaction on `newPendingTransactions` subscription is really useful, but does not return the full information like subscribing for hashes and then using `eth_getTransaction` with it does. \r\n\r\nPlease add `from` and possibly `chainId` (to make it complete) on the full transaction object.\r\n\r\nExample of object returned with `'eth_subscribe', ['newPendingTransactions', true]`:\r\n```\r\n{\r\n  type: '0x2',\r\n  nonce: '0xe',\r\n  gasPrice: null,\r\n  maxPriorityFeePerGas: '0x59682f00',\r\n  maxFeePerGas: '0x8e26dacb2',\r\n  gas: '0x394de',\r\n  value: '0x0',\r\n  input: '0x5ae401dc0000000000000000000000000000000000000000000000000000000063542a0b000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000000e4472b43f30000000000000000000000000000000000000000000a17ae76b747b02bc0bb7800000000000000000000000000000000000000000000000007cc4a16fbd8c81e00000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000038c15f59f2f14adb24672ea25da111c3f81637a0000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004449404b7c00000000000000000000000000000000000000000000000007cc4a16fbd8c81e000000000000000000000000f9eb81b3807e3e9abc5537af73be2a0c8e6b923900000000000000000000000000000000000000000000000000000000',\r\n  v: '0x1',\r\n  r: '0x5aaf8b6da68451a1ac6fba1a00107179eac97500d4cb0b849d9671462eedd890',\r\n  s: '0x279d7df79cb05c3033de9d963cc9b2a785a43bca9c9b802fe33c2ee955edad09',\r\n  to: '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45',\r\n  chainId: '0x1',\r\n  accessList: [],\r\n  hash: '0x5ec2a5ae29fab77d7503e8cc5921b7c31d05e72ad2e7602526c6b3ecabbe18d0'\r\n}\r\n```\r\n\r\nExample of object returned with `'eth_subscribe', ['newPendingTransactions']` , and then `eth_getTransaction` on the result:\r\n```\r\n{\r\n  blockHash: null,\r\n  blockNumber: null,\r\n  from: '0x97521d509A028b1009F651e14E1e471f3452DE36',\r\n  gas: 69724,\r\n  gasPrice: '32950574540',\r\n  maxFeePerGas: '32950574540',\r\n  maxPriorityFeePerGas: '1000000000',\r\n  hash: '0xf5b75b99b293b20a4029718f165f356d2f3d3b2f5b2d36dfd0d0fd7454cc4968',\r\n  input: '0x095ea7b30000000000000000000000001111111254fb6c44bac0bed2854e76f90643097dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',\r\n  nonce: 22,\r\n  to: '0x761D38e5ddf6ccf6Cf7c55759d5210750B5D60F3',\r\n  transactionIndex: null,\r\n  value: '0',\r\n  type: 2,\r\n  accessList: [],\r\n  chainId: '0x1',\r\n  v: '0x0',\r\n  r: '0x608844986b439407a7e49c3c2db9a4b46ff213cef692a4397cf202fea790edb6',\r\n  s: '0x424cce707fe6c5c366a4369d025ae4908def0afec259639f9f70d5dbf26d509b'\r\n}\r\n```\r\n\r\nNote: web3.js (v1.8.0) does not support yet the `true` argument when subscribing `'newPendingTransactions'`. I've opened an issue for it (https://github.com/web3/web3.js/issues/5548).\r\nWorkaround for now is to comment out line 70 in `\\node_modules\\web3-core-subscriptions\\lib\\subscription.js`\r\n```\r\n    if (args.length !== subscription.params) {\r\n        //throw errors.InvalidNumberOfParams(args.length, subscription.params, subscription.subscriptionName);\r\n    }\r\n```\r\n\r\nNote 2: I just noticed that while one method returns hex values, the other returns numbers. I am not sure if that's due to web3.js lack of support but maybe worth taking a look as well.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26030/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26030/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

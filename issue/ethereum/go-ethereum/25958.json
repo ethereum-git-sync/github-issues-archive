@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25958",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25958/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25958/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25958/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/25958",
+  "id": 1402691130,
+  "node_id": "I_kwDOAOvK985Tm146",
+  "number": 25958,
+  "title": "Enable debug mode in SimulatedBackend",
+  "user": {
+    "login": "chawin-a",
+    "id": 10304236,
+    "node_id": "MDQ6VXNlcjEwMzA0MjM2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10304236?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chawin-a",
+    "html_url": "https://github.com/chawin-a",
+    "followers_url": "https://api.github.com/users/chawin-a/followers",
+    "following_url": "https://api.github.com/users/chawin-a/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chawin-a/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chawin-a/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chawin-a/subscriptions",
+    "organizations_url": "https://api.github.com/users/chawin-a/orgs",
+    "repos_url": "https://api.github.com/users/chawin-a/repos",
+    "events_url": "https://api.github.com/users/chawin-a/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chawin-a/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-10T07:03:58Z",
+  "updated_at": "2022-10-10T07:22:58Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "# Rationale\r\n\r\nI attempted to develop test cases for my Go projects. To test locally, I use this [simulator](https://github.com/ethereum/go-ethereum/blob/master/accounts/abi/bind/backends/simulated.go). However, some mathematical calculations in Go and smart contracts differ. I'm not sure why. Only the smart contract's output can be tested using the simulator. I need to go over the code line by line.\r\n\r\n# Implementation\r\n\r\nI've read the code that the simulator uses to call contracts. This [line](https://github.com/ethereum/go-ethereum/blob/564751668aa01f55d39851cbf4673500ec2d4718/accounts/abi/bind/backends/simulated.go#L651) can enable debugging and create its own tracer to capture optcode, call frame, transaction, and so on. \r\nThis is beneficial to Go developers who are interested in Ethereum.\r\n\r\nIssue #25072 is very similar to mine.\r\n\r\nCan we write a function SetVMConfig and use it after creating a simulator like this?\r\n```\r\nsim := backends.NewSimulatedBackend(core.GenesisAlloc{}, 10000000)\r\nsim.SetVMConfig(vm.Config{\r\n    Debug: true,\r\n    Tracer: MyTracer,\r\n})\r\n```\r\nor\r\n```\r\nsim := backends.NewSimulatedBackend(core.GenesisAlloc{}, 10000000, vm.Config{\r\n    Debug: true,\r\n    Tracer: MyTracer,\r\n})\r\n```\r\nand change this [line](https://github.com/ethereum/go-ethereum/blob/564751668aa01f55d39851cbf4673500ec2d4718/accounts/abi/bind/backends/simulated.go#L651)\r\n```\r\nvmEnv := vm.NewEVM(evmContext, txContext, stateDB, b.config, vm.Config{NoBaseFee: true})\r\n```\r\nto\r\n```\r\nvmEnv := vm.NewEVM(evmContext, txContext, stateDB, b.config, vm.Config{\r\n    Debug:     b.blockchain.GetVMConfig().Debug,\r\n    Tracer:    b.blockchain.GetVMConfig().Tracer,\r\n    NoBaseFee: true,\r\n})\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25958/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25958/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

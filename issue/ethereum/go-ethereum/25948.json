@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25948",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25948/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25948/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25948/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/25948",
+  "id": 1401020832,
+  "node_id": "I_kwDOAOvK985TgeGg",
+  "number": 25948,
+  "title": "Remove `personal` namespace from geth",
+  "user": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-07T11:24:17Z",
+  "updated_at": "2022-10-25T13:19:35Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "# Rationale\r\n\r\nWe have long been wanting to remove account management from geth. This proposal is a step towards that, by removing the `personal` namespace from geth. \r\n\r\nWith the upcoming `1.11` release, I think this would be a good time to do it. \r\n\r\n## UX affected\r\n\r\nI think the most blatant PITA for users would be in scenarios where geth is used to sign clique blocks. However, it's a one-time effort to switch to use `clef` instead. Docs here: https://geth.ethereum.org/docs/clef/cliquesigning \r\n\r\n\r\n## Methods affected\r\n\r\n### Methods which have other alternatives\r\n\r\n- `personal.listAccounts`\r\n  - `personal.listAccounts` is identical to `eth.accounts`\r\n- `personal.deriveAccount`\r\n  - `personal.deriveAccount` is identical to `clef_deriveAccount` (not externally exposed)\r\n- `personal.openWallet`\r\n  - `personal.openWallet` corresponds to `clef_openWallet` (not externally exposed)\r\n- `personal.sign`\r\n  - `personal.sign` prefixes data with eip-191 string, and signs.\r\n  - Has corresponding clef-method.\r\n- `personal.listWallets`\r\n  - opposed to listAccounts, this method lists full details, e.g. usb path or keystore-file paths\r\n  - corresponds to `clef_listWallets` (not externally exposed)\r\n- `personal.ecRecover`\r\n  - returns the address for the account that was used to create the signature.\r\n  - corresponds to `EcRecover` on clef extapi\r\n- `personal.sendTransaction`\r\n  - SetDefaults\r\n  - Sign\r\n  - Submit\r\n- `personal.signTransaction`\r\n  - Does _not_ do SetDefaults, but requires all args set\r\n  - Sign, return RLP\r\n- `personal.newAccount`\r\n  - Exists in clef (not externally exposed)\r\n  - also `geth account new`\r\n- `personal.importRawKey`\r\n  - `personal.importRawKey` corresponds to `clef_importRawKey` (not externally exposed)\r\n  - `personal.importRawKey` corresponds to `geth account import`\r\n\r\n### Methods that do not have other (direct) alternatives\r\n\r\n- `personal.unpair`\r\n  - Unpair deletes a pairing between wallet and geth.\r\n  - No corresponding method\r\n- `personal.unlockAccount`\r\n  - replaced by rules in clef\r\n- `personal.lockAccount`\r\n  - replaced by rules in clef\r\n- `personal.initializeWallet`\r\n  - InitializeWallet initializes a new wallet at the provided URL, by generating and returning a new private key.\r\n  - has no corresponding method\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25948/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25948/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
