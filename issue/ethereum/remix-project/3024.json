@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/remix-project/issues/3024",
+  "repository_url": "https://api.github.com/repos/ethereum/remix-project",
+  "labels_url": "https://api.github.com/repos/ethereum/remix-project/issues/3024/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/remix-project/issues/3024/comments",
+  "events_url": "https://api.github.com/repos/ethereum/remix-project/issues/3024/events",
+  "html_url": "https://github.com/ethereum/remix-project/issues/3024",
+  "id": 1409920048,
+  "node_id": "I_kwDODtLRw85UCaww",
+  "number": 3024,
+  "title": "\"Error: Error from IDE : data out-of-bounds\" when contract assertion fails.",
+  "user": {
+    "login": "musicslayer",
+    "id": 10043091,
+    "node_id": "MDQ6VXNlcjEwMDQzMDkx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10043091?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/musicslayer",
+    "html_url": "https://github.com/musicslayer",
+    "followers_url": "https://api.github.com/users/musicslayer/followers",
+    "following_url": "https://api.github.com/users/musicslayer/following{/other_user}",
+    "gists_url": "https://api.github.com/users/musicslayer/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/musicslayer/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/musicslayer/subscriptions",
+    "organizations_url": "https://api.github.com/users/musicslayer/orgs",
+    "repos_url": "https://api.github.com/users/musicslayer/repos",
+    "events_url": "https://api.github.com/users/musicslayer/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/musicslayer/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1922155226,
+      "node_id": "MDU6TGFiZWwxOTIyMTU1MjI2",
+      "url": "https://api.github.com/repos/ethereum/remix-project/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-14T22:16:20Z",
+  "updated_at": "2022-10-26T09:42:56Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Contract: Foo.sol\r\nCompiler: 0.8.17+commit.8df45f5f\r\n\r\n```\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity >=0.8.12 <0.9.0;\r\ncontract Foo {\r\n    function foo() public {\r\n        assert(false);\r\n    }\r\n}\r\n```\r\n\r\n\r\nRun the following JavaScript file (runFoo.js):\r\n\r\n```\r\nconst { ethers } = require(\"hardhat\");\r\n\r\nfunction handleError(err) {\r\n    console.log('ERROR:');\r\n    console.log(JSON.stringify(err, Object.getOwnPropertyNames(err), 4));\r\n}\r\n\r\nasync function async_runFoo() {\r\n    const fooFactory = await ethers.getContractFactory(\"Foo\");\r\n    const fooContract = await fooFactory.deploy();\r\n    await fooContract.deployed();\r\n\r\n    const call_foo = await fooContract.foo();\r\n    await call_foo.wait();\r\n}\r\n\r\nasync_runFoo().catch(handleError);\r\n```\r\n\r\n\r\nIn the console you will see:\r\n\r\n```\r\nnull\r\nERROR:\r\n{\r\n    \"stack\": \"Error: Error from IDE : data out-of-bounds (length=31, offset=32, code=BUFFER_OVERRUN, version=abi/5.5.0)\\n    at a.<anonymous> (https://yann300.github.io/remix-script-runner/script-runner.js:2:145540)\\n    at Object.l (https://yann300.github.io/remix-script-runner/script-runner.js:2:151969)\\n    at a.emit (https://yann300.github.io/remix-script-runner/script-runner.js:2:153682)\\n    at Object.<anonymous> (https://yann300.github.io/remix-script-runner/script-runner.js:2:147683)\\n    at Generator.next (<anonymous>)\\n    at https://yann300.github.io/remix-script-runner/script-runner.js:2:1253287\\n    at new Promise (<anonymous>)\\n    at Module.l (https://yann300.github.io/remix-script-runner/script-runner.js:2:1253032)\\n    at https://yann300.github.io/remix-script-runner/script-runner.js:2:147281\\n    at o.<anonymous> (https://yann300.github.io/remix-script-runner/script-runner.js:2:137997)\",\r\n    \"message\": \"Error from IDE : data out-of-bounds (length=31, offset=32, code=BUFFER_OVERRUN, version=abi/5.5.0)\"\r\n}\r\n```\r\n\r\nI would have expected to see something like this instead:\r\n\r\n```\r\nERROR:\r\n{\r\n    \"stack\": \"Error: call revert exception; VM Exception while processing transaction: reverted with panic code 1 [ See: https://links.ethers.org/v5-errors-CALL_EXCEPTION ] (method=\\\"foo()\\\", data=\\\"0x4e487b710000000000000000000000000000000000000000000000000000000000000001\\\", errorArgs=[{\\\"type\\\":\\\"BigNumber\\\",\\\"hex\\\":\\\"0x01\\\"}], errorName=\\\"Panic\\\", errorSignature=\\\"Panic(uint256)\\\", reason=null, code=CALL_EXCEPTION, version=abi/5.7.0)\\n    at d.makeError (https://yann300.github.io/remix-script-runner/script-runner.js:2:75814)\\n    at d.throwError (https://yann300.github.io/remix-script-runner/script-runner.js:2:75934)\\n    at ht.decodeFunctionResult (https://yann300.github.io/remix-script-runner/script-runner.js:2:555338)\\n    at Vr.<anonymous> (https://yann300.github.io/remix-script-runner/script-runner.js:2:605870)\\n    at Generator.next (<anonymous>)\\n    at o (https://yann300.github.io/remix-script-runner/script-runner.js:2:601565)\",\r\n    \"message\": \"call revert exception; VM Exception while processing transaction: reverted with panic code 1 [ See: https://links.ethers.org/v5-errors-CALL_EXCEPTION ] (method=\\\"foo()\\\", data=\\\"0x4e487b710000000000000000000000000000000000000000000000000000000000000001\\\", errorArgs=[{\\\"type\\\":\\\"BigNumber\\\",\\\"hex\\\":\\\"0x01\\\"}], errorName=\\\"Panic\\\", errorSignature=\\\"Panic(uint256)\\\", reason=null, code=CALL_EXCEPTION, version=abi/5.7.0)\",\r\n    \"reason\": null,\r\n    \"code\": \"CALL_EXCEPTION\",\r\n    \"method\": \"foo()\",\r\n    \"data\": \"0x4e487b710000000000000000000000000000000000000000000000000000000000000001\",\r\n    \"errorArgs\": [\r\n        {}\r\n    ],\r\n    \"errorName\": \"Panic\",\r\n    \"errorSignature\": \"Panic(uint256)\",\r\n    \"address\": \"0x56a2777e796eF23399e9E1d791E1A0410a75E31b\",\r\n    \"args\": [],\r\n    \"transaction\": {\r\n        \"data\": \"0xc2985578\"\r\n    }\r\n}\r\n```\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/remix-project/issues/3024/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/remix-project/issues/3024/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
