@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13710",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13710/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13710/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13710/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13710",
+  "id": 1451881708,
+  "node_id": "I_kwDOAm_5kc5WifTs",
+  "number": 13710,
+  "title": "Optimizer should optimize away body containing only call to super",
+  "user": {
+    "login": "joshlang",
+    "id": 39773384,
+    "node_id": "MDQ6VXNlcjM5NzczMzg0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/39773384?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/joshlang",
+    "html_url": "https://github.com/joshlang",
+    "followers_url": "https://api.github.com/users/joshlang/followers",
+    "following_url": "https://api.github.com/users/joshlang/following{/other_user}",
+    "gists_url": "https://api.github.com/users/joshlang/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/joshlang/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/joshlang/subscriptions",
+    "organizations_url": "https://api.github.com/users/joshlang/orgs",
+    "repos_url": "https://api.github.com/users/joshlang/repos",
+    "events_url": "https://api.github.com/users/joshlang/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/joshlang/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-16T16:13:25Z",
+  "updated_at": "2022-11-16T16:13:25Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Consider these two contracts:\r\n```\r\ncontract MeowBase\r\n{    \r\n    function meow() public virtual view returns (uint256)\r\n    {\r\n        return address(this) == msg.sender ? 1 : 0;\r\n    }\r\n}\r\ncontract Meow is MeowBase\r\n{\r\n    function meow() public override view returns (uint256) \r\n    {\r\n        return super.meow(); \r\n    }\r\n}\r\n```\r\n\r\nCompiling them with solidity 0.8.17 and optimizations 999999999 creates two contracts of different size.  `MeowBase` is `145 bytes` and `Meow` is `157 bytes`.\r\n\r\nCuriously, if the body of `MeowBase` just contained `return 1;` or other simple stuff, the contract sizes turn out the same.  Adding a conditional which can't be optimized away creates the size difference\r\n\r\nBut regardless...\r\n\r\n`return super.meow()` should be optimized away completely\r\n\r\nThe particular use case that brought this up for me is testability/mocking.  Using the above example, I would create a `MeowTest` contract derived from `MeowBase` with additional functions/overrides allowing me to control the return value of `meow()` for various tests - but users of the contract would only derive from `Meow` and shouldn't be able to override `meow()`.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13710/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13710/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
