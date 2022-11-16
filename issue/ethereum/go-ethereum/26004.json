@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 7,
   "created_at": "2022-10-18T03:22:11Z",
-  "updated_at": "2022-10-20T14:34:05Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2022-11-16T16:51:49Z",
+  "closed_at": "2022-11-16T16:51:48Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "# Rationale\r\n\r\nThe blockchain gateway we use supports many additional request parameters, which are specified through the headers of the request. For example, we require the client to pass `x-consistent-hash-key` to support consistent hashing. In fact, if there are any additional extensions on the server side, HTTP Headers is the best way at present.\r\n\r\nHowever, I noticed that currently only global headers are supported:\r\nhttps://github.com/ethereum/go-ethereum/blob/master/rpc/http.go#L215\r\nIt cannot set headers for each independent request. (For example, only for `eth_sendRawTransaction`, without affecting other read requests)\r\n\r\n# Implementation\r\n\r\nI do not deny that there are other ways to achieve the goal, but if there are the following mechanisms, it will be very convenient:\r\n```\r\nclient, _ := ethclient.Dial(\"...\")\r\n\r\nheader := http.Header{}\r\nheader.Set(\"x-consistent-hash\", \"...\")\r\nctx := ethclient.WithHeaders(context.Background(), header)\r\nif err := client.SendTransaction(ctx, tx); err != nil {\r\n\tpanic(err)\r\n}\r\n```\r\n\r\nIf I propose a PR to add this feature, will it be merged?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "storyicon",
+    "id": 29772821,
+    "node_id": "MDQ6VXNlcjI5NzcyODIx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29772821?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/storyicon",
+    "html_url": "https://github.com/storyicon",
+    "followers_url": "https://api.github.com/users/storyicon/followers",
+    "following_url": "https://api.github.com/users/storyicon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/storyicon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/storyicon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/storyicon/subscriptions",
+    "organizations_url": "https://api.github.com/users/storyicon/orgs",
+    "repos_url": "https://api.github.com/users/storyicon/repos",
+    "events_url": "https://api.github.com/users/storyicon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/storyicon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26004/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26004/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -144,7 +163,7 @@
     },
     "created_at": "2022-10-19T08:00:07Z",
     "updated_at": "2022-10-19T08:26:26Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Thank you @jsvisa , but as mentioned in my description:\r\n```\r\nIt cannot set headers for each independent request. (For example, only for eth_sendRawTransaction, without affecting other read requests)\r\n```\r\nThis method has relatively large limitations.\r\nIn contrast, in the client design of `HTTP` and `gRPC`, the entrance to set up header for each request is provided. I think this is a very basic design problem.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1283590200/reactions",
@@ -232,7 +251,7 @@
     },
     "created_at": "2022-10-20T07:12:03Z",
     "updated_at": "2022-10-20T07:12:03Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Thanks @lightclient \r\nThis design still sets the same header for all requests, which has great limitations:\r\n![image](https://user-images.githubusercontent.com/29772821/196880273-b027f9ad-97df-4983-a36c-f9b38349b58c.png)\r\nIn a consistent hash scenario, each request may require a different consistent hash. \r\nThere are more scenes. It should be a common requirement.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1285051943/reactions",
@@ -320,10 +339,54 @@
     },
     "created_at": "2022-10-20T14:34:05Z",
     "updated_at": "2022-10-20T14:34:05Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Sorry @lightclient , I don't think this is a robust solution. This is based on the assumption that `SetHeader` and `doRequest` are atomic operations, which will cause confusion when concurrent requests are made.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1285656549/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1317336553",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26004#issuecomment-1317336553",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26004",
+    "id": 1317336553,
+    "node_id": "IC_kwDOAOvK985OhPXp",
+    "user": {
+      "login": "storyicon",
+      "id": 29772821,
+      "node_id": "MDQ6VXNlcjI5NzcyODIx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29772821?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/storyicon",
+      "html_url": "https://github.com/storyicon",
+      "followers_url": "https://api.github.com/users/storyicon/followers",
+      "following_url": "https://api.github.com/users/storyicon/following{/other_user}",
+      "gists_url": "https://api.github.com/users/storyicon/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/storyicon/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/storyicon/subscriptions",
+      "organizations_url": "https://api.github.com/users/storyicon/orgs",
+      "repos_url": "https://api.github.com/users/storyicon/repos",
+      "events_url": "https://api.github.com/users/storyicon/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/storyicon/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-16T16:51:48Z",
+    "updated_at": "2022-11-16T16:51:48Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "This issue is now resolved by #26023. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1317336553/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
