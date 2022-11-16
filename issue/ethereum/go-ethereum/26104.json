@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26104",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26104/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26104/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26104/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/26104",
+  "id": 1435932804,
+  "node_id": "I_kwDOAOvK985VlpiE",
+  "number": 26104,
+  "title": "Hey @MariusVanDerWijden, not a problem re the delay, this is low priority :) thanks for the feedback.",
+  "user": {
+    "login": "a1love-web",
+    "id": 115647843,
+    "node_id": "U_kgDOBuSlYw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/115647843?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/a1love-web",
+    "html_url": "https://github.com/a1love-web",
+    "followers_url": "https://api.github.com/users/a1love-web/followers",
+    "following_url": "https://api.github.com/users/a1love-web/following{/other_user}",
+    "gists_url": "https://api.github.com/users/a1love-web/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/a1love-web/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/a1love-web/subscriptions",
+    "organizations_url": "https://api.github.com/users/a1love-web/orgs",
+    "repos_url": "https://api.github.com/users/a1love-web/repos",
+    "events_url": "https://api.github.com/users/a1love-web/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/a1love-web/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-04T11:28:11Z",
+  "updated_at": "2022-11-04T11:47:41Z",
+  "closed_at": "2022-11-04T11:47:41Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "        Hey @MariusVanDerWijden, not a problem re the delay, this is low priority :) thanks for the feedback.\r\n\r\nWhat would your suggested approach look like for `SendTransaction()`? Would it copy the `*vm.Config` to the underlying `*core.Blockchain`? I'm concerned that the transaction and call configs would either diverge or we'd require users to set the value twice.\r\n\r\nWhich bit is too complicated for you? The introduction of `Option`s, or the granularity of those provided? Or something else? I think that only having a clone-on-call (regular or pending) without the granularity of the 3 paths would make sense—I personally would need to exclude gas estimation. If it's the `Option` pattern that you don't like, a method that achieves the same thing would work although I do think it feels more natural in a constructor:\r\n\r\n```Go\r\nsim := backends.NewSimulatedBackend(…)\r\ncfg := sim.Blockchain().GetVMConfig()\r\n… // modify cfg\r\nsim.CloneVMConfigOnCall(true)\r\n```\r\n\r\nis pretty similar to:\r\n\r\n```\r\n```Go\r\nsim := backends.NewSimulatedBackend(…, backends.CloneVMConfigOnCall())\r\ncfg := sim.Blockchain().GetVMConfig()\r\n… // modify cfg\r\n```\r\n\r\nbut tx vs call configs gets messy:\r\n\r\n```Go\r\nsim := backends.NewSimulatedBackend(…)\r\ntxConfig := sim.Blockchain().GetVMConfig()\r\n… // modify txConfig\r\nsim.SetVMConfigForCalls(txConfig) // same config? different one? txConfig is a pointer so do we clone it here?\r\n```\r\n\r\n_Originally posted by @aschlosberg in https://github.com/ethereum/go-ethereum/issues/25072#issuecomment-1170206585_\r\n      ",
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26104/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26104/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

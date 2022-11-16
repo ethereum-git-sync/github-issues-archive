@@ -40,7 +40,7 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2022-10-27T21:06:33Z",
-  "updated_at": "2022-10-27T21:07:14Z",
-  "closed_at": null,
+  "updated_at": "2022-10-30T19:21:43Z",
+  "closed_at": "2022-10-30T19:21:43Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Hi, I am hitting a wall trying to replicate some functionality from `ethers` library, and am wondering if it's actually just not possible.\r\n\r\nGiven a Solidity code like this:\r\n```solidity\r\nstruct BlockHeader {\r\n    bytes32 parentHash;\r\n    bytes32 ommersHash;\r\n    address beneficiary;\r\n    bytes32 stateRoot;\r\n    bytes32 transactionsRoot;\r\n    bytes32 receiptsRoot;\r\n    bytes32[8] logsBloom;\r\n    uint256 difficulty;\r\n    uint128 height;\r\n    uint64 gasLimit;\r\n    uint64 gasUsed;\r\n    uint64 timestamp;\r\n    bytes extraData;\r\n    bytes32 mixHash;\r\n    uint64 nonce;\r\n}\r\n\r\n\r\n    struct SignalProof {\r\n        BlockHeader header;\r\n        bytes proof;\r\n    }\r\n\r\n function decode(bytes memory proof)\r\n        public\r\n        pure\r\n        returns (LibBridgeSignal.SignalProof memory)\r\n    {\r\n        LibBridgeSignal.SignalProof memory mkp = abi.decode(\r\n            proof,\r\n            (LibBridgeSignal.SignalProof)\r\n        );\r\n\r\n        return mkp;\r\n    }\r\n```\r\n\r\nI can do this correctly with ethers, after calling `eth_getProof`\r\n```ts\r\n           const blockHeader = {parentHash: 0x123} // etc, just fill out the struct as per the solidity types\r\n            const encodedProof = ethers.utils.defaultAbiCoder.encode(\r\n                [\"bytes\", \"bytes\"],\r\n                [\r\n                    RLP.encode(proof.accountProof),\r\n                    RLP.encode(proof.storageProof[0].proof),\r\n                ]\r\n            )\r\n            \r\n            const encoded = ethers.utils.defaultAbiCoder.encode(\r\n                [\r\n                    \"tuple(tuple(bytes32 parentHash, bytes32 ommersHash, address beneficiary, bytes32 stateRoot, bytes32 transactionsRoot, bytes32 receiptsRoot, bytes32[8] logsBloom, uint256 difficulty, uint128 height, uint64 gasLimit, uint64 gasUsed, uint64 timestamp, bytes extraData, bytes32 mixHash, uint64 nonce) header, bytes proof)\",\r\n                ],\r\n                [{ header: blockHeader, proof: proof }]\r\n            )\r\n```\r\n\r\nI have been bashing my head against the wall trying to fulfill this without `abi.decode` reverting from the go-ethereum `accounts/abi` package.\r\n\r\n```go\r\ntype Proof struct {\r\n\tAccountProof []byte `abi:\"accountProof\"`\r\n\tStorageProof []byte `abi:\"storageProof\"`\r\n}\r\n\r\ntype BlockHeader struct {\r\n\tParentHash       common.Hash  \r\n\tOmmersHash       common.Hash \r\n\tBeneficiary      common.Address\r\n\tStateRoot        common.Hash  \r\n\tTransactionsRoot common.Hash  \r\n\tReceiptsRoot     common.Hash   \r\n\tLogsBloom        [8][32]byte   \r\n\tDifficulty       *big.Int \r\n\tHeight           *big.Int  \r\n\tGasLimit         *big.Int      \r\n\tGasUsed          *big.Int     \r\n\tTimestamp        *big.Int    \r\n\tExtraData        []byte      \r\n\tMixHash          common.Hash  \r\n\tNonce            *big.Int \r\n}\r\n\r\ntype SignalProof struct {\r\n\tHeader BlockHeader `abi:\"header\"`\r\n\tProof  []byte      `abi:\"proof\"`\r\n}\r\n\r\nvar (\r\n\tblockHeaderT, _ = abi.NewType(\"tuple\", \"\", []abi.ArgumentMarshaling{\r\n\t\t{\r\n\t\t\tName: \"parentHash\",\r\n\t\t\tType: \"bytes32\",\r\n\t\t},\r\n\t\t{\r\n\t\t\tName: \"ommersHash\",\r\n\t\t\tType: \"bytes32\",\r\n\t\t}, {\r\n\t\t\tName: \"beneficiary\",\r\n\t\t\tType: \"address\",\r\n\t\t}, {\r\n\t\t\tName: \"stateRoot\",\r\n\t\t\tType: \"bytes32\",\r\n\t\t}, {\r\n\t\t\tName: \"transactionsRoot\",\r\n\t\t\tType: \"bytes32\",\r\n\t\t}, {\r\n\t\t\tName: \"logsBloom\",\r\n\t\t\tType: \"bytes32[8]\",\r\n\t\t}, {\r\n\t\t\tName: \"difficulty\",\r\n\t\t\tType: \"uint256\",\r\n\t\t}, {\r\n\t\t\tName: \"height\",\r\n\t\t\tType: \"uint128\",\r\n\t\t}, {\r\n\t\t\tName: \"gasLimit\",\r\n\t\t\tType: \"uint64\",\r\n\t\t}, {\r\n\t\t\tName: \"gasUsed\",\r\n\t\t\tType: \"uint64\",\r\n\t\t}, {\r\n\t\t\tName: \"timestamp\",\r\n\t\t\tType: \"uint64\",\r\n\t\t}, {\r\n\t\t\tName: \"extraData\",\r\n\t\t\tType: \"bytes\",\r\n\t\t},\r\n\t\t{\r\n\t\t\tName: \"mixHash\",\r\n\t\t\tType: \"bytes32\",\r\n\t\t},\r\n\t\t{\r\n\t\t\tName: \"nonce\",\r\n\t\t\tType: \"uint64\",\r\n\t\t},\r\n\t})\r\n\r\n\t// what do I do here to make a nested tuple for the SignalProof type?\r\n\t// how do I pack it into the appropriate bytes to be decoded identically by Solidity?\r\n\tsignalProofT, _ = abi.NewType(\"tuple\", \"\", []abi.ArgumentMarshaling{\r\n\t\t{\r\n\t\t\tName: \"blockHeader\",\r\n\t\t\tType: \"tuple\",\r\n\t\t},\r\n\t})\r\n)\r\n```\r\n\r\nIs what I am trying to do impossible in this library?\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "cyberhorsey",
+    "id": 113397187,
+    "node_id": "U_kgDOBsJNww",
+    "avatar_url": "https://avatars.githubusercontent.com/u/113397187?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cyberhorsey",
+    "html_url": "https://github.com/cyberhorsey",
+    "followers_url": "https://api.github.com/users/cyberhorsey/followers",
+    "following_url": "https://api.github.com/users/cyberhorsey/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cyberhorsey/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cyberhorsey/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cyberhorsey/subscriptions",
+    "organizations_url": "https://api.github.com/users/cyberhorsey/orgs",
+    "repos_url": "https://api.github.com/users/cyberhorsey/repos",
+    "events_url": "https://api.github.com/users/cyberhorsey/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cyberhorsey/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26056/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26056/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 

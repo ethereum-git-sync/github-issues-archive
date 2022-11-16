@@ -38,18 +38,65 @@
       "color": "FF5E5E",
       "default": false,
       "description": ""
+    },
+    {
+      "id": 1132689577,
+      "node_id": "MDU6TGFiZWwxMTMyNjg5NTc3",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/status:triage",
+      "name": "status:triage",
+      "color": "6be514",
+      "default": false,
+      "description": ""
     }
   ],
   "state": "open",
   "locked": false,
-  "assignee": null,
+  "assignee": {
+    "login": "fjl",
+    "id": 6915,
+    "node_id": "MDQ6VXNlcjY5MTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6915?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fjl",
+    "html_url": "https://github.com/fjl",
+    "followers_url": "https://api.github.com/users/fjl/followers",
+    "following_url": "https://api.github.com/users/fjl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fjl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fjl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fjl/subscriptions",
+    "organizations_url": "https://api.github.com/users/fjl/orgs",
+    "repos_url": "https://api.github.com/users/fjl/repos",
+    "events_url": "https://api.github.com/users/fjl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fjl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "assignees": [
-
+    {
+      "login": "fjl",
+      "id": 6915,
+      "node_id": "MDQ6VXNlcjY5MTU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6915?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fjl",
+      "html_url": "https://github.com/fjl",
+      "followers_url": "https://api.github.com/users/fjl/followers",
+      "following_url": "https://api.github.com/users/fjl/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fjl/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fjl/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fjl/subscriptions",
+      "organizations_url": "https://api.github.com/users/fjl/orgs",
+      "repos_url": "https://api.github.com/users/fjl/repos",
+      "events_url": "https://api.github.com/users/fjl/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fjl/received_events",
+      "type": "User",
+      "site_admin": false
+    }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-10-25T13:24:11Z",
-  "updated_at": "2022-10-25T13:24:11Z",
+  "updated_at": "2022-11-08T13:38:07Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +119,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1303230734",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26040#issuecomment-1303230734",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26040",
+    "id": 1303230734,
+    "node_id": "IC_kwDOAOvK985NrbkO",
+    "user": {
+      "login": "MariusVanDerWijden",
+      "id": 16664698,
+      "node_id": "MDQ6VXNlcjE2NjY0Njk4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16664698?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MariusVanDerWijden",
+      "html_url": "https://github.com/MariusVanDerWijden",
+      "followers_url": "https://api.github.com/users/MariusVanDerWijden/followers",
+      "following_url": "https://api.github.com/users/MariusVanDerWijden/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MariusVanDerWijden/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MariusVanDerWijden/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MariusVanDerWijden/subscriptions",
+      "organizations_url": "https://api.github.com/users/MariusVanDerWijden/orgs",
+      "repos_url": "https://api.github.com/users/MariusVanDerWijden/repos",
+      "events_url": "https://api.github.com/users/MariusVanDerWijden/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MariusVanDerWijden/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-04T10:29:31Z",
+    "updated_at": "2022-11-04T10:29:31Z",
+    "author_association": "MEMBER",
+    "body": "Could repro, looks like the following diff kinda fixes it.\r\nMaybe we should add a timeout to the rpc server/rpc client context.\r\n\r\n```diff\r\ndiff --git a/rpc/handler.go b/rpc/handler.go\r\nindex f3052e7eb..f921e30ac 100644\r\n--- a/rpc/handler.go\r\n+++ b/rpc/handler.go\r\n@@ -219,7 +219,7 @@ func (h *handler) cancelServerSubscriptions(err error) {\r\n func (h *handler) startCallProc(fn func(*callProc)) {\r\n        h.callWG.Add(1)\r\n        go func() {\r\n-               ctx, cancel := context.WithCancel(h.rootCtx)\r\n+               ctx, cancel := context.WithTimeout(h.rootCtx, time.Second)\r\n                defer h.callWG.Done()\r\n                defer cancel()\r\n                fn(&callProc{ctx: ctx})\r\n              ```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1303230734/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
