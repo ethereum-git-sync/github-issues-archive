@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13683",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13683/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13683/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13683/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13683",
+  "id": 1438809638,
+  "node_id": "I_kwDOAm_5kc5Vwn4m",
+  "number": 13683,
+  "title": "Include possible custom errors on ABI",
+  "user": {
+    "login": "gagiuntoli",
+    "id": 25662036,
+    "node_id": "MDQ6VXNlcjI1NjYyMDM2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25662036?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gagiuntoli",
+    "html_url": "https://github.com/gagiuntoli",
+    "followers_url": "https://api.github.com/users/gagiuntoli/followers",
+    "following_url": "https://api.github.com/users/gagiuntoli/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gagiuntoli/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gagiuntoli/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gagiuntoli/subscriptions",
+    "organizations_url": "https://api.github.com/users/gagiuntoli/orgs",
+    "repos_url": "https://api.github.com/users/gagiuntoli/repos",
+    "events_url": "https://api.github.com/users/gagiuntoli/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gagiuntoli/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-07T18:42:16Z",
+  "updated_at": "2022-11-07T19:04:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "\r\n## Abstract\r\n\r\nI am dealing with the problem of trying to include in the ABI of a contract all the possible custom errors thrown by the contracts called by the first. E.g.:\r\n\r\n```solidity\r\nerror customErrorA();\r\nerror customErrorB();\r\n\r\ncontract A {\r\n    function foo() {\r\n         revert customErrorA();\r\n    }\r\n\r\n    function callB(address _addressB) {\r\n         B(_addressB).bar()\r\n    }\r\n}\r\n\r\ncontract B {\r\n    function bar() {\r\n         revert customErrorB();\r\n    }\r\n}\r\n```\r\n \r\n## Motivation\r\n\r\nIf the custom error of the called contracts is included in the caller contract ABI, it is possible to catch the error type easier with the calls.\r\n\r\nNow I am dealing with it by defining a global error interface and inheriting it on the contracts:\r\n\r\n```solidity\r\ninterface Errors {\r\n   error customErrorA();\r\n   error customErrorB();\r\n}\r\n\r\ncontract A is Errors {\r\n    function foo() {\r\n         revert customErrorA();\r\n    }\r\n\r\n    function callB(address _addressB) {\r\n         B(_addressB).bar()\r\n    }\r\n}\r\n\r\ncontract B is Errors {\r\n    function bar() {\r\n         revert customErrorB();\r\n    }\r\n}\r\n```\r\n\r\n## Specification\r\n\r\nI would like to know if the solidity compiler already has another way to do that and add external possible custom errors on the ABIs. If not, are there plans to include this on the compiler? Has sense to include this capability on the compiler?\r\n\r\n## Backwards Compatibility\r\n\r\nIt is just including more error codes on the ABI, this would not affect any byte code.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13683/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13683/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

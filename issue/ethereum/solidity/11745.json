@@ -62,26 +62,45 @@
       "node_id": "LA_kwDOAm_5kc8AAAABCIjhTw",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20impact",
       "name": "medium impact",
-      "color": "314aff",
+      "color": "001dff",
       "default": false,
       "description": "Default level of impact"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 8,
+  "comments": 9,
   "created_at": "2021-08-04T17:15:22Z",
-  "updated_at": "2022-10-04T10:11:48Z",
-  "closed_at": null,
+  "updated_at": "2022-11-07T16:59:08Z",
+  "closed_at": "2022-11-07T16:59:08Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nAdd a way to define macros using `#define` within the source code to declare constants (numbers, strings, addresses, expressions, etc) and fragments of code:\r\n\r\n```c\r\n#define PI 3141592653589793238\r\n```\r\n\r\n## Motivation\r\n\r\nStoring values and performing computations in a smart contract costs gas (and thus money). However when comes the time to gas golf a contract, a dilemma can appear between optimizing the gas usage as much as possible or keeping the readability of the code.\r\n\r\n### Example 1\r\n\r\nThis simplistic example shows that using a direct numeric value for `PI` obviously consumes less gas than storing and reading its value from a constant variable. However too much optimization might impact both the maintainability and the readability of the code.\r\n\r\n> Case 1, using PI as a constant\r\n\r\n```solidity\r\ncontract PIExample {\r\n    uint256 public constant PI = 3141592653589793238;\r\n    uint256 public area;\r\n    uint256 public circumference;\r\n    \r\n    // 44,450 gas used\r\n    function setArea(uint256 r) external {\r\n        area = PI * r ** 2;\r\n    }\r\n    \r\n    // 44,210 gas used\r\n    function setCircumference(uint256 r) external {\r\n        circumference = 2 * PI * r;\r\n    }\r\n}\r\n```\r\n\r\n> Case 2, using PI value directly\r\n\r\n```solidity\r\ncontract PIExample {\r\n    uint256 public area;\r\n    uint256 public circumference;\r\n    \r\n    // 44,428 gas used\r\n    function setArea(uint256 r) external {\r\n        area = 3141592653589793238 * r ** 2;\r\n    }\r\n    \r\n    // 43,978 gas used\r\n    function setCircumference(uint256 r) external {\r\n        circumference = 2 * 3141592653589793238 * r;\r\n    }\r\n}\r\n```\r\n\r\nProgramming languages such as C allow developers to define macros within the source code. These macros can represent constants but also fragments of code that can receive arguments. These *defines* are preprocessed by the compiler before compiling the actual code.\r\n\r\nHaving this feature in Solidity would (in some cases) avoid the necessity to declare constant variables or private functions and then would reduce the gas cost while keeping the readability of the code.\r\n\r\nThe previous example could then be written as:\r\n\r\n```csharp\r\n#define PI 3141592653589793238\r\n\r\ncontract PIExample {\r\n    uint256 public area;\r\n    uint256 public circumference;\r\n    \r\n    function setArea(uint256 r) external {\r\n        area = PI * r ** 2;\r\n    }\r\n    \r\n    function setCircumference(uint256 r) external {\r\n        circumference = 2 * PI * r;\r\n    }\r\n}\r\n```\r\n\r\n### Example 2\r\n\r\nThis other example compares 3 different cases where two private functions and one constant are used. As expected, using directly the expressions or the values instead of their declarations will reduce the gas cost but also impact the maintainability and readability of the code.\r\n\r\n> Case 1: Private functions and PI constant\r\n\r\n```solidity\r\ncontract PIExample {\r\n    uint256 public constant PI = 3141592653589793238;\r\n    uint256 public area;\r\n    uint256 public circumference;\r\n    \r\n    function calculateArea(uint256 r) private pure returns (uint256) {\r\n        return PI * r ** 2;\r\n    }\r\n    \r\n    function calculateCircumference(uint256 r) private pure returns (uint256) {\r\n        return 2 * PI * r;\r\n    }\r\n    \r\n    // 44,493 gas used\r\n    function setArea(uint256 r) external {\r\n        area = calculateArea(r);\r\n    }\r\n    \r\n    // 44,253 gas used\r\n    function setCircumference(uint256 r) external {\r\n        circumference = calculateCircumference(r);\r\n    }\r\n}\r\n```\r\n\r\n> Case 2: No private functions, with PI constant\r\n\r\n```solidity\r\ncontract PIExample {\r\n    uint256 public constant PI = 3141592653589793238;\r\n    uint256 public area;\r\n    uint256 public circumference;\r\n    \r\n    // 44,450 gas used\r\n    function setArea(uint256 r) external {\r\n        area = PI * r ** 2;\r\n    }\r\n    \r\n    // 44,210 gas used\r\n    function setCircumference(uint256 r) external {\r\n        circumference = 2 * PI * r;\r\n    }\r\n}\r\n```\r\n\r\n> Case 3: No private functions, no PI constant\r\n\r\n```solidity\r\ncontract PIExample {\r\n    uint256 public area;\r\n    uint256 public circumference;\r\n    \r\n    // 44,428 gas used\r\n    function setArea(uint256 r) external {\r\n        area = 3141592653589793238 * r ** 2;\r\n    }\r\n    \r\n    // 43,978 gas used\r\n    function setCircumference(uint256 r) external {\r\n        circumference = 2 * 3141592653589793238 * r;\r\n    }\r\n}\r\n```\r\n\r\nUsing `#define`, the previous example could be written as:\r\n\r\n```csharp\r\n#define PI 3141592653589793238\r\n#define calculateArea(r) (PI * r * r)\r\n#define calculateCircumference(r) (2 * PI * R)\r\n\r\ncontract PIExample {\r\n    uint256 public area;\r\n    uint256 public circumference;\r\n    \r\n    // 44,428 gas used\r\n    function setArea(uint256 r) external {\r\n        area = calculateArea(r);\r\n    }\r\n    \r\n    // 43,978 gas used\r\n    function setCircumference(uint256 r) external {\r\n        circumference = calculateCircumference(r);\r\n    }\r\n    \r\n    /**\r\n     * Now calculateArea(r) and calculateCircumference(r) can be reused\r\n     * multiple times in different functions with no additional gas cost\r\n     */\r\n}\r\n```\r\n\r\nObviously these 2 examples are depicting very basic use cases of the `#define` macro, and even if the improvement of both the gas cost and the readability might not be obviously here, the impact on large-scale projects might be significant.\r\n\r\nAdditionally, these macros could also be used to:\r\n- Reduce the storage of some math libraries by replacing constant variables\r\n- Reduce the gas cost of large projects by replacing private functions\r\n- Etc\r\n\r\n*Note: A suggested way to achieve this feature without modifying the Solidity language was to use an external preprocessing tool, such as [hardhat-preprocessor](https://hardhat.org/plugins/hardhat-preprocessor.html). However, relying on an external tool is not an option since it would result in writing non-standard Solidity code and would break the compatibility with many tools.*\r\n\r\n## Specification\r\n\r\nThe specification of the `#define` macro would be very similar to the one used in the C programming language.\r\n\r\n### Simple macro\r\n\r\nA simple macro is a fragment of code defined by a name using `#define`:\r\n\r\n```c\r\n#define PI 31415\r\n#define SOME_ADDRESS 0x012345...\r\n```\r\n\r\nEvery time the compiler would encounter `PI` in the code, it would replace it by `31415`, etc.\r\n\r\n### Function-like macro\r\n\r\nMore complex macros could be defined too: function-like macros. These special macros would work like a function call and would accept arguments.\r\n\r\n```c\r\n#define PI 31415\r\n#define circleArea(r) (PI * r * r)\r\n#define max(a, b) (a < b) ? b : a\r\n```\r\n\r\nThe compiler would then replace `circleArea(r)` by `(31415 * r * r)`, etc.\r\n\r\n### Multiline macro\r\n\r\nMacros could also be defined on multiple lines, such as:\r\n\r\n```c\r\n#define PI\\\r\n        3141592653589793238\r\n```\r\n\r\n### Inheritance\r\n\r\nMacros should be available in the child contracts.\r\n\r\n## Backwards Compatibility\r\n\r\nThe addition of this feature would not impact the compatibility with previous Solidity version.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/11745/reactions",
     "total_count": 6,
@@ -96,7 +115,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/11745/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -439,6 +458,50 @@
     "body": "I'm also in need of this;\r\n`function x() testPublicOrExternal`\r\nWhere I can set a define testPublicOrExternal to `external` if it's production and `public` if it's a test. ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1006811106/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1305908864",
+    "html_url": "https://github.com/ethereum/solidity/issues/11745#issuecomment-1305908864",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/11745",
+    "id": 1305908864,
+    "node_id": "IC_kwDOAm_5kc5N1paA",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-07T16:59:08Z",
+    "updated_at": "2022-11-07T16:59:08Z",
+    "author_association": "MEMBER",
+    "body": "Closing this both as a duplicate of the already mentioned issues and as well as a feature we will most likely not implement (superior solutions like proper compile-time-constant expression evaluation are in our pipeline).",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1305908864/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
