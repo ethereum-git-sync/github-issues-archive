@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26236",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26236/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26236/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26236/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/26236",
+  "id": 1460472895,
+  "node_id": "I_kwDOAOvK985XDQw_",
+  "number": 26236,
+  "title": "Cannot parse post-EIP-2718 unsigned payloads cleanly",
+  "user": {
+    "login": "ArnaudBrousseau",
+    "id": 208469,
+    "node_id": "MDQ6VXNlcjIwODQ2OQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/208469?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ArnaudBrousseau",
+    "html_url": "https://github.com/ArnaudBrousseau",
+    "followers_url": "https://api.github.com/users/ArnaudBrousseau/followers",
+    "following_url": "https://api.github.com/users/ArnaudBrousseau/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ArnaudBrousseau/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ArnaudBrousseau/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ArnaudBrousseau/subscriptions",
+    "organizations_url": "https://api.github.com/users/ArnaudBrousseau/orgs",
+    "repos_url": "https://api.github.com/users/ArnaudBrousseau/repos",
+    "events_url": "https://api.github.com/users/ArnaudBrousseau/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ArnaudBrousseau/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-22T19:57:42Z",
+  "updated_at": "2022-11-22T20:00:17Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Context\r\nRemote signers need to be able to parse an unsigned payload before signing it. This is needed to display information about the to-be-signed transaction, such that humans (or machines) have the ability to validate a payload (amount, destination, data, gas parameters) before it gets signed.\r\n\r\n### Problem with EIP-2718 unsigned payload parsing\r\nUnsigned payloads should be able to be parsed without issues. Here's a failing test to show what I mean:\r\n```golang\r\nfunc TestRemoteSignerParsing(t *testing.T) {\r\n\ttxToSign := NewTx(&DynamicFeeTx{\r\n\t\tChainID:   big.NewInt(1),\r\n\t\tNonce:     0,\r\n\t\tGasTipCap: big.NewInt(100),\r\n\t\tGasFeeCap: big.NewInt(100),\r\n\t\tGas:       100,\r\n\t\tTo:        nil,\r\n\t\tValue:     big.NewInt(100),\r\n\t})\r\n\r\n\t// Note: this \"message to sign\" should be obtainable programmatically, but\r\n\t// this is a separate (although, related!) issue.\r\n\t// See https://github.com/ethereum/go-ethereum/issues/26199#issuecomment-1318777575\r\n\tunsignedTxBytes, err := hex.DecodeString(\"02c90180646464806480c0\")\r\n\tassert.Nil(t, err)\r\n\r\n\t// Prove that `unsignedTxBytes` above is indeed the pre-image of the signer hash\r\n\t// (in other words: I'm not cheating, `unsignedTxBytes` is a realistic value!)\r\n\tsigner := LatestSignerForChainID(txToSign.ChainId())\r\n\tassert.Equal(t, crypto.Keccak256(unsignedTxBytes), signer.Hash(txToSign).Bytes())\r\n\r\n\t// Now that we've established that \"02c90180646464806480c0\" is a valid unsigned payload,\r\n\t// let's try to parse it.\r\n\ttx := new(Transaction)\r\n\terr = tx.UnmarshalBinary(unsignedTxBytes)\r\n\r\n\tassert.Nil(t, err)\r\n}\r\n```\r\n\r\nThe above test fails with:\r\n```\r\nExpected nil, but got: &rlp.decodeError{msg:\"too few elements\", typ:(*reflect.rtype)(0x104778c20), ctx:[]string(nil)}\r\n```\r\nThat's because [`DynamicFeeTx`](https://github.com/ethereum/go-ethereum/blob/64dccf7aa411c5c7cd36090c3d9b9892945ae813/core/types/tx_dynamic_fee.go#L36-L39) has `R`, `S`, and `V` fields. Unsigned payloads, by definition, do not have a signature attached to them. Hence the mismatch (unsigned payload is \"missing\" 3 fields)\r\n\r\n### Workaround\r\nThe best I can come up with is copy/paste-based: below I'm declaring `DynamicFeeTxWithoutSignature` and `AccessListTxWithoutSignature` (straight up copies of `DynamicFeeTx` and `AccessListTx`, minus R/S/V) for the sole purpose of unmarshalling unsigned payloads. Here's what this looks like in practice:\r\n```golang\r\ntype DynamicFeeTxWithoutSignature struct {\r\n\tChainID    *big.Int\r\n\tNonce      uint64\r\n\tGasTipCap  *big.Int // a.k.a. maxPriorityFeePerGas\r\n\tGasFeeCap  *big.Int // a.k.a. maxFeePerGas\r\n\tGas        uint64\r\n\tTo         *common.Address `rlp:\"nil\"` // nil means contract creation\r\n\tValue      *big.Int\r\n\tData       []byte\r\n\tAccessList types.AccessList\r\n}\r\n\r\ntype AccessListTxWithoutSignature struct {\r\n\tChainID    *big.Int             // destination chain ID\r\n\tNonce      uint64               // nonce of sender account\r\n\tGasPrice   *big.Int             // wei per gas\r\n\tGas        uint64               // gas limit\r\n\tTo         *common.Address  `rlp:\"nil\"` // nil means contract creation\r\n\tValue      *big.Int             // wei amount\r\n\tData       []byte               // contract invocation input data\r\n\tAccessList types.AccessList // EIP-2930 access list\r\n}\r\n\r\nfunc DecodeUnsignedPayload(msg []byte) (types.TxData, error) {\r\n\tif len(msg) <= 1 {\r\n\t\treturn nil, fmt.Errorf(\"found less than 1 byte in %v\", msg)\r\n\t}\r\n\tswitch msg[0] {\r\n\tcase types.AccessListTxType:\r\n\t\tvar res AccessListTxWithoutSignature\r\n\t\terr := rlp.DecodeBytes(msg[1:], &res)\r\n\t\treturn &types.AccessListTx{\r\n\t\t\tChainID:    res.ChainID,\r\n\t\t\tNonce:      res.Nonce,\r\n\t\t\tGasPrice:   res.GasPrice,\r\n\t\t\tGas:        res.Gas,\r\n\t\t\tTo:         res.To,\r\n\t\t\tValue:      res.Value,\r\n\t\t\tData:       res.Data,\r\n\t\t\tAccessList: res.AccessList,\r\n\t\t}, err\r\n\tcase types.DynamicFeeTxType:\r\n\t\tvar res DynamicFeeTxWithoutSignature\r\n\t\terr := rlp.DecodeBytes(msg[1:], &res)\r\n\t\treturn &types.DynamicFeeTx{\r\n\t\t\tChainID:    res.ChainID,\r\n\t\t\tNonce:      res.Nonce,\r\n\t\t\tGasTipCap:  res.GasTipCap,\r\n\t\t\tGasFeeCap:  res.GasFeeCap,\r\n\t\t\tGas:        res.Gas,\r\n\t\t\tTo:         res.To,\r\n\t\t\tValue:      res.Value,\r\n\t\t\tData:       res.Data,\r\n\t\t\tAccessList: res.AccessList,\r\n\t\t}, err\r\n\tdefault:\r\n\t\treturn nil, return nil, fmt.Errorf(\"unsupported transaction type: %v\", msg[0])\r\n\t}\r\n}\r\n```\r\nThis \"works\", but is brittle. Is there way to do this more elegantly? It seems to me `R`, `S`, `V` should all be nullable/optional, but I'm curious to hear how you're thinking about this.\r\n\r\n### What about Legacy transactions? Why isn't it a problem for those?\r\nGlad you ask. This isn't a problem for legacy transactions because [EIP-155](https://eips.ethereum.org/EIPS/eip-155) dictates that R/S/V should be part of the message signed. For example, the following test succeeds:\r\n```golang\r\nfunc TestRemoteSignerLegacyParsing(t *testing.T) {\r\n\t// `unsignedTxBytes` maps to the following transaction\r\n\t// tx := NewTx(&LegacyTx{\r\n\t// \tNonce:    0,\r\n\t// \tGasPrice: big.NewInt(100),\r\n\t// \tGas:      100,\r\n\t// \tTo:       nil,\r\n\t// \tValue:    big.NewInt(100),\r\n\t// })\r\n\tunsignedTxBytes, err := hex.DecodeString(\"c9806464806480018080\")\r\n\tassert.Nil(t, err)\r\n\r\n\ttx := new(Transaction)\r\n\terr = tx.UnmarshalBinary(unsignedTxBytes)\r\n\r\n\tassert.Nil(t, err)\r\n}\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26236/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 1
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26236/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
