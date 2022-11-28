@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13750",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13750/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13750/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13750/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13750",
+  "id": 1466260916,
+  "node_id": "I_kwDOAm_5kc5XZV20",
+  "number": 13750,
+  "title": "Special optimizer rules for boolean context",
+  "user": {
+    "login": "chriseth",
+    "id": 9073706,
+    "node_id": "MDQ6VXNlcjkwNzM3MDY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9073706?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chriseth",
+    "html_url": "https://github.com/chriseth",
+    "followers_url": "https://api.github.com/users/chriseth/followers",
+    "following_url": "https://api.github.com/users/chriseth/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chriseth/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chriseth/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chriseth/subscriptions",
+    "organizations_url": "https://api.github.com/users/chriseth/orgs",
+    "repos_url": "https://api.github.com/users/chriseth/repos",
+    "events_url": "https://api.github.com/users/chriseth/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chriseth/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1282209978,
+      "node_id": "MDU6TGFiZWwxMjgyMjA5OTc4",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/optimizer",
+      "name": "optimizer",
+      "color": "d4c5f9",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-28T11:29:22Z",
+  "updated_at": "2022-11-28T11:29:40Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "As suggested by @k06a in https://github.com/ethereum/solidity/issues/13713#issuecomment-1327891344 , we should have a flag for rules in RuleList.h that states that they are used in a \"boolean\" context.\r\n\r\nThe problem is that the RuleList is generic. We cannot do the replacement `iszero(iszero(x)) -> x` (because those expressions are not identical), even though it would be valid in the context if `if iszero(iszero(x)) { ... }`.\r\n\r\nSimilar rules are `iszero(eq(x, y))`, which can be replaced by `sub(x, y)` if we are in a \"boolean context\".\r\n\r\nWhat is a \"boolean context\":\r\n\r\nAn expression is in a \"boolean context\" if program semantics are only changed if the value of the expression changes between zero and nonzero. Any change inside the nonzero subset keeps the semantics.\r\n\r\nExamples of boolean context:\r\n\r\n`iszero(X)` - X is in boolean context\r\n`if X { ... }` - X is in boolean context\r\n`for {} X {} { ... }` - X is in boolean context\r\n\r\nImplementation notes:\r\n\r\n\r\n- SimplificationRules::findFirstMatch should obtain a flag to indicate that it only matches in a boolean context\r\n- It should search a seperate list of rules that only apply in boolean context if that flag is true\r\n- ExpressionSimplifier needs to track if we are inside a boolean context - this applies both to `if` as well as builtin calls\r\n\r\nPotential complication:\r\n\r\nThe code is usually in split form, i.e.\r\n```\r\nlet x := eq(a, b)\r\nif x { ... }\r\nsstore(0, x)\r\n```\r\nWe have to take care that the replacement is only done on the `if` statement, but not inside the sstore call.\r\n\r\n\r\nNB: Some of these replacements are currently implemented in the peephole optimizer because it can \"see\" a `jumpi`.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13750/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13750/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
