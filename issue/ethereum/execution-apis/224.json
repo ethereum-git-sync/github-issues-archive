@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/execution-apis/issues/224",
+  "repository_url": "https://api.github.com/repos/ethereum/execution-apis",
+  "labels_url": "https://api.github.com/repos/ethereum/execution-apis/issues/224/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/execution-apis/issues/224/comments",
+  "events_url": "https://api.github.com/repos/ethereum/execution-apis/issues/224/events",
+  "html_url": "https://github.com/ethereum/execution-apis/issues/224",
+  "id": 1236940733,
+  "node_id": "I_kwDOFoG9Gs5Juje9",
+  "number": 224,
+  "title": "Add eth_signMessage method",
+  "user": {
+    "login": "pedrouid",
+    "id": 10136079,
+    "node_id": "MDQ6VXNlcjEwMTM2MDc5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10136079?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pedrouid",
+    "html_url": "https://github.com/pedrouid",
+    "followers_url": "https://api.github.com/users/pedrouid/followers",
+    "following_url": "https://api.github.com/users/pedrouid/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pedrouid/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pedrouid/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pedrouid/subscriptions",
+    "organizations_url": "https://api.github.com/users/pedrouid/orgs",
+    "repos_url": "https://api.github.com/users/pedrouid/repos",
+    "events_url": "https://api.github.com/users/pedrouid/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pedrouid/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3209172260,
+      "node_id": "MDU6TGFiZWwzMjA5MTcyMjYw",
+      "url": "https://api.github.com/repos/ethereum/execution-apis/labels/A-spec",
+      "name": "A-spec",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Area: specification"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-05-16T10:24:11Z",
+  "updated_at": "2022-06-26T16:48:14Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "This issue is a predecessor to [EIP-3361](https://github.com/ethereum/EIPs/pull/3361) which is now more relevant in this repository\r\n\r\nThis proposal adds a new method `eth_signMessage` to address the fragmentation of the plaintext message signing methods currently used by Wallets in production. \r\n\r\nWhile `eth_sign` was intended to be prefixed there was misunderstanding on the implementation that left unprefixed. This then lead to the introduction for a fix that was addressed with a new method in Geth called `personal_sign` which was part of a set of special methods prefixed with `personal_`. Yet these methods were not part of Ethereum's execution APIs neither were formally specified anywhere\r\n\r\nMetaMask needed to push forward for this fix hence popularized the use of `personal_sign` to prevent unprefixed signing with `eth_sign` but to maintain backwards-compatibility it still allowed dapps to request it. The fragmentation further worsened once some new wallets start implementing `eth_sign` prefixed as the new spec was described and more documentation was written about it.\r\n\r\nToday we have many applications relying on plaintext message signing either through `eth_sign` and/or `personal_sign` and this includes some very popular EIPs such as Sign-in-with-Ethereum (EIP-4361) which defines strict parameters for authenticated a user with a plaintext message.\r\n\r\nThis proposal aims to maintain backwards-compatibility while reducing the fragmentation of different behaviors for very similar methods. Additionally we must specify `personal_sign` behavior within the execution APIs for Ethereum with appropriate order of parameters and prefix.\r\n\r\nCurrently we have the following signing methods:\r\n* eth_sign / unprefixed / params = [address, data] \r\n* personal_sign / prefixed / params = [data, address]\r\n* eth_signTypedData / prefixed / params = [address, data]\r\n\r\nWith my proposal we simply rename personal_sign and reorder params:\r\n* eth_sign / unprefixed / params = [address, data] \r\n* eth_signMessage / prefixed / params = [address, data]\r\n* eth_signTypedData / prefixed / params = [address, data]\r\n\r\nIt would be a simple change that would make newer and older implementations satisfied without breaking APIs and finding consensus over using a single method",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/execution-apis/issues/224/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/execution-apis/issues/224/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

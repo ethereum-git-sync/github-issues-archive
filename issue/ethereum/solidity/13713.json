@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 7,
   "created_at": "2022-11-17T10:51:05Z",
-  "updated_at": "2022-11-28T11:30:10Z",
-  "closed_at": null,
+  "updated_at": "2022-11-29T17:43:13Z",
+  "closed_at": "2022-11-29T17:43:12Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "We noticed that some calldata access cost hundreds of gas for almost no reason.\r\n\r\nFor example following 2 examples have 150 gas difference in cost:\r\n```solidity\r\nstruct Thing {\r\n    uint256 a;\r\n    address b;\r\n    uint256 c;\r\n}\r\n\r\nfunction getB(Thing calldata thing) external view returns(address) {\r\n    return thing.b;\r\n}\r\n```\r\n\r\n```solidity\r\nstruct Thing {\r\n    uint256 a;\r\n    uint256 b; // <= important\r\n    uint256 c;\r\n}\r\n\r\nfunction getB(Thing calldata thing) external view returns(address) {\r\n    return address(uint160(thing.b)); // 150 gas cheaper\r\n}\r\n```\r\n\r\n## Motivation\r\n\r\nThis would dramatically decrease cost of the transactions. If some calldata expected to be `address`, let's read those 20 bytes and **ignore** 12 high bytes, not **check it and maybe revert**.\r\n\r\n## Specification\r\n\r\nI am not sure Solidity compiler put so many checks of calldata size and check high bits are zeroed. I would expect this access to `thing.b` be compiled into the following assembly:\r\n```solidity\r\nshr(96, calldataload(48))\r\n```\r\n\r\nThis would make sure top bits are zeroed and will cost almost nothing.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13713/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13713/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -316,6 +335,50 @@
     "body": "The first focus for Solidity is correctness, gas is always second. If an address is encoded with higher order bits set, it is not an address, and that is what we are checking. People assume that the higher order bits are zero, not that they are ignored. You can for example use the hash of a set of arguments to a function to see if the function has already been called that way (for example if a voucher + address combination has already been used to claim something). If the compiler would just mask away the higher order bits, you could fool this mechanism.\r\n\r\nWe introduced user defined value types specifically to allow users to break out of these checks. The reasoning behind is that if you change the name of the type to explicitly state that the address is unchecked, it is visible to the user and auditor. I really like the example above, I would just not call the type `Address` but something like `SloppyAddress`. The same goes for overflow checks: With the hopefully soon available user defined operators, you can define your own integer type that has wrapping behaviour with arithmetic.\r\n\r\nConcerning the optimizer: `iszero(eq(x, y))` is already optimized in the peephole optimizer, but it might be a good idea to introduce a flag for rules in RuleList.h that state that the rule can only be applied if the result is treated by something like `if` or `iszero`. New issue: https://github.com/ethereum/solidity/issues/13750\r\nThanks for the suggestion!",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1328924566/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331036641",
+    "html_url": "https://github.com/ethereum/solidity/issues/13713#issuecomment-1331036641",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13713",
+    "id": 1331036641,
+    "node_id": "IC_kwDOAm_5kc5PVgHh",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-29T17:43:12Z",
+    "updated_at": "2022-11-29T17:43:12Z",
+    "author_association": "MEMBER",
+    "body": "@k06a I take it that the comments above explains the fact that the behaviour is very much intentional?\r\n\r\nIndependently of that, FYI, we're trying to move towards reserving github issues mainly for concrete discussions of implementations, resp. of items we have scheduled for implementation, while we'll be trying to move most discussion to the [Solidity forum](https://forum.soliditylang.org/).\r\n\r\nIn any case, I'm closing the issue given the explanations above - if you want to discuss this further, though, feel free to comment, reopen, or open a post in the forum.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331036641/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

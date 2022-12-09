@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/tests/issues/1094",
+  "repository_url": "https://api.github.com/repos/ethereum/tests",
+  "labels_url": "https://api.github.com/repos/ethereum/tests/issues/1094/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/tests/issues/1094/comments",
+  "events_url": "https://api.github.com/repos/ethereum/tests/issues/1094/events",
+  "html_url": "https://github.com/ethereum/tests/issues/1094",
+  "id": 1444371279,
+  "node_id": "I_kwDOAO0i585WF1tP",
+  "number": 1094,
+  "title": "EIP-4750 test vectors",
+  "user": {
+    "login": "gumb0",
+    "id": 1863135,
+    "node_id": "MDQ6VXNlcjE4NjMxMzU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1863135?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gumb0",
+    "html_url": "https://github.com/gumb0",
+    "followers_url": "https://api.github.com/users/gumb0/followers",
+    "following_url": "https://api.github.com/users/gumb0/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gumb0/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gumb0/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gumb0/subscriptions",
+    "organizations_url": "https://api.github.com/users/gumb0/orgs",
+    "repos_url": "https://api.github.com/users/gumb0/repos",
+    "events_url": "https://api.github.com/users/gumb0/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gumb0/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-10T18:24:38Z",
+  "updated_at": "2022-11-10T19:03:59Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Test vectors extracted from [evmone implementation](https://github.com/ethereum/evmone/pull/497/files#diff-f3435433f73536d1892709b197a467bd24dbe248ff8cda5ed0aedc69bd814145) unit tests.\r\n\r\n\r\n### EOF validation\r\n\r\n#### Valid cases\r\n\r\n| Bytecode                                           | Comment                                 |\r\n|----------------------------------------------------|--------------------------------------------------|\r\n| `EF0001 010001 00 FE`                                               | implicit type section, no data section                                 |\r\n| `EF0001 010001 020001 00 FE DA`                                               | implicit type section, data section                                 |\r\n| `EF0001 030002 01000100 0000 FE`                                               | type section, no data section                                 |\r\n| `EF0001 030002 010001 020001 00 0000 FE DA`                                               | type section, data section                                 |\r\n| `EF0001 030004 010001 010001 00 00000000 FE FE`                                               | multiple code sections, no data section                                |\r\n| `EF0001 030004 010001 010001 020001 00 00000000 FE FE DA`                                               | multiple code sections, data section                               |\r\n| `EF0001 030008 010001 010002 010002 010002 00 0000010000010203 FE 5000 3000 8000`                                               | non-void input and output types                              |\r\n|`ef000101000100fc`| RETF is terminating instruction |\r\n| `\"EF0001 030800\" + 1024 * \"010001\" + \"00\" + 1024 * \"0000\" + 1024 * \"FE\"`                                               | max number of code sections                              |\r\n\r\n#### Invalid cases\r\n\r\n| Bytecode                                           | Validation error                                 |\r\n|----------------------------------------------------|--------------------------------------------------|\r\n| `EF0001 040001 00 FE`                                               | unknown_section_id                            |\r\n| `EF0001 010001 010001 00 FE FE`                                               | mandatory_type_section_missing                            |\r\n| `EF0001 030002 030002 010001 010001 00 0000 0000 FE FE`                                               | multiple_type_sections                         |\r\n| `EF0001 030002 010001 010001 030002 00 0000 FE FE 0000`                                               | multiple_type_sections                            |\r\n| `EF0001 010001 030002 00 FE 0000`                                               | code_section_before_type_section                            |\r\n| `EF0001 010001 030002 010001 00 FE 0000 FE`                                               | code_section_before_type_section                            |\r\n| `EF0001 010001 030002 020003 00 FE 0000 AABBCC`                                               | code_section_before_type_section                          |\r\n| `EF0001 010001 020003 030002 00 FE AABBCC 0000`                                               | code_section_before_type_section                         |\r\n| `EF0001 030001 010001 00 00 FE`                                               | invalid_type_section_size                          |\r\n| `EF00010004 010001 00 00000000 FE`                                               | invalid_type_section_size                          |\r\n| `EF0001 030004 010001 010001 010001 00 00000000 FE FE FE`                                               | invalid_type_section_size                          |\r\n| `EF0001 030008 010001 010001 010001 00 0000000000000000 FE FE FE`                                               | invalid_type_section_size                        \r\n| `EF0001 030002 010003 00 0001 60005C`                                               | invalid_first_section_type                        \r\n| `EF0001 030002 010002 00 0100 5000`                                               | invalid_first_section_type                        \r\n| `EF0001 030002 010003 00 0203 60005C`                                               | invalid_first_section_type                        \r\n| `\"EF0001 030801\" + 1025 * \"010001\" + \"00\" + 1025 * \"0000\" + 1025 * \"FE\"`                                               | too_many_code_sections                        \r\n\r\nTODO add truncated CALLF test\r\n\r\n### Execution\r\n\r\n| Bytecode                                           | Calldata | Result | Comment                                |\r\n|----------------------------------------------------|--------------------------------------------------|--|--|\r\n| `ef000103000401000f010002000000020160016008fb000160005260206000f303fc`  | | `0000000000000000000000000000000000000000000000000000000000000007` |  |\r\n| `ef000103000601003b01001701001d0000000101010160043560003560e01c63c766526781145d001c63c6c2ea1781145d00065050600080fd50fb000260005260206000f350fb000160005260206000f3600181115d0004506001fc60018103fb000181029050fc600281115d0004506001fc60028103fb000260018203fb0002019050fc`  | `c76652670000000000000000000000000000000000000000000000000000000000000005` | `0000000000000000000000000000000000000000000000000000000000000078` | Call `fac(5)` |\r\n| `ef000103000601003b01001701001d0000000101010160043560003560e01c63c766526781145d001c63c6c2ea1781145d00065050600080fd50fb000260005260206000f350fb000160005260206000f3600181115d0004506001fc60018103fb000181029050fc600281115d0004506001fc60028103fb000260018203fb0002019050fc`  |`c6c2ea17000000000000000000000000000000000000000000000000000000000000000f` | `0000000000000000000000000000000000000000000000000000000000000262` | Call `fib(15)` |\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/tests/issues/1094/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/tests/issues/1094/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

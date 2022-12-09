@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/1273",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/1273/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/1273/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/1273/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/1273",
+  "id": 358638517,
+  "node_id": "MDU6SXNzdWUzNTg2Mzg1MTc=",
+  "number": 1273,
+  "title": "Several decorators entirely destroy type support for the decorated functions",
+  "user": {
+    "login": "cburgdorf",
+    "id": 521109,
+    "node_id": "MDQ6VXNlcjUyMTEwOQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/521109?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cburgdorf",
+    "html_url": "https://github.com/cburgdorf",
+    "followers_url": "https://api.github.com/users/cburgdorf/followers",
+    "following_url": "https://api.github.com/users/cburgdorf/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cburgdorf/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cburgdorf/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cburgdorf/subscriptions",
+    "organizations_url": "https://api.github.com/users/cburgdorf/orgs",
+    "repos_url": "https://api.github.com/users/cburgdorf/repos",
+    "events_url": "https://api.github.com/users/cburgdorf/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cburgdorf/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 630871939,
+      "node_id": "MDU6TGFiZWw2MzA4NzE5Mzk=",
+      "url": "https://api.github.com/repos/ethereum/py-evm/labels/type:%20bug",
+      "name": "type: bug",
+      "color": "eeeeee",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 983628230,
+      "node_id": "MDU6TGFiZWw5ODM2MjgyMzA=",
+      "url": "https://api.github.com/repos/ethereum/py-evm/labels/prio:%20P3%20important",
+      "name": "prio: P3 important",
+      "color": "fad8c7",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2018-09-10T14:04:18Z",
+  "updated_at": "2018-09-10T14:04:18Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "\r\n### What is wrong?\r\n\r\nThis is somewhat related to #1272 but yet different enough to create a separate issue about it.\r\n\r\nThe revealed type of a function such as `LightPeerChain.get_block_header_by_hash` is currently `Any`. This means, we can call it as `LightPeerChain.get_block_header_by_hash('foobar`), `LightPeerChain.get_block_header_by_hash(1, 2, 3)` or in any other way without `mypy` noticing anything at all.\r\n\r\nLet's take a look at the function definiton.\r\n\r\n```python\r\n@alru_cache(maxsize=1024, cache_exceptions=False)\r\n@service_timeout(COMPLETION_TIMEOUT)\r\nasync def get_block_header_by_hash(self, block_hash: Hash32) -> BlockHeader:\r\n    ...\r\n```\r\n\r\nThere are several problems, one is further outlined in #1272. Let's remove the decorators and notice what `mypy` things about it then.\r\n\r\nTurns out, once we remove the decorators the revealed type becomes `def (self: trinity.sync.light.service.LightPeerChain, block_hash: Any) -> typing.Coroutine[Any, Any, eth.rlp.headers.BlockHeader]`\r\n\r\nThe problem here is that the decorators redefine the function without type information. This has already been [discussed here](https://github.com/ethereum/eth-utils/pull/88) once. \r\n\r\n### How can it be fixed\r\n\r\nDo one of the following things:\r\n\r\n- either create type stubs\r\n\r\nor \r\n\r\n- dive into [PEP561](https://www.python.org/dev/peps/pep-0561/) and  https://mypy.readthedocs.io/en/latest/installed_packages.html and see if we can get type safety for external libs without stubs by now.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/1273/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/1273/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

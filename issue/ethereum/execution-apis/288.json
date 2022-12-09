@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/execution-apis/issues/288",
+  "repository_url": "https://api.github.com/repos/ethereum/execution-apis",
+  "labels_url": "https://api.github.com/repos/ethereum/execution-apis/issues/288/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/execution-apis/issues/288/comments",
+  "events_url": "https://api.github.com/repos/ethereum/execution-apis/issues/288/events",
+  "html_url": "https://github.com/ethereum/execution-apis/issues/288",
+  "id": 1335413005,
+  "node_id": "I_kwDOFoG9Gs5PmMkN",
+  "number": 288,
+  "title": "Proposal: Error handling specification #2",
+  "user": {
+    "login": "JosephK95",
+    "id": 86999601,
+    "node_id": "MDQ6VXNlcjg2OTk5NjAx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/86999601?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JosephK95",
+    "html_url": "https://github.com/JosephK95",
+    "followers_url": "https://api.github.com/users/JosephK95/followers",
+    "following_url": "https://api.github.com/users/JosephK95/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JosephK95/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JosephK95/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JosephK95/subscriptions",
+    "organizations_url": "https://api.github.com/users/JosephK95/orgs",
+    "repos_url": "https://api.github.com/users/JosephK95/repos",
+    "events_url": "https://api.github.com/users/JosephK95/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JosephK95/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-08-11T03:04:38Z",
+  "updated_at": "2022-08-20T03:52:38Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hi all,\r\n\r\nI am working on a project that validates whether four Ethereum client implementations (Geth, Erigon, Nethermind, Besu) behave consistently to one another.\r\n\r\nAnd while doing the experiments, I found out that the clients handle error cases and uncle block arguments in very much different ways:\r\n\r\n----------------------------------------------------------------------------------\r\n\r\n1. Gas estimation: High max fee\r\n- (Geth, Erigon) returns an `Error`\r\n- (Nethermind, Besu) returns the estimated gas value\r\n\r\n2. Gas estimation: Priority fee > max fee\r\n- (Geth, Erigon) returns an `Error`\r\n- (Nethermind, Besu) returns the estimated gas value\r\n\r\n3. Gas estimation: Base fee > max fee\r\n- (Geth, Erigon) returns an `Error`\r\n- (Nethermind, Besu) returns the estimated gas value\r\n\r\n4. Gas estimation: Low gas limit \r\n- (Geth, Erigon, Besu) returns the estimated gas value\r\n- (Nethermind) returns an `Error`\r\n\r\n5. Gas estimation: High gas limit\r\n- (Geth, Nethermind, Besu) returns the estimated gas value\r\n- (Erigon) returns an `Error`\r\n \r\n6. Gas estimation: Invalid type\r\n- (Geth, Erigon, Besu) returns the estimated gas value\r\n- (Nethermind) returns an `Error`\r\n\r\n7. Gas estimation: Invalid nonce\r\n- (Geth, Erigon, Besu) returns the estimated gas value\r\n- (Nethermind) returns an `Error`\r\n\r\n8. Gas estimation: Insufficient funds\r\n- (Geth, Nethermind, Besu) returns the estimated gas value\r\n- (Erigon) returns an `Error`\r\n \r\n----------------------------------------------------------------------------------\r\n\r\n9. Call: Priority fee > max fee\r\n- (Geth, Erigon, Besu) returns an `Error`\r\n- (Nethermind) returns the execution result value\r\n\r\n10. Call: Base fee > max fee\r\n- (Geth, Erigon, Besu) returns an `Error`\r\n- (Nethermind) returns the execution result value\r\n\r\n11. Call: Low gas limit\r\n- (Geth, Besu) returns an `Error`\r\n- (Erigon, Nethermind) returns the execution result value\r\n\r\n12. Call: Invalid type\r\n- (Geth, Erigon, Besu) returns the execution result value\r\n- (Nethermind) returns an `Error`\r\n\r\n13. Call: Invalid nonce\r\n- (Geth, Erigon, Besu) returns the execution result value\r\n- (Nethermind) returns an `Error`\r\n\r\n----------------------------------------------------------------------------------\r\n\r\n14. Uncle block argument to `getBlock`\r\n- (Geth, Besu) returns an uncle block object\r\n- (Erigon) returns an `Error`\r\n- (Nethermind) returns `null`\r\n\r\n15. Uncle block argument to `getUncle`\r\n- (Geth, Besu) returns an uncle block object\r\n- (Erigon) returns `null`\r\n- (Nethermind) returns an `Error`\r\n\r\n16. Uncle block argument to `getTransactionFromBlock`\r\n- (Geth) returns `null`\r\n- (Erigon, Nethermind) returns an `Error`\r\n- (Besu) returns a transaction object\r\n\r\n17. Uncle block argument to `getBlockTransactionCount`\r\n- (Geth, Besu) returns the number of block transactions\r\n- (Erigon) returns `null`\r\n- (Nethermind) returns an `Error`\r\n\r\n18. Uncle block argument to `getBlockUncleCount`\r\n- (Geth, Besu) returns the number of uncle blocks\r\n- (Erigon) returns `null`\r\n- (Nethermind) returns an `Error`\r\n\r\nI assume these discrepancies derived from the lack of error and uncle handling specification in this document. So, how about specifying the expected results (e.g., Error, null, estimated gas, execution result, ...) so that different client implementations behave consistently in error cases and uncle block arguments as well?\r\n\r\nExample test cases can be found in the following link: [https://github.com/JosephK95/RPCTests](url)\r\n\r\nThanks and please let me know if there is anything I can help you with.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/execution-apis/issues/288/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/execution-apis/issues/288/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

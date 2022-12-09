@@ -38,32 +38,42 @@
       "color": "fef2c0",
       "default": false,
       "description": null
-    },
-    {
-      "id": 1132689577,
-      "node_id": "MDU6TGFiZWwxMTMyNjg5NTc3",
-      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/status:triage",
-      "name": "status:triage",
-      "color": "6be514",
-      "default": false,
-      "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 8,
   "created_at": "2022-11-07T13:59:23Z",
-  "updated_at": "2022-11-08T20:37:29Z",
-  "closed_at": null,
+  "updated_at": "2022-12-07T17:22:58Z",
+  "closed_at": "2022-12-07T17:22:58Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "I am running archive node and when I try to use python requests library (or `curl` from shell) I get `IncompleteRead` for some transactions\r\n\r\nrelevant python code:\r\n````\r\nheaders = {'accept': 'application/json', 'content-type': 'application/json'}\r\npayload = {\"jsonrpc\": \"2.0\", \"method\": \"debug_traceTransaction\",\r\n                           \"params\": [tx.hex()], \"id\": 83}\r\nresult = requests.post('http://127.0.0.1:10010', headers=headers, json=payload)\r\njson_output = result.json()\r\n\r\n````\r\nand the result:\r\n\r\n````\r\nTraceback (most recent call last):\r\n  File \"/usr/local/lib/python3.9/site-packages/urllib3/response.py\", line 443, in _error_catcher\r\n    yield\r\n  File \"/usr/local/lib/python3.9/site-packages/urllib3/response.py\", line 818, in read_chunked\r\n    chunk = self._handle_chunk(amt)\r\n  File \"/usr/local/lib/python3.9/site-packages/urllib3/response.py\", line 771, in _handle_chunk\r\n    returned_chunk = self._fp._safe_read(self.chunk_left)\r\n  File \"/usr/lib64/python3.9/http/client.py\", line 628, in _safe_read\r\n    raise IncompleteRead(b''.join(s), amt)\r\nhttp.client.IncompleteRead: IncompleteRead(6 bytes read, 2042 more expected)\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"/usr/local/lib/python3.9/site-packages/requests/models.py\", line 816, in generate\r\n    yield from self.raw.stream(chunk_size, decode_content=True)\r\n  File \"/usr/local/lib/python3.9/site-packages/urllib3/response.py\", line 623, in stream\r\n    for line in self.read_chunked(amt, decode_content=decode_content):\r\n  File \"/usr/local/lib/python3.9/site-packages/urllib3/response.py\", line 844, in read_chunked\r\n    self._original_response.close()\r\n  File \"/usr/lib64/python3.9/contextlib.py\", line 137, in __exit__\r\n    self.gen.throw(typ, value, traceback)\r\n  File \"/usr/local/lib/python3.9/site-packages/urllib3/response.py\", line 460, in _error_catcher\r\n    raise ProtocolError(\"Connection broken: %r\" % e, e)\r\nurllib3.exceptions.ProtocolError: ('Connection broken: IncompleteRead(6 bytes read, 2042 more expected)', IncompleteRead(6 bytes read, 2042 more expected))\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"/root/eth_tx_status/main.py\", line 66, in <module>\r\n    result = requests.post('http://127.0.0.1:10010', headers=headers, json=payload)\r\n  File \"/usr/local/lib/python3.9/site-packages/requests/api.py\", line 115, in post\r\n    return request(\"post\", url, data=data, json=json, **kwargs)\r\n  File \"/usr/local/lib/python3.9/site-packages/requests/api.py\", line 59, in request\r\n    return session.request(method=method, url=url, **kwargs)\r\n  File \"/usr/local/lib/python3.9/site-packages/requests/sessions.py\", line 587, in request\r\n    resp = self.send(prep, **send_kwargs)\r\n  File \"/usr/local/lib/python3.9/site-packages/requests/sessions.py\", line 745, in send\r\n    r.content\r\n  File \"/usr/local/lib/python3.9/site-packages/requests/models.py\", line 899, in content\r\n    self._content = b\"\".join(self.iter_content(CONTENT_CHUNK_SIZE)) or b\"\"\r\n  File \"/usr/local/lib/python3.9/site-packages/requests/models.py\", line 818, in generate\r\n    raise ChunkedEncodingError(e)\r\nrequests.exceptions.ChunkedEncodingError: ('Connection broken: IncompleteRead(6 bytes read, 2042 more expected)', IncompleteRead(6 bytes read, 2042 more expected))\r\n\r\n\r\n````\r\n\r\n\r\n\r\n### using curl:\r\n````\r\ncurl -H \"Content-Type: application/json\"--data '{\"jsonrpc\":\"2.0\",\"method\":\"debug_traceTransaction\",\"params\":[\"0xaa91b9638522c8a7686fc97ef4e5bec00b74b860a7e426825a49460ed025edab\"],\"id\":83}' --url 127.0.0.1:10010\r\n````\r\n\r\nand the result:\r\n\r\n````\r\n<ommiting part of the response>\r\n...\r\n:\"0000000000000000000000000000000000000000000000000000000000090009\",\"9cbd36e402b21614adfadf3a9bb80b88c8ea865f2a07128c87e2fbf4c217d49f\":\"0000000000000000000000000000000000000000000000000000000000090008\",\"9cbd36ecurl: (18) transfer closed with outstanding read data remaining\r\n````\r\n\r\n\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "s1na",
+    "id": 1591639,
+    "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/s1na",
+    "html_url": "https://github.com/s1na",
+    "followers_url": "https://api.github.com/users/s1na/followers",
+    "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+    "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+    "organizations_url": "https://api.github.com/users/s1na/orgs",
+    "repos_url": "https://api.github.com/users/s1na/repos",
+    "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/s1na/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26127/reactions",
     "total_count": 0,
@@ -78,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26127/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -377,6 +387,50 @@
     "body": "here is the size of the result file\r\n````\r\ndu /tmp/block_0xff47a556-0-0xaa91b963-680803741 \r\n127892  /tmp/block_0xff47a556-0-0xaa91b963-680803741\r\n````\r\n\r\nSince it hovers around 30s I assume that is the default timeout for the HTTP response.\r\nIs there a way to configure it?",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1307796492/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1341311907",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26127#issuecomment-1341311907",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26127",
+    "id": 1341311907,
+    "node_id": "IC_kwDOAOvK985P8suj",
+    "user": {
+      "login": "s1na",
+      "id": 1591639,
+      "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/s1na",
+      "html_url": "https://github.com/s1na",
+      "followers_url": "https://api.github.com/users/s1na/followers",
+      "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+      "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+      "organizations_url": "https://api.github.com/users/s1na/orgs",
+      "repos_url": "https://api.github.com/users/s1na/repos",
+      "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/s1na/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-12-07T17:22:58Z",
+    "updated_at": "2022-12-07T17:22:58Z",
+    "author_association": "MEMBER",
+    "body": "Fixed via #25457 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1341311907/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

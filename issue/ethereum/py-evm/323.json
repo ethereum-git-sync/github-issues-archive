@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/323",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/323/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/323/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/323/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/323",
+  "id": 292159393,
+  "node_id": "MDU6SXNzdWUyOTIxNTkzOTM=",
+  "number": 323,
+  "title": "Reordering imports causes error",
+  "user": {
+    "login": "lrettig",
+    "id": 3316532,
+    "node_id": "MDQ6VXNlcjMzMTY1MzI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3316532?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lrettig",
+    "html_url": "https://github.com/lrettig",
+    "followers_url": "https://api.github.com/users/lrettig/followers",
+    "following_url": "https://api.github.com/users/lrettig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lrettig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lrettig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lrettig/subscriptions",
+    "organizations_url": "https://api.github.com/users/lrettig/orgs",
+    "repos_url": "https://api.github.com/users/lrettig/repos",
+    "events_url": "https://api.github.com/users/lrettig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lrettig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2018-01-27T22:48:34Z",
+  "updated_at": "2018-03-27T21:59:39Z",
+  "closed_at": "2018-03-27T21:59:39Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "* py-evm Version: 0.2.0-alpha.8\r\n* OS: osx\r\n* Python Version (python --version): 3.6.2\r\n* Environment (output of `pip freeze`):\r\n```\r\naiohttp==2.3.1\r\napipkg==1.4\r\nasn1crypto==0.24.0\r\nasync-lru==0.1.0\r\nasync-timeout==2.0.0\r\nattrs==17.4.0\r\nbumpversion==0.5.3\r\ncffi==1.11.4\r\nchardet==3.0.4\r\ncoverage==4.4.2\r\ncryptography==2.1.4\r\ncytoolz==0.9.0\r\neth-bloom==0.5.2\r\neth-keys==0.1.0b3\r\neth-utils==0.7.4\r\nexecnet==1.5.0\r\nflake8==3.5.0\r\nhypothesis==3.30.0\r\nidna==2.6\r\nmccabe==0.6.1\r\nmultidict==4.0.0\r\npluggy==0.6.0\r\npy==1.5.2\r\npy-ecc==1.4.2\r\npycodestyle==2.3.1\r\npycparser==2.18\r\npyethash==0.1.27\r\npyflakes==1.6.0\r\npysha3==1.0.2\r\npytest==3.1.2\r\npytest-asyncio==0.8.0\r\npytest-cov==2.5.1\r\npytest-logging==2015.11.4\r\npytest-xdist==1.18.1\r\nrlp==0.4.7\r\nsix==1.11.0\r\ntoolz==0.9.0\r\ntox==2.7.0\r\ntrie==1.1.0\r\ntyping==3.6.2\r\nvirtualenv==15.1.0\r\nyarl==1.1.0\r\n```\r\n\r\n### What is wrong?\r\n\r\nFor some reason I don't understand, there's an error in the constants imports in [evm/chains/mainnet/__init__.py](https://github.com/ethereum/py-evm/blob/master/evm/chains/mainnet/__init__.py). It appeared with [this commit](https://github.com/lrettig/py-evm/commit/e1515b6b196a7fbdeb97657101a6eed62c1a1435) due to [this change](https://github.com/lrettig/py-evm/commit/64328ecd60a8f50e3ab706c254efd30d6fec3363#diff-2c154d088c2a7f106917603a2fb872a4) to `evm/chains/mainnet/constants.py`.\r\n\r\nYou can recreate the error as follows.\r\n\r\nCheck out [this commit](https://github.com/lrettig/py-evm/commit/64328ecd60a8f50e3ab706c254efd30d6fec3363#diff-2c154d088c2a7f106917603a2fb872a4) and run:\r\n\r\n```\r\n> python -c 'from evm import constants\r\n```\r\n\r\nIt runs without a problem.\r\n\r\nThen check out [this commit](https://github.com/lrettig/py-evm/commit/b6f251956105d97270afca462e1df98b2a6f4b7f) (which just changes the orders of the constants imports back to what they were before the fix) and you'll get an error:\r\n\r\n```\r\n> python -c 'from evm import constants'\r\nTraceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n  File \"evm/__init__.py\", line 13, in <module>\r\n    from evm.chains import (  # noqa: F401\r\n  File \"evm/chains/__init__.py\", line 6, in <module>\r\n    from .mainnet import (  # noqa: F401\r\n  File \"evm/chains/mainnet/__init__.py\", line 47, in <module>\r\n    mix_hash=constants.ZERO_HASH32,\r\nAttributeError: module 'evm.chains.mainnet.constants' has no attribute 'ZERO_HASH32'\r\n```\r\n\r\nThe culprit appears to be [these imports](https://github.com/ethereum/py-evm/blob/master/evm/chains/mainnet/__init__.py#L3-L9). For some reason, `from .constants import...` seems to define a module global `constants` pointing to the chain constants file.\r\n\r\nThis also caused a [test failure](https://travis-ci.org/ethereum/py-evm/jobs/333844158).\r\n\r\n### How can it be fixed\r\n\r\nSwapping the order of these imports (as [here](https://github.com/lrettig/py-evm/commit/b6f251956105d97270afca462e1df98b2a6f4b7f)) makes the error go away but we should understand what's causing it in the first place.\r\n",
+  "closed_by": {
+    "login": "pipermerriam",
+    "id": 824194,
+    "node_id": "MDQ6VXNlcjgyNDE5NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/824194?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pipermerriam",
+    "html_url": "https://github.com/pipermerriam",
+    "followers_url": "https://api.github.com/users/pipermerriam/followers",
+    "following_url": "https://api.github.com/users/pipermerriam/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pipermerriam/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pipermerriam/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pipermerriam/subscriptions",
+    "organizations_url": "https://api.github.com/users/pipermerriam/orgs",
+    "repos_url": "https://api.github.com/users/pipermerriam/repos",
+    "events_url": "https://api.github.com/users/pipermerriam/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pipermerriam/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/323/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/323/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

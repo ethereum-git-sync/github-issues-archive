@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/1929",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/1929/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/1929/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/1929/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/1929",
+  "id": 621144271,
+  "node_id": "MDU6SXNzdWU2MjExNDQyNzE=",
+  "number": 1929,
+  "title": "Test more header-gap-filling scenarios",
+  "user": {
+    "login": "carver",
+    "id": 205327,
+    "node_id": "MDQ6VXNlcjIwNTMyNw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/205327?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/carver",
+    "html_url": "https://github.com/carver",
+    "followers_url": "https://api.github.com/users/carver/followers",
+    "following_url": "https://api.github.com/users/carver/following{/other_user}",
+    "gists_url": "https://api.github.com/users/carver/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/carver/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/carver/subscriptions",
+    "organizations_url": "https://api.github.com/users/carver/orgs",
+    "repos_url": "https://api.github.com/users/carver/repos",
+    "events_url": "https://api.github.com/users/carver/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/carver/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-05-19T17:05:45Z",
+  "updated_at": "2020-05-29T16:51:04Z",
+  "closed_at": "2020-05-29T16:51:04Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "It's possible (likely?) that there are more broken scenarios, especially with multiple checkpoints. (Like #1928) See earlier conversation:\r\n\r\n> this _might_ be an interesting candidate for the [`hypothesis` machinery for testing state machines](https://hypothesis.readthedocs.io/en/latest/stateful.html)\r\n\r\nConsider an [interactive draw](https://hypothesis.readthedocs.io/en/latest/data.html#interactive-draw) too, like:\r\n\r\n```py\r\ndef test_always_canonicalized(data):\r\n    CHAIN_A, CHAIN_B = 0, 1\r\n    chain_length = 10\r\n    headers = [\r\n        # chain A: eventually canonical\r\n        mk_header_chain(genesis_header, length=chain_length),\r\n        # chain B: non-canonical\r\n        mk_header_chain(genesis_header, length=chain_length),\r\n    ]\r\n    missing_indices = [\r\n        set(range(chain_length)),  # chain A \r\n        set(range(chain_length)),  # chain B\r\n    ] \r\n    \r\n    @to_tuple \r\n    def get_valid_extensions(of_missing_indices):\r\n        for chain_index, header_indices in enumerate(of_missing_indices):\r\n            for header_index in header_indices: \r\n                if header_index == 0 or header_index - 1 not in header_indices: \r\n                    yield (chain_index, header_index) \r\n    \r\n    num_checkpoints = 0 \r\n\r\n    while len(missing_indices[CHAIN_A]):\r\n        action = data.draw(st.sample_from(ActionEnum))\r\n        if action == ActionEnum.CHECKPOINT:\r\n            # Will py-evm reject a checkpoint that already exists? Assuming so, we can\r\n            # just check the non-present ones...\r\n            checkpoint_index = data.draw(st.sample_from(missing_indices[CHAIN_A]))\r\n            checkpoint = headers[CHAIN_A][checkpoint_index]\r\n            checkpoint_score = get_score(genesis, headers[CHAIN_A][:checkpoint_index])\r\n            headerdb.persist_checkpoint_header(checkpoint, checkpoint_score) \r\n\r\n            # keep track of whether any checkpoints were added, so we eventually\r\n            # guarantee A as canonical\r\n            num_checkpoints += 1 \r\n             \r\n            missing_indices[CHAIN_A].discard(checkpoint_index)\r\n                 \r\n        elif action == ActionEnum.PERSIST_CHAIN:\r\n            # choose the series of headers to add \r\n            valid_extensions = get_valid_extensions(missing_indices) \r\n            chain_idx, next_chain_start = data.draw(st.sample_from(valid_extensions))\r\n            next_chain_len = data.draw(st.integers(min_value=1, max_value=chain_length))\r\n            chain_range_end = next_chain_start + next_chain_len\r\n            next_headers = headers[chain_idx][next_chain_start:chain_range_end]\r\n\r\n            # persist them to chain\r\n            headerdb.persist_header_chain(next_headers)\r\n\r\n            # mark persisted headers as not missing\r\n            for inserted_index in range(next_chain_start, chain_range_end):\r\n                missing_indices[chain_idx].discard(inserted_index)\r\n\r\n    if num_checkpoints == 0:\r\n        (subsequent_header, ) = mk_header_chain(headers[CHAIN_A][-1], length=1)\r\n        headerdb.persist_checkpoint_header(subsequent_header, get_score(...))\r\n\r\n    assert is_canonical_chain(headers[CHAIN_A])\r\n\r\n```\r\n\r\n_Originally posted by @carver in https://github.com/ethereum/py-evm/pull/1924#issuecomment-630465536_",
+  "closed_by": {
+    "login": "carver",
+    "id": 205327,
+    "node_id": "MDQ6VXNlcjIwNTMyNw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/205327?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/carver",
+    "html_url": "https://github.com/carver",
+    "followers_url": "https://api.github.com/users/carver/followers",
+    "following_url": "https://api.github.com/users/carver/following{/other_user}",
+    "gists_url": "https://api.github.com/users/carver/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/carver/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/carver/subscriptions",
+    "organizations_url": "https://api.github.com/users/carver/orgs",
+    "repos_url": "https://api.github.com/users/carver/repos",
+    "events_url": "https://api.github.com/users/carver/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/carver/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/1929/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/1929/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

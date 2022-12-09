@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/1925",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/1925/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/1925/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/1925/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/1925",
+  "id": 618012693,
+  "node_id": "MDU6SXNzdWU2MTgwMTI2OTM=",
+  "number": 1925,
+  "title": "Make sure `persist_block` persists transactions",
+  "user": {
+    "login": "cburgdorf",
+    "id": 521109,
+    "node_id": "MDQ6VXNlcjUyMTEwOQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/521109?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cburgdorf",
+    "html_url": "https://github.com/cburgdorf",
+    "followers_url": "https://api.github.com/users/cburgdorf/followers",
+    "following_url": "https://api.github.com/users/cburgdorf/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cburgdorf/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cburgdorf/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cburgdorf/subscriptions",
+    "organizations_url": "https://api.github.com/users/cburgdorf/orgs",
+    "repos_url": "https://api.github.com/users/cburgdorf/repos",
+    "events_url": "https://api.github.com/users/cburgdorf/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cburgdorf/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-05-14T08:00:38Z",
+  "updated_at": "2020-05-14T08:00:38Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "\r\n### What is wrong?\r\n\r\nOur current Py-EVM APIs aren't fully capable of backfilling blocks without executing them.\r\n\r\nCurrently `set_block_transactions`  is the place where we deal with RLP encoding transactions and storing them in the db.\r\n\r\nhttps://github.com/ethereum/py-evm/blob/6fef9c25eff570471d147a4f4a6d4eba00262f57/eth/vm/base.py#L315-L322\r\n\r\nBut this is only being done on the VM level during the execution of blocks. If all I want is to backfill ancient blocks (because we are beam syncing) then just calling something like `persist_block`  wouldn't do the trick when it comes to storing the actual transactions in the db. \r\n\r\n### How can it be fixed\r\n\r\nFrom @carver [via chat](https://gitter.im/ethereum/py-evm?at=5ebc6e388c044c19149be936)\r\n\r\nHm, yes, but that sounds like a bug in persist_block() to me. So I think that means we need:\r\n1) a test that after a persist_block(), it's possible to load a transaction body\r\n2) a test that after a persist_block(), it's possible to load a receipt body\r\n3) implement something like these lines in persist_block() https://github.com/ethereum/py-evm/blob/6fef9c25eff570471d147a4f4a6d4eba00262f57/eth/vm/base.py#L321-L325\r\n4) make sure the transaction root and receipt root in the built tries here ^ match the claimed roots in the header (before persisting them to disk)\r\nThis is definitely a place where I'd want to see the red tests from 1 and 2 before implementing 3 and 4",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/1925/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/1925/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

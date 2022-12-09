@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2022-11-23T13:49:18Z",
-  "updated_at": "2022-11-24T23:09:18Z",
-  "closed_at": null,
+  "updated_at": "2022-11-30T22:37:50Z",
+  "closed_at": "2022-11-30T22:37:49Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nAbigen version: `abigen version 1.11.0-unstable-ec2ec2d0-20221122`\r\nOS & Version: OSX 12.6.1\r\nCommit hash : `ec2ec2d0`\r\n\r\nRelated to (or at least similar symptoms of) this issue @MariusVanDerWijden solved previously: https://github.com/ethereum/go-ethereum/issues/22219\r\n\r\n#### Expected behaviour\r\n\r\nRan abigen on the Seaport 1.1 and got the following struct:\r\n```go\r\n// BasicOrderParameters is an auto generated low-level Go binding around an user-defined struct.\r\ntype BasicOrderParameters struct {\r\n\tConsiderationToken                common.Address\r\n\tConsiderationIdentifier           *big.Int\r\n\tConsiderationAmount               *big.Int\r\n\tOfferer                           common.Address\r\n\tZone                              common.Address\r\n\tOfferToken                        common.Address\r\n\tOfferIdentifier                   *big.Int\r\n\tOfferAmount                       *big.Int\r\n\tBasicOrderType                    uint8\r\n\tStartTime                         *big.Int\r\n\tEndTime                           *big.Int\r\n\tZoneHash                          [32]byte\r\n\tSalt                              *big.Int\r\n\tOffererConduitKey                 [32]byte\r\n\tFulfillerConduitKey               [32]byte\r\n\tTotalOriginalAdditionalRecipients *big.Int\r\n\tAdditionalRecipients              []AdditionalRecipient\r\n\tSignature                         []byte\r\n}\r\n```\r\n\r\nAttempting to unpack some calldata data into one of these structs with the following:\r\n\r\n```go\r\nfunc TestUnpack(t *testing.T) {\r\n\tinputHex := \"0xfb0f3ee1000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013fbe85edc900000000000000000000000000006669beff005f900e664de4189d5fde461d0a1cc0000000000000000000000000004c00500000ad104d7dbd00e3ae0a5c00560c000000000000000000000000003e6046b4d127179f0a421f3148b43cf52c08fc410000000000000000000000000000000000000000000000000000000000000f0e000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000063749e4d0000000000000000000000000000000000000000000000000000000063770ac60000000000000000000000000000000000000000000000000000000000000000360c6ebe00000000000000000000000000000000000000004b4c427b0b691c4c0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f00000000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f00000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000024000000000000000000000000000000000000000000000000000000000000002e000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000008e1bc9bf040000000000000000000000000000000a26b00c1f0df003000390027140000faa719000000000000000000000000000000000000000000000000001aa535d3d0c000000000000000000000000000c4ea960b4109f5fb976445038befb0215fa2b124000000000000000000000000000000000000000000000000000000000000004176c90cdb36e04b378e1130ec9f1226dde43439027a562279c4927f1a31bff5372faa27912eeb66ed51a82c564c81ed036b6ef3a02870eb18923788c32d943fa91c00000000000000000000000000000000000000000000000000000000000000360c6ebe\"\r\n\tcalldata, err := hex.DecodeString(inputHex[2:])\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"Failed to decode calldata hex: %v\", err)\r\n\t}\r\n\r\n\tseaportABI, err := seaport.SeaportMetaData.GetAbi()\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"Failed to get ABI: %v\", err)\r\n\t}\r\n\tmethod, err := seaportABI.MethodById(calldata[:4])\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"Failed to get method by ID: %v\", err)\r\n\t}\r\n\tout, err := method.Inputs.Unpack(calldata[4:])\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"Failed to unpack calldata: %v\", err)\r\n\t}\r\n\tif len(out) != 1 {\r\n\t\tt.Fatalf(\"Expected 1 unpacked arg, got %d\", len(out))\r\n\t}\r\n\tuntyped := out[0]\r\n\tt.Log(untyped.(seaport.BasicOrderParameters))\r\n}\r\n```\r\n\r\nI would expect it to be able to unpack into the struct that it generated using the abi (certainly possible i'm misusing the tooling here?)\r\n\r\n\r\n#### Actual behaviour\r\n\r\nInstead it panics and fails to convert the interface.\r\n\r\nError included further below, but pretty prints to a struct looking like this -- with `[32]uint8` instead of `[32]byte`:\r\n```go\r\ntype UnpackedBasicOrderParameters struct {\r\n\tConsiderationToken                common.Address `json:\"considerationToken\"`\r\n\tConsiderationIdentifier           *big.Int       `json:\"considerationIdentifier\"`\r\n\tConsiderationAmount               *big.Int       `json:\"considerationAmount\"`\r\n\tOfferer                           common.Address `json:\"offerer\"`\r\n\tZone                              common.Address `json:\"zone\"`\r\n\tOfferToken                        common.Address `json:\"offerToken\"`\r\n\tOfferIdentifier                   *big.Int       `json:\"offerIdentifier\"`\r\n\tOfferAmount                       *big.Int       `json:\"offerAmount\"`\r\n\tBasicOrderType                    uint8          `json:\"basicOrderType\"`\r\n\tStartTime                         *big.Int       `json:\"startTime\"`\r\n\tEndTime                           *big.Int       `json:\"endTime\"`\r\n\tZoneHash                          [32]uint8      `json:\"zoneHash\"`\r\n\tSalt                              *big.Int       `json:\"salt\"`\r\n\tOffererConduitKey                 [32]uint8      `json:\"offererConduitKey\"`\r\n\tFulfillerConduitKey               [32]uint8      `json:\"fulfillerConduitKey\"`\r\n\tTotalOriginalAdditionalRecipients *big.Int       `json:\"totalOriginalAdditionalRecipients\"`\r\n\tAdditionalRecipients              []struct {\r\n\t\tAmount    *big.Int       `json:\"amount\"`\r\n\t\tRecipient common.Address `json:\"recipient\"`\r\n\t} `json:\"additionalRecipients\"`\r\n\tSignature []uint8 `json:\"signature\"`\r\n}\r\n```\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nGenerate bindings for [Seaport 1.1](https://etherscan.io/address/0x00000000006c3852cbef3e08e8df289169ede581#code)\r\n\r\nRun the above test case or similar\r\n\r\n\r\n#### Backtrace\r\n\r\n````\r\npanic: interface conversion: interface {} is struct { ConsiderationToken common.Address \"json:\\\"considerationToken\\\"\"; ConsiderationIdentifier *big.Int \"json:\\\"considerationIdentifier\\\"\"; ConsiderationAmount *big.Int \"json:\\\"considerationAmount\\\"\"; Offerer common.Address \"json:\\\"offerer\\\"\"; Zone common.Address \"json:\\\"zone\\\"\"; OfferToken common.Address \"json:\\\"offerToken\\\"\"; OfferIdentifier *big.Int \"json:\\\"offerIdentifier\\\"\"; OfferAmount *big.Int \"json:\\\"offerAmount\\\"\"; BasicOrderType uint8 \"json:\\\"basicOrderType\\\"\"; StartTime *big.Int \"json:\\\"startTime\\\"\"; EndTime *big.Int \"json:\\\"endTime\\\"\"; ZoneHash [32]uint8 \"json:\\\"zoneHash\\\"\"; Salt *big.Int \"json:\\\"salt\\\"\"; OffererConduitKey [32]uint8 \"json:\\\"offererConduitKey\\\"\"; FulfillerConduitKey [32]uint8 \"json:\\\"fulfillerConduitKey\\\"\"; TotalOriginalAdditionalRecipients *big.Int \"json:\\\"totalOriginalAdditionalRecipients\\\"\"; AdditionalRecipients []struct { Amount *big.Int \"json:\\\"amount\\\"\"; Recipient common.Address \"json:\\\"recipient\\\"\" } \"json:\\\"additionalRecipients\\\"\"; Signature []uint8 \"json:\\\"signature\\\"\" }, not seaport.BasicOrderParameters\r\n````\r\n\r\nthanks in advance for any help/guidance! :)\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "sambarnes",
+    "id": 1211977,
+    "node_id": "MDQ6VXNlcjEyMTE5Nzc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1211977?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sambarnes",
+    "html_url": "https://github.com/sambarnes",
+    "followers_url": "https://api.github.com/users/sambarnes/followers",
+    "following_url": "https://api.github.com/users/sambarnes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sambarnes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sambarnes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sambarnes/subscriptions",
+    "organizations_url": "https://api.github.com/users/sambarnes/orgs",
+    "repos_url": "https://api.github.com/users/sambarnes/repos",
+    "events_url": "https://api.github.com/users/sambarnes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sambarnes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26242/reactions",
     "total_count": 2,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26242/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "@fjl really appreciate ya checking this out! ahh interesting, didn't know the json metadata tags would affect the ability to convert to it. I would have thought that `abigen` would generate the exact struct format that `Unpack` would produce. Likely confusing myself here though\r\n\r\nI had tried using `UnpackIntoInterface` intially, however didn't get as far, with it failing on the unpack rather than afterwards:\r\n\r\n```go\r\nfunc TestUnpack(t *testing.T) {\r\n\t// TX: 0xbcf94d220f334eec98253df8284ef7b7d0c2c1a7670d7e241782eb9de831ce45\r\n\tinputHex := \"0xfb0f3ee100000000000000000000000000000000000000000000000000000000000000200000000000000000000000005cc5b05a8a13e3fbdb0bb9fccd98d38e50f90c38000000000000000000000000000000000000000000000000000000000000cc1a000000000000000000000000000000000000000000000000000000000000000100000000000000000000000049658c334d2d2c43638797ca09ab60ddbcf6ec8c000000000000000000000000004c00500000ad104d7dbd00e3ae0a5c00560c00000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000dbd2fc137a30000000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000637ce996000000000000000000000000000000000000000000000000000000006380de130000000000000000000000000000000000000000000000000000000000000000360c6ebe000000000000000000000000000000000000000058ca55ba493459030000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f00000000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f00000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000024000000000000000000000000000000000000000000000000000000000000002e000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000057edfe6e30e0000000000000000000000000000000a26b00c1f0df003000390027140000faa71900000000000000000000000000000000000000000000000000afdbfcdc61c0000000000000000000000000007a9fe22691c811ea339d9b73150e6911a5343dca0000000000000000000000000000000000000000000000000000000000000041871e9481bd8039a2dbcc9f691008a8be28ae9ce8742985cc133157fd5c73943f286d913697774fcd3726ee34c4ee1c513118f02ae0c41344212d0d9dee88522c1b00000000000000000000000000000000000000000000000000000000000000360c6ebe\"\r\n\tcalldata, err := hex.DecodeString(inputHex[2:])\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"Failed to decode calldata hex: %v\", err)\r\n\t}\r\n\r\n\tseaportABI, err := seaport.SeaportMetaData.GetAbi()\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"Failed to get ABI: %v\", err)\r\n\t}\r\n\r\n\tvar parameters seaport.BasicOrderParameters\r\n\terr = seaportABI.UnpackIntoInterface(\r\n\t\t&parameters, \"fulfillBasicOrder\", calldata[4:],\r\n\t)\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"Failed to unpack calldata: %v\", err)\r\n\t}\r\n}\r\n```\r\n\r\nError:\r\n```\r\nFailed to unpack calldata: abi: improperly formatted output: ������������������������������� ������������\\ŰZ�\u0013���\u000B��͘ӎP�\f8�������������������������������\u001A�������������������������������\u0001������������Ie�3M-,Cc���\t�`ݼ����������������L�P���\u0010M}����\r\n        \\�V\f��������������*�9�#��\r\n���R,\u001B�������������������������������6\fn� - Bytes: [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 32 0 0 0 0 0 0 0 0 0 0 0 0 92 197 176 90 138 19 227 251 219 11 185 252 205 152 211 142 80 249 12 56 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 204 26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 73 101 140 51 77 45 44 67 99 135 151 202 9 171 96 221 188 246 236 140 0 0 0 0 0 0 0 0 0 0 0 0 0 76 0 80 0 0 173 16 77 125 189 0 227 174 10 92 0 86 12 0 0 0 0 0 0 0 0 0 0 0 0 0 192 42 170 57 178 35 254 141 10 14 92 79 39 234 217 8 60 117 108 194 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 13 189 47 193 55 163 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 18 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 99 124 233 150 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 99 128 222 19 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 54 12 110 190 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 88 202 85 186 73 52 89 3 0 0 0 123 2 35 0 145 167 237 1 35 0 114 247 0 106 0 77 96 168 212 231 29 89 155 129 4 37 15 0 0 0 0 0 123 2 35 0 145 167 237 1 35 0 114 247 0 106 0 77 96 168 212 231 29 89 155 129 4 37 15 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 64 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 224 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 87 237 254 110 48 224 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 162 107 0 193 240 223 0 48 0 57 0 39 20 0 0 250 167 25 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 175 219 252 220 97 192 0 0 0 0 0 0 0 0 0 0 0 0 0 122 159 226 38 145 200 17 234 51 157 155 115 21 14 105 17 165 52 61 202 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 65 135 30 148 129 189 128 57 162 219 204 159 105 16 8 168 190 40 174 156 232 116 41 133 204 19 49 87 253 92 115 148 63 40 109 145 54 151 119 79 205 55 38 238 52 196 238 28 81 49 24 240 42 224 196 19 68 33 45 13 157 238 136 82 44 27 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 54 12 110 190]]\r\n```\r\n\r\n---\r\n\r\nThere is a 4-byte domain separator on the end of the calldata `360c6ebe` and when removing that, I get the following instead:\r\n```\r\nrouter_test.go:59: Failed to unpack calldata: abi: improperly encoded boolean value\r\n```\r\n\r\n---\r\n\r\nI'll keep trying to tweak things, just seemed odd that what `abigen` was generating isn't the same as the struct the `abi` package unpacks to, unless decoding tx calldata isn't the intended usecase",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1326580271/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1332826479",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26242#issuecomment-1332826479",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26242",
+    "id": 1332826479,
+    "node_id": "IC_kwDOAOvK985PcVFv",
+    "user": {
+      "login": "sambarnes",
+      "id": 1211977,
+      "node_id": "MDQ6VXNlcjEyMTE5Nzc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1211977?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sambarnes",
+      "html_url": "https://github.com/sambarnes",
+      "followers_url": "https://api.github.com/users/sambarnes/followers",
+      "following_url": "https://api.github.com/users/sambarnes/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sambarnes/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sambarnes/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sambarnes/subscriptions",
+      "organizations_url": "https://api.github.com/users/sambarnes/orgs",
+      "repos_url": "https://api.github.com/users/sambarnes/repos",
+      "events_url": "https://api.github.com/users/sambarnes/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sambarnes/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-30T22:37:49Z",
+    "updated_at": "2022-11-30T22:37:49Z",
+    "author_association": "NONE",
+    "body": "pivoting to different tooling to accomplish my goals, thanks again tho :)",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1332826479/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ethereum/yellowpaper/issues/815",
+  "repository_url": "https://api.github.com/repos/ethereum/yellowpaper",
+  "labels_url": "https://api.github.com/repos/ethereum/yellowpaper/issues/815/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/yellowpaper/issues/815/comments",
+  "events_url": "https://api.github.com/repos/ethereum/yellowpaper/issues/815/events",
+  "html_url": "https://github.com/ethereum/yellowpaper/issues/815",
+  "id": 1014460962,
+  "node_id": "I_kwDOARgQGs48d3Ii",
+  "number": 815,
+  "title": "`BYTE` has incorrect semantics",
+  "user": {
+    "login": "hacker-DOM",
+    "id": 18601956,
+    "node_id": "MDQ6VXNlcjE4NjAxOTU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/18601956?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hacker-DOM",
+    "html_url": "https://github.com/hacker-DOM",
+    "followers_url": "https://api.github.com/users/hacker-DOM/followers",
+    "following_url": "https://api.github.com/users/hacker-DOM/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hacker-DOM/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hacker-DOM/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hacker-DOM/subscriptions",
+    "organizations_url": "https://api.github.com/users/hacker-DOM/orgs",
+    "repos_url": "https://api.github.com/users/hacker-DOM/repos",
+    "events_url": "https://api.github.com/users/hacker-DOM/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hacker-DOM/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-10-03T17:04:04Z",
+  "updated_at": "2021-10-04T10:03:16Z",
+  "closed_at": "2021-10-04T10:03:16Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**Abstract**\r\nThe current documentation surrounding `BYTE` says that the first 8 bits of the resultant value pushed onto the stack will potentially be non-zero. I think this is incorrect and should rather be the last 8 bits.\r\n\r\n**Conventions**\r\nThe following is the equation in the `Description` section of `BYTE`. I'll refer to it as `Eq(1)`.\r\n\r\n![](https://i.imgur.com/lQGNyAp.png)\r\n\r\n**Lemma: `\\mu_S[x]_0` refers to the most-significant, left-most, first bit**\r\nI provide two justifications for this lemma:\r\n\r\n1.\r\nIn `SIGNEXTEND`, we want a non-zero number of least-significant, right-most, last bits to remain intact. The only way for the current documentation of `SIGNEXTEND` to achieve that behavior is that `\\mu_S[x]_255` refers to the least-significant, right-most, last bit.\r\n\r\n2.\r\nThe docs of `BYTE` specify that byte-counting is from most-significant, left-most, first byte. Based on the bit-indexing of the first case of the RHS (right-hand side) of `Eq(1)` it is clear that `\\mu_S[x]_0` refers to the most-significant, left-most, first bit.\r\n\r\nNow, to illustrate the bug:\r\n\r\n**Justification**\r\nLet us assume `\\mu_S[0] < 32`. `Eq(1)` says that the most-significant, left-most, first 8 bits of the result pushed onto the stack will be equal to the first case on the RHS of `Eq(1)`. I checked in `ethereumjs-vm`, and based on #729 all other implementations including KEVM instead set the 8 least-significant, right-most, last bits.\r\n\r\n**Correction**\r\nThe first case of the RHS should be:\r\n\r\n```latex\r\n\\mu_S[1]_{i - 248 + 8\\mu_s[0]} \\text{ if } i \\geq 248 \\land \\mu_S[0] < 32\r\n```\r\n\r\n![](https://latex.codecogs.com/png.latex?%5Clarge%20%5Cmu_S%5B1%5D_%7B%28i%20-%20248%20&plus;%208%5Cmu_s%5B0%5D%29%7D%20%5Ctext%7B%20if%20%7D%20i%20%5Cgeq%20248%20%5Cland%20%5Cmu_S%5B0%5D%20%3C%2032)\r\n\r\nThis will ensure that the least-significant, right-most, last byte of the result pushed onto the stack is equal to the indexed byte. The alternative is that all EVM implementations are incorrect, and I firmly believe it is a bug instead in the YP.\r\n\r\n**Source link** \r\nhttps://github.com/ethereum/yellowpaper/blob/80085f71210bde2fbb7d161ab3359e54d8360d94/Paper.tex#L2121-L2124\r\n\r\n**Previous work**\r\nThis has been previously reported in #729 , but ended up being closed by the author.",
+  "closed_by": {
+    "login": "yperbasis",
+    "id": 34320705,
+    "node_id": "MDQ6VXNlcjM0MzIwNzA1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34320705?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yperbasis",
+    "html_url": "https://github.com/yperbasis",
+    "followers_url": "https://api.github.com/users/yperbasis/followers",
+    "following_url": "https://api.github.com/users/yperbasis/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yperbasis/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yperbasis/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yperbasis/subscriptions",
+    "organizations_url": "https://api.github.com/users/yperbasis/orgs",
+    "repos_url": "https://api.github.com/users/yperbasis/repos",
+    "events_url": "https://api.github.com/users/yperbasis/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yperbasis/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/yellowpaper/issues/815/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/yellowpaper/issues/815/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

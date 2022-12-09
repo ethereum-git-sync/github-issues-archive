@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/888",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/888/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/888/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/888/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/888",
+  "id": 330989080,
+  "node_id": "MDU6SXNzdWUzMzA5ODkwODA=",
+  "number": 888,
+  "title": "SMCService error handling discussion",
+  "user": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 769749869,
+      "node_id": "MDU6TGFiZWw3Njk3NDk4Njk=",
+      "url": "https://api.github.com/repos/ethereum/py-evm/labels/eth2.0",
+      "name": "eth2.0",
+      "color": "ff95ca",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2018-06-10T17:58:07Z",
+  "updated_at": "2018-06-15T07:43:54Z",
+  "closed_at": "2018-06-15T07:43:54Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### What is wrong?\r\nSMC utils (`SMC (SMCHandler)` and `ShardTracker`) are invoked in Trinity. And currently, there's no error handling in both sides.\r\n\r\n#### Exception Types\r\n1. API exceptions\r\n    * Known general exceptions (e.g., `ValueError`)\r\n    * Custom exceptions: \r\n        * handler: [sharding/exceptions.py at master · ethereum/sharding · GitHub](https://github.com/ethereum/sharding/blob/master/sharding/handler/exceptions.py)\r\n        * `BlockNotFound`: https://github.com/ethereum/sharding/blob/717975aae7361bf738a51365c0f60cf97a594970/sharding/handler/log_handler.py#L9\r\n2. `web3.py` exceptions [web3.py/exceptions.py at master · ethereum/web3.py · GitHub](https://github.com/ethereum/web3.py/blob/master/web3/exceptions.py)\r\n    * If the provider fails to respond, `CannotHandleRequest` will be thrown and web3 will handle it and continue with next provider.\r\n    * If all providers fail to respond, web3 will throw `UnhandledRequest`.\r\n3. Other unexpected exceptions\r\n\r\n### How can it be fixed\r\n\r\n#### Custom Errors:\r\n1. **[TODO]** Examine will sharding utils throw the right exceptions.\r\n2. Known exceptions:\r\n    * `LogParsingError`: it seems only happening when ABI versions don't match.\r\n    * `BlockNotFound`: [it](https://github.com/ethereum/sharding/blob/717975aae7361bf738a51365c0f60cf97a594970/sharding/handler/log_handler.py#L38-L44) happens when the `from_block` parameter is larger than current block number. \"How to set the suitable `from_block`\" may depend on the syncing procedure. For now, with the current syncing procedure, the simple solution may be (1) adjusting `from_block` to `current_block_number - current_block_number % self.period_length` and then (2) retry.\r\n\r\n#### `web3.py` exceptions:\r\n1. **[TODO]** Examine which exceptions would be raised to `SMC` and how to deal them.\r\n2. If it's retriable\r\n    * For the transaction-calls:\r\n        * Try to make sure whether the transaction is sent or not. (**Q: How to know it?**)\r\n            * If sent, do nothing.\r\n            * If not sent, retry. (**Q: Maximum retries?**)\r\n    * For the polling tasks (e.g., querying `added_header` logs):\r\n        * Retry (**Q: Maximum retries?**)\r\n\r\n#### Other unexpected exceptions\r\nLog the error and call `cleanup()`.",
+  "closed_by": {
+    "login": "jannikluhn",
+    "id": 29854669,
+    "node_id": "MDQ6VXNlcjI5ODU0NjY5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29854669?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jannikluhn",
+    "html_url": "https://github.com/jannikluhn",
+    "followers_url": "https://api.github.com/users/jannikluhn/followers",
+    "following_url": "https://api.github.com/users/jannikluhn/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jannikluhn/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jannikluhn/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jannikluhn/subscriptions",
+    "organizations_url": "https://api.github.com/users/jannikluhn/orgs",
+    "repos_url": "https://api.github.com/users/jannikluhn/repos",
+    "events_url": "https://api.github.com/users/jannikluhn/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jannikluhn/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/888/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/888/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

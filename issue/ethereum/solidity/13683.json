@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2022-11-07T18:42:16Z",
-  "updated_at": "2022-11-07T19:04:10Z",
-  "closed_at": null,
+  "updated_at": "2022-11-29T17:55:31Z",
+  "closed_at": "2022-11-29T17:55:31Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "\r\n## Abstract\r\n\r\nI am dealing with the problem of trying to include in the ABI of a contract all the possible custom errors thrown by the contracts called by the first. E.g.:\r\n\r\n```solidity\r\nerror customErrorA();\r\nerror customErrorB();\r\n\r\ncontract A {\r\n    function foo() {\r\n         revert customErrorA();\r\n    }\r\n\r\n    function callB(address _addressB) {\r\n         B(_addressB).bar()\r\n    }\r\n}\r\n\r\ncontract B {\r\n    function bar() {\r\n         revert customErrorB();\r\n    }\r\n}\r\n```\r\n \r\n## Motivation\r\n\r\nIf the custom error of the called contracts is included in the caller contract ABI, it is possible to catch the error type easier with the calls.\r\n\r\nNow I am dealing with it by defining a global error interface and inheriting it on the contracts:\r\n\r\n```solidity\r\ninterface Errors {\r\n   error customErrorA();\r\n   error customErrorB();\r\n}\r\n\r\ncontract A is Errors {\r\n    function foo() {\r\n         revert customErrorA();\r\n    }\r\n\r\n    function callB(address _addressB) {\r\n         B(_addressB).bar()\r\n    }\r\n}\r\n\r\ncontract B is Errors {\r\n    function bar() {\r\n         revert customErrorB();\r\n    }\r\n}\r\n```\r\n\r\n## Specification\r\n\r\nI would like to know if the solidity compiler already has another way to do that and add external possible custom errors on the ABIs. If not, are there plans to include this on the compiler? Has sense to include this capability on the compiler?\r\n\r\n## Backwards Compatibility\r\n\r\nIt is just including more error codes on the ABI, this would not affect any byte code.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13683/reactions",
     "total_count": 1,
@@ -61,8 +80,95 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13683/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331056988",
+    "html_url": "https://github.com/ethereum/solidity/issues/13683#issuecomment-1331056988",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13683",
+    "id": 1331056988,
+    "node_id": "IC_kwDOAm_5kc5PVlFc",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-29T17:51:17Z",
+    "updated_at": "2022-11-29T17:51:17Z",
+    "author_association": "MEMBER",
+    "body": "The most immediate problem I'm seeing here is that this would give a false sense of certainty on the possibly raised errors.\r\nIn your example, you can call ``A.callB`` with any address, independently of whether it's actually a B - it may be in fact a disguised contract ``C``, which may end up throwing ``customErrorC``. There's no way to guard against that at compile-time. The only way to make sure, would actually be to catch and decode errors on the call to ``B`` and re-raise the ones that are expected, while raising a special one on unexpected errors (in which case they'd actually show up in the ABI again).",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331056988/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331067546",
+    "html_url": "https://github.com/ethereum/solidity/issues/13683#issuecomment-1331067546",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13683",
+    "id": 1331067546,
+    "node_id": "IC_kwDOAm_5kc5PVnqa",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-29T17:55:31Z",
+    "updated_at": "2022-11-29T17:55:31Z",
+    "author_association": "MEMBER",
+    "body": "Or put differently: there is, in general, no way to determine an accurate set of possible custom errors across external calls at compile time. I think any analysis beyond that, rather benefits from us being precise about the errors that actually occur in any given contract - I see in the linked issue that such an analysis is considered in tooling, and I'd generally say that tooling is the place to look for such kinds of auxiliary analysis rather than the compiler itself. Given that, I'm closing the issue, but feel free to reopen, if you disagree, resp. preferably to open a broader discussion in the [Solidity forum](https://forum.soliditylang.org/) to gather additional feedback.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331067546/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

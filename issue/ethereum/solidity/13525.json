@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-09-14T07:22:02Z",
-  "updated_at": "2022-09-14T07:22:02Z",
-  "closed_at": null,
+  "updated_at": "2022-11-29T18:25:28Z",
+  "closed_at": "2022-11-29T18:25:28Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nGiven these two contracts (which from an ABI point of view, return exactly the same values):\r\n\r\n```solidity\r\ncontract A {\r\n    function a() pure external returns (uint256 x, uint256 y) {\r\n        return (0, 0);\r\n    }\r\n}\r\n\r\ncontract B {\r\n    struct XY {\r\n        uint256 x;\r\n        uint256 y;\r\n    }\r\n\r\n    function b() pure external returns (XY memory xy) {\r\n        return XY({x: 0, y: 0});\r\n    }\r\n}\r\n```\r\n\r\n`contract  A` compiles to `0.122 kb`\r\n`contract  B` compiles to `0.157 kb`\r\n\r\nThis is a problem, because since tuples are not yet a first-class datatype in Solidity, you are forced to use structs in some situations where tuples should work, which causes the contract size to increase. For example, you can't declare a tuple type inside a struct. This doesn't work:\r\n\r\n```solidity\r\nstruct Data {\r\n    uint256 a;\r\n    (uint256 x, uint256 y) b;\r\n}\r\n```\r\n\r\nYou have to use instead:\r\n\r\n```solidity\r\nstruct Data {\r\n    uint256 a;\r\n    XY b;\r\n}\r\n```\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.17\r\n- Target EVM version (as per compiler settings):\r\n- Framework/IDE (e.g. Truffle or Remix): Hardhat\r\n- EVM execution environment / backend / blockchain client: \r\n- Operating system: Linux\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13525/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13525/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331107360",
+    "html_url": "https://github.com/ethereum/solidity/issues/13525#issuecomment-1331107360",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13525",
+    "id": 1331107360,
+    "node_id": "IC_kwDOAm_5kc5PVxYg",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-29T18:25:28Z",
+    "updated_at": "2022-11-29T18:25:28Z",
+    "author_association": "MEMBER",
+    "body": "Thank you for this issue! You're perfectly right here, ideally these functions would end up being optimized to the same code size and runtime costs. The main reason for the difference, is that tuples live on stack, whereas structs are (currently) always in memory - and temporary memory usage is generally not well optimized by the compiler just yet.\r\nIn the long run, this issue will be solved in two ways: by improving code generation in the presence of temporary memory use (https://github.com/ethereum/solidity/issues/13722) and by moving to a more flexible type system, in which tuple types will be first-citizen types, as part of our general efforts of introducing generics to the language (https://github.com/ethereum/solidity/issues/869).\r\n\r\nIn that sense, I'm closing this issue as a duplicate in the sense that it will be solved by already scheduled other issues, even though you will be a bit patient until we will have sufficient progress on those to ultimately achieve equal efficiency between the two cases you brought up.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1331107360/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/599",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/599/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/599/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/599/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/599",
+  "id": 317819146,
+  "node_id": "MDU6SXNzdWUzMTc4MTkxNDY=",
+  "number": 599,
+  "title": "Thoughts on API refactors for Chain, VM, and State",
+  "user": {
+    "login": "pipermerriam",
+    "id": 824194,
+    "node_id": "MDQ6VXNlcjgyNDE5NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/824194?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pipermerriam",
+    "html_url": "https://github.com/pipermerriam",
+    "followers_url": "https://api.github.com/users/pipermerriam/followers",
+    "following_url": "https://api.github.com/users/pipermerriam/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pipermerriam/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pipermerriam/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pipermerriam/subscriptions",
+    "organizations_url": "https://api.github.com/users/pipermerriam/orgs",
+    "repos_url": "https://api.github.com/users/pipermerriam/repos",
+    "events_url": "https://api.github.com/users/pipermerriam/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pipermerriam/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 630871768,
+      "node_id": "MDU6TGFiZWw2MzA4NzE3Njg=",
+      "url": "https://api.github.com/repos/ethereum/py-evm/labels/PR%20state:%20WIP",
+      "name": "PR state: WIP",
+      "color": "fbca04",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2018-04-25T22:43:26Z",
+  "updated_at": "2018-04-26T22:13:30Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "# Architecture Refactor for Py-EVM\r\n\r\n## What is wrong?\r\n\r\nThe APIs on `Chain`, `VM` and `State` have all evolved organically.  Now that\r\nwe have a better picture of how they are used, we should be able to make some\r\nimprovements to make things more intuitive, less stateful, and with reduced\r\nmutation.\r\n\r\n## How can it be fixed\r\n\r\n### Terminology\r\n\r\n#### Blocks\r\n\r\n- Finalized:\r\n    - A block which has been *sealed*.  \r\n        - In proof of work this means setting the `mix_hash` and `nonce`\r\n- HEAD: \r\n    - The highest finalized block in the chain\r\n- TIP: \r\n    - The unsealed block who's parent is the HEAD block\r\n\r\n### `Chain`\r\n\r\nThe `Chain` is now the only stateful object with non-pure APIs\r\n\r\n- rename `Chain.header` to `Chain.tip`.\r\n- add `Chain.head` for access to the canonical chain head.\r\n\r\n\r\n#### `Chain.apply_transaction(transaction) -> computation`\r\n\r\nAdds the transaction to the current *TIP* block.\r\n\r\n- error if `chain.tip` is empty.\r\n- executes the `transaction` on top of the *TIP* block.\r\n- mutates `chain.header` with the post execution state.\r\n- persists the `transaction` and resulting `receipt`.\r\n\r\n#### `Chain.import_block(*args, **kwargs) -> block`\r\n\r\n- error if `chain.tip` is empty.\r\n- delegates to `VM` to do block import.\r\n- validates that the imported block is equivalent to the import result.\r\n- persists newly imported block to the database\r\n- mutates `chain.header` with new *tip block* header.\r\n- leaves `chain.tip` empty.\r\n\r\n#### `Chain.finalize_block(*args, **kwargs) -> block`\r\n\r\n- error if `chain.tip` is empty.\r\n- delegates to `VM.mine_block`\r\n- persists newly mined block to the database\r\n- mutates `chain.header` with new *tip block* header.\r\n- leaves `chain.tip` empty.\r\n\r\n#### `Chain.initialize_tip(parent=None, **context)\r\n\r\n- error if `chain.tip` is not empty.\r\n- initializes `chain.tip` with a new fresh header on top of `chain.head`\r\n\r\n\r\n### `VM`\r\n\r\nThe `VM` object is now immutable, only exposing *pure* functions.\r\n\r\n- remove `configure_header` in favor of:\r\n    - new `initialize_block` which initializes the vm with a new *empty* header with some configured params like `coinbase`, `difficulty`, etc.\r\n\r\n\r\n#### `VM.execute_transaction(transaction, block) -> state_root, receipt, computation`\r\n\r\n- **pure**\r\n- executes the transaction on top of the `block`\r\n- returns:\r\n    - the updated state root\r\n    - the receipt for the transaction\r\n    - the computation\r\n\r\n\r\n#### `VM.import_block(block) -> block`\r\n\r\n- **pure**\r\n- TODO: figure out how to remove the `configure_header` call and rather start with no header and initialize a new header with the correct params from the block being imported.\r\n\r\n\r\n#### `VM.finalize_block(block, receipts) -> block`\r\n\r\n- **pure**\r\n- computes receipt and transaction tries.\r\n- TODO: define how `mixhash` and `nonce` get set on the header.\r\n- returns:\r\n    - the finalized block.\r\n\r\n\r\n### `State`\r\n\r\nThe `State` object is now immutable, only exposing *pure* functions.\r\n\r\n#### `State.execute_transaction(transaction) -> computation, state_root`\r\n\r\n- **pure**\r\n- executes the transaction\r\n- returns:\r\n    - the resulting computation and state root.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/599/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/599/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

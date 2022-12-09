@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/940",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/940/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/940/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/940/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/940",
+  "id": 334404813,
+  "node_id": "MDU6SXNzdWUzMzQ0MDQ4MTM=",
+  "number": 940,
+  "title": "Trinity seems to hit a deadlock when terminating its sub-processes",
+  "user": {
+    "login": "gsalgado",
+    "id": 412274,
+    "node_id": "MDQ6VXNlcjQxMjI3NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/412274?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gsalgado",
+    "html_url": "https://github.com/gsalgado",
+    "followers_url": "https://api.github.com/users/gsalgado/followers",
+    "following_url": "https://api.github.com/users/gsalgado/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gsalgado/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gsalgado/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gsalgado/subscriptions",
+    "organizations_url": "https://api.github.com/users/gsalgado/orgs",
+    "repos_url": "https://api.github.com/users/gsalgado/repos",
+    "events_url": "https://api.github.com/users/gsalgado/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gsalgado/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 815420353,
+      "node_id": "MDU6TGFiZWw4MTU0MjAzNTM=",
+      "url": "https://api.github.com/repos/ethereum/py-evm/labels/comp:%20trinity",
+      "name": "comp: trinity",
+      "color": "bfd4f2",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2018-06-21T09:12:21Z",
+  "updated_at": "2018-09-25T08:05:50Z",
+  "closed_at": "2018-09-25T08:05:50Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### What is wrong?\r\n\r\nWhen trinity is shutting down, it sends a SIGINT to its subprocesses and calls `.join()` to wait (up to 5s) for them. However, the join() seems to always timeout, at which point it sends a SIGTERM and calls `.join()` again, but at this time the join seems to return immediately.\r\n\r\nNotice that the fact that the second signal is a SIGTERM doesn't seem to be relevant, as changing that to a SIGINT keeps the behaviour unchanged (i.e. the second join() returns immediately)\r\n\r\nThis is how it shows in the logs:\r\n>     INFO  06-21 10:50:08         ipc  Sent SIGINT to process 22874, waiting 5 seconds for it to terminate\r\n>     INFO  06-21 10:50:13         ipc  Sent SIGTERM to process 22874, waiting 3 seconds for it to terminate\r\n>     INFO  06-21 10:50:13        main  Networking process (pid=22874) terminated\r\n\r\n\r\nThis seems to be a known caveat when using multiprocessing.Queue (which all trinity subprocesses use for logging) and attempting to `.join()`:\r\n\r\n> This means that whenever you use a queue you need to make sure that all items which have been put on the queue will eventually be removed before the process is joined. Otherwise you cannot be sure that processes which have put items on the queue will terminate. Remember also that non-daemonic processes will be joined automatically.\r\n\r\n(from https://docs.python.org/3.4/library/multiprocessing.html?highlight=process#multiprocessing-programming)\r\n\r\n### How can it be fixed\r\n\r\nNeed to investigate how to properly fix it, but I've accidentally found out that a short sleep before calling `kill_process_gracefully(networking_process)` seems to workaround this. Maybe because it gives time for the log handler to consume all msgs from the subprocess' queue, thus avoiding the deadlock on join\r\n",
+  "closed_by": {
+    "login": "gsalgado",
+    "id": 412274,
+    "node_id": "MDQ6VXNlcjQxMjI3NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/412274?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gsalgado",
+    "html_url": "https://github.com/gsalgado",
+    "followers_url": "https://api.github.com/users/gsalgado/followers",
+    "following_url": "https://api.github.com/users/gsalgado/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gsalgado/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gsalgado/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gsalgado/subscriptions",
+    "organizations_url": "https://api.github.com/users/gsalgado/orgs",
+    "repos_url": "https://api.github.com/users/gsalgado/repos",
+    "events_url": "https://api.github.com/users/gsalgado/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gsalgado/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/940/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/940/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

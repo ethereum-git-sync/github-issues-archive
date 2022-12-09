@@ -43,7 +43,7 @@
   "created_at": "2022-10-13T19:13:47Z",
   "updated_at": "2022-10-14T07:24:09Z",
   "closed_at": "2022-10-14T07:24:09Z",
-  "author_association": "NONE",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "In accounts/abi/bind/base.go #374\r\n```\r\n\tif opts.GasPrice != nil {\r\n\t\trawTx, err = c.createLegacyTx(opts, contract, input)\r\n\t} else if opts.GasFeeCap != nil && opts.GasTipCap != nil {\r\n\t\trawTx, err = c.createDynamicTx(opts, contract, input, nil)\r\n\t} else {\r\n\t\t// Only query for basefee if gasPrice not specified\r\n\t\tif head, errHead := c.transactor.HeaderByNumber(ensureContext(opts.Context), nil); errHead != nil {\r\n\t\t\treturn nil, errHead\r\n\t\t} else if head.BaseFee != nil {\r\n\t\t\trawTx, err = c.createDynamicTx(opts, contract, input, head)\r\n\t\t} else {\r\n\t\t\t// Chain is not London ready -> use legacy transaction\r\n\t\t\trawTx, err = c.createLegacyTx(opts, contract, input)\r\n\t\t}\r\n\t}\r\n```\r\nI added another else if for when both GasFeeCap and GasTipCap are specified and no need to retrieve head",
   "closed_by": {

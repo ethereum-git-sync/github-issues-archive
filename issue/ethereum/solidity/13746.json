@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2022-11-26T04:03:08Z",
-  "updated_at": "2022-11-27T19:02:31Z",
-  "closed_at": null,
+  "updated_at": "2022-11-29T14:23:32Z",
+  "closed_at": "2022-11-29T14:23:31Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nThe warning `Warning: Unnamed return variable can remain unassigned.` is produced by code where it is categorically impossible for the return variable to remain unassigned.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.17\r\n- Target EVM version (as per compiler settings): London\r\n- Framework/IDE (e.g. Truffle or Remix): Foundry\r\n- EVM execution environment / backend / blockchain client: N/A\r\n- Operating system: Fedora GNU/Linux\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\npragma solidity 0.8.17;\r\n\r\ncontract Repro {\r\n  function repro(uint256 x) external pure returns (bool) {\r\n    while (true) {\r\n      if ((x >>= 1) == 0) {\r\n        return true;\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\n```\r\nCompiler run successful (with warnings)\r\nwarning[6321]: Warning: Unnamed return variable can remain unassigned. Add an explicit return with value to all non-reverting code paths or name the variable.\r\n --> contracts/Repro.sol:4:52:\r\n  |\r\n4 |   function repro(uint256 x) external view returns (bool) {\r\n  |                                                    ^^^^\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13746/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13746/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "Simpler repro:\r\n```solidity\r\nfunction f() pure returns (bool) {\r\n    while (true)\r\n        return true;\r\n}\r\n```\r\nThis warning has been there since 0.7.4. There's no warning on 0.7.3.\r\n\r\nIt's not really a bug though - more of a limitation of the current control flow graph implementation. The CFG does not evaluate conditions so it can't tell whether the code after the loop will ever be reached. Conservatively, it has to assume that it's possible. It's the same with things like `if (true)`.\r\n\r\nAs a workaround, you could help the compiler figure this out by making it clear that the function would never return the value even if the loop ended:\r\n```solidity\r\nfunction f() pure returns (bool) {\r\n    while (true)\r\n        return true;\r\n    revert();\r\n}\r\n```\r\n\r\nUnfortunately it impossible to evaluate conditions in a general case. We could do that for some limited situations, like constant expressions, but it's debatable if the gains here are worth the effort. We use the CFG in the optimizer so theoretically it would let us detect more code as unreachable and remove it, but, realistically, I doubt that leaving unreachable code after an infinite loop is that common other than by a mistake (which can happen but is probably not common). Unless #13724 is going to make this actually simple to implement?\r\n\r\nOne thing that I think would actually be helpful would be to evaluate specifically `true` and `false`. This would provide a more obvious workaround (i.e. if you know the expression in the loop condition is always true, you can specify just that). In fact, I originally wanted to use `assert(false)` in my workaround, which would be more semantic and that change would help here. What do you think @ekpyron?",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1328317917/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1330726159",
+    "html_url": "https://github.com/ethereum/solidity/issues/13746#issuecomment-1330726159",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13746",
+    "id": 1330726159,
+    "node_id": "IC_kwDOAm_5kc5PUUUP",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-29T14:23:31Z",
+    "updated_at": "2022-11-29T14:23:31Z",
+    "author_association": "MEMBER",
+    "body": "I mean, another quick and dirty workaround for the warning here would be to give the return variable a name :-).\r\n\r\nBut yeah, I agree with what @cameel says. In general there is no way to be completely correct about this (you can construct cases in which, while you can prove that something is always fine, that proof can get arbitrarily complex).\r\n\r\n@cameel However, the CFG used for analysis is not the CFG we use for optimization (which happens on the Yul level). The analysis in the optimizer should in fact be powerful enough to catch dead code after infinite loops and remove it. Which should make the ``revert();`` workaround zero-cost in practice.\r\n\r\nIn any case, we won't start particular special casing on verbatim expressions (like ``true``) here, since that's generally a bottomless pit. We can indeed re-evaluate this once #13724 is done, but until then, I'm unfortunately closing this as won't-fix.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1330726159/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
