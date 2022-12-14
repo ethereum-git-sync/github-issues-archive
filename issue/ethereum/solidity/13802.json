@@ -1,0 +1,103 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13802",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13802/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13802/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13802/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13802",
+  "id": 1495072245,
+  "node_id": "I_kwDOAm_5kc5ZHP31",
+  "number": 13802,
+  "title": "Make it easier for users to get nightly builds",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2685863294,
+      "node_id": "MDU6TGFiZWwyNjg1ODYzMjk0",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/solc-bin",
+      "name": "solc-bin",
+      "color": "3B8CF5",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4438003076,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaNhA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20effort",
+      "name": "medium effort",
+      "color": "ff7df7",
+      "default": false,
+      "description": "Default level of effort"
+    },
+    {
+      "id": 4438155599,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjhTw",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20impact",
+      "name": "medium impact",
+      "color": "001dff",
+      "default": false,
+      "description": "Default level of impact"
+    },
+    {
+      "id": 4438490842,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3-2g",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/should%20have",
+      "name": "should have",
+      "color": "ffbe6c",
+      "default": false,
+      "description": "We like the idea but it’s not important enough to be a part of the roadmap."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-12-13T20:10:32Z",
+  "updated_at": "2022-12-13T20:21:10Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "We provide nightly builds in solc-bin but these are emscripten-only. The static build artifacts on `develop` in the main repo can also be used as nightlies but this is not apparent to users and explaining how to get them is not very straightforward. There are a few things we could do to improve this situation:\r\n\r\n- [ ] Add `b_ubu_static`, `b_win` and `b_osx` runs to the `nightly` workflow. This will make it easier for users to locate nightlies when they look into our CI.\r\n- Expand the [solc-bin `README`](https://github.com/ethereum/solc-bin/blob/gh-pages/README.md)\r\n    - [ ] Document how to get nightlies from CircleCI. Point out that `b_ubu_static`, `b_win`, `b_osx` and `b_ems` jobs produce static binaries and upload them as artifacts. Explain how to find the right workflow in CircleCI.\r\n    - [ ] Add more info about the structure of solc-bin. What is in each dir and that there are lists with meta information. Use the info that's already available in [docs on Static Binaries](https://docs.soliditylang.org/en/latest/installing-solidity.html#static-binaries).\r\n    - [ ] Add links to latest binaries and nightlies. [`bin/soljson-nightly.js`](https://binaries.soliditylang.org/bin/soljson-nightly.js), [`bin/soljson-latest.js`](https://binaries.soliditylang.org/bin/soljson-latest.js), etc. Their locations do not change so it's possible to have a direct link in the README.\r\n- Make static builds available at https://binaries.soliditylang.org\r\n    - [ ] Add a job to the nightly workflow to upload the static binaries to our S3 bucket.\r\n        - Use the `aws s3` utility (like we do in [`s3-mirror`](https://github.com/ethereum/solc-bin/blob/gh-pages/.github/workflows/s3-mirror.yml) workflow and [`sync-s3.sh`](https://github.com/ethereum/solc-bin/blob/gh-pages/sync-s3.sh) script).\r\n        - The simplest option is to upload to the `solc-bin` bucket under some path that's not currently in use (e.g. `nightly/`). You'll just need to [exclude it in the S3 sync script](https://github.com/ethereum/solc-bin/blob/gh-pages/sync-s3.sh#L58-L62) to ensure the script does not delete the files when syncing. There should also be a check that this path does not exist in `solc-bin`.\r\n        - Using a separate bucket is also an option but then the content will not be served from under the `binaries.soliditylang.org` domain. This might still be acceptable given that we'll have links in the `README` though.\r\n        - We only need the latest nightly - no need to version them. They should be available at a predefined path that does not change. Each new upload can overwrite the existing nightlies. The old binaries are still available in CI for some time.\r\n    - [ ] Add static links to these new nightlies in the `README`.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13802/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 1,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13802/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

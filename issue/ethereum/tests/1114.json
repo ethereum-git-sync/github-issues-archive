@@ -1,68 +1,8 @@
 {
-  "url": "https://api.github.com/repos/ethereum/tests/issues/1114",
-  "repository_url": "https://api.github.com/repos/ethereum/tests",
-  "labels_url": "https://api.github.com/repos/ethereum/tests/issues/1114/labels{/name}",
-  "comments_url": "https://api.github.com/repos/ethereum/tests/issues/1114/comments",
-  "events_url": "https://api.github.com/repos/ethereum/tests/issues/1114/events",
-  "html_url": "https://github.com/ethereum/tests/issues/1114",
-  "id": 1487071788,
-  "node_id": "I_kwDOAO0i585Youos",
-  "number": 1114,
-  "title": "EIP-5450 test vectors",
-  "user": {
-    "login": "gumb0",
-    "id": 1863135,
-    "node_id": "MDQ6VXNlcjE4NjMxMzU=",
-    "avatar_url": "https://avatars.githubusercontent.com/u/1863135?v=4",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/gumb0",
-    "html_url": "https://github.com/gumb0",
-    "followers_url": "https://api.github.com/users/gumb0/followers",
-    "following_url": "https://api.github.com/users/gumb0/following{/other_user}",
-    "gists_url": "https://api.github.com/users/gumb0/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/gumb0/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/gumb0/subscriptions",
-    "organizations_url": "https://api.github.com/users/gumb0/orgs",
-    "repos_url": "https://api.github.com/users/gumb0/repos",
-    "events_url": "https://api.github.com/users/gumb0/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/gumb0/received_events",
-    "type": "User",
-    "site_admin": false
-  },
-  "labels": [
-
-  ],
-  "state": "open",
-  "locked": false,
-  "assignee": null,
-  "assignees": [
-
-  ],
-  "milestone": null,
-  "comments": 0,
-  "created_at": "2022-12-09T16:51:41Z",
-  "updated_at": "2022-12-09T17:22:53Z",
-  "closed_at": null,
-  "author_association": "MEMBER",
-  "active_lock_reason": null,
-  "body": "### Validation\r\n\r\n#### Valid cases\r\n\r\n- Branches having same stack height\r\n  - `PUSH1 0 RJUMPI label_true PUSH1 1 PUSH1 2 RJUMP exit label_true: PUSH1 3 PUSH1 4 exit: STOP`\r\n  - Calls returning same output numbers\r\n  \t- function types are [(0, 0), (0, 1), (0, 1)]\r\n  \t  `PUSH1 0 RJUMPI label_true label_false: CALLF 1 RJUMP exit label_true: CALLF 2 exit: STOP`\r\n  - Infinite loop\r\n    - `start: PUSH1 0 PUSH1 1 POP POP RJUMP start`\r\n  - Jump table\r\n    - `PUSH1 0 RJUMPV 2 case1 case2 PUSH1 01 PUSH1 02 RJUMP exit case1: PUSH1 03 PUSH1 04 RJUMP exit case2: PUSH1 05 PUSH1 06 exit: STOP`\r\n- Check that all instructions pass validation with the right number of input stack items\r\n  - `PUSH1 0 PUSH1 0 ADD STOP`\r\n  - `PUSH1 0 PUSH1 MUL STOP`\r\n  - All other instructions taking inputs from stack\r\n  - `CALLF`\r\n\t- function types are [(0, 0), (1, 0), (2, 0), (255, 0)]\r\n\t- `CALLF 0 STOP`\r\n\t- `PUSH1 0 CALLF 1 STOP`\r\n\t- `PUSH1 2 CALLF 2 STOP`\r\n\t- `PUSH1 0` * 255 + `CALLF 3 STOP`\r\n  - `JUMPF`\r\n\t- function types are [(0, 0), (1, 0), (2, 0), (255, 0)]\r\n\t- `JUMPF 0`\r\n\t- `PUSH1 0 JUMPF 1`\r\n\t- `PUSH1 0 PUSH1 0 PUSH1 0 JUMPF 1` # 2 extra items\r\n\t- `PUSH1 0 PUSH1 0 JUMPF 2`\r\n\t- `PUSH1 0 PUSH1 0 PUSH1 0 PUSH1 0 JUMPF 2` # 2 extra items\r\n\t- `PUSH1 0` * 255 + `JUMPF 3 STOP`\r\n\t- `PUSH1 0` * 512 + `JUMPF 3 STOP`\r\n\t- `PUSH1 0` * 1024 + `JUMPF 3 STOP`\r\n- Terminating instruction\r\n  -  `PUSH1 0 POP STOP`\r\n  - other terminating instructions\r\n  - loop ending with unconditional jump\r\n    - `start: RJUMP start`\r\n    - `PUSH1 10 start: PUSH1 1 SWAP1 SUB RJUMPI end STOP end: RJUMP start` \r\n  - function types are [(0, 0), (1, 1), (0, 2)]\r\n    - function 0: `PUSH1 0 JUMPF 1`\r\n    - function 1: `RETF`\r\n    - function 2: `PUSH1 0 PUSH2 0 RETF`\r\n- Stack not required to be clean on terminating instruction\r\n  - `PUSH1 0 PUSH1 0 PUSH1 0 STOP`\r\n  - other terminating instruction\r\n  - function types are [(0, 0), (1, 1), (0, 2)]\r\n    - function 0: `PUSH1 0 PUSH1 0 JUMPF 1`\r\n    - function 1: `PUSH1 0 PUSH1 0 PUSH1 0 RETF`\r\n    - function 2: `PUSH1 0 PUSH2 0 PUSH1 0 PUSH1 0 RETF`\r\n  - function types are [(0, 0), (0, 255)]\r\n    - function 1: `PUSH1 0` * 512 + `RETF`\r\n\r\n\r\n#### Invalid cases\r\n\r\n- Stack height mismatch for different paths\r\n  - Branches pushing different number of items\r\n  \t- `PUSH1 0 RJUMPI label_true PUSH1 1 label_true: PUSH1 2 STOP`\r\n  \t- `PUSH1 0 RJUMPI label_true label_false: PUSH1 1 RJUMP exit label_true: PUSH1 2 PUSH1 3 exit: STOP`\r\n  \t- Calls returning different output numbers\r\n  \t\t- function types are [(0, 0), (0, 1), (0, 2)]\r\n  \t\t  `PUSH1 0 RJUMPI label_true label_false: CALLF 1 RJUMP exit label_true: CALLF 2 exit: STOP`\r\n  - Pushing loop\r\n  \t- `start: PUSH1 0 RJUMP start`\r\n  - Popping loop\r\n  \t-`PUSH1 0 PUSH1 0 PUSH1 0 start: POP RJUMP start`\r\n  - Jump table with different stack heights\r\n    - `PUSH1 0 RJUMPV 2 case1 case2 PUSH1 01 RJUMP exit case1: PUSH1 02 PUSH1 03 RJUMP exit case2: PUSH1 03 PUSH1 04 PUSH1 05 exit: STOP`\r\n- Stack underflow\r\n  - `ADD STOP`\r\n  - `PUSH1 0 ADD STOP`\r\n  - Check all other isntructions handle underflow correctly\r\n  - CALLF\r\n\t- function types are [(0, 0), (1, 0), (2, 0)]\r\n\t  - `CALLF 1 STOP`\r\n\t  - `PUSH1 0 CALLF 2 STOP`\r\n  - JUMPF\r\n\t- function types are [(0, 0), (1, 0), (2, 0)]\r\n\t  - `JUMPF 1`\r\n\t  - `PUSH1 0 JUMPF 2`\r\n- Stack overflow\r\n\t- Function pushing 1024 values\r\n- No terminating instruction\r\n  - `PUSH1 0`\r\n  - `PUSH1 0 RJUMPI exit STOP exit: NOP`\r\n  - `PUSH1 0 RJUMPV 2 case1 case2 INVALID case1: STOP case2: NOP`\r\n- Unreachable code\r\n  - `STOP PUSH1 0 STOP`\r\n  - `STOP STOP`\r\n  - `INVALID STOP`\r\n  - starting with other terminating instructions\r\n  - `RJUMP start PUSH1 0 start: PUSH1 0 STOP`\r\n  - `start: RJUMP start STOP`\r\n\r\n### Execution\r\n\r\n- Check that CALLF fails if callee's max_stack_height overflows the stack\r\n  - function types are [(0, 0), (1, 0)]\r\n    - function 0: `PUSH1 0 CALLF 1 STOP`\r\n    - function 1: `POP` + `PUSH1 0` * 1024 + `POP` * 1024 + `RETF` # should be valid by itself, but make function 0 invalid\r\n  - function types are [(0, 0), (0, 0)]\r\n    - function 0: `PUSH1 0` * 1024 CALLF 1 STOP`  # should be valid by itself, but but invalid if function 1 pushes\r\n    - function 1: `PUSH1 0 RETF`\r\n  - a case when callee has some branch that wouldn't overflow stack by itself\r\n    function types are [(0, 0), (2, 0)]\r\n    - function 0: `PUSH1 0 PUSH1 0 CALLF 1 STOP`\r\n    - function 1: `POP RJUMPI exit + `PUSH1 0` * 1024 + `POP` * 1024 + `exit: RETF` # should be valid by itself, but make function 0 invalid\r\n- Check gas price of JUMPF\r\n- Check that stack handling is correct around JUMPF\r\n  - function types are [(0, 0), (1, 0), (1, 0)]\r\n    - function 0: `PUSH1 1 PUSH1 2 PUSH1 3 CALLF 1 ADD PUSH1 0 SSTORE STOP`, check that sstored result is 3\r\n    - function 1: `POP PUSH1 11 PUSH1 12 PUSH1 13 JUMPF 2` # extra items left on stack\r\n    - function 2: `POP RETF`\r\n ",
-  "closed_by": null,
-  "reactions": {
-    "url": "https://api.github.com/repos/ethereum/tests/issues/1114/reactions",
-    "total_count": 0,
-    "+1": 0,
-    "-1": 0,
-    "laugh": 0,
-    "hooray": 0,
-    "confused": 0,
-    "heart": 0,
-    "rocket": 0,
-    "eyes": 0
-  },
-  "timeline_url": "https://api.github.com/repos/ethereum/tests/issues/1114/timeline",
-  "performed_via_github_app": null,
-  "state_reason": null
+  "message": "API rate limit exceeded for user ID 93719879.",
+  "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
 }
-[
-
-]
+{
+  "message": "API rate limit exceeded for user ID 93719879.",
+  "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
+}

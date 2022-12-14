@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 4,
   "created_at": "2022-11-04T19:48:15Z",
-  "updated_at": "2022-11-15T15:22:59Z",
-  "closed_at": null,
+  "updated_at": "2022-12-13T02:53:30Z",
+  "closed_at": "2022-12-13T02:53:30Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "After #3068, the worst case behavior during withdrawals processing implies a complete scan of the full validator set on _each_ block.\r\n\r\nThere is some discussion in that PR that suggests even as is this worst case scenario is not a blocker but it would be nice to bound the length of the scan to have hard numbers on performance here.\r\n\r\nTo implement, we need to add a constant `MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP` and add it to `get_expected_withdrawals` in that PR on the line that scans the validator set:\r\n\r\n```python\r\nfor _ in range(MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP):\r\n```\r\n\r\nI wanted to open this issue for discussion of this approach and also to get agreement on a concrete number for this new constant.\r\n\r\nI suggest `2**17` as it is a nice power of two and is around 1/4 of the validator set against current `mainnet` numbers.\r\n\r\nedit: It also seems fairer if we also advance the pointer to the last checked validator by `MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP` in the event we don't have any withdrawals during a single sweep so would need another line or code or two along w/ the above to handle that",
-  "closed_by": null,
+  "closed_by": {
+    "login": "djrtwo",
+    "id": 1433595,
+    "node_id": "MDQ6VXNlcjE0MzM1OTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1433595?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/djrtwo",
+    "html_url": "https://github.com/djrtwo",
+    "followers_url": "https://api.github.com/users/djrtwo/followers",
+    "following_url": "https://api.github.com/users/djrtwo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/djrtwo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/djrtwo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/djrtwo/subscriptions",
+    "organizations_url": "https://api.github.com/users/djrtwo/orgs",
+    "repos_url": "https://api.github.com/users/djrtwo/repos",
+    "events_url": "https://api.github.com/users/djrtwo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/djrtwo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3079/reactions",
     "total_count": 3,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3079/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
