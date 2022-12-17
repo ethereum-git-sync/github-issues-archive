@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-12-13T16:41:10Z",
-  "updated_at": "2022-12-13T16:41:35Z",
-  "closed_at": null,
+  "updated_at": "2022-12-15T08:15:21Z",
+  "closed_at": "2022-12-15T08:15:21Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Hi, how can I read data from levelDB?\r\n\r\nI tried with\r\n```\r\npackage main\r\n\r\nimport (\r\n\t\"fmt\"\r\n\t\"github.com/ethereum/go-ethereum/common\"\r\n\t\"github.com/ethereum/go-ethereum/core/rawdb\"\r\n\t\"github.com/ethereum/go-ethereum/core/types\"\r\n)\r\n\r\n// type Header struct {\r\n// \tParentHash  common.Hash    `json:\"parentHash\"       gencodec:\"required\"`\r\n// \tUncleHash   common.Hash    `json:\"sha3Uncles\"       gencodec:\"required\"`\r\n// \tCoinbase    common.Address `json:\"miner\"            gencodec:\"required\"`\r\n// \tRoot        common.Hash    `json:\"stateRoot\"        gencodec:\"required\"`\r\n// \tTxHash      common.Hash    `json:\"transactionsRoot\" gencodec:\"required\"`\r\n// \tReceiptHash common.Hash    `json:\"receiptsRoot\"     gencodec:\"required\"`\r\n// \tBloom       Bloom          `json:\"logsBloom\"        gencodec:\"required\"`\r\n// \tDifficulty  *big.Int       `json:\"difficulty\"       gencodec:\"required\"`\r\n// \tNumber      *big.Int       `json:\"number\"           gencodec:\"required\"`\r\n// \tGasLimit    uint64         `json:\"gasLimit\"         gencodec:\"required\"`\r\n// \tGasUsed     uint64         `json:\"gasUsed\"          gencodec:\"required\"`\r\n// \tTime        uint64         `json:\"timestamp\"        gencodec:\"required\"`\r\n// \tExtra       []byte         `json:\"extraData\"        gencodec:\"required\"`\r\n// \tMixDigest   common.Hash    `json:\"mixHash\"`\r\n// \tNonce       BlockNonce     `json:\"nonce\"`\r\n// }\r\n\r\n// type Body struct {\r\n// \tTransactions []*Transaction\r\n// \tUncles       []*Header\r\n// }\r\n\r\n// type Transaction struct {\r\n// \tdata txdata\r\n// \t// caches\r\n// \thash atomic.Value\r\n// \tsize atomic.Value\r\n// \tfrom atomic.Value\r\n// }\r\n\r\n// type txdata struct {\r\n// \tAccountNonce uint64          `json:\"nonce\"    gencodec:\"required\"`\r\n// \tPrice        *big.Int        `json:\"gasPrice\" gencodec:\"required\"`\r\n// \tGasLimit     uint64          `json:\"gas\"      gencodec:\"required\"`\r\n// \tRecipient    *common.Address `json:\"to\"       rlp:\"nil\"` // nil means contract creation\r\n// \tAmount       *big.Int        `json:\"value\"    gencodec:\"required\"`\r\n// \tPayload      []byte          `json:\"input\"    gencodec:\"required\"`\r\n\r\n// \t// Signature values\r\n// \tV *big.Int `json:\"v\" gencodec:\"required\"`\r\n// \tR *big.Int `json:\"r\" gencodec:\"required\"`\r\n// \tS *big.Int `json:\"s\" gencodec:\"required\"`\r\n\r\n// \t// This is only used when marshaling to JSON.\r\n// \tHash *common.Hash `json:\"hash\" rlp:\"-\"`\r\n// }\r\n\r\nvar (\r\n\tputf = fmt.Printf\r\n\tputs = fmt.Println\r\n\r\n\tupNum       = 46147\r\n\tendNum      = 46147\r\n\tdbPath      = \"/data/eth_main/eth/geth/chaindata\"\r\n\tancientPath = dbPath + \"/ancient\"\r\n)\r\n\r\nfunc main() {\r\n\tancientDb, err := rawdb.NewLevelDBDatabaseWithFreezer(dbPath, 16, 1, ancientPath, \"\", true)\r\n\tif err != nil {\r\n\t\tpanic(err)\r\n\t}\r\n\r\n\t// ReadHeadHeaderHash retrieves the hash of the current canonical head header.\r\n\tcurrHeader := rawdb.ReadHeadHeaderHash(ancientDb)\r\n\tfmt.Printf(\"currHeader: %x\\n\", currHeader)\r\n\r\n\t// ReadHeaderNumber returns the header number assigned to a hash.\r\n\tcurrHiehgt := rawdb.ReadHeaderNumber(ancientDb, currHeader)\r\n\tfmt.Printf(\"currHiehgt: %d\\n\", currHiehgt)\r\n\r\n\tputs(\"----------------------------------------------------------------\")\r\n\r\n\tfor i := upNum; i <= endNum; i++ {\r\n\t\t// ReadCanonicalHash retrieves the hash assigned to a canonical block number.\r\n\t\tblkHash := rawdb.ReadCanonicalHash(ancientDb, uint64(i))\r\n\r\n\t\t// hash := rawdb.ReadAllHashes(ancientDb, uint64(i))\r\n\r\n\t\tfmt.Printf(\"etherscan url: https://etherscan.io/block/%v\\n\", i)\r\n\r\n\t\tif blkHash == (common.Hash{}) {\r\n\t\t\tfmt.Printf(\"i: %v\\n\", i)\r\n\t\t} else {\r\n\t\t\tfmt.Printf(\"blkHash: %x\\n\", blkHash)\r\n\t\t}\r\n\r\n\t\t// ReadBody retrieves the block body corresponding to the hash.\r\n\t\tblkHeader := rawdb.ReadHeader(ancientDb, blkHash, uint64(i))\r\n\t\tfmt.Printf(\"blkHeader Coinbase: 0x%x\\n\", blkHeader.Coinbase)\r\n\t\tfmt.Printf(\"blkHeader Time: %d\\n\", blkHeader.Time)\r\n\r\n\t\t// ReadBody retrieves the block body corresponding to the hash.\r\n\t\tblkBody := rawdb.ReadBody(ancientDb, blkHash, uint64(i))\r\n\t\tfmt.Printf(\"blkBody: %v\\n\", blkBody)\r\n\t\tfmt.Printf(\"blkBody Uncles size: %x\\n\", len(blkBody.Uncles))\r\n\t\tfor _, uncle := range blkBody.Uncles {\r\n\t\t\tfmt.Printf(\"uncle Hash: 0x%x\\n\", uncle.Hash())\r\n\t\t}\r\n\r\n\t\tfmt.Printf(\"blkBody Tx size: %x\\n\", len(blkBody.Transactions))\r\n\t\tfor _, tx := range blkBody.Transactions {\r\n\t\t\tputf(\"tx Hash: 0x%x\\n\", tx.Hash())\r\n\t\t\tputf(\"tx from addr: 0x%x\\n\", getFromAddr(tx))\r\n\t\t\tputf(\"tx To: 0x%x\\n\", tx.To())\r\n\t\t}\r\n\r\n\t\t// ReadBlock retrieves an entire block corresponding to the hash\r\n\t\tblock := rawdb.ReadBlock(ancientDb, blkHash, uint64(i))\r\n\t\tfmt.Printf(\"block hash: 0x%x\\n\", block.Hash())\r\n\r\n\t\tputs(\"----------------------------------------------------------------\")\r\n\t}\r\n\r\n}\r\n\r\nfunc getFromAddr(tx *types.Transaction) common.Address {\r\n\tvar signer types.Signer = types.FrontierSigner{}\r\n\r\n\tfrom, err := types.Sender(signer, tx)\r\n\tif err != nil {\r\n\t\tpanic(err)\r\n\t}\r\n\r\n\treturn from\r\n```\r\n\r\nWhen I run the program, I got a panic:\r\n```\r\npanic: open /data/eth_main/eth/geth/chaindata/ancient/diffs.ridx: no such file or directory\r\n\r\ngoroutine 1 [running]:\r\nmain.main()\r\n\t/data/read-leveldb/newEthLeveldb.go:71 +0xadb\r\n```\r\n\r\nAnd I find there is diffs.ridx in the ancient directory.\r\n\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "shiziwen",
+    "id": 1405245,
+    "node_id": "MDQ6VXNlcjE0MDUyNDU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1405245?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shiziwen",
+    "html_url": "https://github.com/shiziwen",
+    "followers_url": "https://api.github.com/users/shiziwen/followers",
+    "following_url": "https://api.github.com/users/shiziwen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shiziwen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shiziwen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shiziwen/subscriptions",
+    "organizations_url": "https://api.github.com/users/shiziwen/orgs",
+    "repos_url": "https://api.github.com/users/shiziwen/repos",
+    "events_url": "https://api.github.com/users/shiziwen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shiziwen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26354/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26354/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1352701226",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26354#issuecomment-1352701226",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26354",
+    "id": 1352701226,
+    "node_id": "IC_kwDOAOvK985QoJUq",
+    "user": {
+      "login": "shiziwen",
+      "id": 1405245,
+      "node_id": "MDQ6VXNlcjE0MDUyNDU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1405245?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shiziwen",
+      "html_url": "https://github.com/shiziwen",
+      "followers_url": "https://api.github.com/users/shiziwen/followers",
+      "following_url": "https://api.github.com/users/shiziwen/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shiziwen/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shiziwen/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shiziwen/subscriptions",
+      "organizations_url": "https://api.github.com/users/shiziwen/orgs",
+      "repos_url": "https://api.github.com/users/shiziwen/repos",
+      "events_url": "https://api.github.com/users/shiziwen/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shiziwen/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-12-15T08:15:21Z",
+    "updated_at": "2022-12-15T08:15:21Z",
+    "author_association": "NONE",
+    "body": "It was my geth node issue.\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1352701226/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
