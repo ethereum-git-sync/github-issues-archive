@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2022-11-24T10:00:01Z",
-  "updated_at": "2022-11-25T14:47:58Z",
-  "closed_at": null,
+  "updated_at": "2022-12-20T10:37:55Z",
+  "closed_at": "2022-12-20T10:37:55Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "```\r\nGeth version: 1.10.25\r\nOS & Version: OSX\r\n```\r\n\r\ncode:\r\n```\r\npendingBlockNr := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)\r\nestimated, err := DoEstimateGas(ctx, b, callArgs, pendingBlockNr, b.RPCGasCap())\r\n```\r\n\r\nI start several nodes to run a private network, everything is fine.\r\nwhen I use first to do tx of an account, it always error:\"insufficient...\",but it have money which I had check in  getBalance().\r\nthen I get the break point,I think rpc.PendingBlockNumber is not right here?\r\nbecause getbalance is right which use rpc.latestblockNumber\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26249/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26249/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -236,6 +255,50 @@
     "body": "<b>edit) Sorry. I thought it was a question about ethclient. Please ignore it.</b>\r\n\r\nI don't know the history, but the two variable about PendingBlockNumber are different.\r\nSo, If you want data about pending block, use like below\r\n```go\r\n// Get balance from pending block\r\n\r\n// bad\r\nclient.BalanceAt(context.Background(), \"\", rpc.PendingBlockNumber)\r\n\r\n// correct\r\nclient.BalanceAt(context.Background(), \"\", big.NewInt(-1))\r\n```\r\n\r\nIn rpc modules,\r\n```go\r\nconst (\r\n\tSafeBlockNumber      = BlockNumber(-4)\r\n\tFinalizedBlockNumber = BlockNumber(-3)\r\n\tPendingBlockNumber   = BlockNumber(-2)\r\n\tLatestBlockNumber    = BlockNumber(-1)\r\n\tEarliestBlockNumber  = BlockNumber(0)\r\n)\r\n```\r\n\r\nAnd ethclient\r\n```go\r\nfunc toBlockNumArg(number *big.Int) string {\r\n\tif number == nil {\r\n\t\treturn \"latest\"\r\n\t}\r\n\tpending := big.NewInt(-1)\r\n\tif number.Cmp(pending) == 0 {\r\n\t\treturn \"pending\"\r\n\t}\r\n\tfinalized := big.NewInt(int64(rpc.FinalizedBlockNumber))\r\n\tif number.Cmp(finalized) == 0 {\r\n\t\treturn \"finalized\"\r\n\t}\r\n\tsafe := big.NewInt(int64(rpc.SafeBlockNumber))\r\n\tif number.Cmp(safe) == 0 {\r\n\t\treturn \"safe\"\r\n\t}\r\n\treturn hexutil.EncodeBig(number)\r\n}\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1327393850/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1359157169",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26249#issuecomment-1359157169",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26249",
+    "id": 1359157169,
+    "node_id": "IC_kwDOAOvK985RAxex",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-12-20T10:37:55Z",
+    "updated_at": "2022-12-20T10:37:55Z",
+    "author_association": "MEMBER",
+    "body": "> Is this really geth? If so, please provide the first 50 lines of upstart logs, so we can see which exact version it is. If it's a downstream fork, please close.\r\n\r\n.... sounds of silence ... \r\n\r\nI'm closing",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1359157169/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

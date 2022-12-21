@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2021-06-07T13:50:06Z",
-  "updated_at": "2022-06-12T14:48:33Z",
-  "closed_at": null,
+  "updated_at": "2022-12-20T14:08:34Z",
+  "closed_at": "2022-12-20T14:08:33Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: `1.10.1`\r\nOS & Version: Linux\r\n\r\n#### Expected behaviour\r\nTransactions with a gas-price around the current average should get broadcasted properly to the network and \r\nshow up on the blockchain\r\n\r\n\r\n#### Actual behaviour\r\n\r\nSince Thursday we experienced a couple of situations where transactions did not get broadcast. We checked gas price and nonces and those checked out. Here are two example transactions: \r\n\r\n```json\r\n{\r\n  \"function_name\": \"approve\",\r\n  \"to_address\": \"0x255Aa6DF07540Cb5d3d297f0D0D4D84cb52bc8e6\",\r\n  \"args\": [\r\n    \"b'\\\\x1cb\\\\xfff\\\\xaf\\\\x8a\\\\xadA\\\\x00e\\\\xe0#8\\\\xf5\\\\xbf\\\\xbb\\\\xe2>\\\\x1f\\\\x10'\",\r\n    0\r\n  ],\r\n  \"kwargs\": {},\r\n  \"value\": 0,\r\n  \"token\": \"89109fbd-297f-44f7-8cb6-577ae55f38f7\",\r\n  \"node\": \"0x4852c63389da19DcCBEA405c4f9Da3A0104CffC4\",\r\n  \"from_address\": \"0x4852c63389da19DcCBEA405c4f9Da3A0104CffC4\",\r\n  \"eth_node\": \"<EthClient.GETH: 'geth'>\",\r\n  \"startgas\": 33993,\r\n  \"gas_price\": 19982666969,\r\n  \"nonce\": 20,\r\n  \"transaction_hash\": \"0x7493ae44db054c4acf28b2f1bfc1bcfe7f2d1513480744b4887713dfa1d12a42\",\r\n  \"chain_id\": 1,\r\n  \"event\": \"Transaction sent\",\r\n  \"logger\": \"raiden.network.rpc.client\",\r\n  \"level\": \"debug\",\r\n  \"timestamp\": \"2021-06-04 15:39:33.923385\"\r\n}\r\n{\r\n  \"function_name\": \"transfer\",\r\n  \"to_address\": \"0x6B175474E89094C44Da98b954EedeAC495271d0F\",\r\n  \"args\": [\r\n    \"0x3C17455Ad08170DE38cC7B17A3842f90C2490fAB\",\r\n    1e+19\r\n  ],\r\n  \"kwargs\": {},\r\n  \"value\": 0,\r\n  \"token\": \"be309aca-8d90-4877-883b-d9d0727c7160\",\r\n  \"node\": \"0x4852c63389da19DcCBEA405c4f9Da3A0104CffC4\",\r\n  \"from_address\": \"0x4852c63389da19DcCBEA405c4f9Da3A0104CffC4\",\r\n  \"eth_node\": \"<EthClient.GETH: 'geth'>\",\r\n  \"startgas\": 67347,\r\n  \"gas_price\": 19982666969,\r\n  \"nonce\": 21,\r\n  \"transaction_hash\": \"0x76ac1dcbf83805e7cf46015d74f4f45935884b3e4e7836cbbc1bc86b1d893e3a\",\r\n  \"chain_id\": 1,\r\n  \"event\": \"Transaction sent\",\r\n  \"logger\": \"raiden.network.rpc.client\",\r\n  \"level\": \"debug\",\r\n  \"timestamp\": \"2021-06-04 15:39:34.584075\"\r\n\r\n}\r\n```\r\n\r\nThey were posted last Friday but never showed up on etherscan:\r\n[0x7493ae44db054c4acf28b2f1bfc1bcfe7f2d1513480744b4887713dfa1d12a42](https://etherscan.io/tx/0x7493ae44db054c4acf28b2f1bfc1bcfe7f2d1513480744b4887713dfa1d12a42)\r\n[0x76ac1dcbf83805e7cf46015d74f4f45935884b3e4e7836cbbc1bc86b1d893e3a](https://etherscan.io/tx/0x76ac1dcbf83805e7cf46015d74f4f45935884b3e4e7836cbbc1bc86b1d893e3a)\r\n\r\n(note: the tx previous to these two were sent out by the same process for the same [sender](https://etherscan.io/address/0x4852c63389da19dccbea405c4f9da3a0104cffc4)).\r\n\r\n*So far we have*\r\n\r\n1) asserted, that the tx were seen by geth – when creating more transactions for the same address, the nonce/transaction count queried from geth went up.\r\n2) inspected the mempool via the web3's txpool API (some time after the tx were handed to Geth) and the most noteworthy thing to see was that the txpool of our node is at the limits that were configured. We are using the default config for `txpool.*` parameters and had 1024 queued, 4096 pending tx's. We don't use `txpool.locals` whitelisting.\r\n\r\nDo you have any insight on what may be causing this? Any further hints on debugging this behavior?\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/23009/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/23009/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -280,6 +299,50 @@
     "body": "Having the same problem with geth version v.1.10.6. \r\nThis problem was reported by me for more than 2 years, stil lwaiting for a solution ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/894240319/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1359420162",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/23009#issuecomment-1359420162",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/23009",
+    "id": 1359420162,
+    "node_id": "IC_kwDOAOvK985RBxsC",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-12-20T14:08:33Z",
+    "updated_at": "2022-12-20T14:08:33Z",
+    "author_association": "MEMBER",
+    "body": "This is too old, closing",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1359420162/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
