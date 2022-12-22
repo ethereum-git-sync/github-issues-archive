@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13827",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13827/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13827/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13827/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13827",
+  "id": 1506981161,
+  "node_id": "I_kwDOAm_5kc5Z0rUp",
+  "number": 13827,
+  "title": "Overloaded Functions Cannot Be Assigned To Function Type Variables",
+  "user": {
+    "login": "toongeorges",
+    "id": 6784449,
+    "node_id": "MDQ6VXNlcjY3ODQ0NDk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6784449?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/toongeorges",
+    "html_url": "https://github.com/toongeorges",
+    "followers_url": "https://api.github.com/users/toongeorges/followers",
+    "following_url": "https://api.github.com/users/toongeorges/following{/other_user}",
+    "gists_url": "https://api.github.com/users/toongeorges/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/toongeorges/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/toongeorges/subscriptions",
+    "organizations_url": "https://api.github.com/users/toongeorges/orgs",
+    "repos_url": "https://api.github.com/users/toongeorges/repos",
+    "events_url": "https://api.github.com/users/toongeorges/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/toongeorges/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-12-21T22:20:21Z",
+  "updated_at": "2022-12-21T23:53:43Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nFunctions that are overloaded cannot be assigned to a function type variable.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.17\r\n- Target EVM version (as per compiler settings): Remix VM (London)\r\n- Framework/IDE (e.g. Truffle or Remix): Remix\r\n- EVM execution environment / backend / blockchain client:\r\n- Operating system: Ubuntu 21.10\r\n\r\n## Steps to Reproduce\r\n\r\nThe 2 lines in the code example below that assign a value to an external function type variable and an internal function type variable cause a compilation error.  The compiler should have enough information (namely the parameter list from the function types) to know which of the overloaded functions to select.\r\n\r\nIf the functions with 3 arguments are removed so that `sum` and `product` are not overloaded anymore, the compilation errors go away.\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.17;\r\n\r\ncontract Overloading {\r\n    function sum(uint a, uint b) external pure returns (uint) {\r\n        return a + b;\r\n    }\r\n\r\n    function sum(uint a, uint b, uint c) external pure returns (uint) {\r\n        return a + b + c;\r\n    }\r\n}\r\n\r\ncontract SelectOverloadedFunction {\r\n    Overloading private overloading;\r\n\r\n    function(uint, uint) external pure returns (uint) extTwoArguments;\r\n    function(uint, uint) internal pure returns (uint) intTwoArguments;\r\n\r\n    constructor() {\r\n        overloading = new Overloading();\r\n        //causes compilation error: Member \"sum\" not unique after argument-dependent lookup in contract Overloading\r\n        extTwoArguments = overloading.sum;\r\n        //causes compilation error: No matching declaration found after variable lookup\r\n        intTwoArguments = product;\r\n    }\r\n\r\n    function product(uint a, uint b) internal pure returns (uint) {\r\n        return a * b;\r\n    }\r\n\r\n    function product(uint a, uint b, uint c) internal pure returns (uint) {\r\n        return a * b * c;\r\n    }\r\n\r\n    function calculateExternal(uint a, uint b) external view returns (uint) {\r\n        return extTwoArguments(a, b);\r\n    }\r\n\r\n    function calculateInternal(uint a, uint b) external view returns (uint) {\r\n        return intTwoArguments(a, b);\r\n    }\r\n}\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13827/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13827/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
