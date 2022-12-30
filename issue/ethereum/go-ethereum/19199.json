@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "karalabe",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2019-03-02T20:19:52Z",
-  "updated_at": "2020-04-16T08:34:09Z",
-  "closed_at": null,
+  "updated_at": "2022-12-29T10:59:07Z",
+  "closed_at": "2022-12-29T10:59:07Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "If full-sync fails without having done a flush to disk, it will switch over to fast-sync next time it's started\r\n\r\n```\r\n[user@work go-ethereum]$ build/bin/geth --syncmode full\r\nINFO [03-02|21:01:36.907] Maximum peer count                       ETH=25 LES=0 total=25\r\nINFO [03-02|21:01:36.908] Starting peer-to-peer node               instance=Geth/v1.9.0-unstable-f9aa1cd2/linux-amd64/go1.11.2\r\nINFO [03-02|21:01:36.908] Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB\r\n\r\n... panic (my bad)...\r\n```\r\nRecompile, fix `panic`, and start over:\r\n```\r\n[user@work go-ethereum]$ build/bin/geth --syncmode full\r\nINFO [03-02|21:08:20.871] Maximum peer count                       ETH=25 LES=0 total=25\r\nINFO [03-02|21:08:20.872] Starting peer-to-peer node               instance=Geth/v1.9.0-unstable-f9aa1cd2/linux-amd64/go1.11.2\r\nINFO [03-02|21:08:20.872] Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB\r\nINFO [03-02|21:08:20.872] Allocated cache and file handles         database=/home/user/.ethereum/geth/chaindata cache=512.00MiB handles=2048\r\nINFO [03-02|21:08:22.280] Initialised chain configuration          config=\"{ChainID: 1 Homestead: 1150000 DAO: 1920000 DAOSupport: true EIP150: 2463000 EIP155: 2675000 EIP158: 2675000 Byzantium: 4370000 Constantinople: 7280000  ConstantinopleFix: 7280000 Engine: ethash}\"\r\nINFO [03-02|21:08:22.280] Disk storage enabled for ethash caches   dir=/home/user/.ethereum/geth/ethash count=3\r\nINFO [03-02|21:08:22.280] Disk storage enabled for ethash DAGs     dir=/home/user/.ethash               count=2\r\nINFO [03-02|21:08:22.280] Initialising Ethereum protocol           versions=\"[63 62]\" network=1 dbversion=4\r\nWARN [03-02|21:08:22.303] Head state missing, repairing chain      number=46401 hash=6cc737…40b080\r\nINFO [03-02|21:08:23.537] Rewound blockchain to past state         number=0     hash=d4e567…cb8fa3\r\nINFO [03-02|21:08:23.537] Loaded most recent local header          number=46401 hash=6cc737…40b080 td=43055236701273795 age=3y7mo1w\r\nINFO [03-02|21:08:23.537] Loaded most recent local full block      number=0     hash=d4e567…cb8fa3 td=17179869184       age=49y10mo2w\r\nINFO [03-02|21:08:23.537] Loaded most recent local fast block      number=46401 hash=6cc737…40b080 td=43055236701273795 age=3y7mo1w\r\nINFO [03-02|21:08:23.538] Loaded local transaction journal         transactions=0 dropped=0\r\nINFO [03-02|21:08:23.538] Regenerated local transaction journal    transactions=0 accounts=0\r\n\r\n```\r\nSince the full block was never stored, but the fastblock was, `geth` now ignores my command to do a full-sync, and instead proceeds with a fast-sync. \r\n\r\nThe hacky fix to get around it is to do a `geth removedb`, but that's not the Correct Way (tm). ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "MariusVanDerWijden",
+    "id": 16664698,
+    "node_id": "MDQ6VXNlcjE2NjY0Njk4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16664698?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MariusVanDerWijden",
+    "html_url": "https://github.com/MariusVanDerWijden",
+    "followers_url": "https://api.github.com/users/MariusVanDerWijden/followers",
+    "following_url": "https://api.github.com/users/MariusVanDerWijden/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MariusVanDerWijden/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MariusVanDerWijden/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MariusVanDerWijden/subscriptions",
+    "organizations_url": "https://api.github.com/users/MariusVanDerWijden/orgs",
+    "repos_url": "https://api.github.com/users/MariusVanDerWijden/repos",
+    "events_url": "https://api.github.com/users/MariusVanDerWijden/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MariusVanDerWijden/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/19199/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/19199/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -186,6 +205,50 @@
     "body": "Ping to unstale it",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/614499686/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1367237738",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/19199#issuecomment-1367237738",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/19199",
+    "id": 1367237738,
+    "node_id": "IC_kwDOAOvK985RfmRq",
+    "user": {
+      "login": "MariusVanDerWijden",
+      "id": 16664698,
+      "node_id": "MDQ6VXNlcjE2NjY0Njk4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16664698?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MariusVanDerWijden",
+      "html_url": "https://github.com/MariusVanDerWijden",
+      "followers_url": "https://api.github.com/users/MariusVanDerWijden/followers",
+      "following_url": "https://api.github.com/users/MariusVanDerWijden/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MariusVanDerWijden/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MariusVanDerWijden/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MariusVanDerWijden/subscriptions",
+      "organizations_url": "https://api.github.com/users/MariusVanDerWijden/orgs",
+      "repos_url": "https://api.github.com/users/MariusVanDerWijden/repos",
+      "events_url": "https://api.github.com/users/MariusVanDerWijden/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MariusVanDerWijden/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-12-29T10:59:05Z",
+    "updated_at": "2022-12-29T10:59:05Z",
+    "author_association": "MEMBER",
+    "body": "I think this is not an issue with snap sync anymore. Will close, feel free to reopen if still persists",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1367237738/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
