@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26411",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26411/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26411/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26411/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/26411",
+  "id": 1517618100,
+  "node_id": "I_kwDOAOvK985adQO0",
+  "number": 26411,
+  "title": "Adding quotes to args in docker-compose causes the values to be ignored",
+  "user": {
+    "login": "ahasna",
+    "id": 25301467,
+    "node_id": "MDQ6VXNlcjI1MzAxNDY3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25301467?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ahasna",
+    "html_url": "https://github.com/ahasna",
+    "followers_url": "https://api.github.com/users/ahasna/followers",
+    "following_url": "https://api.github.com/users/ahasna/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ahasna/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ahasna/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ahasna/subscriptions",
+    "organizations_url": "https://api.github.com/users/ahasna/orgs",
+    "repos_url": "https://api.github.com/users/ahasna/repos",
+    "events_url": "https://api.github.com/users/ahasna/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ahasna/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-01-03T16:14:34Z",
+  "updated_at": "2023-01-03T16:14:34Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Background\r\n\r\nI am building a dockerized application to deploy private networks using `geth`. For that I am using `docker-compose` file, and the idea is to run `docker-compose up` once the machine is deployed which will create a plug-and-play private ethereum network for some internal testing for contracts deployments. \r\n\r\n### The initial docker-compose file I used\r\n\r\n```yaml\r\nversion: \"3.8\"\r\n\r\nservices:\r\n  geth:\r\n    image: ethereum/client-go\r\n    pull_policy: if_not_present\r\n    container_name: geth\r\n    restart: unless-stopped\r\n    ports:\r\n      - 30303:30303\r\n      - 30303:30303/udp\r\n      - 8545:8545\r\n      - 8546:8546\r\n      - 8551:8551\r\n    stop_signal: SIGINT\r\n    stop_grace_period: 2m\r\n    healthcheck:\r\n      test: [\"CMD-SHELL\", \"echo hi\"]\r\n      interval: 10s\r\n      timeout: 5s\r\n      retries: 5\r\n    volumes:\r\n      - ./geth/geth_password:/geth/password\r\n    command:\r\n      - --datadir=/geth/data\r\n      - --networkid=12345\r\n      - --allow-insecure-unlock\r\n      - --unlock=0x000...\r\n      - --password=/geth/password\r\n      - --mine\r\n      - --miner.threads=1\r\n      - --nodiscover\r\n      - --gcmode=archive\r\n      - --http\r\n      - --http.addr=0.0.0.0\r\n      - --http.vhosts=*\r\n      - --http.corsdomain=*\r\n      - --http.api=\"web3,eth,debug\"\r\n      - --rpc.allow-unprotected-txs\r\n      - --nodiscover\r\n      - --ws\r\n      - --ws.addr=0.0.0.0\r\n      - --ws.origins=*\r\n      - --ws.api=\"web3,eth,debug\"\r\n```\r\n\r\n### The problem\r\n\r\nStarting this container was fine and I could see blocks being mined. However when I tried to deploy contracts I got this error message:\r\n\r\n```log\r\nthe method web3_clientVersion does not exist/is not available\r\n```\r\n\r\nAfter a tedious two-day debugging , I learned (by randomly guessing) that the quotes in the following two cli arguments where causing `geth` to ignore them or maybe not parsing them correctly:\r\n\r\n```txt\r\n      - --http.api=\"web3,eth,debug\"\r\n      - --ws.api=\"web3,eth,debug\"\r\n```\r\n### The solution\r\nRemoving the quotes fixed the issue and I could deploy the contracts successfully.\r\n\r\n#### Working Docker File\r\n```yaml\r\nversion: \"3.8\"\r\n\r\nservices:\r\n  geth:\r\n    image: ethereum/client-go\r\n    pull_policy: if_not_present\r\n    container_name: geth\r\n    restart: unless-stopped\r\n    ports:\r\n      - 30303:30303\r\n      - 30303:30303/udp\r\n      - 8545:8545\r\n      - 8546:8546\r\n      - 8551:8551\r\n    stop_signal: SIGINT\r\n    stop_grace_period: 2m\r\n    healthcheck:\r\n      test: [\"CMD-SHELL\", \"echo hi\"]\r\n      interval: 10s\r\n      timeout: 5s\r\n      retries: 5\r\n    volumes:\r\n      - ./geth/geth_password:/geth/password\r\n    command:\r\n      - --datadir=/geth/data\r\n      - --networkid=12345\r\n      - --allow-insecure-unlock\r\n      - --unlock=0x000...\r\n      - --password=/geth/password\r\n      - --mine\r\n      - --miner.threads=1\r\n      - --nodiscover\r\n      - --gcmode=archive\r\n      - --http\r\n      - --http.addr=0.0.0.0\r\n      - --http.vhosts=*\r\n      - --http.corsdomain=*\r\n      - --http.api=web3,eth,debug\r\n      - --rpc.allow-unprotected-txs\r\n      - --nodiscover\r\n      - --ws\r\n      - --ws.addr=0.0.0.0\r\n      - --ws.origins=*\r\n      - --ws.api=web3,eth,debug\r\n```\r\n\r\n### My question\r\n\r\nIs it actually the case that quotes were causing the issue?",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26411/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26411/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
