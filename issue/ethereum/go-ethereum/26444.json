@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26444",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26444/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26444/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26444/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/26444",
+  "id": 1522714473,
+  "node_id": "I_kwDOAOvK985awsdp",
+  "number": 26444,
+  "title": "Issues with full archive sync with DB compaction",
+  "user": {
+    "login": "imulmat4",
+    "id": 117636097,
+    "node_id": "U_kgDOBwL8AQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/117636097?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/imulmat4",
+    "html_url": "https://github.com/imulmat4",
+    "followers_url": "https://api.github.com/users/imulmat4/followers",
+    "following_url": "https://api.github.com/users/imulmat4/following{/other_user}",
+    "gists_url": "https://api.github.com/users/imulmat4/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/imulmat4/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/imulmat4/subscriptions",
+    "organizations_url": "https://api.github.com/users/imulmat4/orgs",
+    "repos_url": "https://api.github.com/users/imulmat4/repos",
+    "events_url": "https://api.github.com/users/imulmat4/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/imulmat4/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-01-06T14:59:46Z",
+  "updated_at": "2023-01-06T14:59:46Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: `geth version`\r\n1.10.26\r\nCL client & version: e.g. lighthouse/nimbus/prysm@v1.0.0\r\nlighthouse:3.2.1 \r\nOS & Version: Windows/Linux/OSX\r\nUbuntu 22.04.1\r\nCommit hash : (if `develop`)\r\n\r\n#### Expected behavior\r\nSync without ~1-2Hr DB compaction times\r\n\r\n#### Actual behaviour\r\nI am seeing 2 hours of syncing followed by 1-2 hours of DB compaction. Which is making syncing so much slower than it has to be.\r\n\r\n#### Steps to reproduce the behaviour\r\nI am syncing a full archive node from genesis. My node has 128GB of RAM and 32 CPUs. The SSD that has my chaindata on it is an AWS EBS IO2 with 64k IOPS which should be more than enough. MY Geth Command line args are as follows:\r\n--syncmode full --gcmode archive --mainnet --cache 102400 --maxpeers 100 --http --http.api personal,eth,net,web3,debug --ws --graphql --datadir /data/geth  --authrpc.addr localhost --authrpc.port 8551 --authrpc.vhosts localhost --ws.port 8546 --ws.api personal,eth,net,web3,txpool,debug -http.addr 0.0.0.0 -http.vhosts '*'geth --ws --ws.port 8546 --ws.origins \"*\" -ws.addr 0.0.0.0 --metrics --pprof --metrics.addr 127.0.0.1\r\n\r\nPlease let me know if I am missing anything here. One thing that I do notice is that despite me setting my cache to 100Gbs I dont see my memory consumption anyting close to that and it seems like things are single threaded???\r\n\r\n#### Backtrace\r\n\r\n````\r\n[backtrace]\r\nWARN [01-06|14:01:35.342] Snapshot extension registration failed   peer=92a3f6f8 err=\"peer connected on snap without compatible eth support\"\r\nWARN [01-06|14:02:03.732] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nINFO [01-06|14:02:59.222] Writing clean trie cache to disk         path=/data/geth/geth/triecache threads=1\r\nINFO [01-06|14:02:59.223] Regenerated local transaction journal    transactions=0 accounts=0\r\nWARN [01-06|14:03:03.740] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nINFO [01-06|14:03:16.590] Persisted the clean trie cache           path=/data/geth/geth/triecache elapsed=17.368s\r\nWARN [01-06|14:04:03.746] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:05:03.754] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:06:03.761] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:07:03.770] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:08:03.778] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:09:03.783] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:10:03.792] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:11:03.799] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:12:03.804] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:13:03.809] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:14:03.814] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:15:03.825] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:16:03.832] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:17:03.840] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:18:03.847] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:19:03.853] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:20:03.863] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:21:03.872] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:22:03.880] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:23:03.887] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nWARN [01-06|14:24:03.896] Database compacting, degraded performance database=/data/geth/geth/chaindata\r\nINFO [01-06|14:24:32.935] Imported new chain segment               blocks=8  txs=1231  mgas=99.857  elapsed=1h33m39.488s mgasps=0.018   number=11,127,583 hash=92c3ce..02dbd9 age=2y2mo3w  dirty=0.00B\r\n\r\n````\r\n\r\nWhen submitting logs: please submit them as text and not screenshots.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26444/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26444/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
