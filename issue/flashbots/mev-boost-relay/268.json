@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/268",
+  "repository_url": "https://api.github.com/repos/flashbots/mev-boost-relay",
+  "labels_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/268/labels{/name}",
+  "comments_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/268/comments",
+  "events_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/268/events",
+  "html_url": "https://github.com/flashbots/mev-boost-relay/issues/268",
+  "id": 1524371098,
+  "node_id": "I_kwDOHXha9s5a3A6a",
+  "number": 268,
+  "title": "Discussion: support payout tx payee being different than fee recipient",
+  "user": {
+    "login": "JVillella",
+    "id": 6306986,
+    "node_id": "MDQ6VXNlcjYzMDY5ODY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6306986?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JVillella",
+    "html_url": "https://github.com/JVillella",
+    "followers_url": "https://api.github.com/users/JVillella/followers",
+    "following_url": "https://api.github.com/users/JVillella/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JVillella/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JVillella/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JVillella/subscriptions",
+    "organizations_url": "https://api.github.com/users/JVillella/orgs",
+    "repos_url": "https://api.github.com/users/JVillella/repos",
+    "events_url": "https://api.github.com/users/JVillella/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JVillella/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4778997663,
+      "node_id": "LA_kwDOHXha9s8AAAABHNm3nw",
+      "url": "https://api.github.com/repos/flashbots/mev-boost-relay/labels/feature%20request",
+      "name": "feature request",
+      "color": "47F2B5",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-01-08T07:14:37Z",
+  "updated_at": "2023-01-08T07:14:37Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "As it stands now, block validation requires the `to` field of the payout transaction to be that of the fee recipient.\r\n\r\nThis is problematic as reorgs still do happen in eth PoS. The payout tx can make its way into the mempool, and into a future block. Even though one would set a max priority of 0 it can still be picked up by clients who've configured their nodes min priority to be zero.\r\n\r\nA builder would be especially prone to this if they're seldomly building blocks. That payout tx won't be invalidated until their nonce is bumped (i.e. until they get another block in and perform another payout) so it can sit in the pool for e.g. hours. waiting for a builder with their configured max priority = 0 to pick it up.\r\n\r\nThis isn't theoretical, I've seen it happen a few times already.\r\n\r\nOne workaround is to do a 2-step payout. Step 1 - create a tx that funds a contract; step 2 - have this contract address pay the fee recipient with a block number and/or base fee check (to catch re-org).\r\n\r\nHowever, my suggestion is to change the validation rules to remove the `to == fee_recipient` check, and instead validate that the total payout to the fee recipient is `>= bid.value`.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/268/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/268/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
