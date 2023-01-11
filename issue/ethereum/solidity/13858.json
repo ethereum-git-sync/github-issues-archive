@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13858",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13858/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13858/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13858/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13858",
+  "id": 1527740564,
+  "node_id": "I_kwDOAm_5kc5bD3iU",
+  "number": 13858,
+  "title": "IR-based compilation increase contract size when an internal function is called many times",
+  "user": {
+    "login": "fruiz08",
+    "id": 89082649,
+    "node_id": "MDQ6VXNlcjg5MDgyNjQ5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/89082649?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fruiz08",
+    "html_url": "https://github.com/fruiz08",
+    "followers_url": "https://api.github.com/users/fruiz08/followers",
+    "following_url": "https://api.github.com/users/fruiz08/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fruiz08/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fruiz08/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fruiz08/subscriptions",
+    "organizations_url": "https://api.github.com/users/fruiz08/orgs",
+    "repos_url": "https://api.github.com/users/fruiz08/repos",
+    "events_url": "https://api.github.com/users/fruiz08/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fruiz08/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-01-10T17:12:32Z",
+  "updated_at": "2023-01-10T17:12:32Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWhen calling an internal function many times using `viaIR=true`, the contract size increase drastically compared to using `viaIR=false`\r\n\r\nWith viaIR=true\r\n```\r\n ·····················|··············|·················\r\n |  Test              ·      14.445  ·  \r\n ·····················|··············|·················\r\n```\r\n With viaIR=false\r\n```\r\n  ·····················|··············|·················\r\n |  Test              ·       3.788  ·                │\r\n ·····················|··············|·················\r\n```\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.17\r\n- Target EVM version (as per compiler settings): default\r\n- Framework/IDE (e.g. Truffle or Remix): hardhat\r\n- Operating system: macOS\r\n\r\n## Steps to Reproduce\r\nHere is an example and a repository to reproduce it\r\n[Repo](https://github.com/fruiz08/viaIR-size-issue)\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity 0.8.17;\r\n\r\nimport \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";\r\n\r\ncontract Test {\r\n\r\n    ERC20 internal token1;\r\n\r\n    function _function1(address address_) internal {\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n        token1.transfer(address_, 1000 ether);\r\n    }   \r\n\r\n    function function1() public {\r\n        _function1(msg.sender);\r\n    }\r\n\r\n    function function1v2(address address_) public {\r\n        _function1(address_);\r\n    }\r\n\r\n    function function1v10() public {\r\n        _function1(address(10));\r\n    }\r\n    function function1v11() public {\r\n        _function1(address(11));\r\n    }\r\n    function function1v12() public {\r\n        _function1(address(12));\r\n    }\r\n    function function1v13() public {\r\n        _function1(address(13));\r\n    }\r\n    function function1v14() public {\r\n        _function1(address(14));\r\n    }\r\n    function function1v15() public {\r\n        _function1(address(15));\r\n    }\r\n    function function1v16() public {\r\n        _function1(address(16));\r\n    }\r\n    function function1v17() public {\r\n        _function1(address(17));\r\n    }\r\n    function function1v18() public {\r\n        _function1(address(18));\r\n    }\r\n    function function1v19() public {\r\n        _function1(address(19));\r\n    }\r\n}\r\n```\r\n-->\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13858/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13858/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
