@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-01-09T19:32:18Z",
-  "updated_at": "2023-01-09T19:32:18Z",
-  "closed_at": null,
+  "updated_at": "2023-01-10T03:44:17Z",
+  "closed_at": "2023-01-10T03:44:17Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: `v1.10.18`\r\nOS & Version: OSX\r\nCommit hash : (if `develop`)\r\n\r\n#### Expected behaviour\r\nNo race condition should be detected\r\n\r\n#### Actual behaviour\r\nWhile running attached test a race condition will be detected (and it is easy to see in the code that the race condition actually exists)\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\nRun this test:\r\n\r\n````\r\npackage ethereum_test\r\n\r\nimport (\r\n\t\"github.com/ethereum/go-ethereum/accounts/keystore\"\r\n\t\"github.com/ethereum/go-ethereum/common\"\r\n\t\"github.com/ethereum/go-ethereum/core\"\r\n\t\"github.com/ethereum/go-ethereum/eth\"\r\n\t\"github.com/ethereum/go-ethereum/eth/ethconfig\"\r\n\t\"github.com/ethereum/go-ethereum/miner\"\r\n\t\"github.com/ethereum/go-ethereum/node\"\r\n\t\"github.com/ethereum/go-ethereum/params\"\r\n\t\"github.com/ethereum/go-ethereum/rpc\"\r\n\t\"math/big\"\r\n\t\"testing\"\r\n\t\"time\"\r\n)\r\n\r\nvar (\r\n\tTestBalance                = new(big.Int).Lsh(big.NewInt(2e15), 250)\r\n\tTestChainId                = big.NewInt(1337)\r\n\tTestGenesisGasLimit uint64 = 1_000_000_000_000_000_000\r\n\tTestAlloc                  = core.GenesisAlloc(map[common.Address]core.GenesisAccount{\r\n\t\tTestAddr: {Balance: TestBalance},\r\n\t})\r\n)\r\n\r\nvar genesis = &core.Genesis{\r\n\tConfig: &params.ChainConfig{\r\n\t\tChainID:             TestChainId,\r\n\t\tHomesteadBlock:      big.NewInt(0),\r\n\t\tEIP150Block:         big.NewInt(0),\r\n\t\tEIP155Block:         big.NewInt(0),\r\n\t\tEIP158Block:         big.NewInt(0),\r\n\t\tByzantiumBlock:      big.NewInt(0),\r\n\t\tConstantinopleBlock: big.NewInt(0),\r\n\t\tPetersburgBlock:     big.NewInt(0),\r\n\t\tIstanbulBlock:       big.NewInt(0),\r\n\t\tClique: &params.CliqueConfig{\r\n\t\t\tPeriod: 1,\r\n\t\t\tEpoch:  30000,\r\n\t\t},\r\n\t},\r\n\r\n\tAlloc:     TestAlloc,\r\n\tExtraData: make([]byte, 32+common.AddressLength+65),\r\n\tTimestamp: 9000,\r\n\tBaseFee:   big.NewInt(params.InitialBaseFee),\r\n\tGasLimit:  TestGenesisGasLimit,\r\n}\r\n\r\ntype MockedBackend struct {\r\n\tethservice *eth.Ethereum\r\n\tnode       *node.Node\r\n}\r\n\r\nfunc NewMockedBackend(t *testing.T) *MockedBackend {\r\n\t// Create node\r\n\tn, err := node.New(&node.Config{})\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"can't create new node: %v\", err)\r\n\t}\r\n\tcopy(genesis.ExtraData[32:], TestAddr[:])\r\n\t// Create Ethereum Service\r\n\tconfig := &ethconfig.Config{\r\n\t\tGenesis: genesis,\r\n\t\tMiner: miner.Config{\r\n\t\t\tEtherbase: TestAddr,\r\n\t\t\tGasCeil:   genesis.GasLimit * 11 / 10,\r\n\t\t\tGasPrice:  big.NewInt(1),\r\n\t\t\tRecommit:  time.Second,\r\n\t\t},\r\n\t}\r\n\tethservice, err := eth.New(n, config)\r\n\tif err != nil {\r\n\t\tpanic(err)\r\n\t}\r\n\t// Setup key store and unlock the sealer's account\r\n\t_, ks := tmpKeyStore(t, false)\r\n\tsigner, err := ks.ImportECDSA(TestKey, \"\")\r\n\tif err != nil {\r\n\t\tpanic(err)\r\n\t}\r\n\tif err = ks.Unlock(signer, \"\"); err != nil {\r\n\t\tpanic(err)\r\n\t}\r\n\tethservice.AccountManager().AddBackend(ks)\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"can't create new ethereum service: %v\", err)\r\n\t}\r\n\t// Run mining\r\n\terr = ethservice.StartMining(1)\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"can't create new ethereum service: %v\", err)\r\n\t}\r\n\t// Run the node\r\n\tif err := n.Start(); err != nil {\r\n\t\tt.Fatalf(\"can't start test node: %v\", err)\r\n\t}\r\n\treturn &MockedBackend{\r\n\t\tethservice: ethservice,\r\n\t\tnode:       n,\r\n\t}\r\n}\r\n\r\nfunc (mb MockedBackend) Client() (*rpc.Client, error) {\r\n\treturn mb.node.Attach()\r\n}\r\n\r\nfunc (mb MockedBackend) Close() {\r\n\tmb.node.Close()\r\n}\r\n\r\nconst (\r\n\tveryLightScryptN = 2\r\n\tveryLightScryptP = 1\r\n)\r\n\r\nfunc tmpKeyStore(t *testing.T, encrypted bool) (string, *keystore.KeyStore) {\r\n\td := t.TempDir()\r\n\tnewKs := keystore.NewPlaintextKeyStore\r\n\tif encrypted {\r\n\t\tnewKs = func(kd string) *keystore.KeyStore {\r\n\t\t\treturn keystore.NewKeyStore(kd, veryLightScryptN, veryLightScryptP)\r\n\t\t}\r\n\t}\r\n\treturn d, newKs(d)\r\n}\r\n\r\n````\r\n\r\n#### Backtrace\r\n\r\n````\r\nWARNING: DATA RACE\r\nWrite at 0x00c0005ec180 by goroutine 28:\r\n  github.com/ethereum/go-ethereum/consensus/clique.(*Clique).Authorize()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/consensus/clique/clique.go:586 +0xa5\r\n  github.com/ethereum/go-ethereum/eth.(*Ethereum).StartMining()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/eth/backend.go:482 +0x5f2\r\n  github.com/briahealth/xxxx/internal/app/ledger/ethereum/ethereum_test.NewMockedBackend()\r\n      /home/circleci/project/internal/app/ledger/ethereum/ethereum_test/mock_node.go:99 +0x698\r\n  github.com/briahealth/xxxx/internal/app/ledger/ethereum_test.TestTransferEther()\r\n      /home/circleci/project/internal/app/ledger/ethereum/client_test.go:14 +0x4a\r\n  testing.tRunner()\r\n      /usr/local/go/src/testing/testing.go:1446 +0x216\r\n  testing.(*T).Run.func1()\r\n      /usr/local/go/src/testing/testing.go:1493 +0x47\r\n\r\nPrevious read at 0x00c0005ec180 by goroutine 39:\r\n  github.com/ethereum/go-ethereum/consensus/clique.(*Clique).Prepare()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/consensus/clique/clique.go:532 +0x724\r\n  github.com/ethereum/go-ethereum/consensus/beacon.(*Beacon).Prepare()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/consensus/beacon/consensus.go:260 +0x1fc\r\n  github.com/ethereum/go-ethereum/miner.(*worker).prepareWork()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/miner/worker.go:1024 +0xe81\r\n  github.com/ethereum/go-ethereum/miner.(*worker).commitWork()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/miner/worker.go:1114 +0x164\r\n  github.com/ethereum/go-ethereum/miner.(*worker).mainLoop()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/miner/worker.go:534 +0x92a\r\n  github.com/ethereum/go-ethereum/miner.newWorker.func1()\r\n      /home/circleci/.go_workspace/pkg/mod/github.com/ethereum/go-ethereum@v1.10.18/miner/worker.go:293 +0x39\r\n\r\n````\r\n\r\nWhen submitting logs: please submit them as text and not screenshots.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "rjl493456442",
+    "id": 5959481,
+    "node_id": "MDQ6VXNlcjU5NTk0ODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5959481?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rjl493456442",
+    "html_url": "https://github.com/rjl493456442",
+    "followers_url": "https://api.github.com/users/rjl493456442/followers",
+    "following_url": "https://api.github.com/users/rjl493456442/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rjl493456442/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rjl493456442/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rjl493456442/subscriptions",
+    "organizations_url": "https://api.github.com/users/rjl493456442/orgs",
+    "repos_url": "https://api.github.com/users/rjl493456442/repos",
+    "events_url": "https://api.github.com/users/rjl493456442/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rjl493456442/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26457/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26457/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1376688885",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26457#issuecomment-1376688885",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26457",
+    "id": 1376688885,
+    "node_id": "IC_kwDOAOvK985SDpr1",
+    "user": {
+      "login": "rjl493456442",
+      "id": 5959481,
+      "node_id": "MDQ6VXNlcjU5NTk0ODE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5959481?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rjl493456442",
+      "html_url": "https://github.com/rjl493456442",
+      "followers_url": "https://api.github.com/users/rjl493456442/followers",
+      "following_url": "https://api.github.com/users/rjl493456442/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rjl493456442/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rjl493456442/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rjl493456442/subscriptions",
+      "organizations_url": "https://api.github.com/users/rjl493456442/orgs",
+      "repos_url": "https://api.github.com/users/rjl493456442/repos",
+      "events_url": "https://api.github.com/users/rjl493456442/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rjl493456442/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-01-10T03:44:17Z",
+    "updated_at": "2023-01-10T03:44:17Z",
+    "author_association": "MEMBER",
+    "body": "It's already fixed, please upgrade your geth version(the latest release should be 1.10.26)",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1376688885/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

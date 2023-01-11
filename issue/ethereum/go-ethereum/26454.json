@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-01-09T15:08:27Z",
-  "updated_at": "2023-01-09T17:42:24Z",
-  "closed_at": null,
+  "updated_at": "2023-01-10T17:16:13Z",
+  "closed_at": "2023-01-10T17:16:13Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "For some reason, geth `DIFFICULTY` opcode execution differs from the others, given certain statetests, on `London` rules. \r\n\r\nOutputs from various vms: \r\n\r\n```\r\nmartin@mediaNUK:~/workspace/goevmlab/cmd/generic-fuzzer$ more ./nimb-0-output-0.jsonl | grep DIFFICULTY -A1\r\n{\"pc\":67,\"op\":68,\"gas\":\"0x79b15f\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\"],\"depth\":1,\"refund\":0,\"opName\":\"DIFFICULTY\"}\r\n{\"pc\":68,\"op\":138,\"gas\":\"0x79b15d\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\",\"0x20000\"],\"depth\":1,\"refund\":0,\"opName\":\"DUP11\"}\r\nmartin@mediaNUK:~/workspace/goevmlab/cmd/generic-fuzzer$ cat ./erigon-0-output-0.jsonl | grep DIFFICULTY -A1\r\n{\"pc\":67,\"op\":68,\"gas\":\"0x79b15f\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\"],\"depth\":1,\"refund\":0,\"opName\":\"DIFFICULTY\"}\r\n{\"pc\":68,\"op\":138,\"gas\":\"0x79b15d\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\",\"0x20000\"],\"depth\":1,\"refund\":0,\"opName\":\"DUP11\"}\r\nmartin@mediaNUK:~/workspace/goevmlab/cmd/generic-fuzzer$ cat ./geth-0-output-0.jsonl | grep DIFFICULTY -A1\r\n{\"pc\":67,\"op\":68,\"gas\":\"0x79b15f\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\"],\"depth\":1,\"refund\":0,\"opName\":\"DIFFICULTY\"}\r\n{\"pc\":68,\"op\":138,\"gas\":\"0x79b15d\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\",\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"DUP11\"}\r\nmartin@mediaNUK:~/workspace/goevmlab/cmd/generic-fuzzer$ cat ./nethermind-0-output-0.jsonl | grep DIFFICULTY -A1\r\n{\"pc\":67,\"op\":68,\"gas\":\"0x79b15f\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\"],\"depth\":1,\"refund\":0,\"opName\":\"DIFFICULTY\"}\r\n{\"pc\":68,\"op\":138,\"gas\":\"0x79b15d\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[\"0x0\",\"0x1\",\"0x1\",\"0x1\",\"0x2\",\"0x1f4\",\"0x2\",\"0xfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068\",\"0x20000\"],\"depth\":1,\"refund\":0,\"opName\":\"DUP11\"}\r\n```\r\n\r\nExample input statetest\r\n```json\r\n\r\n{\r\n  \"00000061-mixed-0\": {\r\n    \"env\": {\r\n      \"currentCoinbase\": \"b94f5374fce5edbc8e2a8697c15331677e6ebf0b\",\r\n      \"currentDifficulty\": \"0x20000\",\r\n      \"currentGasLimit\": \"0x26e1f476fe1e22\",\r\n      \"currentNumber\": \"0x1\",\r\n      \"currentTimestamp\": \"0x3e8\",\r\n      \"previousHash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n      \"currentBaseFee\": \"0x10\"\r\n    },\r\n    \"pre\": {\r\n      \"0x00000000000000000000000000000000000000f1\": {\r\n        \"code\": \"0x600060016001600260026101f461ffff6f30fd9694935f44896d8c7875147b6f9a3f10927dfa4362665f131b178557177e68388b993bfe6a77a4a19478362087907068448aa330066f3d7c569c439869a019fa165258355819069e388b8e9817835052078c3cf01b8e66879e8316797c1d555246147d6251800747691a31463f9045f08d549979828c1557081697f5997d1282f16a6294fe633111a37d7461ff946390937577f4821c96705375317b7560836ca330a1895f1841559c336d888d8c318360927d3285683b05149fa3085597f16c7e1c433e33777953f09e871c38f49d7c431063171506619c431352769636158f5f946896127845573a2060893e6484a4509b32987d079e66165397a4010153f3371956a2003664a28a84825a3df4994538fa8e8c53647178820260f27b1a446741a4406837a39f389d753dfea139091962936155ff9b89f16353467460758934621b968741699e6b37446c55656a6b766b066d569a1d71407c67746f618f95929902905a87a47e793b179a3d6199376bff5f879667403873878356096b5b3d8d519f03691918507485846177466c8086665af21015530432837a147f02701912833078378d5b738d1c64fd82759e8c0b3f35123f3e7f649067f3328100550a14609f8d45548f9704ff7f9a3af39e859d06928c8744f2809880723df567a03b7d5f90065f95721951fe54f1834332\",\r\n        \"storage\": {},\r\n        \"balance\": \"0x0\",\r\n        \"nonce\": \"0x0\"\r\n      },\r\n      \"0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b\": {\r\n        \"code\": \"0x\",\r\n        \"storage\": {},\r\n        \"balance\": \"0xffffffffff\",\r\n        \"nonce\": \"0x0\"\r\n      }\r\n    },\r\n    \"transaction\": {\r\n      \"gasPrice\": \"0x10\",\r\n      \"nonce\": \"0x0\",\r\n      \"to\": \"0x00000000000000000000000000000000000000f1\",\r\n      \"data\": [\r\n        \"0xd56e983f11894533c0d02e51f26e4ee5abc6f4c0427eb173d1fce554660ac477688929d2b431fcd9f1fc3e1f703e4dce7b67530dbfe459014e05d82abb34ec1e76482d9035\"\r\n      ],\r\n      \"gasLimit\": [\r\n        \"0x60a3\"\r\n      ],\r\n      \"value\": [\r\n        \"0xf54571\"\r\n      ],\r\n      \"secretKey\": \"0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8\"\r\n    },\r\n    \"out\": \"0x\",\r\n    \"post\": {\r\n      \"London\": [\r\n        {\r\n          \"hash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n          \"logs\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n          \"indexes\": {\r\n            \"data\": 0,\r\n            \"gas\": 0,\r\n            \"value\": 0\r\n          }\r\n        }\r\n      ]\r\n    }\r\n  }\r\n}\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26454/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26454/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {

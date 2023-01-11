@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "s1na",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2022-02-22T18:03:45Z",
-  "updated_at": "2022-05-29T21:10:40Z",
-  "closed_at": null,
+  "updated_at": "2023-01-10T13:24:32Z",
+  "closed_at": "2023-01-10T13:24:32Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: `v1.10.16`\r\nOS & Version: Linux\r\n\r\n#### Expected behaviour\r\n\r\nThe `test2()` call reverted so `eth_call` should return 1 both with and without storage `state_override`\r\n\r\n#### Actual behaviour\r\n\r\n`eth_call` returned 1337 with storage `state_override`\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nCompile this contract to runtime bytecode:\r\n\r\n```solidity\r\npragma solidity =0.8.12;\r\n\r\ncontract Test {\r\n    uint private x;\r\n\r\n    function test2() external {\r\n        x = 1337;\r\n        revert();\r\n    }\r\n\r\n    function test() external returns (uint) {\r\n        x = 1;\r\n        try this.test2() {} catch (bytes memory) {}\r\n        return x;\r\n    }\r\n}\r\n```\r\n\r\nRun this curl command (without storage override, Geth returned 1 correctly)\r\n\r\n```\r\ncurl --data '{\"method\":\"eth_call\",\"params\":[\r\n    {\r\n        \"from\": \"0x1111111111111111111111111111111111111111\",\r\n        \"to\": \"0x2222222222222222222222222222222222222222\",\r\n        \"value\": \"0x0\",\r\n        \"data\": \"0xf8a8fd6d\",\r\n        \"gas\": \"0x100000\"\r\n    },\r\n    \"latest\",\r\n    {\r\n        \"0x2222222222222222222222222222222222222222\": {\r\n            \"code\": \"0x6080604052348015600f57600080fd5b506004361060325760003560e01c806366e41cb7146037578063f8a8fd6d14603f575b600080fd5b603d6057565b005b60456062565b60405190815260200160405180910390f35b610539600090815580fd5b60006001600081905550306001600160a01b03166366e41cb76040518163ffffffff1660e01b8152600401600060405180830381600087803b15801560a657600080fd5b505af192505050801560b6575060015b60e9573d80801560e1576040519150601f19603f3d011682016040523d82523d6000602084013e60e6565b606091505b50505b506000549056fea26469706673582212205ce45de745a5308f713cb2f448589177ba5a442d1a2eff945afaa8915961b4d064736f6c634300080c0033\"\r\n        }\r\n    }\r\n],\"id\":1,\"jsonrpc\":\"2.0\"}' -H \"Content-Type: application/json\" -X POST localhost:8545\r\n```\r\n\r\nresult:\r\n\r\n```\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x0000000000000000000000000000000000000000000000000000000000000001\"}\r\n```\r\n\r\n### Run this curl command (with storage override, Geth returned wrong result)\r\n\r\n```\r\ncurl --data '{\"method\":\"eth_call\",\"params\":[\r\n    {\r\n        \"from\": \"0x1111111111111111111111111111111111111111\",\r\n        \"to\": \"0x2222222222222222222222222222222222222222\",\r\n        \"value\": \"0x0\",\r\n        \"data\": \"0xf8a8fd6d\",\r\n        \"gas\": \"0x100000\"\r\n    },\r\n    \"latest\",\r\n    {\r\n        \"0x2222222222222222222222222222222222222222\": {\r\n            \"code\": \"0x6080604052348015600f57600080fd5b506004361060325760003560e01c806366e41cb7146037578063f8a8fd6d14603f575b600080fd5b603d6057565b005b60456062565b60405190815260200160405180910390f35b610539600090815580fd5b60006001600081905550306001600160a01b03166366e41cb76040518163ffffffff1660e01b8152600401600060405180830381600087803b15801560a657600080fd5b505af192505050801560b6575060015b60e9573d80801560e1576040519150601f19603f3d011682016040523d82523d6000602084013e60e6565b606091505b50505b506000549056fea26469706673582212205ce45de745a5308f713cb2f448589177ba5a442d1a2eff945afaa8915961b4d064736f6c634300080c0033\",\r\n            \"state\": {\r\n                \"0x0000000000000000000000000000000000000000000000000000000000000000\": \"0x0000000000000000000000000000000000000000000000000000000000000000\"\r\n            }\r\n        }\r\n    }\r\n],\"id\":1,\"jsonrpc\":\"2.0\"}' -H \"Content-Type: application/json\" -X POST localhost:8545\r\n```\r\n\r\nresult:\r\n\r\n```\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x0000000000000000000000000000000000000000000000000000000000000539\"}\r\n```\r\n\r\nThis bug is caused by `fakeStorage` not tracked in journal: https://github.com/ethereum/go-ethereum/blob/v1.10.16/core/state/state_object.go#L245",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/24456/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/24456/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
