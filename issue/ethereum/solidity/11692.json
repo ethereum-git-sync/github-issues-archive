@@ -40,6 +40,15 @@
       "description": "Issues waiting for more input by the reporter"
     },
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -49,21 +58,40 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2021-07-25T14:18:18Z",
-  "updated_at": "2022-11-25T12:45:21Z",
-  "closed_at": null,
+  "updated_at": "2023-02-07T12:05:01Z",
+  "closed_at": "2023-02-07T12:05:01Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nI'm working on a payment splitter contract that receives LP tokens as well as normal tokens:\r\n- If the token is LP, redeem them using `removeLiquidityETH` and then convert to ETH\r\n- Otherwise, just convert them to ETH\r\n\r\nHowever, I found a very weird bug with the try/catch statement: It's setting the token balance to 0 somehow:\r\n\r\n```solidity\r\nfunction receiveAndDistribute(uint256 amount, address token) external override {\r\n        require(amount > 0, \"Distribution: Amount must be greater than 0\");\r\n        \r\n        address WETH = router.WETH();\r\n        IERC20(token).transferFrom(address(msg.sender), address(this), amount);\r\n        IERC20(token).approve(address(router), amount);\r\n\r\n        uint balanceBefore = IERC20(token).balanceOf(address(this)); // Truffle debugger says it's 10\r\n\r\n        // Check if token is LP\r\n        try IUniswapV2Pair(token).getReserves() {\r\n            // Remove liquidity code\r\n        } catch {\r\n            uint balanceAfter = IERC20(token).balanceOf(address(this)); // Now it's 0 according to truffle?!\r\n        }\r\n    }\r\n```\r\n\r\nEven if I implement the most simple function:\r\n\r\n```solidity\r\nfunction checkLP(address token) internal view returns(bool){\r\n\t\tbool isLp;\r\n\t\ttry IUniswapV2Pair(token).token0(){\r\n\t\t\tisLp = true;\r\n\t\t} catch {\r\n\t\t\tisLp = false;\r\n\t\t}\r\n\t\treturn isLp;\r\n\t}\r\n```\r\nAnd then use it in the same function:\r\n\r\n ```solidity\r\n function receiveAndDistribute(uint256 amount, address token) external override {\r\n\t\trequire(amount > 0, \"Distribution: Amount must be greater than 0\");\r\n\t\t\r\n\t\taddress WETH = router.WETH();\r\n\t\tIERC20(token).transferFrom(address(msg.sender), address(this), amount);\r\n\t\tIERC20(token).approve(address(router), amount);\r\n\r\n\t\tuint balanceBefore = IERC20(token).balanceOf(address(this)); // 10 * 10**18\r\n\t\taddress addressBefore = address(this); // 0x28...27577\r\n\r\n\t\tbool isLp = checkLP(token); // This is where everything breaks\r\n\r\n\t\taddress addressAfter = address(this); // 0x28...27577\r\n\t\tuint balanceAfter = IERC20(token).balanceOf(address(this)); // 0\r\n}\r\n```\r\n\r\nWhen I remove the try/catch, the balance is correct and I'm able to call `transferFrom` in the token, otherwise I get `TransferHelper::transferFrom: transferFrom failed` (because the balance is 0)\r\n\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.2+commit.661d1103.Emscripten.clang\r\n- Target EVM version (as per compiler settings): istanbul \r\n- Framework/IDE (e.g. Truffle or Remix): truffle\r\n- EVM execution environment / backend / blockchain client: ganache\r\n- Operating system: WSL2 on Windows 10 pro\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.2;\r\n\r\nimport \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";\r\nimport \"@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol\";\r\nimport \"@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol\";\r\nimport \"@uniswap/v2-periphery/contracts/interfaces/IWETH.sol\";\r\n\r\n\r\ncontract Distribution{\r\n\r\n\tIUniswapV2Router02 router;\r\n\r\n\tconstructor(IUniswapV2Router02 _router){\r\n\t\trouter = _router;\r\n\t}\r\n\r\n\tfunction testBug(uint256 amount, address token) external  {\r\n\t\tIERC20(token).transferFrom(address(msg.sender), address(this), amount);\r\n\t\tIERC20(token).approve(address(router), amount);\r\n\r\n\t\tuint balanceBefore = IERC20(token).balanceOf(address(this));\r\n\r\n\t\ttry IUniswapV2Pair(token).token0(){} catch {}\r\n\r\n\t\tuint balanceAfter = IERC20(token).balanceOf(address(this));\r\n\r\n\t}\r\n}\r\n```\r\n\r\nSteps:\r\n- Compile using 0.8.2\r\n- Instantiate the contract with UniswapRouterV2's address\r\n- Try using the function with any ERC20 token\r\n- With a debugger, check the values of `balanceBefore` and `balanceAfter`\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/11692/reactions",
     "total_count": 0,
@@ -78,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/11692/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -245,6 +273,50 @@
     "body": "Sure",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/886850335/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1420664275",
+    "html_url": "https://github.com/ethereum/solidity/issues/11692#issuecomment-1420664275",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/11692",
+    "id": 1420664275,
+    "node_id": "IC_kwDOAm_5kc5UrZ3T",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-02-07T12:04:59Z",
+    "updated_at": "2023-02-07T12:04:59Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1420664275/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

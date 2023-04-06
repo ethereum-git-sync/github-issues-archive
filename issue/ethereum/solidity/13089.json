@@ -38,23 +38,60 @@
       "color": "d4c5f9",
       "default": false,
       "description": ""
+    },
+    {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
+      "id": 4699444681,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
+      "name": "stale",
+      "color": "BF4801",
+      "default": false,
+      "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2022-06-02T01:15:07Z",
-  "updated_at": "2022-08-17T13:48:52Z",
-  "closed_at": null,
+  "updated_at": "2023-04-05T12:05:31Z",
+  "closed_at": "2023-04-05T12:05:31Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nUtilize `codecopy` to optimize struct initialization, calldata generation, and other memory based steps\r\n\r\n## Motivation\r\n\r\nStruct initialization requires a memory word to be left as 0s, and when creating a new struct (or array), it is repeatedly copied to zero out memory (as the compiler may have written temporary data to it). Additionally, when performing a call to another smart contract with some constants, `pushN` opcodes are used to load the words on the stack followed by `mstore`. Both of these are relatively inefficient and each get more expensive the larger the struct/more static inputs to the call there are (the calldata optimization explicitly applies to static inputs).\r\n\r\nBoth of these can be improved at the cost of bytecode size.\r\n\r\n## Specification\r\n\r\nFor struct initialization:\r\n1. Keep a running maximum of word size for all structs instantiated in a contract\r\n2. Assign a data section in a contract that would put 0 bytes equal to the size of the largest struct\r\n3. Instead of `mload(zero_word) dup push(mem_loc) mstore, ... push(mem_loc) mstore`, for a given struct of a particular size, perform a `push(struct_size) push(zero_byte_codechunk) push(mem_loc) codecopy`\r\n\r\nFor calldata:\r\n1. Analyze static inputs of calling a contract\r\n2. Assign a data section in a contract that would hold the partially formed calldata, put 0 bytes in of dynamic input\r\n3. Codecopy to the expected location in memory, mstore dynamic inputs\r\n4. If there are dynamic length inputs at beginning/middle, delay the codecopy in the code until we know where to place the static data \r\n\r\nThis kind of optimization likely applies to other things as well, like `keccak256`, `log`, etc.\r\n\r\n## Backwards Compatibility\r\n\r\nShould be compatible?\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13089/reactions",
     "total_count": 0,
@@ -69,8 +106,95 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13089/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1486754905",
+    "html_url": "https://github.com/ethereum/solidity/issues/13089#issuecomment-1486754905",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13089",
+    "id": 1486754905,
+    "node_id": "IC_kwDOAm_5kc5YnhRZ",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-03-28T12:06:43Z",
+    "updated_at": "2023-03-28T12:06:43Z",
+    "author_association": "NONE",
+    "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1486754905/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1497377989",
+    "html_url": "https://github.com/ethereum/solidity/issues/13089#issuecomment-1497377989",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13089",
+    "id": 1497377989,
+    "node_id": "IC_kwDOAm_5kc5ZQCzF",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-04-05T12:05:29Z",
+    "updated_at": "2023-04-05T12:05:29Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1497377989/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

@@ -40,6 +40,15 @@
       "description": "Issues waiting for more input by the reporter"
     },
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -49,21 +58,40 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2019-07-08T18:53:30Z",
-  "updated_at": "2022-11-25T12:42:46Z",
-  "closed_at": null,
+  "updated_at": "2023-02-02T12:05:24Z",
+  "closed_at": "2023-02-02T12:05:24Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nAdding `public` to a mapping field in a contract that is deployed from another contract leads to a `RuntimeError: VM Exception while processing transaction: revert` error.\r\n\r\nIn EmptyContract.spec.ts, a NewContract is deployed first. Then, \r\n```solidity\r\n newContract.doDeploy()\r\n```\r\nis called, which creates a new EmptyContract. This test passes when `mapping(address => address) public depositContracts` does not contain the word `public`, and otherwise fails. Below are the dummy files I created to reproduce this issue. See [EVM stack trace](https://gist.github.com/akhila-raju/2d66be1f5e930f3897ba35beeb7d8ad1).\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.5.0\r\n- Target EVM version (as per compiler settings): ethereumjs-vm 2.6.0\r\n- Framework/IDE (e.g. Truffle or Remix): Waffle\r\n- EVM execution environment / backend / blockchain client: Ganache-core 2.5.6-beta.0\r\n- Operating system: MacOS 10.14\r\n\r\n## Steps to Reproduce\r\nDeploy the following contracts and run EmptyContract.spec.ts. Note that this uses ethereum-waffle which is dictating the EVM/ganache version that I'm using.\r\n\r\n### EmptyContract.spec.ts\r\n```typescript\r\nimport chai = require('chai')\r\nimport {\r\n  createMockProvider,\r\n  deployContract,\r\n  getWallets,\r\n  solidity,\r\n} from 'ethereum-waffle'\r\nimport * as EmptyContract from '../build/EmptyContract.json'\r\nimport * as NewContract from '../build/NewContract.json'\r\n\r\n\r\nchai.use(solidity)\r\nconst { expect } = chai\r\n\r\ndescribe.only('Creates EmptyContract and checks that fields are properly assigned', () => {\r\n  const provider = createMockProvider()\r\n  const [wallet] = getWallets(provider)\r\n  let newContract\r\n\r\n  it('it deploys', async () => {\r\n    newContract = await deployContract(wallet, NewContract, [], {\r\n      gasLimit: 6700000,\r\n    })\r\n    await newContract.doDeploy();\r\n  })\r\n})\r\n```\r\n\r\n### NewContract.sol\r\n```solidity\r\nimport { EmptyContract } from \"./EmptyContract.sol\";\r\n\r\ncontract NewContract {\r\n  address public authenticationAddress;\r\n  address public commitmentChain;\r\n  mapping(address => address) public depositContracts;\r\n  mapping (bytes32 => uint256)  exitRedeemableAfter;\r\n\r\n  uint public id;\r\n\r\n  constructor() public {\r\n  }\r\n\r\n  function doDeploy() public {\r\n   new EmptyContract();\r\n  }\r\n}\r\n```\r\n\r\n### EmptyContract.sol\r\n```solidity\r\nimport { CommitmentChain } from \"./CommitmentChain.sol\";\r\nimport { Deposit } from \"./Deposit.sol\";\r\n\r\n\r\ncontract EmptyContract {\r\n  address public authenticationAddress;\r\n  address public commitmentChain;\r\n  mapping(address => address) depositContracts;\r\n  // mapping (bytes32 => uint256)  exitRedeemableAfter;\r\n\r\n  uint public id;\r\n  // mapping(string => string) public metadata;\r\n\r\n  constructor() public {\r\n  }\r\n}\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/7066/reactions",
     "total_count": 0,
@@ -78,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/7066/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -289,6 +317,50 @@
     "body": "Hi @akhila-raju ,\r\nWhat exactly should happen with the code above?\r\nI just tried it on Remix and both contracts are successfully deployed.\r\nAlso calling `doDeploy` works fine.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/511331182/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1413631855",
+    "html_url": "https://github.com/ethereum/solidity/issues/7066#issuecomment-1413631855",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/7066",
+    "id": 1413631855,
+    "node_id": "IC_kwDOAm_5kc5UQk9v",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-02-02T12:05:22Z",
+    "updated_at": "2023-02-02T12:05:22Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1413631855/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

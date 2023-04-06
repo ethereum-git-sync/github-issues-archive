@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2022-12-31T16:27:59Z",
-  "updated_at": "2023-01-06T14:50:31Z",
-  "closed_at": null,
+  "updated_at": "2023-02-06T18:37:23Z",
+  "closed_at": "2023-02-06T18:37:22Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nSometimes the compiler injects long unnecessary pushes in the bytecode:\r\n\r\n```asm\r\npush32 0x0000000000000000000000000000000000000000000000000000000000000000\r\n```\r\n\r\nThe above can be replaced by `push1 0x00`.\r\n\r\n## Motivation\r\n\r\nAlthough both of the above solutions would have the same runtime gas, `push1 0x00` would produce a smaller bytecode and so it should be favored by the compiler.\r\n\r\n## Specification\r\n\r\nA simplification rule can be added to the compiler that would transform all the instructions of the following form:\r\n\r\n```asm\r\npushN 0x00 ... 00 ; N > 1\r\n```\r\n\r\nto `push1 0x00` and possibly `push0` after [EIP-3855](https://eips.ethereum.org/EIPS/eip-3855) is approved.\r\n\r\n## Backwards Compatibility\r\n\r\nThe simplification rule will be backward compatible.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13834/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13834/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -228,8 +247,8 @@
     "body": "We only ever generate the smallest possible pushes. The only exception is indeed immutable loads, in which case the required push size is not known at compile time and cannot be changed during contract creation, since that would involve shifting all jump offsets.\nSo this is generally not possible to improve without heroic measures like typed immutables  on the yul level, which I don't think are worth the gain here.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1373726372/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -272,6 +291,50 @@
     "body": "To elaborate a bit further: those are not actually zeroes being pushed, but empty placeholders that will be modified by the contract creation code based on user supplied values and the ultimate push value is only known at creation time, at which point bytecode compression is no longer an option.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1373731413/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1419567110",
+    "html_url": "https://github.com/ethereum/solidity/issues/13834#issuecomment-1419567110",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13834",
+    "id": 1419567110,
+    "node_id": "IC_kwDOAm_5kc5UnOAG",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-06T18:37:22Z",
+    "updated_at": "2023-02-06T18:37:22Z",
+    "author_association": "MEMBER",
+    "body": "Closing this, since the occurrence of such pushes is related to immutable design rather than missing simplification/optimization.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1419567110/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

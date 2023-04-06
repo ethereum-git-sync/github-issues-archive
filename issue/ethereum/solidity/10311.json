@@ -40,6 +40,15 @@
       "description": "Any changes to the language, e.g. new features"
     },
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -49,21 +58,40 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 4,
   "created_at": "2020-11-17T01:17:14Z",
-  "updated_at": "2022-11-25T12:43:19Z",
-  "closed_at": null,
+  "updated_at": "2023-02-12T21:28:26Z",
+  "closed_at": "2023-02-05T12:04:29Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\n(Note: I rewrote this issue after realizing it's more general than I originally thought.)\r\n\r\nThe `try`/`catch` construction is supposed to allow one to catch errors from external calls and handle them.  But, Solidity also makes various checks of its own both before and after making an external call, and will error if these checks fail.  If the external call in question has an associated `try`/`catch`, and an applicable `catch` block exists, then Solidity should jump to the `catch` block instead of erroring.\r\n\r\nFor post-call checks, which `catch` block to jump to should be determined the normal way, based on the data returned.  (E.g., if no data was returned, you would jump to the `catch (bytes memory x)` block if it exists, and revert if not.)\r\n\r\nFor pre-call checks, you have to go based on what the returned data *would* be, I guess.  Fortunately as best I can tell the only pre-call check Solidity makes is whether the called has any code.  (I'm unclear why, it doesn't seem like this would save on gas when no ether is being transferred?)  So in this case, if the check fails, you can say that the returned data would have been an empty `hex\"\"`.  So this is still handleable.  I suspect if any other pre-call checks are ever added, they will likely also have this property, that if they can fail you can say the returned data would have been `hex\"\"`.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.7.4\r\n- Target EVM version (as per compiler settings): default\r\n- Framework/IDE (e.g. Truffle or Remix): Truffle\r\n- EVM execution environment / backend / blockchain client: Ganache CLI v6.12.0 (ganache-core: 2.13.0)\r\n\r\n## Steps to Reproduce\r\n\r\n### Pre-call example\r\n\r\n```solidity\r\npragma solidity ^0.7.4;\r\n\r\ncontract TryTest {\r\n  function run() public returns (bytes memory) {\r\n    Called called;\r\n    try called.test() returns (uint n) {\r\n      return abi.encode(n);\r\n    } catch (bytes memory x) {\r\n      return x;\r\n    }\r\n  }\r\n}\r\n\r\ncontract Called {\r\n  function test() public returns (uint) {\r\n    return 1;\r\n  }\r\n}\r\n```\r\n\r\nThe `run()` function should return `hex\"\"`, but instead it reverts.\r\n\r\n### Post-call example\r\n\r\n```solidity\r\npragma solidity ^0.7.4;\r\n\r\ncontract TryTest {\r\n  function run() public returns (bytes memory) {\r\n    Called called = new Called();\r\n    try called.boom() returns (uint n) {\r\n      return abi.encode(n);\r\n    } catch (bytes memory x) {\r\n      return x;\r\n    }\r\n  }\r\n}\r\n\r\ncontract Called {\r\n  function boom() public returns (uint) {\r\n    selfdestruct(tx.origin);\r\n  }\r\n}\r\n```\r\n\r\nThe `run()` function should return `hex\"\"`, but instead it reverts.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/10311/reactions",
     "total_count": 0,
@@ -78,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/10311/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -157,6 +185,94 @@
     "body": "The design choice behind this is that if you reach the catch block, then the call reverted. Other reasons for failure might not lead to the catch block. This is in line with try-catch not being available on internal calls.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/728839285/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1417631269",
+    "html_url": "https://github.com/ethereum/solidity/issues/10311#issuecomment-1417631269",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/10311",
+    "id": 1417631269,
+    "node_id": "IC_kwDOAm_5kc5Uf1Yl",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-02-05T12:04:26Z",
+    "updated_at": "2023-02-05T12:04:26Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1417631269/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1427137240",
+    "html_url": "https://github.com/ethereum/solidity/issues/10311#issuecomment-1427137240",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/10311",
+    "id": 1427137240,
+    "node_id": "IC_kwDOAm_5kc5VEGLY",
+    "user": {
+      "login": "cameel",
+      "id": 137030,
+      "node_id": "MDQ6VXNlcjEzNzAzMA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cameel",
+      "html_url": "https://github.com/cameel",
+      "followers_url": "https://api.github.com/users/cameel/followers",
+      "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+      "organizations_url": "https://api.github.com/users/cameel/orgs",
+      "repos_url": "https://api.github.com/users/cameel/repos",
+      "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cameel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-12T21:28:26Z",
+    "updated_at": "2023-02-12T21:28:26Z",
+    "author_association": "MEMBER",
+    "body": "Note that while this has been closed, we're aware the underlying problem did not disappear. We just have too many duplicate issues about this. Here's a recent one with updated syntax proposals that would address this: https://github.com/ethereum/solidity/issues/13869#issuecomment-1422879881. Feedback is welcome.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1427137240/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

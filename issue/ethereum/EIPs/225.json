@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,7 +49,7 @@
   "milestone": null,
   "comments": 123,
   "created_at": "2017-03-06T11:24:17Z",
-  "updated_at": "2022-10-02T20:13:01Z",
+  "updated_at": "2023-02-24T18:41:59Z",
   "closed_at": "2022-06-10T08:32:27Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -519,8 +519,8 @@
     "body": "Snippet to claim a github user ownership to an ethereum address\r\n\r\n```solidity\r\ncontract GitHubOracle is  usingOraclize {\r\n    //constant for oraclize commits callbacks\r\n    uint8 constant CLAIM_USER = 0;\r\n    //temporary storage enumerating oraclize calls\r\n    mapping (bytes32 => uint8) claimType;\r\n    //temporary storage for oraclize user register queries\r\n    mapping (bytes32 => UserClaim) userClaim;\r\n    //permanent storage of sha3(login) of github users\r\n    mapping (bytes32 => address) users;\r\n    //events\r\n    event UserSet(string githubLogin, address account);\r\n    //stores temporary data for oraclize user register request\r\n    struct UserClaim {\r\n        address sender;\r\n        bytes32 githubid;\r\n        string login;\r\n    }\r\n\r\n    //register or change a github user ethereum address\r\n    function register(string _github_user, string _gistid)\r\n     payable {\r\n        bytes32 ocid = oraclize_query(\"URL\", strConcat(\"https://gist.githubusercontent.com/\",_github_user,\"/\",_gistid,\"/raw/\"));\r\n        claimType[ocid] = CLAIM_USER;\r\n        userClaim[ocid] = UserClaim({sender: msg.sender, githubid: sha3(_github_user), login: _github_user});\r\n    }\r\n  //oraclize response callback\r\n    function __callback(bytes32 _ocid, string _result) {\r\n        if (msg.sender != oraclize_cbAddress()) throw;\r\n        uint8 callback_type = claimType[_ocid];\r\n        if(callback_type==CLAIM_USER){\r\n            if(strCompare(_result,\"404: Not Found\") != 0){    \r\n                address githubowner = parseAddr(_result);\r\n                if(userClaim[_ocid].sender == githubowner){\r\n                    _register(userClaim[_ocid].githubid,userClaim[_ocid].login,githubowner);\r\n                }\r\n            }\r\n            delete userClaim[_ocid]; //should always be deleted\r\n        }\r\n        delete claimType[_ocid]; //should always be deleted\r\n    }\r\n    function _register(bytes32 githubid, string login, address githubowner) \r\n     internal {\r\n        users[githubid] = githubowner;\r\n        UserSet(login, githubowner);\r\n    }\r\n}\r\n```\r\nUser create a gist with his public address and call register passing `_github_user` + `_gistid`\r\n\r\nFrom https://github.com/ethereans/github-token/blob/master/contracts/GitHubToken.sol\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/284451357/reactions",
-      "total_count": 11,
-      "+1": 11,
+      "total_count": 12,
+      "+1": 12,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,

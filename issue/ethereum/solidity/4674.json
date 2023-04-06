@@ -58,6 +58,15 @@
       "description": ""
     },
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -67,21 +76,40 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 46,
+  "comments": 47,
   "created_at": "2018-08-03T14:55:03Z",
-  "updated_at": "2022-11-25T12:41:24Z",
-  "closed_at": null,
+  "updated_at": "2023-01-31T12:05:18Z",
+  "closed_at": "2023-01-31T12:05:18Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "The `RuleList.h` contains a list of simplification rules that can be applied to sequences (or rather expressions) of opcodes. Examples are simple arithmetics on constants or other simplifications that can be applied regardless of the context:\r\n\r\n - `push1 7 push1 8 add` is reduced to `push1 15`\r\n - `dup1 dup1 xor` which is reduced to `push1 0`\r\n\r\nThese rules are currently used in two places: The first one is the new optimizer that will be used on Solidity inline assembly, and the second one is the so-called \"common subexpression eliminator\" that uses these rules both to perform equality checks during symbolic execution and to actually perform the simplifications.\r\n\r\nSince the common subexpression eliminator is a rather complex module and sometimes fails to run on certain code snippets, it makes sense to also run the simplification rules in the old optimizer just on sequences of opcodes prior to running the full subexpression eliminator.\r\n\r\nSince the rule list can be proven correct, it might also make sense to run this module even if the optimizer is turned off (just like the current peephole optimizer).\r\n\r\nThis optimizer stage should be similar to the peephole optimizer: It takes a vector of assembly items and outputs a vector of assembly items.\r\n\r\nThere are two files called `SimplificationRules.h/cpp`, one for the yul optimizer and the other for the common subexpression eliminator. A third one should probably be created for this new module.\r\n\r\nThe concept of \"match groups\" should probably be ignored for the first iteration of solving this issue. They have two purposes: First, they are used to check that two \"items\" are identical (e.g. for the rule `xor(x, x) -> 0`) and secondly, they are used in the execution of the replacement pattern (e.g. for the rule `or(x, x) -> x`). This module should only do local replacements in the stream of opcodes. This means the xor-pattern above could result in `dup1 xor` -> `pop push1 0`, but (at least its initial version) should not perform replacements if it can be inferred that the two top-most stack elements are identical, but you would need non-local information to do that. Also note that the replacement above specifically uses `pop` instead of omitting the preceding opcode, because that opcode might have side-effects. There are other optimizer stages (even inside the peephole optimizer) that will remove the opcode preceding a pop if it does not have side-effects.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/4674/reactions",
     "total_count": 0,
@@ -96,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/4674/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {

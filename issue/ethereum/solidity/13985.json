@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13985",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13985/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13985/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13985/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13985",
+  "id": 1591686039,
+  "node_id": "I_kwDOAm_5kc5e3zOX",
+  "number": 13985,
+  "title": "`Undeclared identifier` error when `outputSelection` is the single target contract but compiles with `outputSelection : *`",
+  "user": {
+    "login": "kuzdogan",
+    "id": 13069972,
+    "node_id": "MDQ6VXNlcjEzMDY5OTcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13069972?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kuzdogan",
+    "html_url": "https://github.com/kuzdogan",
+    "followers_url": "https://api.github.com/users/kuzdogan/followers",
+    "following_url": "https://api.github.com/users/kuzdogan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kuzdogan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kuzdogan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kuzdogan/subscriptions",
+    "organizations_url": "https://api.github.com/users/kuzdogan/orgs",
+    "repos_url": "https://api.github.com/users/kuzdogan/repos",
+    "events_url": "https://api.github.com/users/kuzdogan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kuzdogan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4858664852,
+      "node_id": "LA_kwDOAm_5kc8AAAABIZlXlA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/needs%20investigation",
+      "name": "needs investigation",
+      "color": "9F804C",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-20T11:35:50Z",
+  "updated_at": "2023-02-24T14:32:04Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWhen compiling contracts, Sourcify looks at the `settings.compilationTarget: { contracts/Mycontract.sol: MyContract }` of the metadata and only asks that target contract to be output by the compiler in the `outputSelection`:\r\n\r\n```json\r\n    \"outputSelection\": {\r\n      \"contracts/MyContract\": {\r\n        \"MyContract\": [\r\n          \"evm.bytecode.object\",\r\n          \"evm.deployedBytecode.object\",\r\n          \"metadata\"\r\n        ]\r\n      }\r\n    }\r\n```\r\n\r\nunlike [hardhat](https://github.com/NomicFoundation/hardhat/blob/aee50d6c94a5e8b33f0de30d87e14229ada1300c/packages/hardhat-core/src/internal/core/config/default-config.ts#L139) and [truffle](https://github.com/trufflesuite/truffle/blob/6bc7700cea5cd01af7e6ea38233dd10498255bb4/packages/compile-solidity/src/run.ts#L205) which output all contracts unless a target file is given\r\n\r\n```json\r\n    \"outputSelection\": {\r\n      \"*\": {\r\n        \"*\": [\r\n          \"abi\",\r\n          \"evm.bytecode\",\r\n          \"evm.deployedBytecode\",\r\n          \"evm.methodIdentifiers\"\r\n        ],\r\n        \"\": [\"ast\"]\r\n      }\r\n    }\r\n```\r\n\r\nWe received a contract Sourcify wasn't able to compile because of this difference, but could be compiled with frameworks and deployed.\r\n\r\n**To my understanding, a difference in the `outputSelection` should not affect the compilation as the inputs are not changed.** Therefore I believe this might be a bug.\r\n\r\nNoting that we encountered a bug before because of the same reason, i.e. how we specify the `outputSelection`: https://github.com/ethereum/solidity/issues/12932 \r\n\r\n## Environment\r\n\r\n- Compiler version: `v0.6.5+commit.f956cc89`\r\n- Target EVM version (as per compiler settings): `istanbul`\r\n- Framework/IDE (e.g. Truffle or Remix): Truffle and Hardhat\r\n- EVM execution environment / backend / blockchain client: -\r\n- Operating system: MacOs (reproduced on Linux)\r\n\r\n## Steps to Reproduce\r\n\r\nThe standard JSON used by Sourcify:\r\nhttps://gist.github.com/marcocastignoli/6011093fdab16749fe316597b6289424#file-standard-sourcify-json\r\n\r\nCompile:\r\n`./solc-macosx-amd64-v0.6.5+commit.f956cc89 --standard-json standard-sourcify.json`\r\n\r\ngives the output with errors:\r\n```json\r\n{\r\n  \"errors\": [\r\n    {\r\n      \"component\": \"general\",\r\n      \"formattedMessage\": \"contracts/shields.sol:112:9: Warning: This declaration shadows an existing declaration.\\n        uint256[] memory tokens = new uint256[](balanceOf(owner));\\n        ^---------------------^\\ncontracts/shields.sol:59:5: The shadowed declaration is here:\\n    Shield[] private tokens;\\n    ^---------------------^\\n\",\r\n      \"message\": \"This declaration shadows an existing declaration.\",\r\n      \"secondarySourceLocations\": [\r\n        {\r\n          \"end\": 2232,\r\n          \"file\": \"contracts/shields.sol\",\r\n          \"message\": \"The shadowed declaration is here:\",\r\n          \"start\": 2209\r\n        }\r\n      ],\r\n      \"severity\": \"warning\",\r\n      \"sourceLocation\": {\r\n        \"end\": 4177,\r\n        \"file\": \"contracts/shields.sol\",\r\n        \"start\": 4154\r\n      },\r\n      \"type\": \"Warning\"\r\n    },\r\n    {\r\n      \"component\": \"general\",\r\n      \"formattedMessage\": \"contracts/CBKLandSale.sol:748:17: Warning: This declaration shadows an existing declaration.\\n            for(uint256 i = counter; i < counter + rcLength; i++) {\\n                ^-------^\\ncontracts/CBKLandSale.sol:734:14: The shadowed declaration is here:\\n        for (uint256 i = 0; i < reservations.length; i++) {\\n             ^-------^\\n\",\r\n      \"message\": \"This declaration shadows an existing declaration.\",\r\n      \"secondarySourceLocations\": [\r\n        {\r\n          \"end\": 29653,\r\n          \"file\": \"contracts/CBKLandSale.sol\",\r\n          \"message\": \"The shadowed declaration is here:\",\r\n          \"start\": 29644\r\n        }\r\n      ],\r\n      \"severity\": \"warning\",\r\n      \"sourceLocation\": {\r\n        \"end\": 30444,\r\n        \"file\": \"contracts/CBKLandSale.sol\",\r\n        \"start\": 30435\r\n      },\r\n      \"type\": \"Warning\"\r\n    },\r\n    {\r\n      \"component\": \"general\",\r\n      \"formattedMessage\": \"contracts/cryptoblades.sol:471:9: Warning: This declaration shadows an existing declaration.\\n        int128 mintWeaponFee =\\n        ^------------------^\\ncontracts/cryptoblades.sol:169:5: The shadowed declaration is here:\\n    int128 public mintWeaponFee;\\n    ^-------------------------^\\n\",\r\n      \"message\": \"This declaration shadows an existing declaration.\",\r\n      \"secondarySourceLocations\": [\r\n        {\r\n          \"end\": 6868,\r\n          \"file\": \"contracts/cryptoblades.sol\",\r\n          \"message\": \"The shadowed declaration is here:\",\r\n          \"start\": 6841\r\n        }\r\n      ],\r\n      \"severity\": \"warning\",\r\n      \"sourceLocation\": {\r\n        \"end\": 17558,\r\n        \"file\": \"contracts/cryptoblades.sol\",\r\n        \"start\": 17538\r\n      },\r\n      \"type\": \"Warning\"\r\n    },\r\n    {\r\n      \"component\": \"general\",\r\n      \"formattedMessage\": \"contracts/Blacksmith.sol:143:16: DeclarationError: Undeclared identifier.\\n        return SafeRandoms(links[LINK_SAFE_RANDOMS]).hasSingleSeedRequest(msg.sender, getSeed(seedId, shieldType));\\n               ^---------^\\n\",\r\n      \"message\": \"Undeclared identifier.\",\r\n      \"severity\": \"error\",\r\n      \"sourceLocation\": {\r\n        \"end\": 5317,\r\n        \"file\": \"contracts/Blacksmith.sol\",\r\n        \"start\": 5306\r\n      },\r\n      \"type\": \"DeclarationError\"\r\n    },\r\n    {\r\n      \"component\": \"general\",\r\n      \"formattedMessage\": \"contracts/Blacksmith.sol:150:9: DeclarationError: Undeclared identifier.\\n        SafeRandoms(links[LINK_SAFE_RANDOMS]).requestSingleSeed(msg.sender, getSeed(uint(SHIELD_SEED), shieldType));\\n        ^---------^\\n\",\r\n      \"message\": \"Undeclared identifier.\",\r\n      \"severity\": \"error\",\r\n      \"sourceLocation\": {\r\n        \"end\": 5679,\r\n        \"file\": \"contracts/Blacksmith.sol\",\r\n        \"start\": 5668\r\n      },\r\n      \"type\": \"DeclarationError\"\r\n    },\r\n    {\r\n      \"component\": \"general\",\r\n      \"formattedMessage\": \"contracts/Blacksmith.sol:159:24: DeclarationError: Undeclared identifier.\\n        uint256 seed = SafeRandoms(links[LINK_SAFE_RANDOMS]).popSingleSeed(msg.sender, getSeed(uint(SHIELD_SEED), shieldType), true, false);\\n                       ^---------^\\n\",\r\n      \"message\": \"Undeclared identifier.\",\r\n      \"severity\": \"error\",\r\n      \"sourceLocation\": {\r\n        \"end\": 6103,\r\n        \"file\": \"contracts/Blacksmith.sol\",\r\n        \"start\": 6092\r\n      },\r\n      \"type\": \"DeclarationError\"\r\n    }\r\n  ],\r\n  \"sources\": {}\r\n}\r\n```\r\n\r\nIf you change the `outputSelection` to the following, it compiles successfully:\r\n```json\r\n    \"outputSelection\": {\r\n      \"*\": { <-- Changed\r\n        \"BurningManager\": [\r\n          \"evm.bytecode.object\",\r\n          \"evm.deployedBytecode.object\",\r\n          \"metadata\"\r\n        ]\r\n      }\r\n    }\r\n```\r\n\r\nContract repo: https://github.com/CryptoBlades/cryptoblades/tree/production\r\nCommit hash of the deployed contract: `a7180afc8bfdc74a5450cc1c6362cafd627a0f26`\r\nTarget contract: `BurningManager.sol`\r\n\r\nAdditional background info about the issue: https://github.com/ethereum/sourcify/issues/928",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13985/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13985/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

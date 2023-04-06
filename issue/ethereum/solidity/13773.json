@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-12-02T11:20:48Z",
-  "updated_at": "2022-12-02T11:20:48Z",
-  "closed_at": null,
+  "updated_at": "2023-02-06T17:57:57Z",
+  "closed_at": "2023-02-06T17:57:57Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nSometimes it is good to restrict access to some fields of structs to be only accessible within outer contract/library.\r\n\r\n## Motivation\r\n\r\nSome popular libraries are currently adding underscore to the field names, but can't really protect these vars from being accessed.\r\nFor example, `Counter.sol` in OpenZeppelin library: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/49c0e4370d0cc50ea6090709e3835a3091e33ee2/contracts/utils/Counters.sol#L19\r\n\r\n## Specification\r\n\r\nLet's allow to specify `private`,`public` (and maybe `view`, which could be read-only from other contract/libraries) keywords for struct fields:\r\n```solidity\r\nlibrary Counters {\r\n    struct Counter {\r\n        uint256 private _value;\r\n    }\r\n}\r\n```\r\n\r\nSo this field `_value` should be accessible within `library Counters` and be non-accessing from the other contracts/libraries. This would allow to build libraries which really protect their consistency from unrestricted access.\r\n\r\n## Backwards Compatibility\r\n\r\nDefault visibility modifier should be `public`.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13773/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13773/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1419511969",
+    "html_url": "https://github.com/ethereum/solidity/issues/13773#issuecomment-1419511969",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13773",
+    "id": 1419511969,
+    "node_id": "IC_kwDOAm_5kc5UnAih",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-06T17:57:57Z",
+    "updated_at": "2023-02-06T17:57:57Z",
+    "author_association": "MEMBER",
+    "body": "This makes some sense, but the problem here would be that the scope to which the modifier applies is never clear, resp. the rules would need to be complicated (e.g. for file-level structs etc.).\r\n\r\nI think the preferred way to solve the underlying issue will be to generalize user-defined value types to general user-defined types that can encapsulate even structs and then to only expose certain accessor functions selectively. As such, I'm closing this issue as currently not planned.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1419511969/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

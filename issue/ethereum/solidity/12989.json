@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2022-05-06T01:50:03Z",
-  "updated_at": "2022-05-06T13:24:15Z",
-  "closed_at": null,
+  "updated_at": "2023-03-23T18:25:17Z",
+  "closed_at": "2023-03-23T18:25:17Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nAdd compile time warning for dynamic memory arrays that are not explicitly allocated when declared.\r\n\r\n## Motivation\r\n\r\nThe below example compiles and results in an \"index out of bounds\" warning when run. It would be easier to debug and likely prevent runtime exceptions if the compiler warned or errored with the following syntax.\r\n\r\n## Specification\r\n```\r\nMyStruct[] memory structs;\r\nfor (uint i = 0; i < array.length; i++) {\r\n    structs[i] = MyStruct(...)\r\n}\r\n```\r\nSuggest: structs does not declare a size and cannot be dynamically resized... try `structs = new MyStruct[](size);`\r\n## Backwards Compatibility\r\nNo issues. There may be forward compatibility issues if `push` is implemented for dynamic arrays.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "r0qs",
+    "id": 457348,
+    "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/r0qs",
+    "html_url": "https://github.com/r0qs",
+    "followers_url": "https://api.github.com/users/r0qs/followers",
+    "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+    "organizations_url": "https://api.github.com/users/r0qs/orgs",
+    "repos_url": "https://api.github.com/users/r0qs/repos",
+    "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/r0qs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/12989/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/12989/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -140,6 +159,50 @@
     "body": "Using a different array was purposeful... whenever one modifies array elements e.g. converts to a different type and copies them into a new array, the length of the input array is not always zero. And, the for loop will run in that case.\r\n```\r\ncontract C {\r\n    struct MyStruct {\r\n        uint x;\r\n    }\r\n     struct Data {\r\n        bytes32 y;\r\n    }\r\n    function foo(Data[] memory data) public {\r\n        MyStruct[] memory structs;\r\n        for (uint i = 0; i < data.length; i++) {\r\n            structs[i] = MyStruct(uint(data[i]));\r\n        }\r\n    }\r\n}\r\n```\r\n\r\n> Also, it's perfectly fine not to allocate the array immediately. You might not know the size of the array immediately:\r\n\r\nIn this example, an explicit size is used, so it's not something I'd expect a warning about.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1119604619/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1481696065",
+    "html_url": "https://github.com/ethereum/solidity/issues/12989#issuecomment-1481696065",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/12989",
+    "id": 1481696065,
+    "node_id": "IC_kwDOAm_5kc5YUONB",
+    "user": {
+      "login": "r0qs",
+      "id": 457348,
+      "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/r0qs",
+      "html_url": "https://github.com/r0qs",
+      "followers_url": "https://api.github.com/users/r0qs/followers",
+      "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+      "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+      "organizations_url": "https://api.github.com/users/r0qs/orgs",
+      "repos_url": "https://api.github.com/users/r0qs/repos",
+      "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/r0qs/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-03-23T18:25:17Z",
+    "updated_at": "2023-03-23T18:25:17Z",
+    "author_association": "MEMBER",
+    "body": "> A correctly coded example will not revert because an \"uninitialized\" array does not contain random data. Its length is guaranteed to be zero:\r\n\r\nHi @0xalpharush, as @cameel  pointed out, there are no such thing as uninitialized dynamic arrays in Solidity, i.e. everything that's not explicitly initialized gets some default `zero` value, in this case, it is an array of size zero.\r\n\r\nAnd although your suggestion is valid, it should preferably be done by static analysis tools and not by the Solidity compiler, since having a warning there would not be in line with how all other variables work.\r\n\r\nThus, I will be closing this issue for now. Please, feel free to reopen it if you have anything to add.\r\n\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1481696065/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

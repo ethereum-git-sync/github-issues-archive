@@ -53,7 +53,7 @@
       "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
       "name": "low impact",
-      "color": "001dff",
+      "color": "5d71ff",
       "default": false,
       "description": "Changes are not very noticeable or potential benefits are limited."
     },
@@ -65,23 +65,60 @@
       "color": "ffbe6c",
       "default": false,
       "description": "We like the idea but it’s not important enough to be a part of the roadmap."
+    },
+    {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
+      "id": 4699444681,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
+      "name": "stale",
+      "color": "BF4801",
+      "default": false,
+      "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2021-12-10T22:45:31Z",
-  "updated_at": "2022-09-14T15:50:05Z",
-  "closed_at": null,
+  "updated_at": "2023-03-29T12:05:47Z",
+  "closed_at": "2023-03-29T12:05:46Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Abstract\r\nWhen all contracts to compile are abstract or are interfaces, the compiler should either skip them in the output or provide a message saying that the output was empty.\r\n\r\n## Motivation\r\nHandling such contracts the same way we handle actually deployable contracts may make users confused as to whether they're supposed to deploy them too or not. This is especially confusing when `--output-dir` option is used because the files are then created on disk even if empty and the user might not realize that they can be safely discarded in that case.\r\n\r\n## Example\r\n`test.sol`\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity >=0.0;\r\n\r\ninterface C {\r\n    event E();\r\n    function f() external;\r\n}\r\n```\r\n```bash\r\nsolc test.sol --bin --ir --ir-optimized --asm --asm-json --ewasm --bin-runtime --opcodes --gas\r\n```\r\n```\r\n======= test.sol:C =======\r\nEVM assembly:\r\nnull\r\nGas estimation:\r\nOpcodes:\r\n\r\nBinary:\r\n\r\nBinary of the runtime part:\r\n\r\nIR:\r\n\r\nOptimized IR:\r\n\r\nEwasm text:\r\n\r\nEwasm binary (hex):\r\n```\r\n\r\nNote that not all outputs are empty. `--hashes`, `--devdoc`, `--userdoc` and `--ast-compact-json` do provide useful output even for interfaces and abstract contracts. And `--storage-layout` always prints `{\"storage\":[]}` but it's technically non-empty output.\r\n\r\n## Specification\r\n1. When a given output is completely empty, include a message saying that it was empty.\r\n2. When all requested outputs for a given contract are empty, for brevity omit headers for all outputs and instead include a message saying that there was no output for the contract.\r\n    - Alternatively, we might want to completely omit such contracts in the output. In that case we should provide a message if all contracts in the input ended up being omitted.\r\n3. When `--output-dir` is used, do not create a file if it would end up being empty.\r\n4. When #10275 is implemented, I think it should omit the messages about empty output along with the headers.\r\n\r\n## Backwards Compatibility\r\nIt changes compiler output in a way visible to the user so technically it's a breaking change, but the change only applies to cases when there was no useful output anyway, so it's unlikely to affect tools in a significant way.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/12398/reactions",
     "total_count": 0,
@@ -96,8 +133,95 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/12398/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1479447467",
+    "html_url": "https://github.com/ethereum/solidity/issues/12398#issuecomment-1479447467",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/12398",
+    "id": 1479447467,
+    "node_id": "IC_kwDOAm_5kc5YLpOr",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-03-22T12:05:00Z",
+    "updated_at": "2023-03-22T12:05:00Z",
+    "author_association": "NONE",
+    "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1479447467/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1488477800",
+    "html_url": "https://github.com/ethereum/solidity/issues/12398#issuecomment-1488477800",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/12398",
+    "id": 1488477800,
+    "node_id": "IC_kwDOAm_5kc5YuF5o",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-03-29T12:05:44Z",
+    "updated_at": "2023-03-29T12:05:44Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1488477800/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

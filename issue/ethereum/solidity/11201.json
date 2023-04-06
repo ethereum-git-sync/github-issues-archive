@@ -31,6 +31,15 @@
   },
   "labels": [
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -40,21 +49,40 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2021-03-31T15:07:20Z",
-  "updated_at": "2022-11-25T12:44:14Z",
-  "closed_at": null,
+  "updated_at": "2023-02-06T12:05:01Z",
+  "closed_at": "2023-02-06T12:05:01Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nI noticed that when adding a `require` statement with a complex revert reason (computed by an internal function), I have to pay the cost of computing this revert string regardless of the value of the precondition. Also, if that internal function is not view, and include some state changes, these changes are enacted event when the condition does require a revert.\r\n\r\nHere is an example of code\r\n```\r\ncontract test {\r\n    uint256 public i = 0;\r\n    \r\n    function trigger() external {\r\n        require(true, getErrorMessage());\r\n    }\r\n    \r\n    function getErrorMessage() internal returns (string memory) {\r\n        i++;\r\n        return \"\";\r\n    }\r\n}\r\n```\r\n\r\nWhen calling trigger, I was not expecting the `getErrorMessage()` to be called, and I am not expecting `i` to be incremented. In a way, I'm expecting:\r\n`requier(condition_or_call, string_or_call);` to be translated into `if (!condition_or_call) revert(string_or_call);`\r\n\r\n[In this particular case, using `if-revert` saves about 30k gas on valid paths that do not revert](https://github.com/Amxx/openzeppelin-contracts/blob/feature/AccessControlRevertMessage/contracts/access/AccessControl.sol#L122-L131)\r\n\r\n## Motivation\r\n\r\nHaving the compiler rewrite `require()` using this `if() revert()` logic would reduce the gas cost of non reverting paths since the complex error message would not have to be computer unless absolutely necessary. Also, it means the revert string can be computed with additional assumptions.\r\n\r\n## Specification\r\n\r\nInternally (yul?) rewrite all `require(x,y)` statements as `if (!x) revert(y);`\r\n\r\n## Backwards Compatibility\r\n\r\nWill this does change the behavior of the produced bytecode, I believe it does in a way that is compliant with the common understanding of `require(bool,string)` by devs. Still, this might be breaking in some extreme cases that have to be studied.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/11201/reactions",
     "total_count": 1,
@@ -69,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/11201/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -236,6 +264,50 @@
     "body": "I'd count that as new syntax :)\r\n\r\nJust to be clear, I'm not saying we will definitely deprecate it. Just that we could not agree on a replacement yet and even the new docs use the `if (!c) revert Error();` pattern for it so it's a possibility. Sorry if I worded it in a way that implies that it's more likely than it actually is.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/811396888/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1418974647",
+    "html_url": "https://github.com/ethereum/solidity/issues/11201#issuecomment-1418974647",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/11201",
+    "id": 1418974647,
+    "node_id": "IC_kwDOAm_5kc5Uk9W3",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-02-06T12:04:59Z",
+    "updated_at": "2023-02-06T12:04:59Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1418974647/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

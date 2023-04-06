@@ -67,21 +67,40 @@
       "description": "The proposal is too vague to be implemented right away"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2018-09-17T09:21:59Z",
-  "updated_at": "2023-01-07T12:14:50Z",
-  "closed_at": null,
+  "updated_at": "2023-02-07T11:54:10Z",
+  "closed_at": "2023-02-07T11:54:09Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Certain use-cases require a check to be applied to all or at least many functions. Most notably, this includes a general smart contract deactivation function (as replacement for dangerous selfdestruct), a \"pausable\" pattern and so on.\r\n\r\nModifiers already provide basic support, but it is too easy to forget a modifier to be mentioned with a single function, also it requires quite some typing and can get cluttered fast.\r\n\r\nModifier areas ( #623 ) are a similar solution, but they do not work with inheritance.\r\n\r\nThis proposal tries to start a discussion about how modifier areas could work better with inheritance. The drawback of this proposal is that it provides less choice about which functions to apply.\r\n\r\nSyntax proposal:\r\n```\r\nusing modifier <modifier> for *;\r\n```\r\n\r\nThis applies the given modifier to all functions in this contract, including inherited functions and all functions in potential derived contracts.\r\n\r\nIt might make sense to restrict this to functions that are non-view functions.\r\n\r\nPotential syntax: `using modifier <modifier> for payable, non-payable;`",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/4990/reactions",
     "total_count": 0,
@@ -96,7 +115,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/4990/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -263,6 +282,50 @@
     "body": "I have added some additional background on #13845 as to why this change would not satisfy a blanket reentrancy guard properly, however, if the modifiers can be applied with a proper distinction between mutable and non-mutable functions then this would be a good way to start.\r\n\r\nA core problem I see with this syntax is its compatibility with inheritance. Libraries (such as OpenZeppelin) will be hesitant to apply a global re-entrancy protection across all their functions, meaning that users would have to specify the `using modifier <modifier> for *` syntax **as well as override each and every function of the dependency they wish to apply the modifier for**.\r\n\r\nOn the other hand, due to dependency conflicts certain functions would need to be overridden without any functional changes (i.e. using `super`) but the `using modifier <modifier> for *` syntax would affect them inadvertently, a side-effect most developers will not expect.\r\n\r\nFor the re-entrancy use case in particular I believe this feature would be improperly used and cause more harm than good (i.e. applying `using modifier nonReentrant for *` and assuming that all functions are non-reentrant when they are not). \r\n\r\nAdditionally, the feature as it is would cause nuisances when it comes to inheritance as any overridden function would apply the blanket `modifier` even when that may not be the intention (i.e. the developer is forced to `override` due to an interface & implementation conflict). \r\n\r\nAny solution to the inheritance problem would significantly increase the complexity of how the `using modifier <modifier> for *` is applied and would lead to the syntax becoming difficult to grasp and seldom used as developers would be unsure as to how it behaves. \r\n\r\nAs a final note, the issue also suffers from how `modifier` conflicts are resolved when it comes to the visibility of functions. Traditional modifiers can be applied to both non-external and external functions, however, this syntax assumes that they are only applied to `external` functions.\r\n\r\nIf we extend the syntax to also accept explicit visibilities, it would significantly complicate how it is used (i.e. `using modifier nonReentrant for mutable,external,public;` and `using modifier nonReentrantView for nonmutable,external,public;`) as well as cause conflicts when an `external` function invokes a `public` function and so on. \r\n\r\nTo conclude, we can alleviate all concerns above by specifying thorough documentation as to how the syntax behaves (i.e. visibility needs to be explicit, both `external` and `public` will apply the `modifier` if invoked in a single context, etc.), however, it would be significantly complex to use correctly leading to more developer pitfalls being introduced to the language rather than covering them up.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1374461283/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1420651276",
+    "html_url": "https://github.com/ethereum/solidity/issues/4990#issuecomment-1420651276",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/4990",
+    "id": 1420651276,
+    "node_id": "IC_kwDOAm_5kc5UrWsM",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-07T11:54:09Z",
+    "updated_at": "2023-02-07T11:54:09Z",
+    "author_association": "MEMBER",
+    "body": "If anything I think we'll rather go the route of https://github.com/ethereum/solidity/issues/623 for solving the underlying request, and would allow to properly distinguish between functions explicitly, which I take it would satisfy the concerns by @alex-ppg.\r\nThat being said, I don't see us doing that any time soon either.\r\nClosing this issue for now in any case, since this is not planned.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1420651276/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

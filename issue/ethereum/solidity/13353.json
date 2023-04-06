@@ -33,28 +33,47 @@
     {
       "id": 4858664852,
       "node_id": "LA_kwDOAm_5kc8AAAABIZlXlA",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/Needs%20Investigation",
-      "name": "Needs Investigation",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/needs%20investigation",
+      "name": "needs investigation",
       "color": "9F804C",
       "default": false,
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-08-07T11:27:46Z",
-  "updated_at": "2022-11-30T15:20:45Z",
-  "closed_at": null,
+  "updated_at": "2023-02-06T18:25:15Z",
+  "closed_at": "2023-02-06T18:24:36Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nType identifier strings generated in [Types.cpp](https://github.com/ethereum/solidity/blob/49a2db99e69b5608c24064659528dc1d92b21fef/libsolidity/ast/Types.cpp) cannot be unambiguously decoded with linear parser because of these escape sequences:\r\nhttps://github.com/ethereum/solidity/blob/49a2db99e69b5608c24064659528dc1d92b21fef/libsolidity/ast/Types.cpp#L262-L271\r\n\r\nAn example may be `t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$` where (parsing from left to right) the last 4 symbols (`_$_$`) can be decoded as `))` or `,$` (this one would end up as an invalid type string, but it would require branching of the parser).\r\n\r\nDo you have an example implementation of a type identifier strings decoder?\r\n\r\n## Environment\r\n\r\n- Compiler version: since 0.4.9\r\n- Target EVM version (as per compiler settings): -\r\n- Framework/IDE (e.g. Truffle or Remix): -\r\n- EVM execution environment / backend / blockchain client: -\r\n- Operating system: -",
-  "closed_by": null,
+  "closed_by": {
+    "login": "matheusaaguiar",
+    "id": 95899911,
+    "node_id": "U_kgDOBbdRBw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/95899911?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/matheusaaguiar",
+    "html_url": "https://github.com/matheusaaguiar",
+    "followers_url": "https://api.github.com/users/matheusaaguiar/followers",
+    "following_url": "https://api.github.com/users/matheusaaguiar/following{/other_user}",
+    "gists_url": "https://api.github.com/users/matheusaaguiar/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/matheusaaguiar/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/matheusaaguiar/subscriptions",
+    "organizations_url": "https://api.github.com/users/matheusaaguiar/orgs",
+    "repos_url": "https://api.github.com/users/matheusaaguiar/repos",
+    "events_url": "https://api.github.com/users/matheusaaguiar/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/matheusaaguiar/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13353/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13353/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1419552524",
+    "html_url": "https://github.com/ethereum/solidity/issues/13353#issuecomment-1419552524",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13353",
+    "id": 1419552524,
+    "node_id": "IC_kwDOAm_5kc5UnKcM",
+    "user": {
+      "login": "matheusaaguiar",
+      "id": 95899911,
+      "node_id": "U_kgDOBbdRBw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95899911?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/matheusaaguiar",
+      "html_url": "https://github.com/matheusaaguiar",
+      "followers_url": "https://api.github.com/users/matheusaaguiar/followers",
+      "following_url": "https://api.github.com/users/matheusaaguiar/following{/other_user}",
+      "gists_url": "https://api.github.com/users/matheusaaguiar/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/matheusaaguiar/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/matheusaaguiar/subscriptions",
+      "organizations_url": "https://api.github.com/users/matheusaaguiar/orgs",
+      "repos_url": "https://api.github.com/users/matheusaaguiar/repos",
+      "events_url": "https://api.github.com/users/matheusaaguiar/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/matheusaaguiar/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-06T18:24:36Z",
+    "updated_at": "2023-02-06T18:25:15Z",
+    "author_association": "MEMBER",
+    "body": "Hi @michprev !\r\nThanks for your report. Type identifier strings are not part of the public interface and exist just to make function names unambiguous. In particular, these identifiers can change at any time between releases and parsing them is not reliable - depending on your use case, maybe you rather need specific debugging data from the compiler? [13720](https://github.com/ethereum/solidity/issues/13720) and [13157](https://github.com/ethereum/solidity/issues/13157) might be of help.\r\nGiven that, we won't pursue optimizing those identifiers for decoding and thus we are closing this issue.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1419552524/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

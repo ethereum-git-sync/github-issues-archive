@@ -56,23 +56,60 @@
       "color": "18F737",
       "default": false,
       "description": "The proposal is too vague to be implemented right away"
+    },
+    {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
+      "id": 4699444681,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
+      "name": "stale",
+      "color": "BF4801",
+      "default": false,
+      "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 11,
+  "comments": 13,
   "created_at": "2021-03-15T11:44:27Z",
-  "updated_at": "2022-09-15T12:29:15Z",
-  "closed_at": null,
+  "updated_at": "2023-03-26T12:04:03Z",
+  "closed_at": "2023-03-26T12:04:03Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nAllow the compiler to create a smart contract hub that connects multiple smart contracts together to have a single entry point without being limited to the 24 kb limit of Solidity. \r\n\r\nThe proposal is to introduce syntax for creating a hub contract which acts as a single entry point for complex smart contract systems and proxies calls to different implementation contracts using delegate calls. The hub contract will store all of the storage for its child contracts under separate namespaces. The child contract can be standard contracts or new abstract/library like contracts.\r\n\r\n## Motivation\r\n\r\nComplex dApps require complex smart contracts. I have seen a lot of dApp developers struggle with this. As Ethereum and Solidity have progressed over the years, you can’t really do as much in 24KB as you were used to. Solc bakes in more checks, reason strings take a lot of space, and L2 solutions like Optimism bloat the compiled artifacts with their changes.\r\n\r\nA lot of alternative non-standard solutions are being used right now that introduce another attack surface and added complexity. Having something inbuilt in the compiler will make it safer and easier for developers to build complex smart contract systems.\r\n\r\n## Specification\r\n\r\n- The hub smart contract must specify all child contracts that it will route. The syntax can be something like `contract Hub routing Foo, Bar`. It must work alongside the `is` keyword. I.e. `contract Hub routing Foo, Bar is Proxy` should also work.\r\n- The hub should have a binary searchable router to route all calls to appropriate child contracts using delegate calls.\r\n- The child contracts must import the Hub if they want to access the hub’s storage or route calls to other child contracts. If the child contract is independent of the hub, it does not need to do anything special. I.e. Existing contracts can be used as child contracts. The syntax for importing the hub remains the same as the syntax for importing other contracts. `import ./Hub.sol`.\r\n- Once the hub is imported, the child contracts can access storage and functions of the hub and other routed contracts via `Hub.variable`, `Hub.Foo.variable`, `Hub.Bar.function()` etc.\r\n- If a storage is accessed, the storage should be read/written directly from the pre-defined storage slot rather than making any external calls.\r\n- If a function in an another module is called, a delegate call must be made to self that the hub can route to the proper destination.\r\n- The storage of child contracts must be stored in their own namespace, derived by hashing something like “child_contract” + $child_contract_name. Sort of like how mappings work.\r\n- The hub should be compiled/deployed like contracts that use libraries are compiled/deployed. All child contracts must be deployed individually and then the hub’s code must be updated to include hardcoded addresses of the child contracts.\r\n\r\n## Example Syntax\r\n\r\n```solidity\r\n\r\ncontract Hub routes Foo, Bar {\r\n    string name;\r\n\r\n    function setName(string memory newName) public {\r\n        name = newName;\r\n    }\r\n}\r\n\r\ncontract Foo {\r\n    uint value;\r\n\r\n    function incrementValue() public {\r\n        value += 1;\r\n    }\r\n\r\n    function test() public view returns (string memory) {\r\n        return “hello”;\r\n    }\r\n}\r\n\r\ncontract Bar {\r\n    uint value; // Different than Foo.value;\r\n\r\n    function incrementFooValue() public {\r\n        if (Hub.Foo.value < 42) {\r\n            Hub.Foo.incrementValue();\r\n        }\r\n    }\r\n}\r\n\r\n```\r\n\r\nps Thanks to @ajsantander, @chriseth, @cameel, and others who have helped form this draft proposal.  ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/11102/reactions",
     "total_count": 6,
@@ -87,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/11102/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -571,6 +608,94 @@
       "heart": 0,
       "rocket": 0,
       "eyes": 3
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1474830176",
+    "html_url": "https://github.com/ethereum/solidity/issues/11102#issuecomment-1474830176",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/11102",
+    "id": 1474830176,
+    "node_id": "IC_kwDOAm_5kc5X6B9g",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-03-18T12:04:23Z",
+    "updated_at": "2023-03-18T12:04:23Z",
+    "author_association": "NONE",
+    "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1474830176/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1484076103",
+    "html_url": "https://github.com/ethereum/solidity/issues/11102#issuecomment-1484076103",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/11102",
+    "id": 1484076103,
+    "node_id": "IC_kwDOAm_5kc5YdTRH",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-03-26T12:04:02Z",
+    "updated_at": "2023-03-26T12:04:02Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1484076103/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
     },
     "performed_via_github_app": null
   }

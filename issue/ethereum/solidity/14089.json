@@ -1,0 +1,155 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14089",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14089/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14089/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14089/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14089",
+  "id": 1652908710,
+  "node_id": "I_kwDOAm_5kc5ihWKm",
+  "number": 14089,
+  "title": "Add `--print-smt` flag to output the SMTChecker SMTLIB code",
+  "user": {
+    "login": "PatrickAlphaC",
+    "id": 54278053,
+    "node_id": "MDQ6VXNlcjU0Mjc4MDUz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/54278053?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PatrickAlphaC",
+    "html_url": "https://github.com/PatrickAlphaC",
+    "followers_url": "https://api.github.com/users/PatrickAlphaC/followers",
+    "following_url": "https://api.github.com/users/PatrickAlphaC/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PatrickAlphaC/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PatrickAlphaC/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PatrickAlphaC/subscriptions",
+    "organizations_url": "https://api.github.com/users/PatrickAlphaC/orgs",
+    "repos_url": "https://api.github.com/users/PatrickAlphaC/repos",
+    "events_url": "https://api.github.com/users/PatrickAlphaC/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PatrickAlphaC/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4438006499,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaa4w",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20effort",
+      "name": "low effort",
+      "color": "ffb1fa",
+      "default": false,
+      "description": "There is not much implementation work to be done. The task is very easy or tiny."
+    },
+    {
+      "id": 4438157609,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
+      "name": "low impact",
+      "color": "5d71ff",
+      "default": false,
+      "description": "Changes are not very noticeable or potential benefits are limited."
+    },
+    {
+      "id": 4438490842,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3-2g",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/should%20have",
+      "name": "should have",
+      "color": "ffbe6c",
+      "default": false,
+      "description": "We like the idea but it’s not important enough to be a part of the roadmap."
+    },
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4810143649,
+      "node_id": "LA_kwDOAm_5kc8AAAABHrT3oQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/smt",
+      "name": "smt",
+      "color": "1d76db",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-04-03T23:25:26Z",
+  "updated_at": "2023-04-05T16:20:57Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n\r\nSymbolic execution and formal verification are becoming hotter topics in the web3 & security space. As a community, we are becoming more mature and realizing the current testing status quo isn't enough.\r\n\r\nSymbolic execution and formal verification are ways we can combat many issues. Still, it's challenging for people to understand how they work at the moment, and learn how to implement them effectively. Learning language models like ChatGPT have made this barrier easier, but a simple tweak of solidity such as outputting the SMTLIB code it uses for formal verification would make it much easier to teach the concept, and can be helpful for users trying to understand why the SMTChecker is giving the output it is. \r\n\r\n## Motivation\r\n\r\nSee above.\r\n\r\nIt seems like this would be relatively doable, as a simple print statement can achieve the desired result. https://gist.github.com/hrkrshnn/306ebb5fc4687062a6fd865451348137\r\n\r\n(Thanks Hari!)\r\n\r\n## Specification\r\n\r\n```\r\n./solc example.sol --model-checker-engine bmc --print-smt\r\n```\r\n\r\nThis would then print the smt code. \r\n\r\n```\r\n(declare-datatypes ((bytes_tuple 0)) (((bytes_tuple (bytes_tuple_accessor_array (Array Int Int)) (bytes_tuple_accessor_length Int)))))\r\n(declare-datatypes ((tx_type 0)) (((tx_type (block.basefee Int) (block.chainid Int) (block.coinbase Int) (block.difficulty Int) (block.gaslimit Int) (block.number Int) (block.timestamp Int) (blockhash (Array Int Int)) (msg.data bytes_tuple) (msg.sender Int) (msg.sig Int) (msg.value Int) (tx.gasprice Int) (tx.origin Int)))))\r\n(declare-fun expr_8_1 () Bool)\r\n(declare-fun tx_0 () tx_type)\r\n(declare-fun x_2_0 () Int)\r\n(declare-fun expr_6_0 () Int)\r\n.\r\n.\r\n.\r\n```\r\n\r\n## Backwards Compatibility\r\n\r\nShould be backwards compatible. \r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14089/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 1,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14089/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1495566058",
+    "html_url": "https://github.com/ethereum/solidity/issues/14089#issuecomment-1495566058",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14089",
+    "id": 1495566058,
+    "node_id": "IC_kwDOAm_5kc5ZJIbq",
+    "user": {
+      "login": "leonardoalt",
+      "id": 504195,
+      "node_id": "MDQ6VXNlcjUwNDE5NQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/504195?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/leonardoalt",
+      "html_url": "https://github.com/leonardoalt",
+      "followers_url": "https://api.github.com/users/leonardoalt/followers",
+      "following_url": "https://api.github.com/users/leonardoalt/following{/other_user}",
+      "gists_url": "https://api.github.com/users/leonardoalt/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/leonardoalt/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/leonardoalt/subscriptions",
+      "organizations_url": "https://api.github.com/users/leonardoalt/orgs",
+      "repos_url": "https://api.github.com/users/leonardoalt/repos",
+      "events_url": "https://api.github.com/users/leonardoalt/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/leonardoalt/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-04-04T08:32:00Z",
+    "updated_at": "2023-04-04T08:32:00Z",
+    "author_association": "MEMBER",
+    "body": "Sounds good! I'll try to add it for the next release.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1495566058/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

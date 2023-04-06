@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14080",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14080/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14080/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14080/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14080",
+  "id": 1645953432,
+  "node_id": "I_kwDOAm_5kc5iG0GY",
+  "number": 14080,
+  "title": "`try/catch` only catches the very first external call",
+  "user": {
+    "login": "0xdavinchee",
+    "id": 20151633,
+    "node_id": "MDQ6VXNlcjIwMTUxNjMz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20151633?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xdavinchee",
+    "html_url": "https://github.com/0xdavinchee",
+    "followers_url": "https://api.github.com/users/0xdavinchee/followers",
+    "following_url": "https://api.github.com/users/0xdavinchee/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xdavinchee/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xdavinchee/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xdavinchee/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xdavinchee/orgs",
+    "repos_url": "https://api.github.com/users/0xdavinchee/repos",
+    "events_url": "https://api.github.com/users/0xdavinchee/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xdavinchee/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-29T14:36:35Z",
+  "updated_at": "2023-03-29T16:14:16Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n> **NOTE: This seems to only be breaking if you do another external call from a contract with address(0). e.g. in the example below, if callA returns address(0).**\r\n\r\n`try/catch` only catches the very first external call although it allows multiple external calls to be tried. This could be a bit of a footgun if a single external call is not warned or enforced or if each of the external calls in the \"try\" block are not tried.\r\n\r\n## Motivation\r\n\r\n<!--In this section you describe how you propose to address the problem you described earlier, including by giving one or more exemplary source code snippets for demonstration.-->\r\nThis can be slightly confusing when you do something like: `try IContractB(contractA.callA()).callB() {} catch {}`\r\nThis will revert if the function `callB` doesn't exist on the address returned by `contractA.callA`.\r\n\r\nThe interfaces:\r\n```\r\nIContractA {\r\n  function callA() external returns (address);\r\n}\r\n\r\nIContractB {\r\n  function callB() external;\r\n}\r\n```\r\n\r\n\r\n## Specification\r\n\r\nIt would make more sense to:\r\n1. not allow multiple external calls to be tried (compiler error)\r\n2. try each of them separately\r\n3. warn that you have multiple external calls in a try \"block\" (compiler warning)\r\n\r\n## Backwards Compatibility\r\n\r\nSpecifications 2 and 3 would likely be backwards compatible, but Specification 1 would probably break code which violates this rule when they update their solc if this change was made.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14080/reactions",
+    "total_count": 2,
+    "+1": 2,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14080/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

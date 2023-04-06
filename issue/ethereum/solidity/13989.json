@@ -1,0 +1,121 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/13989",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/13989/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/13989/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/13989/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/13989",
+  "id": 1592346028,
+  "node_id": "I_kwDOAm_5kc5e6UWs",
+  "number": 13989,
+  "title": "[soltest] Unable to test functions accepting fixed bytes types shorter than 32 bytes",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1018738457,
+      "node_id": "MDU6TGFiZWwxMDE4NzM4NDU3",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/testing%20:hammer:",
+      "name": "testing :hammer:",
+      "color": "ffc6db",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2376134343,
+      "node_id": "MDU6TGFiZWwyMzc2MTM0MzQz",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/should%20compile%20without%20error",
+      "name": "should compile without error",
+      "color": "c48f13",
+      "default": false,
+      "description": "Error is reported even though it shouldn't. Source is fine."
+    },
+    {
+      "id": 4438006499,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaa4w",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20effort",
+      "name": "low effort",
+      "color": "ffb1fa",
+      "default": false,
+      "description": "There is not much implementation work to be done. The task is very easy or tiny."
+    },
+    {
+      "id": 4438157609,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
+      "name": "low impact",
+      "color": "5d71ff",
+      "default": false,
+      "description": "Changes are not very noticeable or potential benefits are limited."
+    },
+    {
+      "id": 4438481746,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3bUg",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/must%20have%20eventually",
+      "name": "must have eventually",
+      "color": "ffb04d",
+      "default": false,
+      "description": "Something we consider essential but not enough to prevent us from releasing Solidity 1.0 without it."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-20T19:19:07Z",
+  "updated_at": "2023-02-20T19:20:56Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWhen a function accepts a fixed bytes type other than `bytes32`, an attempt to call it in soltest expectations results in a failure.\r\n\r\nThe failure does not happen for integer types or when the argument passed to the function is `0`. UDVTs based on fixed bytes types are affected as well.\r\n\r\nI suspect that soltest might be badly encoding the arguments. E.g. not padding them to full 32 bytes.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.18 (`develop`)\r\n\r\n## Steps to Reproduce\r\nTest case:\r\n```solidity\r\ncontract C {\r\n    function testBytes1(bytes1 x) public returns (bytes1) { return x; }\r\n    function testBytes4(bytes4 x) public returns (bytes4) { return x; }\r\n    function testBytes32(bytes32 x) public returns (bytes32) { return x; }\r\n    function testUint64(uint64 x) public returns (uint64) { return x; }\r\n}\r\n// ----\r\n// testBytes1(bytes1): 0x42 -> 0x42\r\n// testBytes4(bytes4): 0x42 -> 0x42\r\n// testBytes32(bytes32): 0x42 -> 0x42\r\n// testUint64(uint64): 0x42 -> 0x42\r\n\r\n// testBytes1(bytes1): 0 -> 0\r\n// testBytes4(bytes4): 0 -> 0\r\n// testBytes32(bytes32): 0 -> 0\r\n// testUint64(uint64): 0 -> 0\r\n\r\n```\r\nOutput\r\n```\r\n  Expected result:\r\n  // testBytes1(bytes1): 0x42 -> 0x42\r\n  // testBytes4(bytes4): 0x42 -> 0x42\r\n  // testBytes32(bytes32): 0x42 -> 0x42\r\n  // testUint64(uint64): 0x42 -> 0x42\r\n  // testBytes1(bytes1): 0 -> 0\r\n  // testBytes4(bytes4): 0 -> 0\r\n  // testBytes32(bytes32): 0 -> 0\r\n  // testUint64(uint64): 0 -> 0\r\n\r\n  Obtained result:\r\n  // testBytes1(bytes1): 0x42 -> FAILURE\r\n  Warning: The call to \"testBytes1(bytes1)\" returned\r\n\r\n  // testBytes4(bytes4): 0x42 -> FAILURE\r\n  Warning: The call to \"testBytes4(bytes4)\" returned\r\n\r\n  // testBytes32(bytes32): 0x42 -> 0x42\r\n  // testUint64(uint64): 0x42 -> 0x42\r\n  // testBytes1(bytes1): 0 -> 0\r\n  // testBytes4(bytes4): 0 -> 0\r\n  // testBytes32(bytes32): 0 -> 0\r\n  // testUint64(uint64): 0 -> 0\r\n\r\n  Attention: Updates on the test will apply the detected format displayed.\r\n\r\n  Note that the test also has to pass via Yul.\r\n  Run Settings: evmVersion=paris, optimize=false, useABIEncoderV1=false, batch=1/1\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/13989/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13989/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -8,7 +8,7 @@
   "id": 675031067,
   "node_id": "MDU6SXNzdWU2NzUwMzEwNjc=",
   "number": 9592,
-  "title": "try / catch does not work with custom call to external addresses and passing the calldata",
+  "title": "`try`/`catch` for low-level external calls",
   "user": {
     "login": "adridadou",
     "id": 381065,
@@ -53,7 +53,7 @@
       "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
       "name": "low impact",
-      "color": "001dff",
+      "color": "5d71ff",
       "default": false,
       "description": "Changes are not very noticeable or potential benefits are limited."
     },
@@ -76,7 +76,7 @@
   "milestone": null,
   "comments": 7,
   "created_at": "2020-08-07T13:52:31Z",
-  "updated_at": "2022-11-29T15:46:03Z",
+  "updated_at": "2023-02-12T22:06:34Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -219,8 +219,8 @@
     "body": "Low-level calls return a tuple ``(bool, bytes memory)`` - the ``bool`` indicating, if the call failed, the ``bytes memory`` containing the error message as an ABI-encoded call to a function with signature ``Error(string)``. So with low-level calls you are supposed to manually decode the message.\r\nThe ``bytes memory`` part will consist of the 4-byte signature of ``Error(string)`` followed by a pointer to the string, which in turn consists of a length and the padded string data.\r\nSo for ``revert(\"abc\");`` you can expect the ``bytes memory`` to contain the following:\r\n```\r\n0x08c379a0 -- first 4 bytes of the keccak256 hash of \"Error(String)\"\r\n0x0000000000000000000000000000000000000000000000000000000000000020 -- relative offset of the string argument\r\n0x0000000000000000000000000000000000000000000000000000000000000003 -- length of the string\r\n0x6162630000000000000000000000000000000000000000000000000000000000 -- padded string \"abc\"\r\n```\r\n\r\nPossibly, we will have a ``try...catch``-like mechanism for low-level calls in the future - or will at least make it easier to decode the error message using ``abi.decode`` with memory array slices. But currently decoding this will involve some manual effort.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/671374867/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
