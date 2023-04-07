@@ -1,0 +1,103 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14100",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14100/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14100/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14100/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14100",
+  "id": 1657804308,
+  "node_id": "I_kwDOAm_5kc5i0BYU",
+  "number": 14100,
+  "title": "Inconsistent validation against the size of representation of rational literals",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 3104779662,
+      "node_id": "MDU6TGFiZWwzMTA0Nzc5NjYy",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/should%20report%20error",
+      "name": "should report error",
+      "color": "666666",
+      "default": false,
+      "description": "Compiles without errors but should not."
+    },
+    {
+      "id": 4438006499,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaa4w",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20effort",
+      "name": "low effort",
+      "color": "ffb1fa",
+      "default": false,
+      "description": "There is not much implementation work to be done. The task is very easy or tiny."
+    },
+    {
+      "id": 4438157609,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
+      "name": "low impact",
+      "color": "5d71ff",
+      "default": false,
+      "description": "Changes are not very noticeable or potential benefits are limited."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-06T17:31:45Z",
+  "updated_at": "2023-04-06T17:33:21Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Description\r\nThe compiler has a check against rational literals whose representation requires more than 4096 bits to be stored. This validation is broken and also only enforced for literals using scientific notation.\r\n\r\nI'm not sure if this actually allows anything that would break in the codegen (do we actually need to fit literals in 4096 bits?), but the broken validation should either be fixed or removed.\r\n\r\n### Details\r\n#### Some literals in scientific notation that do not fit 4096 bits are being accepted\r\n`RationalNumberType::isValidLiteral()` uses `fitsPrecisionBase10()` to ensure that a literal fits available precision:\r\nhttps://github.com/ethereum/solidity/blob/e29a68d37421ba46364e2e0d839ffa49a8625257/libsolidity/ast/Types.cpp#L968-L985\r\n\r\nIn `fitsPrecisionBaseX()` that precision is set to 4096 bits:\r\nhttps://github.com/ethereum/solidity/blob/e29a68d37421ba46364e2e0d839ffa49a8625257/libsolutil/Numeric.cpp#L32-L39\r\n\r\nThe problem is that we don't check the precision of the whole mantissa. We only take into account the numerator (when exponent is positive) or the denominator (when exponent is negative). This means that as long as the exponent in the scientific notation is not below -1233, the mantissa can be arbitrarily large.\r\n\r\nFor example this compiles just fine despite requiring more than 4096 bits:\r\n```solidity\r\ncontract C {\r\n    function f() public {\r\n        13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096e-1233; // 2**512 * 10-1233\r\n    }\r\n}\r\n```\r\nAdding/removing digits from a mantissa does not change it.\r\n\r\n#### Some literals in scientific notation that fit 4096 bits are being rejected\r\nOn the other hand just decreasing the exponent to -1234 makes it fail even in situations when mantissa and exponent actually would fit in 4096 bits:\r\n```solidity\r\ncontract C {\r\n    function f() public {\r\n        1e-1234;\r\n    }\r\n}\r\n```\r\n```\r\nError: Invalid literal value.\r\n --> test.sol:3:9:\r\n  |\r\n3 |         1e-1234;\r\n  |         ^^^^^^^\r\n```\r\n\r\n#### Arbitrarily large literals not in scientific notation are being accepted\r\nSince the check is performed only for numbers that contain `e` or `E` (i.e. ones in scientific notation), the compiler still allows the user to input literals with representation just as large as `1e-1234` and even larger, as long as they're spelled out in their entirety:\r\n\r\n```solidity\r\ncontract C {\r\n    function f() public {\r\n        0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001; // * 10-1234\r\n    }\r\n}\r\n```\r\n\r\n### Environment\r\nCompiler version: 0.8.19 (`develop`)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14100/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14100/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

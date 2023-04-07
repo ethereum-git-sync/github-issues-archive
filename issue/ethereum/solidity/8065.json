@@ -43,7 +43,7 @@
   "created_at": "2019-12-19T14:24:45Z",
   "updated_at": "2019-12-21T06:25:23Z",
   "closed_at": "2019-12-21T06:20:07Z",
-  "author_association": "NONE",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\nA View Method:\r\n```\r\nfunction getValue() view public returns (string memory) {\r\n    return _value;\r\n}\r\n```\r\n\r\nABI of a view method in Solidity 0.6.0\r\n```\r\n{ inputs: [],\r\n    name: 'getValue',\r\n    outputs: [ [Object] ],\r\n    stateMutability: 'view',\r\n    type: 'function' },\r\n```\r\nWhile same function code in Solidity 0.5.15 generates the following ABI.\r\n```\r\n{ constant: true,\r\n    inputs: [],\r\n    name: 'getValue',\r\n    outputs: [ [Object] ],\r\n    payable: false,\r\n    stateMutability: 'view',\r\n    type: 'function' }\r\n```\r\n\r\nThis difference in ABI is causing a transaction to send instead of a function call.\r\n```\r\nconst currentValue = await simpleStorageInstance.functions.getValue();\r\n// in 0.5.15 it returns the value.\r\n// in 0.6.0 it returns tx object (which is returned when we do setValue)\r\n```\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.6.0\r\n- Target EVM version (as per compiler settings): byzantium\r\n- Framework/IDE (e.g. Truffle or Remix): [Smart Solidity Template](https://github.com/zemse/smart-solidity-template/generate)\r\n- EVM execution environment / backend / blockchain client: ethers.js with ganache\r\n- Operating system: macOS\r\n\r\n## Steps to Reproduce\r\n1. `git clone https://github.com/zemse/smart-solidity-template.git`\r\n2. `cd smart-solidity-template`\r\n3. `npm i` This will install solc 0.5.15\r\n4. Go to file `/test/SimpleStorage.test.js` and before the line number 45, just add \r\n`console.log(simpleStorageJSON.abi)`.\r\n5. `node compile.js && npm run test`. \r\nThis will console the abi in 0.5.15.\r\n6. `npm i solc@0.6.0`\r\n7. Update solidity version in `contracts/SimpleStorage.sol`: `pragma solidity ^0.6.0;`\r\n8. `node compile.js && npm run test`\r\nThis will console abi in 0.6.0.\r\nAlso the test `1) value should be set properly while deploying` fails because ethers library sends it as a transaction instead of a call.\r\n",
   "closed_by": {
@@ -155,7 +155,7 @@
     },
     "created_at": "2019-12-19T14:33:10Z",
     "updated_at": "2019-12-19T14:33:10Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Okay, I get it. So I shall share this issue with the ethers.js team.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/567513438/reactions",
@@ -243,7 +243,7 @@
     },
     "created_at": "2019-12-21T06:20:07Z",
     "updated_at": "2019-12-21T06:25:23Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "It's fixed by the team, the next version of `ethers.js` will be released soon as `v4.0.41`",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/568156647/reactions",

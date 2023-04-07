@@ -43,7 +43,7 @@
   "created_at": "2019-02-03T12:02:08Z",
   "updated_at": "2019-02-04T17:30:56Z",
   "closed_at": "2019-02-04T17:30:56Z",
-  "author_association": "NONE",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nWhen a function that has not been marked as view or pure, is declared with a return parameter, it will not return the parameter as it only returns the transaction hash. However, the compiler does not warn the developer about this.\r\n\r\n## Environment\r\n\r\n- Current version:0.5.3+commit.10d17f24.Emscripten.clang\r\n\r\n## Steps to Reproduce\r\n\r\n\r\n```\r\npragma solidity ^0.5.3;\r\n\r\ncontract Clipboard {\r\n    string public content;\r\n    \r\n    constructor(string memory initialContent) public {\r\n        content = initialContent;\r\n    }\r\n    \r\n    function setClipboard(string memory newContent) public returns (string memory) {\r\n        content = newContent;\r\n        return content; //this return does not come\r\n    }\r\n}\r\n```\r\n\r\n## Related Issues\r\n\r\nI tried to find if this was a duplicate, but couldn't find anyone reporting exactly the same.",
   "closed_by": {
@@ -155,7 +155,7 @@
     },
     "created_at": "2019-02-04T15:44:59Z",
     "updated_at": "2019-02-04T15:44:59Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "The issue that I'm trying to point out is only with functions that modify storage variables. As functions marked as view or pure can be called without doing a transaction and we can see the return value but other functions (that modify storage variables) cannot be directly called, we have to do a transaction to call these functions. Just like the following function:\r\n```\r\nfunction setClipboard(string memory newContent) public returns (string memory) {\r\n    content = newContent;\r\n    return content;\r\n}\r\n```\r\nIf we actually deploy the contract and do a transaction for this function and wait for the output, we only get the transaction hash returned but not the return value. Compiler should give a warning that there is no point in writing return statements for functions that will require a transaction for invoking as transaction hash will be returned instead of variable in return statement.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/460296958/reactions",
@@ -243,7 +243,7 @@
     },
     "created_at": "2019-02-04T17:30:44Z",
     "updated_at": "2019-02-04T17:30:44Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Oh, now I understood the purpose of having the return statement in such functions.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/460337602/reactions",

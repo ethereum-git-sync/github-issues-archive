@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14099",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14099/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14099/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14099/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14099",
+  "id": 1657773839,
+  "node_id": "I_kwDOAm_5kc5iz58P",
+  "number": 14099,
+  "title": "Add new feature to 'function-definition' for gas-saving",
+  "user": {
+    "login": "joohhnnn",
+    "id": 68833933,
+    "node_id": "MDQ6VXNlcjY4ODMzOTMz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/68833933?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/joohhnnn",
+    "html_url": "https://github.com/joohhnnn",
+    "followers_url": "https://api.github.com/users/joohhnnn/followers",
+    "following_url": "https://api.github.com/users/joohhnnn/following{/other_user}",
+    "gists_url": "https://api.github.com/users/joohhnnn/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/joohhnnn/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/joohhnnn/subscriptions",
+    "organizations_url": "https://api.github.com/users/joohhnnn/orgs",
+    "repos_url": "https://api.github.com/users/joohhnnn/repos",
+    "events_url": "https://api.github.com/users/joohhnnn/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/joohhnnn/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-06T17:07:49Z",
+  "updated_at": "2023-04-06T17:07:49Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "\r\n## Abstract\r\n\r\nI want to add three new keywords 'Ordered', 'Gaslight', and 'Orderlight' to a function, which will promote the function's selector to the top during the compilation phase, and copy the function's body to be stored at 0x00000000 to save user gas in situations with many calls.\r\n## Motivation\r\n\r\nI often use the selector algorithm in the production environment to calculate the function selector as 0x00000000 to save gas, such as with ```function f00000000_bvvvdlt()```. However, the process of calculation is cumbersome. If there were a keyword to improve readability and convenience, it would be helpful. Nevertheless, I still can't figure out how to place the function at the top of the EVM function selector stage, as many of the functions that are called frequently require irrelevant (rarely called) filtering before being invoked\r\n\r\n## Specification\r\n\r\nThe purpose of introducing these three keywords is to optimize gas usage at the compilation level by elevating the function selector's position and representing the function selector with zero bytes. This approach is particularly suitable for high-frequency contract invocation scenarios, where gas savings are crucial. The detailed definitions of the keywords are as follows:\r\n\r\n1. Ordered: Places the function selector at the top of the EVM's selector sequence. Each advanced function order saves 22 gas units (accounted for by the five OPCODEs: PUSH4(3) DUP(3) EQ(3) PUSH2(3) JUMPI(10); 3+3+3+3+10=22, for a total savings of 22N, where N is the elevation sequence). If multiple Ordered keywords are present, they will be arranged in the EVM's selector sequence according to the order in which they appear.\r\n```\r\nfunction calls() external payable ordered{}\r\n```\r\n\r\n2. Gaslight: Duplicates the function body in the EVM, but the selector is 0x00000000 (zero bytes consume less gas), thus achieving gas savings. The Gaslight keyword can only appear once.\r\n```\r\nfunction calls() external payable gaslight{}\r\n```\r\n\r\n3. Orderlight: Combines the functionality of both Ordered and Gaslight. The Orderlight keyword can only appear once.\r\n```\r\nfunction calls() external payable orderlight{}\r\n```\r\n## Backwards Compatibility\r\n\r\nAs this is a completely new feature, there are no compatibility issues to consider. These changes will require modification to the compilation process. If you feel that it's worthwhile, I can attempt to complete these modifications on my own with your permission.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14099/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14099/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
