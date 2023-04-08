@@ -38,23 +38,51 @@
       "color": "84b6eb",
       "default": false,
       "description": null
+    },
+    {
+      "id": 1132689577,
+      "node_id": "MDU6TGFiZWwxMTMyNjg5NTc3",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/status:triage",
+      "name": "status:triage",
+      "color": "6be514",
+      "default": false,
+      "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2021-06-23T16:25:48Z",
-  "updated_at": "2022-06-12T14:48:44Z",
-  "closed_at": null,
+  "updated_at": "2023-03-16T09:21:26Z",
+  "closed_at": "2023-03-16T09:21:26Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "# Rationale\r\nSometimes buggy external code that is interacting with a geth node causes a transaction to be improperly constructed. A common example of this is using the incorrect nonce value in the transaction. This can cause a backlog in the transaction queue of the node, where no additional transactions can be broadcast to the ETH network until the offending transaction is ‘freed’. \r\n\r\n## Current Solution\r\nCurrently, in order to free the transaction queue of geth and return to normal operation, one must delete the file `transactions.rlp` on the node’s server instance then restart geth. \r\n\r\nThis is a relatively trivial operation, but cannot be done remotely unless one has access to an ssh endpoint where the node is being run, assuming it is not being run locally. In 2020 [decrypt.co](https://decrypt.co/44321/70-of-ethereum-nodes-are-hosted-on-centralized-services) reported that more than 70% of nodes are run on hosted services, so it is likely for the average operator that their node is not on a local computer. In many cases, hosted nodes only provide a URL to access geth’s JSON-RPC API, rather than providing an ssh endpoint on port 22 that one could use to modify the underlying filesystem. Without access to the filesystem, the user must contact their hosting provider’s customer support and open a ticket, which could take several hours or days to process. In a space where minutes and even seconds can be critical, it is critical that there is a way to reduce the time needed to carry out this action.\r\n\r\n\r\n# Implementation\r\n\r\nI suggest that there should be an endpoint in the go-ethereum JSON-RPC API that allows for flushing the transaction queue remotely. Unfortunately I am not a geth developer, so cannot offer advice on how this feature could be implemented. My aim is to raise awareness about this usecase with the hope that others have experienced the same problem. I believe this would be an extremely useful feature to have as a part of the geth client, given that most node operators do not have direct access to the filesystem that their nodes are running on, because they are purchasing access to them through a service like infura. ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/23098/reactions",
     "total_count": 3,
@@ -69,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/23098/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +220,50 @@
     "body": "> I'm not really sure what your blocker is here.\r\n> \r\n> If a transaction you've submitted is unsuitable for whatever reason, you can always submit a replacement transaction with the same nonce. You don't need to clear your local pool to do that.\r\n\r\nIn cases of simple sends this is true, but when transactions are being constructed by a node on a different network (i.e. a resource network that interfaces with Ethereum) it may not always be trivial to do this. What motivated me to make this request was that a resource network node constructs a tx, but due to a bug in the code, it fails, but when I try to rebroadcast from the resource node, the logic of the node states that it cannot do so because the transaction has already been sent. Thus an option to manually clear the queue would be extremely helpful in simplifying recovery from these types of issues because presently it is the only viable solution.\r\n> \r\n> Furthermore, deleting stuff from your local pool won't help if the transaction was already propagated through the network and remote nodes still keep hold of it. You'll have to submit a replacement good enough to push it out of remote pools, which essentially is the same as replacing it in your local pool.\r\n\r\nThese transactions are malformed and are thus never broadcast. You wouldn't see them on etherscan if you searched the tx hash\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/867899114/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1466076530",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/23098#issuecomment-1466076530",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/23098",
+    "id": 1466076530,
+    "node_id": "IC_kwDOAOvK985XYo1y",
+    "user": {
+      "login": "MariusVanDerWijden",
+      "id": 16664698,
+      "node_id": "MDQ6VXNlcjE2NjY0Njk4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16664698?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MariusVanDerWijden",
+      "html_url": "https://github.com/MariusVanDerWijden",
+      "followers_url": "https://api.github.com/users/MariusVanDerWijden/followers",
+      "following_url": "https://api.github.com/users/MariusVanDerWijden/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MariusVanDerWijden/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MariusVanDerWijden/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MariusVanDerWijden/subscriptions",
+      "organizations_url": "https://api.github.com/users/MariusVanDerWijden/orgs",
+      "repos_url": "https://api.github.com/users/MariusVanDerWijden/repos",
+      "events_url": "https://api.github.com/users/MariusVanDerWijden/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MariusVanDerWijden/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-03-13T12:43:45Z",
+    "updated_at": "2023-03-13T12:43:45Z",
+    "author_association": "MEMBER",
+    "body": "This seems like a very specific use case and feature. It is always possible to clear the local transaction cache by shutting down the node and removing the `transactions.rlp` file from the datadir. You can also replace the transaction by sending a transaction with 10% higher gas price. I don't think that this is a feature that is worthwhile to add to geth.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1466076530/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

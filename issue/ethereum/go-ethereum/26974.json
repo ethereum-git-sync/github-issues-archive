@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26974",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26974/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26974/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26974/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/26974",
+  "id": 1639525751,
+  "node_id": "I_kwDOAOvK985huS13",
+  "number": 26974,
+  "title": "Speeding up `eth_getTransactionReceipt`",
+  "user": {
+    "login": "fjl",
+    "id": 6915,
+    "node_id": "MDQ6VXNlcjY5MTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6915?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fjl",
+    "html_url": "https://github.com/fjl",
+    "followers_url": "https://api.github.com/users/fjl/followers",
+    "following_url": "https://api.github.com/users/fjl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fjl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fjl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fjl/subscriptions",
+    "organizations_url": "https://api.github.com/users/fjl/orgs",
+    "repos_url": "https://api.github.com/users/fjl/repos",
+    "events_url": "https://api.github.com/users/fjl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fjl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    },
+    {
+      "id": 1157707837,
+      "node_id": "MDU6TGFiZWwxMTU3NzA3ODM3",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/area:rpc",
+      "name": "area:rpc",
+      "color": "d4c5f9",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-03-24T14:43:05Z",
+  "updated_at": "2023-03-28T21:21:15Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Here's an idea for speeding up RPC method `eth_getTransactionReceipt`, i.e. the operation that\r\nloads a single receipt by txhash. Right now, this operation is very slow because it has to:\r\n\r\n1. load inclusion block from the txhash -> block index\r\n2. load the full block from the database\r\n3. find the tx in the block\r\n4. verify tx signature and derive the sender\r\n5. load/parse all receipts in the block\r\n6. derive non-consensus fields for all receipts\r\n7. return receipt n\r\n\r\nSome of these steps should be avoidable. I propose that, in the tx inclusion index (txhash -> block)\r\nwe should also store the tx sender, as well as other information required to derive receipt fields.\r\nIf this information was available, the steps for resolving a single receipts would be:\r\n\r\n1. load the inclusion block, sender, etc. from the txhash -> block index\r\n2. load the full block from the database\r\n3. find the tx in the block\r\n4. load all receipts in the block\r\n5. find receipt n\r\n6. derive fields of receipt n\r\n7. return it\r\n\r\nThis doesn't look very different, but there is another advantage: we wouldn't need to actually parse the receipts just to load the nth one. Decoding receipts is slow, and a bit of time can be saved by not doing it. Unrelated derivation of receipt fields is also avoided.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26974/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26974/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1486493646",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26974#issuecomment-1486493646",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26974",
+    "id": 1486493646,
+    "node_id": "IC_kwDOAOvK985YmhfO",
+    "user": {
+      "login": "fjl",
+      "id": 6915,
+      "node_id": "MDQ6VXNlcjY5MTU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6915?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fjl",
+      "html_url": "https://github.com/fjl",
+      "followers_url": "https://api.github.com/users/fjl/followers",
+      "following_url": "https://api.github.com/users/fjl/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fjl/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fjl/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fjl/subscriptions",
+      "organizations_url": "https://api.github.com/users/fjl/orgs",
+      "repos_url": "https://api.github.com/users/fjl/repos",
+      "events_url": "https://api.github.com/users/fjl/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fjl/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-03-28T09:11:11Z",
+    "updated_at": "2023-03-28T09:11:11Z",
+    "author_association": "MEMBER",
+    "body": "More about the additional content of the txhash -> number index. In order to derive the non-persistent fields of a single receipt, we require these new fields in the index:\r\n\r\n- `txIndex`: the index of the transaction in the block.\r\n- `blockLogCount`: the count of logs in the block up to this receipt. This is needed to assign the index of logs corrrectly.\r\n- `gasUsed`: the gas used by a tx is not stored in the receipt. Instead, we store the cumulative amount of used block gas at the end of the transaction. In the index, we could simply store `gasUsed` directly. This might also be helpful for other use cases of the index.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1486493646/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

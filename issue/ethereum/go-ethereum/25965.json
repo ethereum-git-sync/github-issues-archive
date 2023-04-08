@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2022-10-11T10:53:23Z",
-  "updated_at": "2022-10-11T12:38:06Z",
-  "closed_at": null,
+  "updated_at": "2023-03-08T10:26:06Z",
+  "closed_at": "2023-03-08T10:26:06Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Hey team, we’ve been unable to run snap sync on our mainnet (https://github.com/maticnetwork/bor). To be more specific, it completes the state sync phase, but keeps running in a never ending healing phase. We are aware that the sync has to run faster than the block production and state in order to finish. We have performed some experiments and checks at our end (The block time and block gas limit for our mainnet is 2s and 30M respectively). Also, we know that the process is I/O and network heavy and we've allocated more than enough in these machines. \r\n\r\n1. We tried running a node in snap sync on our mumbai testnet to make sure the issue has nothing to do the other components of our PoS chain specifically the consensus. It works well on the testnet. \r\n2. We tried scaling up some of the parameters involved in the sync mechanism like the pivot marker, the size (bytes) of data to be received in the snap sync trie node (and storage) requests, the dynamic timeout to see the behaviours. We did not see any significant changes in the mechanism. Also, we’re not sure which metrics would be appropriate to checkout while modifying these parameters. Well, to be specific, modifying the pivot parameters didn’t really work as it stopped the healing phase and node stopped syncing totally. \r\n3. We conducted an experiment where we took a full synced mainnet node, disconnected it from outer world and only let 1 fresh node sync from it using snap sync. We saw a lot of peer connectivity issues and after some point, the snap sync node wasn’t able to connect to the full synced peer (maybe it figured out that the opposite peer is stale?). This was an attempt to see if the issue is with the state moving fast or not. \r\n\r\nWe’re currently exploring some ways to understand the mechanism and internals through tests as we thought just tweaking the parameters might not help and would make the process much longer. But, it would be great if you can suggest us some important points/places to look at to dig further, or some experiments to conduct and ways to do so (like finding more internal details about the trie nodes and the rate at which they’re being produced vs downloaded, etc). \r\n\r\nLet us know, if there's anything more which we can share from our end. Thanks!\r\n\r\nEDIT: the tag was auto chosen to \"docs\". I'd put it under \"help wanted\". ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25965/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25965/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "> I see. Also, just to confirm, peers would only respond if they have those blocks in the difflayer which is present due to the --snapshot flag, right?\r\n\r\nIn order for a peer to deliver responses to account/storage requests, they need to have the snapshot layer for that root, and the trie nodes for that root. \r\n\r\nIn order for a peer to deliver responses to trie healing requests, they theoretically only need to have the trie nodes for that root. In practice, however, they required having the snapshot layer too, until this PR (https://github.com/ethereum/go-ethereum/pull/25644). \r\n\r\n\r\n> Any scripts that can help us speed up the process?\r\n\r\nNothing off the top of my head, no. This might also be interesting to look into: https://github.com/ethereum/go-ethereum/pull/25022 \r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1274623218/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1459947496",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/25965#issuecomment-1459947496",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/25965",
+    "id": 1459947496,
+    "node_id": "IC_kwDOAOvK985XBQfo",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-03-08T10:26:06Z",
+    "updated_at": "2023-03-08T10:26:06Z",
+    "author_association": "MEMBER",
+    "body": "Seems answered, closing",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1459947496/reactions",
       "total_count": 1,
       "+1": 1,
       "-1": 0,

@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2022-11-10T00:50:51Z",
-  "updated_at": "2022-11-17T09:51:25Z",
-  "closed_at": null,
+  "updated_at": "2023-02-21T08:39:27Z",
+  "closed_at": "2023-02-21T08:39:26Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "#### System Information\r\n\r\nLinux (Ubuntu 20.04) - master branch\r\n\r\n#### Expected behaviour\r\n\r\nExecuting the following RPC call on a non-synced Geth should return a list of 128 hashed account addresses in the genesis state:\r\n```\r\ncurl -s --data '{\"jsonrpc\":\"2.0\",\"method\":\"debug_accountRange\",\"params\":[\"latest\", \"0x0000000000000000000000000000000000000000\",128,false,false,true], \"id\":\"1\"}' -H \"Content-Type: application/json\" -X POST http://127.0.0.1:8545\r\n```\r\n\r\nExecuting the same query on a snap-synced node should return a list of hashed account addresses in the state.\r\n\r\n#### Actual behaviour\r\n\r\nresult when executing on an unsynced node:\r\n```\r\n{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"result\":{\"root\":\"d7f8974fb5ac78d9ac099b9ad5018bedc2ce0a72dad1827a1709da30580f0544\",\"accounts\":{\"0x0000000000000000000000000000000000000000\":{\"balance\":\"200000000000000000000\",\"nonce\":0,\"root\":\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\"codeHash\":\"0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\",\"key\":\"0x038bc4b01f86691236873429e72ac9a895f5a84f972b889130cfde1955ce4e19\"}},\"next\":\"A4xt/n93vYnKmSeHqgILw/h++hDs9lowCiXErCNErlk=\"}}\r\n```\r\n\r\non a snap-synced node:\r\n```\r\n{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"result\":{\"root\":\"05884e28399f1c9966ff497596b780c8e7ac2ba0ae03bba1c5a0a78a4e972c4d\",\"accounts\":{\"0x0000000000000000000000000000000000000000\":{\"balance\":\"0\",\"nonce\":1,\"root\":\"0xf4894f5d93a9fad81ddc3c915bba04e8b24b153184b4a38622d4e353288b5379\",\"codeHash\":\"0xa7e48f0d73eaf7c47528d6ab59ffae7b4aec13c5eb888b7359f014521767c848\",\"code\":\"0x606060405263ffffffff60e060020a6000350416636ea056a98114610021575bfe5b341561002957fe5b610040600160a060020a0360043516602435610054565b604080519115158252519081900360200190f35b6000805460408051602090810184905281517f3c18d318000000000000000000000000000000000000000000000000000000008152600160a060020a03878116600483015292519290931692633c18d318926024808301939282900301818787803b15156100be57fe5b60325a03f115156100cb57fe5b50505060405180519050600160a060020a0316600036600060405160200152604051808383808284378201915050925050506020604051808303818560325a03f4151561011457fe5b50506040515190505b929150505600a165627a7a7230582072faa239cc9c48e881b02f074d012a710ff574cc3be6ae9a976f28ad2aaaf6710029\",\"storage\":{\"0x0000000000000000000000000000000000000000000000000000000000000000\":\"4f01001cf69785d4c37f03fd87398849411ccbba\"},\"key\":\"0x00000c8c5b4076a7e0e2461349649da99ef8119b98d3e7e1b302072d69bfcdf2\"}},\"next\":\"AAAMptoiixxqbV1hG+g4c3QrkVPKcAEVeF6jq8akT4E=\"}}\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26150/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26150/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "The only thing that is \"strange\" is that we return only one result, not `128`. But that's probably because they're keyed by address, and writing the N:th item to the json struct simply overwrites the previous one written with key `0x0000000000000000000000000000000000000000`. This is  obviously a flaw, yes. ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1318369109/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1438052671",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26150#issuecomment-1438052671",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26150",
+    "id": 1438052671,
+    "node_id": "IC_kwDOAOvK985VtvE_",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-21T08:39:26Z",
+    "updated_at": "2023-02-21T08:39:26Z",
+    "author_association": "MEMBER",
+    "body": "Seems answered to me",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1438052671/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

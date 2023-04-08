@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 7,
   "created_at": "2020-07-08T18:45:25Z",
-  "updated_at": "2020-09-17T08:41:53Z",
-  "closed_at": null,
+  "updated_at": "2023-02-21T09:12:40Z",
+  "closed_at": "2023-02-21T09:12:40Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: `1.9.14-stable`\r\nOS & Version: Linux\r\n\r\n#### Expected behaviour\r\n\r\nThe performance benefits of the snapshot system introduced in 1.9.13 are pretty phenomenal - We've seen some eth_call queries go from 5+ seconds to well under a second with a fully loaded snapshot in place. Running an operation where capacity planning relies on predictable performance, we'd love to be able to take advantage of the snapshot, but to do so requires consistent, predictable performance.\r\n\r\n#### Actual behaviour\r\n\r\nIn the event of an abrupt termination of Geth, the snapshot journal is not written to disk. On the next startup, because the journal is missing, the snapshot is wiped and begins regenerating. On the Ethereum mainnet, snapshot generation can take several days, during which performance is considerably below the peak performance operating with a completed snapshot.\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nkill -9 $GETH_PID\r\n\r\nRestart Geth\r\n\r\n#### Proposed Solution\r\n\r\nIn our case, it would be very preferable to have a longer startup time but have servers come online with working snapshots, rather than come online quickly but spend days reconstructing the snapshot. There are two possible ways to do this:\r\n\r\n1. Our operation typically runs with `--gcmode=archive`. Given that we have all of the intermediate state tries between the 128 block old diskLayer and the current block, we should be able to reconstruct the 128 diffLayers by comparing the state tries while initializing the snapshot. We'd still use the journal for clean shutdowns, as it's much faster than reconstructing the diffLayer by comparing state tries.\r\n2. For those who don't run with `--gcmode=archive` (which I believe is most users), it may be necessary to roll the current block back to the same block as the diskLayer, and resume syncing from there. I'm not sure how feasible this is, as it seems the snapshot tree calls Cap(root, 127) every block, while the trie only gets synced to disk when the dirty threshold is exceeded, and it seems unlikely that those events are likely to line up. If we could ensure that commits to the disk layer happen at the same time as the trie gets committed to disk, then unclean shutdowns should be able to resume from just the disk layer without having to discard the snapshot. Again, we'd still use the journal for clean shutdowns as that makes it easier to handle possible reorgs, but this approach gives us a reasonable hope of not having to discard the snapshot after an unclean shutdown.\r\n\r\nI've already been working on a proof-of-concept of option 1 - once I have the kinks worked out I'd be happy to push it upstream if you'd be amenable. I'd also be willing to hash out a PR for option 2 if that's something you'd be open to, but since I don't need it myself I don't want to sink the time into it if the Geth team has other plans.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/21310/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/21310/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {

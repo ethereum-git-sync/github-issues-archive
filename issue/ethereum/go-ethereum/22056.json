@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 38,
+  "comments": 39,
   "created_at": "2020-12-22T16:44:16Z",
-  "updated_at": "2023-01-04T17:04:43Z",
+  "updated_at": "2023-03-25T13:07:27Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -519,7 +519,7 @@
     "body": "Happened to me when I upgrade to Geth 1.10.1 from 1.9.25 on Ropsten. The 1.9.25 was fully synced at time of doing the operation. \r\n\r\nI first stopped the running 1.9.25 instance. Took a GCP volume snapshot. Created a new container with a new disk created using the snapshot I just took and started the 1.10.1 instance.\r\n\r\nAt launch, Geth 1.1.0.1 took around 10m even before initializing the `IPC` file. While doing this, htop showed heavy disk usage, around 160Mb/s (I don't recall exactly if it was more on the read or the write side). \r\n\r\nAfter ~10m, the node started the `IPC`, connected to the network and synced around 10 blocks, then entered the database compacting stage. This ran for around 5h until I gave up.\r\n\r\nHere the `leveldb.stats` on the 1.9.25 instance\r\n\r\n```\r\n Level |   Tables   |    Size(MB)   |    Time(sec)  |    Read(MB)   |   Write(MB)\r\n-------+------------+---------------+---------------+---------------+---------------\r\n   1   |         50 |      99.27759 |      35.00957 |     814.65889 |     771.45813\r\n   2   |        647 |     999.75740 |      46.79872 |    1487.34292 |    1485.75268\r\n   3   |       4844 |    9097.79491 |     325.22367 |    5466.02774 |    4459.89624\r\n   4   |        539 |     400.50786 |       0.00000 |       0.00000 |       0.00000\r\n   5   |      68207 |  136884.92513 |       0.00000 |       0.00000 |       0.00000\r\n-------+------------+---------------+---------------+---------------+---------------\r\n Total |      74287 |  147482.26288 |     407.03196 |    7768.02954 |    6717.10706\r\n```\r\n\r\nAnd here the same on the 1.10.1 after running 5 hours (in fact, after having forced kill it):\r\n\r\n```\r\n Level |   Tables   |    Size(MB)   |    Time(sec)  |    Read(MB)   |   Write(MB)\r\n-------+------------+---------------+---------------+---------------+---------------\r\n   0   |      74352 |  148558.54873 |       0.00000 |       0.00000 |       0.00000\r\n-------+------------+---------------+---------------+---------------+---------------\r\n Total |      74352 |  148558.54873 |       0.00000 |       0.00000 |       0.00000\r\n```\r\n \r\nSeems it was trying to compact this gigantic amount of L0 tables. The `LOG` file in the `chaindata` folder seems to agree:\r\n \r\n```\r\ncat LOG | grep com\r\n23:06:01.461484 table@compaction L0·74352 -> L1·0 S·145GiB Q·1243574076\r\n```\r\n \r\n And for some level of estimation of the time it would have take:\r\n \r\n ```\r\ncat LOG | grep com\r\n23:06:01.461484 table@compaction L0·74352 -> L1·0 S·145GiB Q·1243574076\r\n23:08:28.748009 table@build created L1@8383020 N·9976 S·2MiB \"\\x00\\x00\\x00..'\\xc6P,v268503960\":\"\\x00\\x01\\x10..\\x86t\\xd9,v591541816\"\r\n...\r\n04:27:32.131617 table@build created L1@8384256 N·9834 S·2MiB\r\n```\r\n\r\nSo from my (limited) understanding of levedb, it compacted 1236 tables (8384256 - 8383020) in ~5h so ~247 tables/h and I imagine probably 12 days (74532 / 247 / 24 ~= 12). The compaction read throughput it really really low, like 150Kb/s to 300Kb/s in both read & write. A single CPU core was maxed out at 100% during the whole time.\r\n\r\nNow, why I turned having that amount of L0 tables, I have no idea. No sure what happened to cause this. I'll redo a round of restore + restart to see if I can avoid the switch to all L0 tables.\r\n\r\nI upgrade other nodes (4 in totals) in-place (i.e. without a volume snapshot + new disk) correctly without problems, not sure what volume snapshot part caused this.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/794875181/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
@@ -527,7 +527,7 @@
       "confused": 0,
       "heart": 0,
       "rocket": 0,
-      "eyes": 0
+      "eyes": 1
     },
     "performed_via_github_app": null
   },
@@ -739,12 +739,12 @@
     "body": "I started to see this issue after upgrading my geth version to:\r\n\r\n```\r\nVersion: 1.10.4-stable\r\nGit Commit: aa637fd38a379db6da98df0d520fb1c5139a18ce\r\nArchitecture: amd64\r\nGo Version: go1.16.4\r\nOperating System: linux\r\nGOPATH=\r\nGOROOT=go\r\n```\r\n\r\nWith my earlier version, of which version number I did not record, I managed to sync geth just fine.\r\n\r\nI start with a fresh data folder. After a while (~1h), for the snap sync,  geth stops syncing and only does database compaction.\r\n\r\nHere is a log extract:\r\n\r\n```\r\nINFO [06-22|19:23:23.632] Imported new block headers               count=2048 elapsed=354.813ms number=2,837,698  hash=426fb5..cbbc99 age=4y6mo3w\r\nINFO [06-22|19:23:24.001] Imported new block headers               count=2048 elapsed=359.921ms number=2,839,746  hash=097d57..0381e9 age=4y6mo3w\r\nINFO [06-22|19:23:24.582] Imported new block receipts              count=2048 elapsed=1.018s    number=2,795,628  hash=182155..b305b6 age=4y7mo3d   size=4.13MiB\r\nWARN [06-22|19:23:26.231] Database compacting, degraded performance database=/root/.ethereum/geth/chaindata\r\nWARN [06-22|19:23:28.438] Dropping unsynced node during sync       id=b3f5796c6727a343 conn=inbound addr=86.125.31.39:60186    type=ethereumjs-devp2p/v4...\r\nERROR[06-22|19:24:10.244] Snapshot extension registration failed   peer=3af25a30 err=\"peer connected on snap without compatible eth support\"\r\nWARN [06-22|19:24:15.699] Dropping unsynced node during sync       id=9b986db754dae7bf conn=inbound addr=15.161.212.85:54304   type=Nethermind/v1.10.73-...\r\nWARN [06-22|19:24:18.716] Dropping unsynced node during sync       id=82b68c45c1649e07 conn=dyndial addr=45.77.49.160:30305    type=Geth/v1.10.2-stable-...\r\nWARN [06-22|19:24:26.242] Database compacting, degraded performance database=/root/.ethereum/geth/chaindata\r\nWARN [06-22|19:24:39.669] Dropping unsynced node during sync       id=d0ad027d764435b3 conn=inbound addr=139.99.9.58:59418     type=Geth/v1.9.24-stable-...\r\nWARN [06-22|19:25:26.254] Database compacting, degraded performance database=/root/.ethereum/geth/chaindata\r\nWARN [06-22|19:25:27.664] Dropping unsynced node during sync       id=9571cfd7011a9334 conn=dyndial addr=45.32.166.77:30305    type=Geth/v1.10.2-stable-...\r\nWARN [06-22|19:25:28.378] Dropping unsynced node during sync       id=c3ce42a8b5ccb91f conn=dyndial addr=143.198.114.251:30303 type=Geth/v1.10.1-stable-...\r\nWARN [06-22|19:26:26.263] Database compacting, degraded performance database=/root/.ethereum/geth/chaindat\r\n```\r\n\r\nGeth does not never seem to resume the syncing after encountering the `Database compacting` issue, but is forever stuck compacting the database.\r\n\r\nI tried to explicitly disable the database compacting with the command line:\r\n\r\n```\r\ngeth --http --cache 8000 --ipcpath /root/geth.ipc --gcmode \"archive\" --syncmode snap --nocompaction\r\n```\r\n\r\n... but it still does the `Database compatcing` and `--nocompaction` flag seem to have no effect.\r\n\r\nThe result is that I cannot get geth synced. I am not sure if this is related to geth version upgrade or something else.\r\n\r\nThe server is running with NVMe disk directly attached to it, so it should have plenty of IO power and lack of IO should not be an issue.\r\n\r\nIf I abort the sync with CTRL+C and restart, geth seems to be syncing just fine until it hits the first `Database compacting` and ends up to the same compact loop.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/866190528/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 2,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
-      "confused": 0,
+      "confused": 1,
       "heart": 0,
       "rocket": 0,
       "eyes": 0

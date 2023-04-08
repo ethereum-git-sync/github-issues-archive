@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "fjl",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 10,
+  "comments": 11,
   "created_at": "2021-02-08T01:05:36Z",
-  "updated_at": "2022-09-16T15:59:12Z",
-  "closed_at": null,
+  "updated_at": "2023-02-21T09:15:09Z",
+  "closed_at": "2023-02-21T09:15:09Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: `geth version`\r\nGeth\r\nVersion: 1.9.25-stable\r\nGit Commit: e7872729012a4871397307b12cc3f4772ffcbec6\r\nArchitecture: amd64\r\nProtocol Versions: [65 64 63]\r\nGo Version: go1.15.6\r\nOperating System: linux\r\nGOPATH=\r\nGOROOT=go\r\n\r\nOS & Version: Linux\r\nCommit hash : (if `develop`)\r\n\r\n#### Expected behaviour\r\nNot segfaulting.\r\n\r\n#### Actual behaviour\r\nI am running `$ geth --syncmode \"fast\" ` on Linux Mint inside a VirtualBox VM and I repeatedly get a segfault:\r\n```\r\nINFO [02-07|19:29:34.845] Looking for peers                        peercount=1 tried=4 static=0\r\nINFO [02-07|19:29:34.850] Imported new block receipts              count=190  elapsed=44.408ms    number=376235   hash=\"ed4407…7e41a2\" age=5y4mo3w   size=151.17KiB\r\nWARN [02-07|19:29:34.917] Invalid header encountered               number=376479   hash=\"ffbb90…fe947a\" parent=\"1fa79e…2a570b\" err=\"invalid mix digest\"\r\nWARN [02-07|19:29:34.918] Rewinding blockchain                     target=374378\r\nINFO [02-07|19:29:34.972] Imported new state entries               count=768  elapsed=2.313ms     processed=874087 pending=28420 trieretry=0 coderetry=0 duplicate=0 unexpected=0\r\npanic: runtime error: invalid memory address or nil pointer dereference\r\n[signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x78ec7a]\r\n\r\ngoroutine 833 [running]:\r\ngithub.com/ethereum/go-ethereum/core/types.(*Block).Header(...)\r\n\tgithub.com/ethereum/go-ethereum/core/types/block.go:343\r\ngithub.com/ethereum/go-ethereum/core/rawdb.WriteAncientBlock(0x7f4648ffa6d8, 0xc000174a20, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/core/rawdb/accessors_chain.go:660 +0x3a\r\ngithub.com/ethereum/go-ethereum/core.(*BlockChain).InsertReceiptChain.func2(0xc00b141000, 0xc0, 0x100, 0xc0071c2800, 0xc0, 0x100, 0x0, 0x0, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/core/blockchain.go:1236 +0x4ae\r\ngithub.com/ethereum/go-ethereum/core.(*BlockChain).InsertReceiptChain(0xc0000a5900, 0xc00b25a000, 0xc0, 0xc0, 0xc000154c00, 0xc0, 0xc0, 0xacffff, 0x0, 0x0, ...)\r\n\tgithub.com/ethereum/go-ethereum/core/blockchain.go:1407 +0x1cca\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).commitFastSyncData(0xc0000c1dc0, 0xc007c93800, 0xc0, 0xc0, 0xc0007ae280, 0xc007c93800, 0xc0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:1880 +0x663\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).processFastSyncContent(0xc0000c1dc0, 0x0, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:1796 +0x785\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).syncWithPeer.func7(0x1, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:554 +0x2a\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).spawnSync.func1(0xc0000c1dc0, 0xc0007ad440, 0xc0002ec3f0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:568 +0x5b\r\ncreated by github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).spawnSync\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:568 +0xaf\r\n\r\n```\r\n\r\nMemory test shows everything is okey:\r\n```\r\n$ sudo memtester 6800M 2\r\nmemtester version 4.3.0 (64-bit)\r\nCopyright (C) 2001-2012 Charles Cazabon.\r\nLicensed under the GNU General Public License version 2 (only).\r\n\r\npagesize is 4096\r\npagesizemask is 0xfffffffffffff000\r\nwant 6800MB (7130316800 bytes)\r\ngot  6800MB (7130316800 bytes), trying mlock ...locked.\r\nLoop 1/2:\r\n  Stuck Address       : ok         \r\n  Random Value        : ok\r\n  Compare XOR         : ok\r\n  Compare SUB         : ok\r\n  Compare MUL         : ok\r\n  Compare DIV         : ok\r\n  Compare OR          : ok\r\n  Compare AND         : ok\r\n  Sequential Increment: ok\r\n  Solid Bits          : ok         \r\n  Block Sequential    : ok         \r\n  Checkerboard        : ok         \r\n  Bit Spread          : ok         \r\n  Bit Flip            : ok         \r\n  Walking Ones        : ok         \r\n  Walking Zeroes      : ok         \r\n  8-bit Writes        : ok\r\n```\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\nRun:\r\n`$ geth --syncmode \"fast\" `\r\n\r\n#### Backtrace\r\n\r\n````\r\ngoroutine 833 [running]:\r\ngithub.com/ethereum/go-ethereum/core/types.(*Block).Header(...)\r\n\tgithub.com/ethereum/go-ethereum/core/types/block.go:343\r\ngithub.com/ethereum/go-ethereum/core/rawdb.WriteAncientBlock(0x7f4648ffa6d8, 0xc000174a20, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/core/rawdb/accessors_chain.go:660 +0x3a\r\ngithub.com/ethereum/go-ethereum/core.(*BlockChain).InsertReceiptChain.func2(0xc00b141000, 0xc0, 0x100, 0xc0071c2800, 0xc0, 0x100, 0x0, 0x0, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/core/blockchain.go:1236 +0x4ae\r\ngithub.com/ethereum/go-ethereum/core.(*BlockChain).InsertReceiptChain(0xc0000a5900, 0xc00b25a000, 0xc0, 0xc0, 0xc000154c00, 0xc0, 0xc0, 0xacffff, 0x0, 0x0, ...)\r\n\tgithub.com/ethereum/go-ethereum/core/blockchain.go:1407 +0x1cca\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).commitFastSyncData(0xc0000c1dc0, 0xc007c93800, 0xc0, 0xc0, 0xc0007ae280, 0xc007c93800, 0xc0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:1880 +0x663\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).processFastSyncContent(0xc0000c1dc0, 0x0, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:1796 +0x785\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).syncWithPeer.func7(0x1, 0x0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:554 +0x2a\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).spawnSync.func1(0xc0000c1dc0, 0xc0007ad440, 0xc0002ec3f0)\r\n\tgithub.com/ethereum/go-ethereum/eth/downloader/downloader.go:568 +0x5b\r\ncreated by github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).spawn\r\n````\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/22281/reactions",
     "total_count": 2,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/22281/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -538,6 +557,50 @@
     "body": "i have something like this  :S \r\n\r\n```\r\ngeth_1                | WARN [09-16|15:53:04.065] Invalid header encountered               number=15,547,189 hash=4a80de..4e285a parent=1409da..843cd6 err=\"unknown ancestor\"\r\ngeth_1                | WARN [09-16|15:53:04.138] Rewinding blockchain                     target=15,545,139\r\ngeth_1                | INFO [09-16|15:53:07.345] State heal in progress                   accounts=211,048@9.86MiB  slots=430,358@33.01MiB codes=3982@29.93MiB nodes=15,935,431@4.09GiB pending=27538\r\ngeth_1                | INFO [09-16|15:53:08.665] Loaded most recent local header          number=15,545,139 hash=92d170..f73065 td=58,750,003,716,598,352,816,469 age=6h55m45s\r\ngeth_1                | INFO [09-16|15:53:08.667] Loaded most recent local full block      number=0          hash=d4e567..cb8fa3 td=17,179,869,184                 age=53y5mo3w\r\ngeth_1                | INFO [09-16|15:53:08.667] Loaded most recent local fast block      number=15,545,139 hash=92d170..f73065 td=58,750,003,716,598,352,816,469 age=6h55m45s\r\ngeth_1                | INFO [09-16|15:53:08.668] Loaded last fast-sync pivot marker       number=15,547,120\r\ngeth_1                | WARN [09-16|15:53:08.668] Rolled back chain segment                header=15547188->15545139 snap=15547119->15545139 block=0->0 reason=\"unknown ancestor\"\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1249534407/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1438122310",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/22281#issuecomment-1438122310",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/22281",
+    "id": 1438122310,
+    "node_id": "IC_kwDOAOvK985VuAFG",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-21T09:15:08Z",
+    "updated_at": "2023-02-21T09:15:08Z",
+    "author_association": "MEMBER",
+    "body": "This is stale, closing",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1438122310/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
