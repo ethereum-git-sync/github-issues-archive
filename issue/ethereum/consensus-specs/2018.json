@@ -49,21 +49,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 8,
+  "comments": 9,
   "created_at": "2020-08-15T17:01:17Z",
-  "updated_at": "2020-09-21T15:41:55Z",
-  "closed_at": null,
+  "updated_at": "2023-01-30T16:05:47Z",
+  "closed_at": "2023-01-30T16:05:46Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "I extracted the Eth1 data votes from the Medalla network at the end of each Eth1 data voting period (1024 slots). The analysis covers the 72 periods (73,728 slots, 2304 epochs, ~10 days) that had been fully finalised before [The Apocalypse](https://docs.google.com/document/d/11RmitNRui10LcLCyoXY6B1INCZZKq30gEU6BEg3EWfk/edit#).\r\n\r\n - [Raw data](https://gist.github.com/benjaminion/8f647b5a49c02cfa2b0a61734ce2884e)\r\n - [Summary spreadsheet](https://docs.google.com/spreadsheets/d/15Nyq7nB0hxzxcoCNv_yegDRCKpA_dp7nIp9S_3cdQpU/edit#gid=0)\r\n\r\n## Consensus on Eth1 block hashes\r\n\r\nCurrently, the beacon chain effectively aims to agree on Eth1 block hashes. It does this by a simple majority rule: within the 1024 slot period, once an Eth1 block hash has been voted for 513 or more times, it is agreed and the beacon state is updated. If no block hash achieves this threshold, then the beacon state is left unchanged.\r\n\r\nThe data from Medalla show that the chain **failed to agree** on an Eth1 block hash in **22% of Eth1 data voting periods**.\r\n\r\nTypically, voting was \"all over the place\", with between 3 and 140 different Eth1 block hashes being voted for within the seventy-two Eth1 data voting periods. There were two runs of three consecutive periods (~10 hours total) during which no agreement was reached.\r\n\r\nNote that validator participation during this period was relatively low, being mostly between 70% and 80%. With higher validator participation it is likely that the threshold for agreement can be reached more often.\r\n\r\nThe consequence of failing to agree on the Eth1 block hash is that onboarding of new validators could be delayed.\r\n\r\n## Consensus on Eth1 deposit roots\r\n\r\nIn the current Phase 0 and Phase 1 specifications, `state.eth1_data.block_hash` is not used at all. Thus it is not strictly necessary to agree on it.\r\n\r\nBy contrast, the chain could very reliably have agreed on the Eth1 deposit root, which is actually used. The deposit root evidently changes less frequently than the block hash - not all Eth1 blocks contain deposits. There were **no failures** to reach a 50% + 1 majority on Eth1 deposit root.\r\n\r\nNote that two Eth1 blocks with the same block hash will have the same deposit root, but not necessarily vice versa. Consensus on block hash implies consensus on deposit root, but the converse is not true.\r\n\r\n## Swiftness of agreement\r\n\r\n[Update] When agreement is reached, it is on average reached 71% of the way through the period (after 727 slots) for the Eth1 block hash, and could be reached 69% of the way through the period (after 707 slots) for the Eth1 deposit root. The earliest point at which agreement could be reached is after 513 slots.\r\n\r\n## Raising the agreement threshold\r\n\r\nIt has been [suggested](https://github.com/ethereum/eth2.0-specs/issues/1632) that we raise the threshold for agreement from 50% to 60%. With this threshold, and this dataset, the beacon chain fails to agree on the Eth1 block hash 27% of the time, and on the Eth1 deposit root 2.7% of the time.\r\n\r\n## Proposal\r\n\r\nAlthough it is not disastrous to fail to agree on the Eth1 data, it is inconvenient for new validators wishing to be onboarded swiftly. It is better to come to agreement more quickly than less quickly.\r\n\r\nSince (a) it is easier to agree on Eth1 data root, and (b) the Eth1 data root and block hash have different, independent, purposes in the Eth2 protocol, I suggest coming to consensus about them separately. This should be fairly easy to implement by changing `process_eth1_data()` to the following:\r\n\r\n_Warning: I don't Python. This is probably broken. But you get the idea._\r\n\r\n```\r\ndef process_eth1_data(state: BeaconState, body: BeaconBlockBody) -> None:\r\n    state.eth1_data_votes.append(body.eth1_data)\r\n    if [v.deposit_root for v in state.eth1_data_votes].count(body.eth1_data.deposit_root) * 2 > EPOCHS_PER_ETH1_VOTING_PERIOD * SLOTS_PER_EPOCH:\r\n        state.eth1_data.deposit_root = body.eth1_data.deposit_root\r\n        state.eth1_data.deposit_count = body.eth1_data.deposit_count\r\n        if [v.block_hash for v in state.eth1_data_votes].count(body.eth1_data.block_hash) * 2 > EPOCHS_PER_ETH1_VOTING_PERIOD * SLOTS_PER_EPOCH:\r\n            state.eth1_data.block_hash = body.eth1_data.block_hash\r\n```\r\n\r\n## Summary\r\n\r\nAt the cost of a very small increase in code complexity we can significantly improve tracking of the Eth1 deposit contract data, and not unnecessarily hold up the onboarding of validators. There is no impact on tracking of Eth1 block roots.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "benjaminion",
+    "id": 20796281,
+    "node_id": "MDQ6VXNlcjIwNzk2Mjgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20796281?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjaminion",
+    "html_url": "https://github.com/benjaminion",
+    "followers_url": "https://api.github.com/users/benjaminion/followers",
+    "following_url": "https://api.github.com/users/benjaminion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjaminion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjaminion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjaminion/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjaminion/orgs",
+    "repos_url": "https://api.github.com/users/benjaminion/repos",
+    "events_url": "https://api.github.com/users/benjaminion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjaminion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2018/reactions",
     "total_count": 5,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2018/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -423,6 +442,50 @@
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/695976997/reactions",
       "total_count": 2,
       "+1": 2,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/1408887843",
+    "html_url": "https://github.com/ethereum/consensus-specs/issues/2018#issuecomment-1408887843",
+    "issue_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2018",
+    "id": 1408887843,
+    "node_id": "IC_kwDOCOoGbc5T-ewj",
+    "user": {
+      "login": "benjaminion",
+      "id": 20796281,
+      "node_id": "MDQ6VXNlcjIwNzk2Mjgx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20796281?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/benjaminion",
+      "html_url": "https://github.com/benjaminion",
+      "followers_url": "https://api.github.com/users/benjaminion/followers",
+      "following_url": "https://api.github.com/users/benjaminion/following{/other_user}",
+      "gists_url": "https://api.github.com/users/benjaminion/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/benjaminion/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/benjaminion/subscriptions",
+      "organizations_url": "https://api.github.com/users/benjaminion/orgs",
+      "repos_url": "https://api.github.com/users/benjaminion/repos",
+      "events_url": "https://api.github.com/users/benjaminion/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/benjaminion/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-01-30T16:05:46Z",
+    "updated_at": "2023-01-30T16:05:46Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Closing this as it is now ancient history, and it looks like we'll be getting rid of Eth1 data voting completely at some point.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/1408887843/reactions",
+      "total_count": 0,
+      "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
