@@ -49,6 +49,15 @@
       "description": ""
     },
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -58,7 +67,7 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "chriseth",
@@ -103,14 +112,33 @@
     }
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2022-11-09T16:28:20Z",
-  "updated_at": "2023-04-01T12:04:40Z",
-  "closed_at": null,
+  "updated_at": "2023-04-08T12:04:54Z",
+  "closed_at": "2023-04-08T12:04:54Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "KnowledgeBase currently uses the rule list to simplify expressions and thus deduce if\r\n- a variable is a (known) constant\r\n- two variables have a (known) constant difference\r\n\r\nIt does one full run of simplification through the rule list to achieve this. The problem is that the DataFlowAnalyzer uses the KnowledgeBase to delete memory (and storage) knowledge on a write to position `p` by iterating through all variables to check if they have a known difference of at least 32 to `p`.\r\n\r\n*First part:*\r\n\r\nIt is much more efficient to already group variables into sets that have a constant difference to each other, since this is the only information we care about.\r\n\r\n*Second part:*\r\n\r\nThis optimization could be dragged into the DataFlowAnalyzer by storing knowledge about storage and memory not by variables but in two layers, first by groups of variables with known constant difference and then by difference.\r\n\r\nSome sketches follow.\r\n\r\n-----\r\n\r\nInterface:\r\n\r\n- variable got assigned new value (or got declared)\r\n- do two variables have a constant difference?\r\n- does one variable have a constant value?\r\n\r\nData:\r\n\r\nVariables:\r\n - Mapping from variable to \"representative\" plus offset.\r\n - Mapping from representative to all members in the group.\r\n - Maybe special case for a single representative that holds a constant value.\r\n\r\nMemory:\r\n - currently: Variable to variable\r\n - could change this to map that goes to representative so that we can easily clear affected memory, but could also try without first\r\n\r\n\r\nWhat happens?\r\n - Variable assignment:\r\n   Potentially remove it from its group.\r\n   Walk the tree of its value (maybe only one step?) and store in group.\r\n   If `x = add(a, b)`, and `a,b` are from different groups, then we have to create a new group.\r\n   If `x = add(a, b)` and one of `a`, `b` are in the constant group, add `x` to the other group.\r\n   If a variable changes, do we need to update dependent variables? I think we only need to do something for the representative - choose a new representative.\r\n\r\nWhat happens in branch joins?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13700/reactions",
     "total_count": 0,
@@ -125,7 +153,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13700/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -160,6 +188,50 @@
     "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1492951770/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1500877670",
+    "html_url": "https://github.com/ethereum/solidity/issues/13700#issuecomment-1500877670",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13700",
+    "id": 1500877670,
+    "node_id": "IC_kwDOAm_5kc5ZdZNm",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-04-08T12:04:52Z",
+    "updated_at": "2023-04-08T12:04:52Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1500877670/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
