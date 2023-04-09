@@ -246,7 +246,7 @@
     },
     "created_at": "2016-03-08T10:27:20Z",
     "updated_at": "2016-03-08T10:27:20Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "I've looked in this issue and I can see one scenario where this might occur (and will occur more often on slow or heavy loaded machines).\n\nAt the moment there's no lock on the `futureBlock` `set.Set` which can result in future blocks being removed from the future block queue while iterating the set using `set.Keys`. This may happen when a block is received, placed in the future queue, future queue ticks, receive the same block and process it and remove it all together from the queue while the previous operation still ticks.\n\nThis can easily be solved by locking the future block queue (the `set.Set` itself is thread safe but the way we're using it this may still result in a race).\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/193709369/reactions",

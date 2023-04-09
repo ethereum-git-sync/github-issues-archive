@@ -98,7 +98,7 @@
   "created_at": "2016-05-17T22:42:46Z",
   "updated_at": "2018-12-14T14:22:56Z",
   "closed_at": "2016-05-21T20:54:31Z",
-  "author_association": "MEMBER",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "#### System information\n\nGeth version: `1.4.1` and upward \nOS & Version: Windows/Linux/OSX\n#### Expected behaviour\n\nWhen doing an `eth_estimateCall` to non-contracts I expect it to return the amount of gas required to do the call.\n#### Actual behaviour\n\nWhen doing an `eth_estimateCall` to a non-contract it returns an error telling me that there's no code at the given address (which is true). \n#### Steps to reproduce the behaviour\n\n```\n> eth.estimateGas({from:eth.accounts[0], to:eth.accounts[1], gas:1000000})\nno contract code at given address\n```\n",
   "closed_by": {
@@ -166,7 +166,7 @@
     },
     "created_at": "2016-05-17T22:49:40Z",
     "updated_at": "2016-05-17T22:49:40Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "The issue is that estimate gas uses the generic  `doCall`. This method checks whether there's code and returns an error when no code could be found at the recipients address. \n\nThis check was added by @karalabe and assume that it was added for abigen / bindings code. Please elaborate on why this was added so it can be properly addressed when creating the PR to fix this regression. \n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/219877415/reactions",
@@ -254,7 +254,7 @@
     },
     "created_at": "2016-05-18T07:18:58Z",
     "updated_at": "2016-05-18T07:18:58Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "I disagree. Doing a call should **not** result in an error if there was no error to be returned. You're abusing an error field to get an indication whether an execution of the EVM may or may not happen. If you require some indication whether code exists at an address check so in advance of the call and not depend on an error field.\n\n>  The most important one of them is to know whether the contract doesn't exist or whether the contract code failed: in the first case the solution is to sync, etc.\n\nExactly. Use `len(GetCode(addr))` instead of abusing an error field. Not having code at at address is **not** an error. Even computers can make very accurate guesses ;-)\n\n> In the case of estimate, the issue is even worse because given that the contract doesn't exist, estimate plain returned 21000 gas (maybe a bit more if input data was also provided).\n\nWorse? Why would a call go out of gas when performed? The estimate call method's purpose is to estimate the gas, even for non-contract calls. This is a feature and this feature no longer works properly, therefor: **regression**. \n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/219945830/reactions",
@@ -298,7 +298,7 @@
     },
     "created_at": "2016-05-18T07:19:53Z",
     "updated_at": "2016-05-18T07:19:53Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "Additionally if the `abi` does not handle `nil` very well then the `abi` should be fixed. \n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/219946026/reactions",

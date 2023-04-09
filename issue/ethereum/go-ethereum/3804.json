@@ -199,7 +199,7 @@
     },
     "created_at": "2017-03-28T13:41:20Z",
     "updated_at": "2017-03-28T13:41:20Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "`ApplyMessage` should not be returning Virtual Machine errors. If you want to get virtual machine level errors you should be using the `runtime` package instead.\r\n\r\nMay I ask why you need VM errors, perhaps I can point you in the right direction.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/289773111/reactions",
@@ -243,7 +243,7 @@
     },
     "created_at": "2017-03-28T13:45:39Z",
     "updated_at": "2017-03-28T13:45:39Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "`ApplyMessage` errors are, as you correctly pointed out, **consensus errors only** for obvious reasons. If an error is returned by `ApplyMessage` we can safely assume that applying the transaction will result in invalid state transition.\r\n\r\nGoing your suggested route means that this assumption no longer holds. We'd have to check for errors (types) to figure out whether the returned error is a consensus error or merely an EVM returned error. This is tedious and error prone.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/289774430/reactions",
@@ -331,7 +331,7 @@
     },
     "created_at": "2017-03-28T14:56:08Z",
     "updated_at": "2017-03-28T14:56:28Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "`Call` and `Create` in package `runtime` are explicit functions, `ApplyMessage` on the other hand is dynamic (it does whatever the message/tx tells it to) + some other functionality. That functionality doesn't really belong in the `runtime` package.\r\n\r\nIf you really need EVM errors *and* need all of the functionality provided by the state transition model you're out of luck I'm afraid.\r\n\r\nI've been thinking about this, though not specifically this issue but rather EVM errors in general; another approach would be to collect all errors generated during the runtime of the EVM (including sub-calls) and expose them through an API. So for example instead of using `ApplyMessage` directly you'd \"reimplement\" it:\r\n\r\n```go\r\nst := core.NewStateTransition(evm, msg, gp)\r\nst.TransitionDb()\r\nerrors := st.EVM().Errors()\r\n```\r\n\r\n*(please note `st.EVM().Errors()` doesn't exist)*\r\n\r\n`errors` would then contain all of the errors generated during the runtime of the virtual machine.\r\n\r\nYou are welcome to implement this but please bear in mind that this may not have a negative impact on the runtime (within a 1.5% margin). You may compare implementations using `go test ./tests -run=- -bench . -benchmem` and can compare results by redirecting the output of `go test` to a file and use the `benchcmp` tool. My workflow usually:\r\n\r\n```sh\r\n# hack\r\n$ git commit -am \"tmp\"\r\n# subsequent changes will: git commit --amend --no-edit\r\n$ go test ./tests -run=- -bench . -benchmem > /tmp/new.txt\r\n$ git checkout HEAD^1\r\n$ go test ./tests -run=- -bench . -benchmem > /tmp/old.txt\r\n$ benchcmp /tmp/old.txt /tmp/new.txt\r\n# results\r\n```\r\n\r\nHope this helps. \r\n\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/289797030/reactions",
@@ -419,7 +419,7 @@
     },
     "created_at": "2017-03-30T07:13:33Z",
     "updated_at": "2017-03-30T07:13:33Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "> It seems like this shouldn't be too tedious for a caller. In particular, one would not need to look at the types of errors to distinguish between the two types of issues (i.e., consensus vs. VM execution). Do I miss something?\r\n\r\nwe loose the simple assumption that errors indicate invalid state transition (i.e. consensus failure). With your proposal we add technical debt to a critical part of the system.\r\n\r\nImage that you'd have to do\r\n\r\n```go\r\nerr := core.ApplyMessage(...)\r\nif err != nil && err != SomeVMError {\r\n     panic(\"oh noes\")\r\n}\r\n```\r\n\r\nIn every part of the code which calls `ApplyMessage`. This is a problem for maintaining in the long run as it's easy to *just* dismiss that error in future calls not to mention external contributors and API users. It also sets to bar for what is \"acceptable\" to return as error, basically anything. Imagine having to do:\r\n\r\n```go\r\nerr := core.ApplyMessage(...)\r\nif err != nil && (err != VmErrorOne || err != VMErrorTwo || err != ...) { /* ... */ }\r\n```\r\n\r\nThis will become a maintenance hell and I'm willing to bet that at some point will result in erroneous code. \r\n\r\nWhat we have to understand here is that the errors returned by the EVM usually don't matter to the state transition -- with the exception of the very first *balance error* -- and that the transition may carry on.\r\n\r\nUnfortunately I'd have to object to the second proposal as well. VM errors really should not be kept by the `StateTransition` and feels very hacky.\r\n\r\nDo you see a problem with my earlier proposal? ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/290322929/reactions",

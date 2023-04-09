@@ -166,7 +166,7 @@
     },
     "created_at": "2016-01-21T01:14:28Z",
     "updated_at": "2016-01-21T01:15:24Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "Adjacent account nonces need to be favoured over price **within their own set**. To further detail the above scenario:\n\n```\nA: from account x, nonce=1, gp=4\nB: from account x, nonce=2, gp=2\nC: from account y, nonce=3, gp=4\n```\n\nThis would be included as `[A, C, B]`.\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/173419362/reactions",
@@ -298,7 +298,7 @@
     },
     "created_at": "2016-01-21T10:21:34Z",
     "updated_at": "2016-01-21T10:21:34Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "> Ah, right. Probably gp for A and B should be swapped? (the higher price - the better for miner)\n\nPrecisely not because that would violate a basic rule of accounting. Nonces need to be subsequent and need to be included in that order **at all time**.\n\nHere's a basic test that will demonstrate the order:\n\n``` go\nfunc TestOrder(t *testing.T) {\n    key1, _ := crypto.GenerateKey()\n    addr1 := crypto.PubkeyToAddress(key1.PublicKey)\n    key2, _ := crypto.GenerateKey()\n    addr2 := crypto.PubkeyToAddress(key2.PublicKey)\n    key3, _ := crypto.GenerateKey()\n\n    txA, _ := NewTransaction(0, addr2, new(big.Int), new(big.Int), big.NewInt(4), nil).SignECDSA(key1)\n    txB, _ := NewTransaction(1, addr2, new(big.Int), new(big.Int), big.NewInt(2), nil).SignECDSA(key1)\n    txC, _ := NewTransaction(2, addr2, new(big.Int), new(big.Int), big.NewInt(5), nil).SignECDSA(key1)\n    txD, _ := NewTransaction(0, addr1, new(big.Int), new(big.Int), big.NewInt(4), nil).SignECDSA(key2)\n    txE, _ := NewTransaction(0, addr1, new(big.Int), new(big.Int), big.NewInt(6), nil).SignECDSA(key3)\n\n    transactions := Transactions{txA, txB, txC, txD, txE}\n    sort.Sort(TxByPriceAndNonce{transactions})\n\n    for _, tx := range transactions {\n        from, _ := tx.From()\n        fmt.Printf(\"A=%x N=%v GP=%v\\n\", from, tx.Nonce(), tx.GasPrice())\n    }\n}\n```\n\nWhich will result in\n\n```\nA=b1c00741f094559d07f3c391f6f7834e071e719a N=0 GP=6\nA=b2dc7bc7ca7d680c3fee304f243674c4a51601a4 N=0 GP=4\nA=b2dc7bc7ca7d680c3fee304f243674c4a51601a4 N=1 GP=2\nA=b2dc7bc7ca7d680c3fee304f243674c4a51601a4 N=2 GP=5\nA=2d29d94ffa6cf0ca232b750508d65669d602f829 N=0 GP=4\n```\n\nWe reward transactions that are send in batches (e.g. those that can fit in to one block).\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/173527386/reactions",
@@ -518,7 +518,7 @@
     },
     "created_at": "2016-01-21T17:45:50Z",
     "updated_at": "2016-01-21T17:45:50Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "It would be sort price, sort nonce\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/173650863/reactions",
@@ -606,7 +606,7 @@
     },
     "created_at": "2016-01-21T17:54:48Z",
     "updated_at": "2016-01-21T17:54:48Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "Global nonce sort will work but isn't ideal. Merge would be idea\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/173653216/reactions",
@@ -738,7 +738,7 @@
     },
     "created_at": "2016-01-22T09:16:28Z",
     "updated_at": "2016-01-22T09:16:28Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "The latter I don't find so important. The former will actually fail in the system. \n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/173856370/reactions",
@@ -826,7 +826,7 @@
     },
     "created_at": "2016-01-22T09:47:28Z",
     "updated_at": "2016-01-22T09:47:28Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "Aww you beat me to it :+1: \n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/173863628/reactions",

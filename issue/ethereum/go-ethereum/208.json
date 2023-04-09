@@ -79,7 +79,7 @@
   "created_at": "2014-12-15T12:42:17Z",
   "updated_at": "2015-01-30T15:19:56Z",
   "closed_at": "2015-01-30T15:19:55Z",
-  "author_association": "MEMBER",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "A new key store needs to be developed for genesis release. The current version has always been in a stand in for the final version.\n\nPossible model\n\n```\n+----------------------+\n| KeyStore - Generic   |\n+----------------------+\n          |\n         \\|/\n+----------------------+\n| KeyManager           |\n+----------------------+\n          |\n         \\|/\n+----------------------+\n| Wallet               |\n+----------------------+\n```\n\n`KeyStore` is a generic interface and should potentially contains:\n- `Keys() []Key` returns all keys currently in the `KeyStore`\n- `Store(Key)` add a new key to the `KeyStore`\n  If any encryption needs to be done for storing, the `KeyStore` should handle this. `Store` and `Keys` simply return keys (unencrypted).\n\n`KeyManager` should accept a `KeyStore` as its backing mechanism. KeyManager need not to know about the implementation details of the `KeyStore`:\n- `NewKey() Key` generates a new key and adds it to the key store.\n- `DeleteKey(Key)` deletes a key from the key manager as well as the `KeyStore`\n\n`Wallet` basic wallet functionality. Manages accounts currently in use, known and owned by the author. Creating transactions for specific accounts should also be handled by the `Wallet`.\n",
   "closed_by": {

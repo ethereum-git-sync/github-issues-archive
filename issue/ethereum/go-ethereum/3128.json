@@ -203,8 +203,8 @@
     "body": "Bump. As times goes on and people use contracts more it is vital we are able to see and process these internal transactions; even telling people not to send from contracts we have to manually adjust balances and send refunds from these on a daily basis since they don't pay attention or don't know any better.\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/256731371/reactions",
-      "total_count": 2,
-      "+1": 2,
+      "total_count": 3,
+      "+1": 3,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -291,8 +291,8 @@
     "body": "So, there are two ways to do it. \r\n\r\n### Tracing\r\n\r\n1. Implement your own tracer. Example:\r\n\r\n```\r\nnc -U /datadrive/geth-devel/geth.ipc\r\n\r\n{\"id\": 1, \"method\": \"debug_subscribe\", \"params\": [\"traceChain\", \"0x56FEE3\", \"0x56FEF4\", {\"tracer\": \"{\\r\\narguments: [],\\r\\nstep: function(log, db) {\\r\\nif (log.op.toNumber() == 10) {\\r\\n    this.arguments.push({x: log.stack.peek(1).toString(16), y:  log.stack.peek(2).toString(16)})\\r\\n}\\r\\n},\\r\\nresult: function(){ return this.arguments;}, \\r\\nfault: function(){}\\r\\n}\\r\\n\", \"reexec\":1000}]}\r\n```\r\n\r\nThat example stores the argument to `EXP` every time the opcode is used. Some more examples of already existing tracers are here: https://github.com/ethereum/go-ethereum/tree/master/eth/tracers/internal/tracers. \r\n\r\nThis type of usage is good if you want to be able to analyze transactions programatically in-depth. If you are a programmer, and knows the VM. \r\n\r\n### Externally\r\n\r\nIf you are interested in e.g. deposits, and maintain balances, the tracing API might not be for you. There are potential pitfalls, for example - Tx A, invokes `CALL` `b`, invokes `CALL` `c` which does `transfer foobar to Y`. Then `c` suceeds ,`b` reverts and `A` succeeds. Are you confident your custom js snippet would have accounted that correctly?\r\n\r\nIf not, I would recommend using `events` for token-transfers, and using `GetModifiedAccountsByNumber` or `GetModifiedAccountsByHash` for ether-transfers. The latter two can tell you if one of your accounts was indeed in any way modified (such as balance added) during the block period you sent in.  ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/395471815/reactions",
-      "total_count": 7,
-      "+1": 7,
+      "total_count": 8,
+      "+1": 8,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
