@@ -68,8 +68,8 @@
   },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/16123/reactions",
-    "total_count": 4,
-    "+1": 4,
+    "total_count": 6,
+    "+1": 6,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -115,14 +115,14 @@
     "body": "The `--gcmode` doesn't matter here. The issue is that when you fast-sync, you don't have all historic states. After a fast-sync is complete, you will start to do an \"archiving\" sync, block by block sync, _from that point on_ . \r\n\r\nSo, your old setup had an earlier \"pivot point\" than your new setup, and thus had the full state for everything after that pivot point. Your new setup does not have that. It's an effect of doing a new fast-sync, not because you upgrade to 1.8.0. \r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/366533523/reactions",
-      "total_count": 3,
-      "+1": 3,
+      "total_count": 6,
+      "+1": 4,
       "-1": 0,
       "laugh": 0,
-      "hooray": 0,
+      "hooray": 1,
       "confused": 0,
       "heart": 0,
-      "rocket": 0,
+      "rocket": 1,
       "eyes": 0
     },
     "performed_via_github_app": null
@@ -247,8 +247,8 @@
     "body": "Not quite, but almost. Say you want to do a trace on block `B`. Now there are a couple of cases:\r\n\r\n1. You did a fast-sync, pivot block `P` where `P <= B`.\r\n2. You did a fast-sync, pivot block `P` where `P > B`. \r\n3. You did a full-sync, with pruning\r\n4. You did a full-sync, without pruning (`--gcmode=archive`)\r\n\r\nHere's what happens:\r\n\r\n1. Geth will regenerate the desired state by replaying blocks from the closest point in time before `B` where it has full state. This defaults to [`128`](https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L52) blocks max, but you can specify more in the actual call `... \"reexec\":1000 .. }` to the tracer. \r\n2. Sorry, can't be done without replaying from genesis.   \r\n3. Same as 1)\r\n4. Does not need to replay anything, can immediately load up the state and serve the request. \r\n\r\nThere is one other option available to you, which may or may not suit your needs. That is to use [Evmlab]( https://github.com/holiman/evmlab). \r\n```\r\ndocker pull holiman/evmlab && docker run -it holiman/evmlab\r\n```\r\nThere you can use the reproducer. The reproducer will incrementally fetch data from infura until it has all the information required to create the trace locally on an evm which is bundled with the image. It will create a custom genesis containing the state that the transaction touches (balances, code, nonce etc). \r\n\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/393798571/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,

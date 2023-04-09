@@ -247,8 +247,8 @@
     "body": "I was just digging into ethspam a  bit. These seem to be the queries: https://github.com/shazow/ethspam/blob/master/queries.go . \r\n\r\nThese would not be affected, as it's not state-data but block data:\r\n \r\n- `genEthGetTransactionReceipt`\r\n- `genEthGetBlockByNumber`\r\n- `genEthBlockNumber` \r\n- `genEthGetTransactionByHash`\r\n- `genEthGetLogs` \r\n\r\nThese should be improved by `snapshot`: \r\n\r\n- `genEthCall`\r\n- `genEthGetBalance`\r\n- `genEthGetTransactionCount` \r\n- `genEthGetCode` \r\n\r\nThese depends on `RandomAddress`: https://github.com/shazow/ethspam/blob/master/state.go#L63 . \r\n```golang\r\nfunc (s *liveState) RandomAddress() string {\r\n\tif len(s.transactions) == 0 {\r\n\t\treturn \"\"\r\n\t}\r\n\tidx := int(s.randSrc.Int63()) % len(s.transactions)\r\n\treturn s.transactions[idx].From.String()\r\n}\r\n```\r\nAs far as I understand it, it selects an account from a list of transactions, and the list of transactions is re-filled from the `latest` block from time to time. That set is also used to populate contract-addresses. \r\n\r\nSo my theory of why you don't experience any orders-of-magnitude performance is: \r\n\r\n- Only 4 out of 9 call types are state-related (snapshotter only improves state access, not block data access) \r\n- The state accesses are all focused on 'recently touched' state, and already resides in memory. \r\n\r\nIt definitely would be interesting to see how these numbers compare with other clients, like turbo-geth, but I would also be very interested to see the stats broken down in query-types, so we could better pinpoint which query types are slowest, or have highest variance etc. \r\n\r\nAnyway, thanks for all the work so far!",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/721285804/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 2,
+      "+1": 2,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
