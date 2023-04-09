@@ -1,8 +1,111 @@
 {
-  "message": "API rate limit exceeded for user ID 93719879.",
-  "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
+  "url": "https://api.github.com/repos/ethereum/execution-apis/issues/313",
+  "repository_url": "https://api.github.com/repos/ethereum/execution-apis",
+  "labels_url": "https://api.github.com/repos/ethereum/execution-apis/issues/313/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/execution-apis/issues/313/comments",
+  "events_url": "https://api.github.com/repos/ethereum/execution-apis/issues/313/events",
+  "html_url": "https://github.com/ethereum/execution-apis/issues/313",
+  "id": 1408780539,
+  "node_id": "I_kwDOFoG9Gs5T-Ej7",
+  "number": 313,
+  "title": "Remove restriction that payloads cannot be built on ancestors of the head",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-10-14T05:20:07Z",
+  "updated_at": "2022-11-16T09:11:26Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "In the current spec for `forkchoiceUpdatedV1` it is stated that a node must not allow a payload to be built atop any ancestor of the head:\r\n\r\n> Client software MAY skip an update of the forkchoice state and MUST NOT begin a payload build process if forkchoiceState.headBlockHash references an ancestor of the head of canonical chain. In the case of such an event, client software MUST return {payloadStatus: {status: VALID, latestValidHash: forkchoiceState.headBlockHash, validationError: null}, payloadId: null}.\r\n\r\n(from: https://github.com/ethereum/execution-apis/blob/main/src/engine/specification.md#engine_forkchoiceupdatedv1)\r\n\r\nHowever, there are cases where it is better for the health of the chain if payloads _can_ be built upon ancestors. If a block arrives late across the entire network and has not been attested to, then it is beneficial to re-org it out to disincentivise that behaviour. Validators may be incentivised to publish blocks as late as possible to maximise MEV, and re-orging them out when they do this is IMO the most viable way to establish a healthy equilibrium.\r\n\r\nI have a proposal for the consensus-specs that allows honest validators to perform re-orgs of late blocks, but it currently requires a hack to suppress the `forkchoiceUpdated` message for the block-to-be-reorged (see: https://github.com/ethereum/consensus-specs/pull/3034). If execution clients were capable of building payloads on ancestors of the head then this hack wouldn't be necessary and the consensus client could just send payload attributes for whichever block it wants to build on.\r\n\r\nWhether or not my proposal is adopted, I suspect that we will eventually move to `(block, slot)` fork choice which will allow attesters to vote for the emptiness of a slot. This would lead to a similar situation, where the canonical head can revert to an ancestor of the previous head, and a new block should be built atop that ancestor.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/execution-apis/issues/313/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/execution-apis/issues/313/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
 }
-{
-  "message": "API rate limit exceeded for user ID 93719879.",
-  "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
-}
+[
+  {
+    "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/1316648829",
+    "html_url": "https://github.com/ethereum/execution-apis/issues/313#issuecomment-1316648829",
+    "issue_url": "https://api.github.com/repos/ethereum/execution-apis/issues/313",
+    "id": 1316648829,
+    "node_id": "IC_kwDOFoG9Gs5Oend9",
+    "user": {
+      "login": "mkalinin",
+      "id": 1892772,
+      "node_id": "MDQ6VXNlcjE4OTI3NzI=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1892772?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mkalinin",
+      "html_url": "https://github.com/mkalinin",
+      "followers_url": "https://api.github.com/users/mkalinin/followers",
+      "following_url": "https://api.github.com/users/mkalinin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mkalinin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mkalinin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mkalinin/subscriptions",
+      "organizations_url": "https://api.github.com/users/mkalinin/orgs",
+      "repos_url": "https://api.github.com/users/mkalinin/repos",
+      "events_url": "https://api.github.com/users/mkalinin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mkalinin/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-11-16T09:11:25Z",
+    "updated_at": "2022-11-16T09:11:25Z",
+    "author_association": "MEMBER",
+    "body": "This requirement in the Engine API spec has been introduced to handle the situation when CL client is syncing from scratch while EL was is already fully synced. In this situation CL sends `forkchoiceUpdated` with pretty old blocks as long as it's catching up with the chain. Reorgs to early blocks are either impossible or very costly for EL clients because of state pruning. Note that building a payload must always happen on top of the head as some EL clients (e.g. Erigon) can't do the other way because they maintain only one state copy. So, the change to Engine API spec must permit reorgs to ancestors up to a certain extent, probably up to the most recent finalized block.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/1316648829/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

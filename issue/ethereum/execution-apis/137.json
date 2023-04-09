@@ -224,7 +224,7 @@
     },
     "created_at": "2021-11-28T08:08:48Z",
     "updated_at": "2021-11-28T08:31:35Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "> It stops at A and returns [A]\r\n\r\nthis would depend, no? why not return `[A, C]`?\r\n\r\n> Array of block hashes.\r\n\r\nThis deviates from the CL protocol a bit: we generally avoid using hashes for historical blocks for several reasons, but in particular because it does not exploit the \"linearity\" of a finalized block history - what we do instead is request by slot / block number - hashes are (comparatively) expensive to look up: for a range of blocks (ie 1024 blocks), this causes a lot of unnecessary seeking - what we want to do instead is serve data from flat storage in linear order which is significantly more efficient (also in EL:s where clients \"freeze\" storage after a certain amount of time has passed). \r\n\r\nThere are two ways to go about that:\r\n\r\n* the EL learns about actual slot numbers - this is different from \"block height\" in the EL in that it accounts for empty slots as well\r\n* the CL uses data from the ExecutionHeader to translate slots to block numbers\r\n\r\nThe latter has been seen as preferable from a backwards compatibility point of view, because everything else in the EL goes by block number.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/980965351/reactions",
@@ -312,7 +312,7 @@
     },
     "created_at": "2021-11-29T15:11:14Z",
     "updated_at": "2021-11-29T15:11:14Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "> The general idea of this proposal is to piggy-back on already existing logic in EL to make this change almost free in terms of implementation.\r\n\r\nI would investigate whether this is really the case with existing client implementations, as finding blocks by block number should be [well supported](https://geth.ethereum.org/docs/rpc/ns-debug#debug_getblockrlp) already - a requirement to keep a by-hash index for this request for an indefinite future is quite heavy, and removing a request from a spec is a lot harder than adding a new one.\r\n\r\n> transactions_root from received data\r\n\r\nYes, this would be the case, or perhaps have an encoding for \"no block found\" if we keep a 1:1 response length. It's also a question of trust I guess, whether the CL blindly should forward whatever the EL gives it or _always_ verify the hash regardless. \r\n\r\n> BeaconBlocksByRoot\r\n\r\nThis request is special in that it only supports unfinalized blocks and therefore the number of blocks requested tends to be small and efficiency is less of a concern.\r\n\r\n It's used only when you receive an attestation or block that refers to a root you have not observed which is .. rare - in particular, we don't know the slot or block number of the block when serving this request. In particular, we made `BlocksByRange` the \"default\" sync mechanism because this aligns well with a world in which chains finalize.\r\n\r\n> What if CL grabs a span of blocks from its database, then parses block hashes from it, and send a request to EL?\r\n\r\nIt's certainly possible, but it introduces a lot of work and structural inefficiency both for the EL and the CL that will be hard to rectify.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/981726326/reactions",
@@ -400,7 +400,7 @@
     },
     "created_at": "2021-11-29T16:10:44Z",
     "updated_at": "2021-11-29T18:13:08Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "> I don't see the complexity on EL side\r\n\r\nI mean computational work, not implementation work: doing hundreds of hash lookups over millions of blocks is extremely slow compared to a linear scan over a range of blocks stored consecutively - practically, it's the difference between supporting HDD:s over SSD:s by and large.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/981782904/reactions",
@@ -444,7 +444,7 @@
     },
     "created_at": "2021-11-29T16:13:18Z",
     "updated_at": "2021-11-29T16:13:18Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "> Finding blocks by block number doesn't cover all the possible cases, it only works when the query is being made over canonical chain.\r\n\r\nyes - this is a good point - there are two ways  to solve this while keeping a by-slot request:\r\n\r\n* allow both types of addressing (this is what the CL spec does)\r\n* accept duplication in CL and EL of unfinalized data\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/981785481/reactions",
@@ -532,7 +532,7 @@
     },
     "created_at": "2021-11-30T15:24:21Z",
     "updated_at": "2021-11-30T15:24:21Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "> This kind of work will anyway exist in EL\r\n\r\nRight, but it doesn't have to, in a post-finalization world - it's very common to download blocks epoch by epoch, or really 1024 consecutive blocks at a time, in CL:s and I expect that trend to continue.\r\n\r\n> A complexity of a by-slot request i\r\n\r\nSorry, my bad - I mean by-block-height - we have the block height on the CL side anyway.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/982740675/reactions",
