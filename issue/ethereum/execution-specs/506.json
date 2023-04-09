@@ -69,7 +69,7 @@
   "created_at": "2022-04-29T11:34:10Z",
   "updated_at": "2023-01-05T13:25:18Z",
   "closed_at": null,
-  "author_association": "COLLABORATOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "OpenSSL 3 has disabled various legacy hash functions by moving them to a legacy provider that isn't enabled by default. This includes RIPEMD160 which we use.\r\n\r\nIf you have OpenSSL 3 and try to use RIPEMD160 you will get `ValueError: [digital envelope routines] unsupported` or `ValueError: unsupported hash type ripemd160` under CPython and `Segmentation fault` under PyPy.\r\n\r\nThe issue can be resolved by adding this lines to `/etc/ssl/openssl.cnf`:\r\n\r\n```\r\n [openssl_init]\r\n providers = provider_sect\r\n \r\n # List of providers to load\r\n [provider_sect]\r\n default = default_sect\r\n+legacy = legacy_sect\r\n\r\n [default_sect]\r\n activate = 1\r\n\r\n+[legacy_sect]\r\n+activate = 1\r\n```\r\n",
   "closed_by": null,
@@ -206,7 +206,7 @@
     },
     "created_at": "2022-05-12T13:15:56Z",
     "updated_at": "2022-05-12T13:15:56Z",
-    "author_association": "COLLABORATOR",
+    "author_association": "MEMBER",
     "body": "I should be able to do that in pure python using the [CFFI](https://cffi.readthedocs.io/en/latest/index.html). I'll add it to my todo list.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/execution-specs/issues/comments/1124981633/reactions",
@@ -294,7 +294,7 @@
     },
     "created_at": "2022-05-13T10:10:53Z",
     "updated_at": "2022-05-13T10:10:53Z",
-    "author_association": "COLLABORATOR",
+    "author_association": "MEMBER",
     "body": "> Good to know. I plan to wrap OpenSSL into common API for Ethereum precompiles. Do you need to use any other cryptography libraries except OpenSSL?\r\n\r\nActually, I think you need quite a few different crypto libraries.\r\n\r\n* OpenSSL for `keccak256()`, `sha256()` and `ripemd160()`\r\n* [libsecp256k1](https://github.com/bitcoin-core/secp256k1) for `secp256k1_recover()`\r\n* A bignum library for `modexp`.\r\n* A `bn_128` library for the `alt_bn_*` precompiles ([example](https://github.com/paritytech/bn))\r\n* The Blake2 `F` compression function. If your language has C level performance this is probably easier to implement directly than add a dependency.\r\n\r\nWe use native python bignum support for `modexp` and implement `bn_128` and BLAKE `F` in python, but we have an unreasonable disregard for performance in the specs.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/execution-specs/issues/comments/1125880502/reactions",
