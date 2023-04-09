@@ -295,7 +295,7 @@
     },
     "created_at": "2017-07-17T19:41:04Z",
     "updated_at": "2017-07-17T19:51:03Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "You should keep in mind that ERC #20 token standard functions are leading to monetary losses. I wrote a number of articles about it (for example [this one](https://www.reddit.com/r/ethereum/comments/6h17aw/critical_problem_of_erc20_tokens/)).\r\n\r\nThe main problem of ERC #20 token is that it has two ways of transferring funds:\r\n1. `transfer`\r\n2. `approve` + `transferFrom`\r\n\r\nwhich assumes that first pattern is processed without handling by the receiver and the second pattern simulates transaction handling.\r\n\r\nThe purpose of `approve` + `transferFrom` was described in [solidity documentation](https://media.readthedocs.org/pdf/solidity/develop/solidity.pdf) at page 39: \r\n\r\n>Warning: There are some dangers in using send:  The transfer fails if the call stack depth is at 1024 (this can always be forced by the caller) and it also fails if the recipient runs out of gas.  So in order to make safe Ether transfers, always check the return value of send, use transfer or **even better: use a pattern where the recipient withdraws the money**\r\n\r\nThis was relevant at the moment of creating ERC20 token standard, but the stack depth attack was fixed through EIP #150 . As the result of this `approve` + `transferFrom` must be considere **deprecated** now.\r\n\r\nI think that there is no need to develop and implement the `approve / allowance` mechanism because:\r\n1. `approve + transferFrom` is leading to monetary losses since it assumes another way to transfer tokens (And an alternative way to execute a transaction often does not implement handling)\r\n2. vulnerability to re-approval attack is described [here](https://drive.google.com/file/d/0ByMtMw2hul0EN3NCaVFHSFdxRzA/view)\r\n3. `approve` is superfluous since common pattern of transactions handling is fallback function execution. It is already described in ERC #223 \r\n\r\nI'd like to recommend to remove `decApprove` / `setApprove` / `getAllowance` from the token standard because of described problems of this approach.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/315860200/reactions",
@@ -471,7 +471,7 @@
     },
     "created_at": "2017-07-18T05:30:50Z",
     "updated_at": "2017-07-18T05:30:50Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": ">Both 0x and swap rely on the approve/transferFrom\r\n\r\nI think that relying on mechanism that is leading to monetary losses for your users is very bad idea.\r\n\r\n> it seems that ERC20 has already become the de facto standard\r\n\r\nDue to the fact that many developers use this standard without any research or understanding of the consequences. They don't care about the fact than their users will lose money.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/315962175/reactions",
@@ -515,7 +515,7 @@
     },
     "created_at": "2017-07-18T05:46:53Z",
     "updated_at": "2017-07-18T12:44:21Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": ">I'm coming up with design ideas how to make my approve/transferFrom implementation safer\r\n\r\nI think that it is possible to make `approve / allowance` mechanism safer but I think that it is not needed. I prefer to consider it deprecated because stack depth attack is already fixed (it is the only purpose of having approves. Approves are superfluous now).\r\n\r\nReasons:\r\n1. Irrational blockchain usage. Ethereum already has problems with network bandwidth. There is no need to introduce and use mechanisms which will cause extra blockchain bloating. Approve + transferFrom is a couple of two different transactions to perform a single action.\r\n\r\n2. Not user friendly. Can cause user mistakes.\r\nWhy do we need two different functions (transfer and approveAndCall) to perform token transactions? Is here any advantages over having only `transfer` function to perform all transfers?\r\n\r\n3. More understandable for developers.\r\n[Event handling](https://en.m.wikipedia.org/wiki/Event_(computing)) and fallback executing is well-known method in programming. Approves are not.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/315964245/reactions",
@@ -955,7 +955,7 @@
     },
     "created_at": "2017-09-05T16:34:49Z",
     "updated_at": "2017-09-05T16:34:49Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "@Arachnid \r\n\r\n>This is untrue. If you remove approve from ERC20, there is no way to transfer tokens to a contract such that the token knows who sent them the tokens.\r\n\r\n`approve` doesn't introduce any functionality that can't be implemented by token fallbacks execution without approves.\r\nBy the way, event handling function execution is a standard practice in programming ([event handling](https://en.wikipedia.org/wiki/Event_(computing))) unlike `approve` + `transferFrom` mechanism that requires twice more transactions to make a token transaction and results in loss of money as well.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/327232155/reactions",
@@ -1043,7 +1043,7 @@
     },
     "created_at": "2017-09-05T17:34:10Z",
     "updated_at": "2017-09-05T17:34:10Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": ">The issue I was raising is that you were suggesting that removing approve without any other changes would not eliminate any use-cases; it definitely would.\r\n\r\nI agree, if you just exclude `approve`s from the default ERC20 token then it will eliminate some use-cases.\r\nI suggested an alternative standard with alternative ways of doing the same thing that `approve`s do, but without loss of money.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/327249028/reactions",

@@ -43,7 +43,7 @@
   "created_at": "2018-07-23T09:41:16Z",
   "updated_at": "2018-12-16T10:23:28Z",
   "closed_at": "2018-07-24T12:39:40Z",
-  "author_association": "NONE",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "```\r\ntitle: Token Migration\r\nauthor: Chiro Hiro (@chiro-hiro)\r\nstatus: Draft\r\ndiscussions-to: <chiro@fkguru.com>\r\ncategory: ERC\r\ncreated: 2018-07-23\r\n```\r\n# Token Migration\r\n\r\n## Simple Summary\r\n\r\nThis document provides a standard to migrating the old token standard to the new one.\r\n\r\n## Abstract\r\n\r\nEach particular token is holding ledger of transactions then It isn't a good idea to make a massive copy, meanwhile new standard of the token is feature rich and secure, so a migration is needed to keep all tokens are up-to-date and reduce the fragment. The Token Migration defines a set of methods to migrate token's ledger for reasonable cost and security.\r\n\r\n## Motivation\r\n\r\nThere are many standards of Ethereum token such as `ERC-20`, `ERC-223`, `ERC-821`. We need a standard to stay away from the fragment or at least a method to migrate old token standard like `ERC-20` to the new one.\r\n\r\n# Specification\r\n\r\n## Rationale\r\n\r\nThe old token will be burned in an invalid address which will keep increasing over time (e.g `0x0000000000000000000000000000000000000001`) meanwhile a new token will be issued with the same amount.\r\n\r\nThe burning process makes the old token impossible to recover or redeem once again.\r\n\r\nThe cost of migration will be distributed among tokenholders and It cost around `77470 gas` for each `migrate()` call.\r\n\r\nThe redeemed token and the non-redeemed token will be *transferred* normally.\r\n\r\n## Implementation\r\n\r\nERC20 Token interface:\r\n```\r\ncontract ERC20Interface {\r\n    function totalSupply() public constant returns (uint);\r\n    function balanceOf(address tokenOwner) public constant returns (uint balance);\r\n    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);\r\n    function transfer(address to, uint256 tokens) public returns (bool success);\r\n    function approve(address spender, uint tokens) public returns (bool success);\r\n    function transferFrom(address from, address to, uint tokens) public returns (bool success);\r\n\r\n    event Transfer(address indexed from, address indexed to, uint tokens);\r\n    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);\r\n}\r\n```\r\nNew token with migration code:\r\n```\r\ncontract NewToken{\r\n    \r\n    mapping (address => uint256) public balances;\r\n    \r\n    uint256 currentProcess = 1;\r\n    \r\n    ERC20Interface oldToken;\r\n    \r\n    constructor(address _oldAddress) public {\r\n        oldToken = ERC20Interface(_oldAddress);\r\n    }\r\n\r\n    /* Token code here */\r\n    \r\n    function migrate() public returns(bool){\r\n        uint256 oldBalance = oldToken.balanceOf(msg.sender);\r\n        \r\n        require(oldBalance > 0);\r\n        \r\n        //Burn old token\r\n        require(address(oldToken).delegatecall(bytes4(keccak256(\"transfer(address,uint256)\")), address(currentProcess), oldBalance));\r\n        \r\n        //Issue new token\r\n        balances[msg.sender] = oldBalance;\r\n        \r\n        currentProcess++;\r\n        \r\n        return true;\r\n    }\r\n    \r\n}\r\n```",
   "closed_by": {
@@ -155,7 +155,7 @@
     },
     "created_at": "2018-07-23T16:59:13Z",
     "updated_at": "2018-07-24T02:02:58Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "@flygoing \r\n>I don't think this will work as expected. This address(oldToken).delegatecall(bytes4(keccak256(\"transfer(address,uint256)\")), address(currentProcess), oldBalance) wont transfer the tokens on the old token to currentProcess. since delegatecall will make it act on the current contracts Storage. This will essentially call the transfer function of oldToken, but act on the storage of the newToken contract. Which doesn't make much sense.\r\n\r\nCould you teach me about this section?. I have just expected `delegatecall()` will keep `msg.sender` of the original actor who calls `migrate()`  and trigger `oldToken.transfer(address, uint256);`.\r\n\r\n>Also, why have currentProcess? Just send to 0x0...0 or 0x0...0dead. The currentProcess variable isn't even public so you aren't getting anything by including it aside from the added gas costs.\r\n\r\nSome token contract won't allow me to burn token since:\r\n```\r\nmodifier onlyValidAddress(address _to){\r\n    require(_to != address(0x00));\r\n}\r\n```\r\nI'd like to keep migration is able to track. It's possible to rebuild a table of redeemed holders. e.g.\r\n\r\nOld Tokenholder| Burned Address | Value\r\n--- | --- | ---\r\n0xea....deaf|0x00....0001|1000\r\n0x44....deaf|0x00....0002|5000\r\n\r\n> For this to work you'd have to approve the newToken contract to move the oldToken, and do a transferFrom within the newToken's migrate function.\r\n\r\nIt's mean, I have to paying  for gas of two transactions.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/407128115/reactions",
@@ -243,7 +243,7 @@
     },
     "created_at": "2018-07-24T03:06:15Z",
     "updated_at": "2018-07-24T03:06:15Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "@flygoing Thank you very much, I will keep thinking for a reasonable on-chain migration.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/407265798/reactions",
@@ -287,7 +287,7 @@
     },
     "created_at": "2018-07-24T11:46:07Z",
     "updated_at": "2018-07-24T11:53:30Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "> For this to work you'd have to approve the `newToken` contract to move the `oldToken`, and do a `transferFrom` within the `newToken`'s `migrate` function.\r\n\r\nThis migration need three steps to be done, I thought.\r\n1. The token-holder registers his address\r\n2. The token-holder approve `newToken` to use his token.\r\n3. The token-holder triggers `newToken`'s `migrate()` then finish the migration.\r\n\r\nI think, we can use `burn and redeem`  mechanism.\r\n1. The token-holder transfer all tokens to `address(keccak256(ms.sender))`.\r\n2. Trigger `newToken`'s `redeem()`.\r\n\r\n```\r\ncontract NewToken{\r\n    \r\n    mapping (address => uint256) public balances;\r\n    \r\n    mapping (address => bool) public redeemed;\r\n    \r\n    ERC20Interface oldToken;\r\n    \r\n    constructor(address _oldAddress) public {\r\n        oldToken = ERC20Interface(_oldAddress);\r\n    }\r\n    \r\n    function redeemAddress() public view returns(address){\r\n        return address(keccak256(abi.encodePacked(msg.sender)));\r\n    }\r\n    \r\n    function redeem() public returns(bool){\r\n        address _owner = redeemAddress();\r\n        uint256 _balance = oldToken.balanceOf(_owner);\r\n        require(redeemed[_owner] == false);\r\n        require(_balance > 0);\r\n        balances[msg.sender] = _balance;\r\n        redeemed[_owner] = true;\r\n        return true;\r\n    }\r\n\r\n}\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/407377289/reactions",
@@ -375,7 +375,7 @@
     },
     "created_at": "2018-07-24T12:38:59Z",
     "updated_at": "2018-07-24T12:38:59Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "@flygoing I get it, I will close this issue.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/407391683/reactions",

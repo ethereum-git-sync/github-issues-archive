@@ -159,8 +159,8 @@
     "body": "a `eth_verifyProof` might be helpful, but not required since you can easily verify this inside you dapp. (or even outside).  , you just call `eth_getBlockBy...` and take the `stateRoot`. and then verify the proof.\r\n```js\r\nimport * as Trie from 'merkle-patricia-tree'\r\nimport * as util from 'ethereumjs-util'\r\n\r\nconst [block, account ] = await Promise.all([\r\n   // we need the blockheader to get the stateRoot \r\n  web3.eth.getBlockByNumber('latest',false),\r\n\r\n  // and we need the proof\r\n  web3.eth.getProof(address,[],'latest')\r\n])\r\n\r\n// this function simply verifies the proof by starting with the stateRoot from the header and hopefully end with the leaf-node containing the rlp-serialized value of the account\r\nTrie.verifyProof( block.stateRoot, util.sha3 ( address ), account.accountProof, (err, value) => {\r\n   if (err || !value.equals(util.rlp.encode(account.nonce,account.balance,account.storageHash, account.codeHash)))\r\n       console.log('proof failed :',err)\r\n   else \r\n       console.log('verified!')\r\n})\r\n```\r\n\r\nBut I think it would be a good idea to offer a function in the web3-library like:\r\n\r\n```js\r\nweb3.eth.verify.account( account,  blockHash )\r\nweb3.eth.verify.storage( account.storageProof, account.stateRoot )\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/401161169/reactions",
-      "total_count": 10,
-      "+1": 10,
+      "total_count": 11,
+      "+1": 11,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -687,8 +687,8 @@
     "body": "Any reason not to move this to final?  It is implemented in Geth, Parity, and Nethermind but Geth is currently behind `--jsonrpc-experimental` flag. Conversation has been dead for quite some time.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/605547639/reactions",
-      "total_count": 3,
-      "+1": 3,
+      "total_count": 4,
+      "+1": 4,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -1039,7 +1039,7 @@
     "body": "@p4u So, I understood all of that. I'm asking a question about how the API expects these arguments to be encoded. Let's say, for example, that I want to access the value that is at storage slot 0; this is the slot you would be accessing if you have a contract with a single field of type uint256 and then like, SSTORE into it. Is the argument supposed to be \"0x0\", or \"0x0000000000000000000000000000000000000000000000000000000000000000\", or even simply \"0\"? Ethereum JSON/RPC APIs typically are defined to have arguments that are of either type QUANTITY or DATA. This API is not really specifying the format... it is just \"ARRAY (of ?!?!?)\", and I'm running into discrepancies with third-party implementations from groups like xDai. What it says here is \"ARRAY 32-byte\"... is that implying ARRAY of _DATA_ 32-byte? It says, though, \"see eth_getStorageAt\", which firmly defines a storage key to be of type QUANTITY, _NOT DATA_. If it is type DATA (as maybe implied by the \"32-byte\"), then it would be \"0x0000000000000000000000000000000000000000000000000000000000000000\", but if it is type QUANTITY (as defined by eth_getStorageAt) then it would be \"0x0\". The \"reference implementation\" (a term which may have been thrown around loosely, but carries weight; the current implementation in geth is essentially identical) takes this string and passes it to common.HexToHash, which (near as I can tell, by implication of \"what works\") accepts _all three of these formats_, including \"0\". Is the intention that other third-party implementations accept all three of these formats? xDai's implementation only works correctly if you pass the DATA format; if you pass the QUANTITY format, it sometimes (as they have different versions--and I think even fundamentally different implementations--of their service behind a load balancer) rejects the value with \"invalid length 1, expected a 0x-prefixed hex string with length of 64\"... and it sometimes (this is \"epic\" ;P) succeeds but _returns a proof of the wrong storage slot_! So, I'm trying to figure out what the intention of the format for this argument was to be, so I can determine things like whether xDai's implementation--or that of any other chain I end up running into (RSK for example has their own implementation of a lot of these APIs in Java)--is compliant and what I should be making sure to generate when calling the API.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/814840715/reactions",
-      "total_count": 1,
+      "total_count": 2,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
@@ -1047,7 +1047,7 @@
       "confused": 0,
       "heart": 0,
       "rocket": 0,
-      "eyes": 1
+      "eyes": 2
     },
     "performed_via_github_app": null
   },
@@ -1259,8 +1259,8 @@
     "body": "> > a `eth_verifyProof` might be helpful, but not required since you can easily verify this inside you dapp. (or even outside). , you just call `eth_getBlockBy...` and take the `stateRoot`. and then verify the proof.\r\n> > ```js\r\n> > import * as Trie from 'merkle-patricia-tree'\r\n> > import * as util from 'ethereumjs-util'\r\n> > \r\n> > const [block, account ] = await Promise.all([\r\n> >    // we need the blockheader to get the stateRoot \r\n> >   web3.eth.getBlockByNumber('latest',false),\r\n> > \r\n> >   // and we need the proof\r\n> >   web3.eth.getProof(address,[],'latest')\r\n> > ])\r\n> > \r\n> > // this function simply verifies the proof by starting with the stateRoot from the header and hopefully end with the leaf-node containing the rlp-serialized value of the account\r\n> > Trie.verifyProof( block.stateRoot, util.sha3 ( address ), account.accountProof, (err, value) => {\r\n> >    if (err || !value.equals(util.rlp.encode(account.nonce,account.balance,account.storageHash, account.codeHash)))\r\n> >        console.log('proof failed :',err)\r\n> >    else \r\n> >        console.log('verified!')\r\n> > })\r\n> > ```\r\n> > \r\n> > \r\n> > But I think it would be a good idea to offer a function in the web3-library like:\r\n> > ```js\r\n> > web3.eth.verify.account( account,  blockHash )\r\n> > web3.eth.verify.storage( account.storageProof, account.stateRoot )\r\n> > ```\r\n> \r\n> I just realized that this \"simple example\" requires library for merkle proof validation that may not be readily available in all environments. This example also doesn't appear to validate an actual storage proof, only the account proof.\r\n> \r\n> So, I would like to re-assert my request that there be a JSON-RPC method for validating account and storage proofs. I don't think it should hold up this from becoming final.\r\n\r\nDon't you think thats kind of controversial? I mean, there might be some cases where you are using `eth_getProof` because you don't trust the source, so why would you trust the response of `eth_verifyProof`? Maybe I'm missing something",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/852435184/reactions",
-      "total_count": 3,
-      "+1": 3,
+      "total_count": 4,
+      "+1": 4,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
