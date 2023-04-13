@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14114",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14114/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14114/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14114/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14114",
+  "id": 1664870441,
+  "node_id": "I_kwDOAm_5kc5jO-gp",
+  "number": 14114,
+  "title": "Unexpected results are produced when fetching Struct across contracts",
+  "user": {
+    "login": "nishuzumi",
+    "id": 13927203,
+    "node_id": "MDQ6VXNlcjEzOTI3MjAz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13927203?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nishuzumi",
+    "html_url": "https://github.com/nishuzumi",
+    "followers_url": "https://api.github.com/users/nishuzumi/followers",
+    "following_url": "https://api.github.com/users/nishuzumi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nishuzumi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nishuzumi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nishuzumi/subscriptions",
+    "organizations_url": "https://api.github.com/users/nishuzumi/orgs",
+    "repos_url": "https://api.github.com/users/nishuzumi/repos",
+    "events_url": "https://api.github.com/users/nishuzumi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nishuzumi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-12T16:23:08Z",
+  "updated_at": "2023-04-12T16:23:08Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\nI encountered a very strange problem, unexpected results are produced when fetching Struct across contracts\r\n## Environment\r\n\r\n- Compiler version: 0.8.18\r\n- Target EVM version (as per compiler settings):0.8.18+commit.87f61d96\r\n- Framework/IDE (e.g. Truffle or Remix):Remix\r\n- EVM execution environment / backend / blockchain client:Remix\r\n- Operating system:Remix\r\n\r\n## Steps to Reproduce\r\n\r\n```\r\npragma solidity ^0.8.0;\r\n\r\ninterface IStorage{\r\n    struct Filed{\r\n        uint id;\r\n        string name;\r\n    }\r\n}\r\n\r\ncontract Storage is IStorage {\r\n    mapping(uint256 => Filed) public store;\r\n\r\n    constructor(){\r\n        store[1] = Filed(1,\"Bot\");\r\n        store[0] = Filed(0,\"Gun\");\r\n        store[2] = Filed(3,\"Love\");\r\n    }\r\n}\r\n\r\ninterface IStorageExtra is IStorage{\r\n    function store(uint id) external view returns(Filed memory);\r\n}\r\n\r\ncontract Query {\r\n    IStorageExtra public storageContract;\r\n    constructor(){\r\n        storageContract = IStorageExtra(address(new Storage()));\r\n    }\r\n\r\n    function query() public view returns(Storage.Filed[] memory){\r\n        uint max = 2;\r\n        Storage.Filed[] memory data = new Storage.Filed[](max);\r\n        for(uint i = 0; i < max ;i++){\r\n            data[i] = storageContract.store(i);\r\n        }\r\n        return data;\r\n    }\r\n\r\n    function query2() public view returns(Storage.Filed[] memory){\r\n        Storage.Filed[] memory data = new Storage.Filed[](1);\r\n        data[0] = storageContract.store(2);\r\n        return data;\r\n    }\r\n\r\n    function query3() public view returns(Storage.Filed memory){\r\n        Storage.Filed memory data = storageContract.store(2);\r\n        return data;\r\n    }\r\n\r\n\r\n    function query4OK() public view returns(Storage.Filed memory){\r\n        Storage.Filed memory data = storageContract.store(0);\r\n        return data;\r\n    }\r\n\r\n    function query5OK() public view returns(Storage.Filed[] memory){\r\n        uint max = 1;\r\n        Storage.Filed[] memory data = new Storage.Filed[](max);\r\n        for(uint i = 0; i < max ;i++){\r\n            data[i] = storageContract.store(i);\r\n        }\r\n        return data;\r\n    }\r\n}\r\n```\r\nI can deploy this code to run on Remix. When I execute the query method in Query, this line of code will give an error, where `query`, `query2`, `query3` will all give an error, while `query4`, `query5` will not give an error.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14114/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14114/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
