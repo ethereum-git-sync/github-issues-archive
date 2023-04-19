@@ -76,7 +76,7 @@
       "description": "Something we consider an essential part of Solidity 1.0."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "cameel",
@@ -143,12 +143,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-02-25T06:45:08Z",
-  "updated_at": "2023-04-13T12:05:18Z",
-  "closed_at": null,
+  "updated_at": "2023-04-18T18:31:57Z",
+  "closed_at": "2023-04-18T18:31:57Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "```\r\nusing{a as''\r\n```\r\n\r\nderefs null ptr here\r\n\r\nhttps://github.com/ethereum/solidity/blob/983407762c3423e9c301d5ae56ac7b6d951655df/libsolidity/parsing/Parser.cpp#L998",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14016/reactions",
     "total_count": 0,
@@ -163,7 +182,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14016/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -193,9 +212,9 @@
       "site_admin": false
     },
     "created_at": "2023-02-25T17:03:18Z",
-    "updated_at": "2023-02-25T17:03:18Z",
+    "updated_at": "2023-04-18T15:41:20Z",
     "author_association": "MEMBER",
-    "body": "Interesting. It actually triggers an exception inside STL:\r\n```\r\nUncaught exception:\r\nDynamic exception type: std::logic_error\r\nstd::exception::what: basic_string::_M_construct null not valid\r\n```\r\nAnd it's unrelated to the fact that the directive is truncated. The full form causes the same crash:\r\n```solidity\r\nusing {a as ''} for uint;\r\n```\r\nTokens like `\"\"` or `hex\"\"` trigger the some problem. Interestingly, others that I would expect to cause this as well do not. `()`, `1`, `x`, `\"abc\"`, `false` are all handled properly.\r\n\r\nI found a very similar problem early in the PR's life where using an identifier like `x` was causing a crash. That was because such tokens have no string representation assigned in `Token.h` (they have `nullptr` instead). That's the case for string literals too so I wonder what's different specifically about empty string literals.",
+    "body": "Interesting. It actually triggers an exception inside STL:\r\n```\r\nUncaught exception:\r\nDynamic exception type: std::logic_error\r\nstd::exception::what: basic_string::_M_construct null not valid\r\n```\r\nAnd it's unrelated to the fact that the directive is truncated. The full form causes the same crash:\r\n```solidity\r\nusing {a as ''} for uint;\r\n```\r\nTokens like `\"\"` or `hex\"\"` trigger the same problem. Interestingly, others that I would expect to cause this as well do not. `()`, `1`, `x`, `\"abc\"`, `false` are all handled properly.\r\n\r\nI found a very similar problem early in the PR's life where using an identifier like `x` was causing a crash. That was because such tokens have no string representation assigned in `Token.h` (they have `nullptr` instead). That's the case for string literals too so I wonder what's different specifically about empty string literals.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1445159819/reactions",
       "total_count": 0,

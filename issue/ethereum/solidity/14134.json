@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-04-17T15:13:21Z",
-  "updated_at": "2023-04-17T15:13:21Z",
-  "closed_at": null,
+  "updated_at": "2023-04-18T15:00:46Z",
+  "closed_at": "2023-04-18T15:00:46Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nI was not able to prove that the total amount of ethers sent by the following contract is always less then or equal to the total amount deposited. Is there any reason why the property is not met, or is it an issue regarding the inability of smtchecker to guess the state of `address(this).balance` resulting in a false positive?\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\npragma solidity >= 0.8.2;\r\n\r\ncontract SimpleTransfer {\r\n\r\n    uint sent;         // tracks the total amount sent outside the contract\r\n    uint deposited;    // tracks the total amount deposited in the contract, including the balance at deployment time\r\n\r\n    constructor () payable {\r\n        deposited = address(this).balance;\r\n    }\r\n\r\n    function withdraw(uint _amount) public {\r\n        require(_amount <= address(this).balance);\r\n        sent += _amount;\r\n        (bool succ,) = msg.sender.call{value: _amount}(\"\");\r\n        require(succ);\r\n    }\r\n\r\n    function invariant() public view {\r\n        assert(sent <= deposited);\r\n    }\r\n}\r\n```\r\n\r\nThis is the command I ran:\r\n```\r\nsolc simple_transfer.sol --model-checker-engine chc --model-checker-timeout 0 --model-checker-targets \"assert\"\r\n```\r\n\r\nAnd this is the output:\r\n```\r\nWarning: CHC: Assertion violation happens here.\r\nCounterexample:\r\nsent = 1, deposited = 0\r\n\r\nTransaction trace:\r\nSimpleTransfer.constructor(){ msg.value: 0 }\r\nState: sent = 0, deposited = 0\r\nSimpleTransfer.withdraw(1){ msg.sender: 0x16dd }\r\n    msg.sender.call{value: _amount}(\"\") -- untrusted external call\r\nState: sent = 1, deposited = 0\r\nSimpleTransfer.invariant()\r\n  --> simple_transfer_ext_call_no_balance.sol:21:9:\r\n   |\r\n21 |         assert(sent <= deposited);\r\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n```\r\n\r\n## Notes\r\n- By trusting external calls the property remains unverified, but no counterexample is returned.\r\n- By adding a variable that tracks the contract balance smtchecker works as expected:\r\n```solidity\r\npragma solidity >= 0.8.2;\r\n\r\ncontract SimpleTransfer {\r\n\r\n    uint balance;\r\n    uint sent;\r\n    uint deposited;\r\n\r\n    constructor () payable {\r\n        balance = address(this).balance;\r\n        deposited = balance;\r\n    }\r\n\r\n    function withdraw(uint _amount) public {\r\n        require(_amount <= balance);\r\n        sent += _amount;\r\n        balance -= _amount;\r\n        (bool succ,) = msg.sender.call{value: _amount}(\"\");\r\n        require(succ);\r\n    }\r\n\r\n    function invariant() public view {\r\n        assert(sent <= deposited);   // verified\r\n    }\r\n}\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fsainas",
+    "id": 58312089,
+    "node_id": "MDQ6VXNlcjU4MzEyMDg5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58312089?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fsainas",
+    "html_url": "https://github.com/fsainas",
+    "followers_url": "https://api.github.com/users/fsainas/followers",
+    "following_url": "https://api.github.com/users/fsainas/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fsainas/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fsainas/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fsainas/subscriptions",
+    "organizations_url": "https://api.github.com/users/fsainas/orgs",
+    "repos_url": "https://api.github.com/users/fsainas/repos",
+    "events_url": "https://api.github.com/users/fsainas/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fsainas/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14134/reactions",
     "total_count": 0,
@@ -69,8 +88,95 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14134/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1512915698",
+    "html_url": "https://github.com/ethereum/solidity/issues/14134#issuecomment-1512915698",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14134",
+    "id": 1512915698,
+    "node_id": "IC_kwDOAm_5kc5aLULy",
+    "user": {
+      "login": "leonardoalt",
+      "id": 504195,
+      "node_id": "MDQ6VXNlcjUwNDE5NQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/504195?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/leonardoalt",
+      "html_url": "https://github.com/leonardoalt",
+      "followers_url": "https://api.github.com/users/leonardoalt/followers",
+      "following_url": "https://api.github.com/users/leonardoalt/following{/other_user}",
+      "gists_url": "https://api.github.com/users/leonardoalt/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/leonardoalt/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/leonardoalt/subscriptions",
+      "organizations_url": "https://api.github.com/users/leonardoalt/orgs",
+      "repos_url": "https://api.github.com/users/leonardoalt/repos",
+      "events_url": "https://api.github.com/users/leonardoalt/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/leonardoalt/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-04-18T11:30:15Z",
+    "updated_at": "2023-04-18T11:30:15Z",
+    "author_association": "MEMBER",
+    "body": "The counterexample is actually correct, here's what is happening:\r\n\r\nBesides payable calls into the contract, there are two other ways to increase a contract's balance that can't be caught with code, those are 1) another contract calls `selfdestruct` with your contract as target, or 2) your contract's address is used as the `coinbase` of a block. Because of that, the CHC engine encodes the balance of a contract precisely plus the possibility of it increasing by a `k >= 0` between two external calls to the contract.\r\n\r\nSo what happens in the counterexample (which I agree should be mentioned there somehow) is that even though the contract's balance is `0` after deployment, it may increase before `withdraw` is called. When it does, the call to `withdraw(1)` succeeds, the contract sends 1 to `msg.sender`, and `sent` increases, even though `deposit` was 0.\r\n\r\nIn your second contract, the tracked `balance` doesn't take into account 1) and 2) above, that's why the property is true for that case.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1512915698/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1513311686",
+    "html_url": "https://github.com/ethereum/solidity/issues/14134#issuecomment-1513311686",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14134",
+    "id": 1513311686,
+    "node_id": "IC_kwDOAm_5kc5aM03G",
+    "user": {
+      "login": "fsainas",
+      "id": 58312089,
+      "node_id": "MDQ6VXNlcjU4MzEyMDg5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58312089?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fsainas",
+      "html_url": "https://github.com/fsainas",
+      "followers_url": "https://api.github.com/users/fsainas/followers",
+      "following_url": "https://api.github.com/users/fsainas/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fsainas/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fsainas/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fsainas/subscriptions",
+      "organizations_url": "https://api.github.com/users/fsainas/orgs",
+      "repos_url": "https://api.github.com/users/fsainas/repos",
+      "events_url": "https://api.github.com/users/fsainas/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fsainas/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-04-18T15:00:46Z",
+    "updated_at": "2023-04-18T15:00:46Z",
+    "author_association": "NONE",
+    "body": "Thank you for your concise answer. You are right, mentioning it somehow would definitely make it clearer what might happen. Perhaps putting something like `selfdestruct(address(this)) { address(this).balance: 1 }` in the transaction trace.\r\n\r\nClosing the issue!",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1513311686/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
