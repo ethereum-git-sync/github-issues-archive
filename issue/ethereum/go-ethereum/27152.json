@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27152",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27152/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27152/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27152/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27152",
+  "id": 1679946902,
+  "node_id": "I_kwDOAOvK985kIfSW",
+  "number": 27152,
+  "title": "Tests in console_test.go leaks some routines when error happens.",
+  "user": {
+    "login": "Mskxn",
+    "id": 118117161,
+    "node_id": "U_kgDOBwpTKQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/118117161?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Mskxn",
+    "html_url": "https://github.com/Mskxn",
+    "followers_url": "https://api.github.com/users/Mskxn/followers",
+    "following_url": "https://api.github.com/users/Mskxn/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Mskxn/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Mskxn/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Mskxn/subscriptions",
+    "organizations_url": "https://api.github.com/users/Mskxn/orgs",
+    "repos_url": "https://api.github.com/users/Mskxn/repos",
+    "events_url": "https://api.github.com/users/Mskxn/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Mskxn/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-23T09:32:51Z",
+  "updated_at": "2023-04-23T10:35:40Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I found there is some leak routines the tests using this test helper function.  It says that user should ensure to call Close to avoid leak, but it seems to be some leaks inside this function.\r\n```\r\n// newTester creates a test environment based on which the console can operate.\r\n// Please ensure you call Close() on the returned tester to avoid leaks.\r\nfunc newTester(t *testing.T, confOverride func(*ethconfig.Config)) *tester {\r\n\t// Create a temporary storage for the node keys and initialize it\r\n\tworkspace := t.TempDir()\r\n\r\n\t// Create a networkless protocol stack and start an Ethereum service within\r\n\tstack, err := node.New(&node.Config{DataDir: workspace, UseLightweightKDF: true, Name: testInstance})\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"failed to create node: %v\", err)\r\n\t}\r\n\tethConf := &ethconfig.Config{\r\n\t\tGenesis: core.DeveloperGenesisBlock(15, 11_500_000, common.Address{}),\r\n\t\tMiner: miner.Config{\r\n\t\t\tEtherbase: common.HexToAddress(testAddress),\r\n\t\t},\r\n\t\tEthash: ethash.Config{\r\n\t\t\tPowMode: ethash.ModeTest,\r\n\t\t},\r\n\t}\r\n\tif confOverride != nil {\r\n\t\tconfOverride(ethConf)\r\n\t}\r\n\tethBackend, err := eth.New(stack, ethConf)\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"failed to register Ethereum protocol: %v\", err)\r\n\t}\r\n\t// Start the node and assemble the JavaScript console around it\r\n\tif err = stack.Start(); err != nil {\r\n\t\tt.Fatalf(\"failed to start test stack: %v\", err)\r\n\t}\r\n\tclient, err := stack.Attach()\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"failed to attach to node: %v\", err)\r\n\t}\r\n\tprompter := &hookedPrompter{scheduler: make(chan string)}\r\n\tprinter := new(bytes.Buffer)\r\n\r\n\tconsole, err := New(Config{\r\n\t\tDataDir:  stack.DataDir(),\r\n\t\tDocRoot:  \"testdata\",\r\n\t\tClient:   client,\r\n\t\tPrompter: prompter,\r\n\t\tPrinter:  printer,\r\n\t\tPreload:  []string{\"preload.js\"},\r\n\t})\r\n\tif err != nil {\r\n\t\tt.Fatalf(\"failed to create JavaScript console: %v\", err)\r\n\t}\r\n\t// Create the final tester and return\r\n\treturn &tester{\r\n\t\tworkspace: workspace,\r\n\t\tstack:     stack,\r\n\t\tethereum:  ethBackend,\r\n\t\tconsole:   console,\r\n\t\tinput:     prompter,\r\n\t\toutput:    printer,\r\n\t}\r\n}\r\n```\r\nThese tests, for example, `TestInteractive`, using defer to close the tester but still seems something leaks.\r\n```\r\n=== RUN   TestInteractive\r\n    console_test.go: failed to create JavaScript console: write pipe: i/o timeout\r\n        [Goroutine 27 in state select, with github.com/ethereum/go-ethereum/rpc.(*Client).dispatch on top of the stack:\r\n        goroutine 27 [select]:\r\n        github.com/ethereum/go-ethereum/rpc.(*Client).dispatch(0xc0015a0080, {0x185ade0?, 0xc00043e300})\r\n                /tool/go-ethereum/rpc/client.go:619 +0x2b7\r\n        created by github.com/ethereum/go-ethereum/rpc.initClient\r\n                /tool/go-ethereum/rpc/client.go:259 +0x311\r\n```\r\n\r\nAs these leak occurs always with a error of console-create-failed, I wonder if there is some cleanup missed during some error handling branch.\r\n\r\n#### Steps to reproduce the behaviour\r\ntrigger this error\r\n```\r\nconsole_test.go: failed to create JavaScript console: write pipe: i/o timeout\r\n```\r\n\r\nThe influence unit test are :\r\n`TestPreload`\r\n`TestWelcome`\r\n`TestEvaluate`\r\n`TestInteractive`\r\n`TestPrettyError`\r\n`TestPrettyPrinter`",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27152/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27152/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
