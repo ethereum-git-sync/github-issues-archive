@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14153",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14153/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14153/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14153/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14153",
+  "id": 1681245437,
+  "node_id": "I_kwDOAm_5kc5kNcT9",
+  "number": 14153,
+  "title": "SemVer parser allows invalid range constraint",
+  "user": {
+    "login": "mattdf",
+    "id": 11067114,
+    "node_id": "MDQ6VXNlcjExMDY3MTE0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11067114?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattdf",
+    "html_url": "https://github.com/mattdf",
+    "followers_url": "https://api.github.com/users/mattdf/followers",
+    "following_url": "https://api.github.com/users/mattdf/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattdf/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattdf/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattdf/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattdf/orgs",
+    "repos_url": "https://api.github.com/users/mattdf/repos",
+    "events_url": "https://api.github.com/users/mattdf/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattdf/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-24T13:09:29Z",
+  "updated_at": "2023-04-24T13:09:29Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nThe SemVer parser allows the following constraint to go through:\r\n\r\n```solidity\r\npragma solidity 0.8.19 .0;\r\n```\r\n\r\nBut as far as I can tell this is not valid SemVer syntax, as can be cross referenced here: https://jubianchi.github.io/semver-check/#/constraint/0.8.19%20.0\r\n\r\nI also don't see this form tested in the vectors for [SemVerMatcher.cpp](https://github.com/ethereum/solidity/blob/develop/test/libsolidity/SemVerMatcher.cpp#L201) so I assume it's a parsing oversight? \r\n\r\nFrom the AST, the compiler seems to treat this as a range constraint of sorts:\r\n\r\n```\r\n      {\r\n         \"id\":1,\r\n         \"literals\":[\r\n            \"solidity\",\r\n            \"0.8\",\r\n            \".19\",\r\n            \".0\"\r\n         ],\r\n         \"nodeType\":\"PragmaDirective\",\r\n         \"src\":\"35:26:4\"\r\n      },\r\n```\r\n\r\nThis is a hard \"violation\" to catch with regex because spaces are allowed in SemVer normally, so would be best to remove this so that people do not use it as it ends up requiring a lot of extra code outside of the usual semver libs to process this nonstandard form.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.19\r\n- Target EVM version (as per compiler settings): paris\r\n- Framework/IDE (e.g. Truffle or Remix): N/A\r\n- EVM execution environment / backend / blockchain client: N/A\r\n- Operating system: linux/amd64\r\n\r\n## Steps to Reproduce\r\n\r\nCompile the following contract:\r\n\r\n```solidity\r\npragma solidity 0.8.19 .0;\r\n\r\ncontract Test {}\r\n```\r\n\r\nWith:\r\n\r\n```\r\nsolc Test.sol\r\n```\r\n\r\nExpected result would be `Error: Invalid version pragma.`, but the contract compiles without error.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14153/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14153/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
