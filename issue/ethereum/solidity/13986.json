@@ -67,7 +67,7 @@
       "description": "Something we consider an essential part of Solidity 1.0."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "r0qs",
@@ -114,12 +114,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-02-20T12:12:07Z",
-  "updated_at": "2023-03-20T15:27:44Z",
-  "closed_at": null,
+  "updated_at": "2023-04-27T14:23:50Z",
+  "closed_at": "2023-04-27T14:23:50Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "After the update in #13947, the stale action started nicely by tagging batches of ~20 issues as stale per day. However, now it's gradually tagging fewer and fewer issues. There was only one marked stale yesterday. We need to fix that.\r\n\r\nLooking at the [last run](https://github.com/ethereum/solidity/actions/runs/4216111453/jobs/7317714930), here's a breakdown of the 100 issues it processed:\r\n- ~25 issues were exempt due to labels or milestones\r\n- 1 was newly marked as stale\r\n- ~5 were found not to be stale\r\n- The rest was already marked as stale but not yet old enough to close\r\n\r\nIt's the last category that seems problematic. For these issues it prints `2 operations consumed for this issue` in the log. I think it's stopping when it uses up its allotted number of Github API operations and that happens before it gets to non-stale issues. There's no such message for issues exempt due to labels or milestones.\r\n\r\nThis seems to be a known issue with this action: https://github.com/actions/stale/issues/792. Looks like it can't cope with too many stale issues at once. I think that in the long term it would eventually get to the newer ones, once some of the stale ones get closed off, but having it stall like this is annoying.\r\n\r\nFortunately our stale period is not *that* long, so after 7 days it should start closing old issues and then it will be tagging as stale again. In fact, it should be starting to close the issues it marked stale first about now. Still, we should try to find a workaround:\r\n- At the very least we should bump the number of API operations it's allowed to perform. It's the quickest and simplest thing to do so it's worth trying, but at some point we'll be rate limited. If we don't, it's great because the problem should resolve itself when we're done with our huge stale backlog.\r\n- We could reconfigure the action to go over stale issues first and only then try closing them. Is that possible?\r\n- We could do another period of more aggressive configuration, as we originally planned to, to get through the oldest issues faster.\r\n- Any other ideas?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "NunoFilipeSantos",
+    "id": 2582498,
+    "node_id": "MDQ6VXNlcjI1ODI0OTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2582498?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/NunoFilipeSantos",
+    "html_url": "https://github.com/NunoFilipeSantos",
+    "followers_url": "https://api.github.com/users/NunoFilipeSantos/followers",
+    "following_url": "https://api.github.com/users/NunoFilipeSantos/following{/other_user}",
+    "gists_url": "https://api.github.com/users/NunoFilipeSantos/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/NunoFilipeSantos/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/NunoFilipeSantos/subscriptions",
+    "organizations_url": "https://api.github.com/users/NunoFilipeSantos/orgs",
+    "repos_url": "https://api.github.com/users/NunoFilipeSantos/repos",
+    "events_url": "https://api.github.com/users/NunoFilipeSantos/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/NunoFilipeSantos/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13986/reactions",
     "total_count": 0,
@@ -134,7 +153,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13986/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
