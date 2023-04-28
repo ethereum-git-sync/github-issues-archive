@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27179",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27179/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27179/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27179/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27179",
+  "id": 1686917932,
+  "node_id": "I_kwDOAOvK985kjFMs",
+  "number": 27179,
+  "title": "TxPool with invalid pending transactions",
+  "user": {
+    "login": "LLDay",
+    "id": 25820843,
+    "node_id": "MDQ6VXNlcjI1ODIwODQz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25820843?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/LLDay",
+    "html_url": "https://github.com/LLDay",
+    "followers_url": "https://api.github.com/users/LLDay/followers",
+    "following_url": "https://api.github.com/users/LLDay/following{/other_user}",
+    "gists_url": "https://api.github.com/users/LLDay/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/LLDay/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/LLDay/subscriptions",
+    "organizations_url": "https://api.github.com/users/LLDay/orgs",
+    "repos_url": "https://api.github.com/users/LLDay/repos",
+    "events_url": "https://api.github.com/users/LLDay/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/LLDay/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-27T13:58:20Z",
+  "updated_at": "2023-04-27T13:58:20Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: 1.10.26-stable\r\nOS & Version: Linux\r\n\r\n#### Expected behaviour\r\n\r\nIncoming transactions can pass all validation checks in TxPool, but they may not pass `preCheck` stage. These transactions should be removed from TxPool.\r\n\r\n#### Actual behaviour\r\n\r\nA transaction that has not passed `StateTransition.preCheck` stage, remains pending until it is replaced with another transaction from the same sender or dropped by timeout.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nI started private PoA network, and explicitly added a new test check to the `state_transition.go` file.\r\n\r\n```go\r\nfunc (st *StateTransition) preCheck() error {\r\n    if st.msg.Value().Uint64() == 100 {\r\n        return fmt.Errorf(\"ERROR\")\r\n    }\r\n    ...\r\n}\r\n```\r\n\r\n\r\n````\r\n> from = \"0x01ef19058ea7449853d9dc297237ec5664caeb2e\"\r\n\"0x01ef19058ea7449853d9dc297237ec5664caeb2e\"\r\n> to = \"0xffffffffffffffffffffffffffffffffffffffff\"\r\n\"0xffffffffffffffffffffffffffffffffffffffff\"\r\n> web3.eth.sendTransaction({from, to, value: 101, gas: 21000})\r\n\"0xfc416c055b02946ccf1adc6cb766d379693f6a871b0cd9a773871e351b53fea3\"\r\n> web3.eth.sendTransaction({from, to, value: 101, gas: 21000})\r\n\"0xf87c282d0279c182fe36b8521894cc52b1b6f8759656e7661863fc8ff97825ff\"\r\n> web3.eth.sendTransaction({from, to, value: 100, gas: 21000})\r\n\"0x0832dc24ca954942f5beaf4af843aa77e0301392e37a5b0a42759ae066e91968\"\r\n> web3.eth.sendTransaction({from, to, value: 101, gas: 21000})\r\n\"0x4e3c5756fe189ff2096e584410851ca812cf62ad27dc7eff83ed3147a88dd843\"\r\n> web3.eth.getBalance(to)\r\n\r\n202\r\n> web3.eth.pendingTransactions\r\n[{\r\n    accessList: [],\r\n    blockHash: null,\r\n    blockNumber: null,\r\n    chainId: \"0xecd3b\",\r\n    from: \"0x01ef19058ea7449853d9dc297237ec5664caeb2e\",\r\n    gas: 21000,\r\n    gasPrice: 2750000000,\r\n    hash: \"0x0832dc24ca954942f5beaf4af843aa77e0301392e37a5b0a42759ae066e91968\",\r\n    input: \"0x\",\r\n    maxFeePerGas: 2750000000,\r\n    maxPriorityFeePerGas: 1000000000,\r\n    nonce: 2,\r\n    r: \"0x5119ea994fb1ecae6ca7f8896b36d51eaa663cc7e3e00fc2b79963735c89aac5\",\r\n    s: \"0x3001d41681a2aecf9168c7914651edaa0bdd9c9b530d0b2c5ae5bdf4c58fd97b\",\r\n    to: \"0xffffffffffffffffffffffffffffffffffffffff\",\r\n    transactionIndex: null,\r\n    type: \"0x2\",\r\n    v: \"0x0\",\r\n    value: 100\r\n}, {\r\n    accessList: [],\r\n    blockHash: null,\r\n    blockNumber: null,\r\n    chainId: \"0xecd3b\",\r\n    from: \"0x01ef19058ea7449853d9dc297237ec5664caeb2e\",\r\n    gas: 21000,\r\n    gasPrice: 2531250000,\r\n    hash: \"0x4e3c5756fe189ff2096e584410851ca812cf62ad27dc7eff83ed3147a88dd843\",\r\n    input: \"0x\",\r\n    maxFeePerGas: 2531250000,\r\n    maxPriorityFeePerGas: 1000000000,\r\n    nonce: 3,\r\n    r: \"0x930de51913cd4f368ba92f75f63d4d4d8fcfc6e008974ef2b268a711c3c3d618\",\r\n    s: \"0x41ed5df9e26e856234da0ed0645abc0ed345c94ed7ddc47ac998176a340d7105\",\r\n    to: \"0xffffffffffffffffffffffffffffffffffffffff\",\r\n    transactionIndex: null,\r\n    type: \"0x2\",\r\n    v: \"0x1\",\r\n    value: 101\r\n}]\r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27179/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27179/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
