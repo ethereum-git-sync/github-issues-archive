@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/8522",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/8522/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/8522/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/8522/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/8522",
+  "id": 1469844289,
+  "node_id": "I_kwDOD5KrTM5XnAtB",
+  "number": 8522,
+  "title": "Import tool: figure out a way to handle bot message authors",
+  "user": {
+    "login": "0x-r4bbit",
+    "id": 445106,
+    "node_id": "MDQ6VXNlcjQ0NTEwNg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/445106?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0x-r4bbit",
+    "html_url": "https://github.com/0x-r4bbit",
+    "followers_url": "https://api.github.com/users/0x-r4bbit/followers",
+    "following_url": "https://api.github.com/users/0x-r4bbit/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0x-r4bbit/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0x-r4bbit/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0x-r4bbit/subscriptions",
+    "organizations_url": "https://api.github.com/users/0x-r4bbit/orgs",
+    "repos_url": "https://api.github.com/users/0x-r4bbit/repos",
+    "events_url": "https://api.github.com/users/0x-r4bbit/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0x-r4bbit/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2036563458,
+      "node_id": "MDU6TGFiZWwyMDM2NTYzNDU4",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 4371312179,
+      "node_id": "LA_kwDOD5KrTM8AAAABBIzuMw",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/E:%20Discord-Import",
+      "name": "E: Discord-Import",
+      "color": "c2e0c6",
+      "default": false,
+      "description": "Issues related to importing discord communities into Status"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-30T15:42:47Z",
+  "updated_at": "2022-12-07T13:52:01Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Something that has come up while testing the import tool for the final switch.\r\n@iurimatias has imported a channel which in discord looks like this:\r\n\r\n![Screenshot from 2022-11-30 16-32-18](https://user-images.githubusercontent.com/445106/204840204-14ca4c87-7441-4426-8c7b-bc3cb57de003.png)\r\n\r\nAfter importing the messages into Status, the message looks like this:\r\n\r\n![Screenshot from 2022-11-30 16-33-03](https://user-images.githubusercontent.com/445106/204840395-456aca1d-fe98-4922-b905-0b1b20ecaf68.png)\r\n\r\nHere's what the data looks like:\r\n\r\n```json\r\n      {\r\n        \"id\": \"SOME_ID\"\r\n        \"name\": \"Loud Mountainous Macropod@bridge\",\r\n        \"discriminator\": \"0000\",\r\n        \"nickname\": \"jakubgs@gitter\",\r\n        \"color\": null,\r\n        \"isBot\": true,\r\n        \"avatarUrl\": \"https://cdn.discordapp.com/embed/avatars/0.png\"\r\n      },\r\n```\r\nWe're using the author's `name` property so this should not be causing this. \r\nHowever it turns out that there's more message author data with the same `id` that looks like this (in fact, it's the first message of the channel that has this data):\r\n\r\n```json\r\n    {\r\n        \"id\": \"SOME_ID\",\r\n        \"name\": \"jakubgs@gitter\",\r\n        \"discriminator\": \"0000\",\r\n        \"nickname\": \"jakubgs@gitter\",\r\n        \"color\": null,\r\n        \"isBot\": true,\r\n        \"avatarUrl\": \"https://cdn.discordapp.com/avatars/633669913697058816/c367bdc0b5f5593254719b07526e3d93.png?size=512\"\r\n      },\r\n```\r\n\r\nSo what happens here is that, when the import tool runs into the first message, it'll save the author data (where `name` and `nickname` happen to be the same), then later when it runs into the message where the author data has the same ID but different `name`, it will just associate the already stored author data with that message (which is correct cause it's the same author ID).\r\n\r\nThis is a special case for messages that originate from bots (see `isBot: true`).\r\n\r\nWe need to handle cases where discord messages can have author data where the ID is the same, but the `name` is different (in which case `isBot: true`).\r\n\r\n### Possible solution\r\n\r\nDuring the import, when processing author data, check if `isBot: true` and create a custom author `id` and update the message author id accordingly, such that for every bot message there's a distinct author entry in the database as well.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/8522/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/8522/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
