@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/1129",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/1129/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/1129/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/1129/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/1129",
+  "id": 716075792,
+  "node_id": "MDU6SXNzdWU3MTYwNzU3OTI=",
+  "number": 1129,
+  "title": "Readding deleted wallet results in erroneous behavior",
+  "user": {
+    "login": "dzuqe",
+    "id": 58890963,
+    "node_id": "MDQ6VXNlcjU4ODkwOTYz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58890963?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dzuqe",
+    "html_url": "https://github.com/dzuqe",
+    "followers_url": "https://api.github.com/users/dzuqe/followers",
+    "following_url": "https://api.github.com/users/dzuqe/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dzuqe/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dzuqe/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dzuqe/subscriptions",
+    "organizations_url": "https://api.github.com/users/dzuqe/orgs",
+    "repos_url": "https://api.github.com/users/dzuqe/repos",
+    "events_url": "https://api.github.com/users/dzuqe/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dzuqe/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2036563458,
+      "node_id": "MDU6TGFiZWwyMDM2NTYzNDU4",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 2331339531,
+      "node_id": "MDU6TGFiZWwyMzMxMzM5NTMx",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/wallet-team",
+      "name": "wallet-team",
+      "color": "b60205",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-10-06T22:59:14Z",
+  "updated_at": "2020-12-09T19:18:46Z",
+  "closed_at": "2020-12-09T19:18:46Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Steps\r\n1. Add account with seed phrase\r\n2. Delete account\r\n3. Readd account with seed\r\n\r\nRPC Log\r\n```\r\nERR 2020-10-07 00:53:53+02:00 Error getting Kudos                        tid=284548 file=collectibles.nim:188 msg=\"Connection timed out\"\r\nDBG 2020-10-07 00:54:00+02:00 callPrivateRPC                             topics=\"rpc\" tid=284540 file=core.nim:20 rpc_method=eth_accounts\r\naccount already exists\r\nERR 2020-10-07 00:54:00+02:00 Error storing the new account. Bad password? tid=284540 file=accounts.nim:264\r\nDBG 2020-10-07 00:54:00+02:00 callPrivateRPC                             topics=\"rpc\" tid=284540 file=core.nim:20 rpc_method=eth_getBalance\r\nERR 2020-10-07 00:54:00+02:00 rpc response error                         topics=\"rpc\" tid=284540 file=core.nim:24 result=\"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"id\\\":0,\\\"error\\\":{\\\"code\\\":-32602,\\\"message\\\":\\\"invalid argument 0: hex string has length 0, want 40 for common.Address\\\"}}\"\r\nERR 2020-10-07 00:54:00+02:00 Error in updateBalance                     topics=\"balance-manager\" tid=284540 file=balance_manager.nim:77 message=\"Error getting balance: {\\\"code\\\":-32602,\\\"message\\\":\\\"invalid argument 0: hex string has length 0, want 40 for common.Address\\\"}\"\r\n```\r\n\r\nAccount displays: 0 balance\r\n\r\n4. Click on the account and the app crashes\r\n\r\nTrace\r\n```\r\n/home/hydr063n/dev/nim-status-client/vendor/nimbus-build-system/vendor/Nim/lib/pure/concurrency/threadpool.nim(377) slave\r\n/home/hydr063n/dev/nim-status-client/src/status/threads.nim(12) backgroundTaskWrapper\r\n/home/hydr063n/dev/nim-status-client/src/app/wallet/view.nim(369) backgroundTask\r\n/home/hydr063n/dev/nim-status-client/src/status/wallet/collectibles.nim(113) getCryptoKitties\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-web3/web3/ethtypes.nim(231) parseAddress\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(89) fromHex\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(79) hexToByteArray\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(70) hexToByteArray\r\nError: unhandled exception: hex string too short [ValueError]\r\n/home/hydr063n/dev/nim-status-client/vendor/nimbus-build-system/vendor/Nim/lib/pure/concurrency/threadpool.nim(377) slave\r\n/home/hydr063n/dev/nim-status-client/src/status/threads.nim(12) backgroundTaskWrapper\r\n/home/hydr063n/dev/nim-status-client/src/app/wallet/view.nim(375) backgroundTask\r\n/home/hydr063n/dev/nim-status-client/src/status/wallet/collectibles.nim(192) getKudos\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-web3/web3/ethtypes.nim(231) parseAddress\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(89) fromHex\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(79) hexToByteArray\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(70) hexToByteArray\r\nError: unhandled exception: hex string too short [ValueError]\r\n/home/hydr063n/dev/nim-status-client/vendor/nimbus-build-system/vendor/Nim/lib/pure/concurrency/threadpool.nim(377) slave\r\n/home/hydr063n/dev/nim-status-client/src/status/threads.nim(12) backgroundTaskWrapper\r\n/home/hydr063n/dev/nim-status-client/src/app/wallet/view.nim(381) backgroundTask\r\n/home/hydr063n/dev/nim-status-client/src/status/wallet/collectibles.nim(152) getEthermons\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-web3/web3/ethtypes.nim(231) parseAddress\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(89) fromHex\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(79) hexToByteArray\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(70) hexToByteArray\r\nError: unhandled exception: hex string too short [ValueError]\r\nNo stack traceback available\r\nSIGSEGV: Illegal storage access. (Attempt to read from nil?)\r\n/home/hydr063n/dev/nim-status-client/vendor/nimbus-build-system/vendor/Nim/lib/pure/concurrency/threadpool.nim(377) slave\r\n/home/hydr063n/dev/nim-status-client/src/status/threads.nim(12) backgroundTaskWrapper\r\n/home/hydr063n/dev/nim-status-client/src/app/wallet/view.nim(387) backgroundTask\r\n/home/hydr063n/dev/nim-status-client/src/status/wallet/collectibles.nim(232) getStickers\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-web3/web3/ethtypes.nim(231) parseAddress\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(89) fromHex\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(79) hexToByteArray\r\n/home/hydr063n/dev/nim-status-client/vendor/nim-stew/stew/byteutils.nim(70) hexToByteArray\r\nError: unhandled exception: hex string too short [ValueError]\r\nQWaitCondition: mutex destroy failure (Device or resource busy)\r\nNo stack traceback available\r\nSIGSEGV: Illegal storage access. (Attempt to read from nil?)\r\nNo stack traceback available\r\nSIGSEGV: Illegal storage access. (Attempt to read from nil?)\r\nmalloc(): unsorted double linked list corrupted\r\nTraceback (most recent call last)\r\n/home/hydr063n/dev/nim-status-client/src/nim_status_client.nim(167) nim_status_client\r\n/home/hydr063n/dev/nim-status-client/src/nim_status_client.nim(164) mainProc\r\n/home/hydr063n/dev/nim-status-client/vendor/nimqml/src/nimqml/private/qapplication.nim(8) exec\r\nSIGABRT: Abnormal termination.\r\nNo stack traceback available\r\nSIGSEGV: Illegal storage access. (Attempt to read from nil?)\r\n```",
+  "closed_by": {
+    "login": "iurimatias",
+    "id": 176720,
+    "node_id": "MDQ6VXNlcjE3NjcyMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/176720?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iurimatias",
+    "html_url": "https://github.com/iurimatias",
+    "followers_url": "https://api.github.com/users/iurimatias/followers",
+    "following_url": "https://api.github.com/users/iurimatias/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iurimatias/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iurimatias/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iurimatias/subscriptions",
+    "organizations_url": "https://api.github.com/users/iurimatias/orgs",
+    "repos_url": "https://api.github.com/users/iurimatias/repos",
+    "events_url": "https://api.github.com/users/iurimatias/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iurimatias/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/1129/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/1129/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
