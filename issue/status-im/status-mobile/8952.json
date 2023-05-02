@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-mobile/issues/8952",
+  "repository_url": "https://api.github.com/repos/status-im/status-mobile",
+  "labels_url": "https://api.github.com/repos/status-im/status-mobile/issues/8952/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-mobile/issues/8952/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-mobile/issues/8952/events",
+  "html_url": "https://github.com/status-im/status-mobile/issues/8952",
+  "id": 491029389,
+  "node_id": "MDU6SXNzdWU0OTEwMjkzODk=",
+  "number": 8952,
+  "title": "Release Android build is broken in 'feature/upgrade-to-rn-hermes' branch",
+  "user": {
+    "login": "pedropombeiro",
+    "id": 138074,
+    "node_id": "MDQ6VXNlcjEzODA3NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/138074?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pedropombeiro",
+    "html_url": "https://github.com/pedropombeiro",
+    "followers_url": "https://api.github.com/users/pedropombeiro/followers",
+    "following_url": "https://api.github.com/users/pedropombeiro/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pedropombeiro/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pedropombeiro/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pedropombeiro/subscriptions",
+    "organizations_url": "https://api.github.com/users/pedropombeiro/orgs",
+    "repos_url": "https://api.github.com/users/pedropombeiro/repos",
+    "events_url": "https://api.github.com/users/pedropombeiro/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pedropombeiro/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-09-09T11:05:57Z",
+  "updated_at": "2020-01-15T13:54:36Z",
+  "closed_at": "2019-09-12T14:15:26Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# Problem\n\nIn the https://github.com/status-im/status-react/pull/8943 PR, the Android build works well on Linux machines, but not on macOS. Two problems were found:\n\n- If Hermes is enabled, then this error is shown:\n\n```\n> Task :app:bundleReleaseJsAndAssets\nwarning: the transform cache was reset.\n2019-09-09T10:10:15,590: [cli] unable to talk to your watchman on /private/tmp/nix-build-status-react-build-release-android.drv-0/pedro-state/sock! (No such file or directory)\n\nWatchman:  watchman --no-pretty get-sockname returned with exit code=1, signal=null, stderr= 2019-09-09T10:10:15,590: [cli] unable to talk to your watchman on /private/tmp/nix-build-status-react-build-release-android.drv-0/pedro-state/sock! (No such file or directory)\n\n\n> Task :app:bundleReleaseJsAndAssets FAILED\n\nFAILURE: Build failed with an exception.\n```\n\n- If Hermes is disabled, then index.android.bundle is missing from the resulting APK file.\n\n## Implementation\n\nAfter investigation, it seems that this was triggered by the upgrade of the `sane` JS library from 3.x to 4.x (4.x no longer supporting FSEvents mode). `Sane` upgrade was ultimately triggered by the upgrade of `@react-native-community/cli`.\n\nThe problem is that watchman isn't able to create a socket while inside a Nix pure build. One way to work around this is to kick off watchman from outside prior to the build, and pass the socket path to the build. We could then wrap `watchman` to include the path to the specified socket.\n\n## Acceptance Criteria\n\nAndroid release build works the same way on a Mac as on a Linux machine. Both Hermes and non-Hermes APKs are functional.\n\n## Notes\n\nRandom notes to keep in mind while implementing it. Mostly about related issues and future plans and thoughts.\n\n## Future Steps\n\nSteps which should be taken after this issue has been resolved.",
+  "closed_by": {
+    "login": "pedropombeiro",
+    "id": 138074,
+    "node_id": "MDQ6VXNlcjEzODA3NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/138074?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pedropombeiro",
+    "html_url": "https://github.com/pedropombeiro",
+    "followers_url": "https://api.github.com/users/pedropombeiro/followers",
+    "following_url": "https://api.github.com/users/pedropombeiro/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pedropombeiro/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pedropombeiro/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pedropombeiro/subscriptions",
+    "organizations_url": "https://api.github.com/users/pedropombeiro/orgs",
+    "repos_url": "https://api.github.com/users/pedropombeiro/repos",
+    "events_url": "https://api.github.com/users/pedropombeiro/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pedropombeiro/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/8952/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/8952/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

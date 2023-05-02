@@ -1,0 +1,113 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-mobile/issues/10143",
+  "repository_url": "https://api.github.com/repos/status-im/status-mobile",
+  "labels_url": "https://api.github.com/repos/status-im/status-mobile/issues/10143/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-mobile/issues/10143/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-mobile/issues/10143/events",
+  "html_url": "https://github.com/status-im/status-mobile/issues/10143",
+  "id": 576979283,
+  "node_id": "MDU6SXNzdWU1NzY5NzkyODM=",
+  "number": 10143,
+  "title": "Replace lein with shadow-cljs and improve Nix handling",
+  "user": {
+    "login": "jakubgs",
+    "id": 2212681,
+    "node_id": "MDQ6VXNlcjIyMTI2ODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2212681?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jakubgs",
+    "html_url": "https://github.com/jakubgs",
+    "followers_url": "https://api.github.com/users/jakubgs/followers",
+    "following_url": "https://api.github.com/users/jakubgs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jakubgs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jakubgs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jakubgs/subscriptions",
+    "organizations_url": "https://api.github.com/users/jakubgs/orgs",
+    "repos_url": "https://api.github.com/users/jakubgs/repos",
+    "events_url": "https://api.github.com/users/jakubgs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jakubgs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 807362947,
+      "node_id": "MDU6TGFiZWw4MDczNjI5NDc=",
+      "url": "https://api.github.com/repos/status-im/status-mobile/labels/clojure",
+      "name": "clojure",
+      "color": "244ae2",
+      "default": false,
+      "description": null
+    },
+    {
+      "id": 933023569,
+      "node_id": "MDU6TGFiZWw5MzMwMjM1Njk=",
+      "url": "https://api.github.com/repos/status-im/status-mobile/labels/feature",
+      "name": "feature",
+      "color": "172b9e",
+      "default": false,
+      "description": "feature requests"
+    },
+    {
+      "id": 1311328202,
+      "node_id": "MDU6TGFiZWwxMzExMzI4MjAy",
+      "url": "https://api.github.com/repos/status-im/status-mobile/labels/nix",
+      "name": "nix",
+      "color": "0052cc",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-03-06T14:48:51Z",
+  "updated_at": "2020-04-30T13:44:09Z",
+  "closed_at": "2020-04-30T13:44:09Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "# Description\n\nCurrently we are using two tools to manage Clojure dependencies: `lein` and `clj`\nThis makes dependency management confusing and updating of Nix Clojure dependencies harder.\n\n# Problem\n\nBased on my discussion with @yenda about this I found out several things.\n\n* There are two Clojure files defining the same dependencies:\n  - `deps.clj` used by `clj` which is used by devs\n  - `project.clj` used by `lein` which is used in CI\n* `nix/tools/lein/generate-nix.sh` updates [`nix/lein/lein-project-deps-maven-inputs.txt`](https://github.com/status-im/status-react/blob/develop/nix/lein/lein-project-deps-maven-inputs.txt)\n* It does that by calling `lein with-profile prod cljsbuild once` and parsing the `stdout`\n* That output in turn is used to generate the [`nix/lein/lein-project-deps.nix`](https://github.com/status-im/status-react/blob/develop/nix/lein/lein-project-deps.nix) file\n\n# Solution\n\nThe possible solution wold be to drop both `lein` and `clj` in favor of [`shadow-cljs`](https://github.com/thheller/shadow-cljs) and then using the [`classpath`](https://shadow-cljs.github.io/docs/UsersGuide.html#_the_classpath) to get a full list of used Clojure dependencies for Nix.\nThen the rest of information like SHA1 hashes and repo URLs could be acquired from files stored in `~/.m2`, like `_remote.repositories` or `POM` files.",
+  "closed_by": {
+    "login": "yenda",
+    "id": 1181225,
+    "node_id": "MDQ6VXNlcjExODEyMjU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1181225?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yenda",
+    "html_url": "https://github.com/yenda",
+    "followers_url": "https://api.github.com/users/yenda/followers",
+    "following_url": "https://api.github.com/users/yenda/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yenda/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yenda/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yenda/subscriptions",
+    "organizations_url": "https://api.github.com/users/yenda/orgs",
+    "repos_url": "https://api.github.com/users/yenda/repos",
+    "events_url": "https://api.github.com/users/yenda/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yenda/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/10143/reactions",
+    "total_count": 5,
+    "+1": 2,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 3,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/10143/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
