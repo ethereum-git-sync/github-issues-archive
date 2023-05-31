@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto/issues/355",
+  "repository_url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto",
+  "labels_url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto/issues/355/labels{/name}",
+  "comments_url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto/issues/355/comments",
+  "events_url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto/issues/355/events",
+  "html_url": "https://github.com/MyCryptoHQ/MyCrypto/issues/355",
+  "id": 272422096,
+  "node_id": "MDU6SXNzdWUyNzI0MjIwOTY=",
+  "number": 355,
+  "title": "Refactor Transaction Stack",
+  "user": {
+    "login": "HenryNguyen5",
+    "id": 6404866,
+    "node_id": "MDQ6VXNlcjY0MDQ4NjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6404866?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/HenryNguyen5",
+    "html_url": "https://github.com/HenryNguyen5",
+    "followers_url": "https://api.github.com/users/HenryNguyen5/followers",
+    "following_url": "https://api.github.com/users/HenryNguyen5/following{/other_user}",
+    "gists_url": "https://api.github.com/users/HenryNguyen5/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/HenryNguyen5/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/HenryNguyen5/subscriptions",
+    "organizations_url": "https://api.github.com/users/HenryNguyen5/orgs",
+    "repos_url": "https://api.github.com/users/HenryNguyen5/repos",
+    "events_url": "https://api.github.com/users/HenryNguyen5/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/HenryNguyen5/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 654893566,
+      "node_id": "MDU6TGFiZWw2NTQ4OTM1NjY=",
+      "url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto/labels/type:%20enhancement",
+      "name": "type: enhancement",
+      "color": "008080",
+      "default": false,
+      "description": "Items that improve overall user experience and/or expand on existing features."
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2017-11-09T02:44:49Z",
+  "updated_at": "2017-12-18T21:30:34Z",
+  "closed_at": "2017-12-18T21:30:34Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Motivation\r\nThe current state of `transaction.ts` makes it difficult to test the library since each function deals with both ether and tokens combined, along with checking conditionals (skipping validation, offline check) and doing api calls (calling node for nonce values, token / ether balances). Ideally, a lot of this functionality can be split into two different files that deal with only ether or token related transactions, along with separate validators. Then at the top level functions, these smaller functions can be called. \r\n\r\n### Replacing hex strings with BN / Buffer\r\nWhen dealing with hex strings, a lot of overhead is encountered from needing to deal with the `0x` prefix, or if the aformented string is in base 10 or 16; along with needing to cast to appropriate types to do value comparisons. By only dealing with BN / Buffers in our internal libs, we can avoid these pitfalls, resulting in concise and clear code where the input is not ambiguous. Achieving this requires clear separation from user input / api calls from internal code.\r\n\r\n### Implementation Goals \r\n\r\n- [x] Any user inputs that deal with things like Ether, Tokens, Gas, Addresses, etc should use components that automatically convert the user input into the internal type (BN / Buffer). \r\n\r\nAn example of this can be seen in #319 with `UnitDisplay` and `UnitConverter`. These two components can be specialised into single-use components such as `EtherDisplay`, `EtherConverter`, `AddressDisplay`, `AddressConverter`, `TokenDisplay`, `TokenConverter`. This would allow for better semantics in our JSX and cleaner component usage.\r\n\r\n- [x] Any external calls that require conversion from our internal type to another type should be done at the latest point possible. \r\n\r\nThis is somewhat reflected in the `Converter` units mentioned above, where they should be used at the last point of contact between the internal type and the UI. Off the top of my head the most important libraries that would need this conversion would be the hardware wallet libraries. Ex. Trezor library doesn't handle BN/Buffer, it expects non-prefixed hex strings, so we should convert our internal type to hex strings just before calling the trezor function, then convert it back to our internal type as early as possible.\r\n\r\n- [x] `transaction.ts` should be free of API calls and limit conditionals. \r\n\r\nThis would be done to decrease testing surface and reduce redundancy. Current API calls in `transaction.ts` include calls for getting the nonce / token / ether balance of the account. All of these calls are unessescary in this library since the components making these calls already have nonce / token / ether balance in their redux state or can use a dispatched action to do an api call to do so. This limits where we can have network related errors and ideally would isolate it to specific libraries that only deal with network requests (making our infrastructure more stable).\r\n\r\n- [x] `transaction.ts` should expose seperate functions for the generation of transactions of ether or tokens. \r\n\r\nBy doing this, viewers of the code can clearly see what transactions are involved with ether, and what transactions are involved with tokens. This also simplifies the library itself and makes it easier to reason about things like validation of balances and computing required gas limits / balances.\r\n\r\n\r\n",
+  "closed_by": {
+    "login": "dternyak",
+    "id": 7861465,
+    "node_id": "MDQ6VXNlcjc4NjE0NjU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7861465?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dternyak",
+    "html_url": "https://github.com/dternyak",
+    "followers_url": "https://api.github.com/users/dternyak/followers",
+    "following_url": "https://api.github.com/users/dternyak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dternyak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dternyak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dternyak/subscriptions",
+    "organizations_url": "https://api.github.com/users/dternyak/orgs",
+    "repos_url": "https://api.github.com/users/dternyak/repos",
+    "events_url": "https://api.github.com/users/dternyak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dternyak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto/issues/355/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/MyCryptoHQ/MyCrypto/issues/355/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
