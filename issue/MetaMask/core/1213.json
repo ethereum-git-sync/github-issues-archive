@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/MetaMask/core/issues/1213",
+  "repository_url": "https://api.github.com/repos/MetaMask/core",
+  "labels_url": "https://api.github.com/repos/MetaMask/core/issues/1213/labels{/name}",
+  "comments_url": "https://api.github.com/repos/MetaMask/core/issues/1213/comments",
+  "events_url": "https://api.github.com/repos/MetaMask/core/issues/1213/events",
+  "html_url": "https://github.com/MetaMask/core/issues/1213",
+  "id": 1674374647,
+  "node_id": "I_kwDOCBB0Cc5jzO33",
+  "number": 1213,
+  "title": "AssetsContractController: Unit tests fail on external endpoints",
+  "user": {
+    "login": "legobeat",
+    "id": 109787230,
+    "node_id": "U_kgDOBos4Xg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/109787230?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/legobeat",
+    "html_url": "https://github.com/legobeat",
+    "followers_url": "https://api.github.com/users/legobeat/followers",
+    "following_url": "https://api.github.com/users/legobeat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/legobeat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/legobeat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/legobeat/subscriptions",
+    "organizations_url": "https://api.github.com/users/legobeat/orgs",
+    "repos_url": "https://api.github.com/users/legobeat/repos",
+    "events_url": "https://api.github.com/users/legobeat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/legobeat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-19T07:49:23Z",
+  "updated_at": "2023-04-19T07:51:17Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nThe assets-controller tests are failing when run locally. Is there some additional setup needed for proxying the requests properly..?\r\n\r\nAs can be seen in the log below, the tests fail on the requests to the metafi endpoints. However, from the same shell that the tests are run from, the same endpoint responds without issues:\r\n\r\n```\r\n$ curl -i https://proxy.metafi.codefi.network/opensea/v1/api/v1/asset_contract/0x495f947276749Ce646f68AC8c248420045cb7b5e\r\nHTTP/2 200\r\ndate: [...]\r\ncontent-type: application/json\r\nx-trace-id: [...]\r\nvary: Accept, Origin, Accept-Encoding\r\nallow: GET, OPTIONS\r\ncache-control: public, max-age=300\r\nage: 10\r\nx-frame-options: DENY\r\nx-frame-options: SAMEORIGIN\r\nx-content-type-options: nosniff\r\nreferrer-policy: same-origin\r\ncross-origin-opener-policy: same-origin\r\ncf-cache-status: DYNAMIC\r\nlast-modified: [...]\r\nstrict-transport-security: max-age=15724800; includeSubDomains\r\nserver: cloudflare\r\ncf-ray: [...]\r\n\r\n```\r\n\r\n###  Environment\r\n\r\nFresh checkout and `node_modules` from current `main`.\r\n\r\n```\r\n$ env | grep -i proxy\r\n\r\n$ node --version\r\nv18.13.0\r\n\r\n$ yarn --version\r\n3.3.0\r\n```\r\n\r\n### Log\r\n\r\n```\r\n# inside `packages/assets-controllers`\r\n$ yarn test\r\n\r\n[...]\r\n\r\n PASS   assets-controllers  src/NftController.test.ts (46.552 s)\r\n  ● Console\r\n\r\n    console.error\r\n      FetchError {\r\n        message: 'request to https://proxy.metafi.codefi.network/opensea/v1/api/v1/asset_contract/0x495f947276749Ce646f68AC8c248420045cb7b5e failed, reason: Failed to fetch',\r\n        type: 'system',\r\n        errno: undefined,\r\n        code: undefined\r\n      }\r\n\r\n      534 |       error === TIMEOUT_ERROR)\r\n      535 |   ) {\r\n    > 536 |     console.error(error);\r\n          |             ^\r\n      537 |   } else {\r\n      538 |     throw error;\r\n      539 |   }\r\n\r\n      at logOrRethrowError (../controller-utils/src/util.ts:536:13)\r\n      at ../controller-utils/src/util.ts:370:5\r\n          at Generator.throw (<anonymous>)\r\n      at rejected (../controller-utils/src/util.ts:6:65)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n\r\n    console.error\r\n      FetchError {\r\n        message: 'request to https://proxy.metafi.codefi.network/opensea/v1/api/v1/asset_contract/0x6EbeAf8e8E946F0716E6533A6f2cefc83f60e8Ab failed, reason: Failed to fetch',\r\n        type: 'system',\r\n        errno: undefined,\r\n        code: undefined\r\n      }\r\n\r\n      534 |       error === TIMEOUT_ERROR)\r\n      535 |   ) {\r\n    > 536 |     console.error(error);\r\n          |             ^\r\n      537 |   } else {\r\n      538 |     throw error;\r\n      539 |   }\r\n\r\n      at logOrRethrowError (../controller-utils/src/util.ts:536:13)\r\n      at ../controller-utils/src/util.ts:370:5\r\n          at Generator.throw (<anonymous>)\r\n      at rejected (../controller-utils/src/util.ts:6:65)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n\r\n    console.error\r\n      FetchError {\r\n        message: 'request to https://proxy.metafi.codefi.network/opensea/v1/api/v1/asset_contract/0x60F80121C31A0d46B5279700f9DF786054aa5eE5 failed, reason: Failed to fetch',\r\n        type: 'system',\r\n        errno: undefined,\r\n        code: undefined\r\n      }\r\n\r\n      534 |       error === TIMEOUT_ERROR)\r\n      535 |   ) {\r\n    > 536 |     console.error(error);\r\n          |             ^\r\n      537 |   } else {\r\n      538 |     throw error;\r\n      539 |   }\r\n\r\n      at logOrRethrowError (../controller-utils/src/util.ts:536:13)\r\n      at ../controller-utils/src/util.ts:370:5\r\n          at Generator.throw (<anonymous>)\r\n      at rejected (../controller-utils/src/util.ts:6:65)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n\r\n    console.error\r\n      FetchError {\r\n        message: 'request to https://proxy.metafi.codefi.network/opensea/v1/api/v1/asset/0x60F80121C31A0d46B5279700f9DF786054aa5eE5/1144858 failed, reason: Failed to fetch',\r\n        type: 'system',\r\n        errno: undefined,\r\n        code: undefined\r\n      }\r\n\r\n      534 |       error === TIMEOUT_ERROR)\r\n      535 |   ) {\r\n    > 536 |     console.error(error);\r\n          |             ^\r\n      537 |   } else {\r\n      538 |     throw error;\r\n      539 |   }\r\n\r\n      at logOrRethrowError (../controller-utils/src/util.ts:536:13)\r\n      at ../controller-utils/src/util.ts:370:5\r\n          at Generator.throw (<anonymous>)\r\n      at rejected (../controller-utils/src/util.ts:6:65)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n\r\n FAIL   assets-controllers  src/AssetsContractController.test.ts (56.857 s)\r\n\r\n[...]\r\n\r\n------------------------------------|---------|----------|---------|---------|---------------------------\r\nFile                                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s\r\n------------------------------------|---------|----------|---------|---------|---------------------------\r\nAll files                           |   96.73 |    89.39 |    96.2 |   96.65 |\r\n src                                |   97.99 |    91.71 |   97.79 |   97.94 |\r\n  AccountTrackerController.ts       |   98.25 |    83.33 |     100 |   98.15 | 186\r\n  AssetsContractController.ts       |   97.47 |    93.55 |     100 |   97.47 | 187,371\r\n  CurrencyRateController.ts         |     100 |      100 |     100 |     100 |\r\n  NftController.ts                  |   98.11 |    88.52 |     100 |   98.08 | 269,395,1125,1188,1257\r\n  NftDetectionController.ts         |   95.31 |    85.37 |   93.75 |   95.08 | 181,270,284\r\n  TokenBalancesController.ts        |     100 |      100 |     100 |     100 |\r\n  TokenDetectionController.ts       |   98.77 |    84.85 |     100 |   98.73 | 135\r\n  TokenListController.ts            |   98.94 |    89.13 |     100 |   98.88 | 151\r\n  TokenRatesController.ts           |   95.74 |    93.48 |   96.15 |   95.56 | 126,207,252,413\r\n  TokensController.ts               |   97.18 |    94.71 |   90.91 |   97.18 | 299,534,538-541,641-651\r\n  assetsUtil.ts                     |     100 |      100 |     100 |     100 |\r\n  crypto-compare.ts                 |     100 |      100 |     100 |     100 |\r\n  token-service.ts                  |     100 |       95 |     100 |     100 | 129\r\n src/Standards                      |   97.14 |    66.67 |     100 |   97.14 |\r\n  ERC20Standard.ts                  |   97.14 |    66.67 |     100 |   97.14 | 82\r\n src/Standards/NftStandards/ERC1155 |   64.71 |    11.76 |   68.42 |      64 |\r\n  ERC1155Standard.ts                |   64.71 |    11.76 |   68.42 |      64 | 44-45,111-126,167,172-182\r\n src/Standards/NftStandards/ERC721  |   98.44 |       85 |     100 |   98.36 |\r\n  ERC721Standard.ts                 |   98.44 |       85 |     100 |   98.36 | 204\r\n------------------------------------|---------|----------|---------|---------|---------------------------\r\nTest Suites: 1 failed, 15 passed, 16 total\r\nTests:       3 failed, 294 passed, 297 total\r\nSnapshots:   0 total\r\nTime:        61.658 s\r\nRan all test suites.\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/MetaMask/core/issues/1213/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/1213/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
