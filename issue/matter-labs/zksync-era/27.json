@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/27",
+  "repository_url": "https://api.github.com/repos/matter-labs/zksync-era",
+  "labels_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/27/labels{/name}",
+  "comments_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/27/comments",
+  "events_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/27/events",
+  "html_url": "https://github.com/matter-labs/zksync-era/issues/27",
+  "id": 1683464117,
+  "node_id": "I_kwDOI-FneM5kV5-1",
+  "number": 27,
+  "title": "Bug/Logic error in tx() method of DeployContractBuilder in zksync-rs ",
+  "user": {
+    "login": "sammyshakes",
+    "id": 76663878,
+    "node_id": "MDQ6VXNlcjc2NjYzODc4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/76663878?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sammyshakes",
+    "html_url": "https://github.com/sammyshakes",
+    "followers_url": "https://api.github.com/users/sammyshakes/followers",
+    "following_url": "https://api.github.com/users/sammyshakes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sammyshakes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sammyshakes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sammyshakes/subscriptions",
+    "organizations_url": "https://api.github.com/users/sammyshakes/orgs",
+    "repos_url": "https://api.github.com/users/sammyshakes/repos",
+    "events_url": "https://api.github.com/users/sammyshakes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sammyshakes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-25T16:07:52Z",
+  "updated_at": "2023-04-25T16:57:57Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Info\r\n---\r\n\r\nThere seems to be a bug/logic error in the rust sdk that has been preventing the deployment of Child contracts from a Factory \r\nhttps://github.com/matter-labs/zksync-era/blob/48fe6e27110c1fe1a438c5375fb256890e8017b1/sdk/zksync-rs/src/operations/deploy_contract.rs#L76 it is trying to feed in only the bytecode of the contract instead of all factory deps.. I changed [this line](https://github.com/matter-labs/zksync-era/blob/48fe6e27110c1fe1a438c5375fb256890e8017b1/sdk/zksync-rs/src/operations/deploy_contract.rs#L76) from:\r\n```\r\nSome(vec![bytecode.clone()])\r\n``` \r\nto:\r\n ```\r\nSome(factory_deps)\r\n``` \r\nand it worked for my use case.. \r\n\r\n## Error received\r\n\r\nThe error received when attempting to deploy a child contract from a SimpleFactory contract by calling `newStepChild()` [here](https://github.com/sammyshakes/sample-fzksync-project/blob/e9db7d7de2ac87e971f8f41cdb4c608122963f04/src/SimpleFactory.sol#L92).\r\n\r\n```\r\nErrorObject { code: ServerError(3), message: \"Failed to submit transaction: cannot estimate gas: The code hash is not known\", data: Some(RawValue({\"code\":104,\"message\":\"cannot estimate gas: The code hash is not known\"})) }\r\n```\r\nOnce i made the change stated above, `newStepChild()` executed and deployed successfully.\r\n*If this is the right fix, I am happy to make a PR for it",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/27/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/27/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
