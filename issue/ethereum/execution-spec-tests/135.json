@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/135",
+  "repository_url": "https://api.github.com/repos/ethereum/execution-spec-tests",
+  "labels_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/135/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/135/comments",
+  "events_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/135/events",
+  "html_url": "https://github.com/ethereum/execution-spec-tests/issues/135",
+  "id": 1730384873,
+  "node_id": "I_kwDOIQGLK85nI5Pp",
+  "number": 135,
+  "title": "evm version not passed to solc when compiling yul",
+  "user": {
+    "login": "danceratopz",
+    "id": 91727015,
+    "node_id": "U_kgDOBXekpw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/91727015?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/danceratopz",
+    "html_url": "https://github.com/danceratopz",
+    "followers_url": "https://api.github.com/users/danceratopz/followers",
+    "following_url": "https://api.github.com/users/danceratopz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/danceratopz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/danceratopz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/danceratopz/subscriptions",
+    "organizations_url": "https://api.github.com/users/danceratopz/orgs",
+    "repos_url": "https://api.github.com/users/danceratopz/repos",
+    "events_url": "https://api.github.com/users/danceratopz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/danceratopz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-29T09:10:11Z",
+  "updated_at": "2023-05-29T09:10:11Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Currently, several fillers fail (for forks older than Shanghai) if ran with solc 0.8.20, which added Shanghai support.\r\n\r\nThis is due to the resulting bytecode containing an opcode that isn't recognized by the `evm` tool for older forks. For example, the bytecode from `fillers/example/example_yul.py` compiled with solc 0.8.20 contains PUSH0 which is not recognized by forks prior to Shanghai. \r\n\r\nThe contract code specified via the `Yul` helper class is compiled with solc using the flags `--assemble -`  (the yul code is provided on stdin). This can be fixed by the evm version to compile via `--evm-version=FORK`:\r\n```\r\n  --evm-version version (=shanghai)\r\n                       Select desired EVM version. Either homestead, \r\n                       tangerineWhistle, spuriousDragon, byzantium, \r\n                       constantinople, petersburg, istanbul, berlin, london, \r\n                       paris or shanghai.\r\n```\r\nThis could be added as a parameter to Yul's `assemble()` method, but this call is tucked away. Might need a bit of clean-up to propagate the fork value to where it is needed.\r\n\r\nTo check: Whether some fillers call assemble() directly.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/135/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/135/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
