@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14275",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14275/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14275/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14275/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14275",
+  "id": 1727307678,
+  "node_id": "I_kwDOAm_5kc5m9J-e",
+  "number": 14275,
+  "title": "[SMTChecker] Option `--model-checker-contract` does not work as expected",
+  "user": {
+    "login": "blishko",
+    "id": 16404346,
+    "node_id": "MDQ6VXNlcjE2NDA0MzQ2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16404346?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/blishko",
+    "html_url": "https://github.com/blishko",
+    "followers_url": "https://api.github.com/users/blishko/followers",
+    "following_url": "https://api.github.com/users/blishko/following{/other_user}",
+    "gists_url": "https://api.github.com/users/blishko/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/blishko/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/blishko/subscriptions",
+    "organizations_url": "https://api.github.com/users/blishko/orgs",
+    "repos_url": "https://api.github.com/users/blishko/repos",
+    "events_url": "https://api.github.com/users/blishko/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/blishko/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-26T10:03:14Z",
+  "updated_at": "2023-05-26T10:03:14Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Consider the following two contracts:\r\n```\r\ncontract D {\r\n    function dec(uint v) public pure returns (uint) {\r\n        --v;\r\n        return v;\r\n    }\r\n}\r\n\r\ncontract C {\r\n    function f() public pure returns (uint) {\r\n        uint ret = d.dec(0);\r\n        return ret;\r\n    }\r\n}\r\n```\r\n\r\nWe would like to check that SMTChecker detects the underflow in `D.dec` when `C.f` is called.\r\nHowever, with default settings, it will much more likely detect the underflow when `D.dec` is called directly.\r\n\r\nWe should have an option to restrict the analysis to consider only contract C as the entry point.\r\nThere exists an option, `--model-checker-contract` , that should allow us to restrict the analysis, but currently it does not work as expected.\r\nAt the moment, SMTChecker analyzes all contracts in the source unit specified with this option, disregarding the actual contract specified.\r\n\r\nIn my opinion, the option should restrict the possible entry point to the contracts specified, but we still need to analyze other contracts if their functions are called from the analyzed contract and we are in the trusted mode.\r\n\r\nIf we manage to resolve this issue, we should add the test above to SMTChecker's test suite for trusted external calls.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14275/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14275/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

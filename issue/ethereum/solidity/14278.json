@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14278",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14278/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14278/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14278/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14278",
+  "id": 1729957820,
+  "node_id": "I_kwDOAm_5kc5nHQ-8",
+  "number": 14278,
+  "title": "Check memory limit before copy dynamic array from storage to memory(gas optimization)",
+  "user": {
+    "login": "Dha0",
+    "id": 42204485,
+    "node_id": "MDQ6VXNlcjQyMjA0NDg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/42204485?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Dha0",
+    "html_url": "https://github.com/Dha0",
+    "followers_url": "https://api.github.com/users/Dha0/followers",
+    "following_url": "https://api.github.com/users/Dha0/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Dha0/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Dha0/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Dha0/subscriptions",
+    "organizations_url": "https://api.github.com/users/Dha0/orgs",
+    "repos_url": "https://api.github.com/users/Dha0/repos",
+    "events_url": "https://api.github.com/users/Dha0/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Dha0/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-29T03:37:14Z",
+  "updated_at": "2023-05-29T03:37:14Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!--## Prerequisites\r\n\r\n- First, many thanks for taking part in the community. We really appreciate that.\r\n- We realize there is a lot of information requested here. We ask only that you do your best to provide as much information as possible so we can better help you.\r\n- Support questions are better asked in one of the following locations:\r\n    - [Solidity chat](https://gitter.im/ethereum/solidity)\r\n    - [Stack Overflow](https://ethereum.stackexchange.com/)\r\n- Ensure the issue isn't already reported.\r\n- The issue should be reproducible with the latest solidity version; however, this isn't a hard requirement and being reproducible with an older version is sufficient.\r\n\r\n*Delete the above section and the instructions in the sections below before submitting*\r\n-->\r\n\r\n## Description\r\n\r\n<!--Please shortly describe the bug you have found, and what you expect instead.-->\r\n\r\n## Environment\r\n\r\n- Compiler version: *\r\n- Target EVM version (as per compiler settings): *\r\n- Framework/IDE (e.g. Truffle or Remix): Visual studio code\r\n- EVM execution environment / backend / blockchain client: *\r\n- Operating system: linux\r\n\r\n## Steps to Reproduce\r\n\r\nWhen compiling the following function in Solidity, when the line `uint[] memory ma = a;` is compiled, the operation of copying the value from storage to memory is executed first, and then the memory usage length check is performed. When `uint[] a` is relatively long, it consumes more gas. **To optimize gas usage, it is recommended to perform the memory check based on the array length before the copy operation.**\r\n\r\n```\r\ncontract TestMemory{\r\n    uint[] a;\r\n    function b() public{\r\n        uint[] memory ma = a;\r\n    }\r\n}\r\n```\r\nHere is yul code:\r\n```\r\nfunction abi_encode_t_array$_t_uint256_$dyn_storage_to_t_array$_t_uint256_$dyn_memory_ptr(value, pos)  -> end  {\r\n                let length := array_length_t_array$_t_uint256_$dyn_storage(value)\r\n                pos := array_storeLengthForEncoding_t_array$_t_uint256_$dyn_memory_ptr(pos, length)\r\n                let baseRef := array_dataslot_t_array$_t_uint256_$dyn_storage(value)\r\n                let srcPtr := baseRef\r\n                for { let i := 0 } lt(i, length) { i := add(i, 1) }\r\n                {\r\n                    let elementValue0 := read_from_storage_offset_0_t_uint256(srcPtr)\r\n                    pos := abi_encodeUpdatedPos_t_uint256_to_t_uint256(elementValue0, pos)\r\n                    srcPtr := array_nextElement_t_array$_t_uint256_$dyn_storage(srcPtr)\r\n                }\r\n                end := pos\r\n            }\r\n\r\n            function abi_encodeUpdatedPos_t_array$_t_uint256_$dyn_storage_to_t_array$_t_uint256_$dyn_memory_ptr(value0, pos) -> updatedPos {\r\n                updatedPos := abi_encode_t_array$_t_uint256_$dyn_storage_to_t_array$_t_uint256_$dyn_memory_ptr(value0, pos)\r\n            }\r\n\r\nfunction finalize_allocation(memPtr, size) {\r\n                let newFreePtr := add(memPtr, round_up_to_mul_of_32(size))\r\n                // protect against overflow\r\n                if or(gt(newFreePtr, 0xffffffffffffffff), lt(newFreePtr, memPtr)) { panic_error_0x41() }\r\n                mstore(64, newFreePtr)\r\n            }\r\n\r\nfunction copy_array_from_storage_to_memory_t_array$_t_uint256_$dyn_storage(slot) -> memPtr {\r\n                memPtr := allocate_unbounded()\r\n                let end := abi_encodeUpdatedPos_t_array$_t_uint256_$dyn_storage_to_t_array$_t_uint256_$dyn_memory_ptr(slot, memPtr)\r\n                finalize_allocation(memPtr, sub(end, memPtr))\r\n            }\r\n```\r\n\r\n\r\n<!--\r\nPlease provide a *minimal* source code example to trigger the bug you have found.\r\nPlease also mention any command line flags that are necessary for triggering the bug.\r\nProvide as much information as necessary to reproduce the bug.\r\n\r\n```solidity\r\n// Some *minimal* Solidity source code to reproduce the bug.\r\n// ...\r\n```\r\n-->\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14278/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14278/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14211",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14211/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14211/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14211/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14211",
+  "id": 1704276553,
+  "node_id": "I_kwDOAm_5kc5llTJJ",
+  "number": 14211,
+  "title": "SMTChecker does not handle increment expression in if statement condition correctly",
+  "user": {
+    "login": "pgebal",
+    "id": 23142088,
+    "node_id": "MDQ6VXNlcjIzMTQyMDg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/23142088?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pgebal",
+    "html_url": "https://github.com/pgebal",
+    "followers_url": "https://api.github.com/users/pgebal/followers",
+    "following_url": "https://api.github.com/users/pgebal/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pgebal/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pgebal/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pgebal/subscriptions",
+    "organizations_url": "https://api.github.com/users/pgebal/orgs",
+    "repos_url": "https://api.github.com/users/pgebal/repos",
+    "events_url": "https://api.github.com/users/pgebal/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pgebal/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4810143649,
+      "node_id": "LA_kwDOAm_5kc8AAAABHrT3oQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/smt",
+      "name": "smt",
+      "color": "1d76db",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-10T16:28:20Z",
+  "updated_at": "2023-05-15T11:34:24Z",
+  "closed_at": "2023-05-15T11:34:24Z",
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "## Environment\r\n\r\n- Compiler version:\r\ncommit https://github.com/ethereum/solidity/commit/a1b79de64235f13e6b06e088fe6365c5a12d13d3\r\n\r\n## Steps to Reproduce\r\nUse the following standard json settings file:\r\n```\r\n{\r\n    \"language\": \"Solidity\",\r\n    \"sources\": {\r\n        \"C.sol\": {\r\n            \"urls\": [\"./C.sol\"]\r\n        }\r\n    },\r\n    \"settings\": {\r\n        \"modelChecker\": {\r\n            \"contracts\": {\r\n                \"C.sol\": [\"C\"]\r\n            },\r\n            \"engine\": \"bmc\",\r\n            \"showUnproved\": true,\r\n            \"solvers\": [\"z3\"],\r\n            \"targets\": [\"assert\"]\r\n        }\r\n    }\r\n}\r\n```\r\nto compile this contract:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract C {\r\n  function f() public pure {\r\n    uint x;\r\n    uint y;\r\n    if (++x < 3)\r\n      y = 1;\r\n \r\n    assert(x == 1);\r\n  }\r\n}\r\n```\r\n\r\nThe output is\r\n```\r\nWarning: BMC: Assertion violation happens here.\\n  --> C.sol:11:5:\\n   |\\n11 |     assert(x == 1);\\n   |     ^^^^^^^^^^^^^^\\n\r\nNote: Counterexample:\\n  x = 2\\n  y = 1\\n\r\n```\r\nIn this case x = 1 and my expectation is that SMTChecker does not report assertion violation.\r\n",
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14211/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14211/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

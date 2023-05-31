@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14250",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14250/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14250/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14250/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14250",
+  "id": 1717369288,
+  "node_id": "I_kwDOAm_5kc5mXPnI",
+  "number": 14250,
+  "title": "Contract bytecode changes vastly when independent contracts added to the compiler ",
+  "user": {
+    "login": "kuzdogan",
+    "id": 13069972,
+    "node_id": "MDQ6VXNlcjEzMDY5OTcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13069972?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kuzdogan",
+    "html_url": "https://github.com/kuzdogan",
+    "followers_url": "https://api.github.com/users/kuzdogan/followers",
+    "following_url": "https://api.github.com/users/kuzdogan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kuzdogan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kuzdogan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kuzdogan/subscriptions",
+    "organizations_url": "https://api.github.com/users/kuzdogan/orgs",
+    "repos_url": "https://api.github.com/users/kuzdogan/repos",
+    "events_url": "https://api.github.com/users/kuzdogan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kuzdogan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-19T14:42:11Z",
+  "updated_at": "2023-05-19T14:42:11Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Summary\r\n\r\nI came across a contract that could not be verified on Sourcify because the Sourcify's compilation output bytecode is different than the author's (Hardhat). Diving deeper I've found out the difference comes to the surface when some other contracts that are unrelated to the compilation target are added to compilation.\r\n\r\nSpecifically these two standard JSON inputs yield different bytecode for the same contract `CompoundLens.sol`:\r\n[CompoundLens-solc-input-Sourcify-bytecode.json.txt](https://github.com/ethereum/solidity/files/11517691/CompoundLens-solc-input-Sourcify-bytecode.json.txt)\r\n[CompoundLens-solc-input-Hardhat-bytecode.json.txt](https://github.com/ethereum/solidity/files/11517692/CompoundLens-solc-input-Hardhat-bytecode.json.txt)\r\n\r\nThe only input sources differences are the following which are unrelated to `CompoundLens`:\r\n```js\r\n[\r\n  '@openzeppelin/contracts/interfaces/draft-IERC1822.sol',\r\n  '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol',\r\n  '@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol',\r\n  '@openzeppelin/contracts/proxy/Proxy.sol',\r\n  '@openzeppelin/contracts/proxy/beacon/IBeacon.sol',\r\n  '@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol',\r\n  '@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol',\r\n  '@openzeppelin/contracts/utils/StorageSlot.sol'\r\n]\r\n```\r\n\r\nYou'll notice the bytecodes differ even when the metadata hashes are the same. This is unexpected as the different sources listed above are not related to `CompoundLens`. `CompoundLens` already compiles without those contracts are input in `CompoundLens-solc-input-Sourcify-bytecode.json` but when added in `CompoundLens-solc-input-Hardhat-bytecode.json` the contract's bytecode changes.\r\n\r\n### To reproduce \r\nUsing Solidity version `v0.8.19`\r\n\r\nOutput the bytecodes\r\n\r\n1. Sourcify\r\n```\r\ncat CompoundLens-solc-input-Sourcify-bytecode.json.txt | solc --standard-json | jq '.contracts.\"contracts/Comptroller/CompoundLens.sol\".CompoundLens.evm.bytecode.object' > CompoundLens-Sourcify-creation-bytecode.txt\r\n```\r\n\r\n2. Hardhat\r\n```\r\ncat CompoundLens-solc-input-Hardhat-bytecode.json.txt | solc --standard-json | jq '.contracts.\"contracts/Comptroller/CompoundLens.sol\".CompoundLens.evm.bytecode.object' > CompoundLens-Hardhat-creation-bytecode.txt\r\n```\r\n\r\nCompare the bytecodes:\r\n```\r\ngit diff --word-diff --word-diff-regex=. CompoundLens-Sourcify-creation-bytecode.txt CompoundLens-Hardhat-creation-bytecode.txt\r\n```\r\n\r\n## Background\r\n\r\nThe contracts are on this Github repo (`verify` branch): https://github.com/meterio/sumer-project/tree/verify \r\n\r\nTo compile (and deploy) the original sources: \r\n```\r\ngit clone https://github.com/meterio/sumer-project/\r\ncd sumer-project\r\nrm -rf dist\r\nyarn\r\nyarn compile\r\nnpx hardhat dcl --rpc http://rpctest.meter.io/ --pk $PRIV_KEY\r\n```\r\n\r\nThe contract is also deployed at: https://goerli.etherscan.io/address/0x46df081108b2e2FDf1bF1E84Eeb2D7ec3AdA0061\r\n\r\nThe bytecode diff between the Sourcify output and Hardhat output was not in the metadata hash or in a certain recognizable pattern for me: \r\n<img width=\"1510\" alt=\"image\" src=\"https://github.com/ethereum/solidity/assets/13069972/fb4b457e-bb08-4409-a6c3-8f92e847bfab\">\r\n\r\n[CompoundLens-hardhat-recompiled-creation.txt](https://github.com/ethereum/solidity/files/11517589/CompoundLens-hardhat-recompiled-creation.txt)\r\n[CompoundLens-recompiled-creation.txt](https://github.com/ethereum/solidity/files/11517591/CompoundLens-recompiled-creation.txt)\r\n\r\nTo generate the diff: `git diff --word-diff --word-diff-regex=. CompoundLens-hardhat-recompiled-creation.txt CompoundLens-recompiled-creation.txt`\r\n\r\nWhat I tried to do was to start from the standard JSON input of Sourcify and try to reach the Hardhat output bytecode in iterations:\r\ninitial Sourcify JSON input: [CompoundLens-solc-input.json.txt](https://github.com/ethereum/solidity/files/11517638/CompoundLens-solc-input.json.txt)\r\nHardhat JSON input: [CompoundLens-hardhat-solc-input.json.txt](https://github.com/ethereum/solidity/files/11517640/CompoundLens-hardhat-solc-input.json.txt)\r\n\r\n1. Tried using the full compilation settings from Hardhat. \r\nUsing the same settings in Hardhat in the initial Sourcify input didn't change the bytecode.\r\n2. Tried using the whole `sources` from the Harhat input in the initial Sourcify input\r\n\r\n**Yes** by using all of the sources from Hardhat, one generates the Hardhat's bytecode output.\r\n\r\nNext, I iteratively copied sources from the Hardhat input to the Sourcify input **to see adding which sources cause the change in the bytecode**.\r\n\r\nSourcify's initial standard JSON input: \r\n<img width=\"555\" alt=\"image\" src=\"https://github.com/ethereum/solidity/assets/13069972/f991f703-5734-430d-b756-fe2e21e458f4\">\r\n\r\nHardhat's standard JSON input (clipped):\r\n<img width=\"511\" alt=\"image\" src=\"https://github.com/ethereum/solidity/assets/13069972/9dfa48c7-82a3-4f1d-a12b-95310e59f9fa\">\r\n\r\nOn each step I copied a contract that might be a potential cause of change, resolved the dependencies by also adding them, compiled the new iterated JSON input and compared the bytecodes.\r\n\r\nFinally, I found a minimal standard JSON diff, that adding the specific sources would change the bytecode output. These are laid out in the above Summary section.\r\n\r\n\r\n\r\n## Environment\r\n\r\n- Compiler version: `v0.8.19`\r\n- Target EVM version (as per compiler settings): paris\r\n- Framework/IDE (e.g. Truffle or Remix): Hardhat and solc CLI\r\n- EVM execution environment / backend / blockchain client:\r\n- Operating system: MacOS\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14250/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14250/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
