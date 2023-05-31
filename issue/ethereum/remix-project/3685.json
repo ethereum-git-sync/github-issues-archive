@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/remix-project/issues/3685",
+  "repository_url": "https://api.github.com/repos/ethereum/remix-project",
+  "labels_url": "https://api.github.com/repos/ethereum/remix-project/issues/3685/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/remix-project/issues/3685/comments",
+  "events_url": "https://api.github.com/repos/ethereum/remix-project/issues/3685/events",
+  "html_url": "https://github.com/ethereum/remix-project/issues/3685",
+  "id": 1698114491,
+  "node_id": "I_kwDODtLRw85lNyu7",
+  "number": 3685,
+  "title": "types/value length mismatch (argument=\"tuple\", value='myAddress'",
+  "user": {
+    "login": "Marcos-Molina-R",
+    "id": 81241977,
+    "node_id": "MDQ6VXNlcjgxMjQxOTc3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/81241977?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Marcos-Molina-R",
+    "html_url": "https://github.com/Marcos-Molina-R",
+    "followers_url": "https://api.github.com/users/Marcos-Molina-R/followers",
+    "following_url": "https://api.github.com/users/Marcos-Molina-R/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Marcos-Molina-R/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Marcos-Molina-R/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Marcos-Molina-R/subscriptions",
+    "organizations_url": "https://api.github.com/users/Marcos-Molina-R/orgs",
+    "repos_url": "https://api.github.com/users/Marcos-Molina-R/repos",
+    "events_url": "https://api.github.com/users/Marcos-Molina-R/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Marcos-Molina-R/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-05T19:49:04Z",
+  "updated_at": "2023-05-05T19:49:04Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I'm not sure this is the right place to ask this question, but I'm desperate, sorry for the incoveniencie if it's not.\r\n\r\nI'm having some problem with the arguments of a function written in solidity and called in JavaScript. I'm using the Remix ballot default example, except I removed the first require in it. It looks like this:\r\n\r\n`function giveRightToVote(address voter) public {\r\nrequire(\r\n    !voters[voter].voted,\r\n    \"The voter already voted.\"\r\n);\r\nrequire(voters[voter].weight == 0);\r\nvoters[voter].weight = 1;}`\r\n\r\nAs far as I'm understanding, I should give it an address so it can give permission to that address. This is the JavaScript code that calls that function:\r\n\r\n`const permission = async () => {\r\n    const ethereumAddress = web3.utils.toChecksumAddress(account);\r\n    const gasEstimate = await window.contract.methods.giveRightToVote(ethereumAddress).estimateGas({ from: account });\r\n    const result = await window.contract.methods.giveRightToVote(ethereumAddress).send({ gas: gasEstimate, from: account});\r\n    document.getElementById(\"permissionArea\").innerHTML = \"Permiso para votar obtenido\";\r\n    /**\r\n    await window.contract.methods.giveRightToVote(account).send({ from: account });\r\n    document.getElementById(\"permissionArea\").innerHTML = \"Permiso para votar obtenido\";\r\n    */\r\n}`\r\n\r\nThe last commented part was the original code. I have changed it a lot trying to make it work. I kind of guess the problem is the argument account. I have tried using [account] which has worked in another function, but I seem to not be able to figure out how it wants the parameters. I know the account is right, I get it like this:\r\n\r\n`\r\nconst accounts = await ethereum.request({method: \"eth_requestAccounts\"});\r\naccount = accounts[0];\r\n`\r\n\r\nAnd when I print it it's the right address. The full error reads:\r\n\r\n`Error: types/value length mismatch (argument=\"tuple\", value=[\"0x40bCba26F1ED151Fa34232E3CFf55d9C2867bCf1\"], code=INVALID_ARGUMENT, version=abi/5.7.0)`\r\n\r\nThis is not the only function that shows this same problem, in fact, I can't send any argument to the solidity functions. I have this vote function that only requires a integer (uint) as an argument. If I just send 0 for example it gives me the error I just addressed. But if I make a javascript Uint8Array and send the complete array like this:\r\n\r\n`let numero = new Uint8Array(1);\r\nnumber[0]=selectedCandidate;\r\nconst gasEstimate = await window.contract.methods.vote(number).estimateGas({ from: account });\r\nawait window.contract.methods.vote(numero).send({ gas: gasEstimate, from: account });`\r\n\r\nIt shows a different error:\r\n\r\n`MetaMask - RPC Error: Internal JSON-RPC error. {code: -32603, message: 'Internal JSON-RPC error.', data: {…}}                inpage.js:1`\r\n\r\nAnd\r\n\r\n`Uncaught (in promise) Error: Internal JSON-RPC error.                             web3.min.js:2\r\n{\r\n  \"message\": \"VM Exception while processing transaction: revert\",\r\n  \"stack\": \"RuntimeError: VM Exception while processing transaction: revert\\n    at exactimate (C:\\\\Users\\\\pc\\\\AppData\\\\Local\\\\Programs\\\\Ganache\\\\resources\\\\static\\\\node\\\\node_modules\\\\ganache\\\\dist\\\\node\\\\1.js:2:182136)\",\r\n  \"code\": -32000,\r\n  \"name\": \"RuntimeError\",\r\n  \"data\": {\r\n    \"hash\": null,\r\n    \"programCounter\": 130,\r\n    \"result\": \"0x\",\r\n    \"reason\": null,\r\n    \"message\": \"revert\"\r\n  }\r\n}`\r\n\r\nI'm still confused that it wants a tuple when the smart contract only takes one argument; any idea what problem I just run into?\r\n\r\nPD: I'm using ganache as the blockchain emulator (localhost:7545) and lite-server as the web server (localhost:3000); also the Smart Contract works in remix, but not when I call it with javascript.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/remix-project/issues/3685/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/remix-project/issues/3685/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
