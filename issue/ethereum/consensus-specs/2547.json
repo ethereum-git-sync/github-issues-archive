@@ -40,7 +40,7 @@
       "description": "CL+EL Merge"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 6,
   "created_at": "2021-08-11T19:58:49Z",
-  "updated_at": "2021-09-23T13:20:25Z",
-  "closed_at": null,
+  "updated_at": "2023-05-24T03:40:18Z",
+  "closed_at": "2023-05-24T03:40:18Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "The current mechanism for the [merge fork](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/merge/fork.md) involves setting an epoch (`MERGE_FORK_EPOCH`) from which nodes expect to wait 1 week before the terminal total difficulty is hit (via `TARGET_SECONDS_TO_MERGE`/`SECONDS_PER_ETH1_BLOCK`).\r\n\r\n`SECONDS_PER_ETH1_BLOCK` is controllable by miners and the possibility exists that in a fit of griefing, they cartelize to slow down the subsequent merge process by a factor. While it's effectively impossible for the PoW chain to halt, such a slowdown could cause coordination headaches for a few days to weeks around merge time. Much of the ensuing uncertainty may also trickle down to entities that rely on sending Eth1x transactions for business/livelihood.\r\n\r\nNot to mention that there may be some unknown unknowns about attacks/issues here.\r\n\r\nI propose adding a `TOTAL_TRANSITION_DIFFICULTY_OVERRIDE` parameter that serves as an override of the merge point to ease coordination during this period. This parameter would be accessible via a beacon node client setting (`--total-transition-difficulty-override`) that's unused by default. Setting this would trigger an alternate code path during [TransitionStore initialization](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/merge/fork.md#initializing-transition-store) that just uses this value for the transition difficulty.\r\n\r\nIf we detect PoW block times slowing after setting `TARGET_SECONDS_TO_MERGE`, we have a lever we can use to change the point of transition. Furthermore, the mere existence of this option may be enough to dissuade miners from any griefing attack in the first place.\r\n\r\nCurious of others' thoughts here.\r\n\r\n(related: https://github.com/ethereum/EIPs/pull/3698)",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2547/reactions",
     "total_count": 1,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2547/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
