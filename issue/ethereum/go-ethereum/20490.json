@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "rjl493456442",
@@ -77,14 +77,33 @@
     }
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2019-12-30T08:29:58Z",
-  "updated_at": "2020-01-08T12:18:21Z",
-  "closed_at": null,
+  "updated_at": "2023-05-09T12:47:16Z",
+  "closed_at": "2023-05-09T12:47:15Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "[LES Protocol](https://github.com/ethereum/devp2p/blob/master/caps/les.md)(light ethereum sub-protocol) contains two parts specs and relative implementations: **LES server** and **LES client**.\r\n\r\nUsually **LES server** refers to a full ethereum node that can offer additional data services for free or not. Basically both server and client share the same protocol definition like `protocol message`, `auxiliary structure definitions` and etc. However most of the internal logic of these two parts are totally different.\r\n\r\nFor **LES client**, most logic defined is:\r\n* *how to retrieve the specified piece of chain data or state data as well as the corresponding proof*. \r\n* *how to manage all connected servers and payment strategy*\r\n\r\nFor **LES server**, most logic defined is:\r\n* *how to serve requests from clients*.\r\n* *how to limit requests from clients* \r\n* *how to manage all connected clients and charge strategy*\r\n\r\nBut now in the current implementation, we mix all these parts logic into the same package. It means it's very hard to maintain the code correctly in the long term. So this is a proposal for LES package clean up and refactor.\r\n\r\nThe approximate structure of les codebase looks like:\r\n\r\n```\r\nles\r\n├── checkpointoracle\r\n│   └── oracle.go\r\n├── flowcontrol\r\n│   ├── control.go\r\n│   ├── logger.go\r\n│   ├── manager.go\r\n│   └── manager_test.go\r\n├── lesclient\r\n│   ├── api_backend.go\r\n│   ├── backend.go\r\n│   ├── bloombits.go\r\n│   ├── common.go\r\n│   ├── distributor\r\n│   │   ├── distributor.go\r\n│   │   └── request.go\r\n│   ├── fetcher\r\n│   │   ├── fetcher.go\r\n│   │   └── ulc.go\r\n│   ├── handler.go\r\n│   ├── odr.go\r\n│   ├── odr_requests.go\r\n│   ├── peer.go\r\n│   ├── retriever.go\r\n│   ├── serverpool\r\n│   │   └── serverpool.go\r\n│   ├── sync.go\r\n│   └── txrelay.go\r\n├── lesserver\r\n│   ├── api.go\r\n│   ├── backend.go\r\n│   ├── clientpool\r\n│   │   ├── balance.go\r\n│   │   ├── balance_test.go\r\n│   │   └── clientpool.go\r\n│   ├── costtracker.go\r\n│   ├── enr_entry.go\r\n│   ├── handler.go\r\n│   ├── misc.go\r\n│   ├── peers.go\r\n│   └── servingqueue.go\r\n├── metrics\r\n│   └── metrics.go\r\n├── protocol\r\n│   ├── costable.go\r\n│   └── protocol.go\r\n├── server\r\n│   ├── backend.go\r\n│   ├── common.go\r\n│   ├── costtracker.go\r\n│   ├── handler.go\r\n│   ├── peer.go\r\n│   └── servingqueue.go\r\n└── utilities\r\n    ├── execqueue.go\r\n    ├── execqueue_test.go\r\n    ├── extendablemap.go\r\n    ├── randselect_test.go\r\n    └── randselector.go\r\n\r\n```\r\n\r\nBasically I propose to split a few common utilities used by both server and client in the `utilities` sub-package. All protocol relative message and structures are all moved to `protocol` sub-package.\r\n\r\nAll in all, it's the purposal for cleanup current les package for long term maintenance. Need input from internal team members especially @zsfelfoldi .\r\n\r\n- [ ] Separate  `utilities`  https://github.com/ethereum/go-ethereum/pull/20509\r\n- [ ] Separate `protocol` https://github.com/ethereum/go-ethereum/pull/20516\r\n- [x] Separate `checkpoint` https://github.com/ethereum/go-ethereum/pull/20508\r\n- [ ] Separate `lesserver` and `lesclient`\r\n- [ ] Aggregate capacity management code",
-  "closed_by": null,
+  "closed_by": {
+    "login": "gballet",
+    "id": 3272758,
+    "node_id": "MDQ6VXNlcjMyNzI3NTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3272758?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gballet",
+    "html_url": "https://github.com/gballet",
+    "followers_url": "https://api.github.com/users/gballet/followers",
+    "following_url": "https://api.github.com/users/gballet/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gballet/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gballet/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gballet/subscriptions",
+    "organizations_url": "https://api.github.com/users/gballet/orgs",
+    "repos_url": "https://api.github.com/users/gballet/repos",
+    "events_url": "https://api.github.com/users/gballet/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gballet/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/20490/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/20490/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -178,6 +197,50 @@
     "body": "In the server side, we have two logic modules: flow control and capacity management.\r\n\r\nFor the flow control, it's a shared package used by client and server, which capacity management is server special. However now a few capacity management relative code is mixed in flow control package.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/572023368/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1540056005",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/20490#issuecomment-1540056005",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/20490",
+    "id": 1540056005,
+    "node_id": "IC_kwDOAOvK985by2PF",
+    "user": {
+      "login": "gballet",
+      "id": 3272758,
+      "node_id": "MDQ6VXNlcjMyNzI3NTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3272758?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/gballet",
+      "html_url": "https://github.com/gballet",
+      "followers_url": "https://api.github.com/users/gballet/followers",
+      "following_url": "https://api.github.com/users/gballet/following{/other_user}",
+      "gists_url": "https://api.github.com/users/gballet/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/gballet/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/gballet/subscriptions",
+      "organizations_url": "https://api.github.com/users/gballet/orgs",
+      "repos_url": "https://api.github.com/users/gballet/repos",
+      "events_url": "https://api.github.com/users/gballet/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/gballet/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-05-09T12:47:15Z",
+    "updated_at": "2023-05-09T12:47:15Z",
+    "author_association": "MEMBER",
+    "body": "LES will be rewritten based on the new beacon light client work. Closing.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1540056005/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

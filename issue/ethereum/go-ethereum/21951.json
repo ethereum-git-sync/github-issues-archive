@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 13,
+  "comments": 14,
   "created_at": "2020-12-03T11:29:04Z",
-  "updated_at": "2021-09-29T03:30:03Z",
-  "closed_at": null,
+  "updated_at": "2023-05-09T12:53:05Z",
+  "closed_at": "2023-05-09T12:53:05Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "\r\n[Logs_period_0.txt](https://github.com/ethereum/go-ethereum/files/5642435/Logs_period_0.txt)\r\n[Logs_period_15.txt](https://github.com/ethereum/go-ethereum/files/5642437/Logs_period_15.txt)\r\n\r\n#### System information\r\n\r\nGeth version: v1.9.24-stable-cc05b050/linux-amd64/go1.15.5\r\nOS & Version: Ubuntu 16.04\r\nCommit hash : (if `develop`)\r\n\r\n#### Expected behaviour\r\nExpecting blocks to be sealed as transactions get submitted with period=0.\r\n\r\n\r\n#### Actual behaviour\r\nNo blocks get sealed with period=0\r\nWith all else setup equally, but setting period=1, period=5, period=15, blocks get sealed at the expected frequency, and all submitted transactions get sealed.\r\nLooking with txpool.content, you can see all the transactions go straight to the pending section.\r\nTried a new instance, with a transaction with nonce=1, and transaction goes to queued txpool, as expected\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\nSet up 1 node and 1 sealer (or 3 nodes and 3 sealers, there is no difference in behavior)\r\nUse peppeth to generate genesis file with period=0 \r\nStart node with\r\n/usr/bin/geth --nousb --allow-insecure-unlock --identity \"xyz\" --verbosity \"5\" --rpc --rpcaddr \"0.0.0.0\" --rpcport \"8545\" --rpccorsdomain \"*\" --rpcvhosts \"*\" --rpcapi \"miner,eth,net,personal,web3\" --port \"30303\" --nodiscover --gcmode \"archive\" --miner.gasprice \"1\" --miner.gastarget \"8000000000\" --miner.gaslimit \"8000000000\" --networkid \"850\" --ipcpath \"/home/eth_user/gethipc/geth.ipc\"  --unlock \"xyz\" --password \"/xyz\" --mine --syncmode \"full\" \r\n\r\nSubmit a transaction using nodejs and web3:\r\n> web3.eth.getAccounts().then(function(acc){accounts=acc;}).catch(e => console.log(e));\r\n> web3.eth.getBalance(accounts[0]).then(console.log).catch(e => console.log(e));\r\n> web3.eth.getBalance(accounts[1]).then(console.log).catch(e => console.log(e));\r\n904625697166532776746648320380374280103671755200316906558262375061821325312\r\n> web3.eth.personal.unlockAccount(accounts[1],\"xyz\",3600).then(res => console.log(res)).catch(e => console.log(e))\r\ntrue\r\n> web3.eth.getTransactionCount(accounts[1]).then(console.log)\r\n0\r\n> web3.eth.sendTransaction({ from: accounts[1], to: accounts[0], nonce: 0, gasPrice: 2100000, gas: 2100000, value: 10000000000000000000 }).then(res => console.log(res)).catch(e => console.log(e))\r\n\r\nCheck geth console:\r\n> txpool.content\r\n{\r\n  pending: {\r\n    0x2D444677e802c1cBEFA3d1d8FeF4994d325bd332: {\r\n      0: {\r\n        blockHash: null,\r\n        blockNumber: null,\r\n        from: \"0x2d444677e802c1cbefa3d1d8fef4994d325bd332\",\r\n        gas: \"0x200b20\",\r\n        gasPrice: \"0x200b20\",\r\n        hash: \"0xd2bce44cffcc82101578b0e19718079da66032e752aee74c7dc8631c27e64341\",\r\n        input: \"0x\",\r\n        nonce: \"0x0\",\r\n        r: \"0x1334934b877defb3502a9299925ef425ab82c1b45a747df1d1c31079d9938154\",\r\n        s: \"0x30ffec938200144cbb11b7e472fb4fd0e0d8edd48abe1ab618f3746c05a5702b\",\r\n        to: \"0x93284d9b0403b6d56306449234e46a80d0e9eb87\",\r\n        transactionIndex: null,\r\n        v: \"0x6b3\",\r\n        value: \"0x8ac7230489e80000\"\r\n      }\r\n    }\r\n  },\r\n  queued: {}\r\n}\r\n\r\n\r\nFor comparison, set up another PoA node with everything the same except create genesis file with period=15, and logs show sealing starts and continues every 15 sec, transactions get sealed, and no transaction shows up in txpool.\r\n\r\n\r\n#### Backtrace\r\n\r\nPlease see the attached logs for both instances for comparison (period=0 and period=15)\r\n\r\n````\r\n[backtrace]\r\n````\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/21951/reactions",
     "total_count": 1,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/21951/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -632,6 +651,50 @@
     "body": "Why not set period = 0 in geth/clique (PoA) always?",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/929798567/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1540065875",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/21951#issuecomment-1540065875",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/21951",
+    "id": 1540065875,
+    "node_id": "IC_kwDOAOvK985by4pT",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-05-09T12:53:05Z",
+    "updated_at": "2023-05-09T12:53:05Z",
+    "author_association": "MEMBER",
+    "body": "Probably some issue with the fork ordering, or rather the signing which made the transactions not sealable in the old-fork blocks. Closing this, since it's ancient. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1540065875/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

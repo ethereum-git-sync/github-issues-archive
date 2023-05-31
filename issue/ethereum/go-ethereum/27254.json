@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27254",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27254/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27254/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27254/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27254",
+  "id": 1707267568,
+  "node_id": "I_kwDOAOvK985lwtXw",
+  "number": 27254,
+  "title": "flaw in snapshot difflayer lookup",
+  "user": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-12T09:16:41Z",
+  "updated_at": "2023-05-16T13:18:41Z",
+  "closed_at": "2023-05-16T13:18:41Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "We have a flaw iin how the snapshot logic works, and that is also the culprit behind the occasional strange test-errors on `TestDiffLayerExternalInvalidationPartialFlatten`, \r\n```\r\n    snapshot_test.go:231: stale reference returned account: 0x0 (err: <nil>)\r\n    snapshot_test.go:234: stale reference returned storage slot:  (err: <nil>)\r\n```\r\nExample on how the flaw can be triggered: have a layer `2`, which relies on layer `1`, and disk layer is `0`. Now, the layer `1` may become stale. So if we ask layer `2` about something, and it needs to consult the parent-hierarchy, we expect it to ask `1`, notice that it is `stale`, and then error out with \"parent is stale\". \r\n\r\nHowever, we also have a bloom filter in `2`. And the bloom filter may indicate \"this doesn't exist in the memory-parent-hierarchy\", so the `2` instead does the lookup directly into `0` -- the disk layer. Meaning, it totally bypasses the stale layer. And that's why we hit this error. The reason we only hit it occasionally is because the bloom filter isn't deterministic\r\n\r\n    bloomAccountHasherOffset = rand.Intn(25)\r\n\r\nWith this diff, I can reproduce it reliably: \r\n```diff\r\ndiff --git a/core/state/snapshot/snapshot_test.go b/core/state/snapshot/snapshot_test.go\r\nindex 249da10aa6..802ae55583 100644\r\n--- a/core/state/snapshot/snapshot_test.go\r\n+++ b/core/state/snapshot/snapshot_test.go\r\n@@ -185,6 +185,7 @@ func TestDiskLayerExternalInvalidationPartialFlatten(t *testing.T) {\r\n // be returned with junk data. This version of the test retains the bottom diff\r\n // layer to check the usual mode of operation where the accumulator is retained.\r\n func TestDiffLayerExternalInvalidationPartialFlatten(t *testing.T) {\r\n+\tbloomDestructHasherOffset, bloomAccountHasherOffset, bloomStorageHasherOffset = 14, 24, 5\r\n \t// Create an empty base layer and a snapshot tree out of it\r\n \tbase := &diskLayer{\r\n \t\tdiskdb: rawdb.NewMemoryDatabase(),\r\n```\r\n```\r\n$ go test ./core/state/snapshot -run \"Diff.*PartialFlatten\" -v \r\n=== RUN   TestDiffLayerExternalInvalidationPartialFlatten\r\n    snapshot_test.go:232: stale reference returned account: 0x0 (err: <nil>)\r\n    snapshot_test.go:235: stale reference returned storage slot:  (err: <nil>)\r\n--- FAIL: TestDiffLayerExternalInvalidationPartialFlatten (0.00s)\r\nFAIL\r\nFAIL    github.com/ethereum/go-ethereum/core/state/snapshot     0.052s\r\nFAIL\r\n```\r\n",
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27254/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27254/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

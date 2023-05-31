@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27308",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27308/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27308/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27308/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27308",
+  "id": 1717703990,
+  "node_id": "I_kwDOAOvK985mYhU2",
+  "number": 27308,
+  "title": "Optimizations for `eth_getProof`",
+  "user": {
+    "login": "prestwich",
+    "id": 10149425,
+    "node_id": "MDQ6VXNlcjEwMTQ5NDI1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10149425?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prestwich",
+    "html_url": "https://github.com/prestwich",
+    "followers_url": "https://api.github.com/users/prestwich/followers",
+    "following_url": "https://api.github.com/users/prestwich/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prestwich/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prestwich/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prestwich/subscriptions",
+    "organizations_url": "https://api.github.com/users/prestwich/orgs",
+    "repos_url": "https://api.github.com/users/prestwich/repos",
+    "events_url": "https://api.github.com/users/prestwich/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prestwich/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-19T19:12:40Z",
+  "updated_at": "2023-05-31T06:52:29Z",
+  "closed_at": "2023-05-31T06:52:29Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Encountered while writing #27306\r\n\r\n# Rationale\r\n\r\n`eth_getProof` is significantly more resource-intensive than it should be\r\n\r\n- `eth_getProof` implementations performs N+1 deep copies, when only 1 is necessary\r\n- `eth_getProof` implementations performs these expensive deep copies before performing cheap hex deserialization\r\n- [GetProof] calls [state.StorageTrie] to see if the account has state\r\n    - This performs a deep copy of the state object\r\n- Then, for each user-provided key\r\n    - It deserializes the hex string into bytes, failing on error\r\n    - Then calls `GetStorageProof`  \r\n    - [state.GetStorageProof] immediately calls [state.StorageTrie] again\r\n        - This performs another deep copy of the same state object, \r\n        - This deep copy is performed for each user-provided hex key until an error is encountered\r\n- As a result, the RPC expends significant resources on invalid requests, which could be cheaply shortcut\r\n\r\nSo a correct request will result in N+1 deep copies of the state object (1 before the loop, and N within the loop). It will perform deep copies even if the input is malformatted (invalid hex), repeatedly until it encounters the invalid input.\r\n\r\n## Implementation\r\n\r\n### Do you have ideas regarding the implementation of this feature?\r\n\r\nSuggestions:\r\n\r\n1. Greedily validate input to prevent deep copying when input is invalid\r\n    - Perform all hex deserialization first at the start of the function, rather than within the `for` loop [as currently written]. \r\n    - shortcut if any hex deser fails\r\n    - this prevents resource expenditure on bad caller input\r\n2. Do not call [state.GetStorageProof] within the loop.\r\n    - instead, use the `storageTrie` reference from outside the loop to generate the storage proof\r\n    - call [storageTrie.Prove] and perform validation on the result within the loop (inlining the checks in [state.GetStorageProof])\r\n    - this cuts out `N` deep copies of the state object\r\n\r\n\r\n### Are you willing to implement this feature?\r\nYes\r\n\r\n[state.StorageTrie]: https://github.com/ethereum/go-ethereum/blob/master/core/state/statedb.go#L373\r\n[GetProof]: https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L659\r\n[as currently writte]: https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L682\r\n[state.getStorageProof]: https://github.com/ethereum/go-ethereum/blob/master/core/state/statedb.go#L340\r\n[storageTrie.Prove]: https://github.com/ethereum/go-ethereum/blob/master/trie/proof.go#L110",
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27308/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27308/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

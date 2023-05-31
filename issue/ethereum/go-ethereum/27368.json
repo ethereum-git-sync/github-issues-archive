@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27368",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27368/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27368/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27368/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27368",
+  "id": 1728288636,
+  "node_id": "I_kwDOAOvK985nA5d8",
+  "number": 27368,
+  "title": "Asynchronous handling of unfulfilled requests in fetchers_concurrent.go",
+  "user": {
+    "login": "joohhnnn",
+    "id": 68833933,
+    "node_id": "MDQ6VXNlcjY4ODMzOTMz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/68833933?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/joohhnnn",
+    "html_url": "https://github.com/joohhnnn",
+    "followers_url": "https://api.github.com/users/joohhnnn/followers",
+    "following_url": "https://api.github.com/users/joohhnnn/following{/other_user}",
+    "gists_url": "https://api.github.com/users/joohhnnn/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/joohhnnn/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/joohhnnn/subscriptions",
+    "organizations_url": "https://api.github.com/users/joohhnnn/orgs",
+    "repos_url": "https://api.github.com/users/joohhnnn/repos",
+    "events_url": "https://api.github.com/users/joohhnnn/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/joohhnnn/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    },
+    {
+      "id": 1132689577,
+      "node_id": "MDU6TGFiZWwxMTMyNjg5NTc3",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/status:triage",
+      "name": "status:triage",
+      "color": "6be514",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-26T22:03:51Z",
+  "updated_at": "2023-05-30T12:24:23Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "I have a question regarding the asynchronous handling of unfulfilled requests in the fetchers_concurrent.go file. Specifically, I would like clarification on the following code snippet and accompanying comment:\r\n```\r\n// Fetch the chunk and make sure any errors return the hashes to the queue\r\nreq, err := queue.request(peer, request, responses)\r\nif err != nil {\r\n    // Sending the request failed, which generally means the peer\r\n    // was disconnected in between assignment and network send.\r\n    // Although all peer removal operations return allocated tasks\r\n    // to the queue, that is async, and we can do better here by\r\n    // immediately pushing the unfulfilled requests.\r\n    queue.unreserve(peer.id) // TODO(karalabe): This needs a non-expiration method\r\n    continue\r\n}\r\n```\r\nMy understanding is that unreserve(peer.id) is used to reintroduce the unfulfilled requests back into the task queue when a request fails to be sent due to peer disconnection. Since the block height of these unfulfilled requests is guaranteed to be smaller than the current tasks in the queue, they should have the highest priority. In the next iteration of the loop, won't these unreserved requests be immediately picked up by other peers?\r\n\r\nI would appreciate some clarification on the following points:\r\n\r\n1. what “that is async” actually means in here, and what will it cause?\r\n\r\n2. Could you provide more insights into why immediate pushing of unfulfilled requests is necessary in this context?",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27368/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27368/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
