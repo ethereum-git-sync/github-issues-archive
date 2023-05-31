@@ -41,7 +41,7 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2015-11-19T01:31:08Z",
-  "updated_at": "2015-11-19T10:36:26Z",
+  "updated_at": "2023-05-21T14:13:34Z",
   "closed_at": "2015-11-19T10:36:26Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -115,14 +115,14 @@
     "body": "recent discussion from https://gist.github.com/frozeman/090ae32041bcfe120824\n\n@vbuterin said:\nYeah, createCheque and cashCheque as above, plus transferCheque(address _from, address _to, uint256 _value) sounds good. In that case, we should probably remove the _to argument from cashCheque; generally, you can only cash cheques from your own bank account.\n\nWe probably also want getChequeValue(address _from, address _for). We then have a choice of whether we want to keep the value argument in cashCheque rather than simply only allowing cashing in 100% of whatever is in there. If we want to fully follow the cheque analogy, this triad seems most intuitive to me:\n\nfunction createCheque(address _for, uint256 _maxValue)\nfunction cashCheque(address _from)\nfunction getChequeValue(address _from, address _for)\nQuestion: does running createCheque twice add the value of the two cheques together? Are there legitimate use cases for creating a cheque multiple times and then cashing either once or multiple times?\n\n@nmushegian said:\nAll the functions that return uint should return (uint, bool) instead. You can easily make up scenarios where a 0 return value is ambiguous and significant. Is there any other simpler pattern for handling this?\n\n@niran said:\nI think the value parameter is useful in cashCheque. It absolves callers from having to verify that the amount they needed was provided, and from having to refund amounts greater than what was needed. cashCheque would only succeed if the provided value was remaining in the cheque.\nAlso, I think using createCheque(2**100) for the approve use case is going to lead to less clear code. It gets better if you make the magic number a constant, like createCheque(UNLIMITED_CHEQUE_VALUE), but lots of people won't do that. I think it's worth having a createBlankCheque or something for the approve scenario. Most tokens will use the TokenLib to handle all of the cheque logic, so it doesn't really make things worse for token authors.\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/157920585/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
       "heart": 0,
-      "rocket": 0,
+      "rocket": 1,
       "eyes": 0
     },
     "performed_via_github_app": null
