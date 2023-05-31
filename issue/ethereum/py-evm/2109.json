@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/py-evm/issues/2109",
+  "repository_url": "https://api.github.com/repos/ethereum/py-evm",
+  "labels_url": "https://api.github.com/repos/ethereum/py-evm/issues/2109/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/py-evm/issues/2109/comments",
+  "events_url": "https://api.github.com/repos/ethereum/py-evm/issues/2109/events",
+  "html_url": "https://github.com/ethereum/py-evm/issues/2109",
+  "id": 1712082667,
+  "node_id": "I_kwDOBJ456s5mDE7r",
+  "number": 2109,
+  "title": "'pc' should be changed to 'program_counter' in the __slots__ of CodeStream class",
+  "user": {
+    "login": "imtypist",
+    "id": 13166579,
+    "node_id": "MDQ6VXNlcjEzMTY2NTc5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13166579?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/imtypist",
+    "html_url": "https://github.com/imtypist",
+    "followers_url": "https://api.github.com/users/imtypist/followers",
+    "following_url": "https://api.github.com/users/imtypist/following{/other_user}",
+    "gists_url": "https://api.github.com/users/imtypist/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/imtypist/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/imtypist/subscriptions",
+    "organizations_url": "https://api.github.com/users/imtypist/orgs",
+    "repos_url": "https://api.github.com/users/imtypist/repos",
+    "events_url": "https://api.github.com/users/imtypist/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/imtypist/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-16T13:55:03Z",
+  "updated_at": "2023-05-16T14:04:29Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "`pc` should be changed to `program_counter` in the `__slots__` of CodeStream class. Although it does not raise errors (since `program_counter` is inherited from `CodeStreamAPI`), I think should correct it.\r\n\r\n```python\r\nclass CodeStream(CodeStreamAPI):\r\n    __slots__ = [\r\n        \"_length_cache\",\r\n        \"_raw_code_bytes\",\r\n        \"invalid_positions\",\r\n        \"valid_positions\",\r\n        \"pc\",\r\n    ]\r\n\r\n    logger = logging.getLogger(\"eth.vm.CodeStream\")\r\n\r\n    def __init__(self, code_bytes: bytes) -> None:\r\n        validate_is_bytes(code_bytes, title=\"CodeStream bytes\")\r\n        # in order to avoid method overhead when setting/accessing pc, we no longer\r\n        # fence the pc (Program Counter) into 0 <= pc <= len(code_bytes).\r\n        # We now let it float free.\r\n        # NOTE: Setting pc to a negative value has undefined behavior.\r\n        self.program_counter = 0\r\n        self._raw_code_bytes = code_bytes\r\n        self._length_cache = len(code_bytes)\r\n        self.invalid_positions: Set[int] = set()\r\n        self.valid_positions: Set[int] = set()\r\n```\r\n\r\nhttps://github.com/ethereum/py-evm/blob/8aa9eb51944b4dcf6b365eb032ac674fed933c09/eth/vm/code_stream.py#LL21C1-L42C47",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/2109/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/2109/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
