@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/ConsenSys/teku/issues/483",
+  "repository_url": "https://api.github.com/repos/ConsenSys/teku",
+  "labels_url": "https://api.github.com/repos/ConsenSys/teku/issues/483/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ConsenSys/teku/issues/483/comments",
+  "events_url": "https://api.github.com/repos/ConsenSys/teku/issues/483/events",
+  "html_url": "https://github.com/ConsenSys/teku/issues/483",
+  "id": 421680741,
+  "node_id": "MDU6SXNzdWU0MjE2ODA3NDE=",
+  "number": 483,
+  "title": "Cache justified/finalized roots in state for use in state transition (Spec PR #756)",
+  "user": {
+    "login": "akhila-raju",
+    "id": 5432198,
+    "node_id": "MDQ6VXNlcjU0MzIxOTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5432198?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/akhila-raju",
+    "html_url": "https://github.com/akhila-raju",
+    "followers_url": "https://api.github.com/users/akhila-raju/followers",
+    "following_url": "https://api.github.com/users/akhila-raju/following{/other_user}",
+    "gists_url": "https://api.github.com/users/akhila-raju/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/akhila-raju/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/akhila-raju/subscriptions",
+    "organizations_url": "https://api.github.com/users/akhila-raju/orgs",
+    "repos_url": "https://api.github.com/users/akhila-raju/repos",
+    "events_url": "https://api.github.com/users/akhila-raju/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/akhila-raju/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1048919129,
+      "node_id": "MDU6TGFiZWwxMDQ4OTE5MTI5",
+      "url": "https://api.github.com/repos/ConsenSys/teku/labels/bug%20%F0%9F%90%9E",
+      "name": "bug 🐞",
+      "color": "dd6c94",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1170684912,
+      "node_id": "MDU6TGFiZWwxMTcwNjg0OTEy",
+      "url": "https://api.github.com/repos/ConsenSys/teku/labels/good%20first%20issue%20:raising_hand:",
+      "name": "good first issue :raising_hand:",
+      "color": "006b75",
+      "default": false,
+      "description": "This is a good first issue for a new contributor to work on"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-03-15T19:54:36Z",
+  "updated_at": "2019-05-08T15:36:57Z",
+  "closed_at": "2019-05-08T15:36:57Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\n1. Correct value for genesis justified roots\r\n\r\nRight now, we just have `ZERO_HASH` for the genesis justified roots. This does not actually reflect the value of the root of the block at genesis. The value of the block at the genesis slot is looks like\r\n\r\n```\r\nblock = get_empty_block()\r\ngenesis_state = get_genesis_state()\r\nblock.state_root = hash_tree_root(genesis_state)\r\n```\r\n\r\nDue to the normal chicken-and-egg state/block-root problem, we can't embed the genesis block root in as the initial justified roots when constructing the genesis state. If we want to enforce this, we can do the following in `cache_state`. This is nice because the value reflects an actual block root but it's not really necessary imo.\r\n\r\n```\r\nif state.justified_root == ZERO_HASH:\r\n    state.justified_root = hash_tree_root(state.latest_block_header)\r\n    state.previous_justified_root = state.justified_root\r\n```\r\n\r\n2. finalized root\r\n\r\nShould we add another field `finalized_root` for symmetry? It is not needed in the state transition but might be nice to be available in state regardless of the number of slots since finality. (if greater than `HISTORICAL_ROOTS_LENGTH` you would no longer have it available in state)\r\n\r\nSee [Spec PR #756](https://github.com/ethereum/eth2.0-specs/pull/756)",
+  "closed_by": {
+    "login": "jrhea",
+    "id": 5555162,
+    "node_id": "MDQ6VXNlcjU1NTUxNjI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5555162?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jrhea",
+    "html_url": "https://github.com/jrhea",
+    "followers_url": "https://api.github.com/users/jrhea/followers",
+    "following_url": "https://api.github.com/users/jrhea/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jrhea/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jrhea/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jrhea/subscriptions",
+    "organizations_url": "https://api.github.com/users/jrhea/orgs",
+    "repos_url": "https://api.github.com/users/jrhea/repos",
+    "events_url": "https://api.github.com/users/jrhea/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jrhea/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ConsenSys/teku/issues/483/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ConsenSys/teku/issues/483/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

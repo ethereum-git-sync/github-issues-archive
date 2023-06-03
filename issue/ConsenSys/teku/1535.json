@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ConsenSys/teku/issues/1535",
+  "repository_url": "https://api.github.com/repos/ConsenSys/teku",
+  "labels_url": "https://api.github.com/repos/ConsenSys/teku/issues/1535/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ConsenSys/teku/issues/1535/comments",
+  "events_url": "https://api.github.com/repos/ConsenSys/teku/issues/1535/events",
+  "html_url": "https://github.com/ConsenSys/teku/issues/1535",
+  "id": 594997225,
+  "node_id": "MDU6SXNzdWU1OTQ5OTcyMjU=",
+  "number": 1535,
+  "title": "The specified deposit amount [3200000000] does not match minimum deposit amount requirements [32000000000]",
+  "user": {
+    "login": "q9f",
+    "id": 58883403,
+    "node_id": "MDQ6VXNlcjU4ODgzNDAz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58883403?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/q9f",
+    "html_url": "https://github.com/q9f",
+    "followers_url": "https://api.github.com/users/q9f/followers",
+    "following_url": "https://api.github.com/users/q9f/following{/other_user}",
+    "gists_url": "https://api.github.com/users/q9f/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/q9f/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/q9f/subscriptions",
+    "organizations_url": "https://api.github.com/users/q9f/orgs",
+    "repos_url": "https://api.github.com/users/q9f/repos",
+    "events_url": "https://api.github.com/users/q9f/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/q9f/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-04-06T10:32:28Z",
+  "updated_at": "2020-04-06T21:26:18Z",
+  "closed_at": "2020-04-06T21:26:18Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\nAs a custom testnet validator, I want to be able to set a custom deposit amount so that I can participate in testnet efforts that have non-mainnet conditions, i.e., a lower minimum deposit amount of 3.2 göETH. \r\n\r\n### Acceptance Criteria\r\n* The `teku validator` command should accept values lower than `32000000000` for `--deposit-amount-gwei`.\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Compile teku on latest master @ 2d07f259eb851e83e0e73ca44a92993d1f3bca19.\r\n2. Create a new validator deposit.\r\n    ```\r\n    ./build/install/teku/bin/teku validator generate \\\r\n      --deposit-amount-gwei=3200000000 \\\r\n      --eth1-deposit-contract-address=\"0xaA888248144Bc5d584a7f400839d0D912F21C39A\" \\\r\n          --eth1-endpoint=http://127.0.0.1:9779 \\\r\n          --eth1-keystore-file=/home/user/.ethereum/goerli/keystore/UTC--2020-01-18T11-33-11.045251948Z--272dd1ff68461dfa848c9c30d8e2c3180a8f18de \\\r\n          --eth1-keystore-password-file=/home/user/.ethereum/goerli/keystore/password.txt \\\r\n          --keys-output-path=/home/user/.local/share/teku/keystore \\\r\n          --encrypted-keystore-validator-password-file=/home/user/.ethereum/goerli/keystore/password.txt \\\r\n          --encrypted-keystore-withdrawal-password-file=/home/user/.ethereum/goerli/keystore/password.txt\r\n    ```\r\n3. Commandlines-Parameter Exception in Thread Main.\r\n    ```\r\n    Exception in thread \"main\" picocli.CommandLine$ParameterException: Invalid value for option '--deposit-amount-gwei': The specified deposit amount [3200000000] does not match minimum deposit amount requirements [32000000000]\r\n      at picocli.CommandLine$Interpreter.tryConvert(CommandLine.java:12393)\r\n      at picocli.CommandLine$Interpreter.applyValueToSingleValuedField(CommandLine.java:11963)\r\n      at picocli.CommandLine$Interpreter.applyOption(CommandLine.java:11867)\r\n      at picocli.CommandLine$Interpreter.processStandaloneOption(CommandLine.java:11755)\r\n      at picocli.CommandLine$Interpreter.processArguments(CommandLine.java:11626)\r\n      at picocli.CommandLine$Interpreter.parse(CommandLine.java:11455)\r\n      at picocli.CommandLine$Interpreter.processSubcommand(CommandLine.java:11652)\r\n      at picocli.CommandLine$Interpreter.processArguments(CommandLine.java:11585)\r\n      at picocli.CommandLine$Interpreter.parse(CommandLine.java:11455)\r\n      at picocli.CommandLine$Interpreter.processSubcommand(CommandLine.java:11652)\r\n      at picocli.CommandLine$Interpreter.processArguments(CommandLine.java:11585)\r\n      at picocli.CommandLine$Interpreter.parse(CommandLine.java:11455)\r\n      at picocli.CommandLine$Interpreter.parse(CommandLine.java:11345)\r\n      at picocli.CommandLine.parseArgs(CommandLine.java:1311)\r\n      at tech.pegasys.artemis.cli.BeaconNodeCommand.maybeFindConfigFile(BeaconNodeCommand.java:168)\r\n      at tech.pegasys.artemis.cli.BeaconNodeCommand.parse(BeaconNodeCommand.java:115)\r\n      at tech.pegasys.artemis.Artemis.main(Artemis.java:23)\r\n    ```\r\n\r\n**Expected behavior:**\r\nThe teku validator should allow for custom deposit anoumts **OR** allow for specifying a chain specification (YAML, TOML) to read the actual minimum amount from.\r\n\r\n**Actual behavior:**\r\nIt throwsn an exception for the values defined in https://github.com/goerli/schlesi/tree/master/v0-10-1 (3.2 göETH).\r\n\r\n**Frequency:**\r\n100%, well reproducible.\r\n\r\n### Versions\r\n```\r\n~/.opt/PegaSysEng/teku master\r\n❯ git log -n1 \r\ncommit 2d07f259eb851e83e0e73ca44a92993d1f3bca19 (HEAD -> master, origin/master, origin/HEAD)\r\nAuthor: Sally MacFarlane <sally.macfarlane@consensys.net>\r\nDate:   Mon Apr 6 12:19:55 2020 +1000\r\n\r\n    color (#1530)\r\n    \r\n    Signed-off-by: Sally MacFarlane <sally.macfarlane@consensys.net>\r\n\r\n~/.opt/PegaSysEng/teku master\r\n❯ build/install/teku/bin/teku --version           \r\nteku/v0.8.2-dev-2d07f259/linux-x86_64/oracle_openjdk-java-11\r\n\r\n~/.opt/PegaSysEng/teku master\r\n❯ java -version\r\nopenjdk version \"11.0.6\" 2020-01-14\r\nOpenJDK Runtime Environment (build 11.0.6+10)\r\nOpenJDK 64-Bit Server VM (build 11.0.6+10, mixed mode)\r\n\r\n~/.opt/PegaSysEng/teku master\r\n❯ uname -a\r\nLinux ceres 5.5.13-arch2-1 #1 SMP PREEMPT Mon, 30 Mar 2020 20:42:41 +0000 x86_64 GNU/Linux\r\n\r\n~/.opt/PegaSysEng/teku master\r\n❯ cat /etc/*release\r\nNAME=\"Arch Linux\"\r\nPRETTY_NAME=\"Arch Linux\"\r\nID=arch\r\nBUILD_ID=rolling\r\nANSI_COLOR=\"0;36\"\r\nHOME_URL=\"https://www.archlinux.org/\"\r\nDOCUMENTATION_URL=\"https://wiki.archlinux.org/\"\r\nSUPPORT_URL=\"https://bbs.archlinux.org/\"\r\nBUG_REPORT_URL=\"https://bugs.archlinux.org/\"\r\nLOGO=archlinux\r\n```\r\n",
+  "closed_by": {
+    "login": "ajsutton",
+    "id": 72675,
+    "node_id": "MDQ6VXNlcjcyNjc1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/72675?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ajsutton",
+    "html_url": "https://github.com/ajsutton",
+    "followers_url": "https://api.github.com/users/ajsutton/followers",
+    "following_url": "https://api.github.com/users/ajsutton/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ajsutton/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ajsutton/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ajsutton/subscriptions",
+    "organizations_url": "https://api.github.com/users/ajsutton/orgs",
+    "repos_url": "https://api.github.com/users/ajsutton/repos",
+    "events_url": "https://api.github.com/users/ajsutton/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ajsutton/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ConsenSys/teku/issues/1535/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ConsenSys/teku/issues/1535/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

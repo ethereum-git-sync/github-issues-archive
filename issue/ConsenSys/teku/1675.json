@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ConsenSys/teku/issues/1675",
+  "repository_url": "https://api.github.com/repos/ConsenSys/teku",
+  "labels_url": "https://api.github.com/repos/ConsenSys/teku/issues/1675/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ConsenSys/teku/issues/1675/comments",
+  "events_url": "https://api.github.com/repos/ConsenSys/teku/issues/1675/events",
+  "html_url": "https://github.com/ConsenSys/teku/issues/1675",
+  "id": 607586292,
+  "node_id": "MDU6SXNzdWU2MDc1ODYyOTI=",
+  "number": 1675,
+  "title": "[crash/fuzzing] \"IllegalArgumentException: List out of bounds\" during block ssz parsing",
+  "user": {
+    "login": "pventuzelo",
+    "id": 9038181,
+    "node_id": "MDQ6VXNlcjkwMzgxODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9038181?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pventuzelo",
+    "html_url": "https://github.com/pventuzelo",
+    "followers_url": "https://api.github.com/users/pventuzelo/followers",
+    "following_url": "https://api.github.com/users/pventuzelo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pventuzelo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pventuzelo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pventuzelo/subscriptions",
+    "organizations_url": "https://api.github.com/users/pventuzelo/orgs",
+    "repos_url": "https://api.github.com/users/pventuzelo/repos",
+    "events_url": "https://api.github.com/users/pventuzelo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pventuzelo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-04-27T14:15:10Z",
+  "updated_at": "2020-04-29T05:36:50Z",
+  "closed_at": "2020-04-29T05:36:50Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nDuring fuzzing with [beacon-fuzz](https://github.com/sigp/beacon-fuzz), I triggered an `java.lang.IllegalArgumentException: List out of bounds`  during block SSZ parsing using `teku transition blocks` tool.\r\n\r\n### Additional info\r\n\r\nOther eth2 clients detects this exception and returns:\r\n- lighthouse: `Ssz decode failed: OutOfBoundsByte { i: 0 }`\r\n- nim: `SszSizeMismatchError`\r\n\r\n### Related code:\r\n\r\nhttps://github.com/PegaSysEng/teku/blob/c6e8e56b7a0edc078a88d1b40587262d22bd4c0a/ssz/src/main/java/tech/pegasys/artemis/ssz/SSZTypes/SSZArrayCollection.java#L66-L72 \r\n\r\n### Steps to Reproduce (Bug)\r\n\r\n- Download: [list_out_of_bound_teku.zip](https://github.com/PegaSysEng/teku/files/4540133/list_out_of_bound_teku.zip)\r\n\r\n- Crash:\r\n``` sh\r\n# install\r\n./gradlew distTar installDist\r\n\r\n# go to build folder\r\ncd build/install/\r\n\r\n# Run teku\r\nbin/teku transition blocks --pre=list_out_of_bound_state_teku.ssz --network=mainnet list_out_of_bound_block_teku.ssz\r\njava.lang.IllegalArgumentException: List out of bounds\r\n\tat tech.pegasys.artemis.ssz.SSZTypes.SSZArrayCollection.add(SSZArrayCollection.java:70)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeFixedElementList(SimpleOffsetSerializer.java:417)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeVariableParts(SimpleOffsetSerializer.java:329)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeContainer(SimpleOffsetSerializer.java:229)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeVariableParts(SimpleOffsetSerializer.java:348)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeContainer(SimpleOffsetSerializer.java:229)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeVariableParts(SimpleOffsetSerializer.java:348)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeContainer(SimpleOffsetSerializer.java:229)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserializeContainerErrorWrapper(SimpleOffsetSerializer.java:205)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.lambda$deserialize$1(SimpleOffsetSerializer.java:196)\r\n\tat org.apache.tuweni.ssz.SSZ.decode(SSZ.java:1255)\r\n\tat tech.pegasys.artemis.datastructures.util.SimpleOffsetSerializer.deserialize(SimpleOffsetSerializer.java:194)\r\n\tat tech.pegasys.artemis.cli.subcommand.TransitionCommand.readBlock(TransitionCommand.java:158)\r\n\tat tech.pegasys.artemis.cli.subcommand.TransitionCommand.lambda$blocks$0(TransitionCommand.java:81)\r\n\tat tech.pegasys.artemis.cli.subcommand.TransitionCommand.processStateTransition(TransitionCommand.java:131)\r\n\tat tech.pegasys.artemis.cli.subcommand.TransitionCommand.blocks(TransitionCommand.java:76)\r\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\r\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\r\n\tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\r\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:566)\r\n\tat picocli.CommandLine.executeUserObject(CommandLine.java:1802)\r\n\tat picocli.CommandLine.access$900(CommandLine.java:145)\r\n\tat picocli.CommandLine$RunLast.executeUserObjectOfLastSubcommandWithSameParent(CommandLine.java:2150)\r\n\tat picocli.CommandLine$RunLast.handle(CommandLine.java:2144)\r\n\tat picocli.CommandLine$RunLast.handle(CommandLine.java:2108)\r\n\tat picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:1975)\r\n\tat picocli.CommandLine.execute(CommandLine.java:1904)\r\n\tat tech.pegasys.artemis.cli.BeaconNodeCommand.parse(BeaconNodeCommand.java:185)\r\n\tat tech.pegasys.artemis.Artemis.main(Artemis.java:31)\r\n```\r\n\r\n### Versions\r\n* Github branch: `master`\r\n* Github commit: 1cc346671521a4381776bb9145af1be3b290fe8b\r\n* Java version: `openjdk version \"11.0.7\" 2020-04-14`\r\n* OS Name & Version: `Ubuntu 18.04.4 LTS`\r\n* Kernel Version: `4.15.0-96-generic`\r\n",
+  "closed_by": {
+    "login": "ajsutton",
+    "id": 72675,
+    "node_id": "MDQ6VXNlcjcyNjc1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/72675?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ajsutton",
+    "html_url": "https://github.com/ajsutton",
+    "followers_url": "https://api.github.com/users/ajsutton/followers",
+    "following_url": "https://api.github.com/users/ajsutton/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ajsutton/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ajsutton/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ajsutton/subscriptions",
+    "organizations_url": "https://api.github.com/users/ajsutton/orgs",
+    "repos_url": "https://api.github.com/users/ajsutton/repos",
+    "events_url": "https://api.github.com/users/ajsutton/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ajsutton/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ConsenSys/teku/issues/1675/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ConsenSys/teku/issues/1675/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

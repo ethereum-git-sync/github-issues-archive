@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/ConsenSys/teku/issues/2557",
+  "repository_url": "https://api.github.com/repos/ConsenSys/teku",
+  "labels_url": "https://api.github.com/repos/ConsenSys/teku/issues/2557/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ConsenSys/teku/issues/2557/comments",
+  "events_url": "https://api.github.com/repos/ConsenSys/teku/issues/2557/events",
+  "html_url": "https://github.com/ConsenSys/teku/issues/2557",
+  "id": 677197270,
+  "node_id": "MDU6SXNzdWU2NzcxOTcyNzA=",
+  "number": 2557,
+  "title": "Peculiar OutOfMemoryError: Java heap space incident",
+  "user": {
+    "login": "benjaminion",
+    "id": 20796281,
+    "node_id": "MDQ6VXNlcjIwNzk2Mjgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20796281?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjaminion",
+    "html_url": "https://github.com/benjaminion",
+    "followers_url": "https://api.github.com/users/benjaminion/followers",
+    "following_url": "https://api.github.com/users/benjaminion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjaminion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjaminion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjaminion/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjaminion/orgs",
+    "repos_url": "https://api.github.com/users/benjaminion/repos",
+    "events_url": "https://api.github.com/users/benjaminion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjaminion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1048919129,
+      "node_id": "MDU6TGFiZWwxMDQ4OTE5MTI5",
+      "url": "https://api.github.com/repos/ConsenSys/teku/labels/bug%20%F0%9F%90%9E",
+      "name": "bug 🐞",
+      "color": "dd6c94",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 2172542566,
+      "node_id": "MDU6TGFiZWwyMTcyNTQyNTY2",
+      "url": "https://api.github.com/repos/ConsenSys/teku/labels/P3",
+      "name": "P3",
+      "color": "FFFF00",
+      "default": false,
+      "description": "Medium"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-08-11T21:06:12Z",
+  "updated_at": "2020-08-18T14:45:23Z",
+  "closed_at": "2020-08-18T14:45:23Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "This is a weird one.\r\n\r\nI'm running with `-Xmx2g` (2GB heap space). Metrics show that heap usage is well below this. Yet I received an OOM as per the stack trace below.\r\n\r\nI suggest taking a precautionary look at the RLP decoder just in case there is anything untoward occurring. If it looks fine we can close this, and reopen if we see it again.\r\n\r\n### Hypothesis to test\r\n\r\nDid the RLP decoder try (and fail) to allocate an enormous chunk of memory, perhaps due to some rogue input? Humungous objects are dealt with solely by Old GC, which might explain why that became active at this point.\r\n\r\n### Observations\r\n\r\n1. Teku did not die - after this error, everything carried on as before\r\n2. Teku _did_ produce a heap dump\r\n3. The heap dump is ~470MB only\r\n4. Putting the heap dump into VisualVM shows only 420MB of heap in use (nowhere near 2GB)\r\n5. In my metrics, there was a spike in Old GC at exactly this time, but nothing in New GC.\r\n\r\n### Stack trace\r\n\r\n```\r\n2020-08-10 13:46:40.011+00:00 | nioEventLoopGroup-4-1 | WARN  | DefaultChannelPipeline | An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.\r\njava.lang.OutOfMemoryError: Java heap space\r\n        at org.web3j.rlp.RlpDecoder.traverse(RlpDecoder.java:123) ~[rlp-4.6.1.jar:?]\r\n        at org.web3j.rlp.RlpDecoder.traverse(RlpDecoder.java:139) ~[rlp-4.6.1.jar:?]\r\n        at org.web3j.rlp.RlpDecoder.traverse(RlpDecoder.java:139) ~[rlp-4.6.1.jar:?]\r\n        at org.web3j.rlp.RlpDecoder.decode(RlpDecoder.java:65) ~[rlp-4.6.1.jar:?]\r\n        at org.ethereum.beacon.discovery.packet.RandomPacket.decode(RandomPacket.java:72) ~[discovery-0.3.8-dev-840e90be.jar:0.3.8-dev-840e90be]\r\n        at org.ethereum.beacon.discovery.packet.RandomPacket.getAuthTag(RandomPacket.java:59) ~[discovery-0.3.8-dev-840e90be.jar:0.3.8-dev-840e90be]\r\n        at org.ethereum.beacon.discovery.pipeline.handler.NotExpectedIncomingPacketHandler.handle(NotExpectedIncomingPacketHandler.java:53) ~[discovery-0.3.8-dev-840e90be.jar:0.3.8-dev-840e90be]\r\n        at org.ethereum.beacon.discovery.pipeline.PipelineImpl$$Lambda$787/0x00000008010a7840.accept(Unknown Source) ~[?:?]\r\n        at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onNext(FluxPeekFuseable.java:189) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onNext(FluxPeekFuseable.java:203) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onNext(FluxPeekFuseable.java:203) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onNext(FluxPeekFuseable.java:203) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onNext(FluxPeekFuseable.java:203) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onNext(FluxPeekFuseable.java:203) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxPeekFuseable$PeekFuseableSubscriber.onNext(FluxPeekFuseable.java:203) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxReplay$SizeBoundReplayBuffer.replayNormal(FluxReplay.java:814) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxReplay$SizeBoundReplayBuffer.replay(FluxReplay.java:898) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.ReplayProcessor.onNext(ReplayProcessor.java:442) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxCreate$IgnoreSink.next(FluxCreate.java:618) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxCreate$SerializedSink.next(FluxCreate.java:153) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at org.ethereum.beacon.discovery.pipeline.PipelineImpl.push(PipelineImpl.java:43) ~[discovery-0.3.8-dev-840e90be.jar:0.3.8-dev-840e90be]\r\n        at org.ethereum.beacon.discovery.DiscoveryManagerImpl$$Lambda$788/0x00000008010a7c40.accept(Unknown Source) ~[?:?]\r\n        at reactor.core.publisher.LambdaSubscriber.onNext(LambdaSubscriber.java:160) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxReplay$SizeBoundReplayBuffer.replayNormal(FluxReplay.java:814) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxReplay$SizeBoundReplayBuffer.replay(FluxReplay.java:898) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.ReplayProcessor.onNext(ReplayProcessor.java:442) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxCreate$IgnoreSink.next(FluxCreate.java:618) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at reactor.core.publisher.FluxCreate$SerializedSink.next(FluxCreate.java:153) ~[reactor-core-3.3.7.RELEASE.jar:3.3.7.RELEASE]\r\n        at org.ethereum.beacon.discovery.network.IncomingMessageSink.channelRead0(IncomingMessageSink.java:31) ~[discovery-0.3.8-dev-840e90be.jar:0.3.8-dev-840e90be]\r\n        at org.ethereum.beacon.discovery.network.IncomingMessageSink.channelRead0(IncomingMessageSink.java:20) ~[discovery-0.3.8-dev-840e90be.jar:0.3.8-dev-840e90be]\r\n        at io.netty.channel.SimpleChannelInboundHandler.channelRead(SimpleChannelInboundHandler.java:99) ~[netty-all-4.1.51.Final.jar:4.1.51.Final]\r\n        at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379) ~[netty-all-4.1.51.Final.jar:4.1.51.Final]\r\n```\r\n\r\nVersion: teku/v0.12.3-dev-79ef540b/linux-x86_64/-privatebuild-openjdk64bitservervm-java-13\r\n",
+  "closed_by": {
+    "login": "cemozerr",
+    "id": 16581242,
+    "node_id": "MDQ6VXNlcjE2NTgxMjQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16581242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cemozerr",
+    "html_url": "https://github.com/cemozerr",
+    "followers_url": "https://api.github.com/users/cemozerr/followers",
+    "following_url": "https://api.github.com/users/cemozerr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cemozerr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cemozerr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cemozerr/subscriptions",
+    "organizations_url": "https://api.github.com/users/cemozerr/orgs",
+    "repos_url": "https://api.github.com/users/cemozerr/repos",
+    "events_url": "https://api.github.com/users/cemozerr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cemozerr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ConsenSys/teku/issues/2557/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 1
+  },
+  "timeline_url": "https://api.github.com/repos/ConsenSys/teku/issues/2557/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

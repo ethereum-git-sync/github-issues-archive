@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/ConsenSys/teku/issues/850",
+  "repository_url": "https://api.github.com/repos/ConsenSys/teku",
+  "labels_url": "https://api.github.com/repos/ConsenSys/teku/issues/850/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ConsenSys/teku/issues/850/comments",
+  "events_url": "https://api.github.com/repos/ConsenSys/teku/issues/850/events",
+  "html_url": "https://github.com/ConsenSys/teku/issues/850",
+  "id": 488893659,
+  "node_id": "MDU6SXNzdWU0ODg4OTM2NTk=",
+  "number": 850,
+  "title": "Guava EventBus Exception Handling ",
+  "user": {
+    "login": "jrhea",
+    "id": 5555162,
+    "node_id": "MDQ6VXNlcjU1NTUxNjI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5555162?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jrhea",
+    "html_url": "https://github.com/jrhea",
+    "followers_url": "https://api.github.com/users/jrhea/followers",
+    "following_url": "https://api.github.com/users/jrhea/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jrhea/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jrhea/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jrhea/subscriptions",
+    "organizations_url": "https://api.github.com/users/jrhea/orgs",
+    "repos_url": "https://api.github.com/users/jrhea/repos",
+    "events_url": "https://api.github.com/users/jrhea/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jrhea/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1048919132,
+      "node_id": "MDU6TGFiZWwxMDQ4OTE5MTMy",
+      "url": "https://api.github.com/repos/ConsenSys/teku/labels/help%20wanted%20%F0%9F%86%98",
+      "name": "help wanted 🆘",
+      "color": "eaa89a",
+      "default": false,
+      "description": "Extra attention is needed"
+    },
+    {
+      "id": 1170684912,
+      "node_id": "MDU6TGFiZWwxMTcwNjg0OTEy",
+      "url": "https://api.github.com/repos/ConsenSys/teku/labels/good%20first%20issue%20:raising_hand:",
+      "name": "good first issue :raising_hand:",
+      "color": "006b75",
+      "default": false,
+      "description": "This is a good first issue for a new contributor to work on"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-09-04T01:26:57Z",
+  "updated_at": "2019-10-08T16:17:54Z",
+  "closed_at": "2019-10-08T16:17:54Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/PegasysEng/artemis/blob/master/CODE-OF-CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging wiki: https://github.com/PegasysEng/artemis/wiki/debugging -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3APegasysEng/Artemis -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\n\r\nExceptions thrown within guava event handlers are automatically trapped and logged.  It was fine for early development, but we do not want to continue this going into production. \r\n\r\nThis is what happens when an assert (defined in the spec) is triggered:\r\n\r\n```\r\nSep 03, 2019 5:52:17 PM com.google.common.eventbus.EventBus$LoggingHandler handleException\r\nSEVERE: Exception thrown by subscriber method onBlock(tech.pegasys.artemis.datastructures.blocks.BeaconBlock) on subscriber tech.pegasys.artemis.statetransition.StateProcessor@6ba060f3 when dispatching event: tech.pegasys.artemis.datastructures.blocks.BeaconBlock@8817775e\r\njava.lang.IllegalArgumentException: on_block: Parent block state is not contained in block_state\r\n at com.google.common.base.Preconditions.checkArgument(Preconditions.java:141)\r\n at tech.pegasys.artemis.statetransition.util.ForkChoiceUtil.on_block(ForkChoiceUtil.java:181)\r\n at tech.pegasys.artemis.statetransition.StateProcessor.onBlock(StateProcessor.java:168)\r\n at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\r\n at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\r\n at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\r\n at java.base/java.lang.reflect.Method.invoke(Method.java:566)\r\n at com.google.common.eventbus.Subscriber.invokeSubscriberMethod(Subscriber.java:87)\r\n at com.google.common.eventbus.Subscriber$SynchronizedSubscriber.invokeSubscriberMethod(Subscriber.java:144)\r\n at com.google.common.eventbus.Subscriber$1.run(Subscriber.java:72)\r\n at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)\r\n at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)\r\n at java.base/java.lang.Thread.run(Thread.java:834)\r\n```\r\n#### Possible Solution \r\n* creating a class implementing the SubscriberExceptionHandler interface\r\n* pass an instance to the EventBus's constructor\r\n\r\nhttps://stackoverflow.com/questions/33599690/google-guava-eventbus-and-exceptions-in-event-handlers/35682964#35682964\r\n",
+  "closed_by": {
+    "login": "cemozerr",
+    "id": 16581242,
+    "node_id": "MDQ6VXNlcjE2NTgxMjQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16581242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cemozerr",
+    "html_url": "https://github.com/cemozerr",
+    "followers_url": "https://api.github.com/users/cemozerr/followers",
+    "following_url": "https://api.github.com/users/cemozerr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cemozerr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cemozerr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cemozerr/subscriptions",
+    "organizations_url": "https://api.github.com/users/cemozerr/orgs",
+    "repos_url": "https://api.github.com/users/cemozerr/repos",
+    "events_url": "https://api.github.com/users/cemozerr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cemozerr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ConsenSys/teku/issues/850/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ConsenSys/teku/issues/850/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

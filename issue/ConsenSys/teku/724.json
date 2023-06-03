@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ConsenSys/teku/issues/724",
+  "repository_url": "https://api.github.com/repos/ConsenSys/teku",
+  "labels_url": "https://api.github.com/repos/ConsenSys/teku/issues/724/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ConsenSys/teku/issues/724/comments",
+  "events_url": "https://api.github.com/repos/ConsenSys/teku/issues/724/events",
+  "html_url": "https://github.com/ConsenSys/teku/issues/724",
+  "id": 457130528,
+  "node_id": "MDU6SXNzdWU0NTcxMzA1Mjg=",
+  "number": 724,
+  "title": "v0.7.1 Fork Choice Updates",
+  "user": {
+    "login": "cemozerr",
+    "id": 16581242,
+    "node_id": "MDQ6VXNlcjE2NTgxMjQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16581242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cemozerr",
+    "html_url": "https://github.com/cemozerr",
+    "followers_url": "https://api.github.com/users/cemozerr/followers",
+    "following_url": "https://api.github.com/users/cemozerr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cemozerr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cemozerr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cemozerr/subscriptions",
+    "organizations_url": "https://api.github.com/users/cemozerr/orgs",
+    "repos_url": "https://api.github.com/users/cemozerr/repos",
+    "events_url": "https://api.github.com/users/cemozerr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cemozerr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-06-17T20:21:18Z",
+  "updated_at": "2019-06-25T15:21:26Z",
+  "closed_at": "2019-06-25T15:21:26Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<pre>\r\ndef lmd_ghost(store: Store, start_state: BeaconState, start_block: BeaconBlock) -> BeaconBlock:\r\n    \"\"\"\r\n    Execute the LMD-GHOST algorithm to find the head ``BeaconBlock``.\r\n    \"\"\"\r\n    validators = start_state.validator_registry\r\n    active_validator_indices = get_active_validator_indices(validators, slot_to_epoch(start_state.slot))\r\n    <b>attestation_targets = [(i, get_latest_attestation_target(store, i)) for i in active_validator_indices]</b>\r\n\r\n<b>\r\n    # Use the rounded-balance-with-hysteresis supplied by the protocol for fork\r\n    # choice voting. This reduces the number of recomputations that need to be\r\n    # made for optimized implementations that precompute and save data</b>\r\n    def get_vote_count(block: BeaconBlock) -> int:\r\n        return sum(\r\n            <b>start_state.validator_registry[validator_index].effective_balance</b>\r\n            for validator_index, target in attestation_targets\r\n            if get_ancestor(store, target, block.slot) == block\r\n        )\r\n\r\n    head = start_block\r\n    while 1:\r\n        children = get_children(store, head)\r\n        if len(children) == 0:\r\n            return head\r\n        # Ties broken by favoring block with lexicographically higher root\r\n        head = max(children, key=lambda x: (get_vote_count(x), hash_tree_root(x)))\r\n</pre>\r\n\r\n## Implementation notes\r\n\r\n### Justification and finality at genesis\r\n\r\n**During genesis, justification and finality root fields within the `BeaconState` reference `ZERO_HASH` rather than a known block. `ZERO_HASH` in `previous_justified_root`, `current_justified_root`, and `finalized_root` should be considered as an alias to the root of the genesis block.**",
+  "closed_by": {
+    "login": "cemozerr",
+    "id": 16581242,
+    "node_id": "MDQ6VXNlcjE2NTgxMjQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16581242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cemozerr",
+    "html_url": "https://github.com/cemozerr",
+    "followers_url": "https://api.github.com/users/cemozerr/followers",
+    "following_url": "https://api.github.com/users/cemozerr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cemozerr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cemozerr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cemozerr/subscriptions",
+    "organizations_url": "https://api.github.com/users/cemozerr/orgs",
+    "repos_url": "https://api.github.com/users/cemozerr/repos",
+    "events_url": "https://api.github.com/users/cemozerr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cemozerr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ConsenSys/teku/issues/724/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ConsenSys/teku/issues/724/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ConsenSys/teku/issues/5244",
+  "repository_url": "https://api.github.com/repos/ConsenSys/teku",
+  "labels_url": "https://api.github.com/repos/ConsenSys/teku/issues/5244/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ConsenSys/teku/issues/5244/comments",
+  "events_url": "https://api.github.com/repos/ConsenSys/teku/issues/5244/events",
+  "html_url": "https://github.com/ConsenSys/teku/issues/5244",
+  "id": 1182862778,
+  "node_id": "I_kwDOCM9I9M5GgQ26",
+  "number": 5244,
+  "title": "Improve block pre-state caching",
+  "user": {
+    "login": "ajsutton",
+    "id": 72675,
+    "node_id": "MDQ6VXNlcjcyNjc1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/72675?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ajsutton",
+    "html_url": "https://github.com/ajsutton",
+    "followers_url": "https://api.github.com/users/ajsutton/followers",
+    "following_url": "https://api.github.com/users/ajsutton/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ajsutton/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ajsutton/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ajsutton/subscriptions",
+    "organizations_url": "https://api.github.com/users/ajsutton/orgs",
+    "repos_url": "https://api.github.com/users/ajsutton/repos",
+    "events_url": "https://api.github.com/users/ajsutton/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ajsutton/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-03-28T04:24:17Z",
+  "updated_at": "2022-03-28T04:24:17Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\nCurrently we cache the pre-state for blocks as a checkpoint state which means the states are held for longer than they are actually useful and compete for space with the states used for validating attestations.\r\n\r\nWe do want to ensure we continue precaching the epoch transition and could benefit from pre-computing and caching the slot transition for all blocks. However, we only need to maintain a relatively small number of these cached states to facilitate validating and importing newly received blocks.  Once they are more than a couple of slots old they are unlikely to be required again.\r\n\r\nWe need to avoid applying too many empty slots in this cache and definitely don't do this preparation while syncing.\r\n\r\nGiven slot processing is quite fast so long as an epoch transition isn't required, it may be worth investigating dropping checkpoint states from the cache that are:\r\n\r\n * more than a few slots behind the current slot (based on clock time)\r\n * not for the first slot of an epoch\r\n * not for a slot in a later epoch than the state they were created from (this rule may be unnecessary given the previous one)\r\n\r\nThere may be better approaches - need to test in multiple scenarios, including long periods of non-finalization with multiple branches.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ConsenSys/teku/issues/5244/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ConsenSys/teku/issues/5244/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
