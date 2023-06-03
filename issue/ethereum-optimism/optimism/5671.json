@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5671",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5671/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5671/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5671/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/5671",
+  "id": 1702840476,
+  "node_id": "I_kwDODjvEJM5lf0ic",
+  "number": 5671,
+  "title": "op-node: allow DataFromEVMTransactions to return error",
+  "user": {
+    "login": "tuxcanfly",
+    "id": 132667,
+    "node_id": "MDQ6VXNlcjEzMjY2Nw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/132667?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tuxcanfly",
+    "html_url": "https://github.com/tuxcanfly",
+    "followers_url": "https://api.github.com/users/tuxcanfly/followers",
+    "following_url": "https://api.github.com/users/tuxcanfly/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tuxcanfly/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tuxcanfly/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tuxcanfly/subscriptions",
+    "organizations_url": "https://api.github.com/users/tuxcanfly/orgs",
+    "repos_url": "https://api.github.com/users/tuxcanfly/repos",
+    "events_url": "https://api.github.com/users/tuxcanfly/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tuxcanfly/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2907832555,
+      "node_id": "MDU6TGFiZWwyOTA3ODMyNTU1",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-feature-request",
+      "name": "C-feature-request",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: A feature request."
+    },
+    {
+      "id": 5251919362,
+      "node_id": "LA_kwDODjvEJM8AAAABOQnuAg",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-bedrock",
+      "name": "C-bedrock",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: Something about Bedrock"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-09T22:34:39Z",
+  "updated_at": "2023-05-11T11:07:14Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\n**Is your feature request related to a problem? Please describe.**\r\n\r\nWhen switching Data Availability layers, there can be a temporary connection error fetching frame data corresponding to the frame pointer posted on ethereum. Right now ethereum related temporary errors are handled by passing `TemporaryError` for e.g. in `DataSource.Next`:\r\n\r\n```\r\n// Next returns the next piece of data if it has it. If the constructor failed, this\r\n// will attempt to reinitialize itself. If it cannot find the block it returns a ResetError\r\n// otherwise it returns a temporary error if fetching the block returns an error.\r\nfunc (ds *DataSource) Next(ctx context.Context) (eth.Data, error) {\r\n                ...\r\n\t\t} else if errors.Is(err, ethereum.NotFound) {\r\n\t\t\treturn nil, NewResetError(fmt.Errorf(\"failed to open calldata source: %w\", err))\r\n\t\t} else {\r\n\t\t\treturn nil, NewTemporaryError(fmt.Errorf(\"failed to open calldata source: %w\", err))\r\n\t\t}\r\n\t}\r\n```\r\n\r\n\r\n**Describe the solution you'd like**\r\n\r\nIt would be useful if `DataFromEVMTransactions` also returned an error, so that the caller could wrap it in a `TemporaryError`, similar to the above caller. This way, temporary errors from resolving the frame data from the pointer would be handled gracefully and retried. Right now there is no way for an alternate Data Availability layer resolving frame data from the pointer to signal that there's a temporary error and the caller _must_ retry. Hence, the suggestion is to simply add `error` to the function signature:\r\n\r\n`func DataFromEVMTransactions(config *rollup.Config, daCfg *rollup.DAConfig, batcherAddr common.Address, txs types.Transactions, log log.Logger) []eth.Data {`\r\n\r\nto\r\n\r\n`func DataFromEVMTransactions(config *rollup.Config, daCfg *rollup.DAConfig, batcherAddr common.Address, txs types.Transactions, log log.Logger) ([]eth.Data, error) {`\r\n\r\nand have the caller return a wrapped temporary error in case of a connection error to the Data Availability layer.\r\n\r\n**Describe alternatives you've considered**\r\n\r\nAs an alternative the Data Availability layer can maintain a fork of the same code with this error plugged in, however it would be very helpful to have this handled upstream so that an integration would be easier in the future, for e.g. with an interface.\r\n\r\n**Additional context**\r\n\r\nThis would be a small function signature change for upstream but it would be really helpful in keeping the forks easier to maintain.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5671/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5671/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

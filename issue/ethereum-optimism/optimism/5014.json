@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5014",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5014/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5014/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5014/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/5014",
+  "id": 1602863637,
+  "node_id": "I_kwDODjvEJM5ficIV",
+  "number": 5014,
+  "title": "cannot decode custom error on optimism mainnet",
+  "user": {
+    "login": "davidinsuomi",
+    "id": 1399563,
+    "node_id": "MDQ6VXNlcjEzOTk1NjM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1399563?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/davidinsuomi",
+    "html_url": "https://github.com/davidinsuomi",
+    "followers_url": "https://api.github.com/users/davidinsuomi/followers",
+    "following_url": "https://api.github.com/users/davidinsuomi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/davidinsuomi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/davidinsuomi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/davidinsuomi/subscriptions",
+    "organizations_url": "https://api.github.com/users/davidinsuomi/orgs",
+    "repos_url": "https://api.github.com/users/davidinsuomi/repos",
+    "events_url": "https://api.github.com/users/davidinsuomi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/davidinsuomi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2907832490,
+      "node_id": "MDU6TGFiZWwyOTA3ODMyNDkw",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-bug",
+      "name": "C-bug",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: This is a bug."
+    },
+    {
+      "id": 2981541772,
+      "node_id": "MDU6TGFiZWwyOTgxNTQxNzcy",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/P-confirmed",
+      "name": "P-confirmed",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "A confirmed bug"
+    },
+    {
+      "id": 4266439918,
+      "node_id": "LA_kwDODjvEJM7-TLTu",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-bedrock-fixes-this",
+      "name": "C-bedrock-fixes-this",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: Something Bedrock fixes"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-28T11:28:32Z",
+  "updated_at": "2023-03-11T03:04:55Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "The issue relates to inconsistent custom error returns in the smart contracts between the Optimism mainnet and testnet RPC requests. The problem can be reproduced through the following steps:\r\n\r\n1. Deploy a simple test contract on the Optimism mainnet: https://optimistic.etherscan.io/address/0xdf07d7fbc2007fb4efaec22207882c4bc1b457cf#code\r\n\r\n2. Deploy the same test contract on the Optimism testnet: https://goerli-optimism.etherscan.io/address/0xdf07d7fbc2007fb4efaec22207882c4bc1b457cf#code\r\n\r\n3. Write a simple test script.\r\n\r\n```\r\nconst ethers = require(\"ethers\");\r\nconst ABI = [\r\n  {\r\n    inputs: [\r\n      {\r\n        internalType: \"uint256\",\r\n        name: \"_m\",\r\n        type: \"uint256\",\r\n      },\r\n      {\r\n        internalType: \"string\",\r\n        name: \"_msg\",\r\n        type: \"string\",\r\n      },\r\n    ],\r\n    name: \"MyCustomError\",\r\n    type: \"error\",\r\n  },\r\n  {\r\n    inputs: [\r\n      {\r\n        internalType: \"string\",\r\n        name: \"_msg\",\r\n        type: \"string\",\r\n      },\r\n    ],\r\n    name: \"test\",\r\n    outputs: [],\r\n    stateMutability: \"view\",\r\n    type: \"function\",\r\n  },\r\n];\r\nasync function queryCustomError() {\r\n  // query op goerli\r\n  console.log(\"try testnet custom error\");\r\n  const contractAddress = \"0xdf07d7fbc2007fb4efaec22207882c4bc1b457cf\";\r\n  const testnet_provider = new ethers.providers.JsonRpcProvider(\r\n    `https://goerli.optimism.io`\r\n  );\r\n  const testnet_contract = new ethers.Contract(\r\n    contractAddress,\r\n    ABI,\r\n    testnet_provider\r\n  );\r\n  try {\r\n    await testnet_contract.test(\"hello\");\r\n  } catch (e) {\r\n    console.log(e);\r\n  }\r\n  console.log(\"try mainnet custom error\");\r\n  const provider = new ethers.providers.JsonRpcProvider(\r\n    `https://mainnet.optimism.io`\r\n  );\r\n  const contract = new ethers.Contract(contractAddress, ABI, provider);\r\n  try {\r\n    await contract.test(\"hello\");\r\n  } catch (e) {\r\n    console.log(e);\r\n  }\r\n}\r\nqueryCustomError();\r\n\r\n```\r\n\r\nIn the goerli testnet, the custom error return can be correctly parsed and looks like:\r\n```\r\ncode: 'CALL_EXCEPTION',\r\n  method: 'test(string)',\r\n  data: '0x9195785a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000568656c6c6f000000000000000000000000000000000000000000000000000000',\r\n  errorArgs: [\r\n    BigNumber { _hex: '0x01', _isBigNumber: true },\r\n    'hello',\r\n    _m: BigNumber { _hex: '0x01', _isBigNumber: true },\r\n    _msg: 'hello'\r\n  ],\r\n  errorName: 'MyCustomError',\r\n  errorSignature: 'MyCustomError(uint256,string)',\r\n  address: '0xdf07d7fbc2007fb4efaec22207882c4bc1b457cf',\r\n  args: [ 'hello' ],\r\n  transaction: {\r\n    data: '0xf9fbd5540000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000568656c6c6f000000000000000000000000000000000000000000000000000000',\r\n    to: '0xDF07d7FBc2007fB4eFAEc22207882c4bc1B457cf'\r\n  }\r\n}\r\n```\r\nin curl raw format\r\n\r\n```\r\ncurl -X POST https://goerli.optimism.io --data '{\"method\":\"eth_call\",\"params\":[{\"to\":\"0xdf07d7fbc2007fb4efaec22207882c4bc1b457cf\",\"data\":\"0xf9fbd5540000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000568656c6c6f000000000000000000000000000000000000000000000000000000\"},\"latest\"],\"id\":44,\"jsonrpc\":\"2.0\"}'\r\n{\"jsonrpc\":\"2.0\",\"error\":{\"code\":3,\"message\":\"execution reverted\",\"data\":\"0x9195785a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000568656c6c6f000000000000000000000000000000000000000000000000000000\"},\"id\":44}\r\n```\r\n\r\nHowever, on the mainnet, the custom error return cannot be parsed correctly and looks like:\r\n```\r\n  reason: 'missing revert data in call exception; Transaction reverted without a reason string',\r\n  code: 'CALL_EXCEPTION',\r\n  data: '0x',\r\n  transaction: {\r\n    to: '0xDF07d7FBc2007fB4eFAEc22207882c4bc1B457cf',\r\n    data: '0xf9fbd5540000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000568656c6c6f000000000000000000000000000000000000000000000000000000',\r\n    accessList: null\r\n  },\r\n\r\n    reason: 'processing response error',\r\n    code: 'SERVER_ERROR',\r\n    body: '{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"execution reverted\"},\"id\":44}\\n',\r\n```\r\nin curl raw format\r\n```\r\ncurl -X POST https://mainnet.optimism.io --data '{\"method\":\"eth_call\",\"params\":[{\"to\":\"0xdf07d7fbc2007fb4efaec22207882c4bc1b457cf\",\"data\":\"0xf9fbd5540000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000568656c6c6f000000000000000000000000000000000000000000000000000000\"},\"latest\"],\"id\":44,\"jsonrpc\":\"2.0\"}'\r\n{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"execution reverted\"},\"id\":44}\r\n```\r\n\r\nIt only returns -32000 error code without additional information about the custom error. \r\nIt seems the nodes on the Optimism mainnet and testnet are different. In the mainnet, custom error returns cannot be parsed correctly.\r\n\r\nUpdate: the geth on the optimism mainnet and goerli testnet do run different versions:\r\ngoerli testnet:\r\n```\r\n curl -X POST https://goerli.optimism.io --data '{\"jsonrpc\":\"2.0\",\"method\":\"web3_clientVersion\",\"params\":[],\"id\":67}'\r\n{\"jsonrpc\":\"2.0\",\"result\":\"Geth/v0.1.0-unstable-985086bf-20230131/linux-amd64/go1.18.10\",\"id\":67}\r\n```\r\nmainnet:\r\n```\r\ncurl -X POST https://mainnet.optimism.io --data '{\"jsonrpc\":\"2.0\",\"method\":\"web3_clientVersion\",\"params\":[],\"id\":67}'\r\n{\"jsonrpc\":\"2.0\",\"result\":\"Geth/v1.9.10-stable/linux-amd64/go1.18\",\"id\":67}\r\n```\r\nwhy the new version of geth cannot decode custom error correctly",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5014/reactions",
+    "total_count": 3,
+    "+1": 3,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5014/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

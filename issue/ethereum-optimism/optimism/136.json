@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/136",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/136/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/136/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/136/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/136",
+  "id": 615174401,
+  "node_id": "MDU6SXNzdWU2MTUxNzQ0MDE=",
+  "number": 136,
+  "title": "Error using mnemonic for L2 wallet generation",
+  "user": {
+    "login": "MFranceschi6",
+    "id": 9447889,
+    "node_id": "MDQ6VXNlcjk0NDc4ODk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9447889?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MFranceschi6",
+    "html_url": "https://github.com/MFranceschi6",
+    "followers_url": "https://api.github.com/users/MFranceschi6/followers",
+    "following_url": "https://api.github.com/users/MFranceschi6/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MFranceschi6/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MFranceschi6/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MFranceschi6/subscriptions",
+    "organizations_url": "https://api.github.com/users/MFranceschi6/orgs",
+    "repos_url": "https://api.github.com/users/MFranceschi6/repos",
+    "events_url": "https://api.github.com/users/MFranceschi6/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MFranceschi6/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-05-09T13:15:56Z",
+  "updated_at": "2020-07-30T14:29:07Z",
+  "closed_at": "2020-07-30T14:29:07Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Describe the bug**\r\nRollup-fullnode fails to deploy the execution manager using mnemonic with error:\r\n```\r\n(node:34) UnhandledPromiseRejectionWarning: Error: missing provider\r\nat Wallet.sendTransaction (/mnt/full-node/node_modules/ethers/wallet.js:107:19)\r\nat ContractFactory.deploy (/mnt/full-node/node_modules/ethers/contract.js:683:28)\r\nat Object.deployContract (/mnt/full-node/packages/rollup-full-node/src/app/util/utils.ts:120:34)\r\nat deployExecutionManager (/mnt/full-node/packages/rollup-full-node/src/app/util/l2-node.ts:203:44)\r\nat getExecutionManagerContract (/mnt/full-node/packages/rollup-full-node/src/app/util/l2-node.ts:183:30)\r\nat processTicksAndRejections (internal/process/task_queues.js:86:5)\r\n````\r\n\r\n**Steps to reproduce**\r\nSteps to reproduce the behavior:\r\n1) yarn build\r\n2) add L2_WALLET_MNEMONIC env variable to the rollup-full-node service in the docker-compose.yml\r\n3) docker-compose up\r\n\r\n**Expected behavior**\r\nEverything starts up as exptected\r\n \r\n**Additional context**\r\nI've actually found the bug in the code:\r\n`packages/rollup-full-node/src/app/util/l2-node.ts`\r\n```js\r\n    ...\r\n    else if (!!Environment.l2WalletMnemonic()) {\r\n      wallet = Wallet.fromMnemonic(Environment.l2WalletMnemonic())\r\n      wallet.connect(provider)\r\n      log.info(`Initialized wallet from mnemonic. Address: ${wallet.address}`)\r\n    }\r\n    ...\r\n```\r\nat line 111 `wallet.connect(provider)` should be `wallet = wallet.connect(provider)`",
+  "closed_by": {
+    "login": "karlfloersch",
+    "id": 706123,
+    "node_id": "MDQ6VXNlcjcwNjEyMw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/706123?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/karlfloersch",
+    "html_url": "https://github.com/karlfloersch",
+    "followers_url": "https://api.github.com/users/karlfloersch/followers",
+    "following_url": "https://api.github.com/users/karlfloersch/following{/other_user}",
+    "gists_url": "https://api.github.com/users/karlfloersch/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/karlfloersch/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/karlfloersch/subscriptions",
+    "organizations_url": "https://api.github.com/users/karlfloersch/orgs",
+    "repos_url": "https://api.github.com/users/karlfloersch/repos",
+    "events_url": "https://api.github.com/users/karlfloersch/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/karlfloersch/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/136/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/136/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

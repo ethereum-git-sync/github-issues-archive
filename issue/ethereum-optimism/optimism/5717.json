@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5717",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5717/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5717/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5717/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/5717",
+  "id": 1711697693,
+  "node_id": "I_kwDODjvEJM5mBm8d",
+  "number": 5717,
+  "title": "proxyd failover is not working",
+  "user": {
+    "login": "umeshtyagitvz",
+    "id": 118340191,
+    "node_id": "U_kgDOBw26Xw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/118340191?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/umeshtyagitvz",
+    "html_url": "https://github.com/umeshtyagitvz",
+    "followers_url": "https://api.github.com/users/umeshtyagitvz/followers",
+    "following_url": "https://api.github.com/users/umeshtyagitvz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/umeshtyagitvz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/umeshtyagitvz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/umeshtyagitvz/subscriptions",
+    "organizations_url": "https://api.github.com/users/umeshtyagitvz/orgs",
+    "repos_url": "https://api.github.com/users/umeshtyagitvz/repos",
+    "events_url": "https://api.github.com/users/umeshtyagitvz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/umeshtyagitvz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2907832490,
+      "node_id": "MDU6TGFiZWwyOTA3ODMyNDkw",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-bug",
+      "name": "C-bug",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: This is a bug."
+    },
+    {
+      "id": 2930018676,
+      "node_id": "MDU6TGFiZWwyOTMwMDE4Njc2",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/P-unconfirmed",
+      "name": "P-unconfirmed",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Issue might be valid, but it’s not yet confirmed"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-16T10:09:44Z",
+  "updated_at": "2023-05-31T15:58:30Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Issue Description\r\n\r\nDeployed proxyd in the kubernetes and i have been using two ethereum rpc node as its backends. But when first backend goes down it does not send the request to second backend.\r\n\r\n## Steps to Reproduce\r\n\r\n1. Clone this repository: [](https://github.com/ethereum-optimism/optimism/proxyd)\r\n2. Build the docker image using given Dockerfile in the same repo\r\n3. This is the proxyd config \r\n`whitelist_error_message = \"rpc method is not whitelisted\"\r\n ws_method_whitelist = [\r\n  \"eth_subscribe\",\r\n  \"eth_accounts\",\r\n  \"eth_call\",\r\n  \"eth_chainId\"\r\n]\r\nws_backend_group = \"providers\"\r\n[server]\r\nrpc_host = \"0.0.0.0\"\r\nrpc_port = 8888\r\nws_host = \"0.0.0.0\"\r\nws_port = 8889\r\nmax_body_size_bytes = 10485760\r\nmax_concurrent_rpcs = 1000\r\nlog_level = \"info\"\r\n[metrics]\r\nenabled = true\r\nhost = \"0.0.0.0\"\r\nport = 9761\r\n[backend]\r\nresponse_timeout_seconds = 5\r\nmax_retries = 3\r\nout_of_service_seconds = 180\r\nmax_latency_threshold = \"30s\"\r\nmax_degraded_latency_threshold = \"10s\"\r\nmax_error_rate_threshold = 0.3\r\n[backends]\r\n[backends.ethereum-1]\r\nrpc_url = \"http://ethereum-archive-node-erigon.ethereum-archive:8545\"\r\nws_url = \"ws://ethereum-archive-node-erigon.ethereum-archive:8545\"\r\n[backends.ethereum-2]\r\nrpc_url = \"http://ethereum-archive-n0-erigon.ethereum-archive-n0:8545\"\r\nws_url = \"ws://ethereum-archive-n0-erigon.ethereum-archive-n0:8545\"\r\n[backend_groups]\r\n[backend_groups.providers]\r\nbackends = [\"ethereum-1\", \"ethereum-2\"]\r\n[rpc_method_mappings]\r\neth_chainId = \"providers\"\r\n[rate_limit]\r\nenable_backend_rate_limiter = true`\r\n\r\n## Expected Behavior\r\n\r\nWhen first backend of the group fails, proxyd automatically marks it as out of service for a configurable period of time and fails over to another backend.\r\n\r\n## Current Behavior\r\n\r\nIt is giving the error `context deadline exceeded` for both backends.\r\n\r\n## Environment\r\n\r\n- Kubernetes \r\n\r\n## Screenshots\r\n\r\n![Screenshot from 2023-05-15 09-55-03](https://github.com/ethereum-optimism/optimism/assets/118340191/0391ae6f-a213-4f22-bebd-bd38a1d22fb1)\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5717/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5717/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

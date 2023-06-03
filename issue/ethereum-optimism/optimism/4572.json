@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4572",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4572/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4572/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4572/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/4572",
+  "id": 1515603531,
+  "node_id": "I_kwDODjvEJM5aVkZL",
+  "number": 4572,
+  "title": "l2geth generates dirty files",
+  "user": {
+    "login": "gabronick",
+    "id": 54854657,
+    "node_id": "MDQ6VXNlcjU0ODU0NjU3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/54854657?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gabronick",
+    "html_url": "https://github.com/gabronick",
+    "followers_url": "https://api.github.com/users/gabronick/followers",
+    "following_url": "https://api.github.com/users/gabronick/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gabronick/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gabronick/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gabronick/subscriptions",
+    "organizations_url": "https://api.github.com/users/gabronick/orgs",
+    "repos_url": "https://api.github.com/users/gabronick/repos",
+    "events_url": "https://api.github.com/users/gabronick/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gabronick/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2907832490,
+      "node_id": "MDU6TGFiZWwyOTA3ODMyNDkw",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-bug",
+      "name": "C-bug",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: This is a bug."
+    },
+    {
+      "id": 2930018676,
+      "node_id": "MDU6TGFiZWwyOTMwMDE4Njc2",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/P-unconfirmed",
+      "name": "P-unconfirmed",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Issue might be valid, but it’s not yet confirmed"
+    },
+    {
+      "id": 4266439918,
+      "node_id": "LA_kwDODjvEJM7-TLTu",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-bedrock-fixes-this",
+      "name": "C-bedrock-fixes-this",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: Something Bedrock fixes"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-01-01T14:23:48Z",
+  "updated_at": "2023-01-20T19:52:25Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Describe the bug**\r\novertime 2geth generates dirty LDB files that are only cleaned up when restarting geth, this causes the disk to reach 100% and L2Geth crashes due to insufficient space, I have a 3.6 Tb disk with 43% effective data, and every 8 hours I have to be restarting l2geth so that it cleans these files and the disk can have space\r\n\r\n**To Reproduce**\r\nlet l2Geth run\r\n\r\nSERVICE FILE \r\n\r\n-----------------------------\r\n[Unit]\r\nDescription=Optimism l2geth\r\nAfter=syslog.target network.target\r\n\r\n[Service] \r\nEnvironment=\"CHAIN_ID=10\"\r\nEnvironment=\"DATADIR=/external/gethData\"\r\nEnvironment=\"NETWORK_ID=10\"\r\nEnvironment=\"NO_DISCOVER=true\"\r\nEnvironment=\"NO_USB=true\"\r\nEnvironment=\"GASPRICE=0\"\r\nEnvironment=\"GCMODE=archive\"\r\nEnvironment=\"BLOCK_SIGNER_ADDRESS=0x00000398232E2064F896018496b4b44b3D62751F\"\r\nEnvironment=\"BLOCK_SIGNER_PRIVATE_KEY=6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27\"\r\nEnvironment=\"ETH1_CTC_DEPLOYMENT_HEIGHT=13596466\"\r\nEnvironment=\"ETH1_SYNC_SERVICE_ENABLE=true\"\r\nEnvironment=\"ROLLUP_ADDRESS_MANAGER_OWNER_ADDRESS=0x9BA6e03D8B90dE867373Db8cF1A58d2F7F006b3A\"\r\nEnvironment=\"ROLLUP_CLIENT_HTTP=http://localhost:7878\"\r\nEnvironment=\"ROLLUP_DISABLE_TRANSFERS=false\"\r\nEnvironment=\"ROLLUP_ENABLE_L2_GAS_POLLING=false\"\r\nEnvironment=\"ROLLUP_GAS_PRICE_ORACLE_OWNER_ADDRESS=0x648E3e8101BFaB7bf5997Bd007Fb473786019159\"\r\nEnvironment=\"ROLLUP_MAX_CALLDATA_SIZE=40000\"\r\nEnvironment=\"ROLLUP_POLL_INTERVAL_FLAG=1s\"\r\nEnvironment=\"ROLLUP_SYNC_SERVICE_ENABLE=true\"\r\nEnvironment=\"ROLLUP_TIMESTAMP_REFRESH=5m\"\r\nEnvironment=\"ROLLUP_VERIFIER_ENABLE=true\"\r\nEnvironment=\"RPC_ADDR=0.0.0.0\"\r\nEnvironment=\"RPC_API=eth,rollup,net,web3,debug\"\r\nEnvironment=\"RPC_CORS_DOMAIN=*\"\r\nEnvironment=\"RPC_ENABLE=true\"\r\nEnvironment=\"RPC_PORT=8545\"\r\nEnvironment=\"RPC_VHOSTS=*\"\r\nEnvironment=\"TARGET_GAS_LIMIT=15000000\"\r\nEnvironment=\"USING_OVM=true\"\r\nEnvironment=\"ROLLUP_BACKEND=l2\"\r\n\r\nLimitNOFILE=50097152\r\nUser=root \r\nGroup=root \r\nRestart=on-failure\r\nType=simple\r\nRestartSec=10s\r\nKillMode=process\r\nKillSignal=SIGINT\r\nTimeoutStopSec=90\r\nExecStart=/external/optimism/l2geth/build/bin/geth --nousb --datadir=/external/gethData --password=/external/password -allow-insecure-unlock --unlock=0x00000398232E2064F896018496b4b44b3D62751F --mine --miner.etherbase=0x00000398232E2064F896018496b4b44b3D62751F \r\n\r\n[Install]\r\nWantedBy=multi-user.target\r\n\r\n-----------------------------------------------------------------------\r\n\r\n**Expected behavior**\r\nl2geth should keep cleaning up its DB like geth does \r\n\r\n**System Specs:**\r\n - OS:  Ubuntu 22.04.1 LTS aarch64, 32Gb RAM, 3.6Tb NVME , AWS instance: im4gn.2xlarge\r\n - Package Version (or commit hash): 266897a9598117a683b436bfbb7374ece3707c49\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4572/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4572/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1379492619",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/4572#issuecomment-1379492619",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4572",
+    "id": 1379492619,
+    "node_id": "IC_kwDODjvEJM5SOWML",
+    "user": {
+      "login": "smartcontracts",
+      "id": 14298799,
+      "node_id": "MDQ6VXNlcjE0Mjk4Nzk5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14298799?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/smartcontracts",
+      "html_url": "https://github.com/smartcontracts",
+      "followers_url": "https://api.github.com/users/smartcontracts/followers",
+      "following_url": "https://api.github.com/users/smartcontracts/following{/other_user}",
+      "gists_url": "https://api.github.com/users/smartcontracts/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/smartcontracts/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/smartcontracts/subscriptions",
+      "organizations_url": "https://api.github.com/users/smartcontracts/orgs",
+      "repos_url": "https://api.github.com/users/smartcontracts/repos",
+      "events_url": "https://api.github.com/users/smartcontracts/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/smartcontracts/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-01-11T21:15:08Z",
+    "updated_at": "2023-01-11T21:15:08Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "We're very close to deprecating L2Geth entirely with the launch of Bedrock, so it's likely that this will not be fixed before Bedrock launches. After Bedrock is live, I might push for a \"Turbo L2Geth\" where we rebuild the legacy L2Geth on top of the latest Geth release.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1379492619/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]
