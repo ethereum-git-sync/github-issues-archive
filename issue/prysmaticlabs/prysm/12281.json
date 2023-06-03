@@ -1,0 +1,113 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12281",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12281/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12281/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12281/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12281",
+  "id": 1668486192,
+  "node_id": "I_kwDOBvuov85jcxQw",
+  "number": 12281,
+  "title": "keystore: Deleting keys via keymanager API may not fully delete keys",
+  "user": {
+    "login": "prestonvanloon",
+    "id": 7246818,
+    "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prestonvanloon",
+    "html_url": "https://github.com/prestonvanloon",
+    "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+    "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+    "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+    "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+    "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129904,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDQ=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Bug",
+      "name": "Bug",
+      "color": "ee0701",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1085357069,
+      "node_id": "MDU6TGFiZWwxMDg1MzU3MDY5",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Priority:%20High",
+      "name": "Priority: High",
+      "color": "f7ea26",
+      "default": false,
+      "description": "High priority item"
+    },
+    {
+      "id": 3792458348,
+      "node_id": "LA_kwDOBvuov87iDFJs",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Keymanager-API",
+      "name": "Keymanager-API",
+      "color": "1394F2",
+      "default": false,
+      "description": "keymanager-api-standards"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-14T15:40:38Z",
+  "updated_at": "2023-04-17T17:08:29Z",
+  "closed_at": "2023-04-17T17:08:29Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "# 🐞 Bug Report\r\n\r\n### Description\r\n\r\nWhen attempting to delete keys from the validator keystores, the process first deletes the key from the in-memory keystore then attempts to save the keystore to disk. If they keystore fails to save to disk, the in memory keystore is still modified and users may be convinced that the keys were indeed removed unless they restarted the validator.\r\n\r\nCurrent flow:\r\n1) Call DELETE /eth/v1/keystores with `n` public keys \r\n2) Delete public keys from in memory keystore\r\n3) [Log success](https://github.com/prysmaticlabs/prysm/blob/52d72c989eb3955fed0cd8d9abdc5543e2b7bfc3/validator/keymanager/local/delete.go#L80) (This is a bad message because the routine hasn't completed yet and should not indicate a success yet)\r\n4) Save the in memory keystore to disk\r\n5) [Log success again](https://github.com/prysmaticlabs/prysm/blob/52d72c989eb3955fed0cd8d9abdc5543e2b7bfc3/validator/keymanager/local/delete.go#L96) and return without error\r\n\r\nIf step 4 fails, the in memory keystore was modified and GET /eth/v1/keystores would indicate that the keys were deleted until the process is restarted and the on disk keystore is reloaded. When paired with the improper success message from line 80, the user can easily be convinced that they properly deleted keys. \r\n\r\n### Has this worked before in a previous version?\r\n\r\nNo. This is an old bug.\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\n- Start the validator\r\n- Change the file permissions of the keystore to readonly\r\n- Attempt to delete keys from the keystore via keymanager API\r\n\r\n## 🔥 Error\r\n\r\nNone.\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:**\r\n\r\n<pre>\r\n  <code>All</code>\r\n</pre>\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\n<pre>\r\n  <code>v4.0.2</code>\r\n</pre>\r\n\r\n**Anything else relevant (validator index / public key)?**\r\n\r\n",
+  "closed_by": {
+    "login": "prestonvanloon",
+    "id": 7246818,
+    "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prestonvanloon",
+    "html_url": "https://github.com/prestonvanloon",
+    "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+    "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+    "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+    "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+    "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12281/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12281/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

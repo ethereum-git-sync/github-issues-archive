@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7546",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7546/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7546/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7546/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/7546",
+  "id": 722665420,
+  "node_id": "MDU6SXNzdWU3MjI2NjU0MjA=",
+  "number": 7546,
+  "title": "Voluntary exit does not support secure gRPC connection",
+  "user": {
+    "login": "yorickdowne",
+    "id": 71337066,
+    "node_id": "MDQ6VXNlcjcxMzM3MDY2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/71337066?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yorickdowne",
+    "html_url": "https://github.com/yorickdowne",
+    "followers_url": "https://api.github.com/users/yorickdowne/followers",
+    "following_url": "https://api.github.com/users/yorickdowne/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yorickdowne/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yorickdowne/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yorickdowne/subscriptions",
+    "organizations_url": "https://api.github.com/users/yorickdowne/orgs",
+    "repos_url": "https://api.github.com/users/yorickdowne/repos",
+    "events_url": "https://api.github.com/users/yorickdowne/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yorickdowne/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-10-15T20:47:22Z",
+  "updated_at": "2020-10-16T14:27:02Z",
+  "closed_at": "2020-10-16T14:27:02Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# 🐞 Bug Report\r\n\r\n### Description\r\n\r\nAlthough `--tls-cert` is passed to `validator accounts-v2 voluntary-exit`, it does not establish a secure connection to the beacon.\r\nThe same beacon has been tested successfully with `validator` and `--tls-cert`\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nSet up a beacon with a TLS cert and key, I used Let's Encrypt. Feel free to use mine to reproduce. The following\r\nassumes that /keys holds one or more `keystore-m` JSON files.\r\n\r\n```\r\n/app/validator/image.binary accounts-v2 import --keys-dir /keys --medalla\r\n/app/validator/image.binary accounts-v2 voluntary-exit --beacon-rpc-provider beacon.medalla-exit.com:4000 --tls-cert /etc/ssl/certs/ca-certificates.crt --medalla\r\n```\r\n\r\n## 🔥 Error\r\n\r\n<pre><code>[2020-10-15 20:38:45]  WARN validator: You are using an insecure gRPC connection. If you are running your beacon node and validator on the same machines, you can ignore this message. If you want to know how to enable secure connections, see: https://docs.prylabs.network/docs/prysm-usage/secure-grpc\r\n</code></pre>\r\n\r\nBecause validator did not attempt to use TLS, this then fails:\r\n\r\n```\r\n[2020-10-15 21:14:54] ERROR accounts-v2: voluntary exit failed for account 0xa106a3fe7138 error=rpc error: code = Unavailable desc = connection closed\r\ngRPC call to get validator index failed\r\ngithub.com/prysmaticlabs/prysm/validator/client.ProposeExit\r\n        validator/client/propose.go:137\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2.performExit\r\n        validator/accounts/v2/accounts_exit.go:196\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2.ExitAccountsCli\r\n        validator/accounts/v2/accounts_exit.go:61\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2.glob..func12\r\n        validator/accounts/v2/cmd_accounts.go:174\r\ngithub.com/urfave/cli/v2.(*Command).Run\r\n        external/com_github_urfave_cli_v2/command.go:164\r\ngithub.com/urfave/cli/v2.(*App).RunAsSubcommand\r\n        external/com_github_urfave_cli_v2/app.go:427\r\ngithub.com/urfave/cli/v2.(*Command).startApp\r\n        external/com_github_urfave_cli_v2/command.go:279\r\ngithub.com/urfave/cli/v2.(*Command).Run\r\n        external/com_github_urfave_cli_v2/command.go:94\r\ngithub.com/urfave/cli/v2.(*App).RunContext\r\n        external/com_github_urfave_cli_v2/app.go:306\r\ngithub.com/urfave/cli/v2.(*App).Run\r\n        external/com_github_urfave_cli_v2/app.go:215\r\nmain.main\r\n        validator/main.go:173\r\nruntime.main\r\n        GOROOT/src/runtime/proc.go:203\r\nruntime.goexit\r\n        GOROOT/src/runtime/asm_amd64.s:1373\r\n[2020-10-15 21:14:54]  INFO accounts-v2: No successful voluntary exits\r\n```\r\n\r\n## 🌍  Your Environment\r\n\r\n* Ubuntu 20.04\r\n* docker\r\n* image: prysmaticlabs/prysm-validator:latest-debug\r\n",
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7546/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7546/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

@@ -1,0 +1,113 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12275",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12275/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12275/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12275/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12275",
+  "id": 1667401859,
+  "node_id": "I_kwDOBvuov85jYoiD",
+  "number": 12275,
+  "title": "Having builder enabled on the validator client while the beacon node's builder is disabled results in a panic",
+  "user": {
+    "login": "james-prysm",
+    "id": 90280386,
+    "node_id": "MDQ6VXNlcjkwMjgwMzg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/90280386?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/james-prysm",
+    "html_url": "https://github.com/james-prysm",
+    "followers_url": "https://api.github.com/users/james-prysm/followers",
+    "following_url": "https://api.github.com/users/james-prysm/following{/other_user}",
+    "gists_url": "https://api.github.com/users/james-prysm/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/james-prysm/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/james-prysm/subscriptions",
+    "organizations_url": "https://api.github.com/users/james-prysm/orgs",
+    "repos_url": "https://api.github.com/users/james-prysm/repos",
+    "events_url": "https://api.github.com/users/james-prysm/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/james-prysm/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129904,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDQ=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Bug",
+      "name": "Bug",
+      "color": "ee0701",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1701740543,
+      "node_id": "MDU6TGFiZWwxNzAxNzQwNTQz",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/API",
+      "name": "API",
+      "color": "30ef13",
+      "default": false,
+      "description": "Api related tasks"
+    },
+    {
+      "id": 3991853008,
+      "node_id": "LA_kwDOBvuov87t7tfQ",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Builder",
+      "name": "Builder",
+      "color": "59D5BA",
+      "default": false,
+      "description": "PR or issue that supports builder related work"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-14T02:14:35Z",
+  "updated_at": "2023-04-14T05:42:59Z",
+  "closed_at": "2023-04-14T05:42:59Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!--💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎\r\n\r\nHellooo! 😄 \r\n\r\nTo help us tend to your issue faster, please search our currently open issues before submitting a new one.\r\nExisting issues often contain information about workarounds, resolution, or progress updates.\r\n\r\n💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎-->\r\n\r\n# 🐞 Bug Report\r\n\r\n### Description\r\n\r\nHaving builder enabled on the validator client while the beacon node's builder is disabled results in a panic\r\n\r\n### Has this worked before in a previous version?\r\n\r\nNo\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nadding the `--enable-builder` flag or adding enable to the builder settings via the `--proposer-settings` flag on the validator client while removing the `--http-mev-relay` flag on the beacon chain will result in a gRPC panic.\r\n\r\n## 🔥 Error\r\n\r\n<pre><code>\r\ntime=\"2023-04-13 17:25:12\" level=info msg=\"Finished applying state transition\" attestations=67 payloadHash=0x41bbbd863547 prefix=blockchain slot=6215224 syncBitsCount=502 txCount=191\r\ntime=\"2023-04-13 17:25:23\" level=error msg=\"gRPC panicked!\" error=\"runtime error: invalid memory address or nil pointer dereference\" stack=\"goroutine 387390391 [running]:\r\nruntime/debug.Stack()\r\n\tGOROOT/src/runtime/debug/stack.go:24 +0x65\r\ngithub.com/prysmaticlabs/prysm/v4/monitoring/tracing.RecoveryHandlerFunc({0x21f13b8?, 0xc0dae81a70?}, {0x19ccc60?, 0x2f0c990})\r\n\tmonitoring/tracing/recovery_interceptor_option.go:29 +0x1f7\r\ngithub.com/grpc-ecosystem/go-grpc-middleware/recovery.recoverFrom({0x21f13b8?, 0xc0dae81a70?}, {0x19ccc60?, 0x2f0c990?}, 0x15de0e4?)\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/recovery/interceptors.go:61 +0x36\r\ngithub.com/grpc-ecosystem/go-grpc-middleware/recovery.UnaryServerInterceptor.func1.1()\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/recovery/interceptors.go:29 +0x7b\r\npanic({0x19ccc60, 0x2f0c990})\r\n\tGOROOT/src/runtime/panic.go:884 +0x212\r\ngithub.com/prysmaticlabs/prysm/v4/beacon-chain/builder.(*Service).GetHeader(0xc05adcaab0, {0x21f1380?, 0xc0ea3903c0?}, 0xc048ea65f8?, {0x41, 0xbb, 0xbd, 0x86, 0x35, 0x47, ...}, ...)\r\n\tbeacon-chain/builder/service.go:105 +0x140\r\ngithub.com/prysmaticlabs/prysm/v4/beacon-chain/rpc/prysm/v1alpha1/validator.(*Server).getPayloadHeaderFromBuilder(0xc00be76200, {0x21f13b8, 0xc0dae81bc0}, 0x464451?, 0x433f31?)\r\n\tbeacon-chain/rpc/prysm/v1alpha1/validator/proposer_bellatrix.go:133 +0x346\r\ngithub.com/prysmaticlabs/prysm/v4/beacon-chain/rpc/prysm/v1alpha1/validator.(*Server).setExecutionData(0xc00be76200?, {0x21f13b8, 0xc0dae81bc0}, {0x2210cc0, 0xc0e934e540}, {0x2217128, 0xc052660fc0})\r\n\tbeacon-chain/rpc/prysm/v1alpha1/validator/proposer_bellatrix.go:51 +0x297\r\ngithub.com/prysmaticlabs/prysm/v4/beacon-chain/rpc/prysm/v1alpha1/validator.(*Server).GetBeaconBlock(0xc00be76200, {0x21f13b8?, 0xc0dae81b90?}, 0xc0e934e460)\r\n\tbeacon-chain/rpc/prysm/v1alpha1/validator/proposer.go:123 +0xf28\r\ngithub.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1._BeaconNodeValidator_GetBeaconBlock_Handler.func1({0x21f13b8, 0xc0dae81b90}, {0x1b3fa40?, 0xc0e934e460})\r\n\tbazel-out/k8-opt/bin/proto/prysm/v1alpha1/go_proto_/github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1/validator.pb.go:4894 +0x78\r\ngithub.com/prysmaticlabs/prysm/v4/beacon-chain/rpc.(*Service).validatorUnaryConnectionInterceptor(0x21f13b8?, {0x21f13b8, 0xc0dae81b90}, {0x1b3fa40, 0xc0e934e460}, 0x34888e0?, 0xc0e93798a8)\r\n\tbeacon-chain/rpc/service.go:433 +0x50\r\ngithub.com/grpc-ecosystem/go-grpc-middleware.ChainUnaryServer.func1.1.1({0x21f13b8?, 0xc0dae81b90?}, {0x1b3fa40?, 0xc0e934e460?})\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/chain.go:25 +0x3a\r\ngithub.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing.UnaryServerInterceptor.func1({0x21f13b8, 0xc0dae81a70}, {0x1b3fa40, 0xc0e934e460}, 0x10?, 0xc0d23cfca0)\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/tracing/opentracing/server_interceptors.go:34 +0x11e\r\ngithub.com/grpc-ecosystem/go-grpc-middleware.ChainUnaryServer.func1.1.1({0x21f13b8?, 0xc0dae81a70?}, {0x1b3fa40?, 0xc0e934e460?})\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/chain.go:25 +0x3a\r\ngithub.com/grpc-ecosystem/go-grpc-prometheus.(*ServerMetrics).UnaryServerInterceptor.func1({0x21f13b8, 0xc0dae81a70}, {0x1b3fa40, 0xc0e934e460}, 0x8?, 0xc0d23cfce0)\r\n\texternal/com_github_grpc_ecosystem_go_grpc_prometheus/server_metrics.go:107 +0x87\r\ngithub.com/grpc-ecosystem/go-grpc-middleware.ChainUnaryServer.func1.1.1({0x21f13b8?, 0xc0dae81a70?}, {0x1b3fa40?, 0xc0e934e460?})\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/chain.go:25 +0x3a\r\ngithub.com/grpc-ecosystem/go-grpc-middleware/recovery.UnaryServerInterceptor.func1({0x21f13b8?, 0xc0dae81a70?}, {0x1b3fa40?, 0xc0e934e460?}, 0x7ec4201df8b8?, 0xc0d23cfc80?)\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/recovery/interceptors.go:33 +0xc4\r\ngithub.com/grpc-ecosystem/go-grpc-middleware.ChainUnaryServer.func1.1.1({0x21f13b8?, 0xc0dae81a70?}, {0x1b3fa40?, 0xc0e934e460?})\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/chain.go:25 +0x3a\r\ngithub.com/grpc-ecosystem/go-grpc-middleware.ChainUnaryServer.func1({0x21f13b8, 0xc0dae81a70}, {0x1b3fa40, 0xc0e934e460}, 0xc0e93a7ae8?, 0x19cb9a0?)\r\n\texternal/com_github_grpc_ecosystem_go_grpc_middleware/chain.go:34 +0xbe\r\ngithub.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1._BeaconNodeValidator_GetBeaconBlock_Handler({0x1c54380?, 0xc00be76200}, {0x21f13b8, 0xc0dae81a70}, 0xc0e9993ec0, 0xc05adcacf0)\r\n\tbazel-out/k8-opt/bin/proto/prysm/v1alpha1/go_proto_/github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1/validator.pb.go:4896 +0x138\r\ngoogle.golang.org/grpc.(*Server).processUnaryRPC(0xc00be52380, {0x21fe6c0, 0xc0a543e780}, 0xc09f6fbd40, 0xc051c00660, 0x2f2d4f8, 0x0)\r\n\texternal/org_golang_google_grpc/server.go:1297 +0xccf\r\ngoogle.golang.org/grpc.(*Server).handleStream(0xc00be52380, {0x21fe6c0, 0xc0a543e780}, 0xc09f6fbd40, 0x0)\r\n\texternal/org_golang_google_grpc/server.go:1626 +0xa2f\r\ngoogle.golang.org/grpc.(*Server).serveStreams.func1.2()\r\n\texternal/org_golang_google_grpc/server.go:941 +0x98\r\ncreated by google.golang.org/grpc.(*Server).serveStreams.func1\r\n\texternal/org_golang_google_grpc/server.go:939 +0x28a\r\n\"\r\ntime=\"2023-04-13 17:25:36\" level=info msg=\"Synced new block\" block=0x2170b0b4... epoch=194225 finalizedEpoch=194223 finalizedRoot=0xf575c857... prefix=blockchain slot=6215226\r\n</code></pre>\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\n<pre>\r\n  <code>\r\n v4.0.2\r\n  </code>\r\n</pre>\r\n\r\n\r\n",
+  "closed_by": {
+    "login": "terencechain",
+    "id": 21316537,
+    "node_id": "MDQ6VXNlcjIxMzE2NTM3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21316537?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/terencechain",
+    "html_url": "https://github.com/terencechain",
+    "followers_url": "https://api.github.com/users/terencechain/followers",
+    "following_url": "https://api.github.com/users/terencechain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/terencechain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/terencechain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/terencechain/subscriptions",
+    "organizations_url": "https://api.github.com/users/terencechain/orgs",
+    "repos_url": "https://api.github.com/users/terencechain/repos",
+    "events_url": "https://api.github.com/users/terencechain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/terencechain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12275/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12275/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

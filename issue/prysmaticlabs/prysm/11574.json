@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11574",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11574/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11574/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11574/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/11574",
+  "id": 1421292068,
+  "node_id": "I_kwDOBvuov85UtzIk",
+  "number": 11574,
+  "title": "[Tracking] - Block Processing Improvements",
+  "user": {
+    "login": "rauljordan",
+    "id": 5572669,
+    "node_id": "MDQ6VXNlcjU1NzI2Njk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5572669?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rauljordan",
+    "html_url": "https://github.com/rauljordan",
+    "followers_url": "https://api.github.com/users/rauljordan/followers",
+    "following_url": "https://api.github.com/users/rauljordan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rauljordan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rauljordan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rauljordan/subscriptions",
+    "organizations_url": "https://api.github.com/users/rauljordan/orgs",
+    "repos_url": "https://api.github.com/users/rauljordan/repos",
+    "events_url": "https://api.github.com/users/rauljordan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rauljordan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1085357069,
+      "node_id": "MDU6TGFiZWwxMDg1MzU3MDY5",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Priority:%20High",
+      "name": "Priority: High",
+      "color": "f7ea26",
+      "default": false,
+      "description": "High priority item"
+    },
+    {
+      "id": 1241586918,
+      "node_id": "MDU6TGFiZWwxMjQxNTg2OTE4",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Tracking",
+      "name": "Tracking",
+      "color": "d0ff7f",
+      "default": false,
+      "description": "Gotta Catch 'Em All"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-24T19:08:00Z",
+  "updated_at": "2022-10-24T19:09:07Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# 💎 Issue\r\n\r\n## Background\r\n\r\nBlock processing is the most critical code path in Prysm, as it involves significant complexity in validation of data, steps of processing, atomicity, and order of operations which could cause serious consensus bugs or leave nodes in inconsistent states if they go wrong. Over the past months, block processing has evolved significantly due to the complexity of the merge, execution client interactions, and fork choice being so tied to how the code behaves.\r\n\r\n## Tracking\r\n\r\n### Cleanup\r\n\r\n- [ ] Explore creating \"full copies\" of forkchoice for scratchpad uses. For example, creating a whole copy of forkchoice statefulness for computing changes during initial sync that can be discarded if needed without polluting the actual forkchoice store\r\n- [ ] Consider refactoring forkchoice to encapsulate mutexes more and leverage atomic types better. This is to prevent complex code that mixes a lot of mutex locking / unlocking in large functions, often leading to deadlocks if one `Unlock()` is omitted by accident\r\n- [ ] Remove the need for two separate state transition functions by instead making a single state transition configurable via functional options. For example, one option can be to create a signature batch instead of verifying signatures sequentially\r\n- [ ] Move all \"book keeping\" goroutines to the very end of block processing to keep processing atomic\r\n- [ ] Refactor the main processing routine into smaller chunks to read as follows:\r\n\r\n```go\r\nPreTransitionVerification()\r\nStateTransition()\r\nNewPayloadNotification()\r\nNewHead()\r\nForkchoiceUpdatedNotification()\r\nCanonicalBookkeeping()\r\n```\r\n\r\n- [ ] Consider creating different type wrappers for the different verification stages of blocks. For example:\r\n```go\r\ntype GossipVerifiedBlock interface {\r\n  SignedBeaconBlock\r\n}\r\n\r\ntype StateTransitionVerifiedBlock interface {\r\n  GossipVerifiedBlock\r\n}\r\n\r\ntype CanonicalBlock interface {\r\n  StateTransitionVerifiedBlock\r\n}\r\n```\r\nA `CanonicalBlock` would not require any checks that the block is canonical. Moreover, state transition verified block would not need to run a state transition again. We could perhaps even define a `NilCheckedBlock` to signify it does not need any nil checks.\r\n\r\n- [ ] Do not make the blockchain service responsible for initial sync caches (explore this further)\r\n- [ ] Do not prune attestations twice in block processing\r\n- [ ] Do not track the “headRoot” as a cached value in the blockchain service struct \r\n\r\n### Testing\r\n\r\n- [ ] Evaluate creating a \"simulated backend\" for CL testing that can be used in Go unit tests to set up a chain with different constraints. For example, set up a chain with caches/blockchain/forkchoice from genesis that skips every 3rd block, or a chain that has a fork at slot N of every epoch, etc. Could use something like the builder pattern:\r\n```go\r\nbackend := testutil.NewSimulatedBeacon().UpToSlot(N).SkipEvery(N).ForksAtSlots(slots []types.Slot)\r\nbackend.Start()\r\n```\r\nthis can be a more flexible solution than e2e for testing block processing in unit tests / integration tests with a much faster feedback loop. Can also be used in forkchoice tests! Could warrant a small design doc\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11574/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11574/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

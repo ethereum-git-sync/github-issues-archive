@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10468",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10468/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10468/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10468/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/10468",
+  "id": 1188241382,
+  "node_id": "I_kwDOBvuov85G0x_m",
+  "number": 10468,
+  "title": "Failed to start beacon: Start request repeated too quickly",
+  "user": {
+    "login": "mohamedmansour",
+    "id": 68524,
+    "node_id": "MDQ6VXNlcjY4NTI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/68524?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mohamedmansour",
+    "html_url": "https://github.com/mohamedmansour",
+    "followers_url": "https://api.github.com/users/mohamedmansour/followers",
+    "following_url": "https://api.github.com/users/mohamedmansour/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mohamedmansour/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mohamedmansour/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mohamedmansour/subscriptions",
+    "organizations_url": "https://api.github.com/users/mohamedmansour/orgs",
+    "repos_url": "https://api.github.com/users/mohamedmansour/repos",
+    "events_url": "https://api.github.com/users/mohamedmansour/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mohamedmansour/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129904,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDQ=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Bug",
+      "name": "Bug",
+      "color": "ee0701",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 802129907,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDc=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Help%20Wanted",
+      "name": "Help Wanted",
+      "color": "33aa3f",
+      "default": false,
+      "description": "Extra attention is needed"
+    },
+    {
+      "id": 802129908,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDg=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Good%20First%20Issue",
+      "name": "Good First Issue",
+      "color": "7057ff",
+      "default": false,
+      "description": "Good for newcomers"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-03-31T15:11:14Z",
+  "updated_at": "2022-03-31T15:31:24Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# 🐞 Bug Report\r\n\r\n### Description\r\n\r\nPower outage happened for two hours, and it automatically shut down my server safely when battery depleted in my UPS.  It should have not crashed and continued checking for internet connection. Geth recovered really quickly at the end of 01:09AM with peers, meanwhile Prysm couldn't find internet connection at 1:10 and crashed.\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\n10:12 PM - Power out, Internet Out, Backup Battery on \r\n12:47 - Power on, Internet Out, Beacon attempting to retrying\r\n12:49 - Power out again\r\n01:09 - Power on, Internet still out\r\n01:10 - Beacon exited, Failed to start eth2\r\n\r\n## 🔥 Error\r\n\r\n### uptime\r\n<pre><code>\r\n 08:14:10 up  7:05,  1 user,  load average: 0.44, 1.19, 1.41\r\n</code></pre>\r\n### reboot logs\r\n\r\n<pre><code>\r\nshutdown system down  5.4.0-99-generic Wed Mar 30 22:12 - 00:46  (02:33)\r\nreboot   system boot  5.4.0-105-generi Thu Mar 31 00:46 - 00:51  (00:04)\r\nrunlevel (to lvl 5)   5.4.0-105-generi Thu Mar 31 00:47 - 00:51  (00:03)\r\nshutdown system down  5.4.0-105-generi Thu Mar 31 00:51 - 01:09  (00:17)\r\nreboot   system boot  5.4.0-105-generi Thu Mar 31 01:09   still running\r\nrunlevel (to lvl 5)   5.4.0-105-generi Thu Mar 31 01:09   still running\r\n\r\n</pre></code>\r\n### prysm beacon logs\r\n<pre><code>\r\nMar 30 22:12:37 server systemd[1]: Stopping eth2 beacon chain service...\r\nMar 30 22:12:37 server prysm.sh[891]: time=\"2022-03-30 22:12:37\" level=info msg=\"Got interrupt, shutting down...\" prefix=node\r\nMar 30 22:12:37 server prysm.sh[891]: time=\"2022-03-30 22:12:37\" level=info msg=\"Stopping beacon node\" prefix=node\r\nMar 30 22:12:38 server systemd[1]: beacon-chain.service: Succeeded.\r\nMar 30 22:12:38 server systemd[1]: Stopped eth2 beacon chain service.\r\n-- Reboot --\r\nMar 31 00:47:29 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 00:47:47 server prysm.sh[1544]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 00:47:47 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 00:47:47 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 00:47:47 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 1.\r\nMar 31 00:47:47 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 00:47:47 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 00:48:07 server prysm.sh[1617]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 00:48:07 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 00:48:07 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 00:48:08 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 2.\r\nMar 31 00:48:08 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 00:48:08 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 00:48:28 server prysm.sh[1665]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 00:48:28 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 00:48:28 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 00:48:28 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 3.\r\nMar 31 00:48:28 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 00:48:28 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 00:48:48 server prysm.sh[1726]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 00:48:48 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 00:48:48 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 00:48:48 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 4.\r\nMar 31 00:48:48 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 00:48:48 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 00:49:08 server prysm.sh[1771]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 00:49:08 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 00:49:08 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 00:49:08 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 5.\r\nMar 31 00:49:08 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 00:49:08 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 00:49:28 server prysm.sh[1819]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 00:49:28 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 00:49:28 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 00:49:29 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 6.\r\nMar 31 00:49:29 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 00:49:29 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 00:49:47 server systemd[1]: Stopping eth2 beacon chain service...\r\nMar 31 00:49:47 server systemd[1]: beacon-chain.service: Succeeded.\r\nMar 31 00:49:47 server systemd[1]: Stopped eth2 beacon chain service.\r\n-- Reboot --\r\nMar 31 01:09:41 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:09:59 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:09:59 server prysm.sh[1539]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:09:59 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:09:59 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 1.\r\nMar 31 01:09:59 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:09:59 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:10:19 server prysm.sh[1618]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:10:19 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:10:19 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:19 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 2.\r\nMar 31 01:10:19 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:10:19 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:10:31 server prysm.sh[1663]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:10:31 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:10:31 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:31 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 3.\r\nMar 31 01:10:31 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:10:31 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:10:32 server prysm.sh[1708]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 4.\r\nMar 31 01:10:32 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:10:32 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:10:32 server prysm.sh[1735]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 5.\r\nMar 31 01:10:32 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:10:32 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:10:32 server prysm.sh[1765]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:32 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 6.\r\nMar 31 01:10:32 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:10:32 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:10:33 server prysm.sh[1793]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 7.\r\nMar 31 01:10:33 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:10:33 server systemd[1]: Started eth2 beacon chain service.\r\nMar 31 01:10:33 server prysm.sh[1822]: Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/prysmaticlabs/prysm/relea>\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Main process exited, code=exited, status=1/FAILURE\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Scheduled restart job, restart counter is at 8.\r\nMar 31 01:10:33 server systemd[1]: Stopped eth2 beacon chain service.\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Start request repeated too quickly.\r\nMar 31 01:10:33 server systemd[1]: beacon-chain.service: Failed with result 'exit-code'.\r\nMar 31 01:10:33 server systemd[1]: Failed to start eth2 beacon chain service.\r\n</code></pre>\r\n\r\nComparing with geth, it didn't crash and it found peers in 1:09:54:\r\n\r\n<pre><code>\r\nMar 30 22:12:56 server geth[10801]: INFO [03-30|22:12:56.273] Blockchain stopped\r\nMar 30 22:12:57 server systemd[1]: eth1.service: Succeeded.\r\nMar 30 22:12:57 server systemd[1]: Stopped geth eth1 service.\r\n-- Reboot --\r\nMar 31 00:47:29 server systemd[1]: Started geth eth1 service.\r\nMar 31 00:49:38 server geth[932]: INFO [03-31|00:49:38.725] Looking for peers                        peercount=0 tried=1 static=0\r\nMar 31 00:49:47 server geth[932]: INFO [03-31|00:49:47.858] Got interrupt, shutting down...\r\nMar 31 00:49:47 server geth[932]: INFO [03-31|00:49:47.860] HTTP server stopped                      endpoint=127.0.0.1:8545\r\nMar 31 00:49:47 server geth[932]: INFO [03-31|00:49:47.862] HTTP server stopped                      endpoint=127.0.0.1:8546\r\nMar 31 00:49:47 server geth[932]: INFO [03-31|00:49:47.862] IPC endpoint closed                      geth.ipc\r\nMar 31 00:49:47 server geth[932]: INFO [03-31|00:49:47.862] Ethereum protocol stopped\r\nMar 31 00:49:47 server geth[932]: INFO [03-31|00:49:47.863] Transaction pool stopped\r\nMar 31 00:49:47 server systemd[1]: Stopping geth eth1 service...\r\nMar 31 00:49:48 server geth[932]: INFO [03-31|00:49:48.079] Blockchain stopped\r\nMar 31 00:49:48 server systemd[1]: eth1.service: Succeeded.\r\nMar 31 00:49:48 server systemd[1]: Stopped geth eth1 service.\r\n-- Reboot --\r\nMar 31 01:09:41 server systemd[1]: Started geth eth1 service.\r\n Mar 31 01:09:54 server geth[937]: INFO [03-31|01:09:54.752] Looking for peers                        peercount=11 tried=2 static=0\r\n</code></pre>\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:**\r\n\r\n<pre>\r\n  <code>\r\nLinux server 5.4.0-105-generic #119-Ubuntu SMP Mon Mar 7 18:49:24 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux\r\n  </code>\r\n</pre>\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\n<pre>\r\n  <code>\r\n2.0.6\r\n  </code>\r\n</pre>\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10468/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10468/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1084747617",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/10468#issuecomment-1084747617",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10468",
+    "id": 1084747617,
+    "node_id": "IC_kwDOBvuov85Ap-9h",
+    "user": {
+      "login": "prestonvanloon",
+      "id": 7246818,
+      "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/prestonvanloon",
+      "html_url": "https://github.com/prestonvanloon",
+      "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+      "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+      "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+      "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+      "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+      "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-03-31T15:27:56Z",
+    "updated_at": "2022-03-31T15:31:24Z",
+    "author_association": "MEMBER",
+    "body": "This seems to be an issue with the prysm.sh script. The first step of the prysm.sh script is to check if there is a new update available. That step requires an internet connection.\r\n\r\n**Workaround**\r\n\r\nThere are two things I think you can do as a workaround (either would work):\r\n1) Manually specify the prysm version with an environment variable `USE_PRYSM_VERSION=v2.0.6`\r\n2) Use the binary files directly rather than on the prysm.sh script. These files are downloaded to the `dist/` directory. \r\n\r\n**Fix**\r\n\r\nI think the fix here is for the `prysm.sh` to choose the highest previously downloaded binary to start if no specific version was requested and the latest release is unable to be determined. There are more reasons than local internet issues that could cause prysm.sh to fail to retrieve the latest version tag so this could be a bigger issue if not resolved.",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1084747617/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

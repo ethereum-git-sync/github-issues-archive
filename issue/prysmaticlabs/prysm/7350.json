@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7350",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7350/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7350/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7350/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/7350",
+  "id": 709371403,
+  "node_id": "MDU6SXNzdWU3MDkzNzE0MDM=",
+  "number": 7350,
+  "title": "wallet-v2 recover panics if you ask it to create 1 account",
+  "user": {
+    "login": "dv8silencer",
+    "id": 15720668,
+    "node_id": "MDQ6VXNlcjE1NzIwNjY4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/15720668?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dv8silencer",
+    "html_url": "https://github.com/dv8silencer",
+    "followers_url": "https://api.github.com/users/dv8silencer/followers",
+    "following_url": "https://api.github.com/users/dv8silencer/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dv8silencer/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dv8silencer/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dv8silencer/subscriptions",
+    "organizations_url": "https://api.github.com/users/dv8silencer/orgs",
+    "repos_url": "https://api.github.com/users/dv8silencer/repos",
+    "events_url": "https://api.github.com/users/dv8silencer/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dv8silencer/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-09-26T00:27:17Z",
+  "updated_at": "2020-09-26T10:13:57Z",
+  "closed_at": "2020-09-26T10:13:57Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#🐞 Bug Report\r\n\r\nCreate a new wallet using `wallet-v2 recover` and when asked \"Enter how many accounts you would like to recover....\" Enter 1.  This will lead to a panic:\r\n\r\n```\r\n[2020-09-26 00:23:43] ERROR main: Runtime panic: runtime error: invalid memory address or nil pointer dereference\r\ngoroutine 1 [running]:\r\nruntime/debug.Stack(0xc00173f608, 0x14f4000, 0x2503330)\r\n\tGOROOT/src/runtime/debug/stack.go:24 +0x9d\r\nmain.main.func9()\r\n\tvalidator/main.go:345 +0x66\r\npanic(0x14f4000, 0x2503330)\r\n\tGOROOT/src/runtime/panic.go:969 +0x166\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2/wallet.(*Wallet).SaveHashedPassword(0x0, 0x1a7b140, 0xc000120000, 0x0, 0x0)\r\n\tvalidator/accounts/v2/wallet/wallet.go:411 +0x37\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2.RecoverWalletCli(0xc00020d500, 0xc000fcf9b8, 0x8)\r\n\tvalidator/accounts/v2/wallet_recover.go:75 +0x289\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2.glob..func10(0xc00020d500, 0x9, 0x10)\r\n\tvalidator/accounts/v2/cmd_wallet.go:77 +0x3d\r\ngithub.com/urfave/cli/v2.(*Command).Run(0x251c4c0, 0xc00020d240, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/command.go:164 +0x4e0\r\ngithub.com/urfave/cli/v2.(*App).RunAsSubcommand(0xc000305680, 0xc00020d100, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/app.go:427 +0xa68\r\ngithub.com/urfave/cli/v2.(*Command).startApp(0x251c160, 0xc00020d100, 0x7ffff399b715, 0x9)\r\n\texternal/com_github_urfave_cli_v2/command.go:279 +0x68c\r\ngithub.com/urfave/cli/v2.(*Command).Run(0x251c160, 0xc00020d100, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/command.go:94 +0xa12\r\ngithub.com/urfave/cli/v2.(*App).RunContext(0xc000305380, 0x1a7b140, 0xc000120000, 0xc00011c150, 0x3, 0x3, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/app.go:306 +0x814\r\ngithub.com/urfave/cli/v2.(*App).Run(...)\r\n\texternal/com_github_urfave_cli_v2/app.go:215\r\nmain.main()\r\n\tvalidator/main.go:350 +0x91f\r\n\r\npanic: runtime error: invalid memory address or nil pointer dereference [recovered]\r\n\tpanic: runtime error: invalid memory address or nil pointer dereference\r\n[signal SIGSEGV: segmentation violation code=0x1 addr=0x38 pc=0x109ac97]\r\n\r\ngoroutine 1 [running]:\r\nmain.main.func9()\r\n\tvalidator/main.go:346 +0x13e\r\npanic(0x14f4000, 0x2503330)\r\n\tGOROOT/src/runtime/panic.go:969 +0x166\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2/wallet.(*Wallet).SaveHashedPassword(0x0, 0x1a7b140, 0xc000120000, 0x0, 0x0)\r\n\tvalidator/accounts/v2/wallet/wallet.go:411 +0x37\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2.RecoverWalletCli(0xc00020d500, 0xc000fcf9b8, 0x8)\r\n\tvalidator/accounts/v2/wallet_recover.go:75 +0x289\r\ngithub.com/prysmaticlabs/prysm/validator/accounts/v2.glob..func10(0xc00020d500, 0x9, 0x10)\r\n\tvalidator/accounts/v2/cmd_wallet.go:77 +0x3d\r\ngithub.com/urfave/cli/v2.(*Command).Run(0x251c4c0, 0xc00020d240, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/command.go:164 +0x4e0\r\ngithub.com/urfave/cli/v2.(*App).RunAsSubcommand(0xc000305680, 0xc00020d100, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/app.go:427 +0xa68\r\ngithub.com/urfave/cli/v2.(*Command).startApp(0x251c160, 0xc00020d100, 0x7ffff399b715, 0x9)\r\n\texternal/com_github_urfave_cli_v2/command.go:279 +0x68c\r\ngithub.com/urfave/cli/v2.(*Command).Run(0x251c160, 0xc00020d100, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/command.go:94 +0xa12\r\ngithub.com/urfave/cli/v2.(*App).RunContext(0xc000305380, 0x1a7b140, 0xc000120000, 0xc00011c150, 0x3, 0x3, 0x0, 0x0)\r\n\texternal/com_github_urfave_cli_v2/app.go:306 +0x814\r\ngithub.com/urfave/cli/v2.(*App).Run(...)\r\n\texternal/com_github_urfave_cli_v2/app.go:215\r\nmain.main()\r\n\tvalidator/main.go:350 +0x91f\r\nruntime: note: your Linux kernel may be buggy\r\nruntime: note: see https://golang.org/wiki/LinuxKernelSignalVectorBug\r\nruntime: note: mlock workaround for kernel bug failed with errno 12\r\n```\r\n\r\n\r\n### Description\r\n\r\nSee above\r\n\r\n### Has this worked before in a previous version?\r\n\r\nI don't really know.\r\n\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nSee above\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:**\r\n\r\nUbuntu VM running Docker\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\nCurrent master.  282f3eec01470935e65460163755fa00595c1ce8\r\n\r\n**Anything else relevant (validator index / public key)?**\r\nNo\r\n\r\n",
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7350/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7350/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

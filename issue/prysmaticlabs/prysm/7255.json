@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7255",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7255/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7255/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7255/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/7255",
+  "id": 703139405,
+  "node_id": "MDU6SXNzdWU3MDMxMzk0MDU=",
+  "number": 7255,
+  "title": "When Importing multiple sets of keys with different passwords, import fails",
+  "user": {
+    "login": "justin95-eth2",
+    "id": 71104363,
+    "node_id": "MDQ6VXNlcjcxMTA0MzYz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/71104363?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/justin95-eth2",
+    "html_url": "https://github.com/justin95-eth2",
+    "followers_url": "https://api.github.com/users/justin95-eth2/followers",
+    "following_url": "https://api.github.com/users/justin95-eth2/following{/other_user}",
+    "gists_url": "https://api.github.com/users/justin95-eth2/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/justin95-eth2/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/justin95-eth2/subscriptions",
+    "organizations_url": "https://api.github.com/users/justin95-eth2/orgs",
+    "repos_url": "https://api.github.com/users/justin95-eth2/repos",
+    "events_url": "https://api.github.com/users/justin95-eth2/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/justin95-eth2/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129904,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDQ=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Bug",
+      "name": "Bug",
+      "color": "ee0701",
+      "default": false,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-09-16T23:29:20Z",
+  "updated_at": "2020-10-26T16:56:58Z",
+  "closed_at": "2020-10-26T16:56:58Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Environment: Windows 10 Version 10.0.18363 \r\nPrysm Alpha 25\r\n\r\nI did my final addition today of adding and depositing 580 validators. When I did this, I did them in runs of 85 with a final run of 70 on the medalla launchpad due to metamask not being able to keep up with that many transactions. I also like to have good security so I made each run of 85 a different password using the deposit.exe file available on the launchpad. I went to go import keys using **prysm.bat validator accounts-v2 import --keys-dir=%LOCALAPPDATA%\\eth2.0-deposit-cli\\validator_keys** \r\n\r\nI got the following error:\r\n\r\n**Enter the password for your imported accounts:\r\nImporting accounts, this may take a while...\r\n[2020-09-16 15:13:27] FATAL accounts-v2: Could not import accounts: wrong password for keystore with pubkey 99de8ebb703c5876e3ea42fb28cc833f7d7acf4bdcc500e36d6d366b51d4e59b70ad718473876d22f03a0567251db2a1\r\nERROR FAILED\r\nan error has occured, set PRYSM_AUTORESTART=1 to automatically restart**\r\n\r\nWhen I was running on Alpha 23 and 24, I had no issue importing keys that had different passwords, when \"Import\" had arrived at a key that had a different password, it would prompt me to enter a new password for the next set of keys. Whereas with 25 I would get the above error.\r\nAfter discussing this issue with dv8S on discord, he had decided to try and import those keys using Alpha 24 running the following commands\r\nCd into download folder and ran:\r\n\r\n**.\\validator-v1.0.0-alpha.24-windows-amd64.exe accounts-v2 import  --keys-dir=%LOCALAPPDATA%\\eth2.0-deposit-cli\\validator_keys**\r\n\r\n\"Import\" took the command and it appeared to import the keys properly and prompted me for the new passwords at each set of keys as it had in the past. \r\nFrom there I CD back into the prysm 25 directory and ran \r\nset USE_PRYSM_VERSION=\r\nTo make sure it was still on 25 when I launched the validator\r\nran prysm.bat validator and it prompted me for the wallet password like always and then got hung up on:\r\n\r\n **INFO validator: Beacon chain started genesisTime=2020-08-04 07:00:08 -0600 MDT\r\nRan verbosity debug alongside validator and found it was sticking on loading prometheus server with error:\r\n\r\nDEBUG prometheus: Starting prometheus service address=127.0.0.1:8081**\r\n\r\nRestarted the machine thinking there might have been an issue with the server and it changed nothing. Now, as a general practice I always back up the files that are present inside the wallet directory in case of an error while importing and thankfully i did it again this time. When I copied keymanageropts.json, validator.db and all-accounts.keystore.json back into their respective folders, overwriting the problem ones, it loaded back up with the original keys and started attesting just fine, at this point, I did not want to try and use Alpha 24 again, so I copied the keys into separate folders for each run, and imported each folder separately, this worked just fine and it imported all 580 keys just fine. Running accounts-v2 list I have all 810 keys report back.\r\n\r\n",
+  "closed_by": {
+    "login": "rkapka",
+    "id": 28876818,
+    "node_id": "MDQ6VXNlcjI4ODc2ODE4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/28876818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rkapka",
+    "html_url": "https://github.com/rkapka",
+    "followers_url": "https://api.github.com/users/rkapka/followers",
+    "following_url": "https://api.github.com/users/rkapka/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rkapka/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rkapka/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rkapka/subscriptions",
+    "organizations_url": "https://api.github.com/users/rkapka/orgs",
+    "repos_url": "https://api.github.com/users/rkapka/repos",
+    "events_url": "https://api.github.com/users/rkapka/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rkapka/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7255/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7255/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

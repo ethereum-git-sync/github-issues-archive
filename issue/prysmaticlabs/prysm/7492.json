@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7492",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7492/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7492/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7492/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/7492",
+  "id": 718527350,
+  "node_id": "MDU6SXNzdWU3MTg1MjczNTA=",
+  "number": 7492,
+  "title": "Event Subscriptions Should Be Initialized in the Constructor",
+  "user": {
+    "login": "nisdas",
+    "id": 33201827,
+    "node_id": "MDQ6VXNlcjMzMjAxODI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33201827?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nisdas",
+    "html_url": "https://github.com/nisdas",
+    "followers_url": "https://api.github.com/users/nisdas/followers",
+    "following_url": "https://api.github.com/users/nisdas/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nisdas/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nisdas/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nisdas/subscriptions",
+    "organizations_url": "https://api.github.com/users/nisdas/orgs",
+    "repos_url": "https://api.github.com/users/nisdas/repos",
+    "events_url": "https://api.github.com/users/nisdas/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nisdas/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129906,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDY=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Enhancement",
+      "name": "Enhancement",
+      "color": "84b6eb",
+      "default": false,
+      "description": "New feature or request"
+    },
+    {
+      "id": 802129907,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDc=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Help%20Wanted",
+      "name": "Help Wanted",
+      "color": "33aa3f",
+      "default": false,
+      "description": "Extra attention is needed"
+    },
+    {
+      "id": 2185788365,
+      "node_id": "MDU6TGFiZWwyMTg1Nzg4MzY1",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Cleanup",
+      "name": "Cleanup",
+      "color": "9ffce6",
+      "default": false,
+      "description": "Code health!"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-10-10T04:17:17Z",
+  "updated_at": "2020-10-27T14:39:15Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "# 💎 Issue\r\n\r\nCurrently a few services initialize event subscriptions for state events(State Initialization, Syncing) in the `Start` routine of a service. This should instead be done in the constructor of the service.\r\n\r\n### Background\r\n\r\nIn #7468, the initial PR failed in runtime during pre-genesis in `Zinken` . This was because the `initial-sync` service instead skipped waiting for state initialization and directly when to `syncing` . This would trigger a race condition where we would received the `synced` event before `state initialization` . Which is logically incomprehensible, as we would need the state to be initialized before we can continue deciding on whether to sync or not. This was initially introduced in #3633 , so as to fix a race condition in where initial sync would be permanently stalled. \r\n\r\n### Description\r\n\r\nThe reason for the race stated above is bad implementation of event subscriptions in our services , where most of them are subscribed to when starting the service in `Start` . This leads to a race between all these services and the `blockchain` service from which the state initialization event is emitted. If we subscribe after that event is emitted we will permanently miss it and lead to undefined behaviour. \r\n\r\nThe correct way to resolve this is to subscribe to events in `NewService` , this ensures that all services will always be able to listen to the events correctly and avoid any race conditions.   ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7492/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7492/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

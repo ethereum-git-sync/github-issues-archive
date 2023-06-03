@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/5015",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/5015/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/5015/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/5015/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/5015",
+  "id": 576397674,
+  "node_id": "MDU6SXNzdWU1NzYzOTc2NzQ=",
+  "number": 5015,
+  "title": "Fix Critical Race Condition Bug at Genesis",
+  "user": {
+    "login": "rauljordan",
+    "id": 5572669,
+    "node_id": "MDQ6VXNlcjU1NzI2Njk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5572669?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rauljordan",
+    "html_url": "https://github.com/rauljordan",
+    "followers_url": "https://api.github.com/users/rauljordan/followers",
+    "following_url": "https://api.github.com/users/rauljordan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rauljordan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rauljordan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rauljordan/subscriptions",
+    "organizations_url": "https://api.github.com/users/rauljordan/orgs",
+    "repos_url": "https://api.github.com/users/rauljordan/repos",
+    "events_url": "https://api.github.com/users/rauljordan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rauljordan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129904,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDQ=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Bug",
+      "name": "Bug",
+      "color": "ee0701",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1085358164,
+      "node_id": "MDU6TGFiZWwxMDg1MzU4MTY0",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Priority:%20Critical",
+      "name": "Priority: Critical",
+      "color": "f7262f",
+      "default": false,
+      "description": "Highest, immediate priority item"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-03-05T16:58:41Z",
+  "updated_at": "2020-03-05T21:20:39Z",
+  "closed_at": "2020-03-05T21:20:39Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Hi all,\r\n\r\nCurrently in our blockchain service, we have two important goroutines that happen when the node first kicks off. One begins listening for incoming attestations, and the other begins listening for the genesis state to be initialized. The former depends on a **one time event** fired by the latter. Given the two are launched as goroutines at the same time, there's a high likelihood (reproducible 3/5 times locally) that the latter goroutine will fire before the former, preventing our node from listening to incoming attestations at all.\r\n\r\nThe offending code is here:\r\n\r\n```go\r\n\t\tgo func() {\r\n\t\t\tstateChannel := make(chan *feed.Event, 1)\r\n\t\t\tstateSub := s.stateNotifier.StateFeed().Subscribe(stateChannel)\r\n\t\t\tdefer stateSub.Unsubscribe()\r\n\t\t\tfor {\r\n\t\t\t\tselect {\r\n\t\t\t\tcase event := <-stateChannel:\r\n\t\t\t\t\tif event.Type == statefeed.ChainStarted {\r\n\t\t\t\t\t\tdata := event.Data.(*statefeed.ChainStartedData)\r\n\t\t\t\t\t\tlog.WithField(\"starttime\", data.StartTime).Debug(\"Received chain start event\")\r\n\t\t\t\t\t\ts.processChainStartTime(ctx, data.StartTime)\r\n\t\t\t\t\t\treturn\r\n\t\t\t\t\t}\r\n\t\t\t\tcase <-s.ctx.Done():\r\n\t\t\t\t\tlog.Debug(\"Context closed, exiting goroutine\")\r\n\t\t\t\t\treturn\r\n\t\t\t\tcase err := <-stateSub.Err():\r\n\t\t\t\t\tlog.WithError(err).Error(\"Subscription to state notifier failed\")\r\n\t\t\t\t\treturn\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}()\r\n\t}\r\n\r\n\tgo s.processAttestation()\r\n```\r\n\r\nIn line https://github.com/prysmaticlabs/prysm/blob/aebc883a0da22e1d27cb9b10e4f9ffb24785d58e/beacon-chain/blockchain/service.go#L182 of our blockchain service, we fire a goroutine that has a race condition with `go s.processAttestations()`. We need to ensure this is deterministic, otherwise many prysm nodes can stall at mainnet genesis.",
+  "closed_by": {
+    "login": "farazdagi",
+    "id": 188194,
+    "node_id": "MDQ6VXNlcjE4ODE5NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/188194?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/farazdagi",
+    "html_url": "https://github.com/farazdagi",
+    "followers_url": "https://api.github.com/users/farazdagi/followers",
+    "following_url": "https://api.github.com/users/farazdagi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/farazdagi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/farazdagi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/farazdagi/subscriptions",
+    "organizations_url": "https://api.github.com/users/farazdagi/orgs",
+    "repos_url": "https://api.github.com/users/farazdagi/repos",
+    "events_url": "https://api.github.com/users/farazdagi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/farazdagi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/5015/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/5015/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

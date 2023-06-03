@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12380",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12380/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12380/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12380/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12380",
+  "id": 1703971812,
+  "node_id": "I_kwDOBvuov85lkIvk",
+  "number": 12380,
+  "title": "Parallelize the process of checking validator roles at the given slot",
+  "user": {
+    "login": "ihooni",
+    "id": 37792049,
+    "node_id": "MDQ6VXNlcjM3NzkyMDQ5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/37792049?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ihooni",
+    "html_url": "https://github.com/ihooni",
+    "followers_url": "https://api.github.com/users/ihooni/followers",
+    "following_url": "https://api.github.com/users/ihooni/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ihooni/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ihooni/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ihooni/subscriptions",
+    "organizations_url": "https://api.github.com/users/ihooni/orgs",
+    "repos_url": "https://api.github.com/users/ihooni/repos",
+    "events_url": "https://api.github.com/users/ihooni/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ihooni/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129907,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDc=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Help%20Wanted",
+      "name": "Help Wanted",
+      "color": "33aa3f",
+      "default": false,
+      "description": "Extra attention is needed"
+    },
+    {
+      "id": 4218204170,
+      "node_id": "LA_kwDOBvuov877bLAK",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/optimization",
+      "name": "optimization",
+      "color": "D83FF8",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-10T13:45:19Z",
+  "updated_at": "2023-05-31T22:20:33Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!--💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎\r\n\r\nHellooo! 😄 \r\n\r\nTo help us tend to your issue faster, please search our currently open issues before submitting a new one.\r\nExisting issues often contain information about workarounds, resolution, or progress updates.\r\n\r\n💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎-->\r\n\r\n# 🚀 Feature Request\r\n\r\nHello Prysm team :)\r\n\r\n### Description\r\n\r\n<!-- ✍️ A clear and concise description of the problem or missing capability... --> \r\n\r\nCurrently, Prysm processes the checking of validator roles without any parallelization (the `RolesAt` function).\r\nhttps://github.com/prysmaticlabs/prysm/blob/f4681fde1946a86c5d33c389564241c7ca0e9c2f/validator/client/validator.go#L702-L704\r\n\r\nThis can cause delaying for performing validator roles such as attestation or block proposal, if single validator-client performing duties for many validators.\r\n\r\nhttps://github.com/prysmaticlabs/prysm/blob/f4681fde1946a86c5d33c389564241c7ca0e9c2f/validator/client/runner.go#L145-L152\r\n\r\nIf this delay is severe, `getHeader` request to mev relay is also delayed, resulting the missed slots. Like below timeline. [ref](https://www.reddit.com/r/ethstaker/comments/136cz6j/comment/jir6uh8/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)\r\n```\r\n1. t = 0 ms: New slot begins.\r\n2. t > 2000 ms < 3000 ms: Validator makes getHeader call to all relays.\r\n3. t > 3000 ms < 4000 ms: Validator's getHeader call to bloXroute times out after 950 ms, validator picks best bid from others, Aestus wins.\r\n4. t = 4000 ms: Cutoff time, relay will no longer accept getPayload calls past this point.\r\n5. t = 4401 ms: Blinded block is ready and signed, validator sends getPayload call to Aestus, Aestus receives it and rejects it as too late (past the cutoff).\r\n6. t = 5368 ms: After 4 more retries, the validator mev-boost client gives up. As it has already signed one block, it doesn't want to risk a slashing by signing a second block, so resigns itself to missing the slot.\r\n```\r\n\r\nThis issue is particularly noticeable in the following environments:\r\n- A single validator-client is performing many validator duties\r\n- web3signer is used instead of a local signer\r\n\r\nCurrently, within the `RolesAt` function, `isAggregator` is called by simple for looping for all validator public keys.\r\nThis function includes the process of `AGGREGATION_SLOT` signing internally, which seems to be the main bottleneck of the `RolesAt` function when using web3signer.\r\n\r\nhttps://github.com/prysmaticlabs/prysm/blob/f4681fde1946a86c5d33c389564241c7ca0e9c2f/validator/client/validator.go#L777-L783\r\n\r\n\r\n### Describe the solution you'd like\r\n\r\n<!-- ✍️ If you have a solution in mind, please describe it. --> \r\n\r\nOne possible soultion is to use goroutines for each validator for paralleizing `RolesAt` function.\r\n\r\n### Describe alternatives you've considered\r\n\r\n<!-- ✍️ Have you considered any alternative solutions or workarounds? --> \r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12380/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 1,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12380/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

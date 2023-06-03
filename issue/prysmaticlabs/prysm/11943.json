@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11943",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11943/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11943/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11943/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/11943",
+  "id": 1564141656,
+  "node_id": "I_kwDOBvuov85dOuhY",
+  "number": 11943,
+  "title": "`error: invalid memory address or nil pointer dereference` when calling `DELETE /eth/v1/validator/{pubkey}/feerecipient` with body",
+  "user": {
+    "login": "nalepae",
+    "id": 4943830,
+    "node_id": "MDQ6VXNlcjQ5NDM4MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4943830?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nalepae",
+    "html_url": "https://github.com/nalepae",
+    "followers_url": "https://api.github.com/users/nalepae/followers",
+    "following_url": "https://api.github.com/users/nalepae/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nalepae/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nalepae/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nalepae/subscriptions",
+    "organizations_url": "https://api.github.com/users/nalepae/orgs",
+    "repos_url": "https://api.github.com/users/nalepae/repos",
+    "events_url": "https://api.github.com/users/nalepae/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nalepae/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-01-31T11:34:36Z",
+  "updated_at": "2023-02-06T14:15:11Z",
+  "closed_at": "2023-01-31T18:01:53Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# 🐞 Bug Report\r\n\r\n\r\n### Description\r\n\r\nWhen calling `DELETE /eth/v1/validator/{pubkey}/feerecipient` with a body, we get:\r\n\r\n```\r\n runtime error: invalid memory address or nil pointer dereference\r\n```\r\n\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nRun Prysm Validator client with Key Manager API activated, exemple:\r\n```\r\n./prysm.sh validator --goerli --disable-monitoring --wallet-password-file <path-to-wallet-password-file> --web\r\n```\r\n\r\nThen call on **Validator Client API** `/eth/v1/validator/{pubkey}/feerecipient` with a body.\r\n\r\nExample body:\r\n```\r\n{\r\n  \"gas_limit\": \"30000000\"\r\n}\r\n```\r\n\r\n(The content of body does not matter, you just need a body).\r\n\r\n\r\n## 🔥 Error\r\n\r\n```\r\n2023/01/31 12:24:13 http: panic serving 127.0.0.1:50224: runtime error: invalid memory address or nil pointer dereference\r\ngoroutine 269 [running]:\r\nnet/http.(*conn).serve.func1()\r\n\t/opt/homebrew/Cellar/go/1.19.5/libexec/src/net/http/server.go:1850 +0x118\r\npanic({0x1068b2780, 0x107c6ade0})\r\n\t/opt/homebrew/Cellar/go/1.19.5/libexec/src/runtime/panic.go:890 +0x26c\r\ngithub.com/prysmaticlabs/prysm/v3/api/gateway/apimiddleware.processField({0x0, 0x0}, {0x14000922e48, 0x2, 0x2})\r\n\t/Users/manu/Kiln/prysm/api/gateway/apimiddleware/process_field.go:21 +0x4c\r\ngithub.com/prysmaticlabs/prysm/v3/api/gateway/apimiddleware.ProcessRequestContainerFields({0x0, 0x0})\r\n\t/Users/manu/Kiln/prysm/api/gateway/apimiddleware/process_request.go:35 +0xe8\r\ngithub.com/prysmaticlabs/prysm/v3/api/gateway/apimiddleware.handleDeleteRequestForEndpoint(0x140004fc7e0, 0x140022d8900)\r\n\t/Users/manu/Kiln/prysm/api/gateway/apimiddleware/api_middleware.go:196 +0xcc\r\ngithub.com/prysmaticlabs/prysm/v3/api/gateway/apimiddleware.(*ApiProxyMiddleware).WithMiddleware.func1({0x106aff210, 0x140004fc700}, 0x140022d8900)\r\n\t/Users/manu/Kiln/prysm/api/gateway/apimiddleware/api_middleware.go:115 +0x508\r\nnet/http.HandlerFunc.ServeHTTP(0x1400034ec20, {0x106aff210, 0x140004fc700}, 0x140022d8900)\r\n\t/opt/homebrew/Cellar/go/1.19.5/libexec/src/net/http/server.go:2109 +0x44\r\ngithub.com/gorilla/mux.(*Router).ServeHTTP(0x140001fe3c0, {0x106aff210, 0x140004fc700}, 0x140022d8900)\r\n\t/Users/manu/go/pkg/mod/github.com/gorilla/mux@v1.8.0/mux.go:210 +0x258\r\ngithub.com/rs/cors.(*Cors).Handler.func1({0x106aff210, 0x140004fc700}, 0x140022d8700)\r\n\t/Users/manu/go/pkg/mod/github.com/rs/cors@v1.7.0/cors.go:219 +0x2cc\r\nnet/http.HandlerFunc.ServeHTTP(0x1400034eb20, {0x106aff210, 0x140004fc700}, 0x140022d8700)\r\n\t/opt/homebrew/Cellar/go/1.19.5/libexec/src/net/http/server.go:2109 +0x44\r\nnet/http.serverHandler.ServeHTTP({0x140004742d0}, {0x106aff210, 0x140004fc700}, 0x140022d8700)\r\n\t/opt/homebrew/Cellar/go/1.19.5/libexec/src/net/http/server.go:2947 +0x41c\r\nnet/http.(*conn).serve(0x1400007dea0, {0x106b00630, 0x14001cf2280})\r\n\t/opt/homebrew/Cellar/go/1.19.5/libexec/src/net/http/server.go:1991 +0x14e0\r\ncreated by net/http.(*Server).Serve\r\n```\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:**\r\nMacOS Ventura 13.1\r\nPrysm v3.2.0\r\n\r\n**Anything else relevant (validator index / public key)?**\r\nNo issue when calling this API without a body.\r\n\r\nFor the context, I found this issue because I use Postman.\r\nI previously sent a `POST` (with body) request, then I switch to this `DELETE` request, and Postman kept the body, so I sent this `DELETE` request with the body of the previous `POST` request.\r\n",
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11943/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11943/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

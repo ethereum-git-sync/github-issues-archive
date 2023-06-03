@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7213",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7213/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7213/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7213/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/7213",
+  "id": 698642309,
+  "node_id": "MDU6SXNzdWU2OTg2NDIzMDk=",
+  "number": 7213,
+  "title": "Passphrase given during HD-wallet creation is not used.  Empty string is used for HD-wallet operations.",
+  "user": {
+    "login": "dv8silencer",
+    "id": 15720668,
+    "node_id": "MDQ6VXNlcjE1NzIwNjY4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/15720668?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dv8silencer",
+    "html_url": "https://github.com/dv8silencer",
+    "followers_url": "https://api.github.com/users/dv8silencer/followers",
+    "following_url": "https://api.github.com/users/dv8silencer/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dv8silencer/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dv8silencer/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dv8silencer/subscriptions",
+    "organizations_url": "https://api.github.com/users/dv8silencer/orgs",
+    "repos_url": "https://api.github.com/users/dv8silencer/repos",
+    "events_url": "https://api.github.com/users/dv8silencer/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dv8silencer/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-09-11T00:12:34Z",
+  "updated_at": "2020-09-16T20:12:17Z",
+  "closed_at": "2020-09-16T20:12:17Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# 🐞 Bug Report\r\n\r\nIf you create a HD wallet, you are asked for a passphrase.  Regardless of what you choose, you can access the wallet using whatever passphrase you please.\r\n\r\n### Description\r\n\r\nCreate HD wallet with passphrase1\r\nThen run accounts-v2 create using passphrase2 <-- No issues\r\nRepeat prior step with a set of random passphrases <-- No issues\r\nList accounts, also no issue.\r\n\r\nThis stems from the following code in validator/keymanager/v2/derived/derived.go at lines 103 and 134:\r\n\r\n```\r\n\tif !fileutil.FileExists(filepath.Join(cfg.Wallet.AccountsDir(), EncryptedSeedFileName)) {\r\n\t\tseedConfig, err := initializeWalletSeedFile(cfg.WalletPassword, cfg.SkipMnemonicConfirm)\r\n\t\tif err != nil {\r\n\t\t\treturn nil, errors.Wrap(err, \"could not initialize new wallet seed file\")\r\n\t\t}\r\n```\r\n\r\n```\r\n\tdecryptor := keystorev4.New()\r\n\tseed, err := decryptor.Decrypt(seedConfig.Crypto, cfg.WalletPassword)\r\n\tif err != nil {\r\n\t\treturn nil, errors.Wrap(err, \"could not decrypt seed configuration with password\")\r\n\t}\r\n```\r\n\r\n**cfg.WalletPassword is being passed without being initialized.  The password obtained during startup would actually be in cfg.Wallet.walletPassword** obtainable using a getter method.\r\n\r\n### Has this worked before in a previous version?\r\n\r\nI don't know.  It might be the first time I have used Prysm HD wallets.\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nSee above\r\n\r\n## 🔥 Error\r\n\r\nSee above\r\n\r\n## 🌍  Your Environment\r\n\r\nBug is in both in Windows 10 as well as Ubuntu running in docker running in Ubuntu VM.  64 bit.\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\nCurrent master.  acddb6035a2f07a8d4f38731c89778e7b1813afc\r\n\r\n**Anything else relevant (validator index / public key)?**\r\nNo\r\n",
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7213/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7213/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

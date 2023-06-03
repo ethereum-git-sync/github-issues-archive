@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7658",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7658/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7658/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7658/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/7658",
+  "id": 731120982,
+  "node_id": "MDU6SXNzdWU3MzExMjA5ODI=",
+  "number": 7658,
+  "title": "Improve getAttPreState with multilock",
+  "user": {
+    "login": "prestonvanloon",
+    "id": 7246818,
+    "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prestonvanloon",
+    "html_url": "https://github.com/prestonvanloon",
+    "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+    "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+    "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+    "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+    "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129906,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDY=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Enhancement",
+      "name": "Enhancement",
+      "color": "84b6eb",
+      "default": false,
+      "description": "New feature or request"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-10-28T05:45:04Z",
+  "updated_at": "2020-11-03T21:18:16Z",
+  "closed_at": "2020-11-03T21:18:16Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "# 🚀 Feature Request\r\n\r\n### Description\r\n\r\nPrior to https://github.com/prysmaticlabs/prysm/pull/7656, we had a lock around getAttPreState. The original intention was to prevent the following scenario:\r\n\r\n- Goroutine 0: getAttPreState(checkpoint0), the state at checkpoint 0 is not cached, so we start regenerating it\r\n- Goroutine 1: getAttPreState(checkpoint0), the state at checkpoint 0 is not cached, so we start regenerating it\r\n- Goroutine 0: regenerated state for checkpoint is now cached\r\n- Goroutine 1: regenerated state for checkpoint is now cached\r\n\r\nIn this scenario we repeated the work while it was already in progress.\r\n\r\nA problem is that if another call came in for a different checkpoint (goroutine 2), it would also have been blocked by the lock held by goroutine 0, even though it would not have benefited from the work completed by goroutine 0. For this reason, we removed the lock in PR https://github.com/prysmaticlabs/prysm/pull/7656.\r\n\r\n### Describe the solution you'd like\r\n\r\nIdeally, goroutine 1 should have waited for goroutine 0 to complete. Instead of a generic lock, we can use a multilock where the key is the epoch + root of the checkpoint. Or a hash of the checkpoint itself. This way goroutine 1 would have rightfully been blocked by goroutine 0 but goroutine 2 would not have been blocked by goroutine 0 since it is requesting a state from a different checkpoint.\r\n\r\n### Describe alternatives you've considered\r\n\r\nI looked into https://github.com/atedja/go-multilock, but it requires periodic cleanup of keys and is not well suited for temporary keys. I'm thinking we'll need to create our own multilock that is self cleaning. \r\n",
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7658/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/7658/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

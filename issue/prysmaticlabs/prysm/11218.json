@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11218",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11218/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11218/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11218/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/11218",
+  "id": 1338552910,
+  "node_id": "I_kwDOBvuov85PyLJO",
+  "number": 11218,
+  "title": "[Prater] `/eth/v2/beacon/blocks` route returns non-canonical blocks",
+  "user": {
+    "login": "jclapis",
+    "id": 627896,
+    "node_id": "MDQ6VXNlcjYyNzg5Ng==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/627896?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jclapis",
+    "html_url": "https://github.com/jclapis",
+    "followers_url": "https://api.github.com/users/jclapis/followers",
+    "following_url": "https://api.github.com/users/jclapis/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jclapis/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jclapis/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jclapis/subscriptions",
+    "organizations_url": "https://api.github.com/users/jclapis/orgs",
+    "repos_url": "https://api.github.com/users/jclapis/repos",
+    "events_url": "https://api.github.com/users/jclapis/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jclapis/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-08-15T05:20:03Z",
+  "updated_at": "2022-08-15T15:48:45Z",
+  "closed_at": "2022-08-15T15:48:45Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "# 🐞 Bug Report\r\n\r\n### Description\r\n\r\nIt looks like after Bellatrix, Prysm v2.1.4 is returning non-canonical blocks via the `/eth/v2/beacon/blocks/<slot>` API route. Specifically, it is returning blocks that were missing from the finalized canonical chain. This is different from the other clients, which all return a 404 when querying a slot that was missing.\r\n\r\nFor example, look at slot `3651831`. Beaconcha.in reports it as missed (https://prater.beaconcha.in/block/3651831), and my own Nimbus and Lighthouse nodes confirm that. Here's what Nimbus returns, for example:\r\n```\r\ncurl http://eth2:5052/eth/v2/beacon/blocks/3651831\r\n\r\n{\"code\":\"404\",\"message\":\"Block header/data has not been found\",\"stacktraces\":[]}\r\n```\r\n\r\nPrysm, however, returns a full block:\r\n\r\n```\r\ncurl http://eth2:5052/eth/v2/beacon/blocks/3651831 | jq\r\n\r\n{\r\n  \"version\": \"bellatrix\",\r\n  \"data\": {\r\n    \"message\": {\r\n      \"slot\": \"3651831\",\r\n      \"proposer_index\": \"341991\",\r\n      \"parent_root\": \"0xd646e76105df4304050975b3a58a3aa30ee5dce1a345b568643dea23b2f932fb\",\r\n      \"state_root\": \"0xb62bd5254e1aa35043323d7f2089bee498eaf15d7ee7d4848256b30ef6929d06\",\r\n      \"body\": {\r\n        \"randao_reveal\": \"0x966247ebc4f81b630989f30ee62e0b141b4d22ab9bcdf4ddc3f32e60ed99de4263550d9f5825067db9b2f330ac9bbe6002a957dc627549fac491f98d0177d33597b681d24d7578ed733f82c0bc4f69ab5feb0b32d47c048e3d103651fd78ec25\",\r\n        \"eth1_data\": {\r\n          \"deposit_root\": \"0xff76f8d0b8551a3168322aff98642c2ecb3bd82f93a0fc78641919ed62ba93dd\",\r\n          \"deposit_count\": \"170712\",\r\n          \"block_hash\": \"0xf1ba5158b4729e7abb924f8c24c5e7decefd3c07a02dd31e9dc69a5bfe3a4ddb\"\r\n        },\r\n        \"graffiti\": \"0x6772616e6420726973696e670000000000000000000000000000000000000000\",\r\n...\r\n```\r\n\r\nWhile I understand that Prysm doesn't delete non-canonical blocks, I don't believe it should be returning them via this API route to maintain parity with the other clients, or it should at least have some kind of distinguishing flag that states they're non-canonical.\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nRun e.g., `curl http://localhost:5052/eth/v2/beacon/blocks/3651831` or any slot that's missing from the canonical finalized Prater chain. I don't know if this will return *every* block, so I'm not sure if this exact slot will provide the repro, but I've seen it show up on 2 of my Prysm nodes so I have some confidence in it at least.\r\n\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:**\r\n`Debian 11 x64`\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n`v2.1.4` or more accurately, Docker image `prysmaticlabs/prysm-beacon-chain:HEAD-4e225f-debug`\r\n",
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11218/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11218/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

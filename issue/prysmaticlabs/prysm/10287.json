@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10287",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10287/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10287/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10287/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/10287",
+  "id": 1154515044,
+  "node_id": "I_kwDOBvuov85E0IBk",
+  "number": 10287,
+  "title": "Consolidate Fork-Related Type Differences Via Encapsulation",
+  "user": {
+    "login": "rauljordan",
+    "id": 5572669,
+    "node_id": "MDQ6VXNlcjU1NzI2Njk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5572669?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rauljordan",
+    "html_url": "https://github.com/rauljordan",
+    "followers_url": "https://api.github.com/users/rauljordan/followers",
+    "following_url": "https://api.github.com/users/rauljordan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rauljordan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rauljordan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rauljordan/subscriptions",
+    "organizations_url": "https://api.github.com/users/rauljordan/orgs",
+    "repos_url": "https://api.github.com/users/rauljordan/repos",
+    "events_url": "https://api.github.com/users/rauljordan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rauljordan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 934596141,
+      "node_id": "MDU6TGFiZWw5MzQ1OTYxNDE=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Discussion",
+      "name": "Discussion",
+      "color": "f9d0c4",
+      "default": false,
+      "description": "Simply a thread for talking about stuff"
+    },
+    {
+      "id": 2185788365,
+      "node_id": "MDU6TGFiZWwyMTg1Nzg4MzY1",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Cleanup",
+      "name": "Cleanup",
+      "color": "9ffce6",
+      "default": false,
+      "description": "Code health!"
+    },
+    {
+      "id": 3533498087,
+      "node_id": "LA_kwDOBvuov87SnObn",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Merge",
+      "name": "Merge",
+      "color": "92E643",
+      "default": false,
+      "description": "PRs related to the great milestone the merge"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-02-28T20:24:07Z",
+  "updated_at": "2022-03-02T18:08:06Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# Background\n\nCurrently, a lot of fork-related code is scattered throughout the codebase. In particular, we use a lot of conditionals or switch statements to change the behavior of our code and types used depending on the current network hard fork in Ethereum. This creates the following problems:\n\n- Adds complexity and more verbosity to our codebase\n- Makes it much harder for us to support future hard forks as there is more cognitive overhead. We have to remember to change all required files and conditionals for a new hard fork, which are easy to miss\n\nOne of the easiest approaches to solve this is to have a good way of consolidating fork conditionals via encapsulation. @kasey has proposed a really neat way of doing this:\n\n\n```go\ntype BlockMutator struct {\n\tPhase0    func(beaconBlock *eth.SignedBeaconBlock)\n\tAltair    func(beaconBlock *eth.SignedBeaconBlockAltair)\n\tBellatrix func(beaconBlock *eth.SignedBeaconBlockBellatrix)\n}\n\nfunc (m BlockMutator) Apply(b block.SignedBeaconBlock) error {\n\tswitch b.Version() {\n\tcase version.Phase0:\n\t\tbb, err := b.PbPhase0Block()\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tm.Phase0(bb)\n\t\treturn nil\n\tcase version.Altair:\n\t\tbb, err := b.PbAltairBlock()\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tm.Altair(bb)\n\t\treturn nil\n\tcase version.Bellatrix:\n\t\tbb, err := b.PbBellatrixBlock()\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tm.Bellatrix(bb)\n\t\treturn nil\n\t}\n\tmsg := fmt.Sprintf(\"version %d = %s\", b.Version(), version.String(b.Version()))\n\treturn errors.Wrap(ErrUnsupportedSignedBeaconBlock, msg)\n}\n\nfunc SetBlockStateRoot(b block.SignedBeaconBlock, sr [32]byte) error {\n\treturn BlockMutator{\n\t\tPhase0:    func(bb *eth.SignedBeaconBlock) { bb.Block.StateRoot = sr[:] },\n\t\tAltair:    func(bb *eth.SignedBeaconBlockAltair) { bb.Block.StateRoot = sr[:] },\n\t\tBellatrix: func(bb *eth.SignedBeaconBlockBellatrix) { bb.Block.StateRoot = sr[:] },\n\t}.Apply(b)\n}\n```\n\nWe propose adding similar encapsulation methods for beacon states and eventually having most, if not all fork logic all in one place. This is a tracking issue to complete this consolidation for beacon blocks.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10287/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10287/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1057224783",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/10287#issuecomment-1057224783",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10287",
+    "id": 1057224783,
+    "node_id": "IC_kwDOBvuov84_A_hP",
+    "user": {
+      "login": "prestonvanloon",
+      "id": 7246818,
+      "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/prestonvanloon",
+      "html_url": "https://github.com/prestonvanloon",
+      "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+      "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+      "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+      "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+      "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+      "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-03-02T18:07:48Z",
+    "updated_at": "2022-03-02T18:08:06Z",
+    "author_association": "MEMBER",
+    "body": "I've been working in this area in the last week or so. I think the example above is still too verbose in code. For example, all of the above could be solved by adding `SetBlockStateRoot(sr [32]byte)` to the `block.SignedBeaconBlock` interface or `block.BeaconBlock` interface.",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1057224783/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

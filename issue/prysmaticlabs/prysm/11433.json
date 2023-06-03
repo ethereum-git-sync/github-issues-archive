@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11433",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11433/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11433/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11433/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/11433",
+  "id": 1368913253,
+  "node_id": "I_kwDOBvuov85Rl_Vl",
+  "number": 11433,
+  "title": "Don't use HTR for the cache key in ssc",
+  "user": {
+    "login": "potuz",
+    "id": 16044918,
+    "node_id": "MDQ6VXNlcjE2MDQ0OTE4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16044918?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/potuz",
+    "html_url": "https://github.com/potuz",
+    "followers_url": "https://api.github.com/users/potuz/followers",
+    "following_url": "https://api.github.com/users/potuz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/potuz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/potuz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/potuz/subscriptions",
+    "organizations_url": "https://api.github.com/users/potuz/orgs",
+    "repos_url": "https://api.github.com/users/potuz/repos",
+    "events_url": "https://api.github.com/users/potuz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/potuz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-09-11T11:19:40Z",
+  "updated_at": "2022-10-03T17:53:19Z",
+  "closed_at": "2022-10-03T17:53:19Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "We currently use the beacon-block header HTR hashed against the slot for the skip slot cache key. This requires two calls to hashing routines that are completely unnecessary in in \r\n```go\r\nfunc cacheKey(_ context.Context, state state.ReadOnlyBeaconState) ([32]byte, error) {\r\n\tbh := state.LatestBlockHeader()\r\n\tif bh == nil {\r\n\t\treturn [32]byte{}, errors.New(\"block head in state can't be nil\")\r\n\t}\r\n\tr, err := bh.HashTreeRoot()\r\n\tif err != nil {\r\n\t\treturn [32]byte{}, err\r\n\t}\r\n\treturn hash.Hash(append(bytesutil.Bytes32(uint64(state.Slot())), r[:]...)), nil\r\n}\r\n```\r\nWe can simply use the `StateRoot` in `bh` instead of `bh.HashTreeRoot()` and we can just replace the last 8 bytes with the slot instead of hashing. ",
+  "closed_by": {
+    "login": "rauljordan",
+    "id": 5572669,
+    "node_id": "MDQ6VXNlcjU1NzI2Njk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5572669?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rauljordan",
+    "html_url": "https://github.com/rauljordan",
+    "followers_url": "https://api.github.com/users/rauljordan/followers",
+    "following_url": "https://api.github.com/users/rauljordan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rauljordan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rauljordan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rauljordan/subscriptions",
+    "organizations_url": "https://api.github.com/users/rauljordan/orgs",
+    "repos_url": "https://api.github.com/users/rauljordan/repos",
+    "events_url": "https://api.github.com/users/rauljordan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rauljordan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11433/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11433/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

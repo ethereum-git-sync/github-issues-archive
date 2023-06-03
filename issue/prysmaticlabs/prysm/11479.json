@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11479",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11479/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11479/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11479/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/11479",
+  "id": 1381123093,
+  "node_id": "I_kwDOBvuov85SUkQV",
+  "number": 11479,
+  "title": "Client-stats stops validator from functioning (and doesn't work itself)",
+  "user": {
+    "login": "kayagoban",
+    "id": 1153994,
+    "node_id": "MDQ6VXNlcjExNTM5OTQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1153994?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kayagoban",
+    "html_url": "https://github.com/kayagoban",
+    "followers_url": "https://api.github.com/users/kayagoban/followers",
+    "following_url": "https://api.github.com/users/kayagoban/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kayagoban/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kayagoban/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kayagoban/subscriptions",
+    "organizations_url": "https://api.github.com/users/kayagoban/orgs",
+    "repos_url": "https://api.github.com/users/kayagoban/repos",
+    "events_url": "https://api.github.com/users/kayagoban/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kayagoban/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-09-21T15:29:55Z",
+  "updated_at": "2022-09-21T15:29:55Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "\r\n\r\n# 🐞 Bug Report\r\n\r\n### Client-stats prevents validator from functioning (and doesn't work itself)\r\n\r\nWhen I run client-stats and connect to the beacon and validator, two things happen:\r\n1) I get JSON that has no useful stats\r\n2) the validator process stops processing validatiions\r\n\r\n### Has this worked before in a previous version?\r\n\r\nActually the client-stats binary used to crash prysm completely, so this is a step up.   D:\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nStart beacon and use --monitor-indices to monitor your validator(s).  Start Validator.  Then go to your client-stats binary and connect to both validator and beacon (on 127.0.0.1 in my case), see error-2.png\r\n\r\n## 🔥 Error\r\n\r\nSee error.png\r\n<pre>\r\n<code>\r\n[2022-09-21 17:09:30] WARN validator: block stream interrupted error=rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial tcp 127.0.0.1:4000: connect: connection refused\": could not connect efused\"\r\n[2022-09-21 17:09:30] WARN validator: block stream interrupted error=rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial tcp 127.0.0.1:4000: connect: connection refused\": could not connect\r\n[2022-09-21 17:09:31] ERROR validator: Could not request attestation to sign at slot error=rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial tcp 127.0.0.1:4000: connect: connection refused\" pubKey=0x91d66da9828c slot=4745745\r\n[2022-09-21 17:09:34]\r\n</code></pre>\r\n\r\nAlso, the JSON vacant of any useful data on client-stats:\r\n<code>\r\n./client-stats-v3.1.1-linux-amd64 --beacon-node-metrics-url=http://127.0.0.1:8080/metrics --validator-metrics-url=http:/127.0.0.1:8081/metrics \r\n[2022-09-21 17:08:25]  WARN main: No --clientstats-api-url flag set, writing to stdout as default metrics sink.\r\n\r\n[2022-09-21 17:09:25]  INFO Scraping beacon-node at http://127.0.0.1:8080/metrics\r\n{\"slasher_active\":false,\"sync_eth1_connected\":false,\"sync_eth2_synced\":false,\"disk_beaconchain_bytes_total\":0,\"network_libp2p_bytes_total_receive\":0,\"network_libp2p_bytes_total_transmit\":0,\"network_peers_connected\":0,\"sync_beacon_head_slot\":0,\"cpu_process_seconds_total\":0,\"memory_process_bytes\":0,\"client_name\":\"prysm\",\"client_version\":\"\",\"client_build\":0,\"sync_eth2_fallback_configured\":false,\"sync_eth2_fallback_connected\":false,\"version\":1,\"timestamp\":1663772966318,\"process\":\"beaconnode\"}[2022-09-21 17:09:26]  INFO Scraping validator at http:/127.0.0.1:8081/metrics\r\n{\"validator_total\":0,\"validator_active\":0,\"cpu_process_seconds_total\":0,\"memory_process_bytes\":0,\"client_name\":\"prysm\",\"client_version\":\"\",\"client_build\":0,\"sync_eth2_fallback_configured\":false,\"sync_eth2_fallback_connected\":false,\"version\":1,\"timestamp\":1663772966318,\"process\":\"validator\"}\r\n</code>\r\n\r\n\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:**\r\n\r\n<pre>\r\n  <code>\r\nDebian 11\r\n  </code>\r\n</pre>\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\n<pre>\r\n  <code>\r\n3.1.1\r\n  </code>\r\n</pre>\r\n\r\n**Anything else relevant (validator index / public key)?**\r\n\r\n![error](https://user-images.githubusercontent.com/1153994/191545505-4842f5ca-3483-4091-8473-b085d6a8e0b0.png)\r\n![error-2](https://user-images.githubusercontent.com/1153994/191545541-3cb37460-ee6a-448a-a2c9-8225699f3f45.png)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11479/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11479/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

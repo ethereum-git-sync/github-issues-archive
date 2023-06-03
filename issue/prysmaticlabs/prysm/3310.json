@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/3310",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/3310/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/3310/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/3310/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/3310",
+  "id": 484988846,
+  "node_id": "MDU6SXNzdWU0ODQ5ODg4NDY=",
+  "number": 3310,
+  "title": "Run time with `--next` flag fatal errors",
+  "user": {
+    "login": "terencechain",
+    "id": 21316537,
+    "node_id": "MDQ6VXNlcjIxMzE2NTM3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21316537?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/terencechain",
+    "html_url": "https://github.com/terencechain",
+    "followers_url": "https://api.github.com/users/terencechain/followers",
+    "following_url": "https://api.github.com/users/terencechain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/terencechain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/terencechain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/terencechain/subscriptions",
+    "organizations_url": "https://api.github.com/users/terencechain/orgs",
+    "repos_url": "https://api.github.com/users/terencechain/repos",
+    "events_url": "https://api.github.com/users/terencechain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/terencechain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1085358164,
+      "node_id": "MDU6TGFiZWwxMDg1MzU4MTY0",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Priority:%20Critical",
+      "name": "Priority: Critical",
+      "color": "f7262f",
+      "default": false,
+      "description": "Highest, immediate priority item"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-08-25T23:28:31Z",
+  "updated_at": "2019-08-26T14:00:41Z",
+  "closed_at": "2019-08-26T14:00:41Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "This issue tracks the following  run time fatal error. It's easily reproducible on a single node + 64 validators set up. The log:\r\n\r\n```\r\n[2019-08-25 16:25:05]  INFO blockchain: Finished state transition and updated fork choice store for block attestations=1 deposits=0 root=b55299a0226cd5efb74032c0c2ea6fd2a6288ee83a87c84328aeab7231724ca4 slot=1\r\n[2019-08-25 16:25:05]  INFO blockchain: Finished applying fork choice for block headRoot=b55299a0226cd5efb74032c0c2ea6fd2a6288ee83a87c84328aeab7231724ca4 headSlot=1\r\n[2019-08-25 16:25:05] DEBUG blockchain: Saved head info root=b55299a0226cd5efb74032c0c2ea6fd2a6288ee83a87c84328aeab7231724ca4 slots=1\r\nunexpected fault address 0xb04755c\r\nfatal error: fault\r\n[signal SIGBUS: bus error code=0x2 addr=0xb04755c pc=0x406064d]\r\n\r\ngoroutine 145 [running]:\r\nruntime.throw(0x516eb5f, 0x5)\r\n\tGOROOT/src/runtime/panic.go:617 +0x72 fp=0xc000bef900 sp=0xc000bef8d0 pc=0x402f872\r\nruntime.sigpanic()\r\n\tGOROOT/src/runtime/signal_unix.go:387 +0x47e fp=0xc000bef930 sp=0xc000bef900 pc=0x404554e\r\nruntime.memmove(0xb04755c, 0xb04757c, 0xe0)\r\n\tGOROOT/src/runtime/memmove_amd64.s:229 +0x23d fp=0xc000bef938 sp=0xc000bef930 pc=0x406064d\r\ngithub.com/prysmaticlabs/prysm/beacon-chain/db/kv.deleteValueForIndices(0xc000359500, 0xc000befbb0, 0x20, 0x20, 0xc0005380e0, 0x0, 0x0)\r\n\tbeacon-chain/db/kv/utils.go:64 +0x24a fp=0xc000befa60 sp=0xc000bef938 pc=0x493acaa\r\ngithub.com/prysmaticlabs/prysm/beacon-chain/db/kv.(*Store).DeleteAttestation.func1(0xc0005380e0, 0x53063f8, 0xc0005380e0)\r\n\tbeacon-chain/db/kv/attestations.go:109 +0x16b fp=0xc000befad8 sp=0xc000befa60 pc=0x493c35b\r\ngithub.com/boltdb/bolt.(*DB).Update(0xc0001b21e0, 0xc000befb78, 0x0, 0x0)\r\n\texternal/com_github_boltdb_bolt/db.go:598 +0x90 fp=0xc000befb28 sp=0xc000befad8 pc=0x491cb20\r\ngithub.com/prysmaticlabs/prysm/beacon-chain/db/kv.(*Store).DeleteAttestation(0xc0004c4cc0, 0x54e3160, 0xc00047b5c0, 0xb795dd6642df3221, 0xa82652c2b21d6b04, 0xf635fda75ae66a64, 0xd5984e378375bea, 0x0, 0x0)\r\n\tbeacon-chain/db/kv/attestations.go:98 +0xcc fp=0xc000befb98 sp=0xc000befb28 pc=0x4934e2c\r\ngithub.com/prysmaticlabs/prysm/beacon-chain/operations.(*Service).removeAttestationsFromPool(0xc000122480, 0x54e3160, 0xc00047b5c0, 0xc0004fe328, 0x1, 0x1, 0x0, 0xc000512600)\r\n\tbeacon-chain/operations/service.go:344 +0x17c fp=0xc000befda8 sp=0xc000befb98 pc=0x4c8640c\r\ngithub.com/prysmaticlabs/prysm/beacon-chain/operations.(*Service).handleProcessedBlock(0xc000122480, 0x54e3160, 0xc00047b5c0, 0x54d9720, 0xc000ac0400, 0x20, 0xc000540e78)\r\n\tbeacon-chain/operations/service.go:312 +0x8b fp=0xc000befe28 sp=0xc000befda8 pc=0x4c8603b\r\ngithub.com/prysmaticlabs/prysm/beacon-chain/operations.(*Service).handleProcessedBlock-fm(0x54e3160, 0xc00047b5c0, 0x54d9720, 0xc000ac0400, 0x54e3160, 0xc00047b5c0)\r\n\tbeacon-chain/operations/service.go:308 +0x52 fp=0xc000befe70 sp=0xc000befe28 pc=0x4c86ca2\r\ngithub.com/prysmaticlabs/prysm/shared/messagehandler.SafelyHandleMessage(0x54e3160, 0xc00047b5c0, 0xc000540f40, 0x54d9720, 0xc000ac0400)\r\n\tshared/messagehandler/messagehandler.go:46 +0x9a fp=0xc000befec8 sp=0xc000befe70 pc=0x4974e1a\r\ngithub.com/prysmaticlabs/prysm/beacon-chain/operations.(*Service).removeOperations(0xc000122480)\r\n\tbeacon-chain/operations/service.go:303 +0x208 fp=0xc000beffd8 sp=0xc000befec8 pc=0x4c85ec8\r\nruntime.goexit()\r\n\tGOROOT/src/runtime/asm_amd64.s:1337 +0x1 fp=0xc000beffe0 sp=0xc000beffd8 pc=0x405f331\r\ncreated by github.com/prysmaticlabs/prysm/beacon-chain/operations.(*Service).Start\r\n\tbeacon-chain/operations/service.go:92 +0xba\r\n```",
+  "closed_by": {
+    "login": "rauljordan",
+    "id": 5572669,
+    "node_id": "MDQ6VXNlcjU1NzI2Njk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5572669?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rauljordan",
+    "html_url": "https://github.com/rauljordan",
+    "followers_url": "https://api.github.com/users/rauljordan/followers",
+    "following_url": "https://api.github.com/users/rauljordan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rauljordan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rauljordan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rauljordan/subscriptions",
+    "organizations_url": "https://api.github.com/users/rauljordan/orgs",
+    "repos_url": "https://api.github.com/users/rauljordan/repos",
+    "events_url": "https://api.github.com/users/rauljordan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rauljordan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/3310/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/3310/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
