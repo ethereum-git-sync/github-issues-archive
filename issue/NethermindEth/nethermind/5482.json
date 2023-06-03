@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5482",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5482/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5482/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5482/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/5482",
+  "id": 1636052132,
+  "node_id": "I_kwDOBggaLc5hhCyk",
+  "number": 5482,
+  "title": "[BUG] Getting disconnected from Geth when sending getReceipts response",
+  "user": {
+    "login": "smartprogrammer93",
+    "id": 33181301,
+    "node_id": "MDQ6VXNlcjMzMTgxMzAx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33181301?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/smartprogrammer93",
+    "html_url": "https://github.com/smartprogrammer93",
+    "followers_url": "https://api.github.com/users/smartprogrammer93/followers",
+    "following_url": "https://api.github.com/users/smartprogrammer93/following{/other_user}",
+    "gists_url": "https://api.github.com/users/smartprogrammer93/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/smartprogrammer93/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/smartprogrammer93/subscriptions",
+    "organizations_url": "https://api.github.com/users/smartprogrammer93/orgs",
+    "repos_url": "https://api.github.com/users/smartprogrammer93/repos",
+    "events_url": "https://api.github.com/users/smartprogrammer93/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/smartprogrammer93/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-22T15:50:05Z",
+  "updated_at": "2023-03-22T15:50:05Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**Description**\r\nNethermind is getting disconnected from Geth nodes when Geth nodes are trying to sync from it. When we dumped the response Nethermid sent to Geth, it showed that it was way too big, way bigger than `SoftOutgoingMessageSizeLimit`.\r\n\r\nLogs from Geth:\r\n```\r\nDEBUG[01-30|12:58:15.237] Adding p2p peer                          peercount=1 id=57b35fa32cfae7e8 conn=inbound addr=170.187.200.192:44458 name=Nethermind/v1.16.1+e...\r\nTRACE[01-30|12:58:15.237] Starting protocol snap/1                 id=57b35fa32cfae7e8 conn=inbound\r\nTRACE[01-30|12:58:15.237] Starting protocol eth/67                 id=57b35fa32cfae7e8 conn=inbound\r\nDEBUG[01-30|12:58:15.239] Ethereum peer connected                  id=57b35fa32cfae7e8 conn=inbound name=Nethermind/v1.16.1+e...\r\nTRACE[01-30|12:58:15.239] Registering sync peer                    peer=57b35fa3\r\nDEBUG[01-30|12:58:15.239] Fetching batch of headers                id=57b35fa32cfae7e8 conn=inbound count=1    fromnum=1,146,879 skip=0 reverse=false\r\nDEBUG[01-30|12:58:15.239] Joining skeleton peer                    id=57b35fa32cfae7e83df02c5ba89e6e8e403f8cc7cc84c01282d6dfc1b0808e6b\r\nTRACE[01-30|12:58:15.239] Fetching range of accounts               peer=57b35fa3 reqid=4,160,028,108,451,251,300 root=77ea8a..5622e6 origin=000000..000000 limit=0fffff..ffffff bytes=64.00KiB\r\nTRACE[01-30|12:58:15.240] Requesting new batch of receipts         peer=57b35fa3 count=1    from=33106\r\nDEBUG[01-30|12:58:15.240] Fetching batch of receipts               id=57b35fa32cfae7e8 conn=inbound count=1\r\nTRACE[01-30|12:58:15.240] Requesting new batch of bodies           peer=57b35fa3 count=1    from=33106\r\nDEBUG[01-30|12:58:15.240] Fetching batch of block bodies           id=57b35fa32cfae7e8 conn=inbound count=1\r\nDEBUG[01-30|12:58:15.251] Message handling failed in `eth`         id=57b35fa32cfae7e8 conn=inbound err=\"invalid message: message msg #16 (12 bytes): invalid message: (code 10) (size 12) rlp: input list has too many elements for eth.ReceiptsPacket66\"\r\nDEBUG[01-30|12:58:15.251] Removing Ethereum peer                   peer=57b35fa3 snap=true\r\nTRACE[01-30|12:58:15.251] Unregistering sync peer                  peer=57b35fa3\r\nTRACE[01-30|12:58:15.251] Protocol eth/67 failed                   id=57b35fa32cfae7e8 conn=inbound err=\"invalid message: message msg #16 (12 bytes): invalid message: (code 10) (size 12) rlp: input list has too many elements for eth.ReceiptsPacket66\"\r\nDEBUG[01-30|12:58:15.251] Reverting account request                peer=57b35fa32cfae7e83df02c5ba89e6e8e403f8cc7cc84c01282d6dfc1b0808e6b reqid=4,160,028,108,451,251,300\r\nDEBUG[01-30|12:58:15.251] Leaving skeleton peer                    id=57b35fa32cfae7e83df02c5ba89e6e8e403f8cc7cc84c01282d6dfc1b0808e6b\r\nERROR[01-30|12:58:15.251] Expired request does not exist           peer=57b35fa32cfae7e83df02c5ba89e6e8e403f8cc7cc84c01282d6dfc1b0808e6b\r\nDEBUG[01-30|12:58:15.251] Receipt delivery stalling                peer=57b35fa32cfae7e83df02c5ba89e6e8e403f8cc7cc84c01282d6dfc1b0808e6b\r\nERROR[01-30|12:58:15.251] Expired request does not exist           peer=57b35fa32cfae7e83df02c5ba89e6e8e403f8cc7cc84c01282d6dfc1b0808e6b\r\nDEBUG[01-30|12:58:15.251] Body delivery stalling                   peer=57b35fa32cfae7e83df02c5ba89e6e8e403f8cc7cc84c01282d6dfc1b0808e6b\r\nDEBUG[01-30|12:58:15.251] Message handling failed in `snap`        peer=57b35fa3 err=EOF\r\nDEBUG[01-30|12:58:15.251] Removing p2p peer                        peercount=0 id=57b35fa32cfae7e8 duration=14.903ms    req=false err=\"invalid message: message msg #16 (12 bytes): invalid message: (code 10) (size 12) rlp: input list has too many elements for eth.ReceiptsPacket66\"\r\n```\r\n\r\nThere is also the issue with bodies:\r\n```\r\nerr=\"invalid message: message msg #6 (12 bytes): invalid message: (code 6) (size 12) rlp: too few elements for eth.BlockBody, decoding into (eth.BlockBodiesPacket66).BlockBodiesPacket[0]\"\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5482/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5482/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

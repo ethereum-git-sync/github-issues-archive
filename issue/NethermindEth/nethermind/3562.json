@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3562",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3562/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3562/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3562/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/3562",
+  "id": 1039297886,
+  "node_id": "I_kwDOBggaLc498m1e",
+  "number": 3562,
+  "title": "Add `syncSpeed` check to `HealthChecks` plugin",
+  "user": {
+    "login": "varasev",
+    "id": 33550681,
+    "node_id": "MDQ6VXNlcjMzNTUwNjgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33550681?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/varasev",
+    "html_url": "https://github.com/varasev",
+    "followers_url": "https://api.github.com/users/varasev/followers",
+    "following_url": "https://api.github.com/users/varasev/following{/other_user}",
+    "gists_url": "https://api.github.com/users/varasev/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/varasev/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/varasev/subscriptions",
+    "organizations_url": "https://api.github.com/users/varasev/orgs",
+    "repos_url": "https://api.github.com/users/varasev/repos",
+    "events_url": "https://api.github.com/users/varasev/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/varasev/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4483912634,
+      "node_id": "LA_kwDOBggaLc8AAAABC0MTug",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/health%20checks",
+      "name": "health checks",
+      "color": "905601",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-10-29T08:14:27Z",
+  "updated_at": "2022-08-31T18:10:10Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "The current HealthService implementation doesn't take into account that a node can get stuck while syncing or producing/processing blocks.\r\n\r\nDue to [this condition](https://github.com/NethermindEth/nethermind/blob/cd3c38118e477a9216fbf7a53b6d6e5207074231/src/Nethermind/Nethermind.HealthChecks/NodeHealthService.cs#L71-L75), we cannot use Docker Healthcheck for a node to automatically restart it when the node getting stuck because according to the condition, the node will have `Unhealthy` status even when it is successfully syncing. When Docker Healthcheck sees node's `Unhealthy` status (while node is syncing), it will restart it continuously.\r\n\r\nIf the node is syncing, but syncing speed is zero or too low, its status should be `Unhealthy`, but if syncing speed is OK, the status should be `Healthy`.\r\n\r\nI propose to add some `syncSpeed` component (number of blocks synced per second) to the conditions https://github.com/NethermindEth/nethermind/blob/cd3c38118e477a9216fbf7a53b6d6e5207074231/src/Nethermind/Nethermind.HealthChecks/NodeHealthService.cs#L71-L75 and https://github.com/NethermindEth/nethermind/blob/cd3c38118e477a9216fbf7a53b6d6e5207074231/src/Nethermind/Nethermind.HealthChecks/NodeHealthService.cs#L83-L87\r\n\r\nSo, for [the first condition](https://github.com/NethermindEth/nethermind/blob/cd3c38118e477a9216fbf7a53b6d6e5207074231/src/Nethermind/Nethermind.HealthChecks/NodeHealthService.cs#L71-L75), if `_isMining` is `false` and `IsSyncing` is `true` and `syncSpeed` is not zero, the node should be treated as `Healthy`.\r\n\r\nFor [another condition](https://github.com/NethermindEth/nethermind/blob/cd3c38118e477a9216fbf7a53b6d6e5207074231/src/Nethermind/Nethermind.HealthChecks/NodeHealthService.cs#L83-L87), if `_isMining` is `true` and `IsSyncing` is `true`, but `syncSpeed` is too low (or zero), the node should be treated as `Unhealthy`.\r\n\r\nThis should allow to successfully use the Docker Healthcheck.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3562/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3562/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

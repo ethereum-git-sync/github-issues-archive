@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5447",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5447/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5447/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5447/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/5447",
+  "id": 1629885709,
+  "node_id": "I_kwDOBggaLc5hJhUN",
+  "number": 5447,
+  "title": "Setup a private-networking failed in docker on Windows 10.",
+  "user": {
+    "login": "zydjohnHotmail",
+    "id": 45263518,
+    "node_id": "MDQ6VXNlcjQ1MjYzNTE4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/45263518?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zydjohnHotmail",
+    "html_url": "https://github.com/zydjohnHotmail",
+    "followers_url": "https://api.github.com/users/zydjohnHotmail/followers",
+    "following_url": "https://api.github.com/users/zydjohnHotmail/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zydjohnHotmail/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zydjohnHotmail/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zydjohnHotmail/subscriptions",
+    "organizations_url": "https://api.github.com/users/zydjohnHotmail/orgs",
+    "repos_url": "https://api.github.com/users/zydjohnHotmail/repos",
+    "events_url": "https://api.github.com/users/zydjohnHotmail/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zydjohnHotmail/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-17T20:15:54Z",
+  "updated_at": "2023-03-17T22:11:46Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hello:\r\nI want to setup a private network in my Windows 10 PC to run nethermind.\r\nI have followed the documents, but the documents seems not talking about where to mount the necessary file systems.\r\nI have done the following:\r\nroot@7b4168d15345:/nethermind/private-networking# history\r\n    1  cd /nethermind\r\n    2  ls -l\r\n    3  mkdir private-networking\r\n    4  cd private-networking/\r\n    5  mkdir node_1 genesis\r\n    6  cd node_1\r\n    7  mkdir node_1/configs node_1/staticNodes\r\n    8  pwd\r\n    9  mkdir configs staticNodes\r\n   10  ls -l\r\n   11  cd ..\r\n   12  wget https://raw.githubusercontent.com/NethermindEth/nethermind/master/src/Nethermind/Chains/spaceneth.json\r\n   13  cp spaceneth.json genesis/spaceneth.json\r\n   14  ls -l genesis/\r\n   15  cd node_1\r\n   16  vim staticNodes/static-nodes.json\r\n   17  cd ..\r\n   18  cat <<EOF > node_1/configs/config.cfg\r\n{\r\n    \"Init\": {\r\n        \"WebSocketsEnabled\": false,\r\n        \"StoreReceipts\" : true,\r\n        \"EnableUnsecuredDevWallet\": true,\r\n        \"IsMining\": true,\r\n        \"ChainSpecPath\": \"/config/genesis/spaceneth.json\",\r\n        \"BaseDbPath\": \"nethermind_db/spaceneth\",\r\n        \"LogFileName\": \"spaceneth.logs.txt\",\r\n        \"StaticNodesPath\": \"Data/static-nodes.json\"\r\n    },\r\n    \"Network\": {\r\n        \"DiscoveryPort\": 30300,\r\n        \"P2PPort\": 30300,\r\n        \"LocalIp\": \"10.5.0.2\",\r\n        \"ExternalIp\": \"10.5.0.2\"\r\n    },\r\n    \"JsonRpc\": {\r\n        \"Enabled\": true,\r\n        \"Host\": \"10.5.0.2\",\r\n        \"Port\": 8545\r\n    }\r\n}\r\nEOF\r\n\r\n   19  which docker-compose\r\n   20  vim docker-compose.yml\r\n   21  cat docker-compose.yml\r\n   22  docker-compose run node_1\r\n\r\nI also launched nethermind with nethermind.Launcher with the following settings:\r\n# cd /usr/share/nethermind\r\n# ln -fs /usr/share/nethermind/ /nethermind\r\n# ls -l /nethermind\r\nlrwxrwxrwx 1 root root 22 Mar 17 21:33 /nethermind -> /usr/share/nethermind/\r\n# ./Nethermind.Launcher\r\n? Start Nethermind Ethereum Node\r\n? Select network Spaceneth (local developer node)\r\n? Select sync persistent (state is stored in the DB)\r\n......\r\n======================== Nethermind initialization completed ========================\r\nThis node    : enode://7cd5a8c61bce0d31a211cca6a0928eb5ab9cd234bd3015bf9f9638e7a7d9dcf5c21099a79618ca9035a3ef45a804c945705443d2ce376cb86f301b03f00b1c88@1.2.3.4:30303\r\nRPC modules  : Admin, Debug, Eth, Evm, Net, Parity, Personal, Proof, Subscribe, Trace, TxPool, Web3\r\nNode address : 0xa6d9430975fb2c2e7879cef62a1ac625aaa5e7d4 (do not use as an account)\r\nMem est tx   :      4MB\r\nMem est DB   :     13MB\r\nJSON RPC     : http://127.0.0.1:8545\r\nGenesis hash : 0x8b9cfb28575ab3d146cd55ed82d6bf629f6e33531da99dec2fc603763cd78026\r\nExternal IP  : 1.2.3.4\r\nEthereum     : tcp://1.2.3.4:30303\r\nClient id    : Nethermind/v1.17.2+4faa7314/linux-x64/dotnet7.0.3\r\nChainspec    : chainspec/spaceneth.json\r\nChain ID     : PoaCore\r\nChain head   : 0\r\n======================================================= \r\nThe above output seems OK.\r\n\r\nroot@7b4168d15345:/nethermind/private-networking# cat node_1/staticNodes/static-nodes.json\r\n[\r\n\"enode://7cd5a8c61bce0d31a211cca6a0928eb5ab9cd234bd3015bf9f9638e7a7d9dcf5c21099a79618ca9035a3ef45a804c945705443d2ce376cb86f301b03f00b1c88@1.2.3.4:30303\"\r\n]\r\nroot@7b4168d15345:/nethermind/private-networking# cat docker-compose.yml\r\nversion: \"3.5\"\r\nservices:\r\n\r\n  node_1:\r\n    image: nethermind/nethermind\r\n    command: --config config\r\n    volumes:\r\n      - ./genesis:/config/genesis\r\n      - ./node_1/configs/config.cfg:/nethermind/configs/config.cfg\r\n      - ./node_1/staticNodes/static-nodes.json:/nethermind/Data/static-nodes.json\r\n      - ./node_1/db/spaceneth:/nethermind/nethermind_db/spaceneth\r\n      - ./node_1/keystore:/nethermind/keystore\r\n    ports:\r\n      - 0.0.0.0:8547:8545\r\n    networks:\r\n      vpcbr:\r\n        ipv4_address: 10.5.0.2\r\n\r\nnetworks:\r\n  vpcbr:\r\n    driver: bridge\r\n    ipam:\r\n      config:\r\n        - subnet: 10.5.0.0/16\r\nroot@7b4168d15345:/nethermind/private-networking#\r\nBut when I want to run docker run, it shows the following errors:\r\nroot@7b4168d15345:/nethermind/private-networking# docker-compose run node_1\r\nCreating private-networking_node_1_run ... done\r\nError response from daemon: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: error mounting \"/usr/share/nethermind/private-networking/node_1/staticNodes/static-nodes.json\" to rootfs at \"/nethermind/Data/static-nodes.json\": mount /usr/share/nethermind/private-networking/node_1/staticNodes/static-nodes.json:/nethermind/Data/static-nodes.json (via /proc/self/fd/14), flags: 0x5000: not a directory: unknown: Are you trying to mount a directory onto a file (or vice-versa)? Check if the specified host path exists and is the expected type\r\nERRO[0000] error waiting for container: context canceled\r\nERROR: 1\r\nroot@7b4168d15345:/nethermind/private-networking#\r\n\r\nI don't quite understand the error.\r\nBut the documents are also kind of misleading, it didn't say where is the /nethermind, so I don't know if I make a symbolic link is working or not:\r\nln -fs /usr/share/nethermind/ /nethermind\r\nAlso, the documents did say, where I can create private-networking, so I created in /usr/share/nethermind/private-networking.\r\nFinally, from the docker-compose.yml file, I can see that in volumes section: there are mounts for both directory and files: /genesis:/config/genesis is directory, the others are files. And also no idea if I should create /node_1/db and /node_1/keystrore directories or not.\r\nSince the documents did say this for Spaceneth network. \r\nPlease advise on how to change the settings, by the way, more important thing is: to change the documents as it is not very clear to follow.\r\nThanks,\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5447/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5447/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

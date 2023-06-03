@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4973",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4973/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4973/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4973/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/4973",
+  "id": 1482738202,
+  "node_id": "I_kwDOBggaLc5YYMoa",
+  "number": 4973,
+  "title": " cmd/evm: output stateroot in statetest result",
+  "user": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-12-07T20:04:27Z",
+  "updated_at": "2022-12-09T13:52:37Z",
+  "closed_at": "2022-12-09T13:52:37Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "See https://github.com/ethereum/go-ethereum/pull/26297 \r\n\r\nRight now, if tracing is not used, the output from a failed statetest is as follows: \r\n```json\r\n[\r\n  {\r\n    \"name\": \"randomStatetestmartin-Wed_10_02_29-14338-0_d0g0v0_\",\r\n    \"pass\": false,\r\n    \"fork\": \"Byzantium\"\r\n  }\r\n]\r\n```\r\nAnd from a passing statetest: \r\n```json\r\n[\r\n  {\r\n    \"name\": \"randomStatetestmartin-Wed_10_02_29-14338-0_d0g0v0_\",\r\n    \"pass\": true,\r\n    \"fork\": \"Byzantium\"\r\n  }\r\n]\r\n```\r\nIt would be great if `nethtest` could spit out the stateroot too, because then stateroot-based differential fuzzing can be used, even if tracing is disabled. This is useful in some scenarios, e.g. when tracing is unreliable or when minimizing a testcase where the stateroot already differs. \r\n\r\nBesu uses `postHash`, geth uses `stateRoot` -- doesn't matter what you choose, as long as the root is there. \r\n\r\nThe corresponding examples from geth and besu, for failing: \r\n### Failing \r\ngeth:\r\n```json\r\n[\r\n  {\r\n    \"name\": \"randomStatetestmartin-Wed_10_02_29-14338-0\",\r\n    \"pass\": false,\r\n    \"stateRoot\": \"0xa2b3391f7a85bf1ad08dc541a1b99da3c591c156351391f26ec88c557ff12134\",\r\n    \"fork\": \"Byzantium\",\r\n    \"error\": \"post state root mismatch: got a2b3391f7a85bf1ad08dc541a1b99da3c591c156351391f26ec88c557ff12134, want 0000000000000000000000000000000000000000000000000000000000000000\"\r\n  }\r\n]\r\n```\r\nbesu \r\n```json\r\n{\r\n  \"output\": \"\",\r\n  \"gasUsed\": \"0x2dc6c0\",\r\n  \"time\": 33949615,\r\n  \"Mgps\": \"88.366\",\r\n  \"test\": \"randomStatetestmartin-Wed_10_02_29-14338-0\",\r\n  \"fork\": \"Byzantium\",\r\n  \"d\": 0,\r\n  \"g\": 0,\r\n  \"v\": 0,\r\n  \"postHash\": \"0xa2b3391f7a85bf1ad08dc541a1b99da3c591c156351391f26ec88c557ff12134\",\r\n  \"postLogsHash\": \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\r\n  \"pass\": false\r\n}\r\n```\r\n\r\n### Passing test\r\n\r\ngeth\r\n```json\r\n[\r\n  {\r\n    \"name\": \"randomStatetestmartin-Wed_10_02_29-14338-0\",\r\n    \"pass\": true,\r\n    \"stateRoot\": \"0xa2b3391f7a85bf1ad08dc541a1b99da3c591c156351391f26ec88c557ff12134\",\r\n    \"fork\": \"Byzantium\"\r\n  }\r\n]\r\n```\r\nbesu \r\n```json\r\n{\r\n  \"output\": \"\",\r\n  \"gasUsed\": \"0x2dc6c0\",\r\n  \"time\": 31813538,\r\n  \"Mgps\": \"94.299\",\r\n  \"test\": \"randomStatetestmartin-Wed_10_02_29-14338-0\",\r\n  \"fork\": \"Byzantium\",\r\n  \"d\": 0,\r\n  \"g\": 0,\r\n  \"v\": 0,\r\n  \"postHash\": \"0xa2b3391f7a85bf1ad08dc541a1b99da3c591c156351391f26ec88c557ff12134\",\r\n  \"postLogsHash\": \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\r\n  \"pass\": true\r\n}\r\n```\r\n\r\nAlso related: https://github.com/ledgerwatch/erigon/issues/6244\r\n",
+  "closed_by": {
+    "login": "MarekM25",
+    "id": 9356351,
+    "node_id": "MDQ6VXNlcjkzNTYzNTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9356351?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MarekM25",
+    "html_url": "https://github.com/MarekM25",
+    "followers_url": "https://api.github.com/users/MarekM25/followers",
+    "following_url": "https://api.github.com/users/MarekM25/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MarekM25/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MarekM25/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MarekM25/subscriptions",
+    "organizations_url": "https://api.github.com/users/MarekM25/orgs",
+    "repos_url": "https://api.github.com/users/MarekM25/repos",
+    "events_url": "https://api.github.com/users/MarekM25/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MarekM25/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4973/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4973/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

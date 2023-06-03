@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5396",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5396/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5396/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5396/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/5396",
+  "id": 1613951080,
+  "node_id": "I_kwDOBggaLc5gMvBo",
+  "number": 5396,
+  "title": "Admin prune causes databse errors until manual restart",
+  "user": {
+    "login": "ibhagwan",
+    "id": 59988195,
+    "node_id": "MDQ6VXNlcjU5OTg4MTk1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/59988195?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ibhagwan",
+    "html_url": "https://github.com/ibhagwan",
+    "followers_url": "https://api.github.com/users/ibhagwan/followers",
+    "following_url": "https://api.github.com/users/ibhagwan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ibhagwan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ibhagwan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ibhagwan/subscriptions",
+    "organizations_url": "https://api.github.com/users/ibhagwan/orgs",
+    "repos_url": "https://api.github.com/users/ibhagwan/repos",
+    "events_url": "https://api.github.com/users/ibhagwan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ibhagwan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-07T18:01:01Z",
+  "updated_at": "2023-03-07T18:03:32Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Description**\r\nAfter calling `admin_prune`, judging by the state folder sizes in `nethermind_db/state/{0,1}` the pruning seems to have been completed correctly(?) but nethermind is unable to continue synchorinzation with the network and goes into a loop spewing these errors:\r\n```\r\n2023-03-06 23:15:49.4302|WARN|28|Processing loop threw an exception. Block: 8611660 (0x920afe...2cc3e7), Exception: Nethermind.Trie.TrieException: Failed to load key c2575a0e9e593c00f959f8c92f12db2869c3395a3b0502d05e2516446f71f85b from root hash 0xb415664fc95274aaa975144303ed41503d2bfe02d04ea2d178cc31b282d47f00.\r\n ---> Nethermind.Trie.TrieException: Node 0xb415664fc95274aaa975144303ed41503d2bfe02d04ea2d178cc31b282d47f00 is missing from the DB\r\n   at Nethermind.Trie.Pruning.TrieStore.LoadRlp(Keccak keccak, IKeyValueStore keyValueStore)\r\n   at Nethermind.Trie.TrieNode.ResolveNode(ITrieNodeResolver tree)\r\n   at Nethermind.Trie.PatriciaTree.Get(Span`1 rawKey, Keccak rootHash)\r\n   --- End of inner exception stack trace ---\r\n   at Nethermind.Trie.PatriciaTree.Get(Span`1 rawKey, Keccak rootHash)\r\n   at Nethermind.State.PersistentStorageProvider.LoadFromTree(StorageCell storageCell)\r\n   at Nethermind.State.StorageProvider.Get(StorageCell storageCell)\r\n   at Nethermind.Evm.VirtualMachine.ExecuteCall(EvmState vmState, Byte[] previousCallResult, ZeroPaddedSpan previousCallOutput, UInt256& previousCallOutputDestination, IReleaseSpec spec)\r\n   at Nethermind.Evm.VirtualMachine.Run(EvmState state, IWorldState worldState, ITxTracer txTracer)\r\n   at Nethermind.Evm.TransactionProcessing.TransactionProcessor.Execute(Transaction transaction, BlockHeader block, ITxTracer txTracer, ExecutionOptions executionOptions)\r\n   at Nethermind.Consensus.Processing.BlockProcessor.Process(Keccak newBranchStateRoot, List`1 suggestedBlocks, ProcessingOptions options, IBlockTracer blockTracer)\r\n   at Nethermind.Consensus.Processing.BlockchainProcessor.ProcessBranch(ProcessingBranch processingBranch, ProcessingOptions options, IBlockTracer tracer)\r\n   at Nethermind.Consensus.Processing.BlockchainProcessor.Process(Block suggestedBlock, ProcessingOptions options, IBlockTracer tracer)\r\n   at Nethermind.Consensus.Processing.BlockchainProcessor.RunProcessingLoop() \r\n2023-03-06 23:15:49.4350|ERROR|28|engine_newPayloadV1 failed: Nethermind.Blockchain.BlockchainException: Block processing threw exception.\r\n ---> Nethermind.Trie.TrieException: Failed to load key c2575a0e9e593c00f959f8c92f12db2869c3395a3b0502d05e2516446f71f85b from root hash 0xb415664fc95274aaa975144303ed41503d2bfe02d04ea2d178cc31b282d47f00.\r\n ---> Nethermind.Trie.TrieException: Node 0xb415664fc95274aaa975144303ed41503d2bfe02d04ea2d178cc31b282d47f00 is missing from the DB\r\n```\r\n\r\nI was also able to observe that while this was happening `nethermind_db/state/1` still existed (sized ~40GB on goerli) and was disposed of probably during shudown:\r\n```\r\n2023-03-07 09:29:29.9268|INFO|227|IPC JSON RPC service stopped \r\n2023-03-07 09:29:29.9268|INFO|227|Disposing Nethermind.Core.Reactive+AnonymousDisposable... \r\n2023-03-07 09:29:29.9957|INFO|227|Disposing Nethermind.Consensus.Producers.ProducedBlockSuggester... \r\n2023-03-07 09:29:29.9970|INFO|227|Disposing Nethermind.Synchronization.SyncServer... \r\n2023-03-07 09:29:29.9970|INFO|227|Disposing Nethermind.Merge.Plugin.Synchronization.MergeSynchronizer... \r\n2023-03-07 09:29:30.0005|INFO|227|Disposing Nethermind.Synchronization.ParallelSync.MultiSyncModeSelector... \r\n2023-03-07 09:29:30.0005|INFO|227|Disposing Nethermind.Merge.Plugin.Synchronization.PeerRefresher... \r\n2023-03-07 09:29:30.0012|INFO|227|Disposing Nethermind.Synchronization.Peers.SyncPeerPool... \r\n2023-03-07 09:29:30.0022|INFO|227|Disposing Nethermind.Blockchain.FullPruning.FullPruner... \r\n2023-03-07 09:29:30.0249|INFO|227|Disposing DB State1 \r\n```\r\n\r\nAfter service restart the synchorinization was able to pickup from the start of the errors and resume normal operation.\r\n\r\n\r\n**Steps to Reproduce**\r\nUsed `1.17.0` on Linux with custom goerli config (below), found the issue while updating to `1.17.1` and restart the node recovered all the missing blocks and is back in sync.\r\n\r\n> updated the pivot hash/number when upgrading to `1.17.1`\r\n```\r\n{\r\n  \"Init\": {\r\n    \"ChainSpecPath\": \"chainspec/goerli.json\",\r\n    \"GenesisHash\": \"0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a\",\r\n    \"BaseDbPath\": \"nethermind_db/goerli\",\r\n    \"LogFileName\": \"goerli.logs.txt\",\r\n    \"MemoryHint\": 768000000\r\n  },\r\n  \"TxPool\": {\r\n    \"Size\": 1024\r\n  },\r\n  \"Db\": {\r\n    \"EnableMetricsUpdater\": true\r\n  },\r\n  \"Network\": {\r\n    \"P2PPort\": 30303,\r\n    \"MaxActivePeers\": 128\r\n  },\r\n  \"Sync\": {\r\n    \"FastSync\": true,\r\n    \"SnapSync\": true,\r\n    \"PivotNumber\": 8580000,\r\n    \"PivotHash\": \"0x01e3013a1f80460ec86ef50106524157e894c5388b6737b5009abcc5abb80aa7\",\r\n    \"PivotTotalDifficulty\": \"10790000\",\r\n    \"FastBlocks\": true,\r\n    \"UseGethLimitsInFastBlocks\": true,\r\n    \"FastSyncCatchUpHeightDelta\": \"10000000000\"\r\n  },\r\n  \"Bloom\": {\r\n    \"IndexLevelBucketSizes\": [\r\n      16,\r\n      16,\r\n      16,\r\n      16\r\n    ]\r\n  },\r\n  \"JsonRpc\": {\r\n    \"Enabled\": true,\r\n    \"Timeout\": 20000,\r\n    \"Host\": \"127.0.0.1\",\r\n    \"Port\": 8545,\r\n    \"WebSocketsPort\": 8546,\r\n    \"AdditionalRpcUrls\": [\r\n      \"http://localhost:8551|http;ws|net;eth;subscribe;engine;web3;client\"\r\n    ],\r\n    \"EnabledModules\": [\"Eth\", \"Subscribe\", \"Trace\", \"TxPool\", \"Web3\", \"Personal\", \"Proof\", \"Net\", \"Parity\", \"Health\", \"Admin\"],\r\n    \"EnginePort\": 8551,\r\n    \"EngineHost\": \"127.0.0.1\",\r\n    \"JwtSecretFile\": \"keystore/jwtsecret\"\r\n  },\r\n  \"Merge\": {\r\n    \"Enabled\": true\r\n  }\r\n}\r\n``` \r\n\r\n**Logs**\r\n[goerli.logs.txt](https://github.com/NethermindEth/nethermind/files/10912410/goerli.logs.txt)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5396/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5396/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

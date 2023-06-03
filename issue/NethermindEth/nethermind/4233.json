@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4233",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4233/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4233/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4233/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/4233",
+  "id": 1292029442,
+  "node_id": "I_kwDOBggaLc5NAs4C",
+  "number": 4233,
+  "title": "PersistingTrie on shutdown has to be exclusive with block processing",
+  "user": {
+    "login": "LukaszRozmej",
+    "id": 12445221,
+    "node_id": "MDQ6VXNlcjEyNDQ1MjIx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/12445221?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/LukaszRozmej",
+    "html_url": "https://github.com/LukaszRozmej",
+    "followers_url": "https://api.github.com/users/LukaszRozmej/followers",
+    "following_url": "https://api.github.com/users/LukaszRozmej/following{/other_user}",
+    "gists_url": "https://api.github.com/users/LukaszRozmej/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/LukaszRozmej/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/LukaszRozmej/subscriptions",
+    "organizations_url": "https://api.github.com/users/LukaszRozmej/orgs",
+    "repos_url": "https://api.github.com/users/LukaszRozmej/repos",
+    "events_url": "https://api.github.com/users/LukaszRozmej/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/LukaszRozmej/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-07-02T11:00:00Z",
+  "updated_at": "2022-07-07T12:22:52Z",
+  "closed_at": "2022-07-07T12:22:52Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "**Describe the bug**\r\nIf both run in parallel there can be an exception\r\n\r\n```\r\n2022-07-02 09:20:29.1713|BlockchainProcessor encountered an exception. RocksDbSharp.RocksDbException: Corruption: bad WriteBatch Put\r\n   at RocksDbSharp.Native.rocksdb_write(IntPtr db, IntPtr options, IntPtr batch) in /src/rocksdb-sharp/RocksDbSharp/Native.cs:line 1118\r\n   at RocksDbSharp.RocksDb.Write(WriteBatch writeBatch, WriteOptions writeOptions) in /src/rocksdb-sharp/RocksDbSharp/RocksDb.cs:line 193\r\n   at Nethermind.Db.Rocks.DbOnTheRocks.RocksDbBatch.Dispose() in /src/Nethermind/Nethermind.Db.Rocks/DbOnTheRocks.cs:line 439\r\n   at Nethermind.Trie.Pruning.TrieStore.FinishBlockCommit(TrieType trieType, Int64 blockNumber, TrieNode root) in /src/Nethermind/Nethermind.Trie/Pruning/TrieStore.cs:line 322\r\n   at Nethermind.Trie.PatriciaTree.Commit(Int64 blockNumber) in /src/Nethermind/Nethermind.Trie/PatriciaTree.cs:line 167\r\n   at Nethermind.State.StorageProvider.CommitTrees(Int64 blockNumber) in /src/Nethermind/Nethermind.State/StorageProvider.cs:line 350\r\n   at Nethermind.Consensus.Processing.BlockProcessor.PreCommitBlock(Keccak newBranchStateRoot, Int64 blockNumber) in /src/Nethermind/Nethermind.Consensus/Processing/BlockProcessor.cs:line 190\r\n   at Nethermind.Consensus.Processing.BlockProcessor.Process(Keccak newBranchStateRoot, List`1 suggestedBlocks, ProcessingOptions options, IBlockTracer blockTracer) in /src/Nethermind/Nethermind.Consensus/Processing/BlockProcessor.cs:line 118\r\n   at Nethermind.Consensus.Processing.BlockchainProcessor.ProcessBranch(ProcessingBranch processingBranch, Block suggestedBlock, ProcessingOptions options, IBlockTracer tracer) in /src/Nethermind/Nethermind.Consensus/Processing/BlockchainProcessor.cs:line 475\r\n   at Nethermind.Consensus.Processing.BlockchainProcessor.Process(Block suggestedBlock, ProcessingOptions options, IBlockTracer tracer) in /src/Nethermind/Nethermind.Consensus/Processing/BlockchainProcessor.cs:line 299\r\n   at Nethermind.Consensus.Processing.BlockchainProcessor.RunProcessingLoop() in /src/Nethermind/Nethermind.Consensus/Processing/BlockchainProcessor.cs:line 264\r\n   at System.Threading.Tasks.Task.InnerInvoke()\r\n   at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(Object obj)\r\n   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)\r\n--- End of stack trace from previous location ---\r\n   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)\r\n2022-07-02 09:20:29.5009|Old Receipts  4853969 / 14957000 | queue   581 | current    17.98bps | total    49.28bps \r\n2022-07-02 09:20:29.9107|Failure RocksDbSharp.RocksDbException: Corruption: bad WriteBatch Put\r\n   at RocksDbSharp.Native.rocksdb_write(IntPtr db, IntPtr options, IntPtr batch) in /src/rocksdb-sharp/RocksDbSharp/Native.cs:line 1118\r\n   at RocksDbSharp.RocksDb.Write(WriteBatch writeBatch, WriteOptions writeOptions) in /src/rocksdb-sharp/RocksDbSharp/RocksDb.cs:line 193\r\n   at Nethermind.Db.Rocks.DbOnTheRocks.RocksDbBatch.Dispose() in /src/Nethermind/Nethermind.Db.Rocks/DbOnTheRocks.cs:line 439\r\n   at Nethermind.Trie.Pruning.TrieStore.Persist(BlockCommitSet commitSet) in /src/Nethermind/Nethermind.Trie/Pruning/TrieStore.cs:line 647\r\n   at Nethermind.Trie.Pruning.TrieStore.PersistOnShutdown() in /src/Nethermind/Nethermind.Trie/Pruning/TrieStore.cs:line 784\r\n   at Nethermind.Trie.Pruning.TrieStore.HackPersistOnShutdown() in /src/Nethermind/Nethermind.Trie/Pruning/TrieStore.cs:line 326\r\n   at Nethermind.Runner.Ethereum.EthereumRunner.StopAsync() in /src/Nethermind/Nethermind.Runner/Ethereum/EthereumRunner.cs:line 73\r\n   at Nethermind.Runner.Program.<>c__DisplayClass9_0.<<Run>b__2>d.MoveNext() in /src/Nethermind/Nethermind.Runner/Program.cs:line 188\r\n```",
+  "closed_by": {
+    "login": "asdacap",
+    "id": 1841324,
+    "node_id": "MDQ6VXNlcjE4NDEzMjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1841324?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/asdacap",
+    "html_url": "https://github.com/asdacap",
+    "followers_url": "https://api.github.com/users/asdacap/followers",
+    "following_url": "https://api.github.com/users/asdacap/following{/other_user}",
+    "gists_url": "https://api.github.com/users/asdacap/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/asdacap/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/asdacap/subscriptions",
+    "organizations_url": "https://api.github.com/users/asdacap/orgs",
+    "repos_url": "https://api.github.com/users/asdacap/repos",
+    "events_url": "https://api.github.com/users/asdacap/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/asdacap/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4233/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4233/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

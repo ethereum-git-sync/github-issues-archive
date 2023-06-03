@@ -1,0 +1,122 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/380",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/380/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/380/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/380/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/380",
+  "id": 405906207,
+  "node_id": "MDU6SXNzdWU0MDU5MDYyMDc=",
+  "number": 380,
+  "title": "Performance Improvements",
+  "user": {
+    "login": "tkstanczak",
+    "id": 498913,
+    "node_id": "MDQ6VXNlcjQ5ODkxMw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/498913?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tkstanczak",
+    "html_url": "https://github.com/tkstanczak",
+    "followers_url": "https://api.github.com/users/tkstanczak/followers",
+    "following_url": "https://api.github.com/users/tkstanczak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tkstanczak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tkstanczak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tkstanczak/subscriptions",
+    "organizations_url": "https://api.github.com/users/tkstanczak/orgs",
+    "repos_url": "https://api.github.com/users/tkstanczak/repos",
+    "events_url": "https://api.github.com/users/tkstanczak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tkstanczak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 674950062,
+      "node_id": "MDU6TGFiZWw2NzQ5NTAwNjI=",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/help%20wanted",
+      "name": "help wanted",
+      "color": "128A0C",
+      "default": true,
+      "description": null
+    },
+    {
+      "id": 1117819507,
+      "node_id": "MDU6TGFiZWwxMTE3ODE5NTA3",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/performance",
+      "name": "performance",
+      "color": "ee2bf2",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1133993971,
+      "node_id": "MDU6TGFiZWwxMTMzOTkzOTcx",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/perpetual",
+      "name": "perpetual",
+      "color": "47e084",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1145016563,
+      "node_id": "MDU6TGFiZWwxMTQ1MDE2NTYz",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/good%20first%20issue",
+      "name": "good first issue",
+      "color": "8731e2",
+      "default": true,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-02-01T22:58:14Z",
+  "updated_at": "2019-07-23T12:33:45Z",
+  "closed_at": "2019-07-23T12:33:45Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Starting this issue as a summary of various small quick performance wins available in Nethermind.\r\nFor each of these items (that should be treated as low-level or algorithmic C# exercises), we add a benchmark in Nethermind.Benchmarks project in the main solution.\r\n\r\nThese items may not be the most important for the general performance of Nethermind (as it may be affected by caching mechanisms, structural decisions, and IO interactions) nonetheless they are a great opportunity to create incremental performance improvement for EVM processing, hashing, lookups and similar.\r\n\r\nThe idea is simple - write the code without using 'unsafe', in C# that is faster (or allocates much less) that our current code and propose a solution as a new benchmark method. For each of those items, we will be updating the code regularly to include the current winning solution. Obviously, the code still has to pass all the tests. We are planning to setup GitCoin bounties for these soon.\r\n\r\nQ1 2019 table:\r\nWherever the 'Best Solution by' is 'nethermind' it means this is either an original solution when this GitHub issue is created or a significant internal improvement over the best solution suggested.\r\n\r\nsome of the issues are marked with * - they may require the understanding of the code outside of the scope of performance fix or simply require a bigger code rewrite.\r\n\r\nsome of the issues are marked with ^ - they do not have the benchmark scenarios properly set yet (either ignore them or add benchmark scenarios)\r\n\r\nEach improvement submission should a PR stating which of the categories below got imporved through the code change and each benchmark should be prepared to run to confirm the improvements. Each improvement of more than 25% will be rewarded when bounties are setup. 10x style improvements will be rewarded extra.\r\n\r\n| Benchmark | Value | Weight | Current Best | Best Proposed Solution By | Runner-up |\r\n|-|-|-|-|-|-|\r\n|||||||\r\n| Bytes.Compare | A |+++| SequenceEqual() | Nethermind| |\r\n| BytesIsZero | A |++| noname | Nethermind | |\r\n| BytesPad | A |++| noname | Nethermind | |\r\n|||||||\r\n| Keccak256 | B |+++|ImprovedMeadow | Nethermind |\r\n| *Keccak512 | C |+++|HashLib | HashLib | |\r\n|||||||\r\n| ^*Bn128AddPrecompile | D |+++| noname | Nethermind | |\r\n| ^*Bn128MulPrecompile | D |+++| noname | Nethermind | |\r\n| ^*Bn128PairingPrecompile | D |+++| noname | Nethermind | |\r\n| *CalculateJumpDestinations | A |+| noname | Nethermind | |\r\n| Int256.Add | B | +++ |BigInteger | Nethermind | |\r\n| Int256.Subtract | B | +++ |BigInteger | Nethermind | |\r\n| Int256.Multiply | B | +++ |BigInteger | Nethermind | |\r\n| Int256.Divide | B | +++ |BigInteger | Nethermind | |\r\n| Int256.Modulo | B | +++|BigInteger | Nethermind | |\r\n| ^*IntrinsicGasCalculator | A |+| noname | Nethermind | |\r\n| ^EcRecoverPrecompile | B |++| noname | Nethermind | |\r\n| ^ModExpPrecompile | C |++| noname | Nethermind | |\r\n| ^Sha2Precompile | A |+| noname | Nethermind | |\r\n| ^RipemdPrecompile | A |+| noname | Nethermind | |\r\n| ^*SimpleTransferProcessing | C |++| noname | Nethermind | |\r\n| UInt256.Add| A | +++ |Dirichlet.UInt256 | Nethermind | |\r\n| UInt256.Subtract | A | +++ |UInt256 | Nethermind | |\r\n| UInt256.Multiply | A | +++ |BigInteger | Nethermind | |\r\n| UInt256.Divide | A | +++ |BigInteger | Nethermind | |\r\n| UInt256.Modulo | A | +++|BigInteger | Nethermind | |\r\n|||||||\r\n| ^*NettyFrameEncoder | C |+++| noname | Nethermind | |\r\n| ^*NettyFrameMerger | C |+++| noname | Nethermind | |\r\n| ^*NettyPacketSplitter | C |+++| noname | Nethermind | |\r\n|||||||\r\n| Rlp.DecodeAccount | B |+++| noname | Nethermind | |\r\n| Rlp.EncodeAccount | B |+++| noname | Nethermind | |\r\n| *Rlp.DecodeBlock | C |+++| noname | Nethermind | |\r\n| *Rlp.EncodeBlock | C |+++| noname | Nethermind | |\r\n|||||||\r\n| HexPrefix.FromBytes | A |++| noname | Nethermind | |\r\n| *PatriciaTree.Lookup | C |+++| noname | Nethermind | |\r\n|||||||\r\n| Ethash.Hashimoto | B |++| noname | Nethermind | |\r\n|||||||\r\n\r\nTo run a benchmark you will need to run Nethermind.Benchmarks in the Release mode.\r\nYou will need to comment out benchmarks that you do not want to run in the Program.cs file\r\n\r\nWe can use the class BigIntegerVsUInt256Add as an example. We have three methods there marked with the Benchmark attribute like below:\r\n\r\n[Benchmark]\r\npublic void BigInteger()\r\n{\r\n}\r\n\r\nSample result (that is displayed in the console at the end of the run looks like this).\r\nIn this particular example, we were comparing the int256 addition using BigInteger and Dirichlet libraries.\r\n\r\n|Method | AllZeros |      Mean |     Error |    StdDev | Ratio |\r\n|--------------- |--------- |----------:|----------:|----------:|------:|\r\n|     BigInteger |    False | 179.87 ns | 3.5744 ns | 3.8246 ns |  1.00 |\r\n|                |          |           |           |           |       |\r\n|        UInt256 |    False |  78.41 ns | 0.4307 ns | 0.3818 ns |  1.00 |\r\n|                |          |           |           |           |       |\r\n| UInt256InPlace |    False | 164.46 ns | 1.7714 ns | 1.5703 ns |  1.00 |\r\n|                |          |           |           |           |       |\r\n|     BigInteger |     True |  77.41 ns | 0.7942 ns | 0.7429 ns |  1.00 |\r\n|                |          |           |           |           |       |\r\n|        UInt256 |     True |  75.42 ns | 1.5303 ns | 1.5715 ns |  1.00 |\r\n|                |          |           |           |           |       |\r\n |UInt256InPlace |     True |  46.71 ns | 0.9173 ns | 1.0196 ns |  1.00 |\r\n\r\nyou can add the MemoryDiagnoser attribute to the class:",
+  "closed_by": {
+    "login": "tkstanczak",
+    "id": 498913,
+    "node_id": "MDQ6VXNlcjQ5ODkxMw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/498913?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tkstanczak",
+    "html_url": "https://github.com/tkstanczak",
+    "followers_url": "https://api.github.com/users/tkstanczak/followers",
+    "following_url": "https://api.github.com/users/tkstanczak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tkstanczak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tkstanczak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tkstanczak/subscriptions",
+    "organizations_url": "https://api.github.com/users/tkstanczak/orgs",
+    "repos_url": "https://api.github.com/users/tkstanczak/repos",
+    "events_url": "https://api.github.com/users/tkstanczak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tkstanczak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/380/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/380/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

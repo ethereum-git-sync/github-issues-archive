@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4827",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4827/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4827/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4827/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/4827",
+  "id": 1425197039,
+  "node_id": "I_kwDOBggaLc5U8sfv",
+  "number": 4827,
+  "title": "Add more metrics to sync dispatch.",
+  "user": {
+    "login": "asdacap",
+    "id": 1841324,
+    "node_id": "MDQ6VXNlcjE4NDEzMjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1841324?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/asdacap",
+    "html_url": "https://github.com/asdacap",
+    "followers_url": "https://api.github.com/users/asdacap/followers",
+    "following_url": "https://api.github.com/users/asdacap/following{/other_user}",
+    "gists_url": "https://api.github.com/users/asdacap/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/asdacap/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/asdacap/subscriptions",
+    "organizations_url": "https://api.github.com/users/asdacap/orgs",
+    "repos_url": "https://api.github.com/users/asdacap/repos",
+    "events_url": "https://api.github.com/users/asdacap/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/asdacap/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-27T07:55:30Z",
+  "updated_at": "2022-10-27T07:57:32Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**Is your feature request related to a problem? Please describe.**\r\n- Lack of metrics for sync dispatch grouped by feed type.\r\n\r\n**Describe the solution you'd like**\r\n- prototype at branch `feature/sync-dispatch-metric`.\r\n- I usually have these metrics on my local build in one form or another.\r\n- They are very useful to know:\r\n  - How much time does the peer take to response 50p, 90p or avg.\r\n  - How much time does the sync feed take to process the request, 50p, 90p, or avg.\r\n  - How much time in total, per second spent on these tasks which can suggest if it is limited by processing or network, or something else.\r\n- Problem:\r\n  - Histogram are composed of multiple prometheus series, at the branch it increase the number of metrics from 321 to 925.\r\n  - We can cut that down to like.. 500 if we don't measure the time for failed or timeout dispatch.\r\n  - We can cut that down to 406 if we dont keep the histogram. so we won't have percentile, only sum, count and avg.\r\n\r\nEg:,\r\nDispatch rate during goerli old bodies. Pretty sure for mainnet the timeout rate was like 20%. Maybe its just mainnet?\r\n![Screenshot from 2022-10-27 15-48-28](https://user-images.githubusercontent.com/1841324/198222955-cf7a2518-d6f5-4f8a-bc75-6cea9b4ef4ea.png)\r\n\r\nSync processing latency. 50 and 90p. On my machine 90p for old bodies is 2 second to 10 second?. For some reason, 90p of snap processing is more than 10 second (the histogram was not configured to measure above this). State sync processing was consistently slow. Even 50p is more than 10 second.\r\n![Screenshot from 2022-10-27 15-47-43](https://user-images.githubusercontent.com/1841324/198223088-f9e0f757-39eb-429f-8839-fb1f3c5a0b65.png)\r\n\r\nSync dispatch latency. Snap and state does not have much request latency. 90p for bodies is nearly 10 second at which point, it will timeout. This is because bodies are large. \r\n![Screenshot from 2022-10-27 15-47-25](https://user-images.githubusercontent.com/1841324/198223533-8d67b197-4cd3-430d-b276-ea1d829edaf7.png)\r\n\r\nFrom this graph, we can see that I'm network limited for old bodies.\r\n![Screenshot from 2022-10-27 15-46-30](https://user-images.githubusercontent.com/1841324/198223849-579e5331-f17f-4229-b587-07faef517fa8.png)\r\n\r\nFrom this graph, we can see that I'm probably IO limited for snap sync.\r\n![Screenshot from 2022-10-27 15-45-24](https://user-images.githubusercontent.com/1841324/198224104-bc00d560-0e4c-43b4-b560-b7a532eed06a.png)\r\n\r\nThe whole thing, old receipts did not start.\r\n![Screenshot from 2022-10-27 15-43-47](https://user-images.githubusercontent.com/1841324/198224946-584323b4-5041-484d-ae94-8be8c0b9380e.png)\r\n\r\n**Describe alternatives you've considered**\r\n- Total them up, print a log.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4827/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/4827/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
