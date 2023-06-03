@@ -40,7 +40,7 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "siddarthkay",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 8,
   "created_at": "2023-06-02T06:45:41Z",
-  "updated_at": "2023-06-03T03:33:40Z",
-  "closed_at": null,
+  "updated_at": "2023-06-03T04:36:18Z",
+  "closed_at": "2023-06-03T04:36:18Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "# Bug Report\r\nThe Android release app from this PR : https://github.com/status-im/status-mobile/pull/16016 insta crashes.\r\n\r\nWe've seen this behaviour in the last upgrade as well\r\nref : https://github.com/status-im/status-mobile/pull/15486#issuecomment-1500232783\r\n\r\n## Problem \r\n\r\nAfter connecting logcat the stack trace is below : \r\n\r\n```log\r\n2023-06-02 08:32:34.264 32471-32471 SoLoader               \r\npid-32471                            \r\nE  couldn't find DSO to load: libjscexecutor.so\r\nSoSource 0: com.facebook.soloader.ApkSoSource[root = /data/data/im.status.ethereum.pr/lib-main flags = 1]\r\nSoSource 1: com.facebook.soloader.DirectorySoSource[root = \r\n/data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64 flags = 0]\r\nSoSource 2: com.facebook.soloader.DirectorySoSource[root = /system/lib64 flags = 2]\r\nSoSource 3: com.facebook.soloader.DirectorySoSource[root = /vendor/lib64 flags = 2]\r\nNative lib dir: /data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64\r\nresult: 0\r\n\r\n```\r\n\r\n```log\r\n2023-06-02 08:32:34.266 32471-32471 SoLoader \r\npid-32471\r\nE  couldn't find DSO to load: libhermes-executor-debug.so\r\nSoSource 0: com.facebook.soloader.ApkSoSource[root = /data/data/im.status.ethereum.pr/lib-main flags = 1]\r\nSoSource 1: com.facebook.soloader.DirectorySoSource[root = \r\n/data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64 flags = 0]\r\nSoSource 2: com.facebook.soloader.DirectorySoSource[root = /system/lib64 flags = 2]\r\nSoSource 3: com.facebook.soloader.DirectorySoSource[root = /vendor/lib64 flags = 2]\r\nNative lib dir: /data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64\r\nresult: 0\r\n\r\n```\r\n\r\nThis log below seems to be the root causes\r\n\r\n```log\r\n\r\n2023-06-02 08:32:34.267 32471-32471 SoLoader\r\npid-32471\r\nE  couldn't find DSO to load: libhermes-executor-release.so\r\nSoSource 0: com.facebook.soloader.ApkSoSource[root = /data/data/im.status.ethereum.pr/lib-main flags = 1]\r\nSoSource 1: com.facebook.soloader.DirectorySoSource[root = \r\n/data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64 flags = 0]\r\nSoSource 2: com.facebook.soloader.DirectorySoSource[root = /system/lib64 flags = 2]\r\nSoSource 3: com.facebook.soloader.DirectorySoSource[root = /vendor/lib64 flags = 2]\r\nNative lib dir: /data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64\r\nresult: 0\r\n2023-06-02 08:32:34.267 32471-32471 AndroidRuntime \r\npid-32471\r\nE  FATAL EXCEPTION: main\r\nProcess: im.status.ethereum.pr, PID: 32471\r\nava.lang.UnsatisfiedLinkError: couldn't find DSO to load: libhermes-executor-release.so\r\nSoSource 0: com.facebook.soloader.ApkSoSource[root = /data/data/im.status.ethereum.pr/lib-main flags = 1]\r\nSoSource 1: com.facebook.soloader.DirectorySoSource[root = \r\n/data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64 flags = 0]\r\nSoSource 2: com.facebook.soloader.DirectorySoSource[root = /system/lib64 flags = 2]\r\nSoSource 3: com.facebook.soloader.DirectorySoSource[root = /vendor/lib64 flags = 2]\r\nNative lib dir: /data/app/~~FHkFRTBNK5ZxslLIXKdQqA==/im.status.ethereum.pr-pXglUHfjfa4emKUPty0Ybw==/lib/arm64\r\nresult: 0\r\nat com.facebook.soloader.SoLoader.doLoadLibraryBySoName(SoLoader.java:1098)\r\nat com.facebook.soloader.SoLoader.loadLibraryBySoNameImpl(SoLoader.java:914)\r\nat com.facebook.soloader.SoLoader.loadLibraryBySoName(SoLoader.java:826)\r\nat com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:773)\r\nat com.facebook.soloader.SoLoader.loadLibrary(SoLoader.java:743)\r\nat com.facebook.hermes.reactexecutor.HermesExecutor.loadLibrary(HermesExecutor.java:30)\r\nat com.facebook.hermes.reactexecutor.HermesExecutor.<clinit>(HermesExecutor.java:19)\r\nat com.facebook.hermes.reactexecutor.HermesExecutor.loadLibrary(HermesExecutor.java:23)\r\nat com.facebook.react.ReactInstanceManagerBuilder.getDefaultJSExecutorFactory(ReactInstanceManagerBuilder.java:394)\r\nat com.facebook.react.ReactInstanceManagerBuilder.build(ReactInstanceManagerBuilder.java:344)\r\nat com.reactnativenavigation.react.NavigationReactNativeHost.createReactInstanceManager\r\n(NavigationReactNativeHost.java:58)\r\nat com.facebook.react.ReactNativeHost.getReactInstanceManager(ReactNativeHost.java:42)\r\nat com.reactnativenavigation.react.ReactGateway.<init>(ReactGateway.java:20)\r\nat com.reactnativenavigation.NavigationApplication.createReactGateway(NavigationApplication.java:40)\r\nat com.reactnativenavigation.NavigationApplication.onCreate(NavigationApplication.java:27)\r\nat im.status.ethereum.MainApplication.onCreate(MainApplication.java:78)\r\nat android.app.Instrumentation.callApplicationOnCreate(Instrumentation.java:1277)\r\nat android.app.ActivityThread.handleBindApplication(ActivityThread.java:6771)\r\nat android.app.ActivityThread.-$$Nest$mhandleBindApplication(Unknown Source:0)\r\nat android.app.ActivityThread$H.handleMessage(ActivityThread.java:2129)\r\nat android.os.Handler.dispatchMessage(Handler.java:106)\r\nat android.os.Looper.loopOnce(Looper.java:201)\r\nat android.os.Looper.loop(Looper.java:288)\r\nat android.app.ActivityThread.main(ActivityThread.java:7884)\r\nat java.lang.reflect.Method.invoke(Native Method)\r\nat com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)\r\nat com.android.internal.os.ZygoteInit.main(ZygoteInit.java:936)\r\n2023-06-02 08:32:34.268  1703-4625 \r\nActivityManager\r\npid-1703\r\nE  App crashed on incremental package im.status.ethereum.pr which is 100% loaded.\r\n2023-06-02 08:32:34.270  1703-4625  \r\nActivityTaskManager\r\npid-1703\r\nW    Force finishing activity im.status.ethereum.pr/im.status.ethereum.MainActivity\r\n2023-06-02 08:32:34.277  1703-1786  \r\nActivityManager\r\npid-1703                             \r\nI  Showing crash dialog for package im.status.ethereum.pr u0\r\n\r\n```\r\n\r\n\r\n### Additional Information \r\n- Operating System: Android",
-  "closed_by": null,
+  "closed_by": {
+    "login": "siddarthkay",
+    "id": 64726664,
+    "node_id": "MDQ6VXNlcjY0NzI2NjY0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/64726664?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/siddarthkay",
+    "html_url": "https://github.com/siddarthkay",
+    "followers_url": "https://api.github.com/users/siddarthkay/followers",
+    "following_url": "https://api.github.com/users/siddarthkay/following{/other_user}",
+    "gists_url": "https://api.github.com/users/siddarthkay/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/siddarthkay/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/siddarthkay/subscriptions",
+    "organizations_url": "https://api.github.com/users/siddarthkay/orgs",
+    "repos_url": "https://api.github.com/users/siddarthkay/repos",
+    "events_url": "https://api.github.com/users/siddarthkay/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/siddarthkay/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-mobile/issues/16139/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/16139/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -408,6 +427,50 @@
       "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1573707640/reactions",
       "total_count": 1,
       "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1574638062",
+    "html_url": "https://github.com/status-im/status-mobile/issues/16139#issuecomment-1574638062",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/16139",
+    "id": 1574638062,
+    "node_id": "IC_kwDOAx4p2c5d2xHu",
+    "user": {
+      "login": "siddarthkay",
+      "id": 64726664,
+      "node_id": "MDQ6VXNlcjY0NzI2NjY0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/64726664?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/siddarthkay",
+      "html_url": "https://github.com/siddarthkay",
+      "followers_url": "https://api.github.com/users/siddarthkay/followers",
+      "following_url": "https://api.github.com/users/siddarthkay/following{/other_user}",
+      "gists_url": "https://api.github.com/users/siddarthkay/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/siddarthkay/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/siddarthkay/subscriptions",
+      "organizations_url": "https://api.github.com/users/siddarthkay/orgs",
+      "repos_url": "https://api.github.com/users/siddarthkay/repos",
+      "events_url": "https://api.github.com/users/siddarthkay/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/siddarthkay/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-03T04:32:09Z",
+    "updated_at": "2023-06-03T04:32:09Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Fixed with \r\n\r\ndowngrading gradle plugin version here : `nix/pkgs/aapt2/default.nix`\r\n\r\n```diff\r\npname = \"aapt2\";\r\n  # Warning: This must be the same as gradlePluginVersion android/gradle.properties\r\n-  version = \"7.3.0-8691043\";\r\n+  version = \"7.2.2-7984345\";\r\n\r\n  pkgPath = \"com/android/tools/build/aapt2\";\r\n  repoUrl = \"https://dl.google.com/dl/android/maven2\";\r\n\r\n    jar = fetchurl {\r\n      url = \"${repoUrl}/${pkgPath}/${version}/${filenames.jar}\";\r\n      sha256 = getAttr platform {\r\n-        linux = \"sha256-AP75/vGPx4cOZ7K8w60FhZptB/836mGAdIJ2+gCtOVc=\";\r\n-        osx = \"sha256-Kg400fBovA3RlRpdnAPZXnPBliXFq5df+OpfhiAkvUc=\";\r\n+       linux = \"sha256-BKtK5f7lxp0YdQU4AFGL933vjEAykQ1RiKpDwfc32oI=\";\r\n+       osx = \"sha256-OORgWnGQS0GwqZrSg8sFQb4FM23hrYHwmarcYd8EO/0=\";\r\n      };\r\n    };\r\n    sha = fetchurl {\r\n      url = \"${repoUrl}/${pkgPath}/${version}/${filenames.jar}.sha1\";\r\n      sha256 = getAttr platform {\r\n-        linux = \"sha256-908Oq40eqHlu4KtlgJQIxyUu2IOyrtErjVc+MH5JM5E=\";\r\n-        osx = \"sha256-hQQVMnqzaNd2v57uxWIzea21MlAuGur01T6fpcWD1fc=\";\r\n+       linux = \"sha256-4F4REWQLj8hdnh1tIwRVgdWJjUBhvvINP56nIscwePA=\";\r\n+       osx = \"sha256-n0jFUphzlFnNacolbXoNmNHs/hXfktVpYRlJ1JW9ukU=\";\r\n      };\r\n    };\r\n    pom = fetchurl {\r\n      url = \"${repoUrl}/${pkgPath}/${version}/${filenames.pom}\";\r\n-      sha256 = \"sha256-HVQS9Dt7vvFN/MLr7I103KTbWQw3i/eCMUL+lNDFt6Y=\";\r\n+      sha256 = \"sha256-XWEn9Zvxv0hgYU2yUSlZ4OiguZy1bz+Gh0wRrm4d9GQ=\";\r\n    };\r\n  };\r\n```\r\n\r\nand here `android/gradle.properties`\r\n\r\n```diff\r\nbuildToolsVersion=31.0.0\r\nsupportLibVersion=28.0.0\r\n# This should match version from nix/mobile/android/maven-and-npm-deps/maven/default.nix\r\n- gradlePluginVersion=7.3.0\r\n+ gradlePluginVersion=7.2.2\r\nkotlinPluginVersion=1.6.20\r\n\r\nandroid.useAndroidX=true\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1574638062/reactions",
+      "total_count": 0,
+      "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
