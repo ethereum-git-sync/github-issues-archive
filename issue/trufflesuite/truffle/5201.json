@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5201",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5201/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5201/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5201/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/5201",
+  "id": 1273138031,
+  "node_id": "I_kwDOAkfq-c5L4otv",
+  "number": 5201,
+  "title": "Uncaught (in promise) Error: TodoList has not been deployed to detected network (network/artifact mismatch)",
+  "user": {
+    "login": "Smit-05",
+    "id": 85776968,
+    "node_id": "MDQ6VXNlcjg1Nzc2OTY4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85776968?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Smit-05",
+    "html_url": "https://github.com/Smit-05",
+    "followers_url": "https://api.github.com/users/Smit-05/followers",
+    "following_url": "https://api.github.com/users/Smit-05/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Smit-05/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Smit-05/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Smit-05/subscriptions",
+    "organizations_url": "https://api.github.com/users/Smit-05/orgs",
+    "repos_url": "https://api.github.com/users/Smit-05/repos",
+    "events_url": "https://api.github.com/users/Smit-05/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Smit-05/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": true,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-06-16T06:57:55Z",
+  "updated_at": "2022-06-23T18:18:43Z",
+  "closed_at": "2022-06-23T18:18:43Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "\r\n## Issue\r\n\r\nI am new to truffle and blockchain world and I have tried following a youtube video to make this project. But I am getting an error in deploying the contract.\r\n\r\n***Uncaught (in promise) Error: TodoList has not been deployed to detected network (network/artifact mismatch)\r\n    at truffle-contract.js:456:17\r\n    at async Object.loadContract (app.js:60:20)\r\n    at async Object.load (app.js:13:5)***\r\n\r\nForgive me for the rudeness as it is my first issue.\r\n## TodoList.sol\r\n\r\n```\r\npragma solidity ^0.5.0;\r\n\r\ncontract TodoList{\r\n    uint public taskCount=0;\r\n\r\n    struct Task{\r\n        uint id;\r\n        string taskName;\r\n        bool completed;\r\n    }\r\n\r\n    mapping(uint => Task) public tasks;\r\n\r\n    constructor () public {\r\n        createTask(\"Start doig tasks now :)\");\r\n    }\r\n\r\n    function createTask(string memory content) public {\r\n        taskCount++;\r\n        tasks[taskCount] = Task(taskCount,content,false);\r\n\r\n    }\r\n}\r\n```\r\n\r\n## app.js\r\n```\r\nvar print = console.log\r\n\r\nWeb3 = require('web3')\r\nApp = {\r\n  loading:false,\r\n  contracts: {},\r\n\r\n  load: async () => {\r\n    await App.loadWeb3()\r\n    await App.loadAccount()\r\n    await App.loadContract()\r\n    await App.render()\r\n  },\r\n\r\n  loadWeb3: async () => {\r\n    \r\n    if (typeof web3 !== 'undefined') {\r\n      App.web3Provider = web3.currentProvider\r\n      web3 = new Web3(web3.currentProvider)\r\n    } else {\r\n      window.alert(\"Please connect to Metamask.\")\r\n    }\r\n    // Modern dapp browsers...\r\n    if (window.ethereum) {\r\n      window.web3 = new Web3(ethereum)\r\n      try {\r\n        // Request account access if needed\r\n        await ethereum.enable()\r\n        // Acccounts now exposed\r\n        web3.eth.sendTransaction({/* ... */})\r\n      } catch (error) {\r\n        // User denied account access...\r\n      }\r\n    }\r\n    // Legacy dapp browsers...\r\n    else if (window.web3) {\r\n      App.web3Provider = web3.currentProvider\r\n      window.web3 = new Web3(web3.currentProvider)\r\n      // Acccounts always exposed\r\n      web3.eth.sendTransaction({/* ... */})\r\n    }\r\n    // Non-dapp browsers...\r\n    else {\r\n      console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')\r\n    }\r\n  },\r\n\r\n  loadAccount: async () => {\r\n    App.account = window.web3.eth.accounts[0]\r\n    print(App.account)\r\n  },\r\n\r\n  loadContract: async () => {\r\n    const todoList = await $.getJSON('TodoList.json')\r\n    App.contracts.TodoList = TruffleContract(todoList)\r\n    App.contracts.TodoList.setProvider(App.web3Provider)\r\n    print(todoList)\r\n    App.todoList = await App.contracts.TodoList.deployed()\r\n    print(App.todoList)\r\n  },\r\n\r\n  render: async () => {\r\n\r\n    if(App.loading){\r\n      return\r\n    }\r\n    App.setLoading(true)\r\n\r\n\r\n    $(\"#account\").html(App.account)\r\n\r\n    App.setLoading(false)\r\n  },\r\n\r\n\r\n  setLoading: (boolean) => {\r\n    App.loading = boolean\r\n    const loader = $('#loader')\r\n    const content = $('#content')\r\n    if (boolean) {\r\n      loader.show()\r\n      content.hide()\r\n    } else {\r\n      loader.hide()\r\n      content.show()\r\n    }\r\n  }\r\n\r\n}\r\n\r\n$(() => {\r\n  $(window).load(() => {\r\n    App.load()\r\n  })\r\n})\r\n```\r\n## 2_deploy_contracts.js\r\n```\r\nvar TodoList = artifacts.require(\"./TodoList.sol\");\r\n\r\nmodule.exports = function(deployer) {\r\n  deployer.deploy(TodoList);\r\n};\r\n```\r\n## Environment\r\n\r\n* Operating System: Windows 10\r\n* Truffle version (`truffle version`):\r\nTruffle v5.0.2 (core: 5.0.2)\r\nSolidity v0.5.0 (solc-js)\r\n* node version (`node --version`): v16.15.0\r\n* npm version (`npm --version`): 8.12.1\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5201/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5201/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5441",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5441/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5441/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5441/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/5441",
+  "id": 1339671741,
+  "node_id": "I_kwDOAkfq-c5P2cS9",
+  "number": 5441,
+  "title": "Truffle's default optimizer settings actually have an effect",
+  "user": {
+    "login": "haltman-at",
+    "id": 35589221,
+    "node_id": "MDQ6VXNlcjM1NTg5MjIx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35589221?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/haltman-at",
+    "html_url": "https://github.com/haltman-at",
+    "followers_url": "https://api.github.com/users/haltman-at/followers",
+    "following_url": "https://api.github.com/users/haltman-at/following{/other_user}",
+    "gists_url": "https://api.github.com/users/haltman-at/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/haltman-at/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/haltman-at/subscriptions",
+    "organizations_url": "https://api.github.com/users/haltman-at/orgs",
+    "repos_url": "https://api.github.com/users/haltman-at/repos",
+    "events_url": "https://api.github.com/users/haltman-at/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/haltman-at/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-08-16T00:38:43Z",
+  "updated_at": "2022-08-16T00:39:35Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Issue\r\n\r\nWhen Truffle compiles Solidity, it merges the settings from the Truffle Config into some default settings, those default settings being:\r\n\r\n```javascript\r\nsettings: {\r\n  optimizer: {\r\n    enabled: false\r\n    runs: 200\r\n  }\r\n}\r\n```\r\n\r\nSeems harmless, right?  Well... turns out that on Solidity versions prior to 0.8.6, having `enabled` set to `false`, and having it absent entirely, had different results.  Having it set to `false`, as opposed to absent entirely, actually turned on some optimizations (though evidently not much).\r\n\r\nThis poses a problem when it comes to contract verification; see discussion on [this Blockscout issue](https://github.com/blockscout/blockscout/issues/5748).  Unfortunately I don't think we can just get rid of this default without potentially breaking things.  But we can perhaps discard it in `fetch-and-compile` specifically.  However if we do so, we'll have to update the Etherscan fetcher (and possibly the Sourcify fetcher?) per the linked discussion (like, the Etherscan fetcher will have to convert `enabled` being absent to it being `false`; the `runs: 200` default may also be necessary).\r\n\r\nAll of this is basically OK for now, but it will need to be solved if we want to do something about #4779.\r\n\r\n## Environment\r\n\r\n* Truffle version (`truffle version`): 5.5.26",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5441/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5441/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

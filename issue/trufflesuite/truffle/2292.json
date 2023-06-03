@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/2292",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2292/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2292/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2292/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/2292",
+  "id": 479934524,
+  "node_id": "MDU6SXNzdWU0Nzk5MzQ1MjQ=",
+  "number": 2292,
+  "title": "Contract.new() lacks transaction information",
+  "user": {
+    "login": "haltman-at",
+    "id": 35589221,
+    "node_id": "MDQ6VXNlcjM1NTg5MjIx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35589221?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/haltman-at",
+    "html_url": "https://github.com/haltman-at",
+    "followers_url": "https://api.github.com/users/haltman-at/followers",
+    "following_url": "https://api.github.com/users/haltman-at/following{/other_user}",
+    "gists_url": "https://api.github.com/users/haltman-at/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/haltman-at/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/haltman-at/subscriptions",
+    "organizations_url": "https://api.github.com/users/haltman-at/orgs",
+    "repos_url": "https://api.github.com/users/haltman-at/repos",
+    "events_url": "https://api.github.com/users/haltman-at/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/haltman-at/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1086852667,
+      "node_id": "MDU6TGFiZWwxMDg2ODUyNjY3",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/needs%20requirements",
+      "name": "needs requirements",
+      "color": "d4c5f9",
+      "default": false,
+      "description": "feature request is unclear"
+    },
+    {
+      "id": 1675042518,
+      "node_id": "MDU6TGFiZWwxNjc1MDQyNTE4",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/priority6%20%F0%9F%92%AD",
+      "name": "priority6 💭",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2019-08-13T02:51:41Z",
+  "updated_at": "2020-05-13T18:08:50Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Issue\r\n\r\nThe various `sendTransaction()` methods return an object containing information about the transaction -- `tx`, `receipt`, and `logs`.  However, one runs into a problem attempting to get this information for a contract creation transaction.  The way to do these is with `Contract.new()`; however, `Contract.new()` returns a contract object, and not the transaction information.\r\n\r\nIt's possible to work around this, of course; the contract object contains a field `transationHash`, containing the same information as `tx`, and one can then use this to retrieve the receipt via web3.  However, there are slight differences in the format of the receipt when it comes to the logs.  The receipt returned from a `sendTransaction` has a `logs` field containing the decoded logs, and a `rawLogs` field containing the undecoded logs; while the receipt returned from `web3.eth.getTransactionReceipt` has only a `logs` field, and it contains the undecoded logs.\r\n\r\nMoreover, there's still the matter of the `logs` field, containing the decoded logs.  One could run the undecoded logs obtained from the receipt trough web3's decoder, but this is inconvenient.\r\n\r\nIdeally, these workarounds would not be necessary, and it would be possible to directly get the same information from `Contract.new` as one would get from an ordinary method call.\r\n\r\nIt's not clear what the right way to implement this is, especially if one wants to do it in a non-breaking manner.  One way would be to provide a new, distinct method that yields this information *instead* of the new contract object, but this is unsatisfactory, as you'd have to create contracts with one *or* the other; you're only creating one contract, you should be able to get all the information about it.  You could have `Contract.new` return an object with a field for each, but this would be a breaking change, and it's probably not what people want anyway.\r\n\r\nIdeas for solutions that might be OK:\r\n\r\n1. Just have `Contract.new` return an object with all the fields of both mashed together.  It will return not a usual contract object, but a contract object with `tx`, `receipt`, and `logs` fields appended.  Upsides: Simple, shouldn't be breaking (unless people have contracts with methods of those names, maybe?).  Downsides: Quite inelegant; puts fields in a contract object that shouldn't go there.\r\n\r\n2. Make better use of the fact that `Contract.new()` is actually a `PromiEvent`.  Right now, regardless of which event you wait for, what you get is the contract object.  Maybe waiting on different events could get you other things?  IDK, maybe that's not how PromiEvents are supposed to work, and you're *supposed* to always get the same thing regardless of which event you wait for (possibly minus mising fields)?\r\n\r\n3. Other ideas?? Just go ahead and break it?? IDK.\r\n\r\nBut, those are the ideas I have so far.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/2292/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2292/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/522817378",
+    "html_url": "https://github.com/trufflesuite/truffle/issues/2292#issuecomment-522817378",
+    "issue_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2292",
+    "id": 522817378,
+    "node_id": "MDEyOklzc3VlQ29tbWVudDUyMjgxNzM3OA==",
+    "user": {
+      "login": "haltman-at",
+      "id": 35589221,
+      "node_id": "MDQ6VXNlcjM1NTg5MjIx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35589221?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/haltman-at",
+      "html_url": "https://github.com/haltman-at",
+      "followers_url": "https://api.github.com/users/haltman-at/followers",
+      "following_url": "https://api.github.com/users/haltman-at/following{/other_user}",
+      "gists_url": "https://api.github.com/users/haltman-at/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/haltman-at/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/haltman-at/subscriptions",
+      "organizations_url": "https://api.github.com/users/haltman-at/orgs",
+      "repos_url": "https://api.github.com/users/haltman-at/repos",
+      "events_url": "https://api.github.com/users/haltman-at/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/haltman-at/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2019-08-20T01:40:23Z",
+    "updated_at": "2019-08-20T01:43:46Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Hey, so guess what?  It turns out we already do possibility (2) above!  If you wait for the `receipt` event, you'll get the receipt.  (And it will be in the form with the events decoded, etc.)\r\n\r\nWhile this is still a little awkward, it is at least uniform between contract creations and other transactions.\r\n\r\nNot sure if I should close this, as I would still prefer there to be a better way.",
+    "reactions": {
+      "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/522817378/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5419",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5419/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5419/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5419/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/5419",
+  "id": 1334003866,
+  "node_id": "I_kwDOAkfq-c5Pg0ia",
+  "number": 5419,
+  "title": "No source for EVM bytecode in many of our tests",
+  "user": {
+    "login": "benjamincburns",
+    "id": 803016,
+    "node_id": "MDQ6VXNlcjgwMzAxNg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/803016?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjamincburns",
+    "html_url": "https://github.com/benjamincburns",
+    "followers_url": "https://api.github.com/users/benjamincburns/followers",
+    "following_url": "https://api.github.com/users/benjamincburns/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjamincburns/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjamincburns/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjamincburns/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjamincburns/orgs",
+    "repos_url": "https://api.github.com/users/benjamincburns/repos",
+    "events_url": "https://api.github.com/users/benjamincburns/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjamincburns/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4236573743,
+      "node_id": "LA_kwDOAkfq-c78hPwv",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/technical%20debt",
+      "name": "technical debt",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-08-10T03:14:35Z",
+  "updated_at": "2022-08-11T17:43:02Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Issue\r\n\r\nIn reviewing #5408 I observed that it's apparently common practice in our test suite to generate EVM bytecode for testing something, but not document or otherwise check-in the source and/or a script or repeatable steps for building said bytecode from said missing source code. Usually said bytecode is included as a const hex string in the test source.\r\n\r\nTests that do this are very expensive and/or error-prone to maintain by anyone who isn't intimately familiar with how they were originally created, and they're similarly expensive and/or error-prone to audit for correctness.\r\n\r\n## Steps to Reproduce\r\n\r\n1. Attempt to answer the following question: What logic, if any, is embedded in [this bytecode](https://github.com/trufflesuite/truffle/blob/d288a03549385584a0898d90fa3e32d60c0e1435/packages/code-utils/test/index.test.ts#L8)?\r\n\r\n## Expected Behavior\r\n\r\nIt would be possible to answer that question without a disassembler and deep understanding of EVM assembly, or decompiler.\r\n\r\n## Actual Results\r\n\r\nReader attempting to answer that question is faced with an unreadable hex string and little additional information to understand what's present.\r\n\r\n## Suggested improvements\r\n\r\nI propose that we do three things in response to this problem:\r\n\r\n1. Make it easier to write tests that self-document the progeny of their bytecode than it is to write tests that do not document the progeny of their bytecode.\r\n2. Institute a blanket ban on introduction of new tests with embedded bytecode unless they follow the pattern from item 1.\r\n3. Either make an eager effort to replace existing tests that exhibit this pattern with tests that self-document their bytecode, or institute a lazy update policy and fix tests that exhibit this pattern as they're maintained for other reasons.\r\n\r\n### Moving toward a better pattern\r\n\r\nI don't have a specific design in mind, but I think an ideal solution would meet the following criteria:\r\n\r\n1. Compilation of source to bytecode must _not_ be required on every test run (that is, the compiled result is checked in)\r\n2. Generating/regenerating bytecode for test cases should be a simple yarn script\r\n3. A pre-commit hook guards against the case where a compiled result is not checked in (ideally resolved by automatically adding the bytecode to the commit)\r\n4. A pre-commit hook guards against the case where the source for a given test changes but the matching bytecode does not (ideally resolved by automatically recompiling the source and if applicable, adding the updated bytecode to the commit)\r\n\r\nAs further design inspo, I also think that it might be worth loosely modeling this facility after the pattern that the `nock` library uses for recording/caching HTTP traffic for offline testing.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5419/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5419/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

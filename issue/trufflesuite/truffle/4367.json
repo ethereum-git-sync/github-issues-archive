@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/4367",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4367/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4367/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4367/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/4367",
+  "id": 1026841679,
+  "node_id": "I_kwDOAkfq-c49NFxP",
+  "number": 4367,
+  "title": "Debugger should support legacy ASTs",
+  "user": {
+    "login": "haltman-at",
+    "id": 35589221,
+    "node_id": "MDQ6VXNlcjM1NTg5MjIx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35589221?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/haltman-at",
+    "html_url": "https://github.com/haltman-at",
+    "followers_url": "https://api.github.com/users/haltman-at/followers",
+    "following_url": "https://api.github.com/users/haltman-at/following{/other_user}",
+    "gists_url": "https://api.github.com/users/haltman-at/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/haltman-at/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/haltman-at/subscriptions",
+    "organizations_url": "https://api.github.com/users/haltman-at/orgs",
+    "repos_url": "https://api.github.com/users/haltman-at/repos",
+    "events_url": "https://api.github.com/users/haltman-at/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/haltman-at/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 230393328,
+      "node_id": "MDU6TGFiZWwyMzAzOTMzMjg=",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/enhancement",
+      "name": "enhancement",
+      "color": "84b6eb",
+      "default": true,
+      "description": null
+    },
+    {
+      "id": 971535002,
+      "node_id": "MDU6TGFiZWw5NzE1MzUwMDI=",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Debugger",
+      "name": "Debugger",
+      "color": "7911ad",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1675042518,
+      "node_id": "MDU6TGFiZWwxNjc1MDQyNTE4",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/priority6%20%F0%9F%92%AD",
+      "name": "priority6 💭",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2021-10-14T21:32:44Z",
+  "updated_at": "2021-11-05T21:39:06Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Issue\r\n\r\nPrior to Solidity 0.4.12, the Solidity compiler did not emit the current AST format, but only the legacy AST format.  (The legacy AST was removed in 0.8.0, but it exists in all Solidity versions prior to that.)  Truffle supports compiling[0] Solidity back to 0.4.9, but if you attempt to debug contracts from before 0.4.12, you'll notice that while you can step through, there's no tracking or decoding of variables.  This is because the debugger only supports doing so with the current AST format, not the legacy AST format.\r\n\r\nSome important contracts were written with these old versions of Solidity; in particular, the original ENS registrar was written in Solidity 0.4.10.  So, it would be nice to be able to more usefully debug these.\r\n\r\nHowever, there are a number of difficulties in supporting legacy ASTs.  Firstly, there is the question, do we support them as-is, or do we attempt to transform them into current-format ASTs?  The two formats are actually quite similar, so a transformation is not out of the question, and after talking to @gnidan, it seems like this might be the best approach.\r\n\r\nHowever, the transformation would need to know about each individual node type in order to know what order to put the `children` in.  Note that since the legacy AST was removed in 0.8.0, we only need to handle node types that existed prior to 0.8.0; and @gnidan has suggested we could take a further shortcut and only handle node types that existed in 0.4.12 and earlier.\r\n\r\nBut this is a comparatively small problem.  The bigger problem is the lack of type information.  To be clear, the legacy AST *does* contain type information.  The problem however is that it doesn't contain the machine-readable `typeIdentifier`, but only the human-readable `typeString`.\r\n\r\nNow, this does not always represent a loss of information!  In most cases, the type string *does* contain sufficient information to fully reconstruct the type.  But since it isn't made to be machine-readable, parsing it is harder.  It's quite likely that regular expressions won't suffice.  Hell, regular expressions *already* don't suffice for all cases of parsing `typeIdentifier`s, it's just that the only cases they don't suffice for aren't ones we care about.  For `typeString`s, on the other hand, it's quite possible that we'll need a more serious parser even to handle cases that *do* matter.\r\n\r\nWorse than that, sometimes there *is* loss of information -- when dealing with user-defined types, the `typeIdentifier` includes the numeric ID, but the type string doesn't, only the name of the type and the name of the contract that defines it.  That's not necessarily unique!  If you have two contracts named `C` that both declare a struct type named `S`, the type strings will be the same for each, resulting in unsolveable problems.  (And even if it is unique, you'd still have to search to find it, rather than just being able to look it up by ID...)\r\n\r\nNow it might seem like there's an alternative, if we're willing to simply not support tracking mapping keys when using legacy ASTs!  (And once #3842 is implemented, not supporting that won't even be such a big deal.)  Because if we don't worry about mapping keys, then the only types we need concern ourselves with are the types on variable declarations; and while we might not have the machine-readable `typeIdentifer`, we *do* have the AST node for the type on the declaration, which is itself a machine-readable format!  (And for user-defined types, it even includes the numeric IDs.)  So we could go by that instead.\r\n\r\nExcept, the previous paragraph is wrong, because remember that we're discussing Solidity 0.4.x, when `var` existed (and was used; it can't be ignored as an edge case).  The existence of `var` means that in many cases, even for variable declarations, we will *not* have the AST node for the type; our *only* option will be to go by the type string.\r\n\r\nFor this reason, performing the transformation from a legacy AST to a current AST, or supporting legacy ASTs in any way, is a difficult task, and in some cases, due to ambiguous type strings, simply cannot be done reliably.\r\n\r\nStill, uh, maybe it's something we could just do at some point, and we can just crash in the cases that can't be handled reliably, or something...?\r\n\r\n[0]Well, notionally.  At present it only works back to 0.4.11, due to #4366; although it does work all the way back to 0.4.9 in the particular context of `truffle debug --fetch-external`, which avoids that bug.\r\n\r\n## Environment\r\n\r\n* Truffle version (`truffle version`): 5.4.15",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/4367/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4367/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/962237696",
+    "html_url": "https://github.com/trufflesuite/truffle/issues/4367#issuecomment-962237696",
+    "issue_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4367",
+    "id": 962237696,
+    "node_id": "IC_kwDOAkfq-c45WpUA",
+    "user": {
+      "login": "haltman-at",
+      "id": 35589221,
+      "node_id": "MDQ6VXNlcjM1NTg5MjIx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35589221?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/haltman-at",
+      "html_url": "https://github.com/haltman-at",
+      "followers_url": "https://api.github.com/users/haltman-at/followers",
+      "following_url": "https://api.github.com/users/haltman-at/following{/other_user}",
+      "gists_url": "https://api.github.com/users/haltman-at/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/haltman-at/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/haltman-at/subscriptions",
+      "organizations_url": "https://api.github.com/users/haltman-at/orgs",
+      "repos_url": "https://api.github.com/users/haltman-at/repos",
+      "events_url": "https://api.github.com/users/haltman-at/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/haltman-at/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2021-11-05T21:39:06Z",
+    "updated_at": "2021-11-05T21:39:06Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Note: A much more feasible task would be just adding legacy AST support in stacktracing.  That's something we could perhaps actually do.",
+    "reactions": {
+      "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/962237696/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

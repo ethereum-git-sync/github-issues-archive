@@ -1,0 +1,146 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/1236",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/1236/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/1236/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/1236/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/1236",
+  "id": 354632763,
+  "node_id": "MDU6SXNzdWUzNTQ2MzI3NjM=",
+  "number": 1236,
+  "title": "Source map indexes are missing in artifacts",
+  "user": {
+    "login": "ABBDVD",
+    "id": 7634156,
+    "node_id": "MDQ6VXNlcjc2MzQxNTY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7634156?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ABBDVD",
+    "html_url": "https://github.com/ABBDVD",
+    "followers_url": "https://api.github.com/users/ABBDVD/followers",
+    "following_url": "https://api.github.com/users/ABBDVD/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ABBDVD/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ABBDVD/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ABBDVD/subscriptions",
+    "organizations_url": "https://api.github.com/users/ABBDVD/orgs",
+    "repos_url": "https://api.github.com/users/ABBDVD/repos",
+    "events_url": "https://api.github.com/users/ABBDVD/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ABBDVD/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 971535741,
+      "node_id": "MDU6TGFiZWw5NzE1MzU3NDE=",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Artifacts",
+      "name": "Artifacts",
+      "color": "bfb8fc",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 990819613,
+      "node_id": "MDU6TGFiZWw5OTA4MTk2MTM=",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Docs",
+      "name": "Docs",
+      "color": "c5def5",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1442301962,
+      "node_id": "MDU6TGFiZWwxNDQyMzAxOTYy",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/db",
+      "name": "db",
+      "color": "0e7882",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1675042241,
+      "node_id": "MDU6TGFiZWwxNjc1MDQyMjQx",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/priority5%20%F0%9F%8C%80",
+      "name": "priority5 🌀",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2018-08-28T08:53:29Z",
+  "updated_at": "2021-10-28T16:33:22Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "- [x ] I've asked for help in the [Truffle Gitter](http://gitter.im/Consensys/truffle) before filing this issue.\r\n\r\n---------------------------\r\n\r\n## Issue\r\n\r\nThe built json files in /build/contracts contain source maps. The identifiers which source file has which index are not explicitly given, thus making it much less useful to work with for building tools that want to make use of the truffle.\r\n\r\n## Steps to Reproduce\r\n\r\n1. truffle unbox metacoin in an empty folder\r\n2. truffle compile (possibly remove the truffle.js file on Windows before)\r\n3. observe that the .json files in the folder build/contracts contain the source maps but there's no source list given (as solc returns) nor any other explicit mention which source file is which identifier.\r\n\r\n## Expected Behavior\r\n\r\nOutput the source list such that the source mappings can be used.\r\n\r\n## Actual Results\r\n\r\nThe source list or an explicit mention of the source file identifiers are not given\r\n\r\n## Environment\r\n\r\n* Operating System: Windows 10\r\n* Ethereum client: - (non necessary)\r\n* Truffle version (`truffle version`): v4.1.14\r\n* node version (`node --version`): v8.11.1\r\n* npm version (`npm --version`): v6.4.0\r\n\r\n## Possible solutions\r\n\r\nThis could possibly be done as a separate file for example in the build/ folder, but this might be an issue if partial compilations can create overlaps with the identifiers. In which case for example the following could work:\r\n- Each compilation adds an identifier to all contract json files built in that run.\r\n- Each contract json file contains the identifier of it's own source file.\r\nThis is under the assumption that compilation of a contract will always compile also all dependencies and that would then allow us to resolve which source mapping uses which compilation identifier and thus which source list and the source list would contain all relevant source files.\r\n\r\nThe relevant identifiers are returned by the solc output json to truffle [here](https://github.com/trufflesuite/truffle/blob/8ad759cc6a163b811b147a896d6bce4c9ec5ce0a/packages/truffle-compile/index.js#L143) (as far as I can tell) and should thus be relatively easy to add to the built files. The updatedAt could be possibly used somewhat as an identifier for which compilation run it is, but it wouldn't be a nice solution as compilatin runs would have to be identified by comparing similar times.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/1236/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/1236/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/849012092",
+    "html_url": "https://github.com/trufflesuite/truffle/issues/1236#issuecomment-849012092",
+    "issue_url": "https://api.github.com/repos/trufflesuite/truffle/issues/1236",
+    "id": 849012092,
+    "node_id": "MDEyOklzc3VlQ29tbWVudDg0OTAxMjA5Mg==",
+    "user": {
+      "login": "fainashalts",
+      "id": 8952139,
+      "node_id": "MDQ6VXNlcjg5NTIxMzk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8952139?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fainashalts",
+      "html_url": "https://github.com/fainashalts",
+      "followers_url": "https://api.github.com/users/fainashalts/followers",
+      "following_url": "https://api.github.com/users/fainashalts/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fainashalts/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fainashalts/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fainashalts/subscriptions",
+      "organizations_url": "https://api.github.com/users/fainashalts/orgs",
+      "repos_url": "https://api.github.com/users/fainashalts/repos",
+      "events_url": "https://api.github.com/users/fainashalts/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fainashalts/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2021-05-26T18:17:34Z",
+    "updated_at": "2021-05-26T18:17:34Z",
+    "author_association": "MEMBER",
+    "body": "We need to document how to get this info when DB is enabled in the config, as it is now available. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/849012092/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

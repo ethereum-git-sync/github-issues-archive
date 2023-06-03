@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/4163",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4163/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4163/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4163/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/4163",
+  "id": 939895092,
+  "node_id": "MDU6SXNzdWU5Mzk4OTUwOTI=",
+  "number": 4163,
+  "title": "Relative imports with leading `../` segments going beyond compiler's VFS root are not resolved correctly",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1088150379,
+      "node_id": "MDU6TGFiZWwxMDg4MTUwMzc5",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/error%20better",
+      "name": "error better",
+      "color": "f27915",
+      "default": false,
+      "description": "issue indicates improvement to error messaging"
+    },
+    {
+      "id": 1675041996,
+      "node_id": "MDU6TGFiZWwxNjc1MDQxOTk2",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/priority4%20%F0%9F%93%8B",
+      "name": "priority4 📋",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2021-07-08T14:03:13Z",
+  "updated_at": "2021-07-14T17:40:17Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Issue\r\nWhen resolving relative imports with leading `../` segments the compiler stops at the root of its virtual filesystem and ignores any superfluous segments (see [documentation for relative imports](https://docs.soliditylang.org/en/latest/path-resolution.html#relative-imports)). For example `import \"../../../../d.sol\"` resolves into `d.sol` when found inside `a/b/c.sol`. Truffle instead follows the path outside of project directory resulting in such imports not working correctly. The way it works now it can result in the wrong file being imported which could go unnoticed by the user.\r\n\r\nI think these imports should be reported as an error because this is just an obscure corner case that is not really worth supporting in practice. It's more likely to be a mistake on user's part and reporting it would be better. Even if Truffle used the correct path, they would not work anyway due to the recently added `project:/` prefix (#4137).\r\n\r\n## Steps to Reproduce\r\n\r\n```bash\r\ncd /tmp/\r\nmkdir truffle-test/\r\ncd truffle-test/\r\nnpm install truffle\r\nnpx truffle init\r\necho 'module.exports.compilers.solc.version = \"0.8.6\";' >> truffle-config.js\r\n\r\necho 'contract C {}' > /tmp/C.sol\r\necho 'import \"../../C.sol\";' > contracts/C.sol\r\nnpx truffle compile\r\n```\r\n\r\n## Actual Results\r\n\r\n```solidity\r\nParserError: Source \"C.sol\" not found: File import callback not supported\r\n --> project:/contracts/C.sol:1:1:\r\n  |\r\n1 | import \"../../C.sol\";\r\n  | ^^^^^^^^^^^^^^^^^^^^^\r\n\r\nCompilation failed. See above.\r\n```\r\nThe `sources` dict in the JSON input contains these entries:\r\n```json\r\n\"project:/contracts/C.sol\": { \"content\": \"import \\\"../../C.sol\\\";\\n\" },\r\n\"project:/contracts/Migrations.sol\": { \"content\": \"// SPDX-License-Identifier: MIT\\npragma solidity >=0.4.22 <0.9.0;\\n\\ncontract Migrations {\\n  address public owner = msg.sender;\\n  uint public last_completed_migration;\\n\\n  modifier restricted() {\\n    require(\\n      msg.sender == owner,\\n      \\\"This function is restricted to the contract's owner\\\"\\n    );\\n    _;\\n  }\\n\\n  function setCompleted(uint completed) public restricted {\\n    last_completed_migration = completed;\\n  }\\n}\\n\" },\r\n\"/tmp/C.sol\": { \"content\": \"contract C {}\\n\" }\r\n```\r\n\r\n## Expected Behavior\r\nSomething like this works fine as an input to the compiler because it resolves `../../C.sol` into `C.sol`:\r\n```json\r\n{\r\n    \"language\": \"Solidity\",\r\n    \"sources\": {\r\n        \"contracts/C.sol\": { \"content\": \"import \\\"../../C.sol\\\";\\n\" },\r\n        \"C.sol\": { \"content\": \"contract C {}\\n\" }\r\n    },\r\n    \"settings\": {\"outputSelection\": {\"*\": {\"*\": [\"metadata\", \"evm.bytecode\"]}}}\r\n}\r\n```\r\n\r\nFor Truffle this is not viable due to the `project:/` prefix so I think this case should simply be disallowed.\r\n\r\n## Environment\r\n\r\n* Operating System: Arch Linux\r\n* Truffle version: both `5.3.14` and current `develop` (abfb3646eea9d57e0a6f9186c12bb51680c181d8)\r\n* node version: `v16.4.2`\r\n* npm version: `7.17.0`",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/4163/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4163/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/878425729",
+    "html_url": "https://github.com/trufflesuite/truffle/issues/4163#issuecomment-878425729",
+    "issue_url": "https://api.github.com/repos/trufflesuite/truffle/issues/4163",
+    "id": 878425729,
+    "node_id": "MDEyOklzc3VlQ29tbWVudDg3ODQyNTcyOQ==",
+    "user": {
+      "login": "eggplantzzz",
+      "id": 14827965,
+      "node_id": "MDQ6VXNlcjE0ODI3OTY1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14827965?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/eggplantzzz",
+      "html_url": "https://github.com/eggplantzzz",
+      "followers_url": "https://api.github.com/users/eggplantzzz/followers",
+      "following_url": "https://api.github.com/users/eggplantzzz/following{/other_user}",
+      "gists_url": "https://api.github.com/users/eggplantzzz/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/eggplantzzz/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/eggplantzzz/subscriptions",
+      "organizations_url": "https://api.github.com/users/eggplantzzz/orgs",
+      "repos_url": "https://api.github.com/users/eggplantzzz/repos",
+      "events_url": "https://api.github.com/users/eggplantzzz/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/eggplantzzz/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2021-07-12T16:36:46Z",
+    "updated_at": "2021-07-12T16:36:46Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Interesting, thanks for reporting this @cameel! Let me talk about it with the team!",
+    "reactions": {
+      "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/878425729/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/2177",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2177/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2177/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2177/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/2177",
+  "id": 467009042,
+  "node_id": "MDU6SXNzdWU0NjcwMDkwNDI=",
+  "number": 2177,
+  "title": "gasMultiplier issue when Truffle 5.0.26 handles the private ttransaction to quorum ",
+  "user": {
+    "login": "hui-zhu",
+    "id": 51973396,
+    "node_id": "MDQ6VXNlcjUxOTczMzk2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/51973396?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hui-zhu",
+    "html_url": "https://github.com/hui-zhu",
+    "followers_url": "https://api.github.com/users/hui-zhu/followers",
+    "following_url": "https://api.github.com/users/hui-zhu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hui-zhu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hui-zhu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hui-zhu/subscriptions",
+    "organizations_url": "https://api.github.com/users/hui-zhu/orgs",
+    "repos_url": "https://api.github.com/users/hui-zhu/repos",
+    "events_url": "https://api.github.com/users/hui-zhu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hui-zhu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1205502427,
+      "node_id": "MDU6TGFiZWwxMjA1NTAyNDI3",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Enterprise",
+      "name": "Enterprise",
+      "color": "b8def2",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1205502598,
+      "node_id": "MDU6TGFiZWwxMjA1NTAyNTk4",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Quorum",
+      "name": "Quorum",
+      "color": "a5f7dd",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 1675042241,
+      "node_id": "MDU6TGFiZWwxNjc1MDQyMjQx",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/priority5%20%F0%9F%8C%80",
+      "name": "priority5 🌀",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-07-11T17:06:31Z",
+  "updated_at": "2020-04-08T18:18:18Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "- [ ] I've asked for help in the [Truffle Gitter](http://gitter.im/Consensys/truffle) before filing this issue.\r\n---------------------------\r\n\r\n## Issue\r\ngasMultiplier issue when Truffle 5.0.26 handles the private transaction to quorum network\r\n\r\nWhat the issue is, in broad strokes.\r\neth calls comparison between 5.0.26 and 5.0.8\r\n![image](https://user-images.githubusercontent.com/51973396/61069280-8a94a300-a3d1-11e9-967e-5a5f95d7a3f9.png)\r\n![image](https://user-images.githubusercontent.com/51973396/61069329-a9933500-a3d1-11e9-9b33-66294023706a.png)\r\n![image](https://user-images.githubusercontent.com/51973396/61069426-e2cba500-a3d1-11e9-97ee-3ed53afc0c85.png)\r\n![image](https://user-images.githubusercontent.com/51973396/61069440-eceda380-a3d1-11e9-9ca1-f5b0e336148c.png)\r\n\r\nSo, we can see Truffle 5.0.8 is using default gasMultiplier value as 1.25, but truffle 5.0.26 is using 1.0 when autoGas is enabled.\r\n\r\nOther consideration:\r\nThe estimateGas call in Quorum doesn't include the extra gas for private transaction\r\nQuorum 2.2.2 has fixed that estimateGas issue #644 https://github.com/jpmorganchase/quorum/pull/644\r\nCurrently Azure Blockchain Service (ABS) is using Quorum 2.2.1\r\n\r\nWorkaround:\r\nWe can work around it by simply setting SimpleStorage.gasMultiplier = 2\r\nor downgrade our truffle version from 5.0.26 to 5.0.8\r\nbut we still hope to report this issue.\r\n\r\n## Steps to Reproduce\r\n\r\nPlease provide the shortest amount of steps to reproduce your issue.\r\n\r\n## Expected Behavior\r\n\r\nWhat you expected to happen.\r\n\r\n## Actual Results\r\n\r\nWhat actually happened. Please give examples and support it with screenshots, copied output or error messages.\r\n\r\n## Environment\r\n\r\n* Operating System: \r\n* Ethereum client:\r\n* Truffle version (`truffle version`):\r\n* node version (`node --version`):\r\n* npm version (`npm --version`): \r\ntruffle version\r\nTruffle v5.0.26 (core: 5.0.26)\r\nSolidity v0.5.0 (solc-js)\r\nNode v10.15.3\r\nWeb3.js v1.0.0-beta.37\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/2177/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2177/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

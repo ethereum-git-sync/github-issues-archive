@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5977",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5977/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5977/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5977/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/5977",
+  "id": 1636929242,
+  "node_id": "I_kwDOAkfq-c5hkY7a",
+  "number": 5977,
+  "title": "[error] truffle migrate",
+  "user": {
+    "login": "puffanddmx",
+    "id": 38074373,
+    "node_id": "MDQ6VXNlcjM4MDc0Mzcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38074373?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/puffanddmx",
+    "html_url": "https://github.com/puffanddmx",
+    "followers_url": "https://api.github.com/users/puffanddmx/followers",
+    "following_url": "https://api.github.com/users/puffanddmx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/puffanddmx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/puffanddmx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/puffanddmx/subscriptions",
+    "organizations_url": "https://api.github.com/users/puffanddmx/orgs",
+    "repos_url": "https://api.github.com/users/puffanddmx/repos",
+    "events_url": "https://api.github.com/users/puffanddmx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/puffanddmx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-23T06:27:00Z",
+  "updated_at": "2023-03-23T09:47:53Z",
+  "closed_at": "2023-03-23T09:47:53Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Issue\r\n\r\nWhen deploying erc20 using \"truffle migrate --network mychain\", the following error occurs. The blockchain used occurs when deploying erc20 here through individual execution of the poa (proof of authority) based on https://github.com/openethereum/openethereum/releases/tag/v3.3.5.\r\n\r\n## Steps to Reproduce\r\n\r\n'''\r\nMockERC20.sol\r\npragma solidity ^0.8.0;\r\n\r\nimport \"../libraries/ERC20.sol\";\r\n\r\ncontract MockERC20 is ERC20 {\r\n    constructor(\r\n        string memory name,\r\n        string memory symbol,\r\n        uint256 supply\r\n    ) ERC20(name, symbol) {\r\n        _mint(msg.sender, supply);\r\n    }\r\n\r\n    function mint(address account) public {\r\n        _mint(account, 1000);\r\n    }\r\n\r\n    function mint(address account, uint amount) public {\r\n        _mint(account, amount);\r\n    }\r\n}\r\n'''\r\n\r\n'''\r\ntruffle-config.js\r\n....\r\n  mychain: {\r\n      provider: () => new HDWalletProvider(mnemonic, `http://localhost:8545`),\r\n      network_id: 0x1004,\r\n      gas: 5500000,\r\n      confirmations: 0,\r\n      timeoutBlocks: 2000,\r\n      skipDryRun: true\r\n    }\r\n    ....\r\n    compilers: {\r\n    solc: {\r\n      version: \"0.8.0\",    // Fetch exact version from solc-bin (default: truffle's version)\r\n      // docker: true,        // Use \"0.5.1\" you've installed locally with docker (default: false)\r\n      // settings: {          // See the solidity docs for advice about optimization and evmVersion\r\n      //  optimizer: {\r\n      //    enabled: false,\r\n      //    runs: 200\r\n      //  },\r\n      //  evmVersion: \"byzantium\"\r\n      // }\r\n    },\r\n'''\r\n\r\n'''\r\ndeloy_contract.js\r\nmodule.exports = function (deployer) {\r\n    deployer.deploy(MockERC20, \"AMO\", \"AMO\", \"300000000000000\");\r\n'''\r\n\r\n## Expected Behavior\r\n\r\n\bAs it is, erc20 should be distributed. However, this error occurs. It seems to be a problem that has recently occurred in check logic in web3. What should I do to solve this problem? It probably doesn't happen on the Ether testnet, but it seems to happen when deploying to poa using the above github chain. What is the solution?\r\n\r\n## Actual Results\r\n\r\n ./node_modules/truffle/build/cli.bundled.js migrate --network mychain\r\n\r\nCompiling your contracts...\r\n===========================\r\n> Compiling ./contracts/interfaces/IERC165.sol\r\n> Compiling ./contracts/interfaces/IERC20.sol\r\n> Compiling ./contracts/interfaces/IERC20Metadata.sol\r\n> Compiling ./contracts/interfaces/IERC721.sol\r\n> Compiling ./contracts/interfaces/IERC721Enumerable.sol\r\n> Compiling ./contracts/interfaces/IERC721Metadata.sol\r\n> Compiling ./contracts/interfaces/IERC721Receiver.sol\r\n> Compiling ./contracts/interfaces/IWETH.sol\r\n> Compiling ./contracts/libraries/Address.sol\r\n> Compiling ./contracts/libraries/Context.sol\r\n> Compiling ./contracts/libraries/ERC165.sol\r\n> Compiling ./contracts/libraries/ERC20.sol\r\n> Compiling ./contracts/libraries/ERC721.sol\r\n> Compiling ./contracts/libraries/ERC721Enumerable.sol\r\n> Compiling ./contracts/libraries/ReentrancyGuard.sol\r\n> Compiling ./contracts/libraries/SafeERC20.sol\r\n> Compiling ./contracts/libraries/Strings.sol\r\n> Compiling ./contracts/tests/MockERC20.sol\r\n> Compiling ./contracts/tests/MockWETH.sol\r\n> Artifacts written to \r\n/build/contracts\r\n> Compiled successfully using:\r\n   - solc: 0.8.0+commit.c7dfd78e.Emscripten.clang\r\n\r\n\r\nError: Number can only safely store up to 53 bits\r\n    at assert (/node_modules/truffle/build/webpack:/node_modules/bn.js/lib/bn.js:6:1)\r\n    at BN.toNumber (/node_modules/truffle/build/webpack:/node_modules/bn.js/lib/bn.js:506:1)\r\n    at Object.hexToNumber (/node_modules/truffle/build/webpack:/node_modules/web3-utils/lib/utils.js:207:1)\r\n    at Method.outputBlockFormatter (/node_modules/truffle/build/webpack:/node_modules/web3-core-helpers/lib/formatters.js:269:1)\r\n    at Method.web3.eth.getBlock.method.outputFormatter (/node_modules/truffle/build/webpack:/packages/interface-adapter/dist/shim/overloads/ethereum.js:38:1)\r\n    at Method.formatOutput (/node_modules/truffle/build/webpack:/node_modules/web3-core-method/lib/index.js:148:1)\r\n    at sendTxCallback (/node_modules/truffle/build/webpack:/node_modules/web3-core-method/lib/index.js:536:1)\r\n    at cb (util.js:290:31)\r\n    at processTicksAndRejections (internal/process/task_queues.js:82:21)\r\nTruffle v5.8.1 (core: 5.8.1)\r\nNode v14.19.0\r\n\r\n## Environment\r\n\r\n* Operating System: centos 7\r\n* Ethereum client: openethereum poa chain\r\n* Truffle version (`truffle version`): v5.8.1\r\n* node version (`node --version`): v14.19.0\r\n* npm version (`npm --version`): 6.14.16\r\n* web3 version : v1.8.2\r\n* solidity version : 0.8.0 (solc-js)\r\n",
+  "closed_by": {
+    "login": "puffanddmx",
+    "id": 38074373,
+    "node_id": "MDQ6VXNlcjM4MDc0Mzcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38074373?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/puffanddmx",
+    "html_url": "https://github.com/puffanddmx",
+    "followers_url": "https://api.github.com/users/puffanddmx/followers",
+    "following_url": "https://api.github.com/users/puffanddmx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/puffanddmx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/puffanddmx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/puffanddmx/subscriptions",
+    "organizations_url": "https://api.github.com/users/puffanddmx/orgs",
+    "repos_url": "https://api.github.com/users/puffanddmx/repos",
+    "events_url": "https://api.github.com/users/puffanddmx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/puffanddmx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5977/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5977/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

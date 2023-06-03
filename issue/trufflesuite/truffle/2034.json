@@ -1,0 +1,113 @@
+{
+  "url": "https://api.github.com/repos/trufflesuite/truffle/issues/2034",
+  "repository_url": "https://api.github.com/repos/trufflesuite/truffle",
+  "labels_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2034/labels{/name}",
+  "comments_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2034/comments",
+  "events_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2034/events",
+  "html_url": "https://github.com/trufflesuite/truffle/issues/2034",
+  "id": 445652785,
+  "node_id": "MDU6SXNzdWU0NDU2NTI3ODU=",
+  "number": 2034,
+  "title": "Remove solc NPM dependency and use Truffle's `obtain` mechanism instead",
+  "user": {
+    "login": "gnidan",
+    "id": 151065,
+    "node_id": "MDQ6VXNlcjE1MTA2NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/151065?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gnidan",
+    "html_url": "https://github.com/gnidan",
+    "followers_url": "https://api.github.com/users/gnidan/followers",
+    "following_url": "https://api.github.com/users/gnidan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gnidan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gnidan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gnidan/subscriptions",
+    "organizations_url": "https://api.github.com/users/gnidan/orgs",
+    "repos_url": "https://api.github.com/users/gnidan/repos",
+    "events_url": "https://api.github.com/users/gnidan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gnidan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 814266682,
+      "node_id": "MDU6TGFiZWw4MTQyNjY2ODI=",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Epic",
+      "name": "Epic",
+      "color": "3E4B9E",
+      "default": false,
+      "description": null
+    },
+    {
+      "id": 971534911,
+      "node_id": "MDU6TGFiZWw5NzE1MzQ5MTE=",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Next",
+      "name": "Next",
+      "color": "5319e7",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 971681714,
+      "node_id": "MDU6TGFiZWw5NzE2ODE3MTQ=",
+      "url": "https://api.github.com/repos/trufflesuite/truffle/labels/Compiler",
+      "name": "Compiler",
+      "color": "b60205",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-05-17T23:41:08Z",
+  "updated_at": "2019-05-29T04:02:01Z",
+  "closed_at": "2019-05-29T04:02:01Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Overview\r\n\r\nIn a nutshell, this issue proposes to:\r\n- remove NPM solc from Truffle\r\n- use soljson and the compiler supplier (`truffle obtain` mechanism) by default instead\r\n- auto-run `truffle obtain` on Truffle install\r\n\r\n### Background\r\n\r\nAn important requirement for Truffle is to provide users with solc automatically, to make it easy to get started writing smart contracts. To achieve this, Truffle has always depended on the `solc` NPM package, either baked into the bundle or as a separate dependency.\r\n\r\nBoth of these approaches have issues:\r\n- The former creates a bundle too large for Node.js memory bounds.\r\n- The latter has been fraught with compatibility problems on different platforms. This is at odds with the goal of the `truffle` package to be as portable as possible.\r\n\r\nTruffle v5 introduces a mechanism to autodownload solc via the `truffle obtain --solc=<version>` command. This fetches/caches soljson, which is a portable emscripten binary, and wraps it with the NPM package `solc`'s provided `wrapper` module.\r\n\r\nThis issue proposes to meet the stated requirement of providing users with solc automatically by using this `truffle obtain` during the `postinstall` hook when installing Truffle. Since installation can be expected to require an internet connection, it seems safe to perform this download upfront.\r\n\r\n## What this entails\r\n\r\n- Set up postinstall hook to invoke `truffle obtain --solc=<specific-version>` in user and development contexts\r\n- Make `compilers.solc` default to this auto-obtained soljson, instead of the current NPM solc\r\n- Add user-configuration option for disabling auto-download\r\n- Get `solc/wrapper` into its own package and add this as dependency of truffle-compile\r\n- Remove `solc` dependency from all packages\r\n- Remove `Bundled` strategy for the compiler supplier\r\n\r\nThere may be more here that I am missing. We should make sure to consider unknown UX ramifications or other reasons why this might result in a negative experience.\r\n\r\n## Why?\r\n\r\n- soljson is portable.\r\n- The auto fetch/cache functionality (`truffle obtain --solc`) is a key feature and will receive proper maintenance for the foreseeable future.\r\n- Truffle currently runs solc in a number of different ways:\r\n  - NPM solc\r\n  - soljson\r\n  - native shell command\r\n  - docker\r\n\r\nEffectively, the NPM solc integration has been brittle and required a lot of dedicated effort to maintain over the years. That effort can be eliminated moving forward and spent on other, less annoying things ✨ \r\n",
+  "closed_by": {
+    "login": "CruzMolina",
+    "id": 7537712,
+    "node_id": "MDQ6VXNlcjc1Mzc3MTI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7537712?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CruzMolina",
+    "html_url": "https://github.com/CruzMolina",
+    "followers_url": "https://api.github.com/users/CruzMolina/followers",
+    "following_url": "https://api.github.com/users/CruzMolina/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CruzMolina/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CruzMolina/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CruzMolina/subscriptions",
+    "organizations_url": "https://api.github.com/users/CruzMolina/orgs",
+    "repos_url": "https://api.github.com/users/CruzMolina/repos",
+    "events_url": "https://api.github.com/users/CruzMolina/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CruzMolina/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/2034/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/2034/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
