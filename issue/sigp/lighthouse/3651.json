@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/3651",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/3651/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/3651/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/3651/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/3651",
+  "id": 1418970509,
+  "node_id": "I_kwDOCFeAzc5Uk8WN",
+  "number": 3651,
+  "title": "Light client server support [tracking issue]",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647284,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODQ=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "default": true,
+      "description": "New feature or request"
+    },
+    {
+      "id": 2034355093,
+      "node_id": "MDU6TGFiZWwyMDM0MzU1MDkz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/consensus",
+      "name": "consensus",
+      "color": "5e59bf",
+      "default": false,
+      "description": "An issue/PR that touches consensus code, such as state_processing or block verification."
+    },
+    {
+      "id": 2336800125,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMTI1",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/t%20Networking",
+      "name": "t Networking",
+      "color": "40E0D0",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-10-21T23:55:06Z",
+  "updated_at": "2022-11-08T07:00:33Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWe should support the full node side of the light client protocol.\r\n\r\nThe components we need for this are:\r\n\r\n- [x] Light client types in `consensus/types`. This includes `LightClientBootstrap`, `LightClientUpdate` and all the other types defined [here](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/light-client/sync-protocol.md#containers).\r\n- [x] Ability to construct merkle proofs for the `state.finalized_checkpoint.root`, `state.current_sync_committee` and `state.next_sync_committee`. I think it will be easiest if we pursue a non-generic approach for this initially, as a generic approach would require digging into the guts of [`tree_hash_derive`](https://github.com/sigp/lighthouse/blob/stable/consensus/tree_hash_derive/src/lib.rs) to add methods for generating merkle proofs based on field indices. We probably want that eventually, but a non-generic approach can inform the generic implementation. If we implement this atop `unstable` we probably want to integrate with the [`BeaconTreeHashCache`](https://github.com/sigp/lighthouse/blob/stable/consensus/types/src/beacon_state/tree_hash_cache.rs) so that we don't need to re-hash the whole state for the intermediate nodes of the proof. Alternatively we could implement it without caching and rely on the arrival of [`tree-states`](https://github.com/sigp/lighthouse/pull/3206>) to improve performance (because caching is then built in to each field's `tree_hash_root()` method).\r\n- [ ] Support the new gossip topics defined in the P2P spec: https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/light-client/p2p-interface.md\r\n- [ ] Support the new network RPCs defined in the P2P spec\r\n- [ ] Appropriate caching of light client data in the `BeaconChain` to support fast gossip validation and RPC processing.\r\n- [ ] CLI flags to disable the light client server (should be enabled by default).\r\n- [ ] SSZ tests for the `LightClient*` types we support, see [here](https://github.com/sigp/lighthouse/blob/6d5a2b509fac7b6ffe693866f58ba49989f946d7/testing/ef_tests/tests/tests.rs#L225) and [here](https://github.com/sigp/lighthouse/blob/6d5a2b509fac7b6ffe693866f58ba49989f946d7/testing/ef_tests/check_all_files_accessed.py#L30-L41).",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/3651/reactions",
+    "total_count": 7,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 7,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/3651/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1287542883",
+    "html_url": "https://github.com/sigp/lighthouse/issues/3651#issuecomment-1287542883",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/3651",
+    "id": 1287542883,
+    "node_id": "IC_kwDOCFeAzc5Mvlhj",
+    "user": {
+      "login": "michaelsproul",
+      "id": 4452260,
+      "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/michaelsproul",
+      "html_url": "https://github.com/michaelsproul",
+      "followers_url": "https://api.github.com/users/michaelsproul/followers",
+      "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+      "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+      "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+      "repos_url": "https://api.github.com/users/michaelsproul/repos",
+      "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-10-21T23:56:58Z",
+    "updated_at": "2022-10-21T23:56:58Z",
+    "author_association": "MEMBER",
+    "body": "I think we can start merging PRs for these features roughly in order, starting with the types\r\n\r\ncc @Giulio2002 @pawanjay176",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1287542883/reactions",
+      "total_count": 3,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 2,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

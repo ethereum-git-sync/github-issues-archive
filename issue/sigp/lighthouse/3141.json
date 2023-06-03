@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/3141",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/3141/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/3141/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/3141/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/3141",
+  "id": 1192391729,
+  "node_id": "I_kwDOCFeAzc5HEnQx",
+  "number": 3141,
+  "title": "Validator client unnecessarily trips slashing protection when publishing blocks via fallback",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647284,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODQ=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "default": true,
+      "description": "New feature or request"
+    },
+    {
+      "id": 1245875191,
+      "node_id": "MDU6TGFiZWwxMjQ1ODc1MTkx",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/val-client",
+      "name": "val-client",
+      "color": "9cd6fc",
+      "default": false,
+      "description": "Relates to the validator client binary"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-04-04T22:46:55Z",
+  "updated_at": "2022-05-30T04:13:17Z",
+  "closed_at": "2022-05-30T04:13:17Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nDue to the way the VC produces blocks it will sometimes fail unnecessarily when trying to use a fallback BN.\r\n\r\nIts algorithm currently is:\r\n\r\n* For each BN:\r\n   1. Produce a block\r\n   2. Sign the block and store its root in the slashing protection DB\r\n   3. Publish the block\r\n\r\nAs implemented here: https://github.com/sigp/lighthouse/blob/9bc9527998581deb5fd8674052bb2083b640bbbd/validator_client/src/block_service.rs#L264-L305\r\n\r\nThe problem arises when the first BN fails in step (iii) and then we hit step (ii) on the second BN: it will fail because the signature of the block for the first BN will already have been recorded in the DB.\r\n\r\nTo remedy this I propose a modified algorithm:\r\n\r\n1. Produce a block from the first responsive BN (for each BN: query for a block until one is returned)\r\n2. Sign the selected block\r\n3. Publish the block via the first responsive BN (for each BN: attempt to publish the signed block)\r\n\r\nBy moving the signing out of a multi-BN loop we avoid any attempt to sign >1 distinct blocks for the same slot.\r\n\r\n## Detail\r\n\r\nThe error manifests as:\r\n\r\n```\r\nApr 04 05:55:58.497 CRIT Not signing slashable block             error: InvalidBlock(DoubleBlockProposal(SignedBlock { slot: Slot(2711979), signing_root: SigningRoot(0xab2598a379c247797ccb4209ff848694104eb9525e156d0cb30e25358853d47a) }))\r\nApr 04 05:55:58.497 CRIT Error whilst producing block            message: Irrecoverable(\"All endpoints failed http://localhost:5052/ => RequestFailed(Irrecoverable(\\\"Error from beacon node when publishing block: Reqwest(reqwest::Error { kind: Request, url: Url { scheme: \\\\\\\"http\\\\\\\", cannot_be_a_base: false, username: \\\\\\\"\\\\\\\", password: None, host: Some(Domain(\\\\\\\"localhost\\\\\\\")), port: Some(5052), path: \\\\\\\"/eth/v1/beacon/blocks\\\\\\\", query: None, fragment: None }, source: TimedOut })\\\")), https://prater-syd-bb0.lh-infra.io:5052/ => RequestFailed(Recoverable(\\\"Unable to sign block: Slashable(InvalidBlock(DoubleBlockProposal(SignedBlock { slot: Slot(2711979), signing_root: SigningRoot(0xab2598a379c247797ccb4209ff848694104eb9525e156d0cb30e25358853d47a) })))\\\"))\"), service: block\r\n```\r\n\r\n(primary BN timed out, then slashing protection prevented use of the fallback BN)\r\n\r\n## Version\r\n\r\nLighthouse v2.2.0\r\n",
+  "closed_by": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/3141/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/3141/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

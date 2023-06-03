@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/1897",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/1897/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/1897/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/1897/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/1897",
+  "id": 742135455,
+  "node_id": "MDU6SXNzdWU3NDIxMzU0NTU=",
+  "number": 1897,
+  "title": "Update memory metrics for slasher LMDB",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2490305065,
+      "node_id": "MDU6TGFiZWwyNDkwMzA1MDY1",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/A1",
+      "name": "A1",
+      "color": "223184",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2602136164,
+      "node_id": "MDU6TGFiZWwyNjAyMTM2MTY0",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/slasher",
+      "name": "slasher",
+      "color": "FAD722",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-11-13T04:36:18Z",
+  "updated_at": "2020-12-22T04:39:56Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nLMDB uses a lot of shared memory for caching, causing the resident set size to appear large, even when most of the additional memory can be instantly cleared for use if required. See:\r\n\r\n* https://symas.com/understanding-lmdb-database-file-sizes-and-memory-utilization/\r\n* https://blogs.kolabnow.com/2018/02/13/using-and-abusing-memory-with-lmdb-in-kube\r\n* https://github.com/ledgerwatch/turbo-geth#1-htop-shows-incorrect-memory-usage\r\n\r\n## Present Behaviour\r\n\r\nWe report the size of the whole resident set as the amount of memory that Lighthouse is using (the same as `htop`'s `RES` column).\r\n\r\n## Expected Behaviour\r\n\r\nWe should report the size of the resident set _less_ the **clean** shared memory. As mentioned in the KolabNow link above, the value shown by `pmap -x` for `Dirty` memory is the relevant value. We just need a way of accessing this from Rust (TODO).\r\n\r\nWe shouldn't rush into just reporting `RES - SHARED`, because that's inaccurate, and could mislead users into thinking that Lighthouse's memory usage is lower than it actually is -- leading to confusion when an OOM or other memory issue occurs unexpectedly.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/1897/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/1897/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

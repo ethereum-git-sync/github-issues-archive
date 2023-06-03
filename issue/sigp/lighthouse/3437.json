@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/3437",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/3437/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/3437/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/3437/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/3437",
+  "id": 1332051195,
+  "node_id": "I_kwDOCFeAzc5PZXz7",
+  "number": 3437,
+  "title": "Metrics endpoint does not send back Content-Type http header",
+  "user": {
+    "login": "northwestnodes-eric",
+    "id": 100448003,
+    "node_id": "U_kgDOBfy3Aw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/100448003?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/northwestnodes-eric",
+    "html_url": "https://github.com/northwestnodes-eric",
+    "followers_url": "https://api.github.com/users/northwestnodes-eric/followers",
+    "following_url": "https://api.github.com/users/northwestnodes-eric/following{/other_user}",
+    "gists_url": "https://api.github.com/users/northwestnodes-eric/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/northwestnodes-eric/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/northwestnodes-eric/subscriptions",
+    "organizations_url": "https://api.github.com/users/northwestnodes-eric/orgs",
+    "repos_url": "https://api.github.com/users/northwestnodes-eric/repos",
+    "events_url": "https://api.github.com/users/northwestnodes-eric/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/northwestnodes-eric/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-08-08T15:37:07Z",
+  "updated_at": "2023-03-07T22:09:33Z",
+  "closed_at": "2023-03-07T22:09:33Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nThe Prometheus metrics endpoint does not set a `Content-Type` header when returning metrics. This causes the DataDog Agent (\"DD Agent\") we use to error out. Unfortunately we have no way of forcing the DD Agent to ignore http headers. The Geth metrics endpoint, which does set a `Content-Type` header, works fine.\r\n\r\n## Version\r\n\r\nLatest, cookie cutter binary.\r\n\r\n## Present Behaviour\r\n\r\nError in DD Agent:\r\n```\r\n      Instance ID: (......) [ERROR]\r\n      Configuration Source: file:/etc/datadog-agent/conf.d/prometheus.d/conf.yaml\r\n      Total Runs: 1\r\n      Metric Samples: Last Run: 0, Total: 0\r\n      Events: Last Run: 0, Total: 0\r\n      Service Checks: Last Run: 1, Total: 1\r\n      Average Execution Time : 97ms\r\n      Last Execution Date : 2022-08-08 15:20:23 UTC (1659972023000)\r\n      Last Successful Execution Date : Never\r\n      Error: 'content-type'\r\n      Traceback (most recent call last):\r\n        File \"/opt/datadog-agent/embedded/lib/python3.8/site-packages/datadog_checks/base/checks/base.py\", line 1120, in run\r\n          self.check(instance)\r\n        File \"/opt/datadog-agent/embedded/lib/python3.8/site-packages/datadog_checks/base/checks/prometheus/base_check.py\", line 106, in check\r\n          scraper.process(\r\n        File \"/opt/datadog-agent/embedded/lib/python3.8/site-packages/datadog_checks/base/checks/prometheus/mixins.py\", line 408, in process\r\n          for metric in self.scrape_metrics(endpoint, instance=instance):\r\n        File \"/opt/datadog-agent/embedded/lib/python3.8/site-packages/datadog_checks/base/checks/prometheus/mixins.py\", line 380, in scrape_metrics\r\n          for metric in self.parse_metric_family(response):\r\n        File \"/opt/datadog-agent/embedded/lib/python3.8/site-packages/datadog_checks/base/checks/prometheus/mixins.py\", line 190, in parse_metric_family\r\n          if 'application/vnd.google.protobuf' in response.headers['Content-Type']:\r\n        File \"/opt/datadog-agent/embedded/lib/python3.8/site-packages/requests/structures.py\", line 54, in __getitem__\r\n          return self._store[key.lower()][1]\r\n      KeyError: 'content-type'\r\n```\r\n\r\nNo header set as per `curl` verbose output:\r\n```\r\n:~$ curl -v http://localhost:5054/metrics > lighthouse.txt\r\n*   Trying localhost:5054...\r\n* TCP_NODELAY set\r\n  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\r\n                                 Dload  Upload   Total   Spent    Left  Speed\r\n  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Connected to localhost (...) port 5054 (#0)\r\n> GET /metrics HTTP/1.1\r\n> Host: localhost:5054\r\n> User-Agent: curl/7.68.0\r\n> Accept: */*\r\n>\r\n* Mark bundle as not supporting multiuse\r\n< HTTP/1.1 200 OK\r\n< server: Lighthouse/v2.5.1-df51a73/x86_64-linux\r\n< content-length: 159978\r\n< date: Mon, 08 Aug 2022 15:32:20 GMT\r\n<\r\n{ [65408 bytes data]\r\n100  156k  100  156k    0     0  1679k      0 --:--:-- --:--:-- --:--:-- 1679k\r\n* Connection #0 to host localhost left intact\r\n```\r\n## Expected Behaviour\r\n\r\nThe Metrics endpoint/webserver should set a `Content-Type: text/plain` header and follow decent W3 specs.\r\n\r\n## Steps to resolve\r\n\r\nThe Metrics endpoint/webserver should set a `Content-Type: text/plain` header and follow decent W3 specs.\r\n",
+  "closed_by": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/3437/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/3437/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

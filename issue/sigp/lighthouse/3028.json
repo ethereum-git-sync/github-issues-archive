@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/3028",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/3028/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/3028/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/3028/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/3028",
+  "id": 1140787619,
+  "node_id": "I_kwDOCFeAzc5D_wmj",
+  "number": 3028,
+  "title": "MDBX build failing on Windows 2022",
+  "user": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-02-17T02:15:43Z",
+  "updated_at": "2022-04-05T05:07:37Z",
+  "closed_at": "2022-04-05T05:07:37Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nIt appears there's an issue with `mdbx-sys` building on the new Windows 2022 Github Actions runners:\r\n\r\n```\r\n2022-02-17T00:48:55.9460139Z   C:\\Users\\runneradmin\\.cargo\\registry\\src\\github.com-1ecc6299db9ec823\\mdbx-sys-0.11.4-git.20210105\\libmdbx\\mdbx.c(9214,37): fatal error C1003: error count exceeds 100; stopping compilation [D:\\a\\lighthouse\\lighthouse\\target\\release\\build\\mdbx-sys-010ef5037f9347cb\\out\\build\\mdbx-static.vcxproj]\r\n2022-02-17T00:48:56.0667287Z \r\n2022-02-17T00:48:56.1080669Z   --- stderr\r\n2022-02-17T00:48:56.1286698Z   CMake Warning:\r\n2022-02-17T00:48:56.1288854Z     Manually-specified variables were not used by the project:\r\n2022-02-17T00:48:56.1289438Z \r\n2022-02-17T00:48:56.1560176Z       CMAKE_ASM_FLAGS\r\n2022-02-17T00:48:56.1561099Z       CMAKE_ASM_FLAGS_RELEASE\r\n2022-02-17T00:48:56.1561698Z       CMAKE_CXX_FLAGS\r\n2022-02-17T00:48:56.1912442Z       HAVE_LIBM\r\n2022-02-17T00:48:56.1913604Z \r\n2022-02-17T00:48:56.1919053Z \r\n2022-02-17T00:48:56.2809550Z   thread 'main' panicked at '\r\n2022-02-17T00:48:56.2811039Z   command did not execute successfully, got: exit code: 1\r\n2022-02-17T00:48:56.2811696Z \r\n2022-02-17T00:48:56.3500071Z   build script failed, must exit now', C:\\Users\\runneradmin\\.cargo\\registry\\src\\github.com-1ecc6299db9ec823\\cmake-0.1.48\\src\\lib.rs:975:5\r\n2022-02-17T00:48:56.3502226Z   note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\r\n2022-02-17T00:48:56.3503074Z warning: build failed, waiting for other jobs to finish...\r\n2022-02-17T00:48:59.2129148Z error: build failed\r\n2022-02-17T00:48:59.2238702Z make: *** [Makefile:79: test-release] Error 101\r\n2022-02-17T00:48:59.7070942Z ##[error]Process completed with exit code 1.\r\n2022-02-17T00:48:59.7389136Z Cleaning up orphan processes\r\n2022-02-17T00:48:59.7722152Z Terminate orphan process: pid (8700) (vctip)\r\n2022-02-17T00:48:59.7789078Z Terminate orphan process: pid (7476) (MSBuild)\r\n2022-02-17T00:48:59.7887237Z Terminate orphan process: pid (1572) (conhost)\r\n```\r\n[Direct link to logs](https://pipelines.actions.githubusercontent.com/ta376tdv0cLYSOUq7jCJNcRBHS1OVdvR9JKrO66xZcdDEfG50x/_apis/pipelines/1/runs/11351/signedlogcontent/48?urlExpires=2022-02-17T01%3A54%3A57.6380625Z&urlSigningMethod=HMACV1&urlSignature=mvj0%2BKTgkOWqimfw94wb5Vl21uNYX%2BLGBL3tr0YUBrU%3D) <-- I assume github will purge this at some point.\r\n\r\nOver in #3024 I'm going to revert the runner back to Windows 2019. We should come back and ensure compat with Windows 2022, though.\r\n\r\n## Solutions\r\n\r\nIt *might* be related to this: https://github.com/erthink/libmdbx/issues/265\r\n\r\nI notice that the Rust [`mdbx-sys`](https://github.com/vorot93/libmdbx-rs/tree/master/mdbx-sys/libmdbx) is a few versions behind the main [libmdbx](https://github.com/erthink/libmdbx) repo. Perhaps catching up to the latest version would help.",
+  "closed_by": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/3028/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/3028/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

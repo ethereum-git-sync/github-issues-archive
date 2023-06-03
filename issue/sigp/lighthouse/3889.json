@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/3889",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/3889/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/3889/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/3889/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/3889",
+  "id": 1534423977,
+  "node_id": "I_kwDOCFeAzc5bdXOp",
+  "number": 3889,
+  "title": "Per-BN attestation performance tracking",
+  "user": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647284,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODQ=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "default": true,
+      "description": "New feature or request"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-01-16T07:18:00Z",
+  "updated_at": "2023-01-16T07:19:58Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nI'd like to have a metric on the BN which can tell the user: *for each attestation created by this node, how many hit the head/target/source and how many missed.* I think this would be useful for comparing attestation performance between BNs running on different hardware/providers/etc.\r\n\r\nInitially, this seems like something the validator monitor does already. However, when using fallback BNs, it's not clear that just because a BN is monitoring a validator that it's actually producing the attestations for that validator.\r\n\r\nI think we could add something to the validator monitor along these lines:\r\n\r\n- To the [`ValidatorMonitor`](https://github.com/sigp/lighthouse/blob/stable/beacon_node/beacon_chain/src/validator_monitor.rs), add a `set: HashSet<AttestationData>`.\r\n- Add six new [validator monitor metrics](https://github.com/sigp/lighthouse/blob/38514c07f222ff7783834c48cf5c0a6ee7f346d0/beacon_node/beacon_chain/src/metrics.rs#L484-L815) like:\r\n   - Gauge: `validator_monitor_local_attestation_head_hit` (and `_miss`)\r\n   - Gauge: `validator_monitor_local_attestation_target_hit` (and `_miss`)\r\n   - Gauge: `validator_monitor_local_attestation_source_hit` (and `_miss`)\r\n- When the BN [produces an attestation](https://github.com/sigp/lighthouse/blob/38514c07f222ff7783834c48cf5c0a6ee7f346d0/beacon_node/beacon_chain/src/beacon_chain.rs#L1475-L1691), we do `set.insert(attestation.data)`.\r\n- Every epoch, six seconds after the start of the first slot (six seconds is an arbitrary time where we shouldn't be busy doing important things), call a new function on the `ValidatorMonitor` where we get the head state ([`let head_state = beacon_chain.head_snapshot().beacon_state`](https://github.com/sigp/lighthouse/blob/38514c07f222ff7783834c48cf5c0a6ee7f346d0/beacon_node/beacon_chain/src/canonical_head.rs#L436-L441)).\r\n- In the new function, with the `head_state`, iterate the `set` and remove all attestations which were from the penultimate epoch of the state.\r\n   - I'm using the penultimate here because I think it gives a decent-enough guarantee that the chain is deep enough that a re-org isn't going to invalidate these metrics.\r\n- From the list of removed attestations, use `head_state.block_roots` to see if the attestation head/target/source roots are present in the chain of the head block. Update the hit/miss metrics accordingly.\r\n\r\nI've done my best to think this through, however it's likely that I've overlooked something or made a mistake here. Apologies if I have.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/3889/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/3889/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/3772",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/3772/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/3772/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/3772/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/3772",
+  "id": 1473635991,
+  "node_id": "I_kwDOCFeAzc5X1eaX",
+  "number": 3772,
+  "title": "Reconsider peer penalties for `BlockIsAlreadyKnown`",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647284,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODQ=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "default": true,
+      "description": "New feature or request"
+    },
+    {
+      "id": 2336800125,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMTI1",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/t%20Networking",
+      "name": "t Networking",
+      "color": "40E0D0",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-12-03T01:11:21Z",
+  "updated_at": "2022-12-31T13:24:39Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWhile looking at some Gnosis chain logs I noticed that we were penalising peers for `BlockIsAlreadyKnown` errors. This seems to occur if we fetch a block from RPC, then get it on gossip and fail the duplicate check, e.g.\r\n\r\n> Dec 02 08:33:31.078 INFO New RPC block received, hash: 0x976c…5166, slot: 6195334, module: network::beacon_processor::worker::sync_methods:95\r\nDec 02 08:33:31.098 DEBG Rejected gossip block, slot: 6195334, graffiti: Lighthouse:v3.3.0, error: BlockIsAlreadyKnown, service: beacon, module: beacon_chain::beacon_chain:2464\r\nDec 02 08:33:31.098 DEBG Could not verify block for gossip, ignoring the block, error: BlockIsAlreadyKnown, module: network::beacon_processor::worker::gossip_methods:796\r\nDec 02 08:33:31.098 DEBG Peer score adjusted, score: -0.99, peer_id: 16Uiu2HAm1dAXPtpFRVWd9fajwujcjJzMD8RtUH8HmpxFPv4LgtEc, msg: gossip_block_high, service: libp2p, module: lighthouse_network::peer_manager::peerdb:537\r\n\r\n## Version\r\n\r\nLighthouse v3.3.0\r\n\r\n## Present Behaviour\r\n\r\nWe apply a high-tolerance penalty here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/bf533c8e42cc73c35730e285c21df8add0195369/beacon_node/network/src/beacon_processor/worker/gossip_methods.rs#L793-L803\r\n\r\nI guess we expect most blocks _not_ to arrive via RPC, but it seems to happen quite often on Gnosis chain with the short block time and many late blocks. For blocks arriving on gossip the gossip duplicate filter should catch duplicates before processing is attempted.\r\n\r\n## Expected Behaviour\r\n\r\nOne option would be to remove the penalty and assume that the gossip duplicate filter will catch the vast majority of true duplicates sent by peers. I'm not well-versed enough in our gossip/networking code to understand whether this would come with any downsides. I'll let someone else weigh in on that.\r\n\r\nAnother option would be to adjust the gossip check so that we do not penalise gossip blocks if they race with RPC blocks.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/3772/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/3772/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1368215178",
+    "html_url": "https://github.com/sigp/lighthouse/issues/3772#issuecomment-1368215178",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/3772",
+    "id": 1368215178,
+    "node_id": "IC_kwDOCFeAzc5RjU6K",
+    "user": {
+      "login": "djbakerman",
+      "id": 2192654,
+      "node_id": "MDQ6VXNlcjIxOTI2NTQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2192654?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/djbakerman",
+      "html_url": "https://github.com/djbakerman",
+      "followers_url": "https://api.github.com/users/djbakerman/followers",
+      "following_url": "https://api.github.com/users/djbakerman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/djbakerman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/djbakerman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/djbakerman/subscriptions",
+      "organizations_url": "https://api.github.com/users/djbakerman/orgs",
+      "repos_url": "https://api.github.com/users/djbakerman/repos",
+      "events_url": "https://api.github.com/users/djbakerman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/djbakerman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-12-31T13:22:19Z",
+    "updated_at": "2022-12-31T13:24:39Z",
+    "author_association": "NONE",
+    "body": "I am seeing this on mainnet as well.\r\n\r\nDec 30 09:32:44.524 DEBG Could not verify block for gossip, ignoring the block, error: WouldRevertFinalizedSlot { block_slot: Slot(5463966), finalized_slot: Slot(5463968) }, module: network::beacon_processor::worker::gossip_methods:796\r\nDec 30 09:32:44.527 DEBG Could not verify block for gossip, ignoring the block, error: WouldRevertFinalizedSlot { block_slot: Slot(5463965), finalized_slot: Slot(5463968) }, module: network::beacon_processor::worker::gossip_methods:796\r\nDec 30 09:32:46.659 DEBG Could not verify block for gossip, ignoring the block, error: BlockIsAlreadyKnown, module: network::beacon_processor::worker::gossip_methods:796\r\nDec 30 09:32:46.666 DEBG Could not verify block for gossip, ignoring the block, error: BlockIsAlreadyKnown, module: network::beacon_processor::worker::gossip_methods:796\r\nDec 30 09:32:48.062 DEBG Could not verify block for gossip, ignoring the block, error: BlockIsAlreadyKnown, module: network::beacon_processor::worker::gossip_methods:796\r\n**repeats**\r\n\r\nMy host has 3 validators, so one of the validators would attest slot 5463965 instead of 5463966\r\n\r\nDiscord: djbakerman#7065",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1368215178/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

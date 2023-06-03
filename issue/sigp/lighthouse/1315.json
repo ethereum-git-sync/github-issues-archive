@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/1315",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/1315/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/1315/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/1315/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/1315",
+  "id": 647411130,
+  "node_id": "MDU6SXNzdWU2NDc0MTExMzA=",
+  "number": 1315,
+  "title": "VC produces attestation with invalid Target",
+  "user": {
+    "login": "djrtwo",
+    "id": 1433595,
+    "node_id": "MDQ6VXNlcjE0MzM1OTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1433595?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/djrtwo",
+    "html_url": "https://github.com/djrtwo",
+    "followers_url": "https://api.github.com/users/djrtwo/followers",
+    "following_url": "https://api.github.com/users/djrtwo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/djrtwo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/djrtwo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/djrtwo/subscriptions",
+    "organizations_url": "https://api.github.com/users/djrtwo/orgs",
+    "repos_url": "https://api.github.com/users/djrtwo/repos",
+    "events_url": "https://api.github.com/users/djrtwo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/djrtwo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-06-29T14:11:24Z",
+  "updated_at": "2020-07-01T02:45:35Z",
+  "closed_at": "2020-07-01T02:45:35Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nIn some cases VC is producing attestations that BN sees as invalid due to incorrect target\r\n\r\n## Version\r\n\r\nRunning https://github.com/protolambda/lighthouse/ `proto-altona` branch that enabled secio prior to Altona launch. Not expecting the changes made by proto to be the cause here\r\n\r\n## Present Behaviour\r\n\r\nVC produced a few attestations that BN rejected due to invalid Target. This happened at slot 64 and 192. Both happened to be for a skip slot right at an epoch boundary.\r\n\r\n### BN log\r\n@ slot 64 there was also a block rejected from BN for invalid sig:\r\n```\r\nJun 29 12:42:56.385 DEBG Rejected gossip block                   slot: 64, graffiti: @protolambda Prysm^@^@^@^@^@^@^@^@^@^@^@^@^@^@, error: ProposalSignatureInvalid, service: beacon\r\nJun 29 12:42:56.386 WARN Could not verify block for gossip       error: ProposalSignatureInvalid, service: router\r\nJun 29 12:42:56.498 DEBG No new eth1 blocks imported             cached_blocks: 4096, latest_block: 2957623, service: beacon\r\nJun 29 12:42:56.499 TRCE Updated eth1 block cache                head_block: 2957623, blocks_imported: 0, cached_blocks: 4096, service: beacon\r\nJun 29 12:42:57.001 DEBG HTTP API request successful             duration_ms: 0, path: /validator/attestation, service: http\r\nJun 29 12:42:57.006 DEBG Attestation processing cache miss       target_block_epoch: 1, attn_epoch: 2, service: beacon\r\nJun 29 12:42:57.012 DEBG No new deposits found                   total_deposits: 1440, latest_block: 2957562, service: beacon\r\nJun 29 12:42:57.012 TRCE Updated eth1 deposit cache              last_processed_eth1_block: 2957624, logs_imported: 0, cached_deposits: 1440, service: beacon\r\nJun 29 12:42:57.012 DEBG Updated eth1 cache                      deposits: DepositCacheUpdateOutcome { logs_imported: 0 }, blocks: BlockCacheUpdateOutcome { blocks_imported: 0, head_block_number: Some(2957623) }, retry_millis: 7000, service: beacon\r\nJun 29 12:42:57.151 ERRO Local attestation invalid for fork choice, slot: 64, index: 0, source: 0, target: 2, reason: InvalidTarget { attestation: 0x04e951bd1a58c7f52e26a07b475b7e59bac3f3d80f2c0baac2748545c7886f80, local: 0x896089ef7911f0967b52f200e3e5e2a797ce80974624878c8f2320d6088e475d }, detail: unaggregated attestation 0 was unable to be added to fork choice, service: http\r\n```\r\n\r\n### VC log\r\n\r\n@ slot 64\r\n```\r\nJun 29 12:42:35.003 INFO All validators active                   slot: 62, epoch: 1, total_validators: 15, active_validators: 15, proposers: 0, service: notifier\r\nJun 29 12:42:45.017 INFO Successfully published attestations     type: unaggregated, slot: 63, committee_index: 0, head_block: 0x04e951bd1a58c7f52e26a07b475b7e59bac3f3d80f2c0baac2748545c7886f80, count: 1, service: attestation\r\nJun 29 12:42:47.001 INFO All validators active                   slot: 63, epoch: 1, total_validators: 15, active_validators: 15, proposers: 0, service: notifier\r\nJun 29 12:42:49.024 INFO Successfully published attestations     type: aggregated, slot: 63, committee_index: 0, head_block: 0x04e951bd1a58c7f52e26a07b475b7e59bac3f3d80f2c0baac2748545c7886f80, signatures: 16, service: attestation\r\nJun 29 12:42:57.153 CRIT Published attestation was invalid       type: unaggregated, slot: 64, committee_index: 0, message: Invalid local attestation. Error: InvalidTarget { attestation: 0x04e951bd1a58c7f52e26a07b475b7e59bac3f3d80f2c0baac2748545c7886f80, local: 0x896089ef7911f0967b52f200e3e5e2a797ce80974624878c8f2320d6088e475d } Detail: unaggregated attestation 0 was unable to be added to fork choice, service: attestation\r\nJun 29 12:42:59.006 INFO All validators active                   slot: 64, epoch: 2, total_validators: 15, active_validators: 15, proposers: 2, service: notifier\r\nJun 29 12:43:01.031 CRIT Published attestation was invalid       type: aggregated, slot: 64, committee_index: 0, message: Invalid local attestation. Error: InvalidTarget { attestation: 0x04e951bd1a58c7f52e26a07b475b7e59bac3f3d80f2c0baac2748545c7886f80, local: 0x896089ef7911f0967b52f200e3e5e2a797ce80974624878c8f2320d6088e475d } Detail: aggregated attestation 0 was unable to be added to fork choice, service: attestation\r\n```\r\n\r\n\r\n## Expected Behaviour\r\n\r\nVC and BN should live in harmony.\r\n\r\nAlso, even if target is incorrect but the source is correct, the BN should probably be more forgiving and propagate because the attestation can be included on chain for some amount of reward (or less penalty).\r\n\r\n## Steps to resolve\r\n\r\n\r\n",
+  "closed_by": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/1315/reactions",
+    "total_count": 2,
+    "+1": 2,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/1315/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
