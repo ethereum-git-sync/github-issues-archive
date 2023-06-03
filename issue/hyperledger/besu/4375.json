@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/4375",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/4375/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/4375/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/4375/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/4375",
+  "id": 1367459005,
+  "node_id": "I_kwDODE2jmc5RgcS9",
+  "number": 4375,
+  "title": "P2P DNS/TCP Burst Issue on Mainnet and Goerli with Docker",
+  "user": {
+    "login": "siladu",
+    "id": 2893793,
+    "node_id": "MDQ6VXNlcjI4OTM3OTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2893793?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/siladu",
+    "html_url": "https://github.com/siladu",
+    "followers_url": "https://api.github.com/users/siladu/followers",
+    "following_url": "https://api.github.com/users/siladu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/siladu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/siladu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/siladu/subscriptions",
+    "organizations_url": "https://api.github.com/users/siladu/orgs",
+    "repos_url": "https://api.github.com/users/siladu/repos",
+    "events_url": "https://api.github.com/users/siladu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/siladu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2152224197,
+      "node_id": "MDU6TGFiZWwyMTUyMjI0MTk3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamRevenant",
+      "name": "TeamRevenant",
+      "color": "78e298",
+      "default": false,
+      "description": "GH issues worked on by Revenant Team"
+    },
+    {
+      "id": 3013559202,
+      "node_id": "MDU6TGFiZWwzMDEzNTU5MjAy",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/mainnet",
+      "name": "mainnet",
+      "color": "9D578C",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 3805591260,
+      "node_id": "LA_kwDODE2jmc7i1Lbc",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/peering",
+      "name": "peering",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-09-09T08:14:24Z",
+  "updated_at": "2023-01-26T12:55:11Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Report from Discord user KuDeTa: https://discord.com/channels/905194001349627914/1014169639258964081/1016969914805927987\r\n\r\n> Neither Goerli nor mainnet will sync reliably for me\r\n> Geth, erigon, prysm, teku all running perfectly well in the same stack.\r\n\r\n> If i delete the whole database, it does OK for a little while then drops\r\n> I see these DNS resolver messages sometimes too:\r\n```\r\n2022-09-07 07:24:36.608+00:00 | \r\nTimer-0 | WARN  | DNSResolver | I/O exception contacting remote DNS server when resolving OSBNAM4I3ZWCOLC4QLPNVYK4C4.all.mainnet.ethdisco.net\r\njava.io.IOException: Timed out while trying to resolve OSBNAM4I3ZWCOLC4QLPNVYK4C4.all.mainnet.ethdisco.net./TXT, id=4930\r\n    at org.xbill.DNS.Resolver.send(Resolver.java:170)\r\n```\r\n\r\n> I saw someone else post that their pi hole (DNS server) was seeing thousands of DNS requests a second, mine is too. I was kind of wondering if there is an issue with docker and the volume of DNS traffic.\r\n> I haven't checked exactly what is going on with my router (Unifi gear), but this looks like it is actually ddosing my network stack\r\n> All i can say right now is that every time i start this, it seems to break my DNS server (pi hole) and bring my router to it's knees.\r\n\r\n<img width=\"1308\" alt=\"Screenshot_2022-09-07_at_08 26 08\" src=\"https://user-images.githubusercontent.com/2893793/189302657-94ebbad9-bd38-45f9-b3b5-ffbfd062afb7.png\">\r\n<img width=\"1381\" alt=\"Screenshot_2022-09-07_at_08 35 37\" src=\"https://user-images.githubusercontent.com/2893793/189302671-3ddca403-fb90-4051-83b0-d2f78f43e0ab.png\">\r\n\r\n...and it's only besu that has DNS bursts like this?\r\n> It's certainly only besu that seems to burst so hard and then complain it can't find peers \r\n> But my pi.hole is set to allow 2000/min and even that is being hit.\r\n> And my router is a UXG-PRO - prosumer (commercial) grade.\r\n> But clearly this isn't a widespread issue, so could docker be the real problem somewhere here? I will try that Xdns stuff and try > bypassing the local dns server to see if either improve it\r\n\r\n> Neither Xdns or getting rid of the local DNS server helped. Router continues to buckle under the weight of traffic as soon as the service is started - it needs some proper investigation. \r\n```\r\nSep  7 11:32:14 UXGPro user.info ubios-udapi-server: wan-failover-interfaces: wf-interface-ppp0 (my ip\r\n) is down [_DD___](no dns)\r\n```\r\n\r\n> It looks like that TCP_tw traffic is the issue\r\n> I'm at the limit of my understand right there, but no other node software causes that kind of burst\r\n\r\n<img width=\"931\" alt=\"Screenshot_2022-09-07_at_13 22 16\" src=\"https://user-images.githubusercontent.com/2893793/189303333-b09e6c1d-bb21-48ec-a0f6-2fee833eff40.png\">\r\n\r\n```\r\nTotal: 355\r\nTCP:   1264 (estab 6, closed 1221, orphaned 18, timewait 599)\r\n\r\nTransport Total     IP        IPv6\r\nRAW      1         0         1\r\nUDP      35        28        7\r\nTCP      43        31        12\r\nINET      79        59        20\r\nFRAG      0         0         0\r\n```\r\n> (on starting besu)\r\n   \r\n> Some debug logs attached \r\n\r\n[mainnet-debug-logs.txt](https://github.com/hyperledger/besu/files/9533606/mainnet-debug-logs.txt)\r\n\r\n\r\n> A lot of these logs which may be related?   \r\n```\r\n2022-09-08 16:17:29.203+00:00 | nioEventLoopGroup-3-1 | DEBUG | AbstractPeerConnection | Terminating connection 1376930571, reason 0x01 TCP_SUBSYSTEM_ERROR\r\n2022-09-08 16:17:29.203+00:00 | nioEventLoopGroup-3-1 | DEBUG | AbstractPeerConnection | Terminating connection 1376930571, reason 0x10 SUBPROTOCOL_TRIGGERED\r\n```\r\n> and\r\n```\r\n2022-09-08 16:19:50.730+00:00 | nioEventLoopGroup-3-3 | DEBUG | AbstractHandshakeHandler | Handshake error:\r\njava.io.IOException: Connection reset by peer\r\n    at java.base/sun.nio.ch.FileDispatcherImpl.read0(Native Method)\r\n    at java.base/sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:39)\r\n    at java.base/sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:276)\r\n    at java.base/sun.nio.ch.IOUtil.read(IOUtil.java:233)\r\n    at java.base/sun.nio.ch.IOUtil.read(IOUtil.java:223)\r\n    at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:356)\r\n    at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:258)\r\n    at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)\r\n    at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:357)\r\n    at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:151)\r\n    at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:722)\r\n    at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:658)\r\n    at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:584)\r\n    at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:496)\r\n    at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)\r\n    at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)\r\n    at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n    at java.base/java.lang.Thread.run(Thread.java:829)\r\n```\r\n\r\n** **UPGRADED TO 22.7.2** **\r\n\r\n> OK, testing this identical config on goerli, using a completely separate box, but also using docker within the same networking stack: results are identical to mainnet: Massive TCP spike. Router keels over, no peers, etc.\r\n\r\n[besugoerli.txt](https://github.com/hyperledger/besu/files/9533635/besugoerli.txt)\r\n(besu mainnet log file size too big for github, see: https://discord.com/channels/905194001349627914/1014169639258964081/1017548263852888195)\r\n\r\n> And if you want some flavour of what i go through every time i start besu, here is a good screenshot :S\r\n<img width=\"1296\" alt=\"Screenshot_2022-09-08_at_22 36 30\" src=\"https://user-images.githubusercontent.com/2893793/189305263-749d957f-f2eb-4bea-88e0-8bb2a39af599.png\">\r\n\r\n\r\nIs your router acting as your DNS provider? Maybe you could change that to something else if the router is struggling?\r\n> I've tried turning off my pi.hole, it made no difference\r\n> Whatever is going on here, it seems like it should be escalated as much as you can - i've never come across a piece of software that can bork an entire network.\r\n> I don't think i can blame the UXG-PRO (https://store.ui.com/products/unifi-next-generation-gateway-professional) - it should be capable of handling hundreds of concurrent users and many servers - but i'm happy to try and help isolate the cause of this. I guess docker is the prime suspect atm.\r\n\r\ndid you try lowering the max-peers? \r\n> Yeah i went back down to defaults at various points.\r\n\r\n\r\n### Hardware\r\nhexacore (12 thread) NUC (i7-FNH):\r\n   \r\n<img width=\"555\" alt=\"Screenshot_2022-09-08_at_22 00 02\" src=\"https://user-images.githubusercontent.com/2893793/189303707-f0a5f662-60dc-4c40-ad6b-95a979a05c4c.png\">\r\n> No noticeable blips from node exporter at any of the times i've started besu\r\n\r\n    \r\n### Docker configuration\r\n\r\nmainnet\r\n```\r\nservices:\r\n  el-besu:\r\n    stdin_open: true\r\n    tty: true\r\n    container_name: el-besu\r\n    image: hyperledger/besu:latest\r\n    volumes:\r\n      - /archive/el-besu:/var/lib/besu\r\n      - /home/ethereum/secrets:/secrets\r\n    restart: unless-stopped\r\n    ports: # add 8545:8545 for RPC\r\n      - \"50303:50303\"\r\n      - \"50303:50303/udp\"\r\n    networks:\r\n      - ethereum\r\n    command: >\r\n      --data-path=/var/lib/besu\r\n      --rpc-http-enabled\r\n      --rpc-http-api=\"WEB3,ETH,NET\"\r\n      --rpc-http-host=\"0.0.0.0\"\r\n      --rpc-http-port=8545\r\n      --rpc-http-cors-origins=*\r\n      --rpc-http-max-active-connections=65536\r\n      --rpc-ws-enabled\r\n      --rpc-ws-api=\"WEB3,ETH,NET,ADMIN\"\r\n      --rpc-ws-host=\"0.0.0.0\"\r\n      --rpc-ws-port=8546\r\n      --p2p-port=50303\r\n      --max-peers=40\r\n      --fast-sync-min-peers=5\r\n      --host-allowlist=*\r\n      --engine-host-allowlist=*\r\n      --engine-jwt-secret=/secrets/jwt\r\n      --engine-rpc-port=8551\r\n      --data-storage-format=BONSAI\r\n      --sync-mode=X_SNAP\r\n      --nat-method=DOCKER\r\n      --p2p-host=<myip>\r\n      --p2p-interface=0.0.0.0\r\n    stop_grace_period: 10m\r\n```\r\n\r\n```\r\n#testnet config\r\nversion: \"3.5\"\r\n\r\nservices:\r\n  el-besu:\r\n    stdin_open: true\r\n    tty: true\r\n    container_name: el-besu\r\n    image: hyperledger/besu:latest\r\n    volumes:\r\n      - /home/el-besu:/var/lib/besu\r\n      - /home/ethereum/secrets:/secrets\r\n    restart: unless-stopped\r\n    ports: # add 8545:8545 for RPC\r\n      - \"50304:50304\"\r\n      - \"50304:50304/udp\"\r\n    networks:\r\n      - ethereum\r\n    command: >\r\n      --network=goerli\r\n      --data-path=/var/lib/besu\r\n      --rpc-http-enabled\r\n      --rpc-http-api=\"WEB3,ETH,NET,ADMIN\"\r\n      --rpc-http-host=\"0.0.0.0\"\r\n      --rpc-http-port=8545\r\n      --rpc-http-cors-origins=*\r\n      --rpc-ws-enabled\r\n      --rpc-ws-api=\"WEB3,ETH,NET,ADMIN\"\r\n      --rpc-ws-host=\"0.0.0.0\"\r\n      --rpc-ws-port=8546\r\n      --p2p-port=50304\r\n      --max-peers=40\r\n      --fast-sync-min-peers=5\r\n      --host-allowlist=*\r\n      --engine-host-allowlist=*\r\n      --engine-jwt-secret=/secrets/jwt\r\n      --engine-rpc-port=8551\r\n      --data-storage-format=BONSAI\r\n      --sync-mode=X_SNAP\r\n      --logging=DEBUG\r\n      --nat-method=DOCKER\r\n      --p2p-host=<ip>\r\n      --p2p-interface=0.0.0.0\r\n      --Xdns-enabled=true\r\n    stop_grace_period: 10m\r\n\r\nnetworks:\r\n  ethereum:\r\n    name: ethereum\r\n    driver: bridge\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/4375/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/4375/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1404965838",
+    "html_url": "https://github.com/hyperledger/besu/issues/4375#issuecomment-1404965838",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/4375",
+    "id": 1404965838,
+    "node_id": "IC_kwDODE2jmc5TvhPO",
+    "user": {
+      "login": "non-fungible-nelson",
+      "id": 85905982,
+      "node_id": "MDQ6VXNlcjg1OTA1OTgy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/85905982?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/non-fungible-nelson",
+      "html_url": "https://github.com/non-fungible-nelson",
+      "followers_url": "https://api.github.com/users/non-fungible-nelson/followers",
+      "following_url": "https://api.github.com/users/non-fungible-nelson/following{/other_user}",
+      "gists_url": "https://api.github.com/users/non-fungible-nelson/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/non-fungible-nelson/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/non-fungible-nelson/subscriptions",
+      "organizations_url": "https://api.github.com/users/non-fungible-nelson/orgs",
+      "repos_url": "https://api.github.com/users/non-fungible-nelson/repos",
+      "events_url": "https://api.github.com/users/non-fungible-nelson/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/non-fungible-nelson/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-01-26T12:55:11Z",
+    "updated_at": "2023-01-26T12:55:11Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Any status? ",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1404965838/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

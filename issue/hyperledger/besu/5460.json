@@ -1,0 +1,164 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5460",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5460/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5460/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5460/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5460",
+  "id": 1711108459,
+  "node_id": "I_kwDODE2jmc5l_XFr",
+  "number": 5460,
+  "title": "Incorrectly marking bad blocks halts chain",
+  "user": {
+    "login": "siladu",
+    "id": 2893793,
+    "node_id": "MDQ6VXNlcjI4OTM3OTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2893793?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/siladu",
+    "html_url": "https://github.com/siladu",
+    "followers_url": "https://api.github.com/users/siladu/followers",
+    "following_url": "https://api.github.com/users/siladu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/siladu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/siladu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/siladu/subscriptions",
+    "organizations_url": "https://api.github.com/users/siladu/orgs",
+    "repos_url": "https://api.github.com/users/siladu/repos",
+    "events_url": "https://api.github.com/users/siladu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/siladu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362496,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDk2",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "default": true,
+      "description": "New feature or request"
+    },
+    {
+      "id": 1921587647,
+      "node_id": "MDU6TGFiZWwxOTIxNTg3NjQ3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamGroot",
+      "name": "TeamGroot",
+      "color": "1d76db",
+      "default": false,
+      "description": "GH issues worked on by Groot Team"
+    },
+    {
+      "id": 2051683573,
+      "node_id": "MDU6TGFiZWwyMDUxNjgzNTcz",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/P3",
+      "name": "P3",
+      "color": "ffff00",
+      "default": false,
+      "description": "Medium (ex: JSON-RPC request not working with a specific client library due to loose spec assumtion)"
+    },
+    {
+      "id": 2152224197,
+      "node_id": "MDU6TGFiZWwyMTUyMjI0MTk3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamRevenant",
+      "name": "TeamRevenant",
+      "color": "78e298",
+      "default": false,
+      "description": "GH issues worked on by Revenant Team"
+    },
+    {
+      "id": 3013559202,
+      "node_id": "MDU6TGFiZWwzMDEzNTU5MjAy",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/mainnet",
+      "name": "mainnet",
+      "color": "9D578C",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4328706977,
+      "node_id": "LA_kwDODE2jmc8AAAABAgLToQ",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamChupa",
+      "name": "TeamChupa",
+      "color": "fbca04",
+      "default": false,
+      "description": "GH issues worked on by Chupacabara Team"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-05-16T02:26:43Z",
+  "updated_at": "2023-05-25T22:25:23Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**Problem**: If Besu puts an INVALID block in the bad block cache and that block is subsequently valid, then we can only recover with a manual restart.\r\n\r\nSome reasons that Besu might 'incorrectly' mark blocks as INVALID:\r\n- unhandled internal error during block import (e.g. RocksDB error) \r\n  - These have previously been mitigated with https://github.com/hyperledger/besu/blob/c85841d308f9d4bc37b6d3a0f61737a3f4b18c35/ethereum/core/src/main/java/org/hyperledger/besu/ethereum/chain/BadBlockManager.java#L93C19-L99 but it relies on knowing the possible errors ahead of time\r\n- CL has a bug and temporarily sends a bad block\r\n  - Best case the problem might be transient or the fix might be to restart CL, but then you also have to restart besu as well to clear the bad block cache.\r\n\r\nThere are other scenarios where besu marks blocks as INVALID such as when backwards syncing that probably should continue to do that so we don't end up with besu on a fork.\r\n\r\n**Potential Solutions**:\r\n1. Maintain both an \"operational\" and an \"archive\" bad block cache. Always add to the \"archive\", maybe don't add to the \"operational\" (this might be useful even alongside the other options).\r\n2. Have the cache expire after some time or after repeated hits (converse of (3)).\r\n3. Use a circuit breaker approach where we only add it to the bad block cache if we get the same bad block after X retries (converse of (2)).\r\n4. Extreme version of (1) where we only maintain an \"archive\", no \"operational\" cache and so always re-process bad blocks - this is the most lenient approach.\r\n\r\n(2) is what geth do: https://github.com/ethereum/go-ethereum/blob/73697529994e14996b7740730481e926d5ec3e40/eth/catalyst/api.go#L105-L109\r\n\r\nGeth's response about how they handle it https://discord.com/channels/595666850260713488/892088344438255616/1078206539548078122:\r\n> Seems I was somewhat wrong about that. In the 'core' blockchain, we do have badblocks-tagging, and we do store it to disk, but never ever consult it ourselves during processing. So I was right about that. However, the beacon API module has it's own cache for bad blocks, to avoid re-validating already known 'bad' blocks, and I didn't know about that. The cache is pretty small, though, and apparently the idea was to actually sometimes revalidate them anyway and not be too strict about it. \r\n\r\n> The reasoning behind not caching bad blocks would be just what happened here: a (temporary) situation occurs, which marks a good block as bad. Later, after the situation has been resolved, the reputation of certain blocks lingers, and causes long-term problems / longer splits than necessary.\r\n\r\nRelated to:\r\n- https://github.com/hyperledger/besu/issues/5094#issuecomment-1430834216\r\n- https://github.com/hyperledger/besu/issues/5153\r\n\r\nOriginal discussion here: https://discord.com/channels/905194001349627914/905205502940696607/1077867357487243315\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5460/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5460/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1563583424",
+    "html_url": "https://github.com/hyperledger/besu/issues/5460#issuecomment-1563583424",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/5460",
+    "id": 1563583424,
+    "node_id": "IC_kwDODE2jmc5dMmPA",
+    "user": {
+      "login": "non-fungible-nelson",
+      "id": 85905982,
+      "node_id": "MDQ6VXNlcjg1OTA1OTgy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/85905982?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/non-fungible-nelson",
+      "html_url": "https://github.com/non-fungible-nelson",
+      "followers_url": "https://api.github.com/users/non-fungible-nelson/followers",
+      "following_url": "https://api.github.com/users/non-fungible-nelson/following{/other_user}",
+      "gists_url": "https://api.github.com/users/non-fungible-nelson/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/non-fungible-nelson/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/non-fungible-nelson/subscriptions",
+      "organizations_url": "https://api.github.com/users/non-fungible-nelson/orgs",
+      "repos_url": "https://api.github.com/users/non-fungible-nelson/repos",
+      "events_url": "https://api.github.com/users/non-fungible-nelson/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/non-fungible-nelson/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-05-25T22:23:39Z",
+    "updated_at": "2023-05-25T22:23:39Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "expire with persistence on disk ",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1563583424/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

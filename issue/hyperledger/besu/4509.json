@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/4509",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/4509/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/4509/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/4509/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/4509",
+  "id": 1403055081,
+  "node_id": "I_kwDODE2jmc5ToOvp",
+  "number": 4509,
+  "title": "Node tries to connect with itself and loses connection to validator node",
+  "user": {
+    "login": "lunoon",
+    "id": 19373692,
+    "node_id": "MDQ6VXNlcjE5MzczNjky",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19373692?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lunoon",
+    "html_url": "https://github.com/lunoon",
+    "followers_url": "https://api.github.com/users/lunoon/followers",
+    "following_url": "https://api.github.com/users/lunoon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lunoon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lunoon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lunoon/subscriptions",
+    "organizations_url": "https://api.github.com/users/lunoon/orgs",
+    "repos_url": "https://api.github.com/users/lunoon/repos",
+    "events_url": "https://api.github.com/users/lunoon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lunoon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-10-10T11:56:59Z",
+  "updated_at": "2022-10-10T12:04:36Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nWhen referencing own enode url as bootnodes and static-nodes, new connections will be established and halt the network as nodes lose connection and attempt to reconnect to the validator node.\r\n\r\n### Acceptance Criteria\r\nA node shouldn't attempt to connect with itself when referenced as static node or boot node\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Create network with IBFT2, 1 validator node and 1 non-validator node\r\n2. Use as bootnodes and static-nodes both enode urls\r\n3. Create other non-validator nodes but keep it under max-peers amount\r\n\r\n**Expected behavior:**\r\nNodes will stay connected and validator will create new blocks.\r\n\r\n**Actual behavior:**\r\nNodes attempt duplicate connection and disconnect:\r\n\r\n`2022-10-08 23:48:31.112+02:00 | nioEventLoopGroup-3-8 | DEBUG | RlpxAgent | Duplicate connection detected, disconnecting previously established connection in favor of new inbound connection for peer:  0xa8a133c7fd9cf8c2904a9afa7212bf03019e14ece23d7077cc4c3a30f3de381b08dede99f9dcbe2a546caa700a38beda3ce5e054bea1d923cfc42bcbca2b2184\r\n2022-10-08 23:48:31.112+02:00 | nioEventLoopGroup-3-7 | DEBUG | EthProtocolManager | Sending status message to Peer 0xa8a133c7fd9cf8c290... PeerReputation 100, validated? true, disconnected? true.\r\n2022-10-08 23:48:31.112+02:00 | nioEventLoopGroup-3-8 | DEBUG | EthProtocolManager | Disconnect - Outbound - 0x05 ALREADY_CONNECTED - PeerInfo{version=5, clientId='besu/v22.4.4/linux-x86_64/openjdk-java-11', capabilities=[eth/62, eth/63, eth/64, eth/65, eth/66, IBF/1, snap/1], port=30303, nodeId=0xa8a133c7fd9cf8c2904a9afa7212bf03019e14ece23d7077cc4c3a30f3de381b08dede99f9dcbe2a546caa700a38beda3ce5e054bea1d923cfc42bcbca2b2184} - 121 peers left`\r\n\r\n`2022-10-08 23:48:31.112+02:00 | nioEventLoopGroup-3-8 | DEBUG | SnapProtocolManager | Disconnect - Inbound - 0x05 ALREADY_CONNECTED - PeerInfo{version=5, clientId='besu/v22.4.4/linux-x86_64/openjdk-java-11', capabilities=[eth/62, eth/63, eth/64, eth/65, eth/66, IBF/1, snap/1], port=30303, nodeId=0xa8a133c7fd9cf8c2904a9afa7212bf03019e14ece23d7077cc4c3a30f3de381b08dede99f9dcbe2a546caa700a38beda3ce5e054bea1d923cfc42bcbca2b2184} - 122 peers left`\r\n\r\nnon-validator node will try connecting with itself:\r\n\r\n`2022-10-08 23:50:28.988+02:00 | vert.x-eventloop-thread-1 | DEBUG | PeerDiscoveryController | Peer table refresh triggered by insufficient peers\r\n2022-10-08 23:50:28.989+02:00 | vert.x-eventloop-thread-1 | DEBUG | RecursivePeerRefreshState | Start peer search.\r\n2022-10-08 23:50:28.989+02:00 | vert.x-eventloop-thread-1 | DEBUG | RecursivePeerRefreshState | Skipping bonding round because no candidates are available\r\n2022-10-08 23:50:28.989+02:00 | vert.x-eventloop-thread-1 | DEBUG | RecursivePeerRefreshState | Iterative peer search complete.  0 peers processed over 1 rounds.\r\n2022-10-08 23:50:31.105+02:00 | nioEventLoopGroup-3-1 | DEBUG | HandshakeHandlerOutbound | Wrote initial crypto handshake message to /<INITIAL_NON_VALIDATOR_IP>:30303.\r\n2022-10-08 23:50:31.116+02:00 | nioEventLoopGroup-3-1 | DEBUG | RlpxAgent | Outbound connection established to peer: 0xa8a133c7fd9cf8c2904a9afa7212bf03019e14ece23d7077cc4c3a30f3de381b08dede99f9dcbe2a546caa700a38beda3ce5e054bea1d923cfc42bcbca2b2184\r\n2022-10-08 23:50:31.116+02:00 | nioEventLoopGroup-3-2 | DEBUG | RlpxAgent | Duplicate connection detected, disconnecting previously established connection in favor of new inbound connection for peer:  0xa8a133c7fd9cf8c2904a9afa7212bf03019e14ece23d7077cc4c3a30f3de381b08dede99f9dcbe2a546caa700a38beda3ce5e054bea1d923cfc42bcbca2b2184\r\n2022-10-08 23:50:31.116+02:00 | nioEventLoopGroup-3-1 | DEBUG | EthProtocolManager | Sending status message to Peer 0xa8a133c7fd9cf8c290... PeerReputation 100, validated? true, disconnected? false.\r\n2022-10-08 23:50:31.116+02:00 | nioEventLoopGroup-3-2 | DEBUG | EthProtocolManager | Disconnect - Outbound - 0x05 ALREADY_CONNECTED - PeerInfo{version=5, clientId='besu/v22.4.4/linux-x86_64/openjdk-java-11', capabilities=[eth/62, eth/63, eth/64, eth/65, eth/66, IBF/1, snap/1], port=30303, nodeId=0xa8a133c7fd9cf8c2904a9afa7212bf03019e14ece23d7077cc4c3a30f3de381b08dede99f9dcbe2a546caa700a38beda3ce5e054bea1d923cfc42bcbca2b2184} - 122 peers left\r\n`\r\n\r\nOne of the other non-validator nodes tries to connect to validator node after losing connection and receives TOO_MANY_PEERS error:\r\n\r\n`2022-10-08 20:15:47.195+02:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | No sync target, waiting for peers. Current peers: 0\r\n2022-10-08 20:15:47.195+02:00 | EthScheduler-Timer-0 | DEBUG | WaitForPeerTask | Waiting for new peer connection. 0 peers currently connected.\r\n2022-10-08 20:15:49.182+02:00 | nioEventLoopGroup-3-5 | DEBUG | HandshakeHandlerOutbound | Wrote initial crypto handshake message to <VALIDATOR_IP>:30303.\r\n2022-10-08 20:15:49.207+02:00 | nioEventLoopGroup-3-5 | DEBUG | RlpxAgent | Outbound connection established to peer: 0x51b87d347a1c514ce02fb2549be32d682fc860afc2684e5b05016ff03ace407af214dc3fd814c63a61617e4e2897d0f851cadfecccde27c9fb0346c861b23f22\r\n2022-10-08 20:15:49.207+02:00 | nioEventLoopGroup-3-5 | DEBUG | EthProtocolManager | Sending status message to Peer 0x51b87d347a1c514ce0... PeerReputation 100, validated? true, disconnected? false.\r\n2022-10-08 20:15:49.208+02:00 | nioEventLoopGroup-3-5 | DEBUG | EthProtocolManager | Disconnect - Inbound - 0x04 TOO_MANY_PEERS - PeerInfo{version=5, clientId='besu/v22.4.4/linux-x86_64/openjdk-java-11', capabilities=[eth/62, eth/63, eth/64, eth/65, eth/66, IBF/1, snap/1], port=30303, nodeId=0x51b87d347a1c514ce02fb2549be32d682fc860afc2684e5b05016ff03ace407af214dc3fd814c63a61617e4e2897d0f851cadfecccde27c9fb0346c861b23f22} - 0 peers left\r\n2022-10-08 20:15:49.208+02:00 | nioEventLoopGroup-3-5 | DEBUG | SnapProtocolManager | Disconnect - Inbound - 0x04 TOO_MANY_PEERS - PeerInfo{version=5, clientId='besu/v22.4.4/linux-x86_64/openjdk-java-11', capabilities=[eth/62, eth/63, eth/64, eth/65, eth/66, IBF/1, snap/1], port=30303, nodeId=0x51b87d347a1c514ce02fb2549be32d682fc860afc2684e5b05016ff03ace407af214dc3fd814c63a61617e4e2897d0f851cadfecccde27c9fb0346c861b23f22} - 0 peers left\r\n2022-10-08 20:15:52.196+02:00 | EthScheduler-Timer-0 | INFO  | FullSyncTargetManager | No sync target, waiting for peers. Current peers: 0`\r\n\r\n**Frequency:**\r\nThe amount of connected peers will increase as static-nodes don't count towards connection limits\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 22.4.4\r\n* Java version: openjdk 11.0.16\r\n* OS Name & Version:  Ubuntu 20.04.5 LTS\r\n* Kernel Version: Linux 5.4.0-126-generic\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n* Besu setup info - genesis file, config options\r\nstatic-nodes.json and bootnodes for validator and non-validators looked like this:\r\n[\"enode validator\",\"enode initial_non_validator\"]\r\n* System info - memory: 32 GB, CPU: Intel(R) Core(TM) i7-4770 CPU (for the initial non-validator node)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/4509/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/4509/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

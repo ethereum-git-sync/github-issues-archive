@@ -1,0 +1,113 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/4628",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/4628/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/4628/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/4628/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/4628",
+  "id": 1438857824,
+  "node_id": "I_kwDODE2jmc5Vwzpg",
+  "number": 4628,
+  "title": "Sync Stability / Perf",
+  "user": {
+    "login": "non-fungible-nelson",
+    "id": 85905982,
+    "node_id": "MDQ6VXNlcjg1OTA1OTgy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85905982?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/non-fungible-nelson",
+    "html_url": "https://github.com/non-fungible-nelson",
+    "followers_url": "https://api.github.com/users/non-fungible-nelson/followers",
+    "following_url": "https://api.github.com/users/non-fungible-nelson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/non-fungible-nelson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/non-fungible-nelson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/non-fungible-nelson/subscriptions",
+    "organizations_url": "https://api.github.com/users/non-fungible-nelson/orgs",
+    "repos_url": "https://api.github.com/users/non-fungible-nelson/repos",
+    "events_url": "https://api.github.com/users/non-fungible-nelson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/non-fungible-nelson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1913956965,
+      "node_id": "MDU6TGFiZWwxOTEzOTU2OTY1",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/epic",
+      "name": "epic",
+      "color": "3E4B9E",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2152224197,
+      "node_id": "MDU6TGFiZWwyMTUyMjI0MTk3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamRevenant",
+      "name": "TeamRevenant",
+      "color": "78e298",
+      "default": false,
+      "description": "GH issues worked on by Revenant Team"
+    },
+    {
+      "id": 4328706977,
+      "node_id": "LA_kwDODE2jmc8AAAABAgLToQ",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamChupa",
+      "name": "TeamChupa",
+      "color": "fbca04",
+      "default": false,
+      "description": "GH issues worked on by Chupacabara Team"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-07T19:22:44Z",
+  "updated_at": "2023-05-10T18:06:42Z",
+  "closed_at": "2023-05-10T18:06:42Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "the snapsync currently has several issues that we need to fix. we tried several fixes that seem to help to be more stable but it is not enough\n\nThe list of issues : \n\n- the block download part can get stuck for several hours before resuming. it seems due to a bad peers that besu asks in a loop instead of disconnecting it (https://github.com/hyperledger/besu/pull/4651/files#diff-83416dbbeb0a69c5ba6de11c0d661a82140b337d9320610c70c1e9e284a359d0R118)\n**This fix seems to help to unblock the situation by disconnecting from the peers which returns us an empty list of headers. This makes it possible to find a new best peers and to unblock the pipeline**\n> \n\n- the download part of the worldstate can also get stuck for several hours due to a bad peer that besu asks in a loop instead of disconnecting it. You can see a drop in Snapsync nodes rate in the grafana and a stucked number of pending tasks(account,storage,trie, code) during several hours \n**The idea of this code is to retry on several peers instead of staying on the same when we have empty response. This fix seems to help a lot but more tests are needed to validate that it is good idea** (fixing this one on my flat database PR https://github.com/hyperledger/besu/pull/4744/files) \n\nEnable this logs can help you \n> curl --location --request POST 'http://localhost:8545' --header 'Content-Type: text/plain' --data-raw '{\"jsonrpc\":\"2.0\",\"method\":\"admin_changeLogLevel\",\"params\":[\"TRACE\", [\"org.hyperledger.besu.ethereum.eth.manager.task\"]], \"id\":1}'\n\nI linked the different modifications that we have tried to add if it can help the dev who is going to deal with this topic\n\n\n\n",
+  "closed_by": {
+    "login": "non-fungible-nelson",
+    "id": 85905982,
+    "node_id": "MDQ6VXNlcjg1OTA1OTgy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85905982?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/non-fungible-nelson",
+    "html_url": "https://github.com/non-fungible-nelson",
+    "followers_url": "https://api.github.com/users/non-fungible-nelson/followers",
+    "following_url": "https://api.github.com/users/non-fungible-nelson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/non-fungible-nelson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/non-fungible-nelson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/non-fungible-nelson/subscriptions",
+    "organizations_url": "https://api.github.com/users/non-fungible-nelson/orgs",
+    "repos_url": "https://api.github.com/users/non-fungible-nelson/repos",
+    "events_url": "https://api.github.com/users/non-fungible-nelson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/non-fungible-nelson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/4628/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/4628/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

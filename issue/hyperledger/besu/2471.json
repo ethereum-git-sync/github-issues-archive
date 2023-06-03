@@ -1,0 +1,146 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/2471",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/2471/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/2471/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/2471/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/2471",
+  "id": 927864100,
+  "node_id": "MDU6SXNzdWU5Mjc4NjQxMDA=",
+  "number": 2471,
+  "title": "IBFT2 Queue size exceeded but blocks still being imported",
+  "user": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362490,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDkw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 2051683573,
+      "node_id": "MDU6TGFiZWwyMDUxNjgzNTcz",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/P3",
+      "name": "P3",
+      "color": "ffff00",
+      "default": false,
+      "description": "Medium (ex: JSON-RPC request not working with a specific client library due to loose spec assumtion)"
+    },
+    {
+      "id": 2152224197,
+      "node_id": "MDU6TGFiZWwyMTUyMjI0MTk3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamRevenant",
+      "name": "TeamRevenant",
+      "color": "78e298",
+      "default": false,
+      "description": "GH issues worked on by Revenant Team"
+    },
+    {
+      "id": 5290172097,
+      "node_id": "LA_kwDODE2jmc8AAAABO1GewQ",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/non%20mainnet%20(private%20networks)",
+      "name": "non mainnet (private networks)",
+      "color": "0052cc",
+      "default": false,
+      "description": "not related to mainnet features - covers privacy, permissioning, IBFT2, QBFT"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2021-06-23T05:09:28Z",
+  "updated_at": "2023-03-21T02:42:39Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\nAs a besu user, I want IBFT2 queue to be reliable so that performance isn't affected. \r\n\r\n### Acceptance Criteria\r\n* [Criteria 1]\r\n\r\n### Steps to Reproduce (Bug)\r\nSetup is 3 Besu nodes. 1 validator and 2 others. Besu1 periodically starts showing this message in logs but is still importing the latest block. Seems like the queue is filling up when it shouldn't be. \r\n1. I'm using this repo to set up the nodes https://github.com/lucassaldanha/besu-local-nodes\r\n2. But using genesis file (and key for besu3 so I didn't have to change the genesis) from here https://github.com/albert0-hernandez/besu-orion-network-bug\r\n3. run npx hardhat test test/private-contracts-test.js to cause the memory spike\r\n4. Leave the nodes running for a while\r\n5. Cause could be when the memory spike occurs but doesn't crash Besu, and some besu processes recover and some don't. I couldn't ctrl-C to stop it just now, I had to kill the java process. \r\n\r\n**Expected behavior:** [What you expect to happen]\r\nI expect to see blocks imported without any warnings in the logs. I do not expect to see queue filled messages when blocks are being imported. \r\n\r\n**Actual behavior:** [What actually happens]\r\n```\r\n2021-06-23 11:50:09.021+10:00 | EthScheduler-Workers-1 | INFO  | PersistBlockTask | Imported #35,721 / 0 tx / 0 om / 0 (0.0%) gas / (0xd3ecc67089588ec31c92dda43307ecc812c6dc7e076d120aacb422dd81edaab0) in 0.001s. Peers: 2\r\n2021-06-23 11:50:10.011+10:00 | EthScheduler-Workers-3 | WARN  | BftEventQueue | Queue size exceeded trying to add new bft event NewChainHead{New Chain Head Header=BlockHeader{hash=0x68a06881b7ffe124639af6261e26f69dd0c659428050f4987f527ea9900060d7, parentHash=0xd3ecc67089588ec31c92dda43307ecc812c6dc7e076d120aacb422dd81edaab0, ommersHash=0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347, coinbase=0xe7adb9584fc2a307962a90f8e97fa5b53f280ccb, stateRoot=0x4550f1eea0bffe196114344b7564f996128559c5d1bfe6f4a7675b0c7cc925d1, transactionsRoot=0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421, receiptsRoot=0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421, logsBloom=0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, difficulty=1, number=35722, gasLimit=9007199254740991, gasUsed=0, timestamp=1624413010, extraData=0xf882a00000000000000000000000000000000000000000000000000000000000000000d594e7adb9584fc2a307962a90f8e97fa5b53f280ccb808400000000f843b841b07293be06dfb7f1a03aa23ece01ee92ecb8b9d8c46fe0da2d6f00849e51d9ad4fd554c2b3b28d252a4a1785f71213d6bf339d1e855c90636258fa5034d57da401, baseFee=null, mixHash=0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365, nonce=0}}\r\n```\r\n**Frequency:** [What percentage of the time does it occur?]\r\nNever happens on Besu2, only on Besu1 which is where the RPC calls are being sent (and the one that I'm reproducing the OOM error on). But not all the time. Maybe 10% of the time.\r\n\r\n\r\n### Versions (Add all that apply)\r\n* Software version: [`besu --version`]\r\nbesu/v21.7.0-RC1-dev-1ca3a4d3/osx-x86_64/oracle_openjdk-java-11\r\n* Java version: [`java -version`]\r\nopenjdk version \"11.0.10\" 2021-01-19\r\nOpenJDK Runtime Environment (build 11.0.10+9)\r\nOpenJDK 64-Bit Server VM (build 11.0.10+9, mixed mode)\r\n* OS Name & Version: [`cat /etc/*release`]\r\nsysctl kern.version\r\nkern.version: Darwin Kernel Version 20.5.0: Sat May  8 05:10:33 PDT 2021; root:xnu-7195.121.3~9/RELEASE_X86_64\r\n* Kernel Version: [`uname -a`]\r\nDarwin Kernel Version 20.5.0: Sat May  8 05:10:33 PDT 2021; root:xnu-7195.121.3~9/RELEASE_X86_64 x86_64\r\n* Docker Version: [`docker version`]\r\nthis setup isn't using docker\r\n\r\n### Additional Information\r\nhttps://github.com/albert0-hernandez/besu-orion-network-bug has the smart contracts and test scripts to cause the memory spike.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/2471/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/2471/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/866528612",
+    "html_url": "https://github.com/hyperledger/besu/issues/2471#issuecomment-866528612",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/2471",
+    "id": 866528612,
+    "node_id": "MDEyOklzc3VlQ29tbWVudDg2NjUyODYxMg==",
+    "user": {
+      "login": "macfarla",
+      "id": 2627919,
+      "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/macfarla",
+      "html_url": "https://github.com/macfarla",
+      "followers_url": "https://api.github.com/users/macfarla/followers",
+      "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+      "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+      "organizations_url": "https://api.github.com/users/macfarla/orgs",
+      "repos_url": "https://api.github.com/users/macfarla/repos",
+      "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/macfarla/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2021-06-23T05:15:00Z",
+    "updated_at": "2021-06-23T05:15:00Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "proof that it happened another time! \r\n```\r\n2021-06-16 12:31:27.780+10:00 | EthScheduler-Workers-0 | WARN  | BftEventQueue | Queue size exceeded trying to add new bft event NewChainHead{New Chain Head Header=BlockHeader{hash=0xf571b45e7815079eb24f2d108fd2d633abee8b32fc1278f977e51c0e854c34ec, parentHash=0x54d1c8af2c33a2ce26dabb10d3f6873be0844222230817e3871d78a1272e4c20, ommersHash=0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347, coinbase=0xe7adb9584fc2a307962a90f8e97fa5b53f280ccb, stateRoot=0xce9616d7f4b452e87df66a0337159bd2c579b699e319f0fc18778f3d997490fd, transactionsRoot=0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421, receiptsRoot=0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421, logsBloom=0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, difficulty=1, number=5253, gasLimit=9007199254740991, gasUsed=0, timestamp=1623810680, extraData=0xf882a00000000000000000000000000000000000000000000000000000000000000000d594e7adb9584fc2a307962a90f8e97fa5b53f280ccb808400000000f843b841b7c0653a4240165814ad2b07e97e49d7e5b5b4be3a1816e4dee91390933b5b532010839b411f633df99dbd670eb7655e5283044a9d15a2bfb2b59d4540b7b6d500, baseFee=null, mixHash=0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365, nonce=0}}\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/866528612/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

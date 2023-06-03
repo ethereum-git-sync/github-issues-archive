@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/4324",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/4324/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/4324/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/4324/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/4324",
+  "id": 1354255699,
+  "node_id": "I_kwDODE2jmc5QuE1T",
+  "number": 4324,
+  "title": "host allowlists configures authorized server hostnames, not authorized client hosts",
+  "user": {
+    "login": "trackpete",
+    "id": 8779751,
+    "node_id": "MDQ6VXNlcjg3Nzk3NTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8779751?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/trackpete",
+    "html_url": "https://github.com/trackpete",
+    "followers_url": "https://api.github.com/users/trackpete/followers",
+    "following_url": "https://api.github.com/users/trackpete/following{/other_user}",
+    "gists_url": "https://api.github.com/users/trackpete/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/trackpete/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/trackpete/subscriptions",
+    "organizations_url": "https://api.github.com/users/trackpete/orgs",
+    "repos_url": "https://api.github.com/users/trackpete/repos",
+    "events_url": "https://api.github.com/users/trackpete/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/trackpete/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362490,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDkw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-08-29T13:01:38Z",
+  "updated_at": "2023-03-02T19:06:48Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nAs an administrator, I expect an allow list to limit the clients that can access a host so that unauthorized clients cannot connect. I do not expect a host allow list to merely define a list of valid hostnames that can be used to call the server itself from any client.\r\n\r\nThis appears to apply to all of the host-allowlist subroutines, all of which use variants such as `request().host()` or `HttpHeaders.HOST` as the condition of authorization. \r\n\r\n### Acceptance Criteria\r\n* Host allow lists control what (client) hosts are allowed to access the server host.\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Configure a Besu host on one system (besu.example.com / 192.168.0.1)\r\n2. Configure a Teku host on a different system (teku.example.com / 192.168.0.2)\r\n3. Configure host allowlist on the Besu host to allow access from \"teku.example.com\" and/or \"192.168.0.2\"\r\n4. Access besu.example.com or 192.168.0.1 from teku.example.com\r\n    a. ex `curl http://besu.example.com:port` from teku\r\n    b. ex `curl http://192.168.0.1:port` from teku\r\n\r\n**Expected behavior:**\r\n\r\n* The request in 4a succeeds because it is being made from a host in the allow list\r\n* The request in 4b succeeds because it is being made from a host in the allow list\r\n\r\n**Actual behavior:** [What actually happens]\r\n\r\n* The request in 4a will return `Host not authorized` because `besu.example.com` is not in the allow list and pay no attention to the fact that the request is coming from teku.example.com or 192.168.0.2\r\n* The request in 4b will return `Host not authorized` because `192.168.0.1` is not in the allow list and pay no attention to the fact that the request is coming from teku.example.com or 192.168.0.2\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\n\r\n100%\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 22.7.1\r\n* all / all\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n\r\n* To be clear, the current implementation adds no security but may trick people into believing it adds security - as long as you know what is in a hosts allow list, you can bypass it (example, I can set \"localhost\" as a hostname to the IP address of a Besu server and when that request gets to the Besu server it will check the host header and see it was sent to \"localhost\" and allow it even though it wasn't sent _from_ localhost).\r\n* You can see the relevant functions that check the host header by [searching for \"host not authorized\"](https://github.com/hyperledger/besu/search?q=%22host+not+authorized%22&type=code).\r\n* This doesn't seem to have affected too many folks because most people run everything on the same machine and set it to localhost so they don't realize how it's working\r\n* The docs **do specify \"this isn't a permissioning feature\"** but why include it at all? \r\n* [#615](https://github.com/hyperledger/besu/issues/615) caught this awhile ago, but there appeared to be a misunderstanding and it was treated as a documentation issue\r\n\r\nIt's not immediately clear to me the best way to fix this as I'm not familiar with java servers, but I think you'd want to inspect the origin or similar. \r\n\r\nAlternatively, you may just be much more clear about the fact that this isn't a way to control **who** is allowed to access the Besu host but instead is just to allow hostname aliases for accessing the server (though I'm not really sure why that's necessary tbh).",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/4324/reactions",
+    "total_count": 2,
+    "+1": 2,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/4324/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

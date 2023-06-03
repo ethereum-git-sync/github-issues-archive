@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5370",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5370/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5370/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5370/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5370",
+  "id": 1675548916,
+  "node_id": "I_kwDODE2jmc5j3tj0",
+  "number": 5370,
+  "title": "[Private Network] NullPointerException on NodeSmartContractV2PermissioningController.createPayload",
+  "user": {
+    "login": "camilodotto",
+    "id": 42941530,
+    "node_id": "MDQ6VXNlcjQyOTQxNTMw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/42941530?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/camilodotto",
+    "html_url": "https://github.com/camilodotto",
+    "followers_url": "https://api.github.com/users/camilodotto/followers",
+    "following_url": "https://api.github.com/users/camilodotto/following{/other_user}",
+    "gists_url": "https://api.github.com/users/camilodotto/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/camilodotto/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/camilodotto/subscriptions",
+    "organizations_url": "https://api.github.com/users/camilodotto/orgs",
+    "repos_url": "https://api.github.com/users/camilodotto/repos",
+    "events_url": "https://api.github.com/users/camilodotto/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/camilodotto/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-19T20:05:34Z",
+  "updated_at": "2023-04-20T19:17:51Z",
+  "closed_at": "2023-04-20T19:17:51Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\nBesu is throwing NullpointerException in all other nodes connected when some other node is removed from the permissioning smart contract v2 (If I have nodes n1, n2, n3 and n4, and then remove n4, the nodes n1, n2 and n3 throw the exception).\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Start a private network\r\n2. Deploy permissioning smart contract v2 defining nodeRulesContract.activateValidationEnodeIdOnly(true) \r\n3. Remove a node from the smart contract\r\n\r\n**Expected behavior:** \r\n* Node removed\r\n\r\n**Actual behavior:**\r\n* NullpointerException\r\n\r\n**Frequency:** Everytime a node is removed and then when the nodes are restarted\r\n\r\n### Logs\r\n```\r\n2023-04-19T14:22:02.024-0300 ERROR State machine threw exception while processing event \\{org.hyperledger.besu.consensus.common.bft.events.BftReceivedMessageEvent@5c2fb8e5\\}\r\njava.lang.RuntimeException: Error building payload to call node permissioning smart contract\r\n\tat org.hyperledger.besu.ethereum.permissioning.NodeSmartContractV2PermissioningController.createPayload(NodeSmartContractV2PermissioningController.java:110) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.NodeSmartContractV2PermissioningController.getCallResult(NodeSmartContractV2PermissioningController.java:81) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.NodeSmartContractV2PermissioningController.isPermitted(NodeSmartContractV2PermissioningController.java:69) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.NodeSmartContractV2PermissioningController.checkSmartContractRules(NodeSmartContractV2PermissioningController.java:60) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.AbstractNodeSmartContractPermissioningController.isConnectionPermitted(AbstractNodeSmartContractPermissioningController.java:87) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningController.isPermitted(NodePermissioningController.java:98) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.node.PeerPermissionsAdapter.inboundIsPermitted(PeerPermissionsAdapter.java:122) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.node.PeerPermissionsAdapter.isPermitted(PeerPermissionsAdapter.java:78) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions$CombinedPeerPermissions.isPermitted(PeerPermissions.java:129) ~[besu-p2p-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerRlpxPermissions.allowOngoingConnection(PeerRlpxPermissions.java:61) ~[besu-p2p-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.p2p.rlpx.RlpxAgent.lambda$handlePermissionsUpdate$10(RlpxAgent.java:285) ~[besu-p2p-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183) ~[?:?]\r\n\tat java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[?:?]\r\n\tat java.util.stream.DistinctOps$1$2.accept(DistinctOps.java:174) ~[?:?]\r\n\tat java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[?:?]\r\n\tat java.util.concurrent.ConcurrentHashMap$ValueSpliterator.forEachRemaining(ConcurrentHashMap.java:3612) ~[?:?]\r\n\tat java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[?:?]\r\n\tat java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[?:?]\r\n\tat java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310) ~[?:?]\r\n\tat java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734) ~[?:?]\r\n\tat java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[?:?]\r\n\tat java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[?:?]\r\n\tat java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150) ~[?:?]\r\n\tat java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173) ~[?:?]\r\n\tat java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[?:?]\r\n\tat java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[?:?]\r\n\tat org.hyperledger.besu.ethereum.p2p.rlpx.RlpxAgent.handlePermissionsUpdate(RlpxAgent.java:283) ~[besu-p2p-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.lambda$dispatchUpdate$0(PeerPermissions.java:79) ~[besu-p2p-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.util.Subscribers.lambda$forEach$0(Subscribers.java:131) ~[besu-util-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat java.lang.Iterable.forEach(Iterable.java:75) ~[?:?]\r\n\tat org.hyperledger.besu.util.Subscribers.forEach(Subscribers.java:128) ~[besu-util-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.dispatchUpdate(PeerPermissions.java:79) ~[besu-p2p-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.permissioning.node.PeerPermissionsAdapter.lambda$new$0(PeerPermissionsAdapter.java:54) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.chain.DefaultBlockchain.lambda$appendBlockHelper$9(DefaultBlockchain.java:336) ~[besu-core-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.util.Subscribers.lambda$forEach$0(Subscribers.java:131) ~[besu-util-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat java.lang.Iterable.forEach(Iterable.java:75) ~[?:?]\r\n\tat org.hyperledger.besu.util.Subscribers.forEach(Subscribers.java:128) ~[besu-util-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.chain.DefaultBlockchain.appendBlockHelper(DefaultBlockchain.java:336) ~[besu-core-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.chain.DefaultBlockchain.appendBlock(DefaultBlockchain.java:286) ~[besu-core-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter.lambda$importBlock$0(MainnetBlockImporter.java:53) ~[besu-core-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat java.util.Optional.ifPresent(Optional.java:178) ~[?:?]\r\n\tat org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter.importBlock(MainnetBlockImporter.java:51) ~[besu-core-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.ethereum.core.BlockImporter.importBlock(BlockImporter.java:45) ~[besu-core-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.ibft.statemachine.IbftRound.importBlockToChain(IbftRound.java:316) ~[besu-ibft-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.ibft.statemachine.IbftRound.peerIsCommitted(IbftRound.java:289) ~[besu-ibft-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.ibft.statemachine.IbftRound.handleCommitMessage(IbftRound.java:213) ~[besu-ibft-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManager.actionOrBufferMessage(IbftBlockHeightManager.java:214) ~[besu-ibft-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManager.handleCommitPayload(IbftBlockHeightManager.java:204) ~[besu-ibft-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.common.bft.statemachine.BaseBftController.consumeMessage(BaseBftController.java:126) ~[besu-consensus-common-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.ibft.statemachine.IbftController.handleMessage(IbftController.java:90) ~[besu-ibft-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.common.bft.statemachine.BaseBftController.handleMessageEvent(BaseBftController.java:88) ~[besu-consensus-common-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat org.hyperledger.besu.consensus.common.bft.EventMultiplexer.handleBftEvent(EventMultiplexer.java:53) ~[besu-consensus-common-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat java.util.Optional.ifPresent(Optional.java:178) [?:?]\r\n\tat org.hyperledger.besu.consensus.common.bft.BftProcessor.run(BftProcessor.java:65) [besu-consensus-common-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) [?:?]\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) [?:?]\r\n\tat java.lang.Thread.run(Thread.java:833) [?:?]\r\nCaused by: java.lang.NullPointerException\r\n\tat java.util.Objects.requireNonNull(Objects.java:208) ~[?:?]\r\n\tat java.util.ImmutableCollections.listFromTrustedArray(ImmutableCollections.java:213) ~[?:?]\r\n\tat java.util.List.of(List.java:847) ~[?:?]\r\n\tat org.hyperledger.besu.ethereum.permissioning.NodeSmartContractV2PermissioningController.createPayload(NodeSmartContractV2PermissioningController.java:106) ~[besu-permissioning-23.4.0-SNAPSHOT.jar:23.4.0-dev-d54a1bf2]\r\n\t... 56 more\r\n```\r\n\r\n### Versions\r\n* Software version: 23.4.0-dev-d54a1bf2\r\n* Java version: openjdk-java-17\r\n* OS Name & Version: Ubuntu 22.04.2 LTS\r\n* Kernel Version: 5.19.0-38-generic\r\n* Docker Version: 23.0.4\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n\r\nFragment of docker-compose.yml\r\n```\r\n...\r\nx-defaults:\r\n\r\n  logging: &logging-default\r\n    options:\r\n      max-size: '10m'\r\n      max-file: '5'\r\n    driver: json-file\r\n\r\n  localization: &localization-default\r\n    TZ: America/Sao_Paulo\r\n    LANG: en_US.UTF-8\r\n...\r\n    image: ${IMAGE_BESU}\r\n    logging: *logging-default\r\n    environment:\r\n      << : *localization-default\r\n      LOG4J_CONFIGURATION_FILE: \"/var/lib/besu/log.xml\"\r\n      BESU_DATA_PATH: \"/var/lib/besu\"\r\n      BESU_GENESIS_FILE: \"/var/lib/besu/genesis.json\"\r\n      BESU_STATIC_NODES_FILE: \"/var/lib/besu/static-nodes.json\"\r\n      BESU_MAX_PEERS: \"50\"\r\n      BESU_REMOTE_CONNECTIONS_LIMIT_ENABLED: \"false\"\r\n      BESU_DISCOVERY_ENABLED: \"true\"\r\n      BESU_MIN_GAS_PRICE: \"0\"\r\n      BESU_P2P_PORT: \"60606\"\r\n      BESU_RPC_HTTP_ENABLED: \"true\"\r\n      BESU_RPC_HTTP_API: \"ADMIN,ETH,TXPOOL,NET,IBFT,WEB3,DEBUG,TRACE,PERM\"\r\n      BESU_RPC_HTTP_CORS_ORIGINS: \"*\"\r\n      BESU_HOST_ALLOWLIST: \"*\"\r\n      BESU_METRICS_ENABLED: \"true\"\r\n      BESU_METRICS_HOST: \"0.0.0.0\"\r\n\r\n    command: >-\r\n      --permissions-nodes-contract-enabled\r\n      --permissions-nodes-contract-address \"0xB65EA7377ad0cAffE2f9e5aaA7045c05334ecAc4\"\r\n      --permissions-nodes-contract-version=2\r\n...\r\n```\r\n\r\n\r\n\r\n",
+  "closed_by": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5370/reactions",
+    "total_count": 3,
+    "+1": 3,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5370/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/3329",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/3329/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/3329/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/3329/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/3329",
+  "id": 1115134960,
+  "node_id": "I_kwDODE2jmc5Cd5vw",
+  "number": 3329,
+  "title": "Besu stalled when syncing on Kintsugi",
+  "user": {
+    "login": "luisnaranjo733",
+    "id": 1091547,
+    "node_id": "MDQ6VXNlcjEwOTE1NDc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1091547?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/luisnaranjo733",
+    "html_url": "https://github.com/luisnaranjo733",
+    "followers_url": "https://api.github.com/users/luisnaranjo733/followers",
+    "following_url": "https://api.github.com/users/luisnaranjo733/following{/other_user}",
+    "gists_url": "https://api.github.com/users/luisnaranjo733/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/luisnaranjo733/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/luisnaranjo733/subscriptions",
+    "organizations_url": "https://api.github.com/users/luisnaranjo733/orgs",
+    "repos_url": "https://api.github.com/users/luisnaranjo733/repos",
+    "events_url": "https://api.github.com/users/luisnaranjo733/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/luisnaranjo733/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3013559202,
+      "node_id": "MDU6TGFiZWwzMDEzNTU5MjAy",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/mainnet",
+      "name": "mainnet",
+      "color": "9D578C",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-01-26T15:14:35Z",
+  "updated_at": "2022-11-08T17:46:15Z",
+  "closed_at": "2022-11-08T17:46:15Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nAs an Ethereum user, I want to sync Besu on Kintsugi to the tip of the chain so that I can help test the merge\r\n\r\n### Acceptance Criteria\r\n* Besu should finish syncing to the latest block height, when running against the parameters in the [Kintsugi testnet guide](https://hackmd.io/dFzKxB3ISWO8juUqPpJFfw#Connect-Besu-Teku)\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Download source and compile Besu with Java 11 against the ```c6eddef39fabdf2cf5ea98cf0b8d98402c5b9147``` commit in the \"merge\" branch (listed below)\r\n2. Run Besu with the parameters listed in the Kintsugi testnet guide (linked earlier). I also set  the --miner-coinbase flag to the zero address because of [this bug](https://github.com/hyperledger/besu/issues/3310)\r\n3. Detailed instructions can be found here https://luisnaranjo733.hashnode.dev/want-to-help-test-the-merge-run-a-node-on-kintsugi where I'm trying to help people run the Besu/Teku combo\r\n\r\n```ini\r\n[Unit]\r\nDescription=Ethereum Besu execution client\r\nAfter=network.target\r\nBefore=network.target\r\n\r\n[Service]\r\nUser=besu\r\nGroup=besu\r\nType=simple\r\nRestart=always\r\nRestartSec=5\r\nEnvironment=\"JAVA_OPTS=-Xmx4g\"\r\nExecStart=/usr/local/bin/besu/bin/besu \\\r\n    --data-path=\"<path to your besu data dir>\" \\\r\n    --genesis-file=\"/home/<username>/merge-testnets/kintsugi/besu_genesis.json\" \\\r\n    --rpc-http-enabled \\\r\n    --rpc-http-api=ADMIN,MINER,ETH,NET,DEBUG,TXPOOL,EXECUTION \\\r\n    --network-id=1337702 \\\r\n    --p2p-enabled=true \\\r\n    --Xmerge-support=true \\\r\n    --bootnodes=enode://6f377dd1ef5a3272d7e02fac9064c4f95d74f7edfd866e59ded774ee5b4649ff61c3f24c95f5c3d07d692b447f0569716b8921b6861810b96a705c92e1d27ff9@161.35.67.219:30303 \\\r\n    --miner-coinbase=0x0000000000000000000000000000000000000000\r\n\r\n[Install]\r\nWantedBy=multi-user.target\r\n```\r\n\r\n\r\n**Expected behavior:** Besu should finish syncing at some point, and the block height should match the block height in the [Kintsugi block explorer](https://explorer.kintsugi.themerge.dev/).\r\n\r\n**Actual behavior:** Besu thinks it is done syncing, but the block height it reports over HTTP RPC is pretty far behind the actual tip\r\n\r\nAccording to the Besu RPC server, the node thinks it is done syncing and the block height is much lower than what it should be.\r\nI assume 0x2824E is the hexadecimal block height (which is 164,430 in b10). Meanwhile, the actual blockheight is in the 242k range\r\n\r\nDetailed logs at the bottom of this issue\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\nThis happened 2/2 for me. After the first time, I deleted my VM and started over, same result the 2nd time\r\n\r\n### Versions (Add all that apply)\r\n* Software version: [`besu --version`]\r\nbesu/v22.1.0-RC2-dev-c6eddef3/linux-x86_64/openjdk-java-11\r\n\r\n* Java version: [`java -version`]\r\nopenjdk version \"11.0.13\" 2021-10-19\r\nOpenJDK Runtime Environment (build 11.0.13+8-Ubuntu-0ubuntu1.20.04)\r\nOpenJDK 64-Bit Server VM (build 11.0.13+8-Ubuntu-0ubuntu1.20.04, mixed mode, sharing)\r\n\r\n* OS Name & Version: [`cat /etc/*release`]\r\n\r\nDISTRIB_ID=Ubuntu\r\nDISTRIB_RELEASE=20.04\r\nDISTRIB_CODENAME=focal\r\nDISTRIB_DESCRIPTION=\"Ubuntu 20.04.3 LTS\"\r\nNAME=\"Ubuntu\"\r\nVERSION=\"20.04.3 LTS (Focal Fossa)\"\r\nID=ubuntu\r\nID_LIKE=debian\r\nPRETTY_NAME=\"Ubuntu 20.04.3 LTS\"\r\nVERSION_ID=\"20.04\"\r\nHOME_URL=\"https://www.ubuntu.com/\"\r\nSUPPORT_URL=\"https://help.ubuntu.com/\"\r\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\r\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\r\nVERSION_CODENAME=focal\r\nUBUNTU_CODENAME=focal\r\n\r\n* Kernel Version: [`uname -a`]\r\n\r\nLinux kintsugi-vm 5.11.0-1025-azure #27~20.04.1-Ubuntu SMP Fri Jan 7 15:02:06 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux\r\n\r\n* Virtual Machine software & version: [`vmware -v`] N/A\r\n* Docker Version: [`docker version`] N/A\r\n* Cloud VM, type, size: Azure B2ms VM with an attached standard performance 2TB data disk mounted at /datadrive\r\n\r\n### Additional Information\r\n\r\nMore logs\r\n\r\n```\r\nluis@kintsugi2-vm:~$ curl -X POST --data '{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false]}' http://127.0.0.1:8545\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : \"1\",\r\n  \"result\" : {\r\n    \"number\" : \"0x2824e\",\r\n    \"hash\" : \"0xfd8fffee65e42337d898e66dedec2a7efa64d9492bc3795866aae011babc6774\",\r\n    \"mixHash\" : \"0xe5837db486edc3fcf475c41896c9d0595ccb396fc217dd9a9ddbb9062ff8c02b\",\r\n    \"parentHash\" : \"0x03a39a04193ab75319d2a4ac4a8159bb591662d4769ea21ea37d761a2c43dac6\",\r\n    \"nonce\" : \"0x0000000000000000\",\r\n    \"sha3Uncles\" : \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\r\n    \"logsBloom\" : \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"transactionsRoot\" : \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\r\n    \"stateRoot\" : \"0x8f561281dee794f98a5094e29522650f950296702419a351f5389ee10e9d0d4d\",\r\n    \"receiptsRoot\" : \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\r\n    \"miner\" : \"0x0000000000000000000000000000000000000001\",\r\n    \"difficulty\" : \"0x0\",\r\n    \"totalDifficulty\" : \"0x12a0eee4a\",\r\n    \"extraData\" : \"0x\",\r\n    \"baseFeePerGas\" : \"0x7\",\r\n    \"size\" : \"0x200\",\r\n    \"gasLimit\" : \"0x9e25fc\",\r\n    \"gasUsed\" : \"0x0\",\r\n    \"timestamp\" : \"0x61e27a74\",\r\n    \"uncles\" : [ ],\r\n    \"transactions\" : [ ]\r\n  }\r\n}\r\nluis@kintsugi2-vm:~$curl -X POST --data '{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"eth_blockNumber\",\"params\":[]}' http://127.0.0.1:8545\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : \"1\",\r\n  \"result\" : \"0x2824e\"\r\n}\r\n\r\nluis@kintsugi2-vm:~$ curl -X POST --data '{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"eth_syncing\",\"params\":[]}' http://127.0.0.1:8545\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : \"1\",\r\n  \"result\" : false\r\n}\r\n\r\nluis@kintsugi2-vm:~$sudo journalctl -fu besu.service\r\n-- Logs begin at Mon 2022-01-24 02:27:43 UTC. --\r\nJan 25 20:11:08 kintsugi2-vm besu[11962]: 2022-01-25 20:11:08.414+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0x14e4fd0011ce54b8969d7669441aaa8ea033889197bc3d46aedda2874a6ce0eb, finalized: 0x14e4fd0011ce54b8969d7669441aaa8ea033889197bc3d46aedda2874a6ce0eb\r\nJan 25 20:11:08 kintsugi2-vm besu[11962]: 2022-01-25 20:11:08.567+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0x188646c4370e43452702cd859802e7ded87afe0a189459b5dc25ccc4ed380774, finalized: 0x188646c4370e43452702cd859802e7ded87afe0a189459b5dc25ccc4ed380774\r\nJan 25 20:11:08 kintsugi2-vm besu[11962]: 2022-01-25 20:11:08.654+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0x912d98edd1ac5e909e564baf0064d92d952155b58071d432450e12f58ff75120, finalized: 0x912d98edd1ac5e909e564baf0064d92d952155b58071d432450e12f58ff75120\r\nJan 25 20:11:08 kintsugi2-vm besu[11962]: 2022-01-25 20:11:08.801+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0x314667feb777bc237742d4141170b7f177e3751cbf89d74f0a87e4450c078e82, finalized: 0x314667feb777bc237742d4141170b7f177e3751cbf89d74f0a87e4450c078e82\r\nJan 25 20:11:08 kintsugi2-vm besu[11962]: 2022-01-25 20:11:08.877+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0x87b932b081e7cd758d71bbe51506a7e491298527ecf949fce3e716fe101506b1, finalized: 0x87b932b081e7cd758d71bbe51506a7e491298527ecf949fce3e716fe101506b1\r\nJan 25 20:11:09 kintsugi2-vm besu[11962]: 2022-01-25 20:11:09.018+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0xe4eaa7026cf177d86195899df92341f2c78a05a1c93af897a3e856f470e46a46, finalized: 0xe4eaa7026cf177d86195899df92341f2c78a05a1c93af897a3e856f470e46a46\r\nJan 25 20:11:09 kintsugi2-vm besu[11962]: 2022-01-25 20:11:09.065+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0xf2668ecdca17787ec6ca5c7210232a90d782c2612d79ec6a66f56719ff362b13, finalized: 0xf2668ecdca17787ec6ca5c7210232a90d782c2612d79ec6a66f56719ff362b13\r\nJan 25 20:11:09 kintsugi2-vm besu[11962]: 2022-01-25 20:11:09.110+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0x6bcef1c0eb301addf3d1748dc04120a09934a57d16a020f0390a8aa82e5e74dc, finalized: 0x6bcef1c0eb301addf3d1748dc04120a09934a57d16a020f0390a8aa82e5e74dc\r\nJan 25 20:11:09 kintsugi2-vm besu[11962]: 2022-01-25 20:11:09.151+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0x03a39a04193ab75319d2a4ac4a8159bb591662d4769ea21ea37d761a2c43dac6, finalized: 0x03a39a04193ab75319d2a4ac4a8159bb591662d4769ea21ea37d761a2c43dac6\r\nJan 25 20:11:09 kintsugi2-vm besu[11962]: 2022-01-25 20:11:09.193+00:00 | vert.x-worker-thread-0 | INFO  | EngineForkchoiceUpdated | Consensus fork-choice-update: head: 0xfd8fffee65e42337d898e66dedec2a7efa64d9492bc3795866aae011babc6774, finalized: 0xfd8fffee65e42337d898e66dedec2a7efa64d9492bc3795866aae011babc6774\r\n\r\nluis@kintsugi2-vm:~$ sudo journalctl -fu teku.service\r\n-- Logs begin at Mon 2022-01-24 02:27:43 UTC. --\r\nJan 26 15:05:52 kintsugi2-vm teku[12159]: 2022-01-26 15:05:52.101 INFO  - Slot Event  *** Slot: 295804, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 74\r\nJan 26 15:06:04 kintsugi2-vm teku[12159]: 2022-01-26 15:06:04.100 INFO  - Slot Event  *** Slot: 295805, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 73\r\nJan 26 15:06:16 kintsugi2-vm teku[12159]: 2022-01-26 15:06:16.101 INFO  - Slot Event  *** Slot: 295806, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 73\r\nJan 26 15:06:28 kintsugi2-vm teku[12159]: 2022-01-26 15:06:28.100 INFO  - Slot Event  *** Slot: 295807, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 74\r\nJan 26 15:06:28 kintsugi2-vm teku[12159]: 2022-01-26 15:06:28.626 WARN  - Ignoring calculated payload attributes since it violates ordering\r\nJan 26 15:06:36 kintsugi2-vm teku[12159]: 2022-01-26 15:06:36.100 INFO  - Epoch Event *** Epoch: 9244, Justified checkpoint: 6698, Finalized checkpoint: 6697, Finalized root: a253d50c06db0eae41abbde3b4e53bc4f7ce9447f71a2b13923829f9bf3dd519\r\nJan 26 15:06:40 kintsugi2-vm teku[12159]: 2022-01-26 15:06:40.101 INFO  - Slot Event  *** Slot: 295808, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 74\r\nJan 26 15:06:52 kintsugi2-vm teku[12159]: 2022-01-26 15:06:52.101 INFO  - Slot Event  *** Slot: 295809, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 74\r\nJan 26 15:07:04 kintsugi2-vm teku[12159]: 2022-01-26 15:07:04.102 INFO  - Slot Event  *** Slot: 295810, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 74\r\nJan 26 15:07:16 kintsugi2-vm teku[12159]: 2022-01-26 15:07:16.101 INFO  - Slot Event  *** Slot: 295811, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 73\r\nJan 26 15:07:28 kintsugi2-vm teku[12159]: 2022-01-26 15:07:28.101 INFO  - Slot Event  *** Slot: 295812, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 73\r\nJan 26 15:07:40 kintsugi2-vm teku[12159]: 2022-01-26 15:07:40.101 INFO  - Slot Event  *** Slot: 295813, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 74\r\nJan 26 15:07:52 kintsugi2-vm teku[12159]: 2022-01-26 15:07:52.100 INFO  - Slot Event  *** Slot: 295814, Block:    ... empty, Justified: 6698, Finalized: 6697, Peers: 74\r\n```\r\n",
+  "closed_by": {
+    "login": "non-fungible-nelson",
+    "id": 85905982,
+    "node_id": "MDQ6VXNlcjg1OTA1OTgy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85905982?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/non-fungible-nelson",
+    "html_url": "https://github.com/non-fungible-nelson",
+    "followers_url": "https://api.github.com/users/non-fungible-nelson/followers",
+    "following_url": "https://api.github.com/users/non-fungible-nelson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/non-fungible-nelson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/non-fungible-nelson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/non-fungible-nelson/subscriptions",
+    "organizations_url": "https://api.github.com/users/non-fungible-nelson/orgs",
+    "repos_url": "https://api.github.com/users/non-fungible-nelson/repos",
+    "events_url": "https://api.github.com/users/non-fungible-nelson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/non-fungible-nelson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/3329/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/3329/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
