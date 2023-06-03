@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1406",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1406/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1406/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1406/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/1406",
+  "id": 764144121,
+  "node_id": "MDU6SXNzdWU3NjQxNDQxMjE=",
+  "number": 1406,
+  "title": "RPC trace_call - returns incorrect error for some (potentially state changing?) traces",
+  "user": {
+    "login": "tjayrush",
+    "id": 5417918,
+    "node_id": "MDQ6VXNlcjU0MTc5MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5417918?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tjayrush",
+    "html_url": "https://github.com/tjayrush",
+    "followers_url": "https://api.github.com/users/tjayrush/followers",
+    "following_url": "https://api.github.com/users/tjayrush/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tjayrush/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tjayrush/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tjayrush/subscriptions",
+    "organizations_url": "https://api.github.com/users/tjayrush/orgs",
+    "repos_url": "https://api.github.com/users/tjayrush/repos",
+    "events_url": "https://api.github.com/users/tjayrush/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tjayrush/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-12-12T18:15:35Z",
+  "updated_at": "2021-05-23T06:50:35Z",
+  "closed_at": "2021-05-23T06:50:35Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**Only happens against the call-trace branch**\r\n\r\n### Discussion:\r\n\r\nOE appears to ignore errors when tracing where, if the call was actual call, an error would have occurred. TurboGeth does not ignore such errors.\r\n\r\nFor the following `curl` command, which is a simple ETH transfer, OE returns what appears to be a valid trace. TurboGeth returns an error. Note that the send has no ETH. If one 'zeros out' the `value`, TurboGeth returns a valid trace.\r\n\r\nI'm not sure which behavior is correct, but in any case TG does not reproduce OE. I think OE may have a bug here (see below).\r\n\r\n### Difference:\r\n\r\n![image](https://user-images.githubusercontent.com/5417918/101991799-0527b900-3c7d-11eb-856d-6b96edd19ae4.png)\r\n\r\n### Curl Command:\r\n\r\n```[bash]\r\ncurl -s --location --request POST --header 'Content-Type:  application/json' --data-raw '{\"jsonrpc\":  \"2.0\",\"method\":  \"trace_call\",\"params\":  [{\"from\":  \"0x407d73d8a49eeb85d32cf465507dd71d507100c1\",\"to\":  \"0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b\",\"value\":  \"0x186a0\"},[\"trace\"],\"0x186a0\"],\"id\":  \"1\"}' http://localhost:8545\r\n```\r\n\r\n### Note:\r\n\r\nThis appears to only happen with state-changing `trace_call` invocations. If one modifies the `value` field of the request, TG returns a valid trace, even it's slightly different than OE (but this is a separate issue).\r\n\r\n### Expected:\r\n\r\nIt's not totally clear to me which result is correct. I think Parity may have a bug. [This test case](https://github.com/Great-Hill-Corporation/trueblocks-core/blob/develop/src/other/trace_tests/curl_tests/tests/trace_call_stateDiff.json) with [results here](https://github.com/Great-Hill-Corporation/trueblocks-core/blob/develop/src/other/trace_tests/curl_tests/expected/trace_call_stateDiff.json) shows, that for the same invocation, OE is reporting that the balance of the receiving account is modified which is incorrect since the sending account has no ETH.\r\n",
+  "closed_by": {
+    "login": "AlexeyAkhunov",
+    "id": 13686139,
+    "node_id": "MDQ6VXNlcjEzNjg2MTM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13686139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AlexeyAkhunov",
+    "html_url": "https://github.com/AlexeyAkhunov",
+    "followers_url": "https://api.github.com/users/AlexeyAkhunov/followers",
+    "following_url": "https://api.github.com/users/AlexeyAkhunov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AlexeyAkhunov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AlexeyAkhunov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AlexeyAkhunov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AlexeyAkhunov/orgs",
+    "repos_url": "https://api.github.com/users/AlexeyAkhunov/repos",
+    "events_url": "https://api.github.com/users/AlexeyAkhunov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AlexeyAkhunov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1406/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1406/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

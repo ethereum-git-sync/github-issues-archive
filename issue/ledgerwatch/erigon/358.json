@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/358",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/358/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/358/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/358/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/358",
+  "id": 560938103,
+  "node_id": "MDU6SXNzdWU1NjA5MzgxMDM=",
+  "number": 358,
+  "title": "Data race while pruning",
+  "user": {
+    "login": "JekaMas",
+    "id": 3192700,
+    "node_id": "MDQ6VXNlcjMxOTI3MDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3192700?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JekaMas",
+    "html_url": "https://github.com/JekaMas",
+    "followers_url": "https://api.github.com/users/JekaMas/followers",
+    "following_url": "https://api.github.com/users/JekaMas/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JekaMas/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JekaMas/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JekaMas/subscriptions",
+    "organizations_url": "https://api.github.com/users/JekaMas/orgs",
+    "repos_url": "https://api.github.com/users/JekaMas/repos",
+    "events_url": "https://api.github.com/users/JekaMas/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JekaMas/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-02-06T11:03:18Z",
+  "updated_at": "2020-05-08T05:02:48Z",
+  "closed_at": "2020-05-08T05:02:48Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "```\r\n==================\r\nWARNING: DATA RACE\r\nRead at 0x00c00609a038 by goroutine 49:\r\n  github.com/ledgerwatch/bolt.(*node).read()\r\n      /mnt/sdb/go/pkg/mod/github.com/ledgerwatch/bolt@v1.4.2/node.go:204 +0x24e\r\n  github.com/ledgerwatch/bolt.(*Bucket).node()\r\n      /mnt/sdb/go/pkg/mod/github.com/ledgerwatch/bolt@v1.4.2/bucket.go:831 +0x2b8\r\n  github.com/ledgerwatch/bolt.(*Cursor).node()\r\n      /mnt/sdb/go/pkg/mod/github.com/ledgerwatch/bolt@v1.4.2/cursor.go:558 +0x369\r\n  github.com/ledgerwatch/bolt.(*Bucket).Put()\r\n      /mnt/sdb/go/pkg/mod/github.com/ledgerwatch/bolt@v1.4.2/bucket.go:310 +0x374\r\n  github.com/ledgerwatch/turbo-geth/ethdb.(*BoltDatabase).Put.func1()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/ethdb/bolt_db.go:85 +0x16c\r\n  github.com/ledgerwatch/bolt.(*DB).Update()\r\n      /mnt/sdb/go/pkg/mod/github.com/ledgerwatch/bolt@v1.4.2/db.go:650 +0xdf\r\n  github.com/ledgerwatch/turbo-geth/ethdb.(*BoltDatabase).Put()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/ethdb/bolt_db.go:80 +0x110\r\n  github.com/ledgerwatch/turbo-geth/core.(*BasicPruner).WriteLastPrunedBlockNum()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/core/pruner.go:130 +0x2a0\r\n  github.com/ledgerwatch/turbo-geth/core.(*BasicPruner).pruningLoop()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/core/pruner.go:71 +0xd39\r\n\r\nPrevious write at 0x00c00609a038 by goroutine 391:\r\n  [failed to restore the stack]\r\n\r\nGoroutine 49 (running) created at:\r\n  github.com/ledgerwatch/turbo-geth/core.(*BasicPruner).Start()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/core/pruner.go:52 +0xe5\r\n  github.com/ledgerwatch/turbo-geth/core.NewBlockChain()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/core/blockchain.go:328 +0x15c9\r\n  github.com/ledgerwatch/turbo-geth/eth.New()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/eth/backend.go:195 +0x13c0\r\n  main.makeMiner.func1()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/miner/stresstest/stress_ethash.go:199 +0x4f\r\n  github.com/ledgerwatch/turbo-geth/node.(*Node).Start()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/node/node.go:209 +0x73d\r\n  main.makeMiner()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/miner/stresstest/stress_ethash.go:204 +0x90a\r\n  main.main()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/miner/stresstest/stress_ethash.go:73 +0x7ac\r\n\r\nGoroutine 391 (running) created at:\r\n  github.com/ledgerwatch/turbo-geth/consensus/ethash.(*Ethash).Seal()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/consensus/ethash/sealer.go:97 +0x9a3\r\n  github.com/ledgerwatch/turbo-geth/miner.(*worker).taskLoop()\r\n      /mnt/sdb/go/src/github.com/ledgerwatch/turbo-geth/miner/worker.go:569 +0x756\r\n==================\r\n```",
+  "closed_by": {
+    "login": "AlexeyAkhunov",
+    "id": 13686139,
+    "node_id": "MDQ6VXNlcjEzNjg2MTM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13686139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AlexeyAkhunov",
+    "html_url": "https://github.com/AlexeyAkhunov",
+    "followers_url": "https://api.github.com/users/AlexeyAkhunov/followers",
+    "following_url": "https://api.github.com/users/AlexeyAkhunov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AlexeyAkhunov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AlexeyAkhunov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AlexeyAkhunov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AlexeyAkhunov/orgs",
+    "repos_url": "https://api.github.com/users/AlexeyAkhunov/repos",
+    "events_url": "https://api.github.com/users/AlexeyAkhunov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AlexeyAkhunov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/358/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/358/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

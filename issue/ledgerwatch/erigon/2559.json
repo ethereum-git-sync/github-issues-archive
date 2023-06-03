@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2559",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2559/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2559/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2559/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/2559",
+  "id": 975419445,
+  "node_id": "MDU6SXNzdWU5NzU0MTk0NDU=",
+  "number": 2559,
+  "title": "RPCDaemon passes zero gasPrice to eth_call EVM execution",
+  "user": {
+    "login": "canepat",
+    "id": 16927169,
+    "node_id": "MDQ6VXNlcjE2OTI3MTY5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16927169?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/canepat",
+    "html_url": "https://github.com/canepat",
+    "followers_url": "https://api.github.com/users/canepat/followers",
+    "following_url": "https://api.github.com/users/canepat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/canepat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/canepat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/canepat/subscriptions",
+    "organizations_url": "https://api.github.com/users/canepat/orgs",
+    "repos_url": "https://api.github.com/users/canepat/repos",
+    "events_url": "https://api.github.com/users/canepat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/canepat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-08-20T09:09:22Z",
+  "updated_at": "2021-08-20T09:51:27Z",
+  "closed_at": "2021-08-20T09:51:27Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: 2021.08.4-alpha\r\n\r\nOS & Version: Linux Ubuntu 20.04.2 LTS\r\n\r\nCommit hash : [0a887fd](https://github.com/ledgerwatch/erigon/commit/0a887fdb63d8760f0ec24bba890618dbf5ac4e76)\r\n\r\n#### Expected behaviour\r\nResponse to eth_call API in Goerli testnet is the same using:\r\n\r\nInfura (used as reference, its client version is Geth v1.10.6)\r\nRPCDaemon connected to Erigon Core\r\nSilkrpc connected to Erigon Core\r\n\r\n#### Actual behaviour\r\nRPCDaemon+Erigon gives a different result from Infura and Sillkrpc+Erigon (which give the same result) executing `eth_call` for the following transaction: [0x2d2eb5044637df2d6d733b958c0f7b3859b75c8ab0bb1533f457553ff4365dbe](https://goerli.etherscan.io/tx/0x2d2eb5044637df2d6d733b958c0f7b3859b75c8ab0bb1533f457553ff4365dbe)\r\n\r\nInfura: error execution reverted (same code, data and message as Silkrpc)\r\nSilkrpc: error execution reverted (same code, data and message as Infura)\r\nRPCDaemon: {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x\"}\r\n\r\n#### Steps to reproduce the behaviour\r\n- Compare how the three API endpoints (Infura/RPCDaemon/Silkrpc) answer to `eth_call` for such transaction using the following command:\r\n\r\n```\r\ncurl --silent -X POST -H \"Content-Type: application/json\" --data '{\"jsonrpc\": \"2.0\", \"method\": \"eth_call\", \"params\": [{\"data\": \"0x13ca4b3b00000000000000000000000000000000000000000000000000000002540be400\",\"from\": \"0x3f164d991502e930043292fac5e62e313018125a\", \"to\": \"0xcf463b20ab8b33211fbdb0dc5785536601505a86\", \"gas\": \"0x1e8480\", \"gasPrice\": \"0x2540be400\"}, \"0x50C954\"], \"id\": 1}' <api_endpoint_url>\r\n```\r\n\r\n#### Analysis\r\nLooking at [target contract](https://goerli.etherscan.io/address/0xcf463b20ab8b33211fbdb0dc5785536601505a86) bytecode you can find the encoded revert message returned by Infura/Silkrpc and decompiling the bytecode gives an hint at where the problem lies. Such revert message is returned just in case the `tx.gas_price >= param1` condition is satisfied, where `param1` is the provided call parameter (0x2540be400).\r\nThe root cause can be tracked down to the [ToMessage](https://github.com/ledgerwatch/erigon/blob/devel/internal/ethapi/api.go#L386) function where `gasPrice` variable shadowing leaves outer scope variable with the same name unassigned resulting eventually in zero gas price passed to the EVM context.\r\n",
+  "closed_by": {
+    "login": "AskAlexSharov",
+    "id": 46885206,
+    "node_id": "MDQ6VXNlcjQ2ODg1MjA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/46885206?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AskAlexSharov",
+    "html_url": "https://github.com/AskAlexSharov",
+    "followers_url": "https://api.github.com/users/AskAlexSharov/followers",
+    "following_url": "https://api.github.com/users/AskAlexSharov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AskAlexSharov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AskAlexSharov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AskAlexSharov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AskAlexSharov/orgs",
+    "repos_url": "https://api.github.com/users/AskAlexSharov/repos",
+    "events_url": "https://api.github.com/users/AskAlexSharov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AskAlexSharov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2559/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2559/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

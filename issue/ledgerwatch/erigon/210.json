@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/210",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/210/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/210/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/210/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/210",
+  "id": 530615991,
+  "node_id": "MDU6SXNzdWU1MzA2MTU5OTE=",
+  "number": 210,
+  "title": "Add eth_getBlockByNumber RPC request to RPC daemon",
+  "user": {
+    "login": "AlexeyAkhunov",
+    "id": 13686139,
+    "node_id": "MDQ6VXNlcjEzNjg2MTM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13686139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AlexeyAkhunov",
+    "html_url": "https://github.com/AlexeyAkhunov",
+    "followers_url": "https://api.github.com/users/AlexeyAkhunov/followers",
+    "following_url": "https://api.github.com/users/AlexeyAkhunov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AlexeyAkhunov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AlexeyAkhunov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AlexeyAkhunov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AlexeyAkhunov/orgs",
+    "repos_url": "https://api.github.com/users/AlexeyAkhunov/repos",
+    "events_url": "https://api.github.com/users/AlexeyAkhunov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AlexeyAkhunov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2019-11-30T18:43:50Z",
+  "updated_at": "2019-12-04T10:44:55Z",
+  "closed_at": "2019-12-04T10:44:55Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "In order to build and run turbo-geth node together with RPC daemon, you need to do the following:\r\n1. Clone turbo-geth repo\r\n2. Build it by running `make`\r\n3. Start it (it will start syncing to the mainnet) like this:\r\n````\r\n./build/bin/geth --remote-db-listen-addr localhost:9999\r\n````\r\n4. Look out for this in the console/log file:\r\n````\r\nINFO [11-30|18:34:12.687] Remote DB interface listening on         address=localhost:9999\r\n````\r\n5. In another terminal/tab, build RPC daemon:\r\n````\r\nmake rpcdaemon\r\n````\r\n6. Run it:\r\n````\r\n./build/bin/rpcdaemon --rpcapi eth\r\n````\r\nBy default, it will connect to the turbo-geth node on the `localhost:9999`, but this can be changed via command line parameters. Note that it does not matter in which order you start these two processes, RPC daemon will only try to connect to turbo-geth node when serving its first RPC request, and then it will reconnect if connection is lost (for example, if you restart turbo-geth)\r\n7. Try `eth_blockNumber` call. In another console/tab, use `curl` to make RPC call:\r\n````\r\ncurl -X POST -H \"Content-Type: application/json\" --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\", \"params\": [], \"id\":1}' localhost:8545\r\n````\r\n8. It should return something like this (depending on how far your turbo-geth node has synced):\r\n````\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":823909}\r\n````\r\nThe code implementing most of the daemon is in `cmd/rpcdaemon/commands/daemon.go`. At the time of writing, it is not yet in `master` branch, but after the pull request https://github.com/ledgerwatch/turbo-geth/pull/209, it will be\r\n\r\nThe task is to implement another RPC request, https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getblockbynumber\r\nThe current implementation can be found in https://github.com/ledgerwatch/turbo-geth/blob/ce1c14809b997051de73699e9d5139913deb46c1/eth/api_backend.go#L107\r\nBut please ignore the case of the \"Pending\" block.",
+  "closed_by": {
+    "login": "AlexeyAkhunov",
+    "id": 13686139,
+    "node_id": "MDQ6VXNlcjEzNjg2MTM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13686139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AlexeyAkhunov",
+    "html_url": "https://github.com/AlexeyAkhunov",
+    "followers_url": "https://api.github.com/users/AlexeyAkhunov/followers",
+    "following_url": "https://api.github.com/users/AlexeyAkhunov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AlexeyAkhunov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AlexeyAkhunov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AlexeyAkhunov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AlexeyAkhunov/orgs",
+    "repos_url": "https://api.github.com/users/AlexeyAkhunov/repos",
+    "events_url": "https://api.github.com/users/AlexeyAkhunov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AlexeyAkhunov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/210/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/210/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

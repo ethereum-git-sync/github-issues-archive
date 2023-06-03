@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1786",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1786/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1786/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1786/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/1786",
+  "id": 865547643,
+  "node_id": "MDU6SXNzdWU4NjU1NDc2NDM=",
+  "number": 1786,
+  "title": "trace_block does not report mining or uncle rewards",
+  "user": {
+    "login": "tjayrush",
+    "id": 5417918,
+    "node_id": "MDQ6VXNlcjU0MTc5MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5417918?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tjayrush",
+    "html_url": "https://github.com/tjayrush",
+    "followers_url": "https://api.github.com/users/tjayrush/followers",
+    "following_url": "https://api.github.com/users/tjayrush/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tjayrush/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tjayrush/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tjayrush/subscriptions",
+    "organizations_url": "https://api.github.com/users/tjayrush/orgs",
+    "repos_url": "https://api.github.com/users/tjayrush/repos",
+    "events_url": "https://api.github.com/users/tjayrush/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tjayrush/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-04-22T22:46:53Z",
+  "updated_at": "2021-05-04T12:46:30Z",
+  "closed_at": "2021-05-04T12:46:30Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Calling `trace_block` against OpenEthereum returns not only transaction traces, but also an issuance trace for the block. For example, \r\n\r\n```\r\ncurl -s --data '{\"method\":\"trace_block\",\"params\":[\"0xb443\"],\"id\":\"1\",\"jsonrpc\":\"2.0\"}' -H \"Content-Type: application/json\" -X POST http://localhost:8545\r\n```\r\n\r\nreturns this data (which you can see includes the block reward).\r\n\r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"result\": [\r\n    {\r\n      \"action\": {\r\n        \"callType\": \"call\",\r\n        \"from\": \"0xa1e4380a3b1f749673e270229993ee55f35663b4\",\r\n        \"gas\": \"0x0\",\r\n        \"input\": \"0x\",\r\n        \"to\": \"0x5df9b87991262f6ba471f09758cde1c0fc1de734\",\r\n        \"value\": \"0x7a69\"\r\n      },\r\n      \"blockHash\": \"0x4e3a3754410177e6937ef1f84bba68ea139e8d1a2258c5f85db9f1cd715a1bdd\",\r\n      \"blockNumber\": 46147,\r\n      \"result\": {\r\n        \"gasUsed\": \"0x0\",\r\n        \"output\": \"0x\"\r\n      },\r\n      \"subtraces\": 0,\r\n      \"traceAddress\": [],\r\n      \"transactionHash\": \"0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060\",\r\n      \"transactionPosition\": 0,\r\n      \"type\": \"call\"\r\n    },\r\n    {\r\n      \"action\": {\r\n        \"author\": \"0xe6a7a1d47ff21b6321162aea7c6cb457d5476bca\",\r\n        \"rewardType\": \"block\",\r\n        \"value\": \"0x4563918244f40000\"\r\n      },\r\n      \"blockHash\": \"0x4e3a3754410177e6937ef1f84bba68ea139e8d1a2258c5f85db9f1cd715a1bdd\",\r\n      \"blockNumber\": 46147,\r\n      \"result\": null,\r\n      \"subtraces\": 0,\r\n      \"traceAddress\": [],\r\n      \"transactionHash\": null,\r\n      \"transactionPosition\": null,\r\n      \"type\": \"reward\"\r\n    }\r\n  ],\r\n  \"id\": \"1\"\r\n}\r\n```\r\n\r\nBlock 3 is an example of a block with no transactions but both a block and an uncle reward. I've included the return below for reference:\r\n\r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"result\": [\r\n    {\r\n      \"action\": {\r\n        \"author\": \"0x5088d623ba0fcf0131e0897a91734a4d83596aa0\",\r\n        \"rewardType\": \"block\",\r\n        \"value\": \"0x478eae0e571ba000\"\r\n      },\r\n      \"blockHash\": \"0x3d6122660cc824376f11ee842f83addc3525e2dd6756b9bcf0affa6aa88cf741\",\r\n      \"blockNumber\": 3,\r\n      \"result\": null,\r\n      \"subtraces\": 0,\r\n      \"traceAddress\": [],\r\n      \"transactionHash\": null,\r\n      \"transactionPosition\": null,\r\n      \"type\": \"reward\"\r\n    },\r\n    {\r\n      \"action\": {\r\n        \"author\": \"0xc8ebccc5f5689fa8659d83713341e5ad19349448\",\r\n        \"rewardType\": \"uncle\",\r\n        \"value\": \"0x340aad21b3b70000\"\r\n      },\r\n      \"blockHash\": \"0x3d6122660cc824376f11ee842f83addc3525e2dd6756b9bcf0affa6aa88cf741\",\r\n      \"blockNumber\": 3,\r\n      \"result\": null,\r\n      \"subtraces\": 0,\r\n      \"traceAddress\": [],\r\n      \"transactionHash\": null,\r\n      \"transactionPosition\": null,\r\n      \"type\": \"reward\"\r\n    }\r\n  ],\r\n  \"id\": \"1\"\r\n}\r\n```\r\n\r\nTurbo Geth returns:\r\n\r\n```\r\n{\r\n  \"data\": [\r\n    {\r\n      \"id\": \"17\",\r\n      \"jsonrpc\": \"2.0\",\r\n      \"result\": []\r\n    }\r\n  ]\r\n}\r\n```\r\n\r\nThis image shows the difference pretty clearly for the first example above.\r\n\r\n![image](https://user-images.githubusercontent.com/5417918/115793659-82390c80-a39a-11eb-97d5-fdadf52dda5a.png)\r\n",
+  "closed_by": {
+    "login": "AlexeyAkhunov",
+    "id": 13686139,
+    "node_id": "MDQ6VXNlcjEzNjg2MTM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13686139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AlexeyAkhunov",
+    "html_url": "https://github.com/AlexeyAkhunov",
+    "followers_url": "https://api.github.com/users/AlexeyAkhunov/followers",
+    "following_url": "https://api.github.com/users/AlexeyAkhunov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AlexeyAkhunov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AlexeyAkhunov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AlexeyAkhunov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AlexeyAkhunov/orgs",
+    "repos_url": "https://api.github.com/users/AlexeyAkhunov/repos",
+    "events_url": "https://api.github.com/users/AlexeyAkhunov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AlexeyAkhunov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1786/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/1786/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

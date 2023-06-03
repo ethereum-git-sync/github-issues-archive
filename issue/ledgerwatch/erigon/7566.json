@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7566",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7566/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7566/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7566/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/7566",
+  "id": 1722431324,
+  "node_id": "I_kwDOC0FsAM5mqjdc",
+  "number": 7566,
+  "title": "Engine API is not responding to the Docker Host:  \"Recv failure: Connection reset by peer\"",
+  "user": {
+    "login": "victorelec14",
+    "id": 543450,
+    "node_id": "MDQ6VXNlcjU0MzQ1MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/543450?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/victorelec14",
+    "html_url": "https://github.com/victorelec14",
+    "followers_url": "https://api.github.com/users/victorelec14/followers",
+    "following_url": "https://api.github.com/users/victorelec14/following{/other_user}",
+    "gists_url": "https://api.github.com/users/victorelec14/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/victorelec14/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/victorelec14/subscriptions",
+    "organizations_url": "https://api.github.com/users/victorelec14/orgs",
+    "repos_url": "https://api.github.com/users/victorelec14/repos",
+    "events_url": "https://api.github.com/users/victorelec14/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/victorelec14/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-23T16:32:04Z",
+  "updated_at": "2023-05-23T17:07:05Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `./erigon --version`\r\n\r\nerigon version 2.43.0-stable-1106475e\r\n\r\nOS & Version:  Linux  (Docker version 20.10.21, build baeda1f)\r\n\r\nCommit hash:  1106475e\r\n\r\nErigon Command (with flags/config):  \r\n\r\nDocker \r\n```yml\r\nversion: \"3\"\r\nservices:\r\n  erigon:\r\n    image: thorax/erigon:v2.43.0\r\n    restart: unless-stopped\r\n    stop_grace_period: 1m\r\n    command:\r\n      - erigon\r\n      - --chain=mainnet\r\n      #- --datadir=/erigon\r\n      - --http\r\n      - --http.api=eth,net,web3,engine,admin,erigon,debug,trace,txpool\r\n      - --private.api.addr=0.0.0.0:9090\r\n      - --authrpc.jwtsecret=/jwt.hex\r\n      - --authrpc.addr=0.0.0.0\r\n      - --authrpc.port=8551\r\n      - --authrpc.vhosts='*'\r\n      #- --snapshots\r\n      - --http.addr=0.0.0.0\r\n      - --http.port=8545\r\n      - --http.vhosts=\"*\"\r\n      - --http.corsdomain=\"*\"\r\n      - --ws\r\n      - --externalcl\r\n      - --nat=any\r\n    user: 'root' #1000:1000\r\n    ports:\r\n      - \"30303:30303/tcp\"\r\n      - \"30303:30303/udp\"\r\n      - \"30304:30304/tcp\"\r\n      - \"30304:30304/udp\"\r\n      - \"42068:42068/tcp\"\r\n      - \"42068:42068/udp\"\r\n      - \"8545:8545\"\r\n      - \"8551:8551\"\r\n      - \"6060:6060\"\r\n    volumes:\r\n      - ./erigon:/root/.local/share/erigon\r\n      - ./jwt.hex:/jwt.hex\r\n\r\n```\r\nConcensus Layer:\r\n\r\nConcensus Layer Command (with flags/config):\r\n\r\nChain/Network:  Mainnet\r\n\r\n#### Expected behaviour\r\n\r\nErigon does not respond to requests from the Docker host when the Engine API is called on port 8551, it responds with\r\n>  Recv failure: Connection reset by peer\r\n\r\nWhen should I reply \"Missing Token\"  (normal value when the hex token is not passed in the query)\r\n\r\n\r\nThis only happens from the Docker Host and not inside the container, there if it responds correctly:\r\n```\r\nroot@erigon:~# docker exec -it b53618c520ee sh\r\n\r\n/ # curl -X POST http://localhost:8551/  -H \"Content-Type: application/json\"  --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":1}'\r\nmissing token\r\n```\r\n\r\n\r\n#### Actual behaviour\r\n\r\n```\r\nroot@erigon:~# curl -X POST http://127.0.0.1:8551/  -H \"Content-Type: application/json\"  --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":1}'\r\ncurl: (56) Recv failure: Connection reset by peer\r\n```\r\n\r\n#### Steps to reproduce the behaviour\r\ndocker-compose up -d\r\ndocker exec -it erigon sh\r\ncurl -X POST http://localhost:8551/  -H \"Content-Type: application/json\"  --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":1}'\r\n\r\n\r\n#### Backtrace\r\n\r\n127.0.0.1 even when the parameter \"- --authrpc.addr=0.0.0.0\" is set\r\n\r\n> erigon_1  | [INFO] [05-23|17:03:45.874] HTTP endpoint opened for Engine API      url=127.0.0.1:8551 ws=true ws.compression=true\r\n\r\n\r\n````\r\n[backtrace]\r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7566/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7566/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

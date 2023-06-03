@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2632",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2632/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2632/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2632/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/2632",
+  "id": 988687193,
+  "node_id": "MDU6SXNzdWU5ODg2ODcxOTM=",
+  "number": 2632,
+  "title": "Enode db race",
+  "user": {
+    "login": "AskAlexSharov",
+    "id": 46885206,
+    "node_id": "MDQ6VXNlcjQ2ODg1MjA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/46885206?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AskAlexSharov",
+    "html_url": "https://github.com/AskAlexSharov",
+    "followers_url": "https://api.github.com/users/AskAlexSharov/followers",
+    "following_url": "https://api.github.com/users/AskAlexSharov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AskAlexSharov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AskAlexSharov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AskAlexSharov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AskAlexSharov/orgs",
+    "repos_url": "https://api.github.com/users/AskAlexSharov/repos",
+    "events_url": "https://api.github.com/users/AskAlexSharov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AskAlexSharov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-09-06T02:44:21Z",
+  "updated_at": "2021-09-13T06:07:19Z",
+  "closed_at": "2021-09-13T06:07:19Z",
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "```\r\n==================\r\nWARNING: DATA RACE\r\nWrite at 0x00c002dc65f0 by goroutine 100:\r\n  github.com/ledgerwatch/erigon/p2p/enode.(*DB).Close()\r\n      github.com/ledgerwatch/erigon/p2p/enode/nodedb.go:773 +0x8e\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).run·dwrap·18()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:730 +0x39\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).run()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:833 +0x2449\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).Start·dwrap·14()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:505 +0x39\r\n\r\nPrevious read at 0x00c002dc65f0 by goroutine 81:\r\n  github.com/ledgerwatch/erigon/p2p/enode.(*DB).expirer()\r\n      github.com/ledgerwatch/erigon/p2p/enode/nodedb.go:459 +0xf9\r\n  github.com/ledgerwatch/erigon/p2p/enode.(*DB).ensureExpirer.func1·dwrap·25()\r\n      github.com/ledgerwatch/erigon/p2p/enode/nodedb.go:447 +0x39\r\n\r\nGoroutine 100 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).Start()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:505 +0x927\r\n  github.com/ledgerwatch/erigon/cmd/sentry/download.(*SentryServerImpl).SetStatus()\r\n      github.com/ledgerwatch/erigon/cmd/sentry/download/sentry.go:824 +0x6f8\r\n  github.com/ledgerwatch/erigon-lib/direct.(*SentryClientDirect).SetStatus()\r\n      github.com/ledgerwatch/erigon-lib@v0.0.0-20210903073605-b91934e9e8ac/direct/sentry_client.go:194 +0x6a\r\n  github.com/ledgerwatch/erigon/cmd/sentry/download.SentrySetStatus()\r\n      github.com/ledgerwatch/erigon/cmd/sentry/download/downloader.go:314 +0x6f\r\n  github.com/ledgerwatch/erigon/cmd/sentry/download.RecvMessageLoop()\r\n      github.com/ledgerwatch/erigon/cmd/sentry/download/downloader.go:236 +0x376\r\n  github.com/ledgerwatch/erigon/eth.(*Ethereum).Start.func1()\r\n      github.com/ledgerwatch/erigon/eth/backend.go:674 +0xfe\r\n  github.com/ledgerwatch/erigon/eth.(*Ethereum).Start·dwrap·9()\r\n      github.com/ledgerwatch/erigon/eth/backend.go:675 +0x47\r\n\r\nGoroutine 81 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p/enode.(*DB).ensureExpirer.func1()\r\n      github.com/ledgerwatch/erigon/p2p/enode/nodedb.go:447 +0x98\r\n  sync.(*Once).doSlow()\r\n      sync/once.go:68 +0x127\r\n  sync.(*Once).Do()\r\n      sync/once.go:59 +0x46\r\n  github.com/ledgerwatch/erigon/p2p/enode.(*DB).ensureExpirer()\r\n      github.com/ledgerwatch/erigon/p2p/enode/nodedb.go:447 +0x50\r\n  github.com/ledgerwatch/erigon/p2p/enode.(*DB).QuerySeeds.func1()\r\n      github.com/ledgerwatch/erigon/p2p/enode/nodedb.go:701 +0x3fa\r\n  github.com/ledgerwatch/erigon-lib/kv/mdbx.(*MdbxKV).View()\r\n      github.com/ledgerwatch/erigon-lib@v0.0.0-20210903073605-b91934e9e8ac/kv/mdbx/kv_mdbx.go:586 +0x1ce\r\n  github.com/ledgerwatch/erigon/p2p/enode.(*DB).QuerySeeds()\r\n      github.com/ledgerwatch/erigon/p2p/enode/nodedb.go:673 +0x314\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*Table).loadSeedNodes()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:307 +0x76\r\n  github.com/ledgerwatch/erigon/p2p/discover.newTable()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:124 +0x698\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:147 +0x5a9\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).setupDiscovery()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:607 +0x889\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).Start()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:499 +0x875\r\n  github.com/ledgerwatch/erigon/cmd/sentry/download.(*SentryServerImpl).SetStatus()\r\n      github.com/ledgerwatch/erigon/cmd/sentry/download/sentry.go:824 +0x6f8\r\n  github.com/ledgerwatch/erigon-lib/direct.(*SentryClientDirect).SetStatus()\r\n      github.com/ledgerwatch/erigon-lib@v0.0.0-20210903073605-b91934e9e8ac/direct/sentry_client.go:194 +0x6a\r\n  github.com/ledgerwatch/erigon/cmd/sentry/download.SentrySetStatus()\r\n      github.com/ledgerwatch/erigon/cmd/sentry/download/downloader.go:314 +0x6f\r\n  github.com/ledgerwatch/erigon/cmd/sentry/download.RecvMessageLoop()\r\n      github.com/ledgerwatch/erigon/cmd/sentry/download/downloader.go:236 +0x376\r\n  github.com/ledgerwatch/erigon/eth.(*Ethereum).Start.func1()\r\n      github.com/ledgerwatch/erigon/eth/backend.go:674 +0xfe\r\n  github.com/ledgerwatch/erigon/eth.(*Ethereum).Start·dwrap·9()\r\n      github.com/ledgerwatch/erigon/eth/backend.go:675 +0x47\r\n==================\r\n```",
+  "closed_by": {
+    "login": "AskAlexSharov",
+    "id": 46885206,
+    "node_id": "MDQ6VXNlcjQ2ODg1MjA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/46885206?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AskAlexSharov",
+    "html_url": "https://github.com/AskAlexSharov",
+    "followers_url": "https://api.github.com/users/AskAlexSharov/followers",
+    "following_url": "https://api.github.com/users/AskAlexSharov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AskAlexSharov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AskAlexSharov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AskAlexSharov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AskAlexSharov/orgs",
+    "repos_url": "https://api.github.com/users/AskAlexSharov/repos",
+    "events_url": "https://api.github.com/users/AskAlexSharov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AskAlexSharov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2632/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2632/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

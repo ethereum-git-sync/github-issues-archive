@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2483",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2483/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2483/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2483/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/2483",
+  "id": 958562154,
+  "node_id": "MDU6SXNzdWU5NTg1NjIxNTQ=",
+  "number": 2483,
+  "title": "RPCDaemon gives different eth_gasPrice results compared to Infura/Silkrpc",
+  "user": {
+    "login": "canepat",
+    "id": 16927169,
+    "node_id": "MDQ6VXNlcjE2OTI3MTY5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16927169?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/canepat",
+    "html_url": "https://github.com/canepat",
+    "followers_url": "https://api.github.com/users/canepat/followers",
+    "following_url": "https://api.github.com/users/canepat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/canepat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/canepat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/canepat/subscriptions",
+    "organizations_url": "https://api.github.com/users/canepat/orgs",
+    "repos_url": "https://api.github.com/users/canepat/repos",
+    "events_url": "https://api.github.com/users/canepat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/canepat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-08-02T22:42:30Z",
+  "updated_at": "2021-08-03T04:48:10Z",
+  "closed_at": "2021-08-03T04:48:10Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: 2021.08.1-alpha\r\n\r\nOS & Version: Linux Ubuntu 20.04.2 LTS\r\n\r\nCommit hash : [12982b2](https://github.com/ledgerwatch/erigon/commit/12982b21c148f5b13548420dafd40cab56af56ad)\r\n\r\n#### Expected behaviour\r\n\r\nResponse to `eth_gasPrice` API in Goerli testnet is the same using:\r\n- Infura (used as reference, its client version is Geth v1.10.6)\r\n- RPCDaemon connected to Erigon Core\r\n- Silkrpc connected to Erigon Core\r\n\r\n#### Actual behaviour\r\n\r\nRPCDaemon+Erigon gives a different result from Infura and Sillkrpc-Erigon (which give the same result). E.g. at block number 0x502087\r\n\r\nInfura: {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"**0x12a05f200**\"}\r\nSilkrpc: {\"id\":1,\"jsonrpc\":\"2.0\",\"result\":\"**0x12a05f200**\"}\r\nRPCDaemon: {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"**0x12a05f1dd**\"}\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n- Check that all three API endpoints (Infura/RPCDaemon/Silkrpc) return the same response to `eth_blockNumber` (sanity check)\r\n- Compare how the three API endpoints (Infura/RPCDaemon/Silkrpc) answer to `eth_gasPrice`\r\n\r\n#### Analysis\r\n\r\nThe difference in RPCDaemon response is always some multiplier of the block `baseFee` (currently 7 wei on Goerli) and seems to depend on two factors:\r\n- the sorting performed in the transaction gas price heap, which triggers calls to function [`Less`](https://github.com/ledgerwatch/erigon/blob/devel/eth/gasprice/gasprice.go#L177). Such function in turn calls function GetEffectiveGasTip for [DynamicFeeTransaction](https://github.com/ledgerwatch/erigon/blob/devel/core/types/dynamic_fee_tx.go#L52) and for [LegacyTx](https://github.com/ledgerwatch/erigon/blob/devel/core/types/legacy_tx.go#L80) where `gasFeeCap` and consequently `GasPrice` attribute is decremented by `baseFee` at every call: `effectiveFee := gasFeeCap.Sub(gasFeeCap, baseFee)`, hence the first missing pieces depending on the number of Less calls.\r\n- the [SuggestPrice](https://github.com/ledgerwatch/erigon/blob/devel/eth/gasprice/gasprice.go#L111) function used to implement the `eth_gasPrice` API requires adding `baseFee` to the returned value to obtain the legacy gas price, which is the expected result according to [Geth](https://github.com/ethereum/pm/issues/328#issuecomment-853234014), given that AFAIK a formal behavior is not spec'd. However, the calling [GasPrice](https://github.com/ledgerwatch/erigon/blob/devel/cmd/rpcdaemon/commands/eth_system.go#L107) function does not add such contribute to the returned price, hence the second missing piece.\r\n",
+  "closed_by": {
+    "login": "AskAlexSharov",
+    "id": 46885206,
+    "node_id": "MDQ6VXNlcjQ2ODg1MjA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/46885206?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AskAlexSharov",
+    "html_url": "https://github.com/AskAlexSharov",
+    "followers_url": "https://api.github.com/users/AskAlexSharov/followers",
+    "following_url": "https://api.github.com/users/AskAlexSharov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AskAlexSharov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AskAlexSharov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AskAlexSharov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AskAlexSharov/orgs",
+    "repos_url": "https://api.github.com/users/AskAlexSharov/repos",
+    "events_url": "https://api.github.com/users/AskAlexSharov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AskAlexSharov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2483/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/2483/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

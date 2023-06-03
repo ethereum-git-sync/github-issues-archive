@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7538",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7538/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7538/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7538/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/7538",
+  "id": 1715884812,
+  "node_id": "I_kwDOC0FsAM5mRlMM",
+  "number": 7538,
+  "title": "Syncing of matic mainnet is stucked",
+  "user": {
+    "login": "samarthk-systango",
+    "id": 128302698,
+    "node_id": "U_kgDOB6W-ag",
+    "avatar_url": "https://avatars.githubusercontent.com/u/128302698?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/samarthk-systango",
+    "html_url": "https://github.com/samarthk-systango",
+    "followers_url": "https://api.github.com/users/samarthk-systango/followers",
+    "following_url": "https://api.github.com/users/samarthk-systango/following{/other_user}",
+    "gists_url": "https://api.github.com/users/samarthk-systango/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/samarthk-systango/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/samarthk-systango/subscriptions",
+    "organizations_url": "https://api.github.com/users/samarthk-systango/orgs",
+    "repos_url": "https://api.github.com/users/samarthk-systango/repos",
+    "events_url": "https://api.github.com/users/samarthk-systango/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/samarthk-systango/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-18T16:03:09Z",
+  "updated_at": "2023-05-18T16:03:09Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hi Team,\r\n\r\nI have started the matic node using docker compose but syncing is stucked from last 5 days on one of the block id, we restarted the service multiple times but it's not showing any progress.  \r\n\r\n**Current Block\t     Latest Block\t                 Lag\r\n     41775619\t               42843218                    1067599**\r\n\r\n**Here are the configuration and services which we have in our docker-compose file**\r\n\r\n```\r\nservices:\r\n  heimdall:\r\n    image: 0xpolygon/heimdall:0.3.0\r\n    entrypoint: /usr/bin/heimdalld\r\n    command: start --home=/heimdall-home --chain=bor-mainnet\r\n    ports: [ \"26657:26657\", \"26656:26656\"]\r\n    volumes:\r\n      - /data/heimdalld:/heimdall-home:rw\r\n    networks:\r\n      - polygon\r\n    restart: unless-stopped\r\n\r\n  heimdallr:\r\n    image: 0xpolygon/heimdall:0.3.0\r\n    entrypoint: /usr/bin/heimdalld\r\n    command: rest-server --laddr=tcp://0.0.0.0:1317 --home=/heimdall-home --chain=bor-mainnet --node=tcp://heimdall:26657\r\n    ports: [ \"1317:1317\"]\r\n    volumes:\r\n      - /data/heimdalld:/heimdall-home:rw\r\n    networks:\r\n      - polygon\r\n    restart: unless-stopped\r\n    depends_on:\r\n      - heimdall\r\n\r\n  erigon:\r\n    image: thorax/erigon:v2.42.0\r\n    # build:\r\n    #   args:\r\n    #     UID: ${DOCKER_UID:-1000}\r\n    #     GID: ${DOCKER_GID:-1000}\r\n    #   context: .\r\n    user: root\r\n    command: |\r\n      ${ERIGON_FLAGS-} --private.api.addr=0.0.0.0:9090\r\n      --sentry.api.addr=sentry:9091 --downloader.api.addr=downloader:9093 --txpool.disable\r\n      --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --pprof --pprof.addr=0.0.0.0 --pprof.port=6061 --snapshots=false\r\n      --authrpc.jwtsecret=/home/erigon/.local/share/erigon/jwt.hex --datadir=/home/erigon/.local/share/erigon --bor.heimdall=http://heimdallr:1317 --chain=bor-mainnet\r\n    ports: [ \"8551:8551\" ]\r\n    volumes:\r\n      # It's ok to mount sub-dirs of \"datadir\" to different drives\r\n      - /data/erigon:/home/erigon/.local/share/erigon\r\n    restart: unless-stopped\r\n    mem_swappiness: 0\r\n    networks:\r\n      - polygon\r\n\r\n  sentry:\r\n    <<: *default-erigon-service\r\n    entrypoint: sentry\r\n    command: ${SENTRY_FLAGS-} --sentry.api.addr=0.0.0.0:9091 --datadir=/home/erigon/.local/share/erigon\r\n    ports: [ \"30303:30303/tcp\", \"30303:30303/udp\" ]\r\n    networks:\r\n      - polygon\r\n\r\n  downloader:\r\n    <<: *default-erigon-service\r\n    entrypoint: downloader \r\n    command: ${DOWNLOADER_FLAGS-} --downloader.api.addr=0.0.0.0:9093 --datadir=/home/erigon/.local/share/erigon\r\n    ports: [ \"42069:42069/tcp\", \"42069:42069/udp\" ]\r\n    networks:\r\n      - polygon\r\n\r\n  txpool:\r\n    <<: *default-erigon-service\r\n    entrypoint: txpool\r\n    command: ${TXPOOL_FLAGS-} --private.api.addr=erigon:9090 --txpool.api.addr=0.0.0.0:9094 --sentry.api.addr=sentry:9091 --datadir=/home/erigon/.local/share/erigon\r\n    networks:\r\n      - polygon\r\n\r\n  rpcdaemon:\r\n    <<: *default-erigon-service\r\n    entrypoint: rpcdaemon\r\n    command: |\r\n      ${RPCDAEMON_FLAGS-} --http.addr=0.0.0.0 --http.vhosts=* --http.corsdomain=* --ws\r\n      --private.api.addr=erigon:9090 --txpool.api.addr=txpool:9094 --datadir=/home/erigon/.local/share/erigon\r\n    ports: [ \"8545:8545\" ]\r\n    networks:\r\n      - polygon\r\n```\r\n\r\n**Here are the hardware details for more information:**\r\n\r\nMachine SKU: Standard L16as v3 \r\nvCPU: 16\r\nRAM: 128GB\r\nDisk attached: 16 TB\r\n\r\n**Below are the current log snippet of the node :+1:** \r\n\r\n![Screenshot from 2023-05-18 21-17-39](https://github.com/ledgerwatch/erigon/assets/128302698/0f4f9fd5-2e4e-4733-b794-93e7f4528cf6)\r\n\r\n![Screenshot from 2023-05-18 21-18-03](https://github.com/ledgerwatch/erigon/assets/128302698/560d60ac-f761-4042-99cc-5e48086b189c)\r\n\r\n ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7538/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7538/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

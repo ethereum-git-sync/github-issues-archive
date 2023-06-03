@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/350",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/350/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/350/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/350/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/350",
+  "id": 558840532,
+  "node_id": "MDU6SXNzdWU1NTg4NDA1MzI=",
+  "number": 350,
+  "title": "THIN_HISTORY: Panic when adding transaction to the pool",
+  "user": {
+    "login": "AlexeyAkhunov",
+    "id": 13686139,
+    "node_id": "MDQ6VXNlcjEzNjg2MTM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13686139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AlexeyAkhunov",
+    "html_url": "https://github.com/AlexeyAkhunov",
+    "followers_url": "https://api.github.com/users/AlexeyAkhunov/followers",
+    "following_url": "https://api.github.com/users/AlexeyAkhunov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AlexeyAkhunov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AlexeyAkhunov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AlexeyAkhunov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AlexeyAkhunov/orgs",
+    "repos_url": "https://api.github.com/users/AlexeyAkhunov/repos",
+    "events_url": "https://api.github.com/users/AlexeyAkhunov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AlexeyAkhunov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-02-03T04:50:56Z",
+  "updated_at": "2020-03-25T20:16:20Z",
+  "closed_at": "2020-03-25T20:16:20Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Looks like it is only reproducible after the full sync to the tip of the chain\r\n\r\n````\r\npanic: runtime error: index out of range [0] with length 0\r\ngoroutine 219485 [running]:\r\ngithub.com/ledgerwatch/turbo-geth/core/types/accounts.(*Account).DecodeForStorage(0xc2210b43e8, 0x7f6209045d98, 0x0, 0x583, 0x20, 0x20)\r\n        /server/turbo-geth/core/types/accounts/account.go:549 +0xc92\r\ngithub.com/ledgerwatch/turbo-geth/ethdb.BoltDBFindByHistory(0xc0f0fa1b20, 0x1e9840c, 0x3, 0x3, 0xc0e5baeec0, 0x20, 0x20, 0x8f89e1, 0x422648, 0x20, ...)\r\n        /server/turbo-geth/ethdb/history_index.go:127 +0x366\r\ngithub.com/ledgerwatch/turbo-geth/ethdb.(*BoltDatabase).GetAsOf.func1(0xc0f0fa1b20, 0x41ad00, 0xc0f0fa1b20)\r\n        /server/turbo-geth/ethdb/bolt_db.go:246 +0xe3\r\ngithub.com/ledgerwatch/bolt.(*DB).View(0xc00000c1e0, 0xc2210b46c0, 0x0, 0x0)\r\n        /home/akhounov/go/pkg/mod/github.com/ledgerwatch/bolt@v1.4.2/db.go:681 +0xa8\r\ngithub.com/ledgerwatch/turbo-geth/ethdb.(*BoltDatabase).GetAsOf(0xc000152060, 0x1e983ce, 0x2, 0x2, 0x1e9840c, 0x3, 0x3, 0xc0e5baeec0, 0x20, 0x20, ...)\r\n        /server/turbo-geth/ethdb/bolt_db.go:243 +0x11b\r\ngithub.com/ledgerwatch/turbo-geth/ethdb.(*mutation).GetAsOf(0xc0001ea540, 0x1e983ce, 0x2, 0x2, 0x1e9840c, 0x3, 0x3, 0xc0e5baeec0, 0x20, 0x20, ...)\r\n        /server/turbo-geth/ethdb/mutation.go:252 +0xd4\r\ngithub.com/ledgerwatch/turbo-geth/core/state.(*DbState).ReadAccountData(0xc03e3ab900, 0xb88be5aad60dd40a, 0x6b40c076c94607cd, 0x365d22f3, 0xc037ac1900, 0x18000, 0x7e9eb\r\nf478c69ef86)\r\n        /server/turbo-geth/core/state/readonly.go:167 +0x173\r\ngithub.com/ledgerwatch/turbo-geth/core/state.(*IntraBlockState).getStateObject(0xc0bdf85a00, 0xb88be5aad60dd40a, 0x6b40c076c94607cd, 0x6e3888f9365d22f3, 0x5bb3f7f108926\r\n6c1)\r\n        /server/turbo-geth/core/state/intra_block_state.go:673 +0x11f\r\ngithub.com/ledgerwatch/turbo-geth/core/state.(*IntraBlockState).GetNonce(0xc0bdf85a00, 0xb88be5aad60dd40a, 0x6b40c076c94607cd, 0xc3365d22f3, 0x0)\r\n        /server/turbo-geth/core/state/intra_block_state.go:294 +0xc3\r\ngithub.com/ledgerwatch/turbo-geth/core.(*TxPool).validateTx(0xc0001f4600, 0xc239004120, 0x8e4fd32cfb493f00, 0x957cc7134b111918, 0x4700bf5e684eb858)\r\n        /server/turbo-geth/core/tx_pool.go:637 +0x1e7\r\ngithub.com/ledgerwatch/turbo-geth/core.(*TxPool).add(0xc0001f4600, 0xc239004120, 0x0, 0xc0f1be97e0, 0x0, 0xc2c143c6e0)\r\n        /server/turbo-geth/core/tx_pool.go:672 +0xc5\r\ngithub.com/ledgerwatch/turbo-geth/core.(*TxPool).addTxsLocked(0xc0001f4600, 0xc0f1f0d730, 0x1, 0x1, 0x6b40c076c9460700, 0x365d22f3, 0x0, 0x0, 0xc37be8e663)\r\n        /server/turbo-geth/core/tx_pool.go:916 +0xd2\r\ngithub.com/ledgerwatch/turbo-geth/core.(*TxPool).addTxs(0xc0001f4600, 0xc2cb43c720, 0x1, 0x4, 0x8e4fd32cfb490000, 0x957cc7134b111918, 0x4700bf5e684eb858, 0xc1ec1584e0)\r\n        /server/turbo-geth/core/tx_pool.go:892 +0x3b4\r\ngithub.com/ledgerwatch/turbo-geth/core.(*TxPool).AddRemotes(0xc0001f4600, 0xc2cb43c720, 0x1, 0x4, 0x4700bf5e684eb858, 0x15dc97f2a08d, 0x1f9bcc0)\r\n        /server/turbo-geth/core/tx_pool.go:843 +0x50\r\ngithub.com/ledgerwatch/turbo-geth/eth.(*ProtocolManager).handleMsg(0xc0001e61c0, 0xc1a79b00c0, 0x0, 0x0)\r\n        /server/turbo-geth/eth/handler.go:750 +0x3e3\r\ngithub.com/ledgerwatch/turbo-geth/eth.(*ProtocolManager).handle(0xc0001e61c0, 0xc1a79b00c0, 0x0, 0x0)\r\n        /server/turbo-geth/eth/handler.go:389 +0x8ba\r\ngithub.com/ledgerwatch/turbo-geth/eth.(*ProtocolManager).makeProtocol.func1(0xc1e3f3faa0, 0x14a6140, 0xc0bbe9eb40, 0x0, 0x0)\r\n        /server/turbo-geth/eth/handler.go:241 +0x1ee\r\n````\r\n",
+  "closed_by": {
+    "login": "AlexeyAkhunov",
+    "id": 13686139,
+    "node_id": "MDQ6VXNlcjEzNjg2MTM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13686139?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AlexeyAkhunov",
+    "html_url": "https://github.com/AlexeyAkhunov",
+    "followers_url": "https://api.github.com/users/AlexeyAkhunov/followers",
+    "following_url": "https://api.github.com/users/AlexeyAkhunov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AlexeyAkhunov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AlexeyAkhunov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AlexeyAkhunov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AlexeyAkhunov/orgs",
+    "repos_url": "https://api.github.com/users/AlexeyAkhunov/repos",
+    "events_url": "https://api.github.com/users/AlexeyAkhunov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AlexeyAkhunov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/350/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/350/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

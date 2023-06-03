@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/7599",
+  "id": 1730796154,
+  "node_id": "I_kwDOC0FsAM5nKdp6",
+  "number": 7599,
+  "title": "Unable to create filter on contract events via erigon node",
+  "user": {
+    "login": "samarthk-systango",
+    "id": 128302698,
+    "node_id": "U_kgDOB6W-ag",
+    "avatar_url": "https://avatars.githubusercontent.com/u/128302698?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/samarthk-systango",
+    "html_url": "https://github.com/samarthk-systango",
+    "followers_url": "https://api.github.com/users/samarthk-systango/followers",
+    "following_url": "https://api.github.com/users/samarthk-systango/following{/other_user}",
+    "gists_url": "https://api.github.com/users/samarthk-systango/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/samarthk-systango/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/samarthk-systango/subscriptions",
+    "organizations_url": "https://api.github.com/users/samarthk-systango/orgs",
+    "repos_url": "https://api.github.com/users/samarthk-systango/repos",
+    "events_url": "https://api.github.com/users/samarthk-systango/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/samarthk-systango/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-29T13:48:30Z",
+  "updated_at": "2023-05-29T13:48:30Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Requirement:**\r\nOur objective is to utilize the createFilter method of contract events in order to filter the events emitted by the contract.\r\n\r\n**Problem Statement:**\r\nWe are currently facing an issue while attempting to filter the events emitted by the contract using the createFilter method. Our setup involves an archive node through erigon. We have a script in place that successfully achieves this task when we utilize RPC endpoints provided by other providers like chainstack or Ankr. However, when we use our own node URL, we are unable to obtain any results from the filtering process.\r\n\r\n**Script:**\r\n```\r\nimport json\r\nfrom web3 import Web3\r\nfrom web3.middleware import geth_poa_middleware\r\n\r\nabi = '[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"}]'\r\n\r\nnode_provider_url = \"https://\" \r\nw3 = Web3(Web3.HTTPProvider(node_provider_url))\r\n\r\ndef get_event_txn(contract_address):\r\n    checksum_addr = w3.toChecksumAddress(contract_address)\r\n    w3.middleware_onion.inject(geth_poa_middleware, layer=0)\r\n    contract = w3.eth.contract(address=checksum_addr, abi=json.loads(abi))\r\n    arg_list = []\r\n    start_block = 16341846\r\n    end_block = 16342200\r\n    print(\"Start Block ---- \", start_block)\r\n    print(\"End Block ---- \", end_block)\r\n    print(\"*************************************************\")\r\n    event_filter = contract.events.Transfer.createFilter(fromBlock=start_block, toBlock=end_block).get_all_entries()\r\n    print(event_filter)\r\n    for event in event_filter:\r\n        arg_list.append(event)\r\n\r\n    return arg_list\r\n\r\nevent_details = get_event_txn('0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599')\r\nfor event in event_details:\r\n    print(event)\r\n```\r\n\r\n**Result from other node provider:**\r\n![Screenshot from 2023-05-29 19-06-24](https://github.com/ledgerwatch/erigon/assets/128302698/aeb90960-d1d1-4a6a-a87c-abe9cf137cd8)\r\n\r\n\r\n**Result from own node:**\r\n![Screenshot from 2023-05-29 19-07-14](https://github.com/ledgerwatch/erigon/assets/128302698/3fdb3041-1cdc-4d55-a532-4f2bbbaa2651)\r\n\r\n\r\n**Here are the hardware details of our node for more information:**\r\n\r\nMachine SKU: Standard_L16as_v3\r\nvCPU: 16\r\nRAM: 128GB\r\nDisk attached: 16 TB\r\n\r\n**How we can enable this in our node ?**\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
