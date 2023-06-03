@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/2703",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/2703/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/2703/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/2703/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/2703",
+  "id": 983733119,
+  "node_id": "MDU6SXNzdWU5ODM3MzMxMTk=",
+  "number": 2703,
+  "title": "Plugin CLI options not bound until after register is called",
+  "user": {
+    "login": "antonydenyer",
+    "id": 469160,
+    "node_id": "MDQ6VXNlcjQ2OTE2MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/469160?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/antonydenyer",
+    "html_url": "https://github.com/antonydenyer",
+    "followers_url": "https://api.github.com/users/antonydenyer/followers",
+    "following_url": "https://api.github.com/users/antonydenyer/following{/other_user}",
+    "gists_url": "https://api.github.com/users/antonydenyer/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/antonydenyer/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/antonydenyer/subscriptions",
+    "organizations_url": "https://api.github.com/users/antonydenyer/orgs",
+    "repos_url": "https://api.github.com/users/antonydenyer/repos",
+    "events_url": "https://api.github.com/users/antonydenyer/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/antonydenyer/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362496,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDk2",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "default": true,
+      "description": "New feature or request"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-08-31T11:06:31Z",
+  "updated_at": "2021-08-31T11:06:31Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Description\r\nAs a plugin developer, I want access to the cli options that are pertinent to my plugin during the registration phase. The reason for this is that I may not wish to register my plugin if it's not enabled/configured correctly. The problem is that we have a catch 22 with regards to registering PicoCLIOptions. The only place you can register PicoCLIOptions is in the register method, this is, obviously, too late if you are expecting those parameters to be bound at that point in time.\r\n\r\n\r\n```java\r\n\r\n@AutoService(BesuPlugin.class)\r\npublic class MyMetricsPlugin implements BesuPlugin {\r\n\r\n  @Option(\r\n      names = {\"--plugin-metrics-enabled\"},\r\n      description = \"Enable Metrics plugin\")\r\n  private boolean enabled;\r\n\r\n  @Override\r\n  public void register(final BesuContext context) {\r\n    final PicoCLIOptions cmdlineOptions = context.getService(PicoCLIOptions.class).get();\r\n    cmdlineOptions.addPicoCLIOptions(\"metrics\", this);\r\n   \r\n    if (enabled) {\r\n      // register metrics category\r\n      ...\r\n    }\r\n\r\n  }\r\n  ... \r\n}\r\n\r\n\r\n```\r\n\r\nObviously, this will not work because enabled will always equal false.\r\n\r\n\r\nWe need a better way of allowing plugin developers to configure command-line arguments. \r\n\r\n### Options\r\n\r\n#### Add an optional method to the `BesuPlugin` interface \r\n\r\nSomething like\r\n\r\n```java\r\n  void initialize(PicoCLIOptions options);\r\n```\r\nwould allow a plugin developer to call `addPicoCLIOptions` before `register` is called.\r\n\r\n#### Always mixin BesuPlugin classes\r\n\r\nAnother option is to always 'mixin' the plugin class. This would mean that a plugin implementor would only be able to register options in a class that implements `BesuPlugin`. But would not need to explicitly call `addPicoCLIOptions` anywhere. \r\n\r\n#### Backwards compatibility\r\nEither option, or both, could be added whilst maintaining the current behaviour.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/2703/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/2703/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

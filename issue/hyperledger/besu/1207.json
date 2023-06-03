@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/1207",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/1207/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/1207/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/1207/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/1207",
+  "id": 653990728,
+  "node_id": "MDU6SXNzdWU2NTM5OTA3Mjg=",
+  "number": 1207,
+  "title": "Feature: Revert reason in  eth_estimateGas response",
+  "user": {
+    "login": "fllaca",
+    "id": 14851307,
+    "node_id": "MDQ6VXNlcjE0ODUxMzA3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14851307?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fllaca",
+    "html_url": "https://github.com/fllaca",
+    "followers_url": "https://api.github.com/users/fllaca/followers",
+    "following_url": "https://api.github.com/users/fllaca/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fllaca/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fllaca/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fllaca/subscriptions",
+    "organizations_url": "https://api.github.com/users/fllaca/orgs",
+    "repos_url": "https://api.github.com/users/fllaca/repos",
+    "events_url": "https://api.github.com/users/fllaca/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fllaca/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362498,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDk4",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/help%20wanted",
+      "name": "help wanted",
+      "color": "008672",
+      "default": true,
+      "description": "Extra attention is needed"
+    },
+    {
+      "id": 1537362500,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNTAw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/good%20first%20issue",
+      "name": "good first issue",
+      "color": "7057ff",
+      "default": true,
+      "description": "Good for newcomers"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-07-09T11:35:35Z",
+  "updated_at": "2020-12-18T21:05:19Z",
+  "closed_at": "2020-12-18T21:05:19Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/master/CODE-OF-CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging wiki: https://github.com/hyperledger/besu/wiki/debugging -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nWhen calling `eth_estimateGas` with input data for a transaction that would fail (rever), the output of the estimation is \"internal error\":\r\n```json\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : 24529,\r\n  \"error\" : {\r\n    \"code\" : -32603,\r\n    \"message\" : \"Internal error\"\r\n  }\r\n}\r\n```\r\nWould it be possible to return more detailed information about the revert reason or explaining that the transaction simulation failed? As an example of this behavior, this was implemented in the latest version of go-ethereum: https://github.com/ethereum/go-ethereum/releases/tag/v1.9.15\r\n\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 1,\r\n  \"error\": {\r\n    \"code\": 3,\r\n    \"message\": \"execution reverted: some error\",\r\n    \"data\": \"0x08c379a000000000000000000...\"\r\n  }\r\n}\r\n```\r\n\r\n### Acceptance Criteria\r\n* The output of *eth_estimateGas*  includes in `.error.message` a message explaining that the execution was reverted. (see example above)\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Execute an eth_estimateGas call for a contract+function that would result in a revert:\r\n```solidity\r\npragma solidity ^0.6.4;\r\ncontract Apple {\r\n\tfunction banana() external {\r\n\t\trequire(false, \"revert reason\");\r\n\t}\r\n}\r\n```\r\njson-rpc parameters:\r\n```json\r\n{\r\n\t\"jsonrpc\":\"2.0\",\r\n\t\"id\":234,\r\n\t\"method\":\"eth_estimateGas\",\r\n\t\"params\":[\r\n\t\t{\r\n\t\t\t\"from\":\"0x913da4198e6be1d5f5e4a40d0667f70c0b5430eb\",\r\n\t\t\t\"to\":\"0xaf517e20601df8d8584035eb895c02713bc1f3a4\",\r\n\t\t\t\"data\":\"0xc3cafc6f\",\r\n\t\t\t\"value\":\"0x0\"\r\n\t\t}\r\n\t]\r\n}\r\n```\r\n(took from https://github.com/ethereum/go-ethereum/issues/20714#issuecomment-601503496)\r\n\r\n**Expected behavior:**\r\ndescriptive message explaining that the execution was reverted:\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 1,\r\n  \"error\": {\r\n    \"code\": 3,\r\n    \"message\": \"execution reverted: some error\",\r\n    \"data\": \"0x08c379a000000000000000000...\"\r\n  }\r\n}\r\n```\r\n\r\n\r\n**Actual behavior:**\r\n\"Internal error\" message:\r\n```json\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : 24529,\r\n  \"error\" : {\r\n    \"code\" : -32603,\r\n    \"message\" : \"Internal error\"\r\n  }\r\n}\r\n```\r\n\r\n### Versions \r\ntested with latest stable Besu 1.4.6\r\n",
+  "closed_by": {
+    "login": "shemnon",
+    "id": 38109,
+    "node_id": "MDQ6VXNlcjM4MTA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38109?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shemnon",
+    "html_url": "https://github.com/shemnon",
+    "followers_url": "https://api.github.com/users/shemnon/followers",
+    "following_url": "https://api.github.com/users/shemnon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shemnon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shemnon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shemnon/subscriptions",
+    "organizations_url": "https://api.github.com/users/shemnon/orgs",
+    "repos_url": "https://api.github.com/users/shemnon/repos",
+    "events_url": "https://api.github.com/users/shemnon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shemnon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/1207/reactions",
+    "total_count": 5,
+    "+1": 5,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/1207/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

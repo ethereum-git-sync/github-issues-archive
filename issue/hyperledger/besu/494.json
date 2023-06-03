@@ -1,0 +1,103 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/494",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/494/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/494/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/494/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/494",
+  "id": 582596095,
+  "node_id": "MDU6SXNzdWU1ODI1OTYwOTU=",
+  "number": 494,
+  "title": "Improve debug-level Logging",
+  "user": {
+    "login": "timbeiko",
+    "id": 9390255,
+    "node_id": "MDQ6VXNlcjkzOTAyNTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9390255?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/timbeiko",
+    "html_url": "https://github.com/timbeiko",
+    "followers_url": "https://api.github.com/users/timbeiko/followers",
+    "following_url": "https://api.github.com/users/timbeiko/following{/other_user}",
+    "gists_url": "https://api.github.com/users/timbeiko/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/timbeiko/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/timbeiko/subscriptions",
+    "organizations_url": "https://api.github.com/users/timbeiko/orgs",
+    "repos_url": "https://api.github.com/users/timbeiko/repos",
+    "events_url": "https://api.github.com/users/timbeiko/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/timbeiko/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362498,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDk4",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/help%20wanted",
+      "name": "help wanted",
+      "color": "008672",
+      "default": true,
+      "description": "Extra attention is needed"
+    },
+    {
+      "id": 1537362500,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNTAw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/good%20first%20issue",
+      "name": "good first issue",
+      "color": "7057ff",
+      "default": true,
+      "description": "Good for newcomers"
+    },
+    {
+      "id": 2129007612,
+      "node_id": "MDU6TGFiZWwyMTI5MDA3NjEy",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/dev%20experience",
+      "name": "dev experience",
+      "color": "2a0b89",
+      "default": false,
+      "description": "The build system, things that enable easier development etc."
+    },
+    {
+      "id": 4164098293,
+      "node_id": "LA_kwDODE2jmc74Mxj1",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/icebox",
+      "name": "icebox",
+      "color": "1D76DB",
+      "default": false,
+      "description": "items that need more consideration, time, or can wait"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-03-16T21:00:18Z",
+  "updated_at": "2022-05-24T16:57:52Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "In the past few weeks, we've had several issues with misconfigured nodes that have been difficult to debug. We should add additional logging to help with debugging.\n\n*Connection-Level Misconfiguration*\n\nThe connection-level misconfiguration manifests as follows:\n * A user is configuring a private network using static nodes\n\n * The static nodes contain the correct endpoint, but the public keys are wrong\n\n   * This can be due to file system issues where a node can’t access the correct key and so generates a new key. This means that any enode urls referencing this node will have the wrong public key.\n\n * When a connection is attempted to an enode with an inaccurate public key, the crypto handshake will fail.\n\nWe can catch this case in the [ECIESHandshaker here|https://github.com/PegaSysEng/pantheon/blob/a4bb4af0dfc8ca9e7b97720aa8ef47e330d7f903/ethereum/p2p/src/main/java/tech/pegasys/pantheon/ethereum/p2p/rlpx/handshake/ecies/ECIESHandshaker.java#L208]. If this error is thrown when a the handshaker is the initiator (initiator = true), we should log a debug error like: LOG.debug(“Outbound handshake to {} failed. Static nodes configured with the wrong public key are a possible cause of this error.”, theirPubKey.getEncodedBytes())\n\n*Discovery-Level Misconfiguration*\n\nThe discovery-level misconfiguration manifests as follows:\n * The bootnode enode urls are inaccurate: they contain the correct endpoint information but the wrong public key.\n\n * As a result, our misconfigured node will send a discovery PING to its bootnode\n\n * The bootnode will respond with a PONG, but because the PONG comes from a peer with a non-matching node id, we’ll ignore it.\n\nSuggested fix:\n * If a [PONG is received|https://github.com/PegaSysEng/pantheon/blob/80f293ae7cdf43b06317957c2d37221df7d0d57f/ethereum/p2p/src/main/java/tech/pegasys/pantheon/ethereum/p2p/discovery/internal/PeerDiscoveryController.java#L315] with no corresponding match, log a debug message (possibly including the list of inflight PING messages or the list of unbonded bootnodes).\n\n ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/494/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/494/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

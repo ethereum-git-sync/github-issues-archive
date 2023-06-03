@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/3621",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/3621/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/3621/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/3621/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/3621",
+  "id": 1176749272,
+  "node_id": "I_kwDODE2jmc5GI8TY",
+  "number": 3621,
+  "title": "Fuzzer failure - newPayload/forkChoiceUpdated block with same timestamp as parent",
+  "user": {
+    "login": "jflo",
+    "id": 345937,
+    "node_id": "MDQ6VXNlcjM0NTkzNw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/345937?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jflo",
+    "html_url": "https://github.com/jflo",
+    "followers_url": "https://api.github.com/users/jflo/followers",
+    "following_url": "https://api.github.com/users/jflo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jflo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jflo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jflo/subscriptions",
+    "organizations_url": "https://api.github.com/users/jflo/orgs",
+    "repos_url": "https://api.github.com/users/jflo/repos",
+    "events_url": "https://api.github.com/users/jflo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jflo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-03-22T12:59:56Z",
+  "updated_at": "2022-03-29T13:44:06Z",
+  "closed_at": "2022-03-29T13:44:06Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Differential Fuzzer was run on a Besu / Geth combo.\r\n\r\nFuzzer output:\r\n\r\n```\r\nWARN [03-22|06:41:04.633] Served eth_createAccessList              conn=127.0.0.1:34292 reqid=25226 duration=\"43.682_s\"  err=\"contract creation without any data provided\"\r\nWARN [03-22|06:41:04.634] Served eth_createAccessList              conn=127.0.0.1:34292 reqid=25228 duration=\"44.474_s\"  err=\"contract creation without any data provided\"\r\nWARN [03-22|06:41:04.635] Served eth_createAccessList              conn=127.0.0.1:34292 reqid=25230 duration=\"49.213_s\"  err=\"contract creation without any data provided\"\r\nWARN [03-22|06:41:05.156] Ignoring payload with missing parent     number=326,493,332,485 hash=1f4ba2..ae123e parent=000000..000000\r\n```\r\n\r\nBesu output:\r\n```\r\n2022-03-22 06:40:41.533-05:00 | main | INFO  | NetworkRunner | Starting Network.\r\n2022-03-22 06:40:41.536-05:00 | nioEventLoopGroup-2-1 | INFO  | RlpxAgent | P2P RLPx agent started and listening on /[0:0:0:0:0:0:0:0]:30303.\r\n2022-03-22 06:40:41.537-05:00 | main | INFO  | PeerDiscoveryAgent | Starting peer discovery agent on host=0.0.0.0, port=30303\r\n2022-03-22 06:40:41.561-05:00 | vert.x-eventloop-thread-2 | INFO  | VertxPeerDiscoveryAgent | Started peer discovery agent successfully, on effective host=0:0:0:0:0:0:0:0 and port=30303\r\n2022-03-22 06:40:41.564-05:00 | vert.x-eventloop-thread-2 | INFO  | PeerDiscoveryAgent | P2P peer discovery agent started and listening on /[0:0:0:0:0:0:0:0]:30303\r\n2022-03-22 06:40:41.592-05:00 | vert.x-eventloop-thread-2 | INFO  | PeerDiscoveryAgent | Writing node record to disk. NodeRecord{seq=1, publicKey=0x037425e92a94c0a22b0972ded6db12fd75ceb0166dbb2660146267b9e4f52796cc, udpAddress=Optional[/127.0.0.1:30303], tcpAddress=Optional[/127.0.0.1:30303], asBase64=-Je4QDI0SR1vGHXnhbkpOdSgAR3a6gPqVWqyDDujV4qh14L3Zdq3HmuO4q2t14HfXtk-NtXVbi2MetHK4AYD2xbTLw4Bg2V0aMfGhKWkplmAgmlkgnY0gmlwhH8AAAGJc2VjcDI1NmsxoQN0JekqlMCiKwly3tbbEv11zrAWbbsmYBRiZ7nk9SeWzIN0Y3CCdl-DdWRwgnZf, nodeId=0xe7898a792215e50f9e5fde2d9cf03fa6df609bdbd339ba1600218c203869bb43, customFields={tcp=30303, udp=30303, ip=0x7f000001, eth=[[0xa5a4a659, 0x]], id=V4, secp256k1=0x037425e92a94c0a22b0972ded6db12fd75ceb0166dbb2660146267b9e4f52796cc}}\r\n```\r\n\r\nGeth output: \r\n\r\n```\r\nINFO [03-22|06:41:06.769] Producing block                          parentHash=42e574..b6f4e8\r\nERROR[03-22|06:41:06.769] Failed to create sealing payload         err=\"invalid timestamp, parent 1647949278 given 1647949278\"\r\npanic: different heads, a: 0x42e5747b860336a2c031537f590e381b297008cbe32aef18a35e12b7cbb6f4e8, b: 0xf3f30c6df177ab05d59b6246d7b4e5798ffe38a688c83a3c62a5f3b798169e7f\r\n```\r\n\r\nBesu head:\r\n\r\n```{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : 1,\r\n  \"result\" : {\r\n    \"number\" : \"0x2\",\r\n    \"hash\" : \"0xf3f30c6df177ab05d59b6246d7b4e5798ffe38a688c83a3c62a5f3b798169e7f\",\r\n    \"mixHash\" : \"0x46279dcd18fc7e5b2308c00cc0357a10a0ec75dab9e14cf2549dd4171a4056e3\",\r\n    \"parentHash\" : \"0x42e5747b860336a2c031537f590e381b297008cbe32aef18a35e12b7cbb6f4e8\",\r\n    \"nonce\" : \"0x0000000000000000\",\r\n    \"sha3Uncles\" : \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\r\n    \"logsBloom\" : \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"transactionsRoot\" : \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\r\n    \"stateRoot\" : \"0xca3149fa9e37db08d1cd49c9061db1002ef1cd58db2210f2115c8c989b2bdf45\",\r\n    \"receiptsRoot\" : \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\r\n    \"miner\" : \"0x6a211d6d6921383090aea4634474ada837233ad3\",\r\n    \"difficulty\" : \"0x0\",\r\n    \"totalDifficulty\" : \"0x400000000\",\r\n    \"extraData\" : \"0x\",\r\n    \"baseFeePerGas\" : \"0x7\",\r\n    \"size\" : \"0x1fe\",\r\n    \"gasLimit\" : \"0x1c9c380\",\r\n    \"gasUsed\" : \"0x0\",\r\n    \"timestamp\" : \"0x6239b5de\",\r\n    \"uncles\" : [ ],\r\n    \"transactions\" : [ ]\r\n  }\r\n}\r\n ```\r\n\r\nGeth head:\r\n\r\n```\r\n> eth.getBlock(\"latest\")\r\n{\r\n  baseFeePerGas: 7,\r\n  difficulty: 0,\r\n  extraData: \"0x\",\r\n  gasLimit: 30000000,\r\n  gasUsed: 0,\r\n  hash: \"0x42e5747b860336a2c031537f590e381b297008cbe32aef18a35e12b7cbb6f4e8\",\r\n  logsBloom: \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n  miner: \"0x6a211d6d6921383090aea4634474ada837233ad3\",\r\n  mixHash: \"0x46279dcd18fc7e5b2308c00cc0357a10a0ec75dab9e14cf2549dd4171a4056e3\",\r\n  nonce: \"0x0000000000000000\",\r\n  number: 1,\r\n  parentHash: \"0x3b8fb240d288781d4aac94d3fd16809ee413bc99294a085798a589dae51ddd4a\",\r\n  receiptsRoot: \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\r\n  sha3Uncles: \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\r\n  size: 510,\r\n  stateRoot: \"0xca3149fa9e37db08d1cd49c9061db1002ef1cd58db2210f2115c8c989b2bdf45\",\r\n  timestamp: 1647949278,\r\n  totalDifficulty: 17179869184,\r\n  transactions: [],\r\n  transactionsRoot: \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\r\n  uncles: []\r\n}\r\n```\r\n\r\nLooks like newPayload can produce blocks with the same timestamp as the parent.\r\nForkChoiceUpdated should also not allow a next block with the same timestamp as parent.",
+  "closed_by": {
+    "login": "jflo",
+    "id": 345937,
+    "node_id": "MDQ6VXNlcjM0NTkzNw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/345937?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jflo",
+    "html_url": "https://github.com/jflo",
+    "followers_url": "https://api.github.com/users/jflo/followers",
+    "following_url": "https://api.github.com/users/jflo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jflo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jflo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jflo/subscriptions",
+    "organizations_url": "https://api.github.com/users/jflo/orgs",
+    "repos_url": "https://api.github.com/users/jflo/repos",
+    "events_url": "https://api.github.com/users/jflo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jflo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/3621/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/3621/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
