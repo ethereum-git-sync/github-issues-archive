@@ -1,0 +1,113 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3081",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3081/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3081/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3081/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/3081",
+  "id": 987950587,
+  "node_id": "MDU6SXNzdWU5ODc5NTA1ODc=",
+  "number": 3081,
+  "title": "altair epoch processing slower than expected",
+  "user": {
+    "login": "dapplion",
+    "id": 35266934,
+    "node_id": "MDQ6VXNlcjM1MjY2OTM0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35266934?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dapplion",
+    "html_url": "https://github.com/dapplion",
+    "followers_url": "https://api.github.com/users/dapplion/followers",
+    "following_url": "https://api.github.com/users/dapplion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dapplion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dapplion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dapplion/subscriptions",
+    "organizations_url": "https://api.github.com/users/dapplion/orgs",
+    "repos_url": "https://api.github.com/users/dapplion/repos",
+    "events_url": "https://api.github.com/users/dapplion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dapplion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2159934357,
+      "node_id": "MDU6TGFiZWwyMTU5OTM0MzU3",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-testnet-debugging",
+      "name": "scope-testnet-debugging",
+      "color": "980043",
+      "default": false,
+      "description": "Issues uncovered through running a node on a public testnet."
+    },
+    {
+      "id": 2829611743,
+      "node_id": "MDU6TGFiZWwyODI5NjExNzQz",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/spec-altair",
+      "name": "spec-altair",
+      "color": "6baed6",
+      "default": false,
+      "description": "Issues targeting the Altair spec version."
+    },
+    {
+      "id": 2963898184,
+      "node_id": "MDU6TGFiZWwyOTYzODk4MTg0",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-performance",
+      "name": "scope-performance",
+      "color": "980043",
+      "default": false,
+      "description": "Performance issue and ideas to improve performance."
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-09-03T16:53:31Z",
+  "updated_at": "2022-01-07T15:22:52Z",
+  "closed_at": "2022-01-07T15:22:52Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "<!--NOTE: -->\r\n<!--- General questions should go to the discord chat instead of the issue tracker.-->\r\n\r\n**Describe the bug**\r\n\r\nIn an overloaded Prater node in contabo an epoch transition takes > 2s\r\n\r\n![Screenshot from 2021-09-03 18-52-16](https://user-images.githubusercontent.com/35266934/132041230-7f81543e-2cca-4fd5-9a6d-05b3cafe8d87.png)\r\n\r\n\r\n**Expected behavior**\r\n\r\nNot be that slow\r\n\r\n------\r\n\r\nNote: this CPU profile was taken in an overloaded contabo node.\r\n\r\nRunning the altair block performance benchmarks in my laptop do\r\n\r\n```\r\n  altair processEpoch - pyrmont_e62330\r\n    ✓ altair processEpoch - pyrmont_e62330                                2.113840 ops/s    473.0727 ms/op        -         15 runs   7.81 s\r\n    altair processEpoch steps - pyrmont_e62330\r\n      ✓ pyrmont_e62330 - altair beforeProcessEpoch                          11.02012 ops/s    90.74315 ms/op        -         19 runs   2.33 s\r\n      ✓ pyrmont_e62330 - altair processJustificationAndFinalization         3123.848 ops/s    320.1180 us/op        -        735 runs   3.01 s\r\n      ✓ pyrmont_e62330 - altair processInactivityUpdates                    13.98109 ops/s    71.52520 ms/op        -         13 runs   1.48 s\r\n      ✓ pyrmont_e62330 - altair processRewardsAndPenalties                  17.44437 ops/s    57.32509 ms/op        -         27 runs   2.14 s\r\n      ✓ pyrmont_e62330 - altair processRegistryUpdates                      17492.00 ops/s    57.16900 us/op        -       2000 runs   4.04 s\r\n      ✓ pyrmont_e62330 - altair processSlashings                            58428.28 ops/s    17.11500 us/op        -       1390 runs   3.13 s\r\n      ✓ pyrmont_e62330 - altair processEth1DataReset                        68226.79 ops/s    14.65700 us/op        -       1814 runs   3.62 s\r\n      ✓ pyrmont_e62330 - altair processEffectiveBalanceUpdates              172.3456 ops/s    5.802295 ms/op        -        148 runs   1.66 s\r\n      ✓ pyrmont_e62330 - altair processSlashingsReset                       11255.56 ops/s    88.84500 us/op        -       2143 runs   4.32 s\r\n      ✓ pyrmont_e62330 - altair processRandaoMixesReset                     8505.933 ops/s    117.5650 us/op        -       1820 runs   3.94 s\r\n      ✓ pyrmont_e62330 - altair processHistoricalRootsUpdate                50387.99 ops/s    19.84600 us/op        -       1244 runs   2.91 s\r\n      ✓ pyrmont_e62330 - altair processParticipationFlagUpdates             27.59981 ops/s    36.23213 ms/op        -         63 runs   2.97 s\r\n      ✓ pyrmont_e62330 - altair processSyncCommitteeUpdates                 75602.93 ops/s    13.22700 us/op        -        694 runs   2.25 s\r\n      ✓ pyrmont_e62330 - altair afterProcessEpoch                           9.181512 ops/s    108.9145 ms/op        -         12 runs   2.24 s\r\n```\r\n\r\nWhile running the same in that contabo's host\r\n\r\n```\r\n  altair processEpoch - pyrmont_e62330\r\n    ✓ altair processEpoch - pyrmont_e62330                                1.100529 ops/s    908.6539 ms/op        -         46 runs   43.4 s\r\n    altair processEpoch steps - pyrmont_e62330\r\n      ✓ pyrmont_e62330 - altair beforeProcessEpoch                          6.497628 ops/s    153.9023 ms/op        -         29 runs   5.04 s\r\n      ✓ pyrmont_e62330 - altair processJustificationAndFinalization         4544.463 ops/s    220.0480 us/op        -        148 runs   2.81 s\r\n      ✓ pyrmont_e62330 - altair processInactivityUpdates                    8.332975 ops/s    120.0052 ms/op        -         30 runs   4.30 s\r\n      ✓ pyrmont_e62330 - altair processRewardsAndPenalties                  11.71630 ops/s    85.35115 ms/op        -         30 runs   3.17 s\r\n      ✓ pyrmont_e62330 - altair processRegistryUpdates                      23183.03 ops/s    43.13500 us/op        -       2377 runs   5.96 s\r\n      ✓ pyrmont_e62330 - altair processSlashings                            60197.45 ops/s    16.61200 us/op        -        819 runs   3.83 s\r\n      ✓ pyrmont_e62330 - altair processEth1DataReset                        81155.66 ops/s    12.32200 us/op        -       2345 runs   6.72 s\r\n      ✓ pyrmont_e62330 - altair processEffectiveBalanceUpdates              59.61962 ops/s    16.77300 ms/op        -        189 runs   4.21 s\r\n      ✓ pyrmont_e62330 - altair processSlashingsReset                       11369.58 ops/s    87.95400 us/op        -       1645 runs   5.44 s\r\n      ✓ pyrmont_e62330 - altair processRandaoMixesReset                     9063.636 ops/s    110.3310 us/op        -       1361 runs   4.57 s\r\n      ✓ pyrmont_e62330 - altair processHistoricalRootsUpdate                74128.98 ops/s    13.49000 us/op        -       1887 runs   4.53 s\r\n      ✓ pyrmont_e62330 - altair processParticipationFlagUpdates             12.02302 ops/s    83.17381 ms/op        -         96 runs   9.13 s\r\n      ✓ pyrmont_e62330 - altair processSyncCommitteeUpdates                 111657.0 ops/s    8.956000 us/op        -        730 runs   3.15 s\r\n      ✓ pyrmont_e62330 - altair afterProcessEpoch                           5.318273 ops/s    188.0310 ms/op        -         14 runs   3.78 s\r\n```",
+  "closed_by": {
+    "login": "philknows",
+    "id": 58080811,
+    "node_id": "MDQ6VXNlcjU4MDgwODEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58080811?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/philknows",
+    "html_url": "https://github.com/philknows",
+    "followers_url": "https://api.github.com/users/philknows/followers",
+    "following_url": "https://api.github.com/users/philknows/following{/other_user}",
+    "gists_url": "https://api.github.com/users/philknows/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/philknows/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/philknows/subscriptions",
+    "organizations_url": "https://api.github.com/users/philknows/orgs",
+    "repos_url": "https://api.github.com/users/philknows/repos",
+    "events_url": "https://api.github.com/users/philknows/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/philknows/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3081/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3081/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

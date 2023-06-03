@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3700",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3700/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3700/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3700/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/3700",
+  "id": 1125128229,
+  "node_id": "I_kwDOCD5_Gc5DEBgl",
+  "number": 3700,
+  "title": "Error proposing block - Cannot get tree for index",
+  "user": {
+    "login": "dapplion",
+    "id": 35266934,
+    "node_id": "MDQ6VXNlcjM1MjY2OTM0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35266934?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dapplion",
+    "html_url": "https://github.com/dapplion",
+    "followers_url": "https://api.github.com/users/dapplion/followers",
+    "following_url": "https://api.github.com/users/dapplion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dapplion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dapplion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dapplion/subscriptions",
+    "organizations_url": "https://api.github.com/users/dapplion/orgs",
+    "repos_url": "https://api.github.com/users/dapplion/repos",
+    "events_url": "https://api.github.com/users/dapplion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dapplion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1200090450,
+      "node_id": "MDU6TGFiZWwxMjAwMDkwNDUw",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/prio-critical",
+      "name": "prio-critical",
+      "color": "fd6f60",
+      "default": false,
+      "description": "Drop everything to resolve this immediately. Examples: consensus bug, un-usable CLI"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-02-06T07:21:21Z",
+  "updated_at": "2022-02-10T17:52:33Z",
+  "closed_at": "2022-02-10T17:52:33Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "<!--NOTE: -->\r\n<!--- General questions should go to the discord chat instead of the issue tracker.-->\r\n\r\n**Describe the bug**\r\n\r\nOne of our beacon nodes has been encountering this error for some hours\r\n\r\n```\r\nFeb-06 07:07:11.526 [ETH1]            error: Error updating eth1 chain cache code=ETH1_ERROR_DUPLICATE_DISTINCT_LOG, newIndex=292236, prevIndex=293927\r\nError: ETH1_ERROR_DUPLICATE_DISTINCT_LOG\r\n    at Eth1DepositsCache.add (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositsCache.ts:45:15)\r\n    at Eth1DepositDataTracker.updateDepositCache (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:163:5)\r\n    at Eth1DepositDataTracker.update (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:144:33)\r\n    at Eth1DepositDataTracker.runAutoUpdate (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:118:29)\r\nFeb-06 07:07:15.243 [ETH1]            error: Error updating eth1 chain cache code=ETH1_ERROR_DUPLICATE_DISTINCT_LOG, newIndex=292236, prevIndex=293927\r\nError: ETH1_ERROR_DUPLICATE_DISTINCT_LOG\r\n    at Eth1DepositsCache.add (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositsCache.ts:45:15)\r\n    at Eth1DepositDataTracker.updateDepositCache (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:163:5)\r\n    at Eth1DepositDataTracker.update (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:144:33)\r\n    at Eth1DepositDataTracker.runAutoUpdate (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:118:29)\r\n```\r\n\r\nThen when it had to propose a block it couldn't get the deposit tree due to missing deposits\r\n\r\n```\r\nFeb-06 05:52:11.151 [API]             error: Req req-rdg produceBlockV2 error message=Cannot get tree for index: 294009, maxIndex: 293927\r\nError: Cannot get tree for index: 294009, maxIndex: 293927\r\n    at getTreeAtIndex (/usr/app/node_modules/@chainsafe/lodestar/src/util/tree.ts:7:11)\r\n    at getDepositsWithProofs (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/utils/deposits.ts:45:44)\r\n    at Eth1DepositsCache.get (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositsCache.ts:29:33)\r\n    at getDeposits (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/utils/deposits.ts:28:20)\r\n    at Eth1DepositDataTracker.getDeposits (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:104:12)\r\n    at Eth1DepositDataTracker.getEth1DataAndDeposits (/usr/app/node_modules/@chainsafe/lodestar/src/eth1/eth1DepositDataTracker.ts:77:22)\r\n    at assembleBody (/usr/app/node_modules/@chainsafe/lodestar/src/chain/factory/block/body.ts:64:32)\r\n    at assembleBlock (/usr/app/node_modules/@chainsafe/lodestar/src/chain/factory/block/index.ts:44:11)\r\n    at Object.produceBlock (/usr/app/node_modules/@chainsafe/lodestar/src/api/impl/validator/index.ts:182:21)\r\n    at Object.handler (/usr/app/node_modules/@chainsafe/lodestar-api/src/server/utils/server.ts:70:23)\r\nFeb-06 05:52:11.157 [API]             debug: Res req-rdg produceBlockV2 - 500\r\n```\r\n\r\n**Expected behavior**\r\n\r\n- Not get dead locked with ETH1_ERROR_DUPLICATE_DISTINCT_LOG\r\n- The block that was proposed after this missed one contained 0 deposits. Why did a faulty depositTree stopped a block proposal? \r\n\r\n",
+  "closed_by": {
+    "login": "wemeetagain",
+    "id": 1348242,
+    "node_id": "MDQ6VXNlcjEzNDgyNDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1348242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wemeetagain",
+    "html_url": "https://github.com/wemeetagain",
+    "followers_url": "https://api.github.com/users/wemeetagain/followers",
+    "following_url": "https://api.github.com/users/wemeetagain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wemeetagain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wemeetagain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wemeetagain/subscriptions",
+    "organizations_url": "https://api.github.com/users/wemeetagain/orgs",
+    "repos_url": "https://api.github.com/users/wemeetagain/repos",
+    "events_url": "https://api.github.com/users/wemeetagain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wemeetagain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3700/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3700/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

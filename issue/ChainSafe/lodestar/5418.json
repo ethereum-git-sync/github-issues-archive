@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5418",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5418/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5418/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5418/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5418",
+  "id": 1683336375,
+  "node_id": "I_kwDOCD5_Gc5kVay3",
+  "number": 5418,
+  "title": "Lighthouse BN subnet discovery warnings when running with Lodestar VC",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4116812272,
+      "node_id": "LA_kwDOCD5_Gc71YZHw",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-interop",
+      "name": "scope-interop",
+      "color": "980043",
+      "default": false,
+      "description": "Issues that fix interop issues between Lodestar and CL, EL or tooling."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-25T14:55:34Z",
+  "updated_at": "2023-04-25T15:43:47Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Lighthouse BN\r\n\r\nAt the beginning of the epoch the Lighthouse BN logs the following warning when running with Lodestar VC (likely only if there are duties for the first 2 slots)\r\n\r\n```\r\nWARN Not enough time for a discovery search  subnet_id: ExactSubnet { subnet_id: SubnetId(4), slot: Slot(6300288) }, service: attestation_service\r\nWARN Not enough time for a discovery search  subnet_id: ExactSubnet { subnet_id: SubnetId(1), slot: Slot(6300288) }, service: attestation_service\r\n```\r\n\r\nOn the Lighthouse BN there is a check that a [subnet slot must be greater than or equal the current slot + 2](https://github.com/sigp/lighthouse/blob/693886b94176faa4cb450f024696cb69cda2fe58/beacon_node/network/src/subnet_service/attestation_subnets.rs#L491-L493) or otherwise it will [log the warning](https://github.com/sigp/lighthouse/blob/693886b94176faa4cb450f024696cb69cda2fe58/beacon_node/network/src/subnet_service/attestation_subnets.rs#L509-L512) and not attempt to discover peers for the subscription.\r\n\r\nAs noted in Lighthouse [`MIN_PEER_DISCOVERY_SLOT_LOOK_AHEAD`](https://github.com/sigp/lighthouse/blob/693886b94176faa4cb450f024696cb69cda2fe58/beacon_node/network/src/subnet_service/attestation_subnets.rs#L29):\r\n\r\n> The minimum number of slots ahead that we attempt to discover peers for a subscription. If the\r\n   slot is less than this number, skip the peer discovery process.\r\n   Subnet discovery query takes at most 30 secs, 2 slots take 24s.\r\n\r\n\r\n### Lodestar VC\r\n\r\nLodestar VC pushes out subscriptions for the current and next epoch (`current_epoch + 1`)\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/05c93ba85a4b801c3f220d498e3ddaf45f968536/packages/validator/src/services/attestationDuties.ts#L177-L183\r\n\r\nResubscribing for the current epoch likely causes this warning, but due to the fact that the subscription are already done much earlier for this epoch (`current_epoch - 1`) it does not cause any issue, attestations and aggregations work as expected.\r\n\r\nIt needs to be investigated if resubscribing for the current epoch is correct, the [Lookahead](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/validator.md#lookahead) section in consensus spec notes that it should be called at the start of each epoch to get the assignment for the next epoch (`current_epoch + 1`).\r\n\r\nApparently the same happens when running Lighthouse BN with Teku VC, further investigation will be required.\r\n\r\n### Related\r\n\r\nFrom discord: https://discord.com/channels/593655374469660673/593655641445367808/1100407245403066561",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5418/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5418/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

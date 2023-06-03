@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5413",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5413/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5413/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5413/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5413",
+  "id": 1682489567,
+  "node_id": "I_kwDOCD5_Gc5kSMDf",
+  "number": 5413,
+  "title": "Optimize block time to head",
+  "user": {
+    "login": "dapplion",
+    "id": 35266934,
+    "node_id": "MDQ6VXNlcjM1MjY2OTM0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35266934?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dapplion",
+    "html_url": "https://github.com/dapplion",
+    "followers_url": "https://api.github.com/users/dapplion/followers",
+    "following_url": "https://api.github.com/users/dapplion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dapplion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dapplion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dapplion/subscriptions",
+    "organizations_url": "https://api.github.com/users/dapplion/orgs",
+    "repos_url": "https://api.github.com/users/dapplion/repos",
+    "events_url": "https://api.github.com/users/dapplion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dapplion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-25T06:04:18Z",
+  "updated_at": "2023-04-25T06:28:55Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "In unstable metrics show that the time to process a block = seen in gossip until set as head ranges 600-900ms. This includes calling the execution client to notify the payload. Running the state transition function for a block takes ~50ms and computing the head another ~50ms. So the long process times are due to the shared resources with other items like processing attestations.\r\n\r\n**Block process timeline**\r\n\r\n| Step | Avg time |\r\n| -- | -- | \r\n| Gossip validation | 30 ms |\r\n| Send notify payload | 10 ms |\r\n| State transition | 45 ms |\r\n| State hashing | 25 ms |\r\n| Verify block sigs | 25 ms |\r\n| notify new payload idle | 300 ms |\r\n| import attestations | 10 ms |\r\n| recompute head | 100 ms |\r\n| persist LC data | 25 ms |\r\n| **total** | 570 ms |\r\n\r\nCPU profiles show that attestation processing interlaces with block processing, It's unclear now if the 300 ms time for the new payload response is caused by that or not. See two examples of idle and busy loop waiting for notify new payload response\r\n\r\n![image](https://user-images.githubusercontent.com/35266934/234184688-9c8320fb-8033-4608-aaa6-32e83fe32ee3.png)\r\n\r\n![image](https://user-images.githubusercontent.com/35266934/234186189-e3591930-24b7-46d1-8c3d-5b8474a51be4.png)\r\n\r\n**Research / gather more data**\r\n\r\n- What's the actual notify new payload time from the point of view of the execution client\r\n  - On unstable mainnet, average time is 100ms\r\n```\r\nrpc_duration_engine_newPayloadV2_success {quantile=\"0.5\"} 104116.5\r\nrpc_duration_engine_newPayloadV2_success {quantile=\"0.75\"} 132396.75\r\nrpc_duration_engine_newPayloadV2_success {quantile=\"0.95\"} 225751.89999999988\r\nrpc_duration_engine_newPayloadV2_success {quantile=\"0.99\"} 364260.3900000002\r\nrpc_duration_engine_newPayloadV2_success {quantile=\"0.999\"} 1.0846435890000006e+06\r\nrpc_duration_engine_newPayloadV2_success {quantile=\"0.9999\"} 1.090077e+06\r\n```\r\n\r\n- If significantly less than 300ms, add a snooper to watch traffic and understand where is the delay\r\n- At what point into the slot is the new payload HTTP request actually dispatched from the OS?\r\n\r\n**Optimization targets**\r\n\r\n- Algorithmic optimization of recompute head\r\n- Stack recompute head with new payload waiting\r\n- Complete block import before new payload response setting it as optimistic head and set as VALID on response latter\r\n- Block network processor queues when importing recent blocks. To allocate all cycles to block processor without interlaced attestations\r\n- Optimize persist LC data, or schedule for latter to complete import faster\r\n\r\nCC @tuyennhv ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5413/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5413/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

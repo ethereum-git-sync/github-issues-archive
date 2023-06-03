@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4341",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4341/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4341/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4341/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/4341",
+  "id": 1315837572,
+  "node_id": "I_kwDOCD5_Gc5ObhaE",
+  "number": 4341,
+  "title": "Audit the use of Array.slice()",
+  "user": {
+    "login": "tuyennhv",
+    "id": 10568965,
+    "node_id": "MDQ6VXNlcjEwNTY4OTY1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10568965?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tuyennhv",
+    "html_url": "https://github.com/tuyennhv",
+    "followers_url": "https://api.github.com/users/tuyennhv/followers",
+    "following_url": "https://api.github.com/users/tuyennhv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tuyennhv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tuyennhv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tuyennhv/subscriptions",
+    "organizations_url": "https://api.github.com/users/tuyennhv/orgs",
+    "repos_url": "https://api.github.com/users/tuyennhv/repos",
+    "events_url": "https://api.github.com/users/tuyennhv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tuyennhv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1200090446,
+      "node_id": "MDU6TGFiZWwxMjAwMDkwNDQ2",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/prio-medium",
+      "name": "prio-medium",
+      "color": "fdc09f",
+      "default": false,
+      "description": "Resolve this some time soon (tm)."
+    },
+    {
+      "id": 3172006584,
+      "node_id": "MDU6TGFiZWwzMTcyMDA2NTg0",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-memory",
+      "name": "scope-memory",
+      "color": "980043",
+      "default": false,
+      "description": "Issues to reduce and improve memory usage."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-07-24T07:57:30Z",
+  "updated_at": "2022-08-12T13:19:15Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**Is your feature request related to a problem? Please describe.**\r\n\r\nSome `Array.slice()` is used unnecessarily just for api convenience, this not only affects performance (as a new array is copied) but also cause `gc` to run more frequently. Some examples:\r\n\r\n1. archiveBlocks.ts:\r\n```typescript\r\nfor (let i = 0; i < blocks.length; i += BATCH_SIZE) {\r\n    const toIdx = Math.min(i + BATCH_SIZE, blocks.length);\r\n    const canonicalBlocks = blocks.slice(i, toIdx);\r\n```\r\nthen we loop `canonicalBlocks`. In this case we can just do a for loop over `i` and `toIdx`\r\n\r\n2. stateContextCache\r\n\r\n```typescript\r\nprune(headStateRootHex: RootHex): void {\r\n    const keys = Array.from(this.cache.keys());\r\n    if (keys.length > this.maxStates) {\r\n      // object keys are stored in insertion order, delete keys starting from the front\r\n      for (const key of keys.slice(0, keys.length - this.maxStates)) {\r\n```\r\n\r\nin this case we can just do a regular `for` loop and break if it goes beyond the limit.\r\n\r\n**Describe the solution you'd like**\r\n\r\nAudit the use of `Array.slice()` in lodestar, only use it if it's really needed\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4341/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4341/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
