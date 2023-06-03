@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4185",
+  "id": 1669788882,
+  "node_id": "I_kwDOA9tCBs5jhvTS",
+  "number": 4185,
+  "title": "Rounding mode names",
+  "user": {
+    "login": "PaulRBerg",
+    "id": 8782666,
+    "node_id": "MDQ6VXNlcjg3ODI2NjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8782666?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PaulRBerg",
+    "html_url": "https://github.com/PaulRBerg",
+    "followers_url": "https://api.github.com/users/PaulRBerg/followers",
+    "following_url": "https://api.github.com/users/PaulRBerg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PaulRBerg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PaulRBerg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PaulRBerg/subscriptions",
+    "organizations_url": "https://api.github.com/users/PaulRBerg/orgs",
+    "repos_url": "https://api.github.com/users/PaulRBerg/repos",
+    "events_url": "https://api.github.com/users/PaulRBerg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PaulRBerg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-16T08:49:15Z",
+  "updated_at": "2023-04-17T15:02:59Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "This issue is about the `Rounding` enum part of the math library:\r\n\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts/blob/8d633cb7d169f2f8595b273660b00b69e845c2fe/contracts/utils/math/Math.sol#L10-L14\r\n\r\nI'd like to provide some feedback:\r\n\r\n- Given that the math library in OZ exclusively supports unsigned integers, I see no need for both `Rounding.Down` and `Rounding.Zero`. They essentially mean the same thing for positive numbers.\r\n- Independent of the first point, the term `Rounding.Zero` is ambiguous. To understand that it means \"toward zero,\" one must examine the source code, as it could be mistaken for \"away from zero.\"\r\n- The words \"down\" and \"up\" can create confusion. As stated by Wikipedia:\r\n\r\n> For positive x, round-down is equivalent to round-toward-zero, while round-up is equivalent to round-away-from-zero. For negative x, round-down corresponds to round-away-from-zero, and round-up corresponds to round-toward-zero.\r\n\r\nComplicating the matter, the ICU has further [butchered](https://unicode-org.github.io/icu/userguide/format_parse/numbers/rounding-modes.html) these terms by defining \"down\" as \"rounded towards the next smaller absolute value\" (which Wikipedia refers to as \"toward zero\"), and \"up\" as \"rounded towards the next greater absolute value\" (which Wikipedia refers to as \"away from zero\"). This can be misleading, as \"down\" typically implies \"toward negative infinity,\" and \"up\" implies \"toward positive infinity.\"\r\n\r\nTo address all of these issues, I recommend adhering to the [`Intl.NumberFormat V3`](https://github.com/tc39/proposal-intl-numberformat-v3/tree/842e01#rounding-modes-ecma-402-419) standard, which replaces the terms \"down\" and \"up\" with \"trunc\" and \"expand\", respectively:\r\n\r\n```solidity\r\nenum Rounding {\r\n    Expand, // away from zero\r\n    Trunc // toward zero\r\n}\r\n```\r\n\r\nOr like this (more verbose, but clear):\r\n\r\n```solidity\r\nenum Rounding {\r\n    AwayFromZero,\r\n    TowardZero\r\n}\r\n```\r\n\r\nOr like this (given that only unsigned numbers are supported):\r\n\r\n```solidity\r\nenum Rounding {\r\n    Ceil, // toward positive infinity\r\n    Floor, // toward negative infinity\r\n}\r\n```\r\n\r\nHowever, I wouldn't go with the last option if you plan on supporting signed numbers in the future.\r\n\r\nA good related discussion about this topic can be found here: https://github.com/tc39/proposal-intl-numberformat-v3/issues/7",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

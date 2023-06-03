@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2448",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2448/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2448/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2448/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/2448",
+  "id": 776319847,
+  "node_id": "MDU6SXNzdWU3NzYzMTk4NDc=",
+  "number": 2448,
+  "title": "Bug in ERC20PresetMinterPauserUpgradeable - symbol is not initialized",
+  "user": {
+    "login": "Dmdv",
+    "id": 805238,
+    "node_id": "MDQ6VXNlcjgwNTIzOA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/805238?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Dmdv",
+    "html_url": "https://github.com/Dmdv",
+    "followers_url": "https://api.github.com/users/Dmdv/followers",
+    "following_url": "https://api.github.com/users/Dmdv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Dmdv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Dmdv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Dmdv/subscriptions",
+    "organizations_url": "https://api.github.com/users/Dmdv/orgs",
+    "repos_url": "https://api.github.com/users/Dmdv/repos",
+    "events_url": "https://api.github.com/users/Dmdv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Dmdv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-12-30T07:46:55Z",
+  "updated_at": "2020-12-30T11:20:07Z",
+  "closed_at": "2020-12-30T11:20:07Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I use `ERC20PresetMinterPauserUpgradeable` as a base class\r\n\r\nDuring initialization `symbol` in the contract is not initialized\r\n\r\n**💻 Environment**\r\n\r\nTruffle v5.1.57 (core: 5.1.57)\r\nSolidity - 0.7.5 (solc-js)\r\nNode v15.5.0\r\nWeb3.js v1.2.9\r\n\r\n**📝 Details**\r\n\r\n<!-- Describe the problem you have been experiencing in more detail. Include as much information as you think is relevant. Keep in mind that transactions can fail for many reasons; context is key here. -->\r\n\r\n**🔢 Code to reproduce bug**\r\n\r\nThis is the token declaration\r\n\r\n```javascript\r\npragma solidity >=0.7.5 <=0.8.0;\r\n\r\nimport \"@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol\";\r\nimport \"@openzeppelin/contracts-upgradeable/presets/ERC20PresetMinterPauserUpgradeable.sol\";\r\nimport \"@openzeppelin/contracts-upgradeable/proxy/Initializable.sol\";\r\n\r\ncontract MyToken is\r\n    Initializable,\r\n    ERC20PresetMinterPauserUpgradeable,\r\n    OwnableUpgradeable\r\n{\r\n```\r\n\r\nThis is the `initialize` function\r\n\r\n```javascript\r\n    function initialize(string memory name, string memory symbol)\r\n        public\r\n        override\r\n        initializer\r\n    {\r\n        __ERC20PresetMinterPauser_init(name, symbol);\r\n        __Ownable_init_unchained();\r\n        _mint(msg.sender, 500000000 ether);\r\n    }\r\n```\r\n\r\nThis is the full test code\r\n\r\n```javascript\r\nconst { accounts  } = require(\"@openzeppelin/test-environment\");\r\nconst { constants } = require(\"@openzeppelin/test-helpers\");\r\nconst { deployProxy } = require(\"@openzeppelin/truffle-upgrades\");\r\n\r\nconst { expect } = require(\"chai\");\r\n\r\nconst { ZERO_ADDRESS } = constants;\r\n\r\nconst MyToken = artifacts.require(\"MyToken \");\r\n\r\ndescribe(\"CenX token ERC20 sanity checks\", () => {\r\n  const [owner] = accounts;\r\n\r\n  const name = \"My Token\";\r\n  const symbol = \"CenX\";\r\n\r\n  beforeEach(async function () {\r\n    this.contract = await deployProxy(MyToken, [name, symbol], {\r\n      from: owner,\r\n      unsafeAllowCustomTypes: true,\r\n    });\r\n  });\r\n\r\n  it(\"has an address\", async function () {\r\n    expect(await this.contract.address).to.not.equal(ZERO_ADDRESS);\r\n  });\r\n\r\n  it(\"has a name\", async function () {\r\n    expect(await this.contract.name()).to.equal(name);\r\n  });\r\n\r\n  it(\"has a symbol\", async function () {\r\n    expect((await this.contract.symbol()).to.equal(symbol));\r\n  });\r\n});\r\n```\r\n\r\n![image](https://user-images.githubusercontent.com/805238/103338517-b4db9400-4a8f-11eb-9032-8d70838fca5f.png)\r\n",
+  "closed_by": {
+    "login": "Dmdv",
+    "id": 805238,
+    "node_id": "MDQ6VXNlcjgwNTIzOA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/805238?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Dmdv",
+    "html_url": "https://github.com/Dmdv",
+    "followers_url": "https://api.github.com/users/Dmdv/followers",
+    "following_url": "https://api.github.com/users/Dmdv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Dmdv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Dmdv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Dmdv/subscriptions",
+    "organizations_url": "https://api.github.com/users/Dmdv/orgs",
+    "repos_url": "https://api.github.com/users/Dmdv/repos",
+    "events_url": "https://api.github.com/users/Dmdv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Dmdv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2448/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2448/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3045",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3045/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3045/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3045/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3045",
+  "id": 1086552437,
+  "node_id": "I_kwDOA9tCBs5Aw3l1",
+  "number": 3045,
+  "title": "ETH TO POLYGON",
+  "user": {
+    "login": "Lifestag",
+    "id": 70712311,
+    "node_id": "MDQ6VXNlcjcwNzEyMzEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/70712311?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Lifestag",
+    "html_url": "https://github.com/Lifestag",
+    "followers_url": "https://api.github.com/users/Lifestag/followers",
+    "following_url": "https://api.github.com/users/Lifestag/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Lifestag/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Lifestag/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Lifestag/subscriptions",
+    "organizations_url": "https://api.github.com/users/Lifestag/orgs",
+    "repos_url": "https://api.github.com/users/Lifestag/repos",
+    "events_url": "https://api.github.com/users/Lifestag/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Lifestag/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": true,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-12-22T07:56:59Z",
+  "updated_at": "2021-12-22T08:23:14Z",
+  "closed_at": "2021-12-22T08:23:00Z",
+  "author_association": "NONE",
+  "active_lock_reason": "off-topic",
+  "body": "/**\n *Submitted for verification at Etherscan.io on 2020-09-18\n*/\n\npragma solidity 0.5.16;\n\ncontract lifeStage {\n    \n    struct User {\n        uint id;\n        address referrer;\n        uint partnersCount;\n        uint totalETHEarnings;\n        uint zeroBonusStartMonth;\n        uint zeroBonusEndMonth;\n        uint  zreEarnedETH;\n        uint  ldbEarnedETH;\n        bool zeroBonus;\n        \n        \n        mapping(uint => bool) userZREReceived;\n        \n        mapping(uint => UserSLAP) userSLAP;\n        \n        mapping(uint8 => bool) activeA7Levels;\n        mapping(uint8 => bool) activeP7Levels;\n        \n        mapping(uint8 => A7) a7Matrix;\n        mapping(uint8 => P7) p7Matrix;\n    }\n    \n    \n    struct UserSLAP{\n        uint slap;\n        uint referralCount;\n        bool received;\n    }\n    \n    struct A7 {\n        address currentReferrer;\n        address[] referrals;\n        bool blocked;\n        uint reinvestCount;\n    }\n    \n    struct P7 {\n        address currentReferrer;\n        address[] firstLevelReferrals;\n        address[] secondLevelReferrals;\n        bool blocked;\n        uint reinvestCount;\n\n        address closedPart;\n    }\n    \n    struct divZRERecord\n    {\n        uint totalDividendCollection;\n        uint totalEligibleCount;\n        uint nextMonthEligibleCount;\n        uint withdrawalCount;\n        uint withdrawalDividend;\n        bool withdrawStatus;\n    }\n    \n    struct divLDRecord  \n    {\n        uint totalSLAPCollection;\n        uint totalS1EligibleCount;\n        uint totalS2EligibleCount;\n        uint totalS3EligibleCount;\n        uint totalS4EligibleCount;\n        uint totalS5EligibleCount;\n        bool withdrawStatus;\n    }\n    \n    divLDRecord[] public  LDB;\n    divZRERecord[] public ZRE;\n\n    uint8 public constant LAST_LEVEL = 12;\n    uint public oneMonthDuration = 30 days;\n    uint public oneDayDuration = 1 days;\n    uint public thisMonthEnd;\n    uint public thisDayEnd;\n    bool public lockStatus;\n    \n    mapping(address => User) public users;\n    mapping(uint => address) public idToAddress;\n\n    uint public lastUserId = 2;\n    address public owner;\n    uint public LDBPrice = 0.05 ether;\n    uint public SLAPPrice = LDBPrice*(80 ether)/(100 ether);\n    uint public LDBAdminCommission = LDBPrice*(20 ether)/(100 ether);\n    uint public ZREPrice = (SLAPPrice * (20 ether)/(100 ether));\n    uint public LDBDisPrice = 80 ether;\n    uint public ZREETHLimit = 0.3 ether;\n    \n    mapping(uint8 => uint) public levelPrice;\n    \n    event Registration(address indexed user, address indexed referrer, uint indexed userId, uint referrerId, uint _time);\n    event Reinvest(address indexed user, address indexed currentReferrer, address indexed caller, uint8 matrix, uint8 level, uint _time);\n    event Upgrade(address indexed user, address indexed referrer, uint8 matrix, uint8 level, uint _time);\n    event NewUserPlace(address indexed user, address indexed referrer, uint8 matrix, uint8 level, uint8 place, uint _time);\n    event MissedEthReceive(address indexed receiver, address indexed from, uint8 matrix, uint8 level, uint _time);\n    event SentExtraEthDividends(address indexed from, address indexed receiver, uint8 matrix, uint8 level, uint _time);\n    event LDBWithdrawal(address indexed _user, uint indexed _day, uint _amount, uint _time);\n    event ZREWithdrawal(address indexed _user, uint indexed _month, uint _amount, uint _time);\n    \n    \n    constructor() public {\n        levelPrice[1] = 0.05 ether;\n        for (uint8 i = 2; i <= LAST_LEVEL; i++) {\n            levelPrice[i] = levelPrice[i-1] * 2;\n        }\n        \n        owner = msg.sender;\n        \n        User memory user = User({\n            id: 1,\n            referrer: address(0),\n            partnersCount: uint(0),\n            totalETHEarnings:0,\n            zeroBonusStartMonth:0,\n            zeroBonusEndMonth:0,\n            zreEarnedETH:0,\n            ldbEarnedETH:0,\n            zeroBonus:true\n        });\n        \n        users[owner] = user;\n        idToAddress[1] = owner;\n        \n        for (uint8 i = 1; i <= LAST_LEVEL; i++) {\n            users[owner].activeA7Levels[i] = true;\n            users[owner].activeP7Levels[i] = true;\n        }\n        \n        \n        startNextDay();\n        startNextMonth();\n        \n        uint lastZREIndex = ZRE.length -1;\n        users[owner].zeroBonusStartMonth = lastZREIndex+1;\n        ZRE[lastZREIndex].nextMonthEligibleCount++;\n    }\n    \n    function() external payable {\n        if(msg.data.length == 0) {\n            return registration(msg.sender, owner);\n        }\n        \n        registration(msg.sender, bytesToAddress(msg.data));\n    }\n\n    function registrationExt(address referrerAddress) external payable {\n        require(lockStatus == false,\"Contract is locked\");\n        registration(msg.sender, referrerAddress);\n    }\n    \n    function buyNewLevel(uint8 matrix, uint8 level) external payable {\n        require(lockStatus == false,\"Contract is locked\");\n        require(isUserExists(msg.sender), \"user is not exists. Register first.\");\n        require(matrix == 1 || matrix == 2, \"invalid matrix\");\n        require(msg.value == levelPrice[level], \"invalid price\");\n        require(level > 1 && level <= LAST_LEVEL, \"invalid level\");\n\n        if (matrix == 1) {\n            require(!users[msg.sender].activeA7Levels[level], \"level already activated\");\n\n            if (users[msg.sender].a7Matrix[level-1].blocked) {\n                users[msg.sender].a7Matrix[level-1].blocked = false;\n            }\n    \n            address freeX3Referrer = findFreeA7Referrer(msg.sender, level);\n            users[msg.sender].a7Matrix[level].currentReferrer = freeX3Referrer;\n            users[msg.sender].activeA7Levels[level] = true;\n            updateA7Referrer(msg.sender, freeX3Referrer, level);\n            \n            emit Upgrade(msg.sender, freeX3Referrer, 1, level, now);\n\n        } else {\n            require(!users[msg.sender].activeP7Levels[level], \"level already activated\"); \n\n            if (users[msg.sender].p7Matrix[level-1].blocked) {\n                users[msg.sender].p7Matrix[level-1].blocked = false;\n            }\n\n            address freeP7Referrer = findFreeP7Referrer(msg.sender, level);\n            \n            users[msg.sender].activeP7Levels[level] = true;\n            updateP7Referrer(msg.sender, freeP7Referrer, level);\n            \n            emit Upgrade(msg.sender, freeP7Referrer, 2, level, now);\n        }\n    }    \n    \n    function startNextDay() public returns(bool)\n    {\n        require(msg.sender == owner,\"Invalid user address\");\n        require(thisDayEnd < now,\"day end not reached\");\n        thisDayEnd = now + oneDayDuration;\n        divLDRecord memory temp;\n        temp.totalS1EligibleCount = 1;\n        temp.totalS2EligibleCount = 1;\n        temp.totalS3EligibleCount = 1;\n        temp.totalS4EligibleCount = 1;\n        temp.totalS5EligibleCount = 1;\n        \n       ",
+  "closed_by": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3045/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3045/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

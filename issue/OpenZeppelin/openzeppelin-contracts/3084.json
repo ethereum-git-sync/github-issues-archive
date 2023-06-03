@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3084",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3084/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3084/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3084/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3084",
+  "id": 1095515363,
+  "node_id": "I_kwDOA9tCBs5BTDzj",
+  "number": 3084,
+  "title": "Use WETH gas optimization for ERC-20 transferFrom",
+  "user": {
+    "login": "0xclaudeshannon",
+    "id": 95975036,
+    "node_id": "U_kgDOBbh2fA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/95975036?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xclaudeshannon",
+    "html_url": "https://github.com/0xclaudeshannon",
+    "followers_url": "https://api.github.com/users/0xclaudeshannon/followers",
+    "following_url": "https://api.github.com/users/0xclaudeshannon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xclaudeshannon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xclaudeshannon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xclaudeshannon/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xclaudeshannon/orgs",
+    "repos_url": "https://api.github.com/users/0xclaudeshannon/repos",
+    "events_url": "https://api.github.com/users/0xclaudeshannon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xclaudeshannon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-01-06T17:09:26Z",
+  "updated_at": "2022-01-10T23:08:33Z",
+  "closed_at": "2022-01-10T23:08:33Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**🧐 Motivation**\r\nThe Wrapped Ether (WETH) ERC-20 contract has a gas optimization that does not update the allowance if it is the max uint. I'd like to incorporate this into OpenZeppelin to save 5000 gas per `transferFrom` call when a max approve is used.\r\n\r\n**📝 Details**\r\nThe `transferFrom` code for WETH is:\r\n```\r\n    function transferFrom(address src, address dst, uint wad)\r\n        public\r\n        returns (bool)\r\n    {\r\n        require(balanceOf[src] >= wad);\r\n\r\n        if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {\r\n            require(allowance[src][msg.sender] >= wad);\r\n            allowance[src][msg.sender] -= wad;\r\n        }\r\n\r\n        balanceOf[src] -= wad;\r\n        balanceOf[dst] += wad;\r\n\r\n        Transfer(src, dst, wad);\r\n\r\n        return true;\r\n    }\r\n```\r\n\r\nThe key line is ` if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {`. If the allowance is the max uint (`0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff`), then the WETH contract does not update the `allowance` mapping. This saves 5000 gas for the SSTORE. The only downside is that this changes the abstraction for approvals; if you set the approval to the maximum amount, then the contract can spend more than the max uint of your token. However, this doesn't seem like a risk, as users wanting to actually specify that amount can simply do the max uint minus 1.\r\n\r\nMy proposed change is to incorporate this into . This could save 5000 gas (or 10-20%) per ERC-20 transferFrom, which is used all across Unsiwap, Compound, and other big protocols.",
+  "closed_by": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3084/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3084/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
