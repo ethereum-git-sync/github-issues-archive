@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1581",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1581/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1581/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1581/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1581",
+  "id": 1305543086,
+  "node_id": "I_kwDOCUsNcc5N0QGu",
+  "number": 1581,
+  "title": "Inconsistent loading of imported contracts into project",
+  "user": {
+    "login": "gnpar",
+    "id": 10028199,
+    "node_id": "MDQ6VXNlcjEwMDI4MTk5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10028199?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gnpar",
+    "html_url": "https://github.com/gnpar",
+    "followers_url": "https://api.github.com/users/gnpar/followers",
+    "following_url": "https://api.github.com/users/gnpar/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gnpar/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gnpar/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gnpar/subscriptions",
+    "organizations_url": "https://api.github.com/users/gnpar/orgs",
+    "repos_url": "https://api.github.com/users/gnpar/repos",
+    "events_url": "https://api.github.com/users/gnpar/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gnpar/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-07-15T03:59:21Z",
+  "updated_at": "2022-07-15T03:59:21Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: v1.19.0\r\n* `ganache-cli` Version: v7.3.2\r\n* `solc` Version: 0.8.6\r\n* Python Version: 3.8.10\r\n* OS: linux\r\n\r\n### What was wrong?\r\n\r\nThere seems to be an issue with how contracts are loaded into the project.\r\n\r\nWhen run on a clean directory (no build), imported contracts are loaded into the project's namespace.\r\n\r\nWhen run a second time when the contracts were already built, only project contracts are loaded into the namespace.\r\n\r\nIt can be consistently reproduced:\r\n\r\n1. Setup a new project\r\n```bash\r\nbrownie init reproducer\r\ncd reproducer\r\n```\r\n\r\n2. Create a simple contract in `contracts/HelloWorld.sol`:\r\n```solidity\r\npragma solidity ^0.8.0;\r\n\r\nimport {ERC1967Proxy} from \"@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol\";\r\n\r\ncontract HelloWorld {\r\n    string public message;\r\n\r\n    constructor(string memory initMessage) {\r\n        message = initMessage;\r\n    }\r\n}\r\n```\r\n\r\n3. Add remapping for external dependency in brownie-config.yaml:\r\n```yaml\r\ncompiler:\r\n  solc:\r\n    remappings:\r\n    - \"@openzeppelin=node_modules/@openzeppelin\"\r\n```\r\n\r\n4. Install external dependency:\r\n```\r\nnpm i @openzeppelin/contracts\r\n```\r\n\r\n5. Run the following script with `brownie run scripts/reproducer.py`:\r\n```python\r\nimport brownie\r\n\r\n\r\ndef main():\r\n    try:\r\n        getattr(brownie.project.ReproducerProject, \"ERC1967Proxy\")\r\n        print(\"GOOD\")\r\n    except AttributeError:\r\n        print(f\"BAD {dir(brownie.project.ReproducerProject)}\")\r\n\r\n```\r\n\r\n6. It should print \"GOOD\". Run it again: `brownie run scripts/reproducer.py` and it should print \"BAD\" followed by the listing of project attributes.\r\n\r\n7. Remove the `build` directory and run again, it prints \"GOOD\"\r\n\r\n### How can it be fixed?\r\n\r\nI've been looking at the code but am not sure how to fix it. The problem seems to have been introduced by #1411\r\n\r\nUp until then, because all the contracts were always compiled all imported contracts were also loaded into the project.\r\n\r\nIf someone can point me in the right direction I may be able to provide a working patch.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1581/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1581/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

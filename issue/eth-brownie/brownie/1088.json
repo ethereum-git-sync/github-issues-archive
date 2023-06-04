@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1088",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1088/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1088/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1088/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1088",
+  "id": 898821938,
+  "node_id": "MDU6SXNzdWU4OTg4MjE5Mzg=",
+  "number": 1088,
+  "title": "GasStrategy - ValueError: invalid literal for int() with base 10: '30 gwei'",
+  "user": {
+    "login": "welshm",
+    "id": 3903024,
+    "node_id": "MDQ6VXNlcjM5MDMwMjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3903024?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/welshm",
+    "html_url": "https://github.com/welshm",
+    "followers_url": "https://api.github.com/users/welshm/followers",
+    "following_url": "https://api.github.com/users/welshm/following{/other_user}",
+    "gists_url": "https://api.github.com/users/welshm/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/welshm/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/welshm/subscriptions",
+    "organizations_url": "https://api.github.com/users/welshm/orgs",
+    "repos_url": "https://api.github.com/users/welshm/repos",
+    "events_url": "https://api.github.com/users/welshm/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/welshm/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-05-22T15:08:52Z",
+  "updated_at": "2021-06-13T19:22:45Z",
+  "closed_at": "2021-06-13T19:22:45Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.14.6\r\n* `ganache-cli` Version: 6.12.2\r\n* `solc` Version: x.x.x\r\n* Python Version: 3.8.2\r\n* OS: osx\r\n\r\n### What was wrong?\r\n\r\n```\r\nRunning 'scripts/deployment_v2.py::main'...\r\nTransaction sent: 0x56c5e5dd7826e1460f0ff79aa81f0fa30d3bd07e39c7a5c704faedc456bac0f1\r\n  Gas price: 30.0 gwei   Gas limit: 1245447   Nonce: 6\r\nWaiting for confirmation... Exception in thread Gas strategy 0x56c5e5dd7826e1460f0ff79aa81f0fa30d3bd07e39c7a5c704faedc456bac0f1:\r\nTraceback (most recent call last):\r\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/threading.py\", line 932, in _bootstrap_inner\r\n    self.run()\r\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib/python3.8/threading.py\", line 870, in run\r\n    self._target(*self._args, **self._kwargs)\r\n  File \"/Users/mikewelsh/.local/pipx/venvs/eth-brownie/lib/python3.8/site-packages/brownie/network/gas/bases.py\", line 65, in _loop\r\n    gas_price = next(gas_iter)\r\n  File \"/Users/mikewelsh/.local/pipx/venvs/eth-brownie/lib/python3.8/site-packages/brownie/network/gas/strategies.py\", line 77, in get_gas_price\r\n    last_gas_price = min(int(last_gas_price * self.increment), self.max_gas_price)\r\nValueError: invalid literal for int() with base 10: '30 gwei'\r\n```\r\n\r\nI tried to deploy a contract to mainnet with with the following...\r\n\r\n`brownie run scripts/deployment_v2.py --network mainnet`\r\n\r\n\r\ndeployment_v2.py\r\n\r\n```\r\nfrom brownie import MyContract, accounts, config, network\r\nfrom brownie.network.gas.strategies import GasNowStrategy\r\nfrom brownie.network.gas.strategies import GasNowScalingStrategy\r\nfrom brownie.network.gas.strategies import LinearScalingStrategy\r\nfrom brownie.network import gas_price\r\n\r\ndef main():\r\n    gas_strategy = LinearScalingStrategy(\"30 gwei\", \"30 gwei\", 1)\r\n    gas_price(gas_strategy)\r\n    acct = accounts.add(\r\n        config[\"wallets\"][\"from_key\"]\r\n    )\r\n    contract = MyContract.deploy(\r\n        {\"from\": acct},\r\n        )\r\n    return contract\r\n```\r\n\r\n\r\n### How can it be fixed?\r\n\r\nI don't know how Brownie interprets gwei into int, but I suspect that's where it's failing. Happy to create a PR if you can point me to where the interpretation or type definition is for gwei\r\n",
+  "closed_by": {
+    "login": "iamdefinitelyahuman",
+    "id": 35276322,
+    "node_id": "MDQ6VXNlcjM1Mjc2MzIy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35276322?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iamdefinitelyahuman",
+    "html_url": "https://github.com/iamdefinitelyahuman",
+    "followers_url": "https://api.github.com/users/iamdefinitelyahuman/followers",
+    "following_url": "https://api.github.com/users/iamdefinitelyahuman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iamdefinitelyahuman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iamdefinitelyahuman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iamdefinitelyahuman/subscriptions",
+    "organizations_url": "https://api.github.com/users/iamdefinitelyahuman/orgs",
+    "repos_url": "https://api.github.com/users/iamdefinitelyahuman/repos",
+    "events_url": "https://api.github.com/users/iamdefinitelyahuman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iamdefinitelyahuman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1088/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1088/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

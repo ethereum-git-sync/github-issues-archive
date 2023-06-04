@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1278",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1278/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1278/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1278/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1278",
+  "id": 1019259417,
+  "node_id": "I_kwDOCUsNcc48wKoZ",
+  "number": 1278,
+  "title": "TypeError: Cannot convert str 'Joe Smith' to wei.",
+  "user": {
+    "login": "caenrigen",
+    "id": 31376402,
+    "node_id": "MDQ6VXNlcjMxMzc2NDAy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/31376402?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/caenrigen",
+    "html_url": "https://github.com/caenrigen",
+    "followers_url": "https://api.github.com/users/caenrigen/followers",
+    "following_url": "https://api.github.com/users/caenrigen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/caenrigen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/caenrigen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/caenrigen/subscriptions",
+    "organizations_url": "https://api.github.com/users/caenrigen/orgs",
+    "repos_url": "https://api.github.com/users/caenrigen/repos",
+    "events_url": "https://api.github.com/users/caenrigen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/caenrigen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-10-06T21:22:54Z",
+  "updated_at": "2021-10-06T21:23:07Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hi there! Thank you for the awesome project :)\r\n\r\nI have run into a nasty bug while running tests that involve comparing `ReturnValue[str]` to a `List[str]/Tuple[str]`.\r\n\r\nHow to reproduce:\r\n\r\n```python\r\nfrom brownie.convert.datatypes import ReturnValue\r\nReturnValue((\"Joe Smith\", \"Also Smith\")) == (\"Joe Smith\", \"Also Smith\")\r\n```\r\n\r\nTraceback\r\n\r\n```python\r\n---------------------------------------------------------------------------\r\nValueError                                Traceback (most recent call last)\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in _return_int(original, value)\r\n    116     try:\r\n--> 117         return int(value)\r\n    118     except ValueError:\r\n\r\nValueError: invalid literal for int() with base 10: 'Joe Smith'\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTypeError                                 Traceback (most recent call last)\r\n/var/folders/s5/z9b__9915kq1tpx_kltkywn80000gn/T/ipykernel_26198/1730865466.py in <module>\r\n----> 1 ReturnValue((\"Joe Smith\", \"Also Smith\")) == (\"Joe Smith\", \"Also Smith\")\r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in __eq__(self, other)\r\n    313 \r\n    314     def __eq__(self, other: Any) -> bool:\r\n--> 315         return _kwargtuple_compare(self, other)\r\n    316 \r\n    317     def __ne__(self, other: Any) -> bool:\r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in _kwargtuple_compare(a, b)\r\n    379     if not isinstance(b, (tuple, list, ReturnValue)) or len(b) != len(a):\r\n    380         return False\r\n--> 381     return next((False for i in range(len(a)) if not _kwargtuple_compare(a[i], b[i])), True)\r\n    382 \r\n    383 \r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in <genexpr>(.0)\r\n    379     if not isinstance(b, (tuple, list, ReturnValue)) or len(b) != len(a):\r\n    380         return False\r\n--> 381     return next((False for i in range(len(a)) if not _kwargtuple_compare(a[i], b[i])), True)\r\n    382 \r\n    383 \r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in _kwargtuple_compare(a, b)\r\n    376         if types_.intersection([dict, EthAddress, HexString]):\r\n    377             return a == b\r\n--> 378         return _convert_str(a) == _convert_str(b)\r\n    379     if not isinstance(b, (tuple, list, ReturnValue)) or len(b) != len(a):\r\n    380         return False\r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in _convert_str(value)\r\n    392         return value\r\n    393     try:\r\n--> 394         return Wei(value)\r\n    395     # except (ValueError, TypeError):\r\n    396     except ValueError:\r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in __new__(cls, value)\r\n     40     # Known typing error: https://github.com/python/mypy/issues/4290\r\n     41     def __new__(cls, value: Any) -> Any:  # type: ignore\r\n---> 42         return super().__new__(cls, _to_wei(value))  # type: ignore\r\n     43 \r\n     44     def __hash__(self) -> int:\r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in _to_wei(value)\r\n    110         num = num_str.split(\".\") if \".\" in num_str else [num_str, \"\"]\r\n    111         return int(num[0] + num[1][: int(dec)] + \"0\" * (int(dec) - len(num[1])))\r\n--> 112     return _return_int(original, value)\r\n    113 \r\n    114 \r\n\r\n/usr/local/anaconda3/envs/f39/lib/python3.9/site-packages/brownie/convert/datatypes.py in _return_int(original, value)\r\n    117         return int(value)\r\n    118     except ValueError:\r\n--> 119         raise TypeError(f\"Cannot convert {type(original).__name__} '{original}' to wei.\")\r\n    120 \r\n    121 \r\n\r\nTypeError: Cannot convert str 'Joe Smith' to wei.\r\n```\r\n\r\nSuggestion to fix, on this line  https://github.com/eth-brownie/brownie/blob/878052540ce2f85c6fb6ccf6cd877ef73c6551b0/brownie/convert/datatypes.py#L395\r\nmake it \r\n\r\n```python\r\n    except (ValueError, TypeError):\r\n```\r\n\r\nThe issue is related to the ``if value.count(\" \") != 1:`` as well I believe inside the `_convert_str` function.\r\n\r\nHope this helps, let me know if you could hotfix this or you would like me to create a PR.\r\n\r\nCheers!",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1278/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1278/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

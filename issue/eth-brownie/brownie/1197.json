@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1197",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1197/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1197/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1197/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1197",
+  "id": 968519152,
+  "node_id": "MDU6SXNzdWU5Njg1MTkxNTI=",
+  "number": 1197,
+  "title": "Since from_explorer may throw ConnectionError on live network, related code pieces should be reviewed",
+  "user": {
+    "login": "shensr",
+    "id": 8552661,
+    "node_id": "MDQ6VXNlcjg1NTI2NjE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8552661?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shensr",
+    "html_url": "https://github.com/shensr",
+    "followers_url": "https://api.github.com/users/shensr/followers",
+    "following_url": "https://api.github.com/users/shensr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shensr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shensr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shensr/subscriptions",
+    "organizations_url": "https://api.github.com/users/shensr/orgs",
+    "repos_url": "https://api.github.com/users/shensr/repos",
+    "events_url": "https://api.github.com/users/shensr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shensr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-08-12T10:16:19Z",
+  "updated_at": "2021-08-12T10:16:19Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.14.6\r\n* `ganache-cli` Version: x.x.x\r\n* `solc` Version: x.x.x\r\n* Python Version: 3.9.5\r\n* OS: win\r\n\r\n### What was wrong?\r\n\r\nSince Contract.from_explorer will request the RPC API to fetch source code, abi and bytecode, it may throw ConnectionError on live network with some uncontrollable environment issues. Like this:\r\n\r\nrequests.exceptions.ConnectionError: ('Connection aborted.', TimeoutError(10060, '...', None, 10060, None))\r\n  File \"<console>\", line 1, in <module>\r\n  File \"d:\\python\\python39\\lib\\site-packages\\brownie\\network\\contract.py\", line 593, in __call__\r\n    return tx[\"from\"].deploy(\r\n  File \"d:\\python\\python39\\lib\\site-packages\\brownie\\network\\account.py\", line 510, in deploy\r\n    deployed_contract = contract.at(receipt.contract_address)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\brownie\\network\\contract.py\", line 215, in at\r\n    contract = _find_contract(address)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\brownie\\network\\state.py\", line 546, in _find_contract\r\n    return Contract(address)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\brownie\\network\\contract.py\", line 939, in __init__\r\n    contract = self.from_explorer(address, owner=owner, silent=True)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\brownie\\network\\contract.py\", line 1090, in from_explorer\r\n    data = _fetch_from_explorer(address, \"getsourcecode\", silent)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\brownie\\network\\contract.py\", line 1888, in _fetch_from_explorer\r\n    response = requests.get(url, params=params, headers=REQUEST_HEADERS)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\requests\\api.py\", line 76, in get\r\n    return request('get', url, params=params, **kwargs)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\requests\\api.py\", line 61, in request\r\n    return session.request(method=method, url=url, **kwargs)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\requests\\sessions.py\", line 542, in request\r\n    resp = self.send(prep, **send_kwargs)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\requests\\sessions.py\", line 655, in send\r\n    r = adapter.send(request, **kwargs)\r\n  File \"d:\\python\\python39\\lib\\site-packages\\requests\\adapters.py\", line 516, in send\r\n    raise ConnectionError(e, request=request)\r\n\r\n### How can it be fixed?\r\n\r\nI had a quick look at several related code pieces, and done the following changes:\r\n#1. change from_explorer to Contract.from_abi at the account.py line#510\r\n            #[shensr] old code call from_explorer will cause ConnectionError on live network\r\n            # deployed_contract = contract.at(receipt.contract_address)\r\n            from brownie import Contract\r\n            deployed_contract = Contract.from_abi(str(contract), receipt.contract_address, contract.abi)\r\n#2. change \"except ContractNotFound:\" to \"except:\" in the following files:\r\n  * transaction.py line#526\r\n  * account.py line#514\r\n\r\nThe above changes are not considered deeply. I suggest to review all related code pieces to solv that issue well.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1197/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1197/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

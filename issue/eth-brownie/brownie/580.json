@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/580",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/580/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/580/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/580/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/580",
+  "id": 627974161,
+  "node_id": "MDU6SXNzdWU2Mjc5NzQxNjE=",
+  "number": 580,
+  "title": "Internal tests produce unnecessarily long tracebacks",
+  "user": {
+    "login": "iamdefinitelyahuman",
+    "id": 35276322,
+    "node_id": "MDQ6VXNlcjM1Mjc2MzIy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35276322?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iamdefinitelyahuman",
+    "html_url": "https://github.com/iamdefinitelyahuman",
+    "followers_url": "https://api.github.com/users/iamdefinitelyahuman/followers",
+    "following_url": "https://api.github.com/users/iamdefinitelyahuman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iamdefinitelyahuman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iamdefinitelyahuman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iamdefinitelyahuman/subscriptions",
+    "organizations_url": "https://api.github.com/users/iamdefinitelyahuman/orgs",
+    "repos_url": "https://api.github.com/users/iamdefinitelyahuman/repos",
+    "events_url": "https://api.github.com/users/iamdefinitelyahuman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iamdefinitelyahuman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-05-31T14:27:27Z",
+  "updated_at": "2020-06-04T09:00:46Z",
+  "closed_at": "2020-06-04T09:00:46Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Overview\r\nBecause Brownie itself is a pytest plugin, there is extensive use of `__tracebackhide__` to indicate to pytest that a module/class/function should be omitted from a traceback. This is useful for not drowning end users in gigantic tracebacks, but makes it difficult when dealing with failed tests within Brownie itself.\r\n\r\nAs a workaround, `setup.cfg` includes the `--full-trace` flag which overrides the traceback pruning. The problem is - this means we also get the entire traceback for pytest's internals.\r\n\r\nI haven't tested that it works, but I'm hoping we can find a middleground where instead of \r\n\r\n```python\r\n__tracebackhide__ = True\r\n```\r\n\r\nWe could instead say:\r\n\r\n```\r\n__tracebackhide__ = CONFIG.foo\r\n```\r\n\r\nWhere `foo` is normally `True`, but capable of detecting that pytest is active and swapping itself to `False`.\r\n\r\nThe challenge is that this value is set while module are being imported, so it cannot be modified after the fact during `pytest_configure`.\r\n\r\nThis will take some thought, but I think it's necessary - the overly long tracebacks are getting to me :grimacing: \r\n",
+  "closed_by": {
+    "login": "iamdefinitelyahuman",
+    "id": 35276322,
+    "node_id": "MDQ6VXNlcjM1Mjc2MzIy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35276322?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iamdefinitelyahuman",
+    "html_url": "https://github.com/iamdefinitelyahuman",
+    "followers_url": "https://api.github.com/users/iamdefinitelyahuman/followers",
+    "following_url": "https://api.github.com/users/iamdefinitelyahuman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iamdefinitelyahuman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iamdefinitelyahuman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iamdefinitelyahuman/subscriptions",
+    "organizations_url": "https://api.github.com/users/iamdefinitelyahuman/orgs",
+    "repos_url": "https://api.github.com/users/iamdefinitelyahuman/repos",
+    "events_url": "https://api.github.com/users/iamdefinitelyahuman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iamdefinitelyahuman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/580/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/580/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

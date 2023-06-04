@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1105",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1105/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1105/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1105/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1105",
+  "id": 911104301,
+  "node_id": "MDU6SXNzdWU5MTExMDQzMDE=",
+  "number": 1105,
+  "title": "Bug: Calls to empty accounts do not appear in tx.subcalls",
+  "user": {
+    "login": "skellet0r",
+    "id": 23556333,
+    "node_id": "MDQ6VXNlcjIzNTU2MzMz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/23556333?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/skellet0r",
+    "html_url": "https://github.com/skellet0r",
+    "followers_url": "https://api.github.com/users/skellet0r/followers",
+    "following_url": "https://api.github.com/users/skellet0r/following{/other_user}",
+    "gists_url": "https://api.github.com/users/skellet0r/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/skellet0r/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/skellet0r/subscriptions",
+    "organizations_url": "https://api.github.com/users/skellet0r/orgs",
+    "repos_url": "https://api.github.com/users/skellet0r/repos",
+    "events_url": "https://api.github.com/users/skellet0r/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/skellet0r/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-06-04T04:24:04Z",
+  "updated_at": "2021-07-01T01:57:02Z",
+  "closed_at": "2021-07-01T01:57:02Z",
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.14.6\r\n* `ganache-cli` Version: 6.12.2\r\n* `solc` Version: 0.8.4\r\n* Python Version: 3.8.9\r\n* OS: linux\r\n\r\n### What was wrong?\r\n\r\nLow level calls to addresses which have no deployed contract do not show up in `tx.subcalls`.\r\n\r\nBelow is some example contracts in both solidity and vyper, as well as a sample set of test cases. \r\n\r\n*contracts/SolDummy.sol*\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity >=0.6.0;\r\n\r\ncontract SolDummy {\r\n    address constant TARGET = 0xD0660cD418a64a1d44E9214ad8e459324D8157f1;\r\n\r\n    function foo_call() external {\r\n        TARGET.call(abi.encodeWithSignature(\"bar()\"));\r\n    }\r\n\r\n    function foo_static_call() external {\r\n        TARGET.staticcall(abi.encodeWithSignature(\"bar()\"));\r\n    }\r\n\r\n    function foo_delegate_call() external {\r\n        TARGET.delegatecall(abi.encodeWithSignature(\"bar()\"));\r\n    }\r\n}\r\n```\r\n\r\n*contracts/VyDummy.vy*\r\n```python\r\n# @version 0.2.12\r\n\r\n\r\nTARGET: constant(address) = 0xD0660cD418a64a1d44E9214ad8e459324D8157f1\r\n\r\n\r\n@external\r\ndef foo_call():\r\n    raw_call(TARGET, method_id(\"bar()\"))\r\n\r\n\r\n@external\r\ndef foo_static_call():\r\n    raw_call(TARGET, method_id(\"bar()\"), is_static_call=True)\r\n\r\n\r\n@external\r\ndef foo_delegate_call():\r\n    raw_call(TARGET, method_id(\"bar()\"), is_delegate_call=True)\r\n```\r\n\r\n*tests/test_call.py*\r\n```python\r\nimport pytest\r\n\r\n\r\n@pytest.fixture(scope=\"module\")\r\ndef alice(accounts):\r\n    return accounts[0]\r\n\r\n\r\n@pytest.fixture(scope=\"module\")\r\ndef sol_dummy(alice, SolDummy):\r\n    return SolDummy.deploy({\"from\": alice})\r\n\r\n\r\n@pytest.fixture(scope=\"module\")\r\ndef vy_dummy(alice, VyDummy):\r\n    return VyDummy.deploy({\"from\": alice})\r\n\r\n\r\n@pytest.fixture(scope=\"module\", params=(0, 1), ids=(\"SolDummy\", \"VyDummy\"))\r\ndef dummy(request, sol_dummy, vy_dummy):\r\n    return [sol_dummy, vy_dummy][request.param]\r\n\r\n\r\ndef test_call(alice, dummy):\r\n    tx = dummy.foo_call({\"from\": alice})\r\n    assert len(tx.subcalls) == 1\r\n\r\n\r\ndef test_static_call(alice, dummy):\r\n    tx = dummy.foo_static_call.transact({\"from\": alice})\r\n    assert len(tx.subcalls) == 1\r\n\r\n\r\ndef test_delegate_call(alice, dummy):\r\n    tx = dummy.foo_delegate_call({\"from\": alice})\r\n    assert len(tx.subcalls) == 1\r\n```\r\nWhen the above tests are ran, they all fail, when in fact they should pass as there is exactly 1 low level sub call in each of the dummy functions.\r\n\r\n### How can it be fixed?\r\n\r\nThis needs to be fixed in the `brownie/network/transaction.py` file, specifically in [this area](https://github.com/eth-brownie/brownie/blob/master/brownie/network/transaction.py#L780).\r\n",
+  "closed_by": {
+    "login": "iamdefinitelyahuman",
+    "id": 35276322,
+    "node_id": "MDQ6VXNlcjM1Mjc2MzIy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35276322?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iamdefinitelyahuman",
+    "html_url": "https://github.com/iamdefinitelyahuman",
+    "followers_url": "https://api.github.com/users/iamdefinitelyahuman/followers",
+    "following_url": "https://api.github.com/users/iamdefinitelyahuman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iamdefinitelyahuman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iamdefinitelyahuman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iamdefinitelyahuman/subscriptions",
+    "organizations_url": "https://api.github.com/users/iamdefinitelyahuman/orgs",
+    "repos_url": "https://api.github.com/users/iamdefinitelyahuman/repos",
+    "events_url": "https://api.github.com/users/iamdefinitelyahuman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iamdefinitelyahuman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1105/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1105/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

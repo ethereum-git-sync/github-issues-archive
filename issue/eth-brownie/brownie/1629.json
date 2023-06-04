@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1629",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1629/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1629/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1629/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1629",
+  "id": 1431746655,
+  "node_id": "I_kwDOCUsNcc5VVrhf",
+  "number": 1629,
+  "title": "ValueError: invalid literal for int() with base 16: '0x'",
+  "user": {
+    "login": "PSGAdminTech",
+    "id": 91036542,
+    "node_id": "MDQ6VXNlcjkxMDM2NTQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/91036542?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PSGAdminTech",
+    "html_url": "https://github.com/PSGAdminTech",
+    "followers_url": "https://api.github.com/users/PSGAdminTech/followers",
+    "following_url": "https://api.github.com/users/PSGAdminTech/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PSGAdminTech/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PSGAdminTech/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PSGAdminTech/subscriptions",
+    "organizations_url": "https://api.github.com/users/PSGAdminTech/orgs",
+    "repos_url": "https://api.github.com/users/PSGAdminTech/repos",
+    "events_url": "https://api.github.com/users/PSGAdminTech/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PSGAdminTech/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-01T16:46:50Z",
+  "updated_at": "2022-11-01T17:27:15Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: v1.12.4\r\n* `ganache-cli` Version: v7.5.0 (@ganache/cli: 0.6.0, @ganache/core: 0.6.0)\r\n* `solc` Version: 0.8.16+commit.07a7930e.Darwin.appleclang\r\n* Python Version: Python 3.7.6\r\n* OS: Mac OS Monterey v12.6\r\n\r\nUpdated:\r\n\r\nUnistalled brownie and replaced with eth-brownie==1.19.2\r\n\r\n* eth-abi==2.2.0\r\n* eth-account==0.5.9\r\n* eth-brownie==1.19.2\r\n* eth-event==1.2.3\r\n\r\nStill same error persist (see below)\r\n\r\nPossibly related to Ganache version:\r\nhttps://github.com/eth-brownie/brownie/issues/945\r\n\r\n### What was wrong?\r\n\r\nCan't deploy simple ERC20 to Ganache Development network\r\n\r\nScript:\r\n\r\n```\r\n#!/usr/bin/python3\r\n\r\nfrom brownie import accounts, MockErc20\r\n\r\n\r\ndef main():\r\n    return MockErc20.deploy(1e21,\"Mock Token\",18,\"MTE\", {\"from\": accounts[0]})\r\n```\r\n\r\nOutput:\r\n\r\n```\r\n(coffee-app) ➜  coffee-app-v1 brownie run ./scripts/deploy_mock_erc20.py\r\nBrownie v1.12.4 - Python development framework for Ethereum\r\n\r\nCoffeeAppVProject is the active project.\r\nAttached to local RPC client listening at '127.0.0.1:8545'...\r\n\r\nRunning 'scripts/deploy_mock_erc20.py::main'...\r\n<brownie.network.account.Accounts object at 0x7fb230898dd0>\r\n  File \"brownie/_cli/run.py\", line 49, in main\r\n    return_value = run(args[\"<filename>\"], method_name=args[\"<function>\"] or \"main\")\r\n  File \"brownie/project/scripts.py\", line 66, in run\r\n    return getattr(module, method_name)(*args, **kwargs)\r\n  File \"./scripts/deploy_mock_erc20.py\", line 19, in main\r\n    return MockErc20.deploy(1e21,\"Mock Token\",18,\"MTE\", {\"from\": accounts[0]})\r\n  File \"brownie/network/contract.py\", line 290, in __call__\r\n    required_confs=tx[\"required_confs\"],\r\n  File \"brownie/network/account.py\", line 469, in deploy\r\n    exc = VirtualMachineError(e)\r\n  File \"brownie/exceptions.py\", line 118, in __init__\r\n    raise ValueError(str(exc)) from None\r\nValueError: invalid literal for int() with base 16: '0x'\r\n\r\n```\r\n\r\nGanache Output:\r\n\r\n```\r\nRPC Listening on 127.0.0.1:8545\r\nweb3_clientVersion\r\neth_getBlockByNumber\r\nweb3_clientVersion\r\neth_blockNumber\r\nevm_snapshot\r\nSaved snapshot #1\r\neth_accounts\r\neth_blockNumber\r\neth_getBlockByNumber\r\neth_getTransactionCount\r\n```\r\n\r\nUpdate with Eth-Brownie==1.19.2\r\n\r\nScript:\r\n\r\n```\r\n#!/usr/bin/python3\r\nimport os\r\nfrom brownie import accounts, MockErc20\r\nimport brownie.network as network\r\nfrom brownie.network import max_fee, priority_fee\r\n\r\n\r\ndef main():\r\n    \r\n    if network.show_active() in [\"development\"]:\r\n        return MockErc20.deploy(1e21,\"Mock Token\",18,\"MTE\", {\"from\": accounts[0]})\r\n    elif network.show_active() == \"goerli\":\r\n        owner = accounts.add(os.getenv(\"GOERLI_PRIVATE_KEY\"))\r\n        print(owner)\r\n        publish = True\r\n        return MockErc20.deploy(1e21,\"Mock Token\",18,\"MTE\", {\"from\": owner[0]}, publish_source=publish)\r\n```\r\n\r\nOutput:\r\n\r\n```\r\n(coffee-app) ➜  coffee-app-v1 brownie run deploy -I        \r\nBrownie v1.12.4 - Python development framework for Ethereum\r\n\r\nCoffeeAppVProject is the active project.\r\n\r\nLaunching 'ganache-cli --accounts 10 --hardfork istanbul --gasLimit 12000000 --mnemonic brownie --port 8545'...\r\n\r\nRunning 'scripts/deploy.py::main'...\r\n  File \"brownie/_cli/run.py\", line 49, in main\r\n    return_value = run(args[\"<filename>\"], method_name=args[\"<function>\"] or \"main\")\r\n  File \"brownie/project/scripts.py\", line 66, in run\r\n    return getattr(module, method_name)(*args, **kwargs)\r\n  File \"./scripts/deploy.py\", line 9, in main\r\n    SolidityStorage.deploy({'from':accounts[0]})\r\n  File \"brownie/network/contract.py\", line 290, in __call__\r\n    required_confs=tx[\"required_confs\"],\r\n  File \"brownie/network/account.py\", line 469, in deploy\r\n    exc = VirtualMachineError(e)\r\n  File \"brownie/exceptions.py\", line 118, in __init__\r\n    raise ValueError(str(exc)) from None\r\nValueError: invalid literal for int() with base 16: '0x'\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1629/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1629/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

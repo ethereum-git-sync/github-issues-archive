@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1330",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1330/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1330/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1330/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1330",
+  "id": 1046532040,
+  "node_id": "I_kwDOCUsNcc4-YM_I",
+  "number": 1330,
+  "title": "flattener does not work with remappings",
+  "user": {
+    "login": "mullahfaizal",
+    "id": 91320089,
+    "node_id": "MDQ6VXNlcjkxMzIwMDg5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/91320089?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mullahfaizal",
+    "html_url": "https://github.com/mullahfaizal",
+    "followers_url": "https://api.github.com/users/mullahfaizal/followers",
+    "following_url": "https://api.github.com/users/mullahfaizal/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mullahfaizal/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mullahfaizal/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mullahfaizal/subscriptions",
+    "organizations_url": "https://api.github.com/users/mullahfaizal/orgs",
+    "repos_url": "https://api.github.com/users/mullahfaizal/repos",
+    "events_url": "https://api.github.com/users/mullahfaizal/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mullahfaizal/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-11-06T15:22:09Z",
+  "updated_at": "2021-11-06T15:22:09Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I get a `FileNotFoundError` because brownie is trying to remap from a subdirectory of the project root path e.g. instead of `/a/remap/x.sol`, it tries to access `/a/subdir/remap/x.sol`\r\n\r\n\r\nFixed this locally by applying the following patch\r\n```\r\n                                                                                  git diff\r\ndiff --git a/brownie/network/contract.py b/brownie/network/contract.py\r\nindex 5b7077cd..f3891630 100644\r\n--- a/brownie/network/contract.py\r\n+++ b/brownie/network/contract.py\r\n@@ -279,7 +279,7 @@ class ContractContainer(_ContractBase):\r\n                     \"evmVersion\": self._build[\"compiler\"][\"evm_version\"],\r\n                     \"optimizer\": config[\"solc\"][\"optimizer\"],\r\n                 }\r\n-                self._flattener = Flattener(source_fp, self._name, remaps, compiler_settings)\r\n+                self._flattener = Flattener(source_fp, self._name, remaps, compiler_settings, project_root_path=str(self._project._path))\r\n \r\n             build_json = self._build\r\n \r\ndiff --git a/brownie/project/flattener.py b/brownie/project/flattener.py\r\nindex b18fb9a0..3522804b 100644\r\n--- a/brownie/project/flattener.py\r\n+++ b/brownie/project/flattener.py\r\n@@ -2,9 +2,9 @@ import re\r\n from collections import defaultdict\r\n from pathlib import Path\r\n from typing import DefaultDict, Dict, Set\r\n+import os\r\n \r\n from brownie.utils.toposort import toposort_flatten\r\n-\r\n # Patten matching Solidity `import-directive`, capturing path component\r\n # https://docs.soliditylang.org/en/latest/grammar.html#a4.SolidityParser.importDirective\r\n IMPORT_PATTERN = re.compile(r\"(?<=\\n)?import(?P<prefix>.*)\\\"(?P<path>.*)\\\"(?P<suffix>.*)(?=\\n)\")\r\n@@ -16,7 +16,8 @@ class Flattener:\r\n     \"\"\"Brownie's Robust Solidity Flattener.\"\"\"\r\n \r\n     def __init__(\r\n-        self, primary_source_fp: str, contract_name: str, remappings: dict, compiler_settings: dict\r\n+        self, primary_source_fp: str, contract_name: str, remappings: dict, compiler_settings: dict,\r\n+        project_root_path: str\r\n     ) -> None:\r\n         self.sources: Dict[str, str] = {}\r\n         self.dependencies: DefaultDict[str, Set[str]] = defaultdict(set)\r\n@@ -24,7 +25,7 @@ class Flattener:\r\n         self.contract_name = contract_name\r\n         self.contract_file = Path(primary_source_fp).name\r\n         self.remappings = remappings\r\n-\r\n+        self.project_root_path = project_root_path\r\n         self.traverse(primary_source_fp)\r\n \r\n         license_search = LICENSE_PATTERN.search(self.sources[Path(primary_source_fp).name])\r\n@@ -118,7 +119,8 @@ class Flattener:\r\n         \"\"\"\r\n         for k, v in self.remappings.items():\r\n             if import_path.startswith(k):\r\n-                return import_path.replace(k, v, 1)\r\n+                # Make path absolute with project root as base dir\r\n+                return f\"{self.project_root_path}{os.path.sep}{import_path.replace(k, v, 1)}\"\r\n         return import_path\r\n \r\n     @staticmethod\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1330/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1330/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1454",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1454/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1454/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1454/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1454",
+  "id": 1150602460,
+  "node_id": "I_kwDOCUsNcc5ElMzc",
+  "number": 1454,
+  "title": "Intermittent ValueError: replacement transaction underpriced when priority_fee = 'auto'",
+  "user": {
+    "login": "josh-davis-vicinft",
+    "id": 94843534,
+    "node_id": "U_kgDOBacyjg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/94843534?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/josh-davis-vicinft",
+    "html_url": "https://github.com/josh-davis-vicinft",
+    "followers_url": "https://api.github.com/users/josh-davis-vicinft/followers",
+    "following_url": "https://api.github.com/users/josh-davis-vicinft/following{/other_user}",
+    "gists_url": "https://api.github.com/users/josh-davis-vicinft/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/josh-davis-vicinft/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/josh-davis-vicinft/subscriptions",
+    "organizations_url": "https://api.github.com/users/josh-davis-vicinft/orgs",
+    "repos_url": "https://api.github.com/users/josh-davis-vicinft/repos",
+    "events_url": "https://api.github.com/users/josh-davis-vicinft/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/josh-davis-vicinft/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-02-25T15:50:46Z",
+  "updated_at": "2022-02-25T15:50:46Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.18.1\r\n* `ganache-cli` Version: 6.12.2 (ganache-core: 2.13.2)\r\n* `solc` Version: 0.8.11\r\n* Python Version: 3.8.10\r\n* OS: Linux\r\n\r\n### What was wrong?\r\nI set priority_fee to 'auto'. The initial transaction failed and was retried. At this point chain priority fee had increased, but Brownie was still using an old value, so it failed again with `ValueError: replacement transaction underpriced`.\r\n\r\nThe traceback looks like this:\r\n```\r\n  File \"/home/flowmaster/.local/lib/python3.8/site-packages/brownie/network/contract.py\", line 1710, in __call__\r\n    return self.transact(*args)\r\n  File \"/home/flowmaster/.local/lib/python3.8/site-packages/brownie/network/contract.py\", line 1583, in transact\r\n    return tx[\"from\"].transfer(\r\n  File \"/home/flowmaster/.local/lib/python3.8/site-packages/brownie/network/account.py\", line 644, in transfer\r\n    receipt, exc = self._make_transaction(\r\n  File \"/home/flowmaster/.local/lib/python3.8/site-packages/brownie/network/account.py\", line 752, in _make_transaction\r\n    exc = VirtualMachineError(e)\r\n  File \"/home/flowmaster/.local/lib/python3.8/site-packages/brownie/exceptions.py\", line 96, in __init__\r\n    raise ValueError(exc[\"message\"]) from None\r\nValueError: replacement transaction underpriced\r\n```\r\n\r\n### How can it be fixed?\r\nThe problem is that Brownie resolves the 'auto' priority fee before it enters the retry loop, and then if it needs to retry the transaction, it assumes the old priority fee is still good.\r\n\r\nI'm am about to submit a pull request for this. The change is to resolve the 'auto' priority fee inside the retry loop, so use an updated value each time we retry.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1454/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1454/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

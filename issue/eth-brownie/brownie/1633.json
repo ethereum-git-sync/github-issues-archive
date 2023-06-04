@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1633",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1633/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1633/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1633/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1633",
+  "id": 1446098387,
+  "node_id": "I_kwDOCUsNcc5WMbXT",
+  "number": 1633,
+  "title": "Solidity compiler throws error when `opcodes` is empty",
+  "user": {
+    "login": "BowTiedDevil",
+    "id": 85258057,
+    "node_id": "MDQ6VXNlcjg1MjU4MDU3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85258057?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BowTiedDevil",
+    "html_url": "https://github.com/BowTiedDevil",
+    "followers_url": "https://api.github.com/users/BowTiedDevil/followers",
+    "following_url": "https://api.github.com/users/BowTiedDevil/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BowTiedDevil/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BowTiedDevil/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BowTiedDevil/subscriptions",
+    "organizations_url": "https://api.github.com/users/BowTiedDevil/orgs",
+    "repos_url": "https://api.github.com/users/BowTiedDevil/repos",
+    "events_url": "https://api.github.com/users/BowTiedDevil/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BowTiedDevil/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-11T23:31:46Z",
+  "updated_at": "2022-11-11T23:31:46Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.19.2\r\n* Python Version: 3.10.7\r\n* OS: Linux\r\n\r\n### What was wrong?\r\n\r\nAttempting to load a contract at `0xBeC5938FD565CbEc72107eE39CdE1bc78049537d`, Brownie throws an exception:\r\n\r\n```\r\n>>> token = Contract.from_explorer('0xBeC5938FD565CbEc72107eE39CdE1bc78049537d')\r\n \r\n/home/devil/bots/.venv/lib64/python3.10/site-packages/brownie/network/contract.py:2073: BrownieEnvironmentWarning: No etherscan API token set. You may experience issues with rate limiting. Visit https://etherscan.io/register to obtain a token, and then store it as the environment variable $ETHERSCAN_TOKEN\r\n  warnings.warn(\r\nFetching source of 0xBeC5938FD565CbEc72107eE39CdE1bc78049537d from api.etherscan.io...\r\n  File \"<console>\", line 1, in <module>\r\n  File \"brownie/network/contract.py\", line 1186, in from_explorer\r\n    build_json = compiler.compile_and_format(\r\n  File \"brownie/project/compiler/__init__.py\", line 142, in compile_and_format\r\n    build_json.update(generate_build_json(input_json, output_json, compiler_data, silent))\r\n  File \"brownie/project/compiler/__init__.py\", line 317, in generate_build_json\r\n    build_json[contract_alias] = solidity._get_unique_build_json(\r\n  File \"brownie/project/compiler/solidity.py\", line 281, in _get_unique_build_json\r\n    pc_map, statement_map, branch_map = _generate_coverage_data(\r\n  File \"brownie/project/compiler/solidity.py\", line 506, in _generate_coverage_data\r\n    while opcodes and opcodes[0] not in (\"INVALID\", \"STOP\") and pc < instruction_count:\r\nIndexError: deque index out of range\r\n```\r\n\r\n### How can it be fixed?\r\n\r\nAdding a check prior to pulling the [0] element fixes the error.\r\n\r\nBefore:\r\n```\r\nwhile opcodes[0] not in (\"INVALID\", \"STOP\") and pc < instruction_count:\r\n        # necessary because sometimes solidity returns an incomplete source map\r\n        pc_list.append({\"op\": opcodes.popleft(), \"pc\": pc})\r\n        pc += 1\r\n        if pc_list[-1][\"op\"].startswith(\"PUSH\") and opcodes[0][:2] == \"0x\":\r\n            pc_list[-1][\"value\"] = opcodes.popleft()\r\n            pc += int(pc_list[-1][\"op\"][4:])\r\n\r\n```\r\n\r\nAfter:\r\n```\r\nwhile opcodes and opcodes[0] not in (\"INVALID\", \"STOP\") and pc < instruction_count:\r\n        # necessary because sometimes solidity returns an incomplete source map\r\n        pc_list.append({\"op\": opcodes.popleft(), \"pc\": pc})\r\n        pc += 1\r\n        if pc_list[-1][\"op\"].startswith(\"PUSH\") and opcodes[0][:2] == \"0x\":\r\n            pc_list[-1][\"value\"] = opcodes.popleft()\r\n            pc += int(pc_list[-1][\"op\"][4:])\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1633/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1633/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

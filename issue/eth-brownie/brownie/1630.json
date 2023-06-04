@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1630",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1630/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1630/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1630/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1630",
+  "id": 1437298255,
+  "node_id": "I_kwDOCUsNcc5Vq25P",
+  "number": 1630,
+  "title": "Solidity coverage generator throws `list index out of range` exception for some ERC-20 tokens ",
+  "user": {
+    "login": "BowTiedDevil",
+    "id": 85258057,
+    "node_id": "MDQ6VXNlcjg1MjU4MDU3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85258057?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BowTiedDevil",
+    "html_url": "https://github.com/BowTiedDevil",
+    "followers_url": "https://api.github.com/users/BowTiedDevil/followers",
+    "following_url": "https://api.github.com/users/BowTiedDevil/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BowTiedDevil/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BowTiedDevil/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BowTiedDevil/subscriptions",
+    "organizations_url": "https://api.github.com/users/BowTiedDevil/orgs",
+    "repos_url": "https://api.github.com/users/BowTiedDevil/repos",
+    "events_url": "https://api.github.com/users/BowTiedDevil/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BowTiedDevil/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-06T06:02:54Z",
+  "updated_at": "2022-11-06T06:03:47Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.19.2\r\n* Python Version: 3.10.7\r\n* OS: Linux\r\n\r\n### What was wrong?\r\n\r\nAttempting to run `Contract.from_explorer()` on certain ERC-20 tokens results in an exception: `list index out of range`.\r\n\r\nExample:\r\n```\r\n(.venv) [devil@hades bots]$ brownie console --network mainnet-local\r\nBrownie v1.19.2 - Python development framework for Ethereum\r\n\r\nBotsProject is the active project.\r\nBrownie environment is ready.\r\n>>> x = Contract.from_explorer('0x178c820f862B14f316509ec36b13123DA19A6054')\r\nFetching source of 0x178c820f862B14f316509ec36b13123DA19A6054 from api.etherscan.io...\r\n  File \"<console>\", line 1, in <module>\r\n  File \"brownie/network/contract.py\", line 1186, in from_explorer\r\n    build_json = compiler.compile_and_format(\r\n  File \"brownie/project/compiler/__init__.py\", line 142, in compile_and_format\r\n    build_json.update(generate_build_json(input_json, output_json, compiler_data, silent))\r\n  File \"brownie/project/compiler/__init__.py\", line 317, in generate_build_json\r\n    build_json[contract_alias] = solidity._get_unique_build_json(\r\n  File \"brownie/project/compiler/solidity.py\", line 260, in _get_unique_build_json\r\n    pc_map, statement_map, branch_map = _generate_coverage_data(\r\n  File \"brownie/project/compiler/solidity.py\", line 478, in _generate_coverage_data\r\n    fn_node = source_nodes[contract_id].children(\r\nIndexError: list index out of range\r\n```\r\n\r\n### How can it be fixed?\r\n\r\nThe exception is thrown within this code block:\r\n```\r\n# compare revert and require statements against the map of revert jumps\r\nfor (contract_id, fn_offset), values in revert_map.items():\r\n    fn_node = source_nodes[contract_id].children(\r\n        depth=2,\r\n        include_children=False,\r\n        required_offset=fn_offset,\r\n        filters={\"nodeType\": \"FunctionDefinition\"},\r\n    )[0]\r\n    revert_nodes = fn_node.children(\r\n        filters=(\r\n            {\"nodeType\": \"FunctionCall\", \"expression.name\": \"revert\"},\r\n            {\"nodeType\": \"FunctionCall\", \"expression.name\": \"require\"},\r\n        )\r\n    )\r\n    for node in revert_nodes:\r\n        offset = node.offset\r\n        # if the node offset is not in the source map, apply it's offset to the JUMPI op\r\n        if not next((x for x in pc_list if \"offset\" in x and x[\"offset\"] == offset), False):\r\n            pc_list[values[0]].update(offset=offset, jump_revert=True)\r\n            del values[0]\r\n```\r\n\r\nThe issue is with the assumption that `source_nodes[contract_id].children()` always returns a list with at least one value. If `children()` returns an empty list, the index lookup fails.\r\n\r\nA simple fix is to use an assignment operator (or equivalent if/else) to guard against empty lists before accessing the 0 index:\r\n```\r\nif not (\r\n    fn_node_children := source_nodes[contract_id].children(\r\n        depth=2,\r\n        include_children=False,\r\n        required_offset=fn_offset,\r\n        filters={\"nodeType\": \"FunctionDefinition\"},\r\n        )\r\n    ):\r\n    continue\r\nfn_node = fn_node_children[0]\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1630/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1630/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

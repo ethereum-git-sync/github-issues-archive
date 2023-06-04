@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1322",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1322/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1322/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1322/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1322",
+  "id": 1040480100,
+  "node_id": "I_kwDOCUsNcc4-BHdk",
+  "number": 1322,
+  "title": "new solidity flattener does not load/traverse dependencies",
+  "user": {
+    "login": "nkitlabs",
+    "id": 30922676,
+    "node_id": "MDQ6VXNlcjMwOTIyNjc2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/30922676?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nkitlabs",
+    "html_url": "https://github.com/nkitlabs",
+    "followers_url": "https://api.github.com/users/nkitlabs/followers",
+    "following_url": "https://api.github.com/users/nkitlabs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nkitlabs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nkitlabs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nkitlabs/subscriptions",
+    "organizations_url": "https://api.github.com/users/nkitlabs/orgs",
+    "repos_url": "https://api.github.com/users/nkitlabs/repos",
+    "events_url": "https://api.github.com/users/nkitlabs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nkitlabs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-10-31T14:07:51Z",
+  "updated_at": "2021-11-07T11:19:12Z",
+  "closed_at": "2021-11-07T11:19:12Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.17.0\r\n* `ganache-cli` Version: any\r\n* `solc` Version: any\r\n* Python Version: any\r\n* OS: osx/linux/win\r\n\r\n### What was wrong?\r\n\r\n`Contract.get_verification_info()` does not traverse dependency packages, it only returns main source file.\r\n\r\nAs I investigated further I found out that regex that is used for detect import pattern use double quote ( \\\" ) to separate path but my code use single quote, e.g. `import './xxx/yyy.sol'` instead of `import \"./xxx/yyy.sol\"`, because of a formatter.\r\n\r\nCould it be possible to support both double quote and single quote regex for checking package?\r\n\r\nAnother example that use single quote:\r\nhttps://github.com/Uniswap/v2-periphery/blob/master/contracts/UniswapV2Router02.sol\r\n\r\nexample:\r\nA.sol\r\n```// SPDX-License-Identifier: MIT\r\n\r\npragma solidity 0.8.7;\r\n\r\nimport './B.sol';\r\n\r\ncontract A is B {\r\n  uint public x;\r\n\r\n  constructor() B() {}\r\n\r\n  function setX(uint _x) external {\r\n    require(msg.sender == owner, '!owner');\r\n    x = _x;\r\n  }\r\n}\r\n```\r\n\r\nB.sol\r\n```\r\n// SPDX-License-Identifier: MIT\r\n\r\npragma solidity 0.8.7;\r\n\r\ncontract B {\r\n  address public owner;\r\n\r\n  constructor() {\r\n    owner = msg.sender;\r\n  }\r\n\r\n  function setOwner(address _owner) public virtual {\r\n    owner = _owner;\r\n  }\r\n}\r\n```\r\n\r\n### How can it be fixed?\r\n\r\nchange regex format from\r\n`IMPORT_PATTERN = re.compile(r\"(?<=\\n)?import(?P<prefix>.*)\\\"(?P<path>.*)\\\"(?P<suffix>.*)(?=\\n)\")`\r\nto\r\n`IMPORT_PATTERN = re.compile(r\"(?<=\\n)?import(?P<prefix>.*)(\\'|\\\")(?P<path>.*)(\\'|\\\")(?P<suffix>.*)(?=\\n)\")`\r\n",
+  "closed_by": {
+    "login": "iamdefinitelyahuman",
+    "id": 35276322,
+    "node_id": "MDQ6VXNlcjM1Mjc2MzIy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35276322?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iamdefinitelyahuman",
+    "html_url": "https://github.com/iamdefinitelyahuman",
+    "followers_url": "https://api.github.com/users/iamdefinitelyahuman/followers",
+    "following_url": "https://api.github.com/users/iamdefinitelyahuman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iamdefinitelyahuman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iamdefinitelyahuman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iamdefinitelyahuman/subscriptions",
+    "organizations_url": "https://api.github.com/users/iamdefinitelyahuman/orgs",
+    "repos_url": "https://api.github.com/users/iamdefinitelyahuman/repos",
+    "events_url": "https://api.github.com/users/iamdefinitelyahuman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iamdefinitelyahuman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1322/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1322/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

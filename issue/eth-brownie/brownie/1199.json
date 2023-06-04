@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1199",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1199/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1199/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1199/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1199",
+  "id": 968709927,
+  "node_id": "MDU6SXNzdWU5Njg3MDk5Mjc=",
+  "number": 1199,
+  "title": "Hardhat network isn't killed on exiting brownie console",
+  "user": {
+    "login": "shuklaayush",
+    "id": 27727946,
+    "node_id": "MDQ6VXNlcjI3NzI3OTQ2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/27727946?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shuklaayush",
+    "html_url": "https://github.com/shuklaayush",
+    "followers_url": "https://api.github.com/users/shuklaayush/followers",
+    "following_url": "https://api.github.com/users/shuklaayush/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shuklaayush/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shuklaayush/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shuklaayush/subscriptions",
+    "organizations_url": "https://api.github.com/users/shuklaayush/orgs",
+    "repos_url": "https://api.github.com/users/shuklaayush/repos",
+    "events_url": "https://api.github.com/users/shuklaayush/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shuklaayush/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-08-12T12:17:25Z",
+  "updated_at": "2021-08-16T12:00:10Z",
+  "closed_at": "2021-08-16T12:00:10Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.16.0\r\n* `hardhat` Version: 2.6.0\r\n* Python Version: 3.9.6\r\n* OS: linux\r\n\r\n### What was wrong?\r\n\r\nExiting brownie console (using `quit()` or Ctrl-D) doesn't fully terminate hardhat network.\r\n\r\nSteps to reproduce:\r\n```\r\n# Launch new local hardhat RPC client\r\nbrownie console --network hardhat\r\n# Terminate brownie (should terminate hardhat as well)\r\nquit()\r\n\r\n# Launch new instance\r\nbrownie console --network hardhat\r\n# This reconnects to old instance implying hardhat wasn't terminated properly\r\n```\r\n\r\n### How can it be fixed?\r\n\r\nHardhat process tree spans multiple levels\r\n![image](https://user-images.githubusercontent.com/27727946/129193497-5bf6579e-b0b9-45d8-826f-bc2f16f111d0.png)\r\n\r\nThis is the rpc process according to brownie\r\n![image](https://user-images.githubusercontent.com/27727946/129194680-3a6c0d91-6500-4ff1-87fe-6cf2de1bf73c.png)\r\n\r\nBut the actual rpc is two levels below the primary process\r\n![image](https://user-images.githubusercontent.com/27727946/129194384-d698eafd-5473-4489-b7ea-e7bd353bbaf1.png)\r\n\r\nWe should probably recursively kill all child processes here using `self.process.children(recursive=True)` instead of just killing the immediate children\r\nhttps://github.com/eth-brownie/brownie/blob/master/brownie/network/rpc/__init__.py#L141-L145\r\n",
+  "closed_by": {
+    "login": "shuklaayush",
+    "id": 27727946,
+    "node_id": "MDQ6VXNlcjI3NzI3OTQ2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/27727946?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shuklaayush",
+    "html_url": "https://github.com/shuklaayush",
+    "followers_url": "https://api.github.com/users/shuklaayush/followers",
+    "following_url": "https://api.github.com/users/shuklaayush/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shuklaayush/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shuklaayush/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shuklaayush/subscriptions",
+    "organizations_url": "https://api.github.com/users/shuklaayush/orgs",
+    "repos_url": "https://api.github.com/users/shuklaayush/repos",
+    "events_url": "https://api.github.com/users/shuklaayush/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shuklaayush/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1199/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1199/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

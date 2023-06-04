@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1045",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1045/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1045/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1045/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1045",
+  "id": 852920149,
+  "node_id": "MDU6SXNzdWU4NTI5MjAxNDk=",
+  "number": 1045,
+  "title": "Cannot `chain.get_transaction` for a transaction where the contract has self-destructed",
+  "user": {
+    "login": "WyseNynja",
+    "id": 624221,
+    "node_id": "MDQ6VXNlcjYyNDIyMQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/624221?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/WyseNynja",
+    "html_url": "https://github.com/WyseNynja",
+    "followers_url": "https://api.github.com/users/WyseNynja/followers",
+    "following_url": "https://api.github.com/users/WyseNynja/following{/other_user}",
+    "gists_url": "https://api.github.com/users/WyseNynja/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/WyseNynja/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/WyseNynja/subscriptions",
+    "organizations_url": "https://api.github.com/users/WyseNynja/orgs",
+    "repos_url": "https://api.github.com/users/WyseNynja/repos",
+    "events_url": "https://api.github.com/users/WyseNynja/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/WyseNynja/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1114236588,
+      "node_id": "MDU6TGFiZWwxMTE0MjM2NTg4",
+      "url": "https://api.github.com/repos/eth-brownie/brownie/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-04-07T23:32:37Z",
+  "updated_at": "2021-04-16T15:54:38Z",
+  "closed_at": "2021-04-16T15:54:38Z",
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.14.4\r\n\r\n### What was wrong?\r\n\r\n```\r\n>>> chain.get_transaction(\"0xc0d3e50f01e5345a76d5e902c41cad38bf98afa49b703e82ab05991a4d7a20ff\")\r\n  File \"<console>\", line 1, in <module>\r\n  File \"/Users/ski/code/brownie/brownie/network/state.py\", line 335, in get_transaction\r\n    return tx or TransactionReceipt(txid, silent=True, required_confs=0)\r\n  File \"/Users/ski/code/brownie/brownie/network/transaction.py\", line 194, in init\r\n    self._await_transaction(required_confs, is_blocking)\r\n  File \"/Users/ski/code/brownie/brownie/network/transaction.py\", line 415, in _await_transaction\r\n    self._set_from_tx(tx)\r\n  File \"/Users/ski/code/brownie/brownie/network/transaction.py\", line 519, in _set_from_tx\r\n    if not self.fn_name and state._find_contract(tx[\"to\"]) is not None:\r\n  File \"/Users/ski/code/brownie/brownie/network/state.py\", line 546, in _find_contract\r\n    return Contract(address)\r\n  File \"/Users/ski/code/brownie/brownie/network/contract.py\", line 939, in init\r\n    contract = self.from_explorer(address, owner=owner, silent=True)\r\n  File \"/Users/ski/code/brownie/brownie/network/contract.py\", line 1171, in from_explorer\r\n    return cls.from_abi(name, address, abi, owner)\r\n  File \"/Users/ski/code/brownie/brownie/network/contract.py\", line 1005, in from_abi\r\n    _DeployedContractBase.__init__(self, address, owner, None)\r\n  File \"/Users/ski/code/brownie/brownie/network/contract.py\", line 750, in init\r\n    raise ContractNotFound(f\"No contract deployed at {address}\")\r\nContractNotFound: No contract deployed at 0x52903256dd18D85c2Dc4a6C999907c9793eA61E3\r\n```\r\n\r\n### How can it be fixed?\r\n\r\nMaybe modify `get_transaction` to take the block identifier `get_transaction(txid, block_identifier=None)`.\r\n\r\nI don't think that will work if the contract self destructed in the same block that it was created in (same transaction or not).\r\n\r\nEven if we can't find the contract, the call should probably still return an incomplete transaction object.\r\n",
+  "closed_by": {
+    "login": "iamdefinitelyahuman",
+    "id": 35276322,
+    "node_id": "MDQ6VXNlcjM1Mjc2MzIy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35276322?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iamdefinitelyahuman",
+    "html_url": "https://github.com/iamdefinitelyahuman",
+    "followers_url": "https://api.github.com/users/iamdefinitelyahuman/followers",
+    "following_url": "https://api.github.com/users/iamdefinitelyahuman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iamdefinitelyahuman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iamdefinitelyahuman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iamdefinitelyahuman/subscriptions",
+    "organizations_url": "https://api.github.com/users/iamdefinitelyahuman/orgs",
+    "repos_url": "https://api.github.com/users/iamdefinitelyahuman/repos",
+    "events_url": "https://api.github.com/users/iamdefinitelyahuman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iamdefinitelyahuman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1045/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1045/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

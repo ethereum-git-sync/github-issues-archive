@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1460",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1460/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1460/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1460/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1460",
+  "id": 1158390578,
+  "node_id": "I_kwDOCUsNcc5FC6My",
+  "number": 1460,
+  "title": "Brownie does not work under Aurora as expected",
+  "user": {
+    "login": "fr0zn",
+    "id": 8972753,
+    "node_id": "MDQ6VXNlcjg5NzI3NTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8972753?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fr0zn",
+    "html_url": "https://github.com/fr0zn",
+    "followers_url": "https://api.github.com/users/fr0zn/followers",
+    "following_url": "https://api.github.com/users/fr0zn/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fr0zn/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fr0zn/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fr0zn/subscriptions",
+    "organizations_url": "https://api.github.com/users/fr0zn/orgs",
+    "repos_url": "https://api.github.com/users/fr0zn/repos",
+    "events_url": "https://api.github.com/users/fr0zn/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fr0zn/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-03-03T13:09:38Z",
+  "updated_at": "2022-03-03T13:12:07Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: v1.18.1\r\n* `ganache-cli` Version: v7.0.2\r\n* Python Version: 3.8.12\r\n* OS: osx\r\n\r\n### What was wrong?\r\n\r\nAs an example sending the following `eth_call` under any network such as rinkeby or mainet does work:\r\n\r\n```\r\nbrownie console --network rinkeby\r\n>>> tx = {}\r\n>>> web3.eth.call(tx)\r\nHexBytes('0x')\r\n>>>\r\n```\r\n\r\nHowever, on Aurora the `to` parameters is expected\r\n\r\n```\r\nbrownie console --network aurora-test\r\n>>> tx = {}\r\n>>> web3.eth.call(tx)\r\n...\r\n  File \"web3/middleware/formatting.py\", line 74, in apply_formatters\r\n    response = make_request(method, formatted_params)\r\n  File \"web3/middleware/buffered_gas_estimate.py\", line 40, in middleware\r\n    return make_request(method, params)\r\n  File \"brownie/network/middlewares/catch_tx_revert.py\", line 27, in process_request\r\n    raise ValueError(result[\"error\"])\r\nValueError: {'code': -32602, 'message': 'Invalid method parameter(s).', 'data': {'host': 'r001.eastcoast.us.testnet.internal.aurora.dev', 'cf-ray': '6e62967b86cc6695-IAD'}}\r\n```\r\n\r\nThis does work under Aurora:\r\n\r\n```\r\nbrownie console --network aurora-test\r\n>>> tx = {'to': \"0x0000000000000000000000000000000000000000\"}\r\n>>> web3.eth.call(tx)\r\nHexBytes('0x')\r\n>>>\r\n```\r\n\r\nThis is problematic for contract deployments since the `to` field is not present. I don't know how we should approach this for contract deployments, however, the RCP states that the `to` field on `eth_call` is mandatory but Brownie does not fill it. https://eth.wiki/json-rpc/API\r\n\r\n**Any deployment under Aurora will fail unless the `allow_revert=True` is set skipping the `eth_call` check**\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1460/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1460/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

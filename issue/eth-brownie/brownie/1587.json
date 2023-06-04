@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1587",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1587/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1587/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1587/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1587",
+  "id": 1320813817,
+  "node_id": "I_kwDOCUsNcc5OugT5",
+  "number": 1587,
+  "title": "Bug: Running brownie with --coverage option ignores isolation fixture",
+  "user": {
+    "login": "mbaranovski",
+    "id": 29602306,
+    "node_id": "MDQ6VXNlcjI5NjAyMzA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29602306?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mbaranovski",
+    "html_url": "https://github.com/mbaranovski",
+    "followers_url": "https://api.github.com/users/mbaranovski/followers",
+    "following_url": "https://api.github.com/users/mbaranovski/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mbaranovski/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mbaranovski/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mbaranovski/subscriptions",
+    "organizations_url": "https://api.github.com/users/mbaranovski/orgs",
+    "repos_url": "https://api.github.com/users/mbaranovski/repos",
+    "events_url": "https://api.github.com/users/mbaranovski/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mbaranovski/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-07-28T11:48:49Z",
+  "updated_at": "2022-07-28T11:55:14Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.19.0\r\n* Python Version: 3.10.5\r\n* OS: osx\r\n\r\n### What was wrong?\r\n**Scenario** tests are passing\r\n**Given** example contract:\r\n```\r\npragma solidity ^0.8.14;\r\n\r\ncontract SimpleStorage {\r\n    uint256 public count = 10;\r\n\r\n    function increment() public {\r\n       count += 1;\r\n    }\r\n\r\n    function decrement() public {\r\n       count -= 1;\r\n    }\r\n}\r\n```\r\n**When** below tests are ran with command `brownie test --network hardhat -s`\r\n```\r\nimport pytest\r\nfrom brownie import accounts, SimpleStorage\r\n\r\n@pytest.fixture(scope=\"module\", autouse=True)\r\ndef contractFixture():\r\n    contract = accounts[0].deploy(SimpleStorage)\r\n\r\n    return contract\r\n\r\n@pytest.fixture(autouse=True)\r\ndef isolation(fn_isolation):\r\n    pass\r\n\r\n\r\ndef test_increment(contractFixture):\r\n    assert contractFixture.count() == 10\r\n    contractFixture.increment()\r\n    assert contractFixture.count() == 11\r\n\r\n\r\ndef test_decrement(contractFixture):\r\n    assert contractFixture.count() == 10\r\n    contractFixture.decrement()\r\n    assert contractFixture.count() == 9\r\n```\r\n**Then** tests pass\r\n\r\n---------------------------\r\n**Scenario** tests are failing\r\n**When** running the same tests against the same contract but using command: `brownie test --network hardhat -s --coverage`\r\n**Then** tests are failing due to `fn_isolation` [fixture](https://eth-brownie.readthedocs.io/en/stable/tests-pytest-intro.html#defining-a-shared-initial-state) not being executed.\r\n```\r\nFAILED tests/test_example.py::test_decrement - assert 11 == 10\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1587/reactions",
+    "total_count": 3,
+    "+1": 3,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1587/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

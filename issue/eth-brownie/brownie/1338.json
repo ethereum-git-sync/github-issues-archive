@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1338",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1338/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1338/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1338/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1338",
+  "id": 1049057218,
+  "node_id": "I_kwDOCUsNcc4-h1fC",
+  "number": 1338,
+  "title": "If a tx awaits in mempool, gas strategy does not re-submit with new gas price",
+  "user": {
+    "login": "avatar-lavventura",
+    "id": 18537398,
+    "node_id": "MDQ6VXNlcjE4NTM3Mzk4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/18537398?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/avatar-lavventura",
+    "html_url": "https://github.com/avatar-lavventura",
+    "followers_url": "https://api.github.com/users/avatar-lavventura/followers",
+    "following_url": "https://api.github.com/users/avatar-lavventura/following{/other_user}",
+    "gists_url": "https://api.github.com/users/avatar-lavventura/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/avatar-lavventura/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/avatar-lavventura/subscriptions",
+    "organizations_url": "https://api.github.com/users/avatar-lavventura/orgs",
+    "repos_url": "https://api.github.com/users/avatar-lavventura/repos",
+    "events_url": "https://api.github.com/users/avatar-lavventura/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/avatar-lavventura/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-11-09T20:06:50Z",
+  "updated_at": "2021-11-09T20:10:35Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.17.0\r\n* Python Version: 3.8.10\r\n* OS: linux\r\n\r\n### What was wrong?\r\n\r\nFor test purposes I am using `1 wei` as gas price, which is not much but work with the testnet I am using. I observe that `gas-strategy` does not take place if `tx` awaits in the mempool with following message (`Awaiting Transaction in the mempool`). So the `tx` hangs in the mempool and is not broadcasted. I have to kill the process and re-submit the transaction. Is there any way to force gas-stratagey if the `tx` awaits in the mempool?\r\n\r\nI have tried following simply gas strategy, but I observe that the timeout does not take place:\r\n\r\n``` self.gas_strategy = LinearScalingStrategy(f\"1 gwei\", \"10 gwei\", 1.1, time_duration=15)``` but if a transaction awaits in the mempool it kept remaining and after 15 seconds it is not re-submitted with updated gas price.\r\n\r\n-------\r\n\r\nI have come up with a ugly hack where I have used `Timeout` function to force exit to re-try, but here there could be collusion where when timeout occurs at that moment transaction may broadcasted:\r\n\r\n```python\r\ndef quit_function(fn_name):\r\n    # print to stderr, unbuffered in Python 2.\r\n    print(\"{0} took too long\".format(fn_name), file=sys.stderr)\r\n    sys.stderr.flush()  # python 3 stderr is likely buffered.\r\n    thread.interrupt_main()  # raises KeyboardInterrupt\r\n\r\n\r\ndef exit_after(s):\r\n    \"\"\"Use as decorator to exit process if function takes longer than s seconds.\"\"\"\r\n\r\n    def outer(fn):\r\n        def inner(*args, **kwargs):\r\n            timer = threading.Timer(s, quit_function, args=[fn.__name__])\r\n            timer.start()\r\n            try:\r\n                result = fn(*args, **kwargs)\r\n            finally:\r\n                timer.cancel()\r\n            return result\r\n\r\n        return inner\r\n\r\n    return outer\r\n\r\n@exit_after(15)\r\ndef withdraw_timeout(self) -> \"TransactionReceipt\":\r\n    return self.contract.withdraw(self.ops)\r\n\r\ngas_price = 1\r\nfor _ in range(10):\r\n    ops = {\"gas_price\": gas_price}\r\n    try:\r\n        return self.withdraw_timeout()\r\n    except ValueError as e:\r\n        print(f\"E: {e}\")\r\n        if \"Execution reverted\" in str(e):\r\n            raise e\r\n    except KeyboardInterrupt:\r\n        print(\"warning: Timeout Awaiting Transaction in the mempool\")\r\n        gas_price *= 1.13\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1338/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1338/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

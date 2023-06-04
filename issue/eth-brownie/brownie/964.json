@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/964",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/964/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/964/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/964/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/964",
+  "id": 810434060,
+  "node_id": "MDU6SXNzdWU4MTA0MzQwNjA=",
+  "number": 964,
+  "title": "Vyper version 0.2.10 not installed via brownie",
+  "user": {
+    "login": "skellet0r",
+    "id": 23556333,
+    "node_id": "MDQ6VXNlcjIzNTU2MzMz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/23556333?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/skellet0r",
+    "html_url": "https://github.com/skellet0r",
+    "followers_url": "https://api.github.com/users/skellet0r/followers",
+    "following_url": "https://api.github.com/users/skellet0r/following{/other_user}",
+    "gists_url": "https://api.github.com/users/skellet0r/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/skellet0r/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/skellet0r/subscriptions",
+    "organizations_url": "https://api.github.com/users/skellet0r/orgs",
+    "repos_url": "https://api.github.com/users/skellet0r/repos",
+    "events_url": "https://api.github.com/users/skellet0r/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/skellet0r/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-02-17T18:34:55Z",
+  "updated_at": "2021-02-18T03:52:11Z",
+  "closed_at": "2021-02-18T03:52:11Z",
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.13.1\r\n* `ganache-cli` Version: 6.12.2\r\n* Python Version: 3.9.1\r\n* OS: linux\r\n\r\n### What was wrong?\r\nRunning `brownie compile` or `brownie test` errors out with `IncompatibleVyperVersion` exception.\r\n\r\n> tl;dr: quick fix for users, just reinstall your venv, or upgrade vyper to the latest version using pip.\r\n\r\n*contracts/Foo.vy*\r\n```python\r\n# @version 0.2.10\r\n\r\n@external\r\ndef main() -> uint256:\r\n    return 0\r\n```\r\n\r\n*Error Output*\r\n```bash\r\n$ brownie compile\r\nBrownie v1.13.1 - Python development framework for Ethereum\r\n\r\n  File \"brownie/_cli/__main__.py\", line 64, in main\r\n    importlib.import_module(f\"brownie._cli.{cmd}\").main()\r\n  File \"brownie/_cli/compile.py\", line 50, in main\r\n    proj = project.load()\r\n  File \"brownie/project/main.py\", line 727, in load\r\n    return Project(name, project_path)\r\n  File \"brownie/project/main.py\", line 175, in __init__\r\n    self.load()\r\n  File \"brownie/project/main.py\", line 228, in load\r\n    self._compile(changed, self._compiler_config, False)\r\n  File \"brownie/project/main.py\", line 90, in _compile\r\n    build_json = compiler.compile_and_format(\r\n  File \"brownie/project/compiler/__init__.py\", line 97, in compile_and_format\r\n    find_vyper_versions(vyper_sources, install_needed=True, silent=silent)\r\n  File \"brownie/project/compiler/vyper.py\", line 137, in find_vyper_versions\r\n    raise IncompatibleVyperVersion(\r\nIncompatibleVyperVersion: No installable vyper version matching '0.2.10' in 'contracts/Test.vy'\r\n```\r\nThis error appears for version `0.2.10` and for version `0.2.9`.\r\n\r\n### How can it be fixed?\r\n\r\n~Currently looking into this bug, but it looks like after the version `0.2.10` release of vyper today, the bug appeared. The bug smells like it's coming from the upstream vyperlang/vvm package.~\r\n\r\nLooks like just upgrading the vyper version installed when installing eth-brownie fixes it. This goes double for if you have brownie installed in a virtualenv or globally via pipx.\r\n\r\n## Update: Why does this happen\r\n\r\n*vvm/install.py*\r\n```python\r\ndef get_installable_vyper_versions(headers: Dict = None) -> List[Version]:\r\n    \"\"\"\r\n    Return a list of all `vyper` versions that can be installed by vvm.\r\n\r\n    Returns\r\n    -------\r\n    List\r\n        List of Versions objects of installable `vyper` versions.\r\n    \"\"\"\r\n    version_list = []\r\n\r\n    headers = _get_headers(headers)\r\n\r\n    for release in _get_releases(headers):\r\n        version = Version.coerce(release[\"tag_name\"].lstrip(\"v\"))\r\n        asset = next((i for i in release[\"assets\"] if _get_os_name() in i[\"name\"]), False)\r\n        if asset:\r\n            version_list.append(version)\r\n    return sorted(version_list, reverse=True)\r\n```\r\n\r\nThis piece of code queries the following endpoint `https://api.github.com/repos/vyperlang/vyper/releases?per_page=100` via the `_get_releases(...)` call. In return it gets a response with all of the vyper releases over at vyperlang/vyper. However for each release, if the release doesn't contain a precompiled vyper binary for the users os, it will correctly skip over that release (because there isn't a binary to download and use). Thus reurning a list of only versions with an asset like such: `vyper.0.2.8+commit.069936f.darwin`, the suffix being either linux, darwin, or windows.exe.\r\n\r\nThis is important because later on in the below snippet of code, that list is used as the `available_versions` variable.\r\n\r\n*brownie/compiler/vyper.py::find_vyper_versions*\r\n```python\r\ndef find_vyper_versions(\r\n    contract_sources: Dict[str, str],\r\n    install_needed: bool = False,\r\n    install_latest: bool = False,\r\n    silent: bool = True,\r\n) -> Dict:\r\n\r\n    \"\"\"\r\n    Analyzes contract pragmas and determines which vyper version(s) to use.\r\n\r\n    Args:\r\n        contract_sources: a dictionary in the form of {'path': \"source code\"}\r\n        install_needed: if True, will install when no installed version matches\r\n                        the contract pragma\r\n        install_latest: if True, will install when a newer version is available\r\n                        than the installed one\r\n        silent: set to False to enable verbose reporting\r\n\r\n    Returns: dictionary of {'version': ['path', 'path', ..]}\r\n    \"\"\"\r\n\r\n    available_versions, installed_versions = _get_vyper_version_list()\r\n\r\n    pragma_specs: Dict = {}\r\n    to_install = set()\r\n    new_versions = set()\r\n\r\n    for path, source in contract_sources.items():\r\n        pragma_specs[path] = sources.get_vyper_pragma_spec(source, path)  # This is an semver spec aware object, see semantic_version/base.py::BaseSpec\r\n        version = pragma_specs[path].select(installed_versions)  # Select the best compatible version from installed versions else return None. This will equal None\r\n\r\n        if not version and not (install_needed or install_latest):  # we called this function with install_needed=True so we can skip\r\n            raise IncompatibleVyperVersion(\r\n                f\"No installed vyper version matching '{pragma_specs[path]}' in '{path}'\"\r\n            )\r\n\r\n        # if no installed version of vyper matches the pragma, find the latest available version\r\n        latest = pragma_specs[path].select(available_versions) # Select the best compatible version from available versions\r\n\r\n        if not version and not latest:  # since 0.2.10 is not in the available versions list, latest = None\r\n            raise IncompatibleVyperVersion(\r\n                f\"No installable vyper version matching '{pragma_specs[path]}' in '{path}'\"\r\n            )\r\n...\r\n```  \r\n\r\nSo basically **tl;dr**, vyperlang/vyper just needs to have the precompiled vyper assets in each release, otherwise users with a pre-existing environment won't be able to acquire newer versions of vyper via brownie and vvm.\r\n",
+  "closed_by": {
+    "login": "skellet0r",
+    "id": 23556333,
+    "node_id": "MDQ6VXNlcjIzNTU2MzMz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/23556333?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/skellet0r",
+    "html_url": "https://github.com/skellet0r",
+    "followers_url": "https://api.github.com/users/skellet0r/followers",
+    "following_url": "https://api.github.com/users/skellet0r/following{/other_user}",
+    "gists_url": "https://api.github.com/users/skellet0r/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/skellet0r/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/skellet0r/subscriptions",
+    "organizations_url": "https://api.github.com/users/skellet0r/orgs",
+    "repos_url": "https://api.github.com/users/skellet0r/repos",
+    "events_url": "https://api.github.com/users/skellet0r/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/skellet0r/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/964/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/964/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

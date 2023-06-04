@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1348",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1348/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1348/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1348/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1348",
+  "id": 1057424742,
+  "node_id": "I_kwDOCUsNcc4_BwVm",
+  "number": 1348,
+  "title": "Overloaded methods do not reflect correctly in contract signatures dictionary",
+  "user": {
+    "login": "zomglings",
+    "id": 8016073,
+    "node_id": "MDQ6VXNlcjgwMTYwNzM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8016073?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zomglings",
+    "html_url": "https://github.com/zomglings",
+    "followers_url": "https://api.github.com/users/zomglings/followers",
+    "following_url": "https://api.github.com/users/zomglings/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zomglings/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zomglings/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zomglings/subscriptions",
+    "organizations_url": "https://api.github.com/users/zomglings/orgs",
+    "repos_url": "https://api.github.com/users/zomglings/repos",
+    "events_url": "https://api.github.com/users/zomglings/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zomglings/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-11-18T14:31:04Z",
+  "updated_at": "2021-11-18T14:31:04Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: v1.17.1\r\n* `ganache-cli` Version: v6.12.2\r\n* `solc` Version:  0.8.9+commit.e5eed63a.Linux.g++\r\n* Python Version: 3.9.6\r\n* OS: linux (debian running on WSL2)\r\n\r\n### What was wrong?\r\n\r\nIn my code, `ERC721Facet` is a contract implementing the [ERC721](https://eips.ethereum.org/EIPS/eip-721) interface.\r\n\r\nWhen I inspect the available signatures:\r\n```\r\n$ brownie console\r\nBrownie v1.17.1 - Python development framework for Ethereum\r\n\r\nCuContractsProject is the active project.\r\n\r\nLaunching 'ganache-cli --accounts 10 --hardfork istanbul --gasLimit 12000000 --mnemonic brownie --port 8545'...\r\nBrownie environment is ready.\r\n>>> ERC721Facet.signatures\r\n{\r\n    'addWhiteListAddresses': \"0x0b0bd9bf\",\r\n    'approve': \"0x095ea7b3\",\r\n    'balanceOf': \"0x70a08231\",\r\n    'changeContractURI': \"0x5699b904\",\r\n    'changeLicenseURI': \"0xdd1292ac\",\r\n    'claimGenesisTokens': \"0xb76b192e\",\r\n    'contractURI': \"0xe8a3d485\",\r\n    'genesisEggsMax': \"0x6c4b9134\",\r\n    'getApproved': \"0x081812fc\",\r\n    'getDNA': \"0x5bb209a5\",\r\n    'getMintAllowance': \"0x4a36703b\",\r\n    'isApprovedForAll': \"0xe985e9c5\",\r\n    'license': \"0x6b87d24c\",\r\n    'mint': \"0x6a627842\",\r\n    'name': \"0x06fdde03\",\r\n    'ownerOf': \"0x6352211e\",\r\n    'presaleHatchingUnlockTime': \"0x2964502d\",\r\n    'presaleUnlockTime': \"0x234a4b9b\",\r\n    'safeTransferFrom': \"0xb88d4fde\",\r\n    'setApprovalForAll': \"0xa22cb465\",\r\n    'setDNAForGenesisTokens': \"0xfad5cdd6\",\r\n    'setPaymentToken': \"0x6a326ab1\",\r\n    'setTokenURI': \"0x162094c4\",\r\n    'supportsInterface': \"0x01ffc9a7\",\r\n    'symbol': \"0x95d89b41\",\r\n    'tokenByIndex': \"0x4f6ccce7\",\r\n    'tokenOfOwnerByIndex': \"0x2f745c59\",\r\n    'tokenURI': \"0xc87b56dd\",\r\n    'totalSupply': \"0x18160ddd\",\r\n    'transferFrom': \"0x23b872dd\",\r\n    'withdrawWeth': \"0x8aabba7e\"\r\n}\r\n```\r\n\r\nThe problem is that ERC721 defines two possible signatures for `safeTransferFrom`:\r\n\r\n```\r\n    /// @notice Transfers the ownership of an NFT from one address to another address\r\n    /// @dev Throws unless `msg.sender` is the current owner, an authorized\r\n    ///  operator, or the approved address for this NFT. Throws if `_from` is\r\n    ///  not the current owner. Throws if `_to` is the zero address. Throws if\r\n    ///  `_tokenId` is not a valid NFT. When transfer is complete, this function\r\n    ///  checks if `_to` is a smart contract (code size > 0). If so, it calls\r\n    ///  `onERC721Received` on `_to` and throws if the return value is not\r\n    ///  `bytes4(keccak256(\"onERC721Received(address,address,uint256,bytes)\"))`.\r\n    /// @param _from The current owner of the NFT\r\n    /// @param _to The new owner\r\n    /// @param _tokenId The NFT to transfer\r\n    /// @param data Additional data with no specified format, sent in call to `_to`\r\n    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) external payable;\r\n\r\n    /// @notice Transfers the ownership of an NFT from one address to another address\r\n    /// @dev This works identically to the other function with an extra data parameter,\r\n    ///  except this function just sets data to \"\".\r\n    /// @param _from The current owner of the NFT\r\n    /// @param _to The new owner\r\n    /// @param _tokenId The NFT to transfer\r\n    function safeTransferFrom(address _from, address _to, uint256 _tokenId) external payable;\r\n```\r\n\r\nThe `ERC721Facet` signatures only contain the signature for the 4-parameter version - `0xb88d4fde`. They do not contain the signature for the 3-parameter version - `0x42842e0e`.\r\n\r\nThis makes it quite inconvenient to interface with what is quite common functionality.\r\n\r\n### How can it be fixed?\r\n\r\nNot sure how to fix it in a way that doesn't break things for users expecting the current structure on `Contract.signatures`.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1348/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1348/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
