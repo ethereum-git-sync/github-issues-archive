@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4764",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4764/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4764/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4764/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4764",
+  "id": 1673511318,
+  "node_id": "I_kwDOGBlvNc5jv8GW",
+  "number": 4764,
+  "title": "Invalid test gas reporting for reverting tests",
+  "user": {
+    "login": "iconofsin",
+    "id": 591224,
+    "node_id": "MDQ6VXNlcjU5MTIyNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/591224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iconofsin",
+    "html_url": "https://github.com/iconofsin",
+    "followers_url": "https://api.github.com/users/iconofsin/followers",
+    "following_url": "https://api.github.com/users/iconofsin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iconofsin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iconofsin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iconofsin/subscriptions",
+    "organizations_url": "https://api.github.com/users/iconofsin/orgs",
+    "repos_url": "https://api.github.com/users/iconofsin/repos",
+    "events_url": "https://api.github.com/users/iconofsin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iconofsin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 3593644915,
+      "node_id": "LA_kwDOGBlvNc7WMqtz",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-test",
+      "name": "Cmd-forge-test",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge test"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-18T16:54:57Z",
+  "updated_at": "2023-04-20T11:04:29Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (8d0099b 2023-04-18T08:52:10.531191000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nCode edited to redact project details.\r\n\r\nThe function in question belongs a contract known as `machine` and it will attempt to pull an `amount` of LINK from `account` using an ERC20 transfer wrapper (see below):\r\n  ```solidity\r\n    function transferLINKFrom(uint256 id, address account, uint256 amount) external {\r\n        _enforce();\r\n        emit LINKReplenished(id, account, amount);\r\n        linkBalances[id] += amount;\r\n        if (!link.stave(account, address(this), amount))\r\n            revert ERC20TransferFailed();\r\n    }\r\n ```\r\n\r\n`transferLINKFrom` is supposed to be called from another contract, which `_enforce()` checks for:\r\n\r\n```solidity\r\n    function _enforce() internal view {\r\n        if (msg.sender != address(hook)) revert Unauthorized();\r\n    }\r\n```\r\n \r\nThe ERC20 transfer wrapper is as follows:\r\n```solidity\r\nimport \"@openzeppelin8/contracts/token/ERC20/utils/SafeERC20.sol\";\r\nimport \"@openzeppelin8/contracts/token/ERC20/IERC20.sol\";\r\n\r\nlibrary TransferERC20 {\r\n    using SafeERC20 for IERC20;\r\n\r\n    function stave(\r\n        IERC20 token,\r\n        address from,\r\n        address to,\r\n        uint256 amount\r\n    ) internal returns (bool) {\r\n        uint256 initialBalance = token.balanceOf(to);\r\n        if (from == address(this)) {\r\n            token.safeTransfer(to, amount);\r\n        } else {\r\n            token.safeTransferFrom(from, to, amount);\r\n        }\r\n        uint256 finalBalance = token.balanceOf(to);\r\n        return (initialBalance + amount == finalBalance);\r\n    }\r\n}\r\n```\r\n\r\nThis is the entry point (the driver contract which is known as the hook in the previous code snippet):\r\n```solidity\r\n    function startGame(uint256 id, address linkSource_) external {\r\n        Game storage game = _getGameIfOrganizer(id);\r\n        GameRound storage round = game.rounds[game.activeRound];\r\n        if (\r\n            game.activeRound > 0 ||\r\n            (game.transitionTimestamps[STATE_INDEX_IN_PROGRESS] > 0)\r\n        ) revert GameRunning();\r\n\r\n        _setRoundState(id, 0, round, RoundState.InProgress);\r\n        address from = (linkSource_ == address(0)) ? msg.sender : linkSource_;\r\n        emit GameStarted(\r\n            id,\r\n            address(game.token),\r\n            game.organizer\r\n        );\r\n        machine.transferLINKFrom(id, from, minimums[Params.LINK]);\r\n    }\r\n```\r\n\r\nAnd finally, the relevant tests (`transient` is a modifier that takes a snapshot and reverts after, perhaps extraneous, but it doesn't impact tests):\r\n\r\n```solidity\r\n    function test_transferLINKFrom_non_hook_reverts() public transient {\r\n        vm.prank(deployer);\r\n        vm.expectRevert(Machine.Unauthorized.selector);\r\n        bm.transferLINKFrom(0, address(0), 1);\r\n\r\n        NonHookLINKTransferer nclt = new NonHookLINKTransferer();\r\n\r\n        vm.expectRevert(Machine.Unauthorized.selector);\r\n        nclt.simulatePullDeposit(address(bm));\r\n    }\r\n```\r\n\r\nThis checks that `transferLINKFrom` reverts on the `_enforce` condition both when called by an EOA and a contract that has not been set as the hook (which is what NonHookLINKTransferer is, a mock that simply calls `transferLINKFrom`). Running the test results in the following:\r\n\r\n`[PASS] test_transferLINKFrom_non_cryptoballz_reverts() (gas: 115800)` I imagine most of the gas here is due to deploying an instance of NonHookLINKTransferer, and the intrinsic cost of the reverted transactions is negligibly low.\r\n\r\nThe other test is:\r\n```solidity\r\n    // @dev Fail when the allowance is sufficient, but the balance is insufficient\r\n    function test_transferLINKFrom_insufficient_LINK_reverts() public {\r\n        uint256 insufficientLINKAmount = 25 ether - 1;\r\n        uint256 sufficientLINKAmount = insufficientLINKAmount + 1;\r\n        deal(link, deployer, insufficientLINKAmount);\r\n\r\n        vm.startPrank(deployer);\r\n        bm.setHook(address(hook));\r\n\r\n        IERC20(link).approve(address(bm), sufficientLINKAmount);\r\n\r\n        vm.expectRevert(\"SafeERC20: low-level call failed\");\r\n        hook.startGame(0, address(0));\r\n        vm.stopPrank();\r\n    }\r\n```\r\n\r\nHere, `link` is the mock LINK token (deployed according to instructions by Chainlink). The testing is done on a Mainnet Ethereum fork, starting with block `16990493`. \r\n\r\nBut this test results in:\r\n\r\n`[PASS] test_transferLINKFrom_insufficient_LINK_reverts() (gas: 8797746687696090261)`\r\n\r\nAnother test where the amount in the balance is sufficient, but the allowance is insufficient does the same. As far as I can tell, these are the only two tests (out of 27 so far) that exhibit this overreactive behaviour.\r\n\r\nThe only idea I have is it somehow is related to `deal` (I haven't checked it any LINK exists on my mock at all), but the SafeERC20 wrapper does revert with a correct error, so in theory this shouldn't be an influence?\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4764/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4764/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

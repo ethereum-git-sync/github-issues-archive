@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4311",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4311/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4311/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4311/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4311",
+  "id": 1576760263,
+  "node_id": "I_kwDOGBlvNc5d-3PH",
+  "number": 4311,
+  "title": "bug(forge): no-effect statements on the stack are not ignored in the coverage report",
+  "user": {
+    "login": "PaulRBerg",
+    "id": 8782666,
+    "node_id": "MDQ6VXNlcjg3ODI2NjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8782666?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PaulRBerg",
+    "html_url": "https://github.com/PaulRBerg",
+    "followers_url": "https://api.github.com/users/PaulRBerg/followers",
+    "following_url": "https://api.github.com/users/PaulRBerg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PaulRBerg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PaulRBerg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PaulRBerg/subscriptions",
+    "organizations_url": "https://api.github.com/users/PaulRBerg/orgs",
+    "repos_url": "https://api.github.com/users/PaulRBerg/repos",
+    "events_url": "https://api.github.com/users/PaulRBerg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PaulRBerg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-08T20:30:02Z",
+  "updated_at": "2023-02-09T08:40:52Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (249538f 2023-02-08T00:12:05.805004Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge coverage\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nThe `forge coverage` command does not ignore no-effect statements for unused basic type conversions.\r\n\r\nJust like #4310, I think that the priority for this issue should be set very high, because it may affect lot of Foundry users.\r\n\r\n### Reproduction Steps\r\n\r\nTake the following contract:\r\n\r\n```solidity\r\ncontract Foo {\r\n    function coverMe() external pure returns (bool) {\r\n        uint256(1);\r\n        return true;\r\n    }\r\n}\r\n\r\n```\r\n\r\nAnd the following test:\r\n\r\n```solidity\r\ncontract FooTest is Test {\r\n    Foo internal foo = new Foo();\r\n\r\n    function test_CoverMe() external {\r\n        bool result = foo.coverMe();\r\n        assertTrue(result);\r\n    }\r\n}\r\n```\r\n\r\nNow, run `forge coverage`. You will get this report:\r\n\r\n```text\r\n[⠊] Compiling...\r\n[⠢] Compiling 5 files with 0.8.18\r\n[⠆] Solc 0.8.18 finished in 147.16ms\r\nCompiler run successful (with warnings)\r\nwarning[6133]: Warning: Statement has no effect.\r\n --> src/Foo.sol:6:9:\r\n  |\r\n6 |         uint256(1);\r\n  |         ^^^^^^^^^^\r\n\r\nAnalysing contracts...\r\nRunning tests...\r\n| File        | % Lines      | % Statements | % Branches    | % Funcs       |\r\n|-------------|--------------|--------------|---------------|---------------|\r\n| src/Foo.sol | 50.00% (1/2) | 50.00% (1/2) | 100.00% (0/0) | 100.00% (1/1) |\r\n| Total       | 50.00% (1/2) | 50.00% (1/2) | 100.00% (0/0) | 100.00% (1/1) |\r\n```\r\n\r\nNotice that the statement coverage is 50% instead of 100%, even if the no-effect is technically covered as part of the execution of the `coverMe` function.\r\n\r\nNow, do this - remove the `uint256(1)` expression, and the branch coverage will increase to 100%:\r\n\r\n```text\r\n| File        | % Lines       | % Statements  | % Branches    | % Funcs       |\r\n|-------------|---------------|---------------|---------------|---------------|\r\n| src/Foo.sol | 100.00% (1/1) | 100.00% (1/1) | 100.00% (0/0) | 100.00% (1/1) |\r\n| Total       | 100.00% (1/1) | 100.00% (1/1) | 100.00% (0/0) | 100.00% (1/1) |\r\n```\r\n\r\nIt follows that Forge does not currently ignore \"no-effect statements\" (as they are called by Solidity, see compiler output above).\r\n\r\nBased on my research, this bug applies only to unused type conversion expressions on the stack. Changing the expression to smth like `address(this)` or `address(0xcafe)` or even `bool(true)` will trigger the same 50% statement coverage report. However, interestingly enough, this bug does *not* apply to memory vars, i.e. changing the expression to `string(\"\")` will generate a 100% coverage report.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4311/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4311/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

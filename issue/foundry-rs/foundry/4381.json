@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4381",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4381/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4381/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4381/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4381",
+  "id": 1589626547,
+  "node_id": "I_kwDOGBlvNc5ev8az",
+  "number": 4381,
+  "title": "test_invariant_shrink fails for ubuntu but works on mac",
+  "user": {
+    "login": "CyMule",
+    "id": 46548427,
+    "node_id": "MDQ6VXNlcjQ2NTQ4NDI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/46548427?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CyMule",
+    "html_url": "https://github.com/CyMule",
+    "followers_url": "https://api.github.com/users/CyMule/followers",
+    "following_url": "https://api.github.com/users/CyMule/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CyMule/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CyMule/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CyMule/subscriptions",
+    "organizations_url": "https://api.github.com/users/CyMule/orgs",
+    "repos_url": "https://api.github.com/users/CyMule/repos",
+    "events_url": "https://api.github.com/users/CyMule/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CyMule/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-17T16:28:56Z",
+  "updated_at": "2023-02-17T16:28:56Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (ecddbdb 2023-02-17T00:11:42.4198088Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\n# Test Failure\r\n\r\n`cargo test test_invariant_shrink`\r\nfails on\r\n`Linux dev 5.15.0-60-generic #66~20.04.1-Ubuntu SMP Wed Jan 25 09:41:30 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux`\r\nbut works on\r\n`Darwin dev.local 22.1.0 Darwin Kernel Version 22.1.0: Sun Oct  9 20:14:54 PDT 2022; root:xnu-8792.41.9~2/RELEASE_X86_64 x86_64`\r\n\r\n```\r\nrunning 1 test\r\ntest invariant::test_invariant_shrink ... FAILED\r\n\r\nfailures:\r\n\r\n---- invariant::test_invariant_shrink stdout ----\r\nthread 'invariant::test_invariant_shrink' panicked at 'assertion failed: `(left == right)`\r\n  left: `3`,\r\n right: `2`', forge/tests/it/invariant.rs:164:47\r\n```\r\n\r\n# Workaround\r\n\r\nIf I change [the fuzz seed](https://github.com/foundry-rs/foundry/blob/master/forge/tests/it/invariant.rs#L139) from `102` to `100` then the test passes on my system.\r\n\r\n```rust\r\n#[test]\r\nfn test_invariant_shrink() {\r\n    let mut runner = runner();\r\n\r\n    let mut opts = TEST_OPTS;\r\n    opts.fuzz.seed = Some(U256::from(100u32));\r\n    runner.test_options = opts;\r\n```\r\n\r\nThe [original commit](https://github.com/foundry-rs/foundry/commit/44cd2008351b6b62ddb28d850f629f3073a576b3#diff-cab134924af80b17296b8de3d9de0a14a81f1b7a7a7f8b182b70ce708c6aca1dR95)  for  #2745 had the seed set to 100, it was changed to 102 in the [next commit](https://github.com/foundry-rs/foundry/blob/e7077e2d66e55374021d0a1d39dedd0241794dfb/forge/tests/it/invariant.rs#L135) for #2724 and there is still [a comment ](https://github.com/foundry-rs/foundry/blob/master/forge/tests/it/invariant.rs#L163) from the first commit explaining:\r\n```\r\n// `fuzz_seed` at 100 makes this sequence shrinkable from 4 to 2.\r\n```\r\n\r\n# Solution?\r\n\r\nChanging the seed to `100` did work on both ubuntu and mac for me, but I'm not sure if this is the case for everyone.\r\n\r\nMaybe the test runner could be run multiple times over a range of seeds? This doesn't seem ideal...\r\n\r\nMaybe a comment is added that this case might fail depending on your system? Or an additional message in the failure case?\r\n```rust\r\n    match counter {\r\n        CounterExample::Single(_) => panic!(\"CounterExample should be a sequence.\"),\r\n        // `fuzz_seed` at 100 makes this sequence shrinkable from 4 to 2.\r\n        CounterExample::Sequence(sequence) => {\r\n            assert_eq!(sequence.len(), 2, \"This may fail depending on your system and fuzz seed.\")\r\n\r\n    };\r\n```\r\n\r\nDoes anyone have a more optimal solution? I'm happy to help implement the changes.\r\n\r\n# Additional Context\r\n\r\nAs stated before, this test is originally added in #2745.\r\n\r\nTo my understanding, the test fuzzes [InvariantInnerContract.t.sol](https://github.com/foundry-rs/foundry/blob/master/testdata/fuzz/invariant/common/InvariantInnerContract.t.sol).\r\n\r\nThe goal of the test is to find a \"minimum representation\" of the sequence to find an \"invariant failure\" for the contract.\r\nBy starting with\r\n```rust\r\nopts.fuzz.seed = Some(U256::from(102u32))\r\n```\r\non my system, the test runner is only able to find a sequence of 3 steps to break the invariant even though there is a shorter sequence of length 2, which is what the test expects.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4381/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4381/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

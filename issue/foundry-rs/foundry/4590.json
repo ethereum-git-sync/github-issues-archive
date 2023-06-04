@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4590",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4590/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4590/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4590/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4590",
+  "id": 1629447527,
+  "node_id": "I_kwDOGBlvNc5hH2Vn",
+  "number": 4590,
+  "title": "Feedback on fuzzer benchmarking setup",
+  "user": {
+    "login": "wuestholz",
+    "id": 51156,
+    "node_id": "MDQ6VXNlcjUxMTU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/51156?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wuestholz",
+    "html_url": "https://github.com/wuestholz",
+    "followers_url": "https://api.github.com/users/wuestholz/followers",
+    "following_url": "https://api.github.com/users/wuestholz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wuestholz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wuestholz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wuestholz/subscriptions",
+    "organizations_url": "https://api.github.com/users/wuestholz/orgs",
+    "repos_url": "https://api.github.com/users/wuestholz/repos",
+    "events_url": "https://api.github.com/users/wuestholz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wuestholz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-17T14:50:19Z",
+  "updated_at": "2023-03-17T14:50:19Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I'm trying to compare the Forge fuzzer with Echidna on several benchmark contracts.\r\n\r\nTo make the comparison as fair as possible, I've created a benchmark generator that automatically generates challenging contracts. The benchmarks intentionally use a limited subset of Solidity to avoid language features that could be handled differently by different tools. Each contract contains ~50 assertions (some can fail, but others cannot due to infeasible path conditions). (If you're curious, you can find one of the benchmarks [here](https://gist.githubusercontent.com/wuestholz/b0e66d70743c388f285c49c5c7d7e526/raw/de065bef48de578f8d87a6080c02a6a636193a45/maze-0.foundry.sol). The benchmark-generation approach is inspired by the [Fuzzle](https://softsec.kaist.ac.kr/~sangkilc/papers/lee-ase22.pdf) benchmark generator for C-based fuzzers.) To find the assertions that can fail, a fuzzer needs to generate up to ~15 transactions and satisfy some input constraints for each transaction.\r\n\r\nSince I'm not deeply familiar with the Forge fuzzer I'd like to check if there are any potential issues with my benchmark setup before sharing results.\r\n\r\nSince the fuzzer does not support limiting the execution time (see issue at https://github.com/foundry-rs/foundry/issues/4517), I'm repeatedly running the fuzzer for shorter periods until the time limit for all fuzzers (for instance, 1 hour for each contract). For each of these shorter fuzzing campaigns I'm using the following settings that deviate from the defaults:\r\n- `fuzz.runs`: 2048 (instead of 256)\r\n- `fuzz.max_test_rejects`: 1073741823 (instead of 65536)\r\n- `invariant.runs`: 2048 (instead of 256)\r\n- `invariant.depth`: 30 (instead of 15)\r\n\r\nThe motivation for increasing the `runs` setting is that 256 will terminate very quickly and I'd like to keep the overhead of repeatedly starting the fuzzer low.\r\n\r\nI increased the depth to 30 since some assertions may require up to ~15 transactions, and some generated transactions may fail. Echidna uses 100 by default, and I'm happy to also use the same setting for Forge.\r\n\r\nI also increased `max_test_rejects` to avoid terminating the fuzzer early (although with 2048 runs this bound would probably not be hit anyways).\r\n\r\nPlease let me know if you see any potential issues with this setup.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4590/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4590/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

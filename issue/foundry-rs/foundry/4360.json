@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4360",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4360/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4360/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4360/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4360",
+  "id": 1585682344,
+  "node_id": "I_kwDOGBlvNc5eg5eo",
+  "number": 4360,
+  "title": "Use the `pending` block base fee in the default value for `maxFeePerGas`",
+  "user": {
+    "login": "michprev",
+    "id": 7281754,
+    "node_id": "MDQ6VXNlcjcyODE3NTQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7281754?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michprev",
+    "html_url": "https://github.com/michprev",
+    "followers_url": "https://api.github.com/users/michprev/followers",
+    "following_url": "https://api.github.com/users/michprev/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michprev/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michprev/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michprev/subscriptions",
+    "organizations_url": "https://api.github.com/users/michprev/orgs",
+    "repos_url": "https://api.github.com/users/michprev/repos",
+    "events_url": "https://api.github.com/users/michprev/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michprev/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    },
+    {
+      "id": 4077188949,
+      "node_id": "LA_kwDOGBlvNc7zBPdV",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-anvil",
+      "name": "C-anvil",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: anvil"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-02-15T11:20:34Z",
+  "updated_at": "2023-02-27T13:12:32Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nAnvil\r\n\r\n### Describe the feature you would like\r\n\r\nWhen sending an EIP-1559 transaction, strictly speaking, both `maxFeePerGas` and `maxPriorityFeePerGas` fields should be set. However, many clients (including Anvil) allow setting only `maxFeePerGas`  or only `maxPriorityFeePerGas`. In the case of Anvil, `1000000000` seems to be the default value for `maxFeePerGas` if the transaction does not have this field.\r\n\r\nWhen validating an EIP-1559 transaction, it is checked that the sender has enough funds, i.e. `sender.balance >= maxFeePerGas * gasLimit`.\r\n\r\nNow consider the following scenario:\r\n- we want to send an EIP-1559 transaction from an account that does not have any funds (either through impersonating or sending an unsigned tx)\r\n- we are working on a chain with the base fee set to 0\r\n- we only want to specify `maxPriorityFeePerGas` in the transaction (it will be set to 0)\r\n\r\nIn this case, the actual price of the gas consumed will be 0, but the condition `sender.balance >= maxFeePerGas * gasLimit` checks that the sender has at least `1000000000` wei.\r\n\r\nInstead of the hardcoded value, it might be more sensible to use the base fee of the pending block instead. My proposal is to use `max_priority_fee_per_gas + pending_block.base_fee` as the default value for `max_fee_per_gas`. This way, the transaction in the described scenario would succeed, because `max_fee_per_gas` would be set to 0.\r\n\r\n\r\n\r\n### Additional context\r\n\r\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4360/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4360/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1431452750",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/4360#issuecomment-1431452750",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4360",
+    "id": 1431452750,
+    "node_id": "IC_kwDOGBlvNc5VUjxO",
+    "user": {
+      "login": "mattsse",
+      "id": 19890894,
+      "node_id": "MDQ6VXNlcjE5ODkwODk0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mattsse",
+      "html_url": "https://github.com/mattsse",
+      "followers_url": "https://api.github.com/users/mattsse/followers",
+      "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+      "organizations_url": "https://api.github.com/users/mattsse/orgs",
+      "repos_url": "https://api.github.com/users/mattsse/repos",
+      "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mattsse/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-02-15T14:24:51Z",
+    "updated_at": "2023-02-15T14:24:51Z",
+    "author_association": "MEMBER",
+    "body": "I see, this would be a reasonable change",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1431452750/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

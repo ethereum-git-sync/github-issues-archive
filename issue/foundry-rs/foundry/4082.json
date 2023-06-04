@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4082",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4082/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4082/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4082/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4082",
+  "id": 1531676425,
+  "node_id": "I_kwDOGBlvNc5bS4cJ",
+  "number": 4082,
+  "title": "Weird BlockOutOfRangeError after mining a block in Anvil fork mode",
+  "user": {
+    "login": "wei-rong-1",
+    "id": 99459087,
+    "node_id": "U_kgDOBe2gDw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/99459087?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wei-rong-1",
+    "html_url": "https://github.com/wei-rong-1",
+    "followers_url": "https://api.github.com/users/wei-rong-1/followers",
+    "following_url": "https://api.github.com/users/wei-rong-1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wei-rong-1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wei-rong-1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wei-rong-1/subscriptions",
+    "organizations_url": "https://api.github.com/users/wei-rong-1/orgs",
+    "repos_url": "https://api.github.com/users/wei-rong-1/repos",
+    "events_url": "https://api.github.com/users/wei-rong-1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wei-rong-1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-01-13T04:04:06Z",
+  "updated_at": "2023-01-23T16:16:01Z",
+  "closed_at": "2023-01-23T16:16:01Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nAnvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nanvil 0.1.0 (9256265 2023-01-13T02:41:01.751014Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nAbstract: If the Anvil node ran in fork mode and we mined a block in this node, we call **getBalance** or **getCode** at the fork block number, an BlockOutOfRangeError will be raised.\r\n\r\nSteps:\r\n\r\n1. Run Anvil instance:\r\n````\r\nanvil --fork-url https://rpc.vvs.finance\r\n````\r\n\r\n2. Run a hardhat console\r\n````\r\nyarn hardhat console\r\n````\r\n\r\n3. Run the following code in the console\r\n````\r\nprovider = new ethers.providers.JsonRpcProvider('http://localhost:8545/')\r\nforkBlockNumber = (await provider.send(\"anvil_nodeInfo\", [])).forkConfig.forkBlockNumber\r\n\r\nawait provider.send(\"eth_getBalance\", [\"0xea01e309146551a67366fe9943E9Ed83Ae564057\", '0x' + (Number(forkBlockNumber)).toString(16)])\r\n// Respond successfully\r\n\r\nawait provider.send(\"evm_mine\")\r\n\r\nawait provider.send(\"eth_getBalance\", [\"0xea01e309146551a67366fe9943E9Ed83Ae564057\", '0x' + (Number(forkBlockNumber)).toString(16)])\r\n// Respond error: {\"jsonrpc\":\"2.0\",\"id\":57,\"error\":{\"code\":-32602,\"message\":\"BlockOutOfRangeError: block height is 6466479 but requested was 6466478\"}}'\r\n````\r\n\r\n* I tried the Hardhat node, and it has no such issue.\r\n\r\n",
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4082/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4082/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

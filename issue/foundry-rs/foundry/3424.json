@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3424",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3424/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3424/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3424/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/3424",
+  "id": 1392712383,
+  "node_id": "I_kwDOGBlvNc5TAxq_",
+  "number": 3424,
+  "title": "Forge test errors with unexpected error type when using vm.expectRevert under certain conditions on mainnet forks",
+  "user": {
+    "login": "ape-dev-cs",
+    "id": 83542848,
+    "node_id": "MDQ6VXNlcjgzNTQyODQ4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/83542848?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ape-dev-cs",
+    "html_url": "https://github.com/ape-dev-cs",
+    "followers_url": "https://api.github.com/users/ape-dev-cs/followers",
+    "following_url": "https://api.github.com/users/ape-dev-cs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ape-dev-cs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ape-dev-cs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ape-dev-cs/subscriptions",
+    "organizations_url": "https://api.github.com/users/ape-dev-cs/orgs",
+    "repos_url": "https://api.github.com/users/ape-dev-cs/repos",
+    "events_url": "https://api.github.com/users/ape-dev-cs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ape-dev-cs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 3593644915,
+      "node_id": "LA_kwDOGBlvNc7WMqtz",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-test",
+      "name": "Cmd-forge-test",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge test"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-09-30T16:56:22Z",
+  "updated_at": "2022-10-02T16:35:50Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (7257375 2022-09-30T00:19:04.033244Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nOn some tests where I'm forking Ethereum mainnet and expecting an arithmetic exception (using `vm.expectRevert(stdError.arithmeticError);`), I'm hitting a test failure wherein the test unexpectedly fails with a different exception than the expected one, which is as follows:\r\n\r\n`FAIL. Reason: Error != expected error: Contract <address> does not exist != NH{q]`\r\n\r\nThis address is the address of an EOA which I'm transferring funds to in the method being tested using:\r\n\r\n(success, ) = address.call{value: balance}\r\n\r\nThe address is not, in fact, that of a contract, so I'm confused as to why this bug surfaces at all. Foundry does hit the arithmetic exception in the stack trace, but by the time it's bubbled up it's replaced with the exception I'm hitting. The relevant part of the stack trace is as follows:\r\n\r\n```\r\n    ├─ [63840] Transistor::createTransistor{value: 8000000000000000}(1) \r\n    │   ├─ [0] console::log(8000000000000000) [staticcall]\r\n    │   │   └─ ← ()\r\n    │   ├─ [6329] GnosisSafeProxy::fallback{value: 2000000000000000}() \r\n    │   │   ├─ [1504] GnosisSafe::fallback() [delegatecall]\r\n    │   │   │   ├─ emit SafeReceived(sender: Transistor: [0xE5DdfD2Af9E515e726130E69B98022E69De6A267], value: 2000000000000000)\r\n    │   │   │   └─ ← ()\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] 0x454cD1e89df17cDB61D868C6D3dBC02bC2c38a17::fallback{value: 2000000000000000}() \r\n    │   │   └─ ← ()\r\n    │   ├─ [0] 0xc766B8c9741BC804FCc378FdE75560229CA3AB1E::fallback{value: 2000000000000000}() \r\n    │   │   └─ ← ()\r\n    │   ├─ [2856] ERC20::transferFrom(0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf, Transistor: [0xE5DdfD2Af9E515e726130E69B98022E69De6A267], 6000000000000000000) \r\n    │   │   └─ ← \"Arithmetic over/underflow\"\r\n    │   └─ ← \"Contract 0xc766B8c9741BC804FCc378FdE75560229CA3AB1E does not exist\"\r\n    └─ ← \"Error != expected error: Contract 0xc766B8c9741BC804FCc378FdE75560229CA3AB1E does not exist != NH{q\"```\r\n\r\nIf it would be useful for me to push up a minimal reproduction of this bug I can probably do so in the coming day or two.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3424/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3424/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1264611764",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/3424#issuecomment-1264611764",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3424",
+    "id": 1264611764,
+    "node_id": "IC_kwDOGBlvNc5LYHG0",
+    "user": {
+      "login": "mattsse",
+      "id": 19890894,
+      "node_id": "MDQ6VXNlcjE5ODkwODk0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mattsse",
+      "html_url": "https://github.com/mattsse",
+      "followers_url": "https://api.github.com/users/mattsse/followers",
+      "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+      "organizations_url": "https://api.github.com/users/mattsse/orgs",
+      "repos_url": "https://api.github.com/users/mattsse/repos",
+      "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mattsse/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2022-10-02T10:50:34Z",
+    "updated_at": "2022-10-02T10:50:34Z",
+    "author_association": "MEMBER",
+    "body": "there's like something off with how we unwind revert in forking mode where we check for an address.\r\n\r\nwould appreciate a repro",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1264611764/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

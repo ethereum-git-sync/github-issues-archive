@@ -1,0 +1,122 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4778",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4778/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4778/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4778/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4778",
+  "id": 1675459708,
+  "node_id": "I_kwDOGBlvNc5j3Xx8",
+  "number": 4778,
+  "title": "setting dictionary_weight=100 breaks invariant tests",
+  "user": {
+    "login": "MikeHathaway",
+    "id": 13224356,
+    "node_id": "MDQ6VXNlcjEzMjI0MzU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13224356?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MikeHathaway",
+    "html_url": "https://github.com/MikeHathaway",
+    "followers_url": "https://api.github.com/users/MikeHathaway/followers",
+    "following_url": "https://api.github.com/users/MikeHathaway/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MikeHathaway/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MikeHathaway/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MikeHathaway/subscriptions",
+    "organizations_url": "https://api.github.com/users/MikeHathaway/orgs",
+    "repos_url": "https://api.github.com/users/MikeHathaway/repos",
+    "events_url": "https://api.github.com/users/MikeHathaway/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MikeHathaway/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 3394554570,
+      "node_id": "LA_kwDOGBlvNc7KVMrK",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/A-fuzzing",
+      "name": "A-fuzzing",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Area: fuzzing"
+    },
+    {
+      "id": 3593644915,
+      "node_id": "LA_kwDOGBlvNc7WMqtz",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-test",
+      "name": "Cmd-forge-test",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge test"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-19T19:03:55Z",
+  "updated_at": "2023-05-17T14:05:36Z",
+  "closed_at": "2023-05-17T14:05:36Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (8d0099b 2023-04-18T20:26:12.857066326Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nSetting `dictionary_weight=100` breaks the invariant tests with the following error message:\r\n```\r\nThe application panicked (crashed).\r\nMessage:  Union option has a weight of 0\r\nLocation: /home/mike/.cargo/registry/src/github.com-1ecc6299db9ec823/proptest-1.1.0/src/strategy/unions.rs:83\r\n\r\nThis is a bug. Consider reporting it at https://github.com/foundry-rs/foundry\r\n```\r\n\r\nHere is my foundry.toml:\r\n```\r\n[profile.default]\r\nsrc = 'src'\r\nout = 'out'\r\nlibs = ['lib']\r\n\r\n# See more config options https://github.com/foundry-rs/foundry/tree/master/config\r\n# allow the contract to read the out directory for use in token mocking\r\nfs_permissions = [{ access = \"read\", path = \"./out\"}]\r\n\r\nverbosity           = 3\r\nblock_number        = 16_295_000\r\nfork_block_number   = 16_295_000\r\nrpc_storage_caching = { chains = [\"mainnet\"], endpoints = \"all\" }\r\n\r\n[fuzz]\r\nruns = 150\r\n\r\n[invariant]\r\nruns           = 1     # The number of calls to make in the invariant tests\r\ndepth          = 420   # The number of times to run the invariant tests\r\ncall_override  = false # Override calls\r\nfail_on_revert = true  # Fail the test if the contract reverts\r\ndictionary_weight = 100\r\ninclude_storage = true\r\ninclude_push_bytes = true\r\n```\r\n\r\nThe full backtrace:\r\n```\r\n  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ BACKTRACE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\r\n   1: color_eyre::config::PanicHook::panic_report::h685e4159bbbdebc9\r\n      at <unknown source file>:<unknown line>\r\n   2: color_eyre::config::PanicHook::into_panic_hook::{{closure}}::h673b6ed10b044e83\r\n      at <unknown source file>:<unknown line>\r\n   3: <alloc::boxed::Box<F,A> as core::ops::function::Fn<Args>>::call::h813f31c5cc72640d\r\n      at /rustc/0468a00ae3fd6ef1a6a0f9eaf637d7aa9e604acc/library/alloc/src/boxed.rs:2032\r\n   4: std::panicking::rust_panic_with_hook::h2e61684db9120e8e\r\n      at /rustc/0468a00ae3fd6ef1a6a0f9eaf637d7aa9e604acc/library/std/src/panicking.rs:692\r\n   5: std::panicking::begin_panic::{{closure}}::h76bee50bb833d4ec\r\n      at <unknown source file>:<unknown line>\r\n   6: std::sys_common::backtrace::__rust_end_short_backtrace::hc6b0b006a4163619\r\n      at <unknown source file>:<unknown line>\r\n   7: std::panicking::begin_panic::hdda1a5f2050a89eb\r\n      at <unknown source file>:<unknown line>\r\n   8: proptest::strategy::unions::Union<T>::new_weighted::h341c30ea0ee5d270\r\n      at <unknown source file>:<unknown line>\r\n   9: foundry_evm::fuzz::strategies::invariants::select_random_sender::ha9192d77bf5bc47f\r\n      at <unknown source file>:<unknown line>\r\n  10: <proptest::strategy::map::Map<S,F> as proptest::strategy::traits::ValueTree>::current::h92996e4e4cc31a41\r\n      at <unknown source file>:<unknown line>\r\n  11: <proptest::strategy::flatten::Flatten<S> as proptest::strategy::traits::Strategy>::new_tree::hb8f7b4035cb13906\r\n      at <unknown source file>:<unknown line>\r\n  12: <proptest::strategy::flatten::Flatten<S> as proptest::strategy::traits::Strategy>::new_tree::hb11a17032693ebc8\r\n      at <unknown source file>:<unknown line>\r\n  13: <proptest::strategy::traits::BoxedStrategyWrapper<T> as proptest::strategy::traits::Strategy>::new_tree::ha351e3a7427ad757\r\n      at <unknown source file>:<unknown line>\r\n  14: <alloc::vec::Vec<T> as alloc::vec::spec_from_iter::SpecFromIter<T,I>>::from_iter::h33fe2cb26fae49ef\r\n      at <unknown source file>:<unknown line>\r\n  15: proptest::collection::<impl proptest::strategy::traits::Strategy for alloc::vec::Vec<T>>::new_tree::h73a37f739fe3008e\r\n      at <unknown source file>:<unknown line>\r\n  16: <proptest::strategy::traits::BoxedStrategyWrapper<T> as proptest::strategy::traits::Strategy>::new_tree::h086acd3b455caa66\r\n      at <unknown source file>:<unknown line>\r\n  17: <proptest::strategy::traits::BoxedStrategyWrapper<T> as proptest::strategy::traits::Strategy>::new_tree::h7d9aeca4253f5fe4\r\n      at <unknown source file>:<unknown line>\r\n  18: proptest::test_runner::runner::TestRunner::gen_and_run_case::h2171442bfd6f6f6e\r\n      at <unknown source file>:<unknown line>\r\n  19: proptest::test_runner::runner::TestRunner::run_in_process::h65c44effc2d339d0\r\n      at <unknown source file>:<unknown line>\r\n  20: proptest::test_runner::runner::TestRunner::run::h0b5395685ea9baeb\r\n      at <unknown source file>:<unknown line>\r\n  21: foundry_evm::fuzz::invariant::executor::InvariantExecutor::invariant_fuzz::h8fe55698ffdca442\r\n      at <unknown source file>:<unknown line>\r\n  22: forge::runner::ContractRunner::run_invariant_test::h4acf188a5f46502a\r\n      at <unknown source file>:<unknown line>\r\n  23: forge::runner::ContractRunner::run_tests::h4c2ffbd48616dbbb\r\n      at <unknown source file>:<unknown line>\r\n  24: forge::multi_runner::MultiContractRunner::run_tests::hbe85f6ae8f946675\r\n      at <unknown source file>:<unknown line>\r\n  25: <rayon::iter::map::MapFolder<C,F> as rayon::iter::plumbing::Folder<T>>::consume::h0e8309b386b1ccd4\r\n      at <unknown source file>:<unknown line>\r\n  26: rayon::iter::plumbing::Folder::consume_iter::h81b6ec6ee6a518cc\r\n      at <unknown source file>:<unknown line>\r\n  27: rayon::iter::plumbing::bridge_producer_consumer::helper::h4fa6004c199edb33\r\n      at <unknown source file>:<unknown line>\r\n  28: rayon_core::join::join_context::{{closure}}::h90d5cb504a0a57d6\r\n      at <unknown source file>:<unknown line>\r\n  29: rayon_core::registry::in_worker::h48006e7ff9e9e8a4\r\n      at <unknown source file>:<unknown line>\r\n  30: rayon::iter::plumbing::bridge_producer_consumer::helper::h4fa6004c199edb33\r\n      at <unknown source file>:<unknown line>\r\n  31: <core::panic::unwind_safe::AssertUnwindSafe<F> as core::ops::function::FnOnce<()>>::call_once::h6d318ad584cffdd1\r\n      at <unknown source file>:<unknown line>\r\n  32: <rayon_core::job::StackJob<L,F,R> as rayon_core::job::Job>::execute::h8b17b703a34545cb\r\n      at <unknown source file>:<unknown line>\r\n  33: rayon_core::registry::WorkerThread::wait_until_cold::h1e51a477d3775968\r\n      at <unknown source file>:<unknown line>\r\n  34: rayon_core::registry::ThreadBuilder::run::hf4362c0d8a25b576\r\n      at <unknown source file>:<unknown line>\r\n  35: std::sys_common::backtrace::__rust_begin_short_backtrace::h86d893d1c9627bb7\r\n      at <unknown source file>:<unknown line>\r\n  36: core::ops::function::FnOnce::call_once{{vtable.shim}}::h0143dda7f7edda61\r\n      at <unknown source file>:<unknown line>\r\n  37: <alloc::boxed::Box<F,A> as core::ops::function::FnOnce<Args>>::call_once::hdbff13d45d6b3b01\r\n      at /rustc/0468a00ae3fd6ef1a6a0f9eaf637d7aa9e604acc/library/alloc/src/boxed.rs:2000\r\n  38: <alloc::boxed::Box<F,A> as core::ops::function::FnOnce<Args>>::call_once::h1e5384a2b7a0037a\r\n      at /rustc/0468a00ae3fd6ef1a6a0f9eaf637d7aa9e604acc/library/alloc/src/boxed.rs:2000\r\n  39: std::sys::unix::thread::Thread::new::thread_start::h4b8540c4f94d9763\r\n      at /rustc/0468a00ae3fd6ef1a6a0f9eaf637d7aa9e604acc/library/std/src/sys/unix/thread.rs:108\r\n  40: start_thread<unknown>\r\n      at /build/glibc-CVJwZb/glibc-2.27/nptl/pthread_create.c:463\r\n  41: clone<unknown>\r\n      at /build/glibc-CVJwZb/glibc-2.27/misc/../sysdeps/unix/sysv/linux/x86_64/clone.S:95\r\n```",
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4778/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4778/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

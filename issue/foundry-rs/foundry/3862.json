@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3862",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3862/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3862/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3862/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/3862",
+  "id": 1486694596,
+  "node_id": "I_kwDOGBlvNc5YnSjE",
+  "number": 3862,
+  "title": "Unable to send  wei to an address from an account (address) that's externally  generated. ",
+  "user": {
+    "login": "vikram2784",
+    "id": 65713660,
+    "node_id": "MDQ6VXNlcjY1NzEzNjYw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/65713660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vikram2784",
+    "html_url": "https://github.com/vikram2784",
+    "followers_url": "https://api.github.com/users/vikram2784/followers",
+    "following_url": "https://api.github.com/users/vikram2784/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vikram2784/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vikram2784/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vikram2784/subscriptions",
+    "organizations_url": "https://api.github.com/users/vikram2784/orgs",
+    "repos_url": "https://api.github.com/users/vikram2784/repos",
+    "events_url": "https://api.github.com/users/vikram2784/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vikram2784/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-12-09T12:41:23Z",
+  "updated_at": "2022-12-09T12:41:23Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nCast\n\n### Have you ensured that all of these are up to date?\n\n- [ ] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\ncast 0.2.0 (34d279a 2022-12-08T07:48:46.429075528Z)\n\n### What command(s) is the bug in?\n\ncast send\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nUnable to send  wei to an address from an account (address) that's externally  generated. \r\n\r\nSteps to reproduce with avil and cast:\r\n\r\n- Send wei from an internally generated  account to externally generated account **(works)**:\r\n\r\n`cast send --private-key  <int_account_priv_key>  --from <int_account_address> --value 1000000000000000000 <contract_address> \"transfr(address)\"  <ext_account_address>`\r\n\r\n\r\n- Validate\r\n\r\n```\r\ncast balance <ext_account_address>\r\n> 1000000000000000000\r\n```\r\n\r\n\r\n- Send some wei back to the internally generated  account   from  externally generated account. **(fails)**:\r\n\r\n`cast send --private-key <ext_account_priv_key>   --from <ext_account_address> --value 100000 <contract_address> \"transfr(address)\" <int_account_address>`\r\n\r\nERROR:`(code: -32003, message: Out of gas: required gas exceeds allowance: 30000000, data: None)`\r\n\r\n\r\nFollowing is the smart contract used to transfer:\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity 0.8.17;\r\ncontract Demo {\r\n    function transfr(address addr) external payable {\r\n        payable(addr).call{value: msg.value}(\"\");\r\n    }\r\n}\r\n```\r\n\r\nScript to generate external account:\r\n\r\n```\r\n# Generate the private and public keys\r\nopenssl ecparam -name secp256k1 -genkey -noout | openssl ec -text -noout > key\r\n\r\n# Extract the public key and remove the EC prefix 0x04\r\ncat key | grep pub -A 5 | tail -n +2 | tr -d '\\n[:space:]:' | sed 's/^04//' > pub\r\n\r\n# Extract the private key and remove the leading zero byte\r\ncat key | grep priv -A 3 | tail -n +2 | tr -d '\\n[:space:]:' | sed 's/^00//' > priv\r\n\r\n# Generate the hash and take the address part\r\n#cat pub | keccak-256sum -x -l | tr -d ' -' | tail -c 41 > address\r\npub=$(cat pub | openssl dgst -sha3-256 | awk '{print $NF}')\r\necho ${pub: -40} > address\r\n\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3862/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3862/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

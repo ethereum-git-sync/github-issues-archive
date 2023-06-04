@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4315",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4315/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4315/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4315/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4315",
+  "id": 1577506904,
+  "node_id": "I_kwDOGBlvNc5eBthY",
+  "number": 4315,
+  "title": "bug(forge): coverage does not work for enum assignments",
+  "user": {
+    "login": "PaulRBerg",
+    "id": 8782666,
+    "node_id": "MDQ6VXNlcjg3ODI2NjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8782666?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PaulRBerg",
+    "html_url": "https://github.com/PaulRBerg",
+    "followers_url": "https://api.github.com/users/PaulRBerg/followers",
+    "following_url": "https://api.github.com/users/PaulRBerg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PaulRBerg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PaulRBerg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PaulRBerg/subscriptions",
+    "organizations_url": "https://api.github.com/users/PaulRBerg/orgs",
+    "repos_url": "https://api.github.com/users/PaulRBerg/repos",
+    "events_url": "https://api.github.com/users/PaulRBerg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PaulRBerg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-09T09:07:17Z",
+  "updated_at": "2023-02-09T09:07:17Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (249538f 2023-02-08T00:12:05.805004Z)\n\n### What command(s) is the bug in?\n\nforge coverage\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nTake the following contract (hidden by default for brevity reasons, click the toggle below to collapse it):\r\n\r\n<details>\r\n<summary>Click me to toggle the contract</summary>\r\n\r\n```solidity\r\ncontract Foo {\r\n    enum Status {\r\n        NULL,\r\n        OPEN,\r\n        CLOSED\r\n    }\r\n\r\n    struct Item {\r\n        Status status;\r\n        uint256 value;\r\n    }\r\n\r\n    mapping(uint256 => Item) internal items;\r\n    uint256 public nextId = 1;\r\n\r\n    function getItem(uint256 id) public view returns (Item memory item) {\r\n        item = items[id];\r\n    }\r\n\r\n    function addItem(uint256 value) public returns (uint256 id) {\r\n        id = nextId;\r\n        items[id] = Item(Status.OPEN, value);\r\n        nextId++;\r\n    }\r\n\r\n    function closeIfEqValue(uint256 id, uint256 value) public {\r\n        if (items[id].value == value) {\r\n            items[id].status = Status.CLOSED;\r\n        }\r\n    }\r\n\r\n    function incrementIfEqValue(uint256 id, uint256 value) public {\r\n        if (items[id].value == value) {\r\n            items[id].value = value + 1;\r\n        }\r\n    }\r\n}\r\n\r\n```\r\n\r\n</details>\r\n\r\nAnd the following tests (again, hidden for brevity):\r\n\r\n<details>\r\n<summary>Click me to toggle the tests</summary>\r\n\r\n```solidity\r\ncontract FooTest is Test {\r\n    Foo internal foo = new Foo();\r\n\r\n    function test_AddItem() external {\r\n        uint256 value = 42;\r\n        uint256 id = foo.addItem(value);\r\n        assertEq(id, 1);\r\n        assertEq(foo.nextId(), 2);\r\n\r\n        Foo.Item memory item = foo.getItem(id);\r\n        assertEq(uint8(item.status), uint8(Foo.Status.OPEN));\r\n        assertEq(item.value, value);\r\n    }\r\n\r\n    function test_CloseIfEqValue_NotEq() external {\r\n        uint256 value = 42;\r\n        uint256 id = foo.addItem(value);\r\n        foo.closeIfEqValue(id, 903);\r\n\r\n        Foo.Item memory item = foo.getItem(id);\r\n        assertEq(uint8(item.status), uint8(Foo.Status.OPEN));\r\n    }\r\n\r\n    function test_CloseIfEqValue_Eq() external {\r\n        uint256 value = 42;\r\n        uint256 id = foo.addItem(value);\r\n        foo.closeIfEqValue(id, 42);\r\n\r\n        Foo.Item memory item = foo.getItem(id);\r\n        assertEq(uint8(item.status), uint8(Foo.Status.CLOSED));\r\n    }\r\n\r\n    function test_IncrementIfEqValue_NotEq() external {\r\n        uint256 value = 42;\r\n        uint256 id = foo.addItem(value);\r\n        foo.incrementIfEqValue(id, 903);\r\n\r\n        Foo.Item memory item = foo.getItem(id);\r\n        assertEq(item.value, 42);\r\n    }\r\n\r\n    function test_IncrementIfEqValue_Eq() external {\r\n        uint256 value = 42;\r\n        uint256 id = foo.addItem(value);\r\n        foo.incrementIfEqValue(id, 42);\r\n\r\n        Foo.Item memory item = foo.getItem(id);\r\n        assertEq(item.value, 43);\r\n    }\r\n}\r\n```\r\n\r\n</details>\r\n\r\nNow, run `forge coverage`. You will get this report:\r\n\r\n```text\r\n| File        | % Lines       | % Statements  | % Branches   | % Funcs       |\r\n|-------------|---------------|---------------|--------------|---------------|\r\n| src/Foo.sol | 100.00% (8/8) | 100.00% (8/8) | 75.00% (3/4) | 100.00% (4/4) |\r\n| Total       | 100.00% (8/8) | 100.00% (8/8) | 75.00% (3/4) | 100.00% (4/4) |\r\n```\r\n\r\nNotice that the branch coverage is 75% even if we do have full coverage of all the possible branches of the `closeIfEqValue` function:\r\n\r\n<img width=\"813\" alt=\"Screenshot 2023-02-09 at 11 05 52 AM\" src=\"https://user-images.githubusercontent.com/8782666/217766416-a66956c4-8865-4dca-8a82-41e61e486436.png\">\r\n\r\nBy contrast, the coverage for the `incrementIfEqValue` function is 100%, which shows that this bug is specifically about enum assignments. `closeIfEqValue` and `incrementIfEqValue` are fully equivalent, except for the enum assignment.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4315/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4315/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5038",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5038/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5038/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5038/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5038",
+  "id": 1725204668,
+  "node_id": "I_kwDOGBlvNc5m1Ii8",
+  "number": 5038,
+  "title": "vm.parseJson cannot parse powers of ten starting 1e20",
+  "user": {
+    "login": "mathieu-bour",
+    "id": 21281702,
+    "node_id": "MDQ6VXNlcjIxMjgxNzAy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21281702?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mathieu-bour",
+    "html_url": "https://github.com/mathieu-bour",
+    "followers_url": "https://api.github.com/users/mathieu-bour/followers",
+    "following_url": "https://api.github.com/users/mathieu-bour/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mathieu-bour/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mathieu-bour/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mathieu-bour/subscriptions",
+    "organizations_url": "https://api.github.com/users/mathieu-bour/orgs",
+    "repos_url": "https://api.github.com/users/mathieu-bour/repos",
+    "events_url": "https://api.github.com/users/mathieu-bour/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mathieu-bour/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-25T06:56:32Z",
+  "updated_at": "2023-05-25T06:56:32Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (a26edce 2023-05-25T00:12:21.044857000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nI was writing some tests using the vm.parseJson to load a dataset. However, I started to encounter errors when I tried to input power of ten in my JSON.\r\n\r\n```\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e20)] test_parse_1e20() (gas: 3290)\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e21)] test_parse_1e21() (gas: 3355)\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e42)] test_parse_1e42() (gas: 3421)\r\n```\r\n\r\nFor repro, I wrote the following test:\r\n\r\n<details>\r\n<summary>JsonUint256Test.sol</summary>\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\nimport { Test } from \"forge-std/test.sol\";\r\n\r\nstruct Value {\r\n  uint256 value;\r\n}\r\n\r\ncontract JsonUint256Test is Test {\r\n  /// pass\r\n  function test_parse_maxUint64() public {\r\n    string memory json = '{\"value\": 18446744073709551615}';\r\n    bytes memory parsed = vm.parseJson(json);\r\n    Value memory data = abi.decode(parsed, (Value));\r\n    assertEq(data.value, 18446744073709551615);\r\n  }\r\n\r\n  /// pass\r\n  function test_parse_18446744073709551616000() public {\r\n    string memory json = '{\"value\": 18446744073709551616000}';\r\n    bytes memory parsed = vm.parseJson(json);\r\n    Value memory data = abi.decode(parsed, (Value));\r\n    assertEq(data.value, 18446744073709551616000);\r\n  }\r\n\r\n  /// 1e19 pass\r\n  function test_parse_1e19() public {\r\n    string memory json = '{\"value\": 10000000000000000000}';\r\n    bytes memory parsed = vm.parseJson(json);\r\n    Value memory data = abi.decode(parsed, (Value));\r\n    assertEq(data.value, 10000000000000000000);\r\n  }\r\n\r\n  /// 1e20 fails\r\n  function test_parse_1e20() public {\r\n    string memory json = '{\"value\": 100000000000000000000}';\r\n    bytes memory parsed = vm.parseJson(json);\r\n    Value memory data = abi.decode(parsed, (Value));\r\n    assertEq(data.value, 1000000000000000000000);\r\n  }\r\n\r\n  /// 1e21 fails\r\n  function test_parse_1e21() public {\r\n    string memory json = '{\"value\": 1000000000000000000000}';\r\n    bytes memory parsed = vm.parseJson(json);\r\n    Value memory data = abi.decode(parsed, (Value));\r\n    assertEq(data.value, 1000000000000000000000);\r\n  }\r\n\r\n  /// 1e42 fails\r\n  function test_parse_1e42() public {\r\n    string memory json = '{\"value\": 1000000000000000000000000000000000000000000}';\r\n    bytes memory parsed = vm.parseJson(json);\r\n    Value memory data = abi.decode(parsed, (Value));\r\n    assertEq(data.value, 1000000000000000000000000000000000000000000);\r\n  }\r\n\r\n  /// 1e42+1 pass\r\n  function test_parse_1e42plusOne() public {\r\n    string memory json = '{\"value\": 1000000000000000000000000000000000000000001}';\r\n    bytes memory parsed = vm.parseJson(json);\r\n    Value memory data = abi.decode(parsed, (Value));\r\n    assertEq(data.value, 1000000000000000000000000000000000000000001);\r\n  }\r\n}\r\n```\r\n\r\n</details>\r\n\r\n\r\n<details>\r\n<summary>forge test output</summary>\r\n\r\n```\r\n[⠒] Compiling...\r\n[⠃] Compiling 1 files with 0.8.20\r\n[⠊] Solc 0.8.20 finished in 657.24ms\r\nCompiler run successful!\r\n\r\nRunning 7 tests for test/game/JsonUint256.t.sol:JsonUint256Test\r\n[PASS] test_parse_18446744073709551616000() (gas: 4236)\r\n[PASS] test_parse_1e19() (gas: 4101)\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e20)] test_parse_1e20() (gas: 3290)\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e21)] test_parse_1e21() (gas: 3355)\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e42)] test_parse_1e42() (gas: 3421)\r\n[PASS] test_parse_1e42plusOne() (gas: 4169)\r\n[PASS] test_parse_maxUint64() (gas: 4101)\r\nTest result: FAILED. 4 passed; 3 failed; finished in 600.58µs\r\n\r\nFailing tests:\r\nEncountered 3 failing tests in test/game/JsonUint256.t.sol:JsonUint256Test\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e20)] test_parse_1e20() (gas: 3290)\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e21)] test_parse_1e21() (gas: 3355)\r\n[FAIL. Reason: Failed to parse key \"$\": Unsupported value: Number(1e42)] test_parse_1e42() (gas: 3421)\r\n\r\nEncountered a total of 3 failing tests, 4 tests succeeded\r\n```\r\n\r\n</details>\r\n\r\nI made the following observations:\r\n\r\n1. It seems that the first power of ten that triggers the error is 1e20 (1e19 works).\r\n2. It seems that adding/subbing 1 to the number make it work again (e.g. `100000000000000000001` but not `100000000000000000000`)\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5038/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5038/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5068",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5068/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5068/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5068/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5068",
+  "id": 1729388706,
+  "node_id": "I_kwDOGBlvNc5nFGCi",
+  "number": 5068,
+  "title": "forge coverage counts branches for \"require()\" statements that will always revert",
+  "user": {
+    "login": "kshyun28",
+    "id": 56709653,
+    "node_id": "MDQ6VXNlcjU2NzA5NjUz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/56709653?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kshyun28",
+    "html_url": "https://github.com/kshyun28",
+    "followers_url": "https://api.github.com/users/kshyun28/followers",
+    "following_url": "https://api.github.com/users/kshyun28/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kshyun28/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kshyun28/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kshyun28/subscriptions",
+    "organizations_url": "https://api.github.com/users/kshyun28/orgs",
+    "repos_url": "https://api.github.com/users/kshyun28/repos",
+    "events_url": "https://api.github.com/users/kshyun28/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kshyun28/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-28T10:45:36Z",
+  "updated_at": "2023-05-28T10:45:36Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (31fcf5a 2023-05-19T00:10:33.861185000Z)\n\n### What command(s) is the bug in?\n\nforge coverage\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nHello team, \r\n\r\nI've encountered a potential bug on **calculating branch coverage** while working on my [project](https://github.com/kshyun28/foundry-nft).\r\n\r\nCurrently I cannot get 100% coverage on the branches when running `forge coverage`.\r\n![coverage](https://github.com/foundry-rs/foundry/assets/56709653/0208fc06-c280-4969-a104-f9e27073bbd1)\r\n\r\nThen when running `forge coverage --report debug`, I get\r\n```bash\r\nCompiler run successful!\r\nAnalysing contracts...\r\nRunning tests...\r\nUncovered for src/MyNFT.sol:\r\n- Branch (branch: 0, path: 1) (location: source ID 29, line 44, chars 1313-1346, hits: 0)\r\n```\r\n\r\nThe culprit is the code below, which is a \"require\" statement that will **always revert**, \r\n```solidity\r\nrequire(false, \"cannot renounce\");\r\n```\r\nbut the coverage report is still expecting a branch where \"require\" **will not revert**. \r\n\r\nI appreciate the team's inputs here if this is expected behavior or a valid bug, and will assist wherever I can.\r\n\r\nMinimal code snippet to reproduce below, then run `forge coverage`.\r\n\r\n**MyNFT.sol**\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.13;\r\n\r\nimport \"@openzeppelin/utils/Strings.sol\";\r\nimport \"@openzeppelin/token/ERC721/ERC721.sol\";\r\nimport \"@openzeppelin/access/Ownable.sol\";\r\n\r\ncontract MyNFT is ERC721, Ownable {\r\n    constructor() ERC721(\"MyNFT\", \"MN\") {}\r\n\r\n    function renounceOwnership() public pure override {\r\n        require(false, \"cannot renounce\");\r\n    }\r\n}\r\n```\r\n\r\n**MyNFT.t.sol**\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nimport \"forge-std/Test.sol\";\r\nimport \"../src/MyNFT.sol\";\r\n\r\ncontract MyNFTTest is Test {\r\n    MyNFT public myNFT;\r\n\r\n    function setUp() public {\r\n        myNFT = new MyNFT();\r\n    }\r\n\r\n    function testRenounceOwnership() public {\r\n        vm.expectRevert();\r\n        myNFT.renounceOwnership();\r\n    }\r\n}\r\n\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5068/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5068/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

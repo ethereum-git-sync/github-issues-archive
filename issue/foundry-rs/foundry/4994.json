@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4994",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4994/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4994/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4994/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4994",
+  "id": 1718431118,
+  "node_id": "I_kwDOGBlvNc5mbS2O",
+  "number": 4994,
+  "title": "feat(forge): native support for simulating the passage of time when running invariants",
+  "user": {
+    "login": "PaulRBerg",
+    "id": 8782666,
+    "node_id": "MDQ6VXNlcjg3ODI2NjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8782666?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PaulRBerg",
+    "html_url": "https://github.com/PaulRBerg",
+    "followers_url": "https://api.github.com/users/PaulRBerg/followers",
+    "following_url": "https://api.github.com/users/PaulRBerg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PaulRBerg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PaulRBerg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PaulRBerg/subscriptions",
+    "organizations_url": "https://api.github.com/users/PaulRBerg/orgs",
+    "repos_url": "https://api.github.com/users/PaulRBerg/repos",
+    "events_url": "https://api.github.com/users/PaulRBerg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PaulRBerg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-21T09:22:21Z",
+  "updated_at": "2023-05-21T10:41:03Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\nBecause most smart contract systems expect time to pass, it is a common need to simulate the passage of time (with `vm.warp`) when running invariant test campaigns with Foundry.\r\n\r\nBut this is difficult to do today because [state is not preserved during invariants runs](https://github.com/foundry-rs/foundry/issues/3005). Just look at [Maple Finance's solution](https://github.com/maple-labs/maple-core-v2/blob/00f01ae7175885f8d49ac201a1c72465e320b2f6/tests/invariants/BaseInvariants.t.sol#L34-L37) - they have to apply the `useCurrentTimestamp` modifier to all invariant tests, as well as all functions in the handler contracts.\r\n\r\nNow, regardless of the state-preserving limitation and if and when it will be lifted, I posit that it would be helpful to offer native support for time warps in invariants.\r\n\r\nHere's what I have in mind :\r\n\r\n```toml\r\n[profile.default.invariant]\r\n  time_jump_min = 50\r\n  time_jump_max = 1000\r\n```\r\n\r\nNevermind the names - we can think about what would fit best later. What matters is the idea - to introduce two new config options which would be used for bounding a time jump that gets applied after every invariant test run, i.e. have Foundry do something like this:\r\n\r\n```solidity\r\nmodifier jump() {\r\n    uint256 timeWarp = block.timestamp;\r\n    timeWarp = _bound(timeWarp, 50 seconds, 1000 seconds);\r\n    timestampStore.increaseCurrentTimestamp(timeWarp);\r\n    vm.warp(timestampStore.currentTimestamp());\r\n    _;\r\n}\r\n```\r\n\r\nThis way, an invariant test campaign would more accurately simulate the real world, where time passes between function calls.\r\n\r\n### Additional context\r\n\r\nRelated discussions:\r\n\r\n- https://github.com/foundry-rs/forge-std/issues/376\r\n- https://github.com/foundry-rs/foundry/issues/3005#issuecomment-1556141136\r\n- https://t.me/foundry_support/34043\r\n- https://t.me/foundry_support/35144",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4994/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4994/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

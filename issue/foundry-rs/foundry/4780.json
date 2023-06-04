@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4780",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4780/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4780/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4780/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4780",
+  "id": 1676474447,
+  "node_id": "I_kwDOGBlvNc5j7PhP",
+  "number": 4780,
+  "title": "Contracts are not properly covered (code coverage) when they define the same event",
+  "user": {
+    "login": "gagiuntoli",
+    "id": 25662036,
+    "node_id": "MDQ6VXNlcjI1NjYyMDM2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25662036?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gagiuntoli",
+    "html_url": "https://github.com/gagiuntoli",
+    "followers_url": "https://api.github.com/users/gagiuntoli/followers",
+    "following_url": "https://api.github.com/users/gagiuntoli/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gagiuntoli/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gagiuntoli/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gagiuntoli/subscriptions",
+    "organizations_url": "https://api.github.com/users/gagiuntoli/orgs",
+    "repos_url": "https://api.github.com/users/gagiuntoli/repos",
+    "events_url": "https://api.github.com/users/gagiuntoli/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gagiuntoli/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    },
+    {
+      "id": 4233058229,
+      "node_id": "LA_kwDOGBlvNc78T1e1",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-coverage",
+      "name": "Cmd-forge-coverage",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge coverage"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-20T10:44:45Z",
+  "updated_at": "2023-04-27T13:34:43Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (8d0099b 2023-04-19T00:08:21.764755505Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge coverage\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nI have use [this small](https://github.com/onbjerg/forge-coverage-test) repository used to test `forge coverage`. [Here](https://github.com/onbjerg/forge-coverage-test/pull/1) are my modifications to replicate the bug.\r\n\r\nI cornered case the example a bit (the updates are also in the PR):\r\n\r\nLet's define 2 new contracts:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity >=0.8.15;\r\n\r\ncontract ExtraFileContract1 {\r\n    event ExtraFileEvent(uint256 n);\r\n\r\n    function compute(bool increment) external {\r\n        // Should be treated as a branch\r\n        require(increment);\r\n\r\n        emit ExtraFileEvent(2);\r\n    }\r\n}\r\n\r\ncontract ExtraFileContract2 {\r\n    // BUG (?): If we would call this event `ExtraFileEvent(uint256 n)`\r\n    // then the compute function below would not be covered.\r\n    // event ExtraFileEvent(uint256 n);\r\n    event ExtraFileEvent();\r\n\r\n    function compute(bool increment) external {\r\n        // Should be treated as a branch\r\n        require(increment);\r\n\r\n        //emit ExtraFileEvent(2);\r\n        emit ExtraFileEvent();\r\n    }\r\n}\r\n```\r\n\r\nIn this case, we have 100% coverage.\r\n\r\nIf we rename the event as `ExtraFileEvent(uint256)` (or uncomment the lines) now we get 50% coverage.\r\n\r\nWhat role are these events playing in code coverage?",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4780/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4780/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

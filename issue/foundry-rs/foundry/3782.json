@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3782",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3782/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3782/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3782/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/3782",
+  "id": 1467026047,
+  "node_id": "I_kwDOGBlvNc5XcQp_",
+  "number": 3782,
+  "title": "feat: move cheatcodes from forge-std to forge",
+  "user": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    },
+    {
+      "id": 3703752960,
+      "node_id": "LA_kwDOGBlvNc7cwskA",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/A-cheatcodes",
+      "name": "A-cheatcodes",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Area: cheatcodes"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2022-11-28T20:09:28Z",
+  "updated_at": "2023-04-18T11:52:00Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\nRight now the forge `vm` defines many cheat codes, and `forge-std` builds on these with many additional helpers. The distinction between the two is fairly arbitrary (though that hasn't been much of a problem, just occasional discussions about where a feature should live, e.g. https://github.com/foundry-rs/foundry/issues/3732#issuecomment-1328401986)\r\n\r\nThe suggestion in this issue is to move as many of the forge-std cheats out of solidity and directly into forge in rust. The main rationale is that the `src/` dir of forge-std takes ~3-4s to compile on my machine, so the more we can remove from it the faster it will be for users to compile/run their test suites (since native cheats add no compilation overhead, but solidity ones do), and compilation speed is a common bottleneck.\r\n\r\nOf course, this doesn't mean you'd save the full 4s in testing, since if you're not using all of forge-std you aren't compiling/optimizing all of it. So true benefit may be smaller—a rough benchmark here is take a few repos, replace all forge-std functions with empty implementations, and compare build times before and after those changes. This should underestimate the savings (since there are still more functions to compile, even though they have empty implementations)\r\n\r\nSmaller benefits are:\r\n1. All cheats would now be namespaced behind `vm.*()`, instead of the current split between some `vm.*()` methods for native cheats and `*()` for forge-std cheats (related to discussion in https://github.com/foundry-rs/foundry/issues/3322#issuecomment-1327383210)\r\n2. Can also add assertion helpers like `vm.assertEq()` and `vm.failed()` to remove the need for ds-test as a dependency which is nice\r\n\r\nThere would still be some things we want to keep in forge-std, such as:\r\n- Defining and instantiating the `vm` variable/interface in all tests by simply inheriting from `Test`/`Script`, and keeping the safe vs. unsafe cheats distinction for scripts\r\n- The `stdJson` lib for better UX\r\n- The console lib for Hardhat compatibility\r\n- Standard interfaces for simpler imports\r\n\r\n### Additional context\r\n\r\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3782/reactions",
+    "total_count": 7,
+    "+1": 6,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 1,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3782/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1512948087",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/3782#issuecomment-1512948087",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3782",
+    "id": 1512948087,
+    "node_id": "IC_kwDOGBlvNc5aLcF3",
+    "user": {
+      "login": "mds1",
+      "id": 17163988,
+      "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mds1",
+      "html_url": "https://github.com/mds1",
+      "followers_url": "https://api.github.com/users/mds1/followers",
+      "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+      "organizations_url": "https://api.github.com/users/mds1/orgs",
+      "repos_url": "https://api.github.com/users/mds1/repos",
+      "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mds1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-04-18T11:52:00Z",
+    "updated_at": "2023-04-18T11:52:00Z",
+    "author_association": "COLLABORATOR",
+    "body": "This migration could also be an opportunity to introduce a few breaking changes to cheats, such as:\r\n- https://github.com/foundry-rs/forge-std/issues/349#issuecomment-1510888015",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1512948087/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

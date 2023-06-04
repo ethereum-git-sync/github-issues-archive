@@ -1,0 +1,113 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3267",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3267/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3267/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3267/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/3267",
+  "id": 1377702733,
+  "node_id": "I_kwDOGBlvNc5SHhNN",
+  "number": 3267,
+  "title": "Forge debugger can't find function by signature if `--root` is specified",
+  "user": {
+    "login": "shekhirin",
+    "id": 5773434,
+    "node_id": "MDQ6VXNlcjU3NzM0MzQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5773434?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shekhirin",
+    "html_url": "https://github.com/shekhirin",
+    "followers_url": "https://api.github.com/users/shekhirin/followers",
+    "following_url": "https://api.github.com/users/shekhirin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shekhirin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shekhirin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shekhirin/subscriptions",
+    "organizations_url": "https://api.github.com/users/shekhirin/orgs",
+    "repos_url": "https://api.github.com/users/shekhirin/repos",
+    "events_url": "https://api.github.com/users/shekhirin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shekhirin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    },
+    {
+      "id": 3703753247,
+      "node_id": "LA_kwDOGBlvNc7cwsof",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/A-debugger",
+      "name": "A-debugger",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Area: debugger"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-09-19T10:00:38Z",
+  "updated_at": "2022-09-23T09:26:57Z",
+  "closed_at": "2022-09-23T09:26:57Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (084ef3d 2022-09-19T00:04:35.98318Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nIf I try to run tests matching pattern specifying the root directory manually, it works well:\r\n```bash\r\n➜  ~[Projects] forge test --root /Users/shekhirin/Projects/solmate --match-path src/test/WETH.t.sol\r\n[⠢] Compiling...\r\nNo files changed, compilation skipped\r\n\r\nRunning 7 tests for src/test/WETH.t.sol:WETHTest\r\n[PASS] testDeposit() (gas: 63535)\r\n[PASS] testDeposit(uint256) (runs: 256, μ: 63518, ~: 65880)\r\n[PASS] testFallbackDeposit() (gas: 63249)\r\n[PASS] testFallbackDeposit(uint256) (runs: 256, μ: 64332, ~: 65604)\r\n[PASS] testPartialWithdraw() (gas: 73281)\r\n[PASS] testWithdraw() (gas: 54360)\r\n[PASS] testWithdraw(uint256,uint256) (runs: 256, μ: 73958, ~: 78076)\r\nTest result: ok. 7 passed; 0 failed; finished in 11.67ms\r\n\r\nRunning 1 test for src/test/WETH.t.sol:WETHInvariants\r\n[PASS] invariantTotalSupplyEqualsBalance() (runs: 256, calls: 3840, reverts: 1903)\r\nTest result: ok. 1 passed; 0 failed; finished in 114.22ms\r\n```\r\n\r\nHowever, if I try to do the same but also debug one particular function, it can't detect the contract:\r\n```bash\r\n➜  ~[Projects] forge test --root /Users/shekhirin/Projects/solmate --match-path src/test/WETH.t.sol --debug testPartialWithdraw\r\n[⠢] Compiling...\r\nNo files changed, compilation skipped\r\nError:\r\ncontract source info format must be `<path>:<contractname>` or `<contractname>`\r\n```\r\n\r\nSwitching to the project directory and omitting `--root` makes it work:\r\n```bash\r\n➜  ~[Projects] cd solmate\r\n➜  solmate git:(main) ✗ forge test --match-path src/test/WETH.t.sol --debug testPartialWithdraw\r\n[⠢] Compiling...\r\nNo files changed, compilation skipped\r\n[⠢] Compiling...\r\nNo files changed, compilation skipped\r\n[debugger opens]\r\n```",
+  "closed_by": {
+    "login": "shekhirin",
+    "id": 5773434,
+    "node_id": "MDQ6VXNlcjU3NzM0MzQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5773434?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shekhirin",
+    "html_url": "https://github.com/shekhirin",
+    "followers_url": "https://api.github.com/users/shekhirin/followers",
+    "following_url": "https://api.github.com/users/shekhirin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shekhirin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shekhirin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shekhirin/subscriptions",
+    "organizations_url": "https://api.github.com/users/shekhirin/orgs",
+    "repos_url": "https://api.github.com/users/shekhirin/repos",
+    "events_url": "https://api.github.com/users/shekhirin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shekhirin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3267/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3267/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

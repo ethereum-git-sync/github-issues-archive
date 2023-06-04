@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4617",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4617/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4617/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4617/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4617",
+  "id": 1634334490,
+  "node_id": "I_kwDOGBlvNc5hafca",
+  "number": 4617,
+  "title": "bug(chisel): code after assembly block which returns bytes breaks (stack|mem)dump",
+  "user": {
+    "login": "giovannidisiena",
+    "id": 22510773,
+    "node_id": "MDQ6VXNlcjIyNTEwNzcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/22510773?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/giovannidisiena",
+    "html_url": "https://github.com/giovannidisiena",
+    "followers_url": "https://api.github.com/users/giovannidisiena/followers",
+    "following_url": "https://api.github.com/users/giovannidisiena/following{/other_user}",
+    "gists_url": "https://api.github.com/users/giovannidisiena/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/giovannidisiena/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/giovannidisiena/subscriptions",
+    "organizations_url": "https://api.github.com/users/giovannidisiena/orgs",
+    "repos_url": "https://api.github.com/users/giovannidisiena/repos",
+    "events_url": "https://api.github.com/users/giovannidisiena/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/giovannidisiena/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 4655151684,
+      "node_id": "LA_kwDOGBlvNc8AAAABFXf6RA",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-chisel",
+      "name": "C-chisel",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: chisel"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-03-21T16:50:26Z",
+  "updated_at": "2023-03-21T19:26:06Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nChisel\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (394f217 2023-03-21T00:04:24.143572Z)\n\n### What command(s) is the bug in?\n\nchisel\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nIf an assembly block containing a return statement is followed by some code, `!sd`/`!md` break with the error \"Run function is empty\".\r\n\r\n```solidity\r\n❯ chisel\r\nWelcome to Chisel! Type `!help` to show available commands.\r\n➜ uint test = 1;\r\n  assembly {\r\n      mstore(0x0, 0x1337)\r\n      return(0x0, 0x20)\r\n  }\r\n➜ !md\r\n[0x00:0x20]: 0x0000000000000000000000000000000000000000000000000000000000001337\r\n[0x20:0x40]: 0x0000000000000000000000000000000000000000000000000000000000000000\r\n[0x40:0x60]: 0x0000000000000000000000000000000000000000000000000000000000000080\r\n➜ test = 2;\r\n➜ !md\r\n⚒️ Chisel Error: Run function is empty.\r\n➜ !source\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.17;\r\n\r\nimport {Cheats} from \"forge-std/Vm.sol\";\r\n\r\ncontract REPL {\r\n    Cheats internal constant vm = Cheats(address(uint160(uint(keccak256(\"hevm cheat code\")))));\r\n\r\n    /// @notice REPL contract entry point\r\n    function run() public {\r\n        uint test = 1;\r\n        assembly {\r\n            mstore(0x0, 0x1337)\r\n            return(0x0, 0x20)\r\n        }\r\n        test = 2;\r\n    }\r\n}\r\n```\r\n\r\nSeparating this logic into its own function causes additional issues, resulting in the errors \"Failed to inspect expression\" and \"Run function is empty\".\r\n\r\n```solidity\r\n❯ chisel\r\nWelcome to Chisel! Type `!help` to show available commands.\r\n➜ function testReturn() public returns(bytes memory) {\r\nassembly {\r\n            mstore(0x0, 0x1337)\r\n            return(0x0, 0x20)\r\n        }\r\n}\r\n➜ bytes memory test = testReturn();\r\n➜ test\r\nTraces:\r\n  [149] 0xBd770416a3345F91E4B34576cb804a576fa48EB1::run() \r\n    └─ ← 0x0000000000000000000000000000000000000000000000000000000000001337\r\n\r\n⚒️ Chisel Error: Failed to inspect expression\r\n➜ !source\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.17;\r\n\r\nimport {Cheats} from \"forge-std/Vm.sol\";\r\n\r\ncontract REPL {\r\n    Cheats internal constant vm = Cheats(address(uint160(uint(keccak256(\"hevm cheat code\")))));\r\n\r\n    function testReturn() public returns (bytes memory) {\r\n        assembly {\r\n            mstore(0x0, 0x1337)\r\n            return(0x0, 0x20)\r\n        }\r\n    }\r\n\r\n    /// @notice REPL contract entry point\r\n    function run() public {\r\n        bytes memory test = testReturn();\r\n    }\r\n}\r\n\r\n➜ !md\r\n⚒️ Chisel Error: Run function is empty.\r\n```\r\n\r\nTaking this source for a simple Foundry test, we see that it should work without any issues.\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.17;\r\n\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract REPL is Test {\r\n\r\n    function testReturn() public returns (bytes memory) {\r\n        assembly {\r\n            mstore(0x0, 0x1337)\r\n            return(0x0, 0x20)\r\n        }\r\n    }\r\n\r\n    /// @notice REPL contract entry point\r\n    function run() public {\r\n        bytes memory test = testReturn();\r\n        emit log_named_bytes(\"test\", test);\r\n    }\r\n}\r\n\r\ncontract ChiselTest is Test {\r\n    REPL repl;\r\n\r\n    function setUp() public {\r\n        repl = new REPL();\r\n    }\r\n\r\n    function test_chiselMem() external {\r\n        repl.run();\r\n    }\r\n}\r\n```\r\n\r\nGiven that the code following the return statement represents an unreachable code path, chisel should deal with these cases such that the errors are avoided.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4617/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4617/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1478463673",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/4617#issuecomment-1478463673",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4617",
+    "id": 1478463673,
+    "node_id": "IC_kwDOGBlvNc5YH5C5",
+    "user": {
+      "login": "mds1",
+      "id": 17163988,
+      "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mds1",
+      "html_url": "https://github.com/mds1",
+      "followers_url": "https://api.github.com/users/mds1/followers",
+      "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+      "organizations_url": "https://api.github.com/users/mds1/orgs",
+      "repos_url": "https://api.github.com/users/mds1/repos",
+      "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mds1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-03-21T19:25:58Z",
+    "updated_at": "2023-03-21T19:25:58Z",
+    "author_association": "COLLABORATOR",
+    "body": "cc @clabby, can you check this one out?",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1478463673/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]

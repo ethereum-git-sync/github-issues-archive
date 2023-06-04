@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4777",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4777/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4777/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4777/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4777",
+  "id": 1675179276,
+  "node_id": "I_kwDOGBlvNc5j2TUM",
+  "number": 4777,
+  "title": "forge coverage does not work when calling functions include code hash",
+  "user": {
+    "login": "armorsun",
+    "id": 13297513,
+    "node_id": "MDQ6VXNlcjEzMjk3NTEz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13297513?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/armorsun",
+    "html_url": "https://github.com/armorsun",
+    "followers_url": "https://api.github.com/users/armorsun/followers",
+    "following_url": "https://api.github.com/users/armorsun/following{/other_user}",
+    "gists_url": "https://api.github.com/users/armorsun/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/armorsun/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/armorsun/subscriptions",
+    "organizations_url": "https://api.github.com/users/armorsun/orgs",
+    "repos_url": "https://api.github.com/users/armorsun/repos",
+    "events_url": "https://api.github.com/users/armorsun/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/armorsun/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    },
+    {
+      "id": 4233058229,
+      "node_id": "LA_kwDOGBlvNc78T1e1",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-coverage",
+      "name": "Cmd-forge-coverage",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge coverage"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-19T15:46:28Z",
+  "updated_at": "2023-04-20T11:01:36Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (4a0c8dc 2023-04-16T00:05:25.002055000Z)\n\n### What command(s) is the bug in?\n\nforge coverage\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nforge coverage does not work when calling functions that include code hash. \r\n\r\nFor example, when running the following test,\r\n\r\n```\r\nfunction testAddLiquidity() public {\r\n    uint256 amountToken0 = 10 ether;\r\n    uint256 amountToken1 = 10 ether;\r\n    \r\n    token0.approve(address(router), amountToken0);\r\n    token1.approve(address(router), amountToken1);\r\n    \r\n    (uint256 amount0, uint256 amount1, uint256 liquidity) = router.addLiquidity(\r\n        address(token0),\r\n        address(token1),\r\n        amountToken0,\r\n        amountToken1,\r\n        0,\r\n        0,\r\n        address(this),\r\n        block.timestamp\r\n    );\r\n  \r\n    assertEq(amount0, amountToken0, \"Amount of token0 should match\");\r\n    assertEq(amount1, amountToken1, \"Amount of token1 should match\");\r\n    assertEq(liquidity, 10 ether - 1000, \"Liquidity should be 10 ether - 1000\");\r\n}\r\n```\r\n\r\nThe addLiquidity calls the pairFor function:\r\n\r\n```\r\nfunction addLiquidity (\r\n    address tokenA,\r\n    address tokenB,\r\n    uint amountADesired,\r\n    uint amountBDesired,\r\n    uint amountAMin,\r\n    uint amountBMin,\r\n    address to,\r\n    uint deadline\r\n) external virtual override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {\r\n    (amountA, amountB) = _addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin);\r\n    address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);\r\n    TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);\r\n    TransferHelper.safeTransferFrom(tokenB, msg.sender, pair, amountB);\r\n    liquidity = IUniswapV2Pair(pair).mint(to);\r\n}\r\n```\r\n\r\nThe pairFor function used init code hash, and it caused the forge coverage to exclude it.\r\n```\r\nfunction pairFor(address factory, address tokenA, address tokenB) internal pure returns (address pair) {\r\n    (address token0, address token1) = sortTokens(tokenA, tokenB);\r\n    pair = address(uint(keccak256(abi.encodePacked(\r\n        hex'ff',\r\n        factory,\r\n        keccak256(abi.encodePacked(token0, token1)),\r\n        hex'96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f' // init code hash\r\n    ))));\r\n}\r\n```\r\n\r\nIf another function replaces the fixed init code hash to make the call. The forge coverage will count it in.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4777/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4777/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

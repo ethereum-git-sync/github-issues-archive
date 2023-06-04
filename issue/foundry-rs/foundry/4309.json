@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4309",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4309/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4309/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4309/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4309",
+  "id": 1576224926,
+  "node_id": "I_kwDOGBlvNc5d80ie",
+  "number": 4309,
+  "title": "bug(forge): incorrect branch coverage when passing array elements to custom errors",
+  "user": {
+    "login": "PaulRBerg",
+    "id": 8782666,
+    "node_id": "MDQ6VXNlcjg3ODI2NjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8782666?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PaulRBerg",
+    "html_url": "https://github.com/PaulRBerg",
+    "followers_url": "https://api.github.com/users/PaulRBerg/followers",
+    "following_url": "https://api.github.com/users/PaulRBerg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PaulRBerg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PaulRBerg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PaulRBerg/subscriptions",
+    "organizations_url": "https://api.github.com/users/PaulRBerg/orgs",
+    "repos_url": "https://api.github.com/users/PaulRBerg/repos",
+    "events_url": "https://api.github.com/users/PaulRBerg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PaulRBerg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-08T14:28:42Z",
+  "updated_at": "2023-02-09T09:04:53Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (249538f 2023-02-08T00:12:05.805004Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge coverage\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nThis is a strange bug. Reproducing it in a repo with a clean slate took me hours, but I did eventually manage to get to the bottom of it.\r\n\r\nTake the following unsuspecting contract:\r\n\r\n```solidity\r\ncontract Foo {\r\n    error Gte1(uint256 number, uint256 firstElement);\r\n\r\n    function checkLt(uint256 number, uint256[] memory arr) external pure returns (bool) {\r\n        if (number >= arr[0]) {\r\n            revert Gte1(number, arr[0]);\r\n        }\r\n        return true;\r\n    }\r\n}\r\n```\r\n\r\nAnd the following tests (hidden by default for brevity reasons, click the toggle below to collapse them):\r\n\r\n<details>\r\n<summary>Click me to toggle the tests</summary>\r\n\r\n```solidity\r\ncontract FooTest is Test {\r\n    Foo internal foo = new Foo();\r\n    uint256[] internal arr;\r\n\r\n    function setUp() public virtual {\r\n        arr.push(1);\r\n    }\r\n\r\n    function test_RevertWhen_Gt() external {\r\n        uint256 number = 2;\r\n        vm.expectRevert(abi.encodeWithSelector(Foo.Gte1.selector, number, arr[0]));\r\n        foo.checkLt(number, arr);\r\n    }\r\n\r\n    function test_RevertWhen_Eq() external {\r\n        uint256 number = 1;\r\n        vm.expectRevert(abi.encodeWithSelector(Foo.Gte1.selector, number, arr[0]));\r\n        foo.checkLt(number, arr);\r\n    }\r\n\r\n    function test_Lt() external {\r\n        uint256 number = 0;\r\n        bool result = foo.checkLt(number, arr);\r\n        assertTrue(result);\r\n    }\r\n}\r\n```\r\n\r\n</details>\r\n\r\nNow, run `forge coverage`. You will get this report:\r\n\r\n```text\r\n| File        | % Lines       | % Statements  | % Branches   | % Funcs       |\r\n|-------------|---------------|---------------|--------------|---------------|\r\n| src/Foo.sol | 100.00% (3/3) | 100.00% (3/3) | 50.00% (1/2) | 100.00% (1/1) |\r\n| Total       | 100.00% (3/3) | 100.00% (3/3) | 50.00% (1/2) | 100.00% (1/1) |\r\n```\r\n\r\nNotice that the branch coverage is 50% instead of 100%, even if we have tests that account for the full gamut of possibilities (`>`, `==`, and `<`).\r\n\r\nNow, here's the strangest thing - just by getting rid of the the `firstElement` argument of the custom error, branch coverage increases to 100%. Also, passing the `number` instead of `arr[0]` achieves the same 100% coverage, like this:\r\n\r\n```text\r\n| File        | % Lines       | % Statements  | % Branches    | % Funcs       |\r\n|-------------|---------------|---------------|---------------|---------------|\r\n| src/Foo.sol | 100.00% (3/3) | 100.00% (3/3) | 100.00% (2/2) | 100.00% (1/1) |\r\n| Total       | 100.00% (3/3) | 100.00% (3/3) | 100.00% (2/2) | 100.00% (1/1) |\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4309/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4309/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

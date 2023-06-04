@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/2987",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2987/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2987/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2987/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/2987",
+  "id": 1353405402,
+  "node_id": "I_kwDOGBlvNc5Qq1Pa",
+  "number": 2987,
+  "title": "Consider renaming fields and changing types in the broadcast JSON output files",
+  "user": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    },
+    {
+      "id": 4182991461,
+      "node_id": "LA_kwDOGBlvNc75U2Jl",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-script",
+      "name": "Cmd-forge-script",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge script"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-08-28T16:34:44Z",
+  "updated_at": "2022-08-29T05:32:35Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Describe the feature you would like\n\nRight now in the broadcast logs there are two fields with names we should consider changing due to conflicts with language keywords.\r\n1. `function` is a keyword in JS, solidity, and likely other languages. I'd suggest renaming this to `functionSig` since the full signature is shown\r\n2. `type` is also a keyword in many languages. I'd suggest renaming to `txType`\r\n\r\nThere are also fields where the output types should be changed (I recall discussing this in the past but not sure if we're tracking anywhere so figured I'd mention it here). First, in the `transactions` array:\r\n- `transaction.type` should be a number, currently it's a hex string\r\n- `transaction.gas` should be a number, currently it's a hex string\r\n- Addresses are not logged as checksummed but they should be (also tracked in https://github.com/foundry-rs/foundry/issues/2975)\r\n- When a function argument is an address, the arguments array omits the `0x` prefix but it should be included.\r\n- When a function argument is a boolean, the arguments array contains a string of `\"true\"` instead of a boolean of `true` (same for `false`)\r\n\r\nIn the `receipts` array:\r\n- `transactionIndex` can be a number, currently it's a hex string\r\n- `blockNumber` can be a number, currently it's a hex string\r\n- In the logs array, `transactionIndex`, `logIndex`, and `transactionLogIndex` can all be numbers, currently they are hex strings\r\n- `cumulativeGasUsed` can be a number, currently it's a hex string\r\n- `gasUsed` can be a number, currently it's a hex string\r\n- Addresses are not logged as checksummed but they should be\r\n- `status` is a hex string but should be either a boolean or a number of `1` or `0`\r\n\r\nThe above list is not comprehensive and there may be other fields that should have a more readable type.\r\n\r\nThese suggestions deviate from the ethereum JSON RPC spec in the sense that all numbers are \"quantities\" which means they're returned from the node as hex strings with as few leading zeros as possible. However, this makes the data less readable and harder to parse, and I don't think there's a reason why these log files need to strictly follow the spec.\n\n### Additional context\n\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/2987/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2987/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3740",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3740/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3740/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3740/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/3740",
+  "id": 1460261603,
+  "node_id": "I_kwDOGBlvNc5XCdLj",
+  "number": 3740,
+  "title": "Fuzzer produces inputs causing the same code to consistently both pass and fail when running `forge test`",
+  "user": {
+    "login": "TomAFrench",
+    "id": 15848336,
+    "node_id": "MDQ6VXNlcjE1ODQ4MzM2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/15848336?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/TomAFrench",
+    "html_url": "https://github.com/TomAFrench",
+    "followers_url": "https://api.github.com/users/TomAFrench/followers",
+    "following_url": "https://api.github.com/users/TomAFrench/following{/other_user}",
+    "gists_url": "https://api.github.com/users/TomAFrench/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/TomAFrench/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/TomAFrench/subscriptions",
+    "organizations_url": "https://api.github.com/users/TomAFrench/orgs",
+    "repos_url": "https://api.github.com/users/TomAFrench/repos",
+    "events_url": "https://api.github.com/users/TomAFrench/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/TomAFrench/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-22T17:14:20Z",
+  "updated_at": "2022-11-22T17:14:20Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (251d7d6 2022-11-22T00:08:20.011022291Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\n## Context\r\n\r\nAt Balancer we need to test that two methods of joining/exiting a pool are equivalent, a \"full\" method and a \"simple\" method which handles a join with a single token). To do this we use forge to generate a set of random inputs which represent a \"simple\" join, build the equivalent inputs for the \"full\" join and check to make sure that they both result in the same output.\r\n\r\n## Bug\r\n\r\nWe have the test file [`WeightedMath.t.sol`](https://github.com/balancer-labs/balancer-v2-monorepo/blob/forge-bound-assume-fail/pkg/pool-weighted/test/foundry/WeightedMath.t.sol) which contains two tests `testJoinSwap` and `testExitSwap`.\r\n\r\nBoth functions immediately call into the `prepareValues ` helper function to get a random valid set of weights for the pool to use. `prepareValues` contains the only `vm.assume` call in the entire contract.\r\n\r\nhttps://github.com/balancer-labs/balancer-v2-monorepo/blob/2181edffb71efda789221aca6a50c1b0d251b9da/pkg/pool-weighted/test/foundry/WeightedMath.t.sol#L46\r\n\r\n`prepareValues` only receives values from the fuzzer as inputs so we would assume that if one of the tests fails from too many invalid inputs then the other one should as well. However if we run the test suite we'll consistently see `testJoinSwaps` pass and `testExitSwaps` fail. \r\n\r\n```\r\n$ forge test -m \"test(Join|Exit)Swap\"\r\n[⠆] Compiling...\r\nNo files changed, compilation skipped\r\n\r\nRunning 2 tests for test/foundry/WeightedMath.t.sol:WeightedMathTest\r\n[FAIL. Reason: The `vm.assume` cheatcode rejected too many inputs (60000 allowed)] testExitSwaps(uint256[20],uint256[20],uint256,uint256,uint256,uint256,uint256) (runs: 8566, μ: 52559, ~: 48780)\r\n[PASS] testJoinSwaps(uint256[20],uint256[20],uint256,uint256,uint256,uint256,uint256) (runs: 10000, μ: 62037, ~: 53058)\r\nTest result: FAILED. 1 passed; 1 failed; finished in 11.75s\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/foundry/WeightedMath.t.sol:WeightedMathTest\r\n[FAIL. Reason: The `vm.assume` cheatcode rejected too many inputs (60000 allowed)] testExitSwaps(uint256[20],uint256[20],uint256,uint256,uint256,uint256,uint256) (runs: 8566, μ: 52559, ~: 48780)\r\n\r\nEncountered a total of 1 failing tests, 1 tests succeeded\r\n```\r\n\r\n## To reproduce:\r\n\r\nNote we require node v14.18.x  in order to install the repo. See [here](https://github.com/balancer-labs/balancer-v2-monorepo#pre-requisites) if you run into any issues.\r\n\r\n1. `git clone git@github.com:balancer-labs/balancer-v2-monorepo.git`\r\n2. `git checkout forge-bound-assume-fail`\r\n3. run yarn and init submodules\r\n4. `cd pkg/pool-weighted`\r\n5. `forge test -m \"test(Join|Exit)Swap\"`",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3740/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3740/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

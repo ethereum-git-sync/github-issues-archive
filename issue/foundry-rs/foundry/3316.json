@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3316",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3316/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3316/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3316/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/3316",
+  "id": 1383037905,
+  "node_id": "I_kwDOGBlvNc5Sb3vR",
+  "number": 3316,
+  "title": "feat: `forge dependencies` to list details about installed dependencies",
+  "user": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-09-22T21:29:28Z",
+  "updated_at": "2022-09-23T12:29:00Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Describe the feature you would like\n\nThe idea here is to make it easier to audit a project's dependencies and know which deps are core to the protocol, which are just for testing, etc. Very open to feedback, pushback, etc. as this is just my initial idea and not necessarily the best solution. I'd guess this gets trickier when someone isn't using submodules and is using npm/yarn, and in theory someone could be using both. But in general auditing deps is tedious right now and I think there's room for improvement.\r\n\r\nI know there's https://github.com/foundry-rs/foundry/issues/2618 so dep management might change, but I think a `forge dependencies` (open to other names) command could be useful regardless. This is arguably related to `forge geiger` which in theory should warn about deps with known vulns.\r\n\r\n## Existing Options\r\n\r\nRight now `git submodule status` can show the installed versions of each dependency:\r\n\r\n```\r\n$ git submodule status\r\n 9310e879db8ba3ea6d5c6489a579118fd264a3f5 lib/ds-test (heads/master)\r\n ca8d6e00ea9cb035f6856ff732203c9a3c48b966 lib/forge-std (v0.1.0-80-gca8d6e0)\r\n 5f962edf98f2aeaf2706f7bfd07fac4532b42cc6 lib/murky (heads/main)\r\n 66ec91bc450ff997ca7f7291491f7a1e49107767 lib/openzeppelin-contracts (v4.4.1-314-g66ec91bc)\r\n 10fc959d987aab45f24e592d44449c723191ba2d lib/solmate (v6-157-g10fc959)\r\n```\r\n\r\nAnd you can use a command like this this to see if your deps are up to date (which really just means the latest main, which isn't great, ref https://github.com/foundry-rs/foundry/issues/401#issuecomment-1016918194):\r\n\r\n```\r\n$ git submodule foreach 'git fetch -q; echo $\"current: $(git rev-parse --short HEAD)\\nlatest:  $(git rev-parse --short origin/HEAD)\\n\"' \r\nEntering 'lib/ds-test'\r\ncurrent: 9310e87\r\nlatest:  9310e87\r\n\r\nEntering 'lib/forge-std'\r\ncurrent: ca8d6e0\r\nlatest:  d26946a\r\n\r\nEntering 'lib/murky'\r\ncurrent: 5f962ed\r\nlatest:  5f962ed\r\n\r\nEntering 'lib/openzeppelin-contracts'\r\ncurrent: 66ec91bc\r\nlatest:  046121e0\r\n\r\nEntering 'lib/solmate'\r\ncurrent: 10fc959\r\nlatest:  bff24e8\r\n```\r\n\r\nThere may be other ideas/solutions people have\r\n\r\n## Proposed Solution\r\n\r\nI imagine the output being something like the below, with the key information shown being:\r\n- A list of installed dependencies: their URLs, commit hashes, tags/branches if applicable, and if they are outdated\r\n- Where each dependency is used: `src`, `script`, or `test`. Rationale being that in general, I'd scrutinize a dep more if used in production code compared to tests\r\n- The above bullet can get tricky with recursive submodules, but would be great if that's handled properly. For example, maybe I install murky to help test merkle trees in `test/` and to generate a merkle root in `script/`. But I don't use murky directly in `src/`. However, it has openzeppelin-contracts as its own dependency, and maybe I use that (without having installed it explicitly) in `src/`. It would be nice to know that I'm using that transitive dep and it's version in my production contracts\r\n\r\n```\r\n$ forge dependencies\r\n\r\n======== Installed Dependencies =========\r\nhttps://github.com/dmfxyz/murky\r\n  Current version: 5f962ed\r\n  ✅ Up to date\r\n\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts\r\n  Current version: v4.4.1-314-g66ec91bc\r\n  Latest version: v4.7.3-xyz\r\n  ❗️ Out of date\r\n\r\n======== Dependency Tree Summary ========\r\n\r\nsrc\r\n  https://github.com/OpenZeppelin/openzeppelin-contracts\r\n\r\nscript\r\n  https://github.com/dmfxyz/murky\r\n  https://github.com/OpenZeppelin/openzeppelin-contracts\r\n\r\ntest\r\n  https://github.com/dmfxyz/murky\r\n  https://github.com/OpenZeppelin/openzeppelin-contracts\r\n\r\n======== Dependency Tree ========\r\n\r\nsrc\r\n|-- MyToken.sol\r\n     |-- lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol\r\n\r\netc., basically show everywhere deps are used\r\n```\n\n### Additional context\n\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3316/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 1,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3316/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

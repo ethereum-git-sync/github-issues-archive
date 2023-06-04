@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4510",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4510/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4510/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4510/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4510",
+  "id": 1616036487,
+  "node_id": "I_kwDOGBlvNc5gUsKH",
+  "number": 4510,
+  "title": "Wrong SHA when using grep -n option",
+  "user": {
+    "login": "rcstanciu",
+    "id": 1048185,
+    "node_id": "MDQ6VXNlcjEwNDgxODU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1048185?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rcstanciu",
+    "html_url": "https://github.com/rcstanciu",
+    "followers_url": "https://api.github.com/users/rcstanciu/followers",
+    "following_url": "https://api.github.com/users/rcstanciu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rcstanciu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rcstanciu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rcstanciu/subscriptions",
+    "organizations_url": "https://api.github.com/users/rcstanciu/orgs",
+    "repos_url": "https://api.github.com/users/rcstanciu/repos",
+    "events_url": "https://api.github.com/users/rcstanciu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rcstanciu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-08T22:19:55Z",
+  "updated_at": "2023-03-08T22:28:10Z",
+  "closed_at": "2023-03-08T22:28:10Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nFoundryup\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\n_No response_\n\n### What command(s) is the bug in?\n\nfoundryup\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nIt is custom that people use grep's `-n` option by default, usually set in their shell config.\r\n\r\nE.g.:\r\n```bash\r\n# .zshrc\r\nexport GREP_OPTIONS=\"-n --color\"\r\n```\r\n\r\nThis makes grep add the relative line number to the output, resulting in the following call messing up the `foundryup` script:\r\n\r\n```bash\r\n$ curl -sSf \"https://api.github.com/repos/foundry-rs/foundry/git/refs/tags/nightly\" \\\r\n        | grep -Eo '\"sha\"[^,]*' \\\r\n        | grep -Eo '[^:]*$' \\\r\n        | tr -d '\"' \\\r\n        | tr -d ' '\r\n1:f5e5eb52f62928c5b4daeec0fe963ad7f88cb464\r\n```\r\n\r\nConsequently, `1:f5e5eb52f62928c5b4daeec0fe963ad7f88cb464` is not a valid SHA, so `foundryup` will fail to download the corresponding archive.\r\n\r\nThe solution would be to remove that unnecessary part, using `cut`. E.g.,:\r\n\r\n```diff\r\n$ curl -sSf \"https://api.github.com/repos/foundry-rs/foundry/git/refs/tags/nightly\" \\\r\n        | grep -Eo '\"sha\"[^,]*' \\\r\n        | grep -Eo '[^:]*$' \\\r\n        | tr -d '\"' \\\r\n-        | tr -d ' '\r\n+        | tr -d ' ' \\\r\n+        | cut -d ':' -f 2\r\nf5e5eb52f62928c5b4daeec0fe963ad7f88cb464\r\n```\r\n\r\nThis solution works for people who use the `-n` option and those who don't.",
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4510/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4510/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

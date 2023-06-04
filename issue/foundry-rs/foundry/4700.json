@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4700",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4700/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4700/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4700/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/4700",
+  "id": 1657107101,
+  "node_id": "I_kwDOGBlvNc5ixXKd",
+  "number": 4700,
+  "title": "Anvil returns wrong account balance for last remote block after sending transaction",
+  "user": {
+    "login": "niklasnatter",
+    "id": 13310795,
+    "node_id": "MDQ6VXNlcjEzMzEwNzk1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13310795?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/niklasnatter",
+    "html_url": "https://github.com/niklasnatter",
+    "followers_url": "https://api.github.com/users/niklasnatter/followers",
+    "following_url": "https://api.github.com/users/niklasnatter/following{/other_user}",
+    "gists_url": "https://api.github.com/users/niklasnatter/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/niklasnatter/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/niklasnatter/subscriptions",
+    "organizations_url": "https://api.github.com/users/niklasnatter/orgs",
+    "repos_url": "https://api.github.com/users/niklasnatter/repos",
+    "events_url": "https://api.github.com/users/niklasnatter/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/niklasnatter/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    },
+    {
+      "id": 4077188949,
+      "node_id": "LA_kwDOGBlvNc7zBPdV",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-anvil",
+      "name": "C-anvil",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: anvil"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-06T10:10:32Z",
+  "updated_at": "2023-04-06T13:28:32Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nAnvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (7bfe5bf 2023-04-05T00:08:03.860209000Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nHey,\r\nfirst of all, thanks a lot for working on this project. Its very nice to use and I think its a great addition to the EVM ecosystem.\r\n\r\nI noticed that anvil returns the wrong balance for the last block of the original chain when an account sends a transaction to a forked network. Instead of the correct balance before the transaction, anvil returns the balance after the transaction (which is included in the next block). \r\n\r\nI figured a reproducible example would be the best way to describe the behaviour:\r\n```bash\r\n# start anvil and fork mainnet in a separate terminal\r\n▶ anvil --fork-url https://cloudflare-eth.com\r\n\r\n# impersonate random account with non zero balance\r\n▶ cast rpc anvil_impersonateAccount 0xe8c2e764516b633368Cda857B285B42FEfdF3242\r\n\r\n# query block number before first transaction on fork\r\n▶ cast block --field number\r\n16988831\r\n\r\n# query balance before first transaction on fork\r\n# -> result is correct here\r\n▶ cast balance 0xe8c2e764516b633368Cda857B285B42FEfdF3242 --block 16988831\r\n1253406122102867096\r\n\r\n# send transaction from random account\r\n▶ cast send --from 0xe8c2e764516b633368Cda857B285B42FEfdF3242 --value 1ether\r\nblockHash               0x66b51963dbe338801c70b445ab78f26a37569e7b2c211ce1966668f32c6f8416\r\nblockNumber             16988832\r\ncontractAddress         0x24895D0Ca36fe5921e7aEe462c47f1D5C598353e\r\ncumulativeGasUsed       53000\r\neffectiveGasPrice       27269792965\r\ngasUsed                 53000\r\nlogs                    []\r\nlogsBloom               0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\r\nroot\r\nstatus                  1\r\ntransactionHash         0xc7d2552a2fc187ecf0ab5c38b6ef7a299d94033c8228f5636c371ab96ee1f0a5\r\ntransactionIndex        0\r\ntype                    2\r\n\r\n# query balance before first transaction on fork again \r\n# -> result is incorrect and different to previous result for the same command\r\n▶ cast balance 0xe8c2e764516b633368Cda857B285B42FEfdF3242 --block 16988831\r\n251960823075722096\r\n```\r\n\r\nIf anybody else is running into this: I was able to work around the incorrect balances by mining an empty block on the fork before sending any other commands. With cast, this is possible with the following command:\r\n```\r\n▶ cast rpc anvil_mine 1\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4700/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4700/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
