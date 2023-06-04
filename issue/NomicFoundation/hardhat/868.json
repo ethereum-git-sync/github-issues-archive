@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/868",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/868/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/868/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/868/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/868",
+  "id": 718726366,
+  "node_id": "MDU6SXNzdWU3MTg3MjYzNjY=",
+  "number": 868,
+  "title": "Note on a \"pseudo memory leak\" when using `evm_snapshot` and `evm_revert`",
+  "user": {
+    "login": "smartcontracts",
+    "id": 14298799,
+    "node_id": "MDQ6VXNlcjE0Mjk4Nzk5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14298799?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/smartcontracts",
+    "html_url": "https://github.com/smartcontracts",
+    "followers_url": "https://api.github.com/users/smartcontracts/followers",
+    "following_url": "https://api.github.com/users/smartcontracts/following{/other_user}",
+    "gists_url": "https://api.github.com/users/smartcontracts/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/smartcontracts/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/smartcontracts/subscriptions",
+    "organizations_url": "https://api.github.com/users/smartcontracts/orgs",
+    "repos_url": "https://api.github.com/users/smartcontracts/repos",
+    "events_url": "https://api.github.com/users/smartcontracts/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/smartcontracts/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 947230177,
+      "node_id": "MDU6TGFiZWw5NDcyMzAxNzc=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:blocked",
+      "name": "status:blocked",
+      "color": "0E8A16",
+      "default": false,
+      "description": "Blocked by other issues or external reasons"
+    },
+    {
+      "id": 4745762096,
+      "node_id": "LA_kwDOB7jojM8AAAABGt6VMA",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/blocked-reason:needs-rethnet",
+      "name": "blocked-reason:needs-rethnet",
+      "color": "B60205",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4937718880,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-cYA",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:improvement",
+      "name": "type:improvement",
+      "color": "FBCA04",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-10-11T00:06:49Z",
+  "updated_at": "2023-01-03T09:17:21Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Helloooo. I recently noticed that large test suites begin to eat a significant amount of memory over time. I looked into this further, and it appears that the underlying merkle patricia tree is the source of this \"memory leak.\" I'm putting that in quotes because it seems to be somewhat intended behavior that simply compounds into a massive javascript object over time.\r\n\r\nEssentially the problem stems from the manner in which `evm_snapshot` and `evm_revert` tend to be implemented in node software (so this isn't a buidler-specific problem). `BuidlerNode.takeSnapshot` grabs the state root from the trie [here](https://github.com/nomiclabs/buidler/blob/27cc18e197067fad18fcb81b53dbaea7905b50a7/packages/buidler-core/src/internal/buidler-evm/provider/node.ts#L790) and `BuidlerNode.resetSnapshot` later changes the state root [here](https://github.com/nomiclabs/buidler/blob/27cc18e197067fad18fcb81b53dbaea7905b50a7/packages/buidler-core/src/internal/buidler-evm/provider/node.ts#L834). Since the nodes in the trie are tied to the root, this has the effect of resetting the trie to an earlier state. \r\n\r\nHowever, this method does not actually remove any elements from the trie. Any nodes inserted into the trie during test execution remain in the trie after a snapshot reset. Over time, the size of the trie database (essentially just a plain javascript object at the lowest level) becomes larger and larger. I've noticed memory usage on the order of gigabytes when test suites are sufficiently big. \r\n\r\nOne option here would be to commit the current trie into a \"snapshot trie\" of sorts whenever the user requests a snapshot. When the user wants to reset to a snapshot, simply replace the current trie's database with a copy of the database of the \"snapshot trie.\" Memory usage would still increase over time if the user is creating snapshots, but at least the un-snapshotted state would be removed from memory. One could increase the effectiveness of this by allowing users to manually delete snapshots when no longer needed, thereby reducing the size of the \"snapshot trie.\" \r\n\r\nI tested a very basic version of this locally and managed to get memory usage down to almost constant size, with some expected fluctuation over the course of running a test file. I'd be happy to spec out a solution and make a PR if there's sufficient interest.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/868/reactions",
+    "total_count": 2,
+    "+1": 2,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/868/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

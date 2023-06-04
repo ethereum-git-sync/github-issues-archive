@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1550",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1550/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1550/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1550/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/1550",
+  "id": 921528381,
+  "node_id": "MDU6SXNzdWU5MjE1MjgzODE=",
+  "number": 1550,
+  "title": "Add solc 0.8.5 to stack traces tests",
+  "user": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 901960538,
+      "node_id": "MDU6TGFiZWw5MDE5NjA1Mzg=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:bug",
+      "name": "type:bug",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 4937720577,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
+      "name": "status:ready",
+      "color": "0E8A16",
+      "default": false,
+      "description": "This issue is ready to be worked on"
+    },
+    {
+      "id": 4951951046,
+      "node_id": "LA_kwDOB7jojM8AAAABJyjGxg",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/area:error-inferrer",
+      "name": "area:error-inferrer",
+      "color": "5319E7",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-06-15T15:33:41Z",
+  "updated_at": "2023-01-03T09:17:10Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Running the stack traces tests with 0.8.5 works for all tests but two: `0_8/call-message/external-call\r\ns/incorrect-returndata-size/test.json` and `0_8/create-message/external-calls/incorrect-returndata-size/test.json` (pretty much the same test).\r\n\r\nThe reason they fail is that the resulting stack trace contains the same frame twice (first as a `CALLSTACK_ENTRY` and then as a `RETURNDATA_SIZE_ERROR`). And the reason this is not filtered out by `ErrorInferrer.filterRedundantFrames` is that the stack trace it receives is something like this:\r\n\r\n```\r\nA - B - A\r\n```\r\n\r\nwhere `B` is redundant and therefore removed.\r\n\r\nThis suggests that the fix is simply to run `filterRedundantFrames` multiple times until it gets a stable result but that seems to break the recursive calls tests.\r\n\r\nAt that point I stopped looking into this. The next step is to understand why the recursive test fails if you call `filterRedundantFrames` twice since I would expect that function to be somewhat idempotent (in this scenario).",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1550/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1550/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

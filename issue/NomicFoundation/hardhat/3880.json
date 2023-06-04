@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3880",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3880/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3880/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3880/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/3880",
+  "id": 1683827040,
+  "node_id": "I_kwDOB7jojM5kXSlg",
+  "number": 3880,
+  "title": "hardhat-ethers signer.sendTransaction() does not correctly estimate gas, but does not OOG",
+  "user": {
+    "login": "pmckelvy1",
+    "id": 4543414,
+    "node_id": "MDQ6VXNlcjQ1NDM0MTQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4543414?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pmckelvy1",
+    "html_url": "https://github.com/pmckelvy1",
+    "followers_url": "https://api.github.com/users/pmckelvy1/followers",
+    "following_url": "https://api.github.com/users/pmckelvy1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pmckelvy1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pmckelvy1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pmckelvy1/subscriptions",
+    "organizations_url": "https://api.github.com/users/pmckelvy1/orgs",
+    "repos_url": "https://api.github.com/users/pmckelvy1/repos",
+    "events_url": "https://api.github.com/users/pmckelvy1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pmckelvy1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4937119027,
+      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
+      "name": "status:triaging",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-04-25T20:35:13Z",
+  "updated_at": "2023-04-25T20:35:27Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version of Hardhat\n\n2.12.2\n\n### What happened?\n\nWhen using signer.sendTransaction(), the transaction will run without failure and will commit state that is updated during the course of the transaction, but the transaction will not run to completion (certain state that should have been updated at the end of the tx is not updated) and does not throw any errors.\r\n\r\nI noticed the bug when using an empty `try/catch` block inside of a loop that iterates over an array of addresses an makes calls to external contracts to update state.  the transaction has the above behavior until I do one of two things:\r\n1) add an event after the loop\r\n2) add `gasLimit: ethers.BigNumber.from('1000000')` to the tx\n\n### Minimal reproduction steps\n\npackage.json:\r\n```\r\n    \"@nomicfoundation/hardhat-chai-matchers\": \"^1.0.3\",\r\n    \"@nomicfoundation/hardhat-network-helpers\": \"^1.0.8\",\r\n    \"@nomicfoundation/hardhat-toolbox\": \"^2.0.1\",\r\n    \"@nomiclabs/hardhat-ethers\": \"^2.0.3\",\r\n    \"@typechain/ethers-v5\": \"^7.2.0\",\r\n    \"@typechain/hardhat\": \"^2.3.1\",\r\n\"hardhat\": \"^2.12.2\",\r\n\"@nomicfoundation/hardhat-toolbox\": \"^2.0.1\"\r\n\"ethers\": \"^5.5.2\",\r\n    \"typechain\": \"^5.2.0\",\r\n    \"typescript\": \"^4.4.2\",\r\n\"chai\": \"^4.3.4\",\r\n    \"@types/chai\": \"^4.3.0\",\r\n    \"@types/mocha\": \"^9.0.0\",\r\n```\r\n\r\nsolidity:\r\n```\r\npragma solidity 0.8.17;\r\nimport \"hardhat/console.sol\";\r\n\r\ncontract Counter {\r\n    uint256 public counter;\r\n    constructor() {}\r\n\r\n    function count() external {\r\n        console.log(\"count start\");\r\n        counter += 1;\r\n        console.log(\"count end\");\r\n    }\r\n}\r\n\r\ncontract CounterBroken {\r\n    uint256 public counter;\r\n    constructor() {}\r\n}\r\n\r\ncontract TryCatchBug {\r\n    event Done();\r\n\r\n    address[] public addys;\r\n\r\n    constructor(address[] memory _addys) {\r\n        addys = _addys;\r\n    }\r\n\r\n    function bug() external {\r\n        bugInternal();\r\n    }\r\n\r\n    function bugInternal() internal {\r\n        for (uint256 i = 0; i < addys.length; i++) {\r\n            try Counter(addys[i]).count() {} catch {}\r\n        }\r\n        // uncomment this line to allow the tests to pass\r\n        // emit Done();\r\n    }\r\n}\r\n```\r\ntypescript test:\r\n```\r\nimport { expect } from 'chai'\r\nimport { ethers } from 'hardhat'\r\nimport {\r\n    Counter,\r\n    CounterBroken,\r\n    TryCatchBug\r\n} from '../typechain'\r\n\r\ndescribe('TryCatchBug', () => {\r\n    // Assets\r\n    let tryCatchBug: TryCatchBug\r\n    let countersBroken: CounterBroken[] = []\r\n    let counters: Counter[] = []\r\n\r\n    let numBroken = 10\r\n    let num = 2\r\n\r\n    beforeEach(async () => {\r\n        const counterBrokenFactory = await ethers.getContractFactory('CounterBroken')\r\n        for (let i = 0; i < numBroken; i++) {\r\n            countersBroken.push(await counterBrokenFactory.deploy())\r\n        }\r\n\r\n        const counterFactory = await ethers.getContractFactory('Counter')\r\n        for (let i = 0; i < num; i++) {\r\n            counters.push(await counterFactory.deploy())\r\n        }\r\n\r\n        const tryCatchBugFactory = await ethers.getContractFactory('TryCatchBug')\r\n        tryCatchBug = await tryCatchBugFactory.deploy([...countersBroken.map(o => o.address), ...counters.map(o => o.address)])\r\n    })\r\n\r\n    describe('Does it have a bug', () => {\r\n        it('does not have a bug', async () => {\r\n            const tx = await tryCatchBug.populateTransaction.bug()\r\n            \r\n            const signers = await ethers.getSigners()\r\n            const alice = signers[0]\r\n\r\n            await alice.sendTransaction({\r\n                data: tx.data,\r\n                to: tx.to,\r\n                // uncomment this line to allow the tests to pass\r\n                // gasLimit: ethers.BigNumber.from('1000000')\r\n            })\r\n\r\n            for (const o of countersBroken) {\r\n                expect(await o.counter()).equal(0)\r\n            }\r\n            for (const o of counters) {\r\n                expect(await o.counter()).equal(1)\r\n            }\r\n        })\r\n    })\r\n})\r\n```\r\n\r\nthe solidity has console.log statements to show where the transaction stops executing. the output should look like:\r\n```\r\n  TryCatchBug\r\n    Does it have a bug\r\ncount start\r\ncount end\r\ncount start\r\n      1) does not have a bug\r\n```\r\n\r\nthere is 1 line in the solidity file and 1 line in the test file that, if either is uncommented, will make things work and allow the tests to pass (they are each marked with a comment detailing this).\r\n\r\n\n\n### Search terms\n\nhardhat, hardhat-ethers, ethers, gas estimation, try, catch, try/catch",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3880/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3880/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

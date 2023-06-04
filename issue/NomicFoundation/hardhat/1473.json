@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1473",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1473/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1473/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1473/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/1473",
+  "id": 897926772,
+  "node_id": "MDU6SXNzdWU4OTc5MjY3NzI=",
+  "number": 1473,
+  "title": "Hardhat console hangs when using lazyObject with a circular dependency that involves the HRE",
+  "user": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 901960538,
+      "node_id": "MDU6TGFiZWw5MDE5NjA1Mzg=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:bug",
+      "name": "type:bug",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "closed",
+  "locked": true,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-05-21T10:48:21Z",
+  "updated_at": "2022-11-18T09:55:38Z",
+  "closed_at": "2022-04-18T09:01:43Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": "resolved",
+  "body": "To trigger the bug, use this hardhat config:\r\n\r\n```js\r\nclass Foo {\r\n  constructor(hre) {\r\n    this.hre = hre;\r\n  }\r\n}\r\n\r\nextendEnvironment(hre => {\r\n  hre.foo = lazyObject(() => new Foo(hre))\r\n});\r\n```\r\n\r\nThen start `hh console` and evaluate the `hre`. Note that if you are using node >= 12, then just typing \"hre\" in the console will trigger this bug.\r\n\r\n---\r\n\r\nI'm pretty sure the problem is here:\r\n\r\nhttps://github.com/nomiclabs/hardhat/blob/d59ef54e108f3ab2891dd963f2f9913c073ab0f5/packages/hardhat-core/src/internal/util/lazy.ts#L39-L42\r\n\r\nReplacing that function with `return \"\"` makes the problem go away. There's something in the intersection of `lazyObject`, the HRE and `util.inspect` that causes this.\r\n\r\nNotice that the snippet above is the minimal reproduction as far as I can tell. A simple cicrularity with `lazyObject` doesn't cause this:\r\n\r\n```js\r\nextendEnvironment(hre => {\r\n  hre.foo = lazyObject(() => {\r\n    let foo = {}\r\n    foo.foo = foo;\r\n\r\n    return foo\r\n  })\r\n}\r\n```\r\n\r\nAnd a circularity with the hre but without `lazyObject` doesn't cause it either:\r\n\r\n```js\r\nextendEnvironment(hre => {\r\n  hre.foo = new Foo(hre)\r\n}\r\n```",
+  "closed_by": {
+    "login": "alcuadrado",
+    "id": 176499,
+    "node_id": "MDQ6VXNlcjE3NjQ5OQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/176499?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/alcuadrado",
+    "html_url": "https://github.com/alcuadrado",
+    "followers_url": "https://api.github.com/users/alcuadrado/followers",
+    "following_url": "https://api.github.com/users/alcuadrado/following{/other_user}",
+    "gists_url": "https://api.github.com/users/alcuadrado/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/alcuadrado/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/alcuadrado/subscriptions",
+    "organizations_url": "https://api.github.com/users/alcuadrado/orgs",
+    "repos_url": "https://api.github.com/users/alcuadrado/repos",
+    "events_url": "https://api.github.com/users/alcuadrado/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/alcuadrado/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1473/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1473/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3629",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3629/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3629/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3629/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/3629",
+  "id": 1566284102,
+  "node_id": "I_kwDOB7jojM5dW5lG",
+  "number": 3629,
+  "title": "nit: surface error location first in changeEtherBalances test matcher",
+  "user": {
+    "login": "OmarTawfik",
+    "id": 15987992,
+    "node_id": "MDQ6VXNlcjE1OTg3OTky",
+    "avatar_url": "https://avatars.githubusercontent.com/u/15987992?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/OmarTawfik",
+    "html_url": "https://github.com/OmarTawfik",
+    "followers_url": "https://api.github.com/users/OmarTawfik/followers",
+    "following_url": "https://api.github.com/users/OmarTawfik/following{/other_user}",
+    "gists_url": "https://api.github.com/users/OmarTawfik/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/OmarTawfik/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/OmarTawfik/subscriptions",
+    "organizations_url": "https://api.github.com/users/OmarTawfik/orgs",
+    "repos_url": "https://api.github.com/users/OmarTawfik/repos",
+    "events_url": "https://api.github.com/users/OmarTawfik/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/OmarTawfik/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4937718880,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-cYA",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:improvement",
+      "name": "type:improvement",
+      "color": "FBCA04",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4937720577,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
+      "name": "status:ready",
+      "color": "0E8A16",
+      "default": false,
+      "description": "This issue is ready to be worked on"
+    },
+    {
+      "id": 4952257781,
+      "node_id": "LA_kwDOB7jojM8AAAABJy109Q",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/area:chai-matchers",
+      "name": "area:chai-matchers",
+      "color": "5319E7",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-01T15:06:46Z",
+  "updated_at": "2023-02-06T14:31:01Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version of Hardhat\n\n2.12.6\n\n### What happened?\n\nFor the `changeEtherBalances` matcher:\r\n\r\n```solidity\r\n  await expect(contract.method()).to.changeEtherBalances([myAddress], [10]);\r\n```\r\n\r\nIt produces error messages like:\r\n\r\n```log\r\nAssertionError: Expected the ether balance of 0xf39Fd2e51aad88F6F4ceeaB5827279c6fFb92266 (the 1st address in the list) to change by 10 wei, but it changed by 5 wei\r\n```\r\n\r\nI would suggest that the list index to be first in the message instead of the raw address, which can even be moved to a whole new line/deprioritized by default, since the address itself is not typically hard-coded available in the test source or visible to the user. I would use the list index to debug/fix the failures first and foremost. Example:\r\n\r\n```log\r\nAssertionError: Expected the ether balance of the 1st address in the list to change by 10 wei, but it changed by 5 wei.\r\nBefore: 100\r\nAfter: 105\r\nAddress: 0xf39Fd2e51aad88F6F4ceeaB5827279c6fFb92266\r\n```\r\n\r\nTwo instances of this error:\r\n\r\n1. Positive: [to change by](https://github.com/NomicFoundation/hardhat/blob/97d71e15e7b407ca1336b4c265aa2e9db5a98b53/packages/hardhat-chai-matchers/src/internal/changeEtherBalances.ts#L50)\r\n2. Negative: [NOT to change by](https://github.com/NomicFoundation/hardhat/blob/97d71e15e7b407ca1336b4c265aa2e9db5a98b53/packages/hardhat-chai-matchers/src/internal/changeEtherBalances.ts#L67)\n\n### Minimal reproduction steps\n\n```solidity\r\n  await expect(contract.method()).to.changeEtherBalances([myAddress], [10]);\r\n```\r\n\n\n### Search terms\n\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3629/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3629/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

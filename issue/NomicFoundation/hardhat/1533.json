@@ -1,0 +1,104 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1533",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1533/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1533/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1533/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/1533",
+  "id": 916563940,
+  "node_id": "MDU6SXNzdWU5MTY1NjM5NDA=",
+  "number": 1533,
+  "title": "Default sourceReferences in ErrorInferrer",
+  "user": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2536492104,
+      "node_id": "MDU6TGFiZWwyNTM2NDkyMTA0",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:chore",
+      "name": "type:chore",
+      "color": "FBCA04",
+      "default": false,
+      "description": "A task related to code quality, tooling, CI, or anything that doesn't directly impact the end users"
+    },
+    {
+      "id": 4937720577,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
+      "name": "status:ready",
+      "color": "0E8A16",
+      "default": false,
+      "description": "This issue is ready to be worked on"
+    }
+  ],
+  "state": "closed",
+  "locked": true,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-06-09T18:56:42Z",
+  "updated_at": "2023-05-25T00:13:18Z",
+  "closed_at": "2023-02-23T13:54:41Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": "resolved",
+  "body": "There are some places in the `ErrorInferrer` where we do things like this:\r\n\r\nhttps://github.com/nomiclabs/hardhat/blob/6ace4efd4de68bd876330861185b9271dba6ddcf/packages/hardhat-core/src/internal/hardhat-network/stack-traces/error-inferrer.ts#L985-L992\r\n\r\nNotice the `this._getLastSourceReference(trace)!`. That is, we try to get the source reference for the revert bytecode and, if that doesn't work, we get the last mapped source reference and **assume that one exists**.\r\n\r\nThis isn't great for two reasons:\r\n\r\n1. We should avoid non-null assertions altogether.\r\n2. We should be smarter about what we default to in these scenarios.\r\n\r\nIt's not clear what exactly we need to do here. One idea is to add some helpers that default to some source reference and encode their assumptions using `assertHardhatInvariant`. For example:\r\n\r\n```js\r\nprivate _getDefaultLastSourceReference(...): SourceReference {\r\n  const sourceReference = this._getLastSourceReference(trace);\r\n  assertHardhatInvariant(sourceReference !== undefined, \"There should be some mapped bytecode in this trace\")\r\n  return sourceReference\r\n}\r\n```\r\n\r\n(we can also rename `_getLastSourceReference` to `_tryGetLastSourceReference` and name the asserted one `_getLastSourceReference`)",
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1533/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1533/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

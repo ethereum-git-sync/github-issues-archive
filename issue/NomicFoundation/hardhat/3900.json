@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3900",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3900/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3900/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3900/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/3900",
+  "id": 1696986933,
+  "node_id": "I_kwDOB7jojM5lJfc1",
+  "number": 3900,
+  "title": "`eth_getBlockByNumber` called twice by hardhat when issuing the `hardhat_reset` command",
+  "user": {
+    "login": "sanjukammath",
+    "id": 39719476,
+    "node_id": "MDQ6VXNlcjM5NzE5NDc2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/39719476?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sanjukammath",
+    "html_url": "https://github.com/sanjukammath",
+    "followers_url": "https://api.github.com/users/sanjukammath/followers",
+    "following_url": "https://api.github.com/users/sanjukammath/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sanjukammath/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sanjukammath/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sanjukammath/subscriptions",
+    "organizations_url": "https://api.github.com/users/sanjukammath/orgs",
+    "repos_url": "https://api.github.com/users/sanjukammath/repos",
+    "events_url": "https://api.github.com/users/sanjukammath/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sanjukammath/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4937119027,
+      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
+      "name": "status:triaging",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-05T04:28:37Z",
+  "updated_at": "2023-05-05T04:28:47Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version of Hardhat\n\n2.14.0\n\n### What happened?\n\nI am logging the calls made by hardhat forked node to the main-net provider and I can see that when `hardhat_reset` command is issued to the hardhat node, it makes the same call, `eth_getBlockNumber` twice to the main-net provider. This should not be required. \r\nThis is the log of the 4 calls being made to the node provider.\r\n\r\n- eth_blockNumber\r\n- net_version\r\n- eth_getBlockByNumber\r\n- eth_getBlockByNumber\r\n\r\nNot sure why net_version is being called. But making the same call with same parameters twice, does not seem to be correct.\r\n\r\n```\r\n[\r\n  {\r\n    \"level\": \"debug\",\r\n    \"message\": \"fork stdout event\",\r\n    \"metadata\": {\r\n      \"data\": \"{\\n  message: 'node response event',\\n  request: { jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 2 },\\n  parsedResponse: { jsonrpc: '2.0', id: 2, result: '0x3aa7e9b' }\\n}\\n\"\r\n    }\r\n  },\r\n  {\r\n    \"level\": \"debug\",\r\n    \"message\": \"fork stdout event\",\r\n    \"metadata\": {\r\n      \"data\": \"{\\n  message: 'node response event',\\n  request: { jsonrpc: '2.0', method: 'net_version', params: [], id: 1 },\\n  parsedResponse: { jsonrpc: '2.0', id: 1, result: '250' }\\n}\\n\"\r\n    }\r\n  },\r\n  {\r\n    \"level\": \"debug\",\r\n    \"message\": \"fork stdout event\",\r\n    \"metadata\": {\r\n      \"data\": \"{\\n  message: 'node response event',\\n  request: {\\n    jsonrpc: '2.0',\\n    method: 'eth_getBlockByNumber',\\n    params: [ '0x3aa7e90', false ],\\n    id: 3\\n  },\\n  parsedResponse: {\\n    jsonrpc: '2.0',\\n    id: 3,\\n    result: {\\n      baseFeePerGas: '0x14f577171b',\\n      difficulty: '0x0',\\n      epoch: '0x32db1',\\n      extraData: '0x',\\n      gasLimit: '0xffffffffffff',\\n      gasUsed: '0x7aa809',\\n      hash: '0x00032db10000053fe15443132498aea7b07d288ed49e3e3dad29f91e40ee66f4',\\n      logsBloom: '0x002201424200100841100000800200048000400002000010a0005402084000100000020010110100408000020098030195000005002000000000080301032080404000000000000100c001080044006000220400080222100020000004040040010400000004000540c400000041410020000100000840000201005000000001600000040200108800440000100000002904000828400008020000c0300420005000920140280240008004440200008000e041030200000401000004002800000280112210000a020200010040404080050480c58000201008000800000400001180810000080028000c0022000400020009000209c00004008000080900042a',\\n      miner: '0x0000000000000000000000000000000000000000',\\n      mixHash: '0x0000000000000000000000000000000000000000000000000000000000000000',\\n      nonce: '0x0000000000000000',\\n      number: '0x3aa7e90',\\n      parentHash: '0x00032db100000528d86ac43877df4d7ab5ef22c4cecfd726cab731133deb435c',\\n      receiptsRoot: '0x049a55969c2f61a6053fb692f6e98191996ca495b825fbfc148ca3635b28a7bc',\\n      sha3Uncles: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',\\n      size: '0xf7a',\\n      stateRoot: '0x03b0c2d0a97757fdd827c3dcd6c76c90bb027a26398013ce4082a5cf25f0b0f9',\\n      timestamp: '0x645481b4',\\n      timestampNano: '0x175c23e5661e4dea',\\n      totalDifficulty: '0x0',\\n      transactions: [Array],\\n      transactionsRoot: '0x78171c718b3e85a36fd31ad585243f9f9db13d3fa6199133a8c07ccf9c8a76e0',\\n      uncles: []\\n    }\\n  }\\n}\\n\"\r\n    }\r\n  },\r\n  {\r\n    \"level\": \"debug\",\r\n    \"message\": \"fork stdout event\",\r\n    \"metadata\": {\r\n      \"data\": \"{\\n  message: 'node response event',\\n  request: {\\n    jsonrpc: '2.0',\\n    method: 'eth_getBlockByNumber',\\n    params: [ '0x3aa7e90', true ],\\n    id: 4\\n  },\\n  parsedResponse: {\\n    jsonrpc: '2.0',\\n    id: 4,\\n    result: {\\n      baseFeePerGas: '0x14f577171b',\\n      difficulty: '0x0',\\n      epoch: '0x32db1',\\n      extraData: '0x',\\n      gasLimit: '0xffffffffffff',\\n      gasUsed: '0x7aa809',\\n      hash: '0x00032db10000053fe15443132498aea7b07d288ed49e3e3dad29f91e40ee66f4',\\n      logsBloom: '0x002201424200100841100000800200048000400002000010a0005402084000100000020010110100408000020098030195000005002000000000080301032080404000000000000100c001080044006000220400080222100020000004040040010400000004000540c400000041410020000100000840000201005000000001600000040200108800440000100000002904000828400008020000c0300420005000920140280240008004440200008000e041030200000401000004002800000280112210000a020200010040404080050480c58000201008000800000400001180810000080028000c0022000400020009000209c00004008000080900042a',\\n      miner: '0x0000000000000000000000000000000000000000',\\n      mixHash: '0x0000000000000000000000000000000000000000000000000000000000000000',\\n      nonce: '0x0000000000000000',\\n      number: '0x3aa7e90',\\n      parentHash: '0x00032db100000528d86ac43877df4d7ab5ef22c4cecfd726cab731133deb435c',\\n      receiptsRoot: '0x049a55969c2f61a6053fb692f6e98191996ca495b825fbfc148ca3635b28a7bc',\\n      sha3Uncles: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347',\\n      size: '0xf7a',\\n      stateRoot: '0x03b0c2d0a97757fdd827c3dcd6c76c90bb027a26398013ce4082a5cf25f0b0f9',\\n      timestamp: '0x645481b4',\\n      timestampNano: '0x175c23e5661e4dea',\\n      totalDifficulty: '0x0',\\n      transactions: [Array],\\n      transactionsRoot: '0x78171c718b3e85a36fd31ad585243f9f9db13d3fa6199133a8c07ccf9c8a76e0',\\n      uncles: []\\n    }\\n  }\\n}\\n\"\r\n    }\r\n  }\r\n]\r\n```\n\n### Minimal reproduction steps\n\nAdd logs to \r\n`packages/hardhat-core/src/internal/core/providers/http.ts`\r\n\r\npackage hardhat and add it to my project.\r\n\r\nspin up a hardhat node.\r\n\r\nissue hardhat reset command.\r\n\n\n### Search terms\n\neth_getBlockByNumber, hardhat_reset",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3900/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3900/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

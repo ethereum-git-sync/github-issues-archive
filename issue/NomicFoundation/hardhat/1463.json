@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1463",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1463/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1463/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1463/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/1463",
+  "id": 894605328,
+  "node_id": "MDU6SXNzdWU4OTQ2MDUzMjg=",
+  "number": 1463,
+  "title": "Wrong stack trace when try/catch doesn't catch an error",
+  "user": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 901960538,
+      "node_id": "MDU6TGFiZWw5MDE5NjA1Mzg=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:bug",
+      "name": "type:bug",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 4937720577,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
+      "name": "status:ready",
+      "color": "0E8A16",
+      "default": false,
+      "description": "This issue is ready to be worked on"
+    },
+    {
+      "id": 4951951046,
+      "node_id": "LA_kwDOB7jojM8AAAABJyjGxg",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/area:error-inferrer",
+      "name": "area:error-inferrer",
+      "color": "5319E7",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-05-18T17:17:48Z",
+  "updated_at": "2023-01-03T09:17:10Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "This:\r\n\r\n```solidity\r\ncontract Foo {\r\n  function test() public {\r\n    try this.set() {} catch Error(string memory reason) {}\r\n  }\r\n  function set() public {\r\n    assert(false);\r\n  }\r\n}\r\n```\r\n\r\ncompiler with 0.8.0, results in a stack trace that includes only the `try this.set()` line.\r\n\r\nThe likely culprit is this check:\r\n\r\nhttps://github.com/nomiclabs/hardhat/blob/1a489c7608f05e41dadc6ced4f01ace9e83f481e/packages/hardhat-core/src/internal/hardhat-network/stack-traces/error-inferrer.ts#L1433-L1437\r\n\r\nWhen the statement that throws is a plain statement, like `this.set()`, that check works fine. But the compared sourcemaps in this scenario are not equal, so that function returns false, and so the heuristic fails.\r\n\r\nCuriously, that doesn't happen in an scenario like this one:\r\n\r\n```solidity\r\ncontract Foo {\r\n  function test() public {\r\n    if (check()) {}\r\n  }\r\n\r\n  function check() public returns(bool) {\r\n    require(false);\r\n    return true;\r\n  }\r\n}\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1463/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1463/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

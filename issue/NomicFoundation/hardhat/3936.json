@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3936",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3936/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3936/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3936/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/3936",
+  "id": 1712586710,
+  "node_id": "I_kwDOB7jojM5mE__W",
+  "number": 3936,
+  "title": "Typescript quickstart example tests don't work via mocha",
+  "user": {
+    "login": "EvgeniiaVak",
+    "id": 27793901,
+    "node_id": "MDQ6VXNlcjI3NzkzOTAx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/27793901?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/EvgeniiaVak",
+    "html_url": "https://github.com/EvgeniiaVak",
+    "followers_url": "https://api.github.com/users/EvgeniiaVak/followers",
+    "following_url": "https://api.github.com/users/EvgeniiaVak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/EvgeniiaVak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/EvgeniiaVak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/EvgeniiaVak/subscriptions",
+    "organizations_url": "https://api.github.com/users/EvgeniiaVak/orgs",
+    "repos_url": "https://api.github.com/users/EvgeniiaVak/repos",
+    "events_url": "https://api.github.com/users/EvgeniiaVak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/EvgeniiaVak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4937119027,
+      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
+      "name": "status:triaging",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-16T19:06:00Z",
+  "updated_at": "2023-05-16T19:06:13Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version of Hardhat\n\n2.14.0\n\n### What happened?\n\nThe tests that were created in the example project (Typescript) don't run via mocha command, there are a couple of settings missing.\r\n\r\nI wanted to run them via my IDE built-in tools (which is webstorm, which uses mocha command, more details here: https://github.com/KartanHQ/intellij-hardhat/issues/196 ) and it turned out that I needed to do some additional steps to make it work, namely adding this to the generated tsconfig (otherwise there was [this error](https://ethereum.stackexchange.com/questions/115395/debug-hardhat-project-using-intellij)):\r\n```\r\n  \"include\": [\"./scripts\", \"./test\", \"./typechain-types\"],\r\n  \"files\": [\"./hardhat.config.ts\"]\r\n```\r\n\r\nand adding `.mocharc.json` \r\n```\r\n{\r\n  \"extension\": [\r\n    \"ts\"\r\n  ],\r\n  \"spec\": \"test/**/*.ts\",\r\n  \"require\": \"ts-node/register\"\r\n}\r\n```\r\nI believe for the best developer experience it would be great to add those by default within the script that creates the project.\n\n### Minimal reproduction steps\n\n1. setup\r\n  ```\r\n  npm init \r\n  npm install --save-dev hardhat\r\n  npx hardhat\r\n  ✔ What do you want to do? · Create a TypeScript project\r\n  ✔ Hardhat project root: · /Users/evgeniia/repos/hardhat-demo-no-ide\r\n  ✔ Do you want to add a .gitignore? (Y/n) · y\r\n  ✔ Do you want to install this sample project's dependencies with npm (@nomicfoundation/hardhat-toolbox)? (Y/n) · y\r\n npx hardhat compile\r\n  ```\r\n2. try out tests (observe the errors)\r\n  ```\r\n  npx mocha\r\n  Error: No test files found\r\n  ```\r\n  ```\r\n  npx mocha test/**/*.ts\r\n  \r\n  TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension \".ts\" for /Users/evgeniia/repos/hardhat-demo-no-ide/test/Lock.ts\r\n      at new NodeError (node:internal/errors:393:5)\r\n      at Object.getFileProtocolModuleFormat [as file:] (node:internal/modules/esm/get_format:79:11)\r\n      at defaultGetFormat (node:internal/modules/esm/get_format:121:38)\r\n      at defaultLoad (node:internal/modules/esm/load:81:20)\r\n      at nextLoad (node:internal/modules/esm/loader:163:28)\r\n      at ESMLoader.load (node:internal/modules/esm/loader:605:26)\r\n      at ESMLoader.moduleProvider (node:internal/modules/esm/loader:457:22)\r\n      at new ModuleJob (node:internal/modules/esm/module_job:63:26)\r\n      at #createModuleJob (node:internal/modules/esm/loader:480:17)\r\n      at ESMLoader.getModuleJob (node:internal/modules/esm/loader:434:34)\r\n      at async Promise.all (index 0)\r\n      at async ESMLoader.import (node:internal/modules/esm/loader:530:24)\r\n      at async importModuleDynamicallyWrapper (node:internal/vm/module:438:15)\r\n      at async formattedImport (/Users/evgeniia/repos/hardhat-demo-no-ide/node_modules/mocha/lib/nodejs/esm-utils.js:9:14)\r\n      at async exports.requireOrImport (/Users/evgeniia/repos/hardhat-demo-no-ide/node_modules/mocha/lib/nodejs/esm-utils.js:42:28)\r\n      at async exports.loadFilesAsync (/Users/evgeniia/repos/hardhat-demo-no-ide/node_modules/mocha/lib/nodejs/esm-utils.js:100:20)\r\n      at async singleRun (/Users/evgeniia/repos/hardhat-demo-no-ide/node_modules/mocha/lib/cli/run-helpers.js:125:3)\r\n      at async exports.handler (/Users/evgeniia/repos/hardhat-demo-no-ide/node_modules/mocha/lib/cli/run.js:370:5)\r\n  evgeniia@Evgeniias-MacBook-Air hardhat-demo-no-ide % npm init\r\n  ```\r\n3. fix the tests setup by creating the mentioned above `.mocharc.json` and adding the 2 lines to `tsconfig.json` \r\n  ```\r\n  npx mocha\r\n  \r\n    Lock\r\n      Deployment\r\n        ✔ Should set the right unlockTime (654ms)\r\n        ✔ Should set the right owner\r\n        ✔ Should receive and store the funds to lock\r\n        ✔ Should fail if the unlockTime is not in the future\r\n      Withdrawals\r\n        Validations\r\n          ✔ Should revert with the right error if called too soon\r\n          ✔ Should revert with the right error if called from another account\r\n          ✔ Shouldn't fail if the unlockTime has arrived and the owner calls it\r\n        Events\r\n          ✔ Should emit an event on withdrawals\r\n        Transfers\r\n          ✔ Should transfer the funds to the owner\r\n  \r\n  \r\n    9 passing (742ms)\r\n  ```\r\n\n\n### Search terms\n\ntypescript mocha",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3936/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3936/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1010",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1010/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1010/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1010/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/1010",
+  "id": 740909092,
+  "node_id": "MDU6SXNzdWU3NDA5MDkwOTI=",
+  "number": 1010,
+  "title": "Feature request: transitive compiler overrides",
+  "user": {
+    "login": "gitpusha",
+    "id": 36712489,
+    "node_id": "MDQ6VXNlcjM2NzEyNDg5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/36712489?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gitpusha",
+    "html_url": "https://github.com/gitpusha",
+    "followers_url": "https://api.github.com/users/gitpusha/followers",
+    "following_url": "https://api.github.com/users/gitpusha/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gitpusha/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gitpusha/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gitpusha/subscriptions",
+    "organizations_url": "https://api.github.com/users/gitpusha/orgs",
+    "repos_url": "https://api.github.com/users/gitpusha/repos",
+    "events_url": "https://api.github.com/users/gitpusha/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gitpusha/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 947232611,
+      "node_id": "MDU6TGFiZWw5NDcyMzI2MTE=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:feature",
+      "name": "type:feature",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Feature request"
+    },
+    {
+      "id": 4937720577,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
+      "name": "status:ready",
+      "color": "0E8A16",
+      "default": false,
+      "description": "This issue is ready to be worked on"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-11-11T16:41:07Z",
+  "updated_at": "2023-01-03T09:17:28Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "As discussed with @fvictorio on Telegram, \r\n\r\nit would be great to have a compiler [overrides](https://hardhat.org/guides/compile-contracts.html#multiple-solidity-versions)  setting that makes it so that you can e.g. import 1 contract from a npm package and have your `overrides` configs for that contract compilation also apply to all of its internal contract dependencies that might live and be imported inside the npm package. \r\n\r\nSomething like: \r\n\r\n**NPM package:**\r\n```solidity \r\npragma solidity >=0.6.3;\r\n\r\ncontract Bar {\r\n}\r\n```\r\n\r\n```solidity\r\npragma solidity >=0.6.3;\r\n\r\nimport \"./Bar.sol\"\r\n\r\ncontract Foo is Bar {\r\n}\r\n```\r\n\r\n**Hardhat project**:\r\n```solidity \r\npragma solidity 0.7.4;\r\n\r\nimport \"@bar/contracts/Foo.sol\"\r\n\r\ncontract X is Foo {}\r\n```\r\n\r\n`hardhat.config.js`\r\n```javascript\r\n\"dependency/contracts/Foo.sol\": {\r\n  version: \"0.6.3\",\r\n  transitive: true\r\n}\r\n```\r\n\r\n**With the goal that `Foo.sol` and its internal dependency `Bar.sol` are both always compiled with `0.6.3` .** \r\n\r\nEdit:\r\n\r\nMaybe it's also good to explain the Use Case I have in mind that would benefit from such a config option: \r\n\r\nI am using `forking` a lot when testing stuff and this means I test a lot of contract dependencies who I instantiate from an ABI and whose artifacts are not in my project. This means that they don't benefit from the great debugging features `hardhat network` brings because they don't have a `build-file` associated with them. \r\n\r\nSo my idea is to `import` all my test dependencies contract source code in a `Dependencies.sol` contract from an `npm` package and let `hardhat compile` generate outputs for those too. \r\n\r\nMost of the times this means importing many contracts with different compiler requirements. \r\n\r\nThis is not a big problem with the current `hardhat` compiler settings and overrides. But it get's messy as soon as some of those contracts have **wrong** pragma statments like \r\n\r\n```solidity\r\npragma solidity >= 0.6.0\r\n```\r\n\r\nwhen actually it should be \r\n\r\n```solidity\r\npragma solidity ^0.6.0\r\n```\r\n\r\nThen you get into a situation where if you want all of them and their internal dependencies to be compiled with `0.6` and not anything higher, you have to dig into the contract file and `override` every one of its internal contract dependencies too in the `overrides` config. \r\n\r\nI know this might seem stupid because developers should get their pragma statements right in the first place. \r\n\r\nBut it would be great to have a more powerful overrides option in case they don't. ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1010/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/1010/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
