@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3275",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3275/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3275/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3275/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3275",
+  "id": 1582028711,
+  "node_id": "I_kwDOBGDvrM5eS9en",
+  "number": 3275,
+  "title": "`CompilerPanic` when using `len` and `empty` together",
+  "user": {
+    "login": "trocher",
+    "id": 43437004,
+    "node_id": "MDQ6VXNlcjQzNDM3MDA0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43437004?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/trocher",
+    "html_url": "https://github.com/trocher",
+    "followers_url": "https://api.github.com/users/trocher/followers",
+    "following_url": "https://api.github.com/users/trocher/following{/other_user}",
+    "gists_url": "https://api.github.com/users/trocher/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/trocher/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/trocher/subscriptions",
+    "organizations_url": "https://api.github.com/users/trocher/orgs",
+    "repos_url": "https://api.github.com/users/trocher/repos",
+    "events_url": "https://api.github.com/users/trocher/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/trocher/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4038686785,
+      "node_id": "LA_kwDOBGDvrM7wuXhB",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/bug%20-%20type%200",
+      "name": "bug - type 0",
+      "color": "f9d0c4",
+      "default": false,
+      "description": "compiler halts or panics instead of generating code"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-02-13T10:04:25Z",
+  "updated_at": "2023-02-17T17:14:01Z",
+  "closed_at": "2023-02-17T17:14:01Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.3.8+commit.d76c6ed2\r\n* OS: OSX\r\n* Python Version (output of `python --version`): 3.8.0\r\n\r\n### What's your issue about?\r\n\r\nThe compiler panic when using the builtin `len` on some `Bytes`, `String` or `DynArray` which is written as `empty(...)`.\r\n``` Vyper\r\n@external\r\ndef boo():\r\n    e:uint256 = len(empty(DynArray[uint256,50]))\r\n```\r\n\r\n```Bash\r\nError compiling: tests/customs/code.vy\r\nTraceback (most recent call last):\r\n  File \"/Users/trocher/Documents/thesis/vyper/venv/bin/vyper\", line 11, in <module>\r\n    load_entry_point('vyper==0.3.8', 'console_scripts', 'vyper')()\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 57, in _parse_cli_args\r\n    return _parse_args(sys.argv[1:])\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 154, in _parse_args\r\n    compiled = compile_files(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 294, in compile_files\r\n    compiler_data = vyper.compile_codes(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/evm/opcodes.py\", line 226, in _wrapper\r\n    return fn(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 141, in compile_codes\r\n    exc_handler(contract_name, exc)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 189, in exc_handler\r\n    raise exception\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 138, in compile_codes\r\n    out[contract_name][output_format] = OUTPUT_FORMATS[output_format](compiler_data)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/output.py\", line 82, in build_ir_output\r\n    return compiler_data.ir_nodes\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 126, in ir_nodes\r\n    ir, ir_runtime, sigs = self._ir_output\r\n  File \"/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/functools.py\", line 966, in __get__\r\n    val = self.func(instance)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 122, in _ir_output\r\n    return generate_ir_nodes(self.global_ctx, self.no_optimize)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 258, in generate_ir_nodes\r\n    ir_nodes, ir_runtime, function_sigs = module.generate_ir_for_module(global_ctx)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/module.py\", line 162, in generate_ir_for_module\r\n    runtime, internal_functions = _runtime_ir(runtime_functions, all_sigs, global_ctx)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/module.py\", line 103, in _runtime_ir\r\n    func_ir = generate_ir_for_function(func_ast, all_sigs, global_ctx, skip_nonpayable_check)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/function_definitions/common.py\", line 62, in generate_ir_for_function\r\n    o = generate_ir_for_external_function(code, sig, context, skip_nonpayable_check)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/function_definitions/external_function.py\", line 199, in generate_ir_for_external_function\r\n    body += [parse_body(code.body, context, ensure_terminated=True)]\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 414, in parse_body\r\n    ir = parse_stmt(stmt, context)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 388, in parse_stmt\r\n    return Stmt(stmt, context).ir_node\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 40, in __init__\r\n    self.ir_node = fn()\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 67, in parse_AnnAssign\r\n    rhs = Expr(self.stmt.value, self.context).ir_node\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/expr.py\", line 77, in __init__\r\n    self.ir_node = fn()\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/expr.py\", line 632, in parse_Call\r\n    return DISPATCH_TABLE[function_name].build_IR(self.expr, self.context)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/builtins/functions.py\", line 482, in build_IR\r\n    return get_bytearray_length(arg)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/core.py\", line 309, in get_bytearray_length\r\n    return IRnode.from_list(LOAD(arg), typ=typ)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/core.py\", line 580, in LOAD\r\n    raise CompilerPanic(\"cannot dereference non-pointer type\")\r\nvyper.exceptions.CompilerPanic: cannot dereference non-pointer type\r\n\r\nThis is an unhandled internal compiler error. Please create an issue on Github to notify the developers.\r\nhttps://github.com/vyperlang/vyper/issues/new?template=bug.md\r\n```\r\n### How can it be fixed?\r\n\r\nImplementing the following `todo` should probably fix the issue:\r\nhttps://github.com/vyperlang/vyper/blob/d76c6ed26abf02f917eb1b4f6bab734eb3eb598b/vyper/codegen/core.py#L307",
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3275/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3275/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

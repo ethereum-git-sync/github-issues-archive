@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/2144",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/2144/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/2144/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/2144/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/2144",
+  "id": 694397871,
+  "node_id": "MDU6SXNzdWU2OTQzOTc4NzE=",
+  "number": 2144,
+  "title": "Optimize zero-value memory variable declarations using CALLDATACOPY",
+  "user": {
+    "login": "iamdefinitelyahuman",
+    "id": 35276322,
+    "node_id": "MDQ6VXNlcjM1Mjc2MzIy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35276322?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iamdefinitelyahuman",
+    "html_url": "https://github.com/iamdefinitelyahuman",
+    "followers_url": "https://api.github.com/users/iamdefinitelyahuman/followers",
+    "following_url": "https://api.github.com/users/iamdefinitelyahuman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iamdefinitelyahuman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iamdefinitelyahuman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iamdefinitelyahuman/subscriptions",
+    "organizations_url": "https://api.github.com/users/iamdefinitelyahuman/orgs",
+    "repos_url": "https://api.github.com/users/iamdefinitelyahuman/repos",
+    "events_url": "https://api.github.com/users/iamdefinitelyahuman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iamdefinitelyahuman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2179545631,
+      "node_id": "MDU6TGFiZWwyMTc5NTQ1NjMx",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/Optimization",
+      "name": "Optimization",
+      "color": "6ac3c9",
+      "default": false,
+      "description": "Issues related to compiler optimization"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-09-06T14:18:29Z",
+  "updated_at": "2020-09-30T00:46:51Z",
+  "closed_at": "2020-09-30T00:46:51Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\nA common pattern I use is to declare multiple memory variables with zero-values at the beginning of a function.  For example:\r\n\r\n```python\r\n@external\r\ndef foo():\r\n    a: int128 = 0\r\n    b: uint256[3] = empty(uint256[3])\r\n    c: address = ZERO_ADDRESS\r\n```\r\n\r\nThese intializations produce the following LLL:\r\n\r\n```python\r\n[mstore, 320, 0],\r\n[calldatacopy, 352, calldatasize, 96],\r\n[mstore, 448, 0],\r\n```\r\n\r\nWhich could be optimized to:\r\n\r\n```python\r\n[calldatacopy, 320, calldatasize, 160]\r\n```\r\n\r\n### How to Implement\r\n* After generating the LLL, look for sequential zero-value memory assignments or calldatacopy actions and merge them into a single calldatacopy.\r\n* It might also be possible to mutate the AST by moving all the `AnnAssign` nodes to the top of the function body (if the right-hand-side is a zero value).",
+  "closed_by": {
+    "login": "fubuloubu",
+    "id": 3859395,
+    "node_id": "MDQ6VXNlcjM4NTkzOTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3859395?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fubuloubu",
+    "html_url": "https://github.com/fubuloubu",
+    "followers_url": "https://api.github.com/users/fubuloubu/followers",
+    "following_url": "https://api.github.com/users/fubuloubu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fubuloubu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fubuloubu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fubuloubu/subscriptions",
+    "organizations_url": "https://api.github.com/users/fubuloubu/orgs",
+    "repos_url": "https://api.github.com/users/fubuloubu/repos",
+    "events_url": "https://api.github.com/users/fubuloubu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fubuloubu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/2144/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2144/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

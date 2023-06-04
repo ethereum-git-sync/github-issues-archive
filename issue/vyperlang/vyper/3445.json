@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3445",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3445/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3445/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3445/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3445",
+  "id": 1722117998,
+  "node_id": "I_kwDOBGDvrM5mpW9u",
+  "number": 3445,
+  "title": "bug: invalid memory access when converting empty `BytesT` to `BytesM_T`",
+  "user": {
+    "login": "tserg",
+    "id": 8017125,
+    "node_id": "MDQ6VXNlcjgwMTcxMjU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8017125?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tserg",
+    "html_url": "https://github.com/tserg",
+    "followers_url": "https://api.github.com/users/tserg/followers",
+    "following_url": "https://api.github.com/users/tserg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tserg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tserg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tserg/subscriptions",
+    "organizations_url": "https://api.github.com/users/tserg/orgs",
+    "repos_url": "https://api.github.com/users/tserg/repos",
+    "events_url": "https://api.github.com/users/tserg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tserg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-05-23T13:43:51Z",
+  "updated_at": "2023-05-23T13:43:51Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): https://github.com/vyperlang/vyper/commit/95bf73f493dc8458a1d6981493275379197a4bdf\r\n* OS: linux\r\n* Python Version (output of `python --version`): 3.10.8\r\n\r\n### What's your issue about?\r\n\r\nThis contract generates the following IR where there is a `mload` of `arg + 32`, which is out of bounds of the memory size allocated (1 word for a bytestring of length 0). However, the loaded value does not leak to the user because it is accessed only after shiting it by 256 bits, meaning it is zeroed.\r\n\r\n```\r\n@internal\r\ndef f() -> bytes32:\r\n    return convert(b\"\", bytes32)\r\n```\r\n```\r\n/* convert(b\"\", bytes32) */\r\n[with,\r\n    arg,\r\n    /* b\"\" */ [seq, [mstore, 64, 0], 64],\r\n    [with,\r\n        bits,\r\n        [shl, 3, [sub, 32, [mload, arg]]],\r\n        [shl,\r\n            bits,\r\n            [shr, bits, [mload, [add, arg, 32]]]]]]\r\n```\r\n\r\nh/t @trocher @ptrcarta\r\n\r\n### How can it be fixed?\r\n\r\nFill this in if you know how to fix it.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3445/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3445/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

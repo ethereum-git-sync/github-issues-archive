@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/2273",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/2273/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/2273/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/2273/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/2273",
+  "id": 778242867,
+  "node_id": "MDU6SXNzdWU3NzgyNDI4Njc=",
+  "number": 2273,
+  "title": "VIP: Modularized Code",
+  "user": {
+    "login": "fubuloubu",
+    "id": 3859395,
+    "node_id": "MDQ6VXNlcjM4NTkzOTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3859395?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fubuloubu",
+    "html_url": "https://github.com/fubuloubu",
+    "followers_url": "https://api.github.com/users/fubuloubu/followers",
+    "following_url": "https://api.github.com/users/fubuloubu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fubuloubu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fubuloubu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fubuloubu/subscriptions",
+    "organizations_url": "https://api.github.com/users/fubuloubu/orgs",
+    "repos_url": "https://api.github.com/users/fubuloubu/repos",
+    "events_url": "https://api.github.com/users/fubuloubu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fubuloubu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 751622094,
+      "node_id": "MDU6TGFiZWw3NTE2MjIwOTQ=",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/VIP:%20Discussion",
+      "name": "VIP: Discussion",
+      "color": "000000",
+      "default": false,
+      "description": "Used to denote VIPs and more complex issues that are waiting discussion in a meeting"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-01-04T17:22:58Z",
+  "updated_at": "2021-10-18T20:49:18Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Simple Summary\r\nAllow breaking up a Vyper contract into separate files based on sensible boundaries.\r\n\r\n## Motivation\r\nOnce more complex Vyper contracts are being written, there are often very natural boundary divisions in the code where it would be more readable if the code where broken apart at those boundaries. This is an often-cited \"weakness\" of Vyper, and it would be good to have a design for how larger contract types can be written using Vyper.\r\n\r\n## Specification\r\nIn order to break up a contract type into multiple files, a file structure is used to organize the hierarchy of which file is ultimately the \"build file\" and imports the functionality from others. Borrowing the Python module layout, a contract type can become a \"composite\" contract type if the `__contract__.vy` file is added underneath a folder bearing the contract's type name (e.g. `MyType`). This name is what will be used by the compiler to generate the contract type when compiling, and the `__contract__.vy` file will be considered the \"build file\" for that type, meaning any modular components written in other files at that same level must be imported in to be considered a part of the contract type's implementation.\r\n\r\nThe file hierarchy:\r\n```\r\ncontracts/\r\n\r\n  OtherType.vy\r\n\r\n  something_else/\r\n    MoreTypes.vy\r\n    ...\r\n\r\n  MyType/\r\n    __contract__.vy\r\n    token.vy\r\n    staking.vy\r\n    vesting.vy\r\n```\r\n\r\nThe \"build file\" (`__contract__.vy`):\r\n```python\r\n# Import the functionality from the modular implementation files\r\nfrom .token import *\r\nfrom .staking import *\r\nfrom .vesting import *\r\n\r\n... # Other code to make it work\r\n```\r\n\r\nThere are a lot of considerations to make this work, mostly \"what are the boundary conditions?\" for the import. It would make most sense to limit modular code files from using state variables from other modular code files, as that could create some unnecessary complexity to readers. Also, since Vyper can't call public-facing methods, it makes sense not to be able to call those either in modular code files, and the import statement in the \"build file\" imports those in as final methods for the contract to represent in the build. Internal methods are possible to call in Vyper, so allowing modular components (including the \"build file\") to call internal methods of other modular components seems like a reasonable point of abstraction.\r\n\r\nUsing the example above, `token` would probably implement the basic ERC20 methods, making the internal methods `_transfer`, `_mint`, and `_burn` available to `staking` and `vesting` to perform more complex logic using their own stateful variables. When finally imported into `__contract__.vy`, the `import *` shows that *everything* is being imported from those files, including all state variables and internal and external methods (including public state variables). If there is a conflict during the import (any file uses the same state variable or defines the same internal/external method), the conflict should raise an error during compilation. This ensures that the strict boundary conditions are respected.\r\n\r\n## Backwards Compatibility\r\nThis VIP is fully backwards compatible.\r\n\r\n## Dependencies\r\nNo dependencies\r\n\r\n## References\r\nConsideration should be taken in reference to #2152, #1954, and #1347 with this feature\r\n\r\n## Copyright\r\nCopyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/2273/reactions",
+    "total_count": 6,
+    "+1": 2,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 1,
+    "confused": 0,
+    "heart": 1,
+    "rocket": 1,
+    "eyes": 1
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2273/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

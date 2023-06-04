@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/448",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/448/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/448/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/448/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/448",
+  "id": 272749986,
+  "node_id": "MDU6SXNzdWUyNzI3NDk5ODY=",
+  "number": 448,
+  "title": "compile_lll.py: buggy translation of LLL operator `sha3_32`",
+  "user": {
+    "login": "daejunpark",
+    "id": 5491770,
+    "node_id": "MDQ6VXNlcjU0OTE3NzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5491770?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/daejunpark",
+    "html_url": "https://github.com/daejunpark",
+    "followers_url": "https://api.github.com/users/daejunpark/followers",
+    "following_url": "https://api.github.com/users/daejunpark/following{/other_user}",
+    "gists_url": "https://api.github.com/users/daejunpark/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/daejunpark/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/daejunpark/subscriptions",
+    "organizations_url": "https://api.github.com/users/daejunpark/orgs",
+    "repos_url": "https://api.github.com/users/daejunpark/repos",
+    "events_url": "https://api.github.com/users/daejunpark/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/daejunpark/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2017-11-09T22:31:21Z",
+  "updated_at": "2017-11-16T03:48:40Z",
+  "closed_at": "2017-11-16T03:48:40Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### What's your issue about?\r\n\r\nThe translation of LLL operator `sha3_32` in `compile_lll.py` seems to be buggy.\r\n\r\nFor example, an LLL expression `[sha3_32 0]` is translated to EVM opcodes, `PUSH1, 0, PUSH1, 192, MSTORE, PUSH1, 192, PUSH1, 32, SHA3`, which perhaps should not. AFAIU, the translation logic should be that it first stores 0 in a predefined memory location (here 192), and then computes SHA3 hash of memory range of starting location 192 and width 32 (i.e., MEM[192...223]). But in the generated EVM code, it computes SHA3 hash of memory range of starting location **32** and width **192** (i.e., MEM[32...223]):\r\nhttps://github.com/ethereum/viper/blob/b1fe12ddd8706ef3340a103916e3d3f2cc95ceef/viper/compile_lll.py#L203\r\n\r\nHere is why it works until now. Fortunately (or unfortunately) the unintended memory range MEM[32...191] that is prepended to the value to be hashed (i.e., MEM[192...223]) is fixed over all Viper programs for now. They are pre-occupied to store the five size limits used to clamp values: `ADDRSIZE`, `MAXNUM`, `MINNUM`, `MAXDECIMAL`, `MINDECIMAL`:\r\nhttps://github.com/ethereum/viper/blob/b1fe12ddd8706ef3340a103916e3d3f2cc95ceef/viper/utils.py#L76-L80\r\n\r\nHere is a minimal example to reproduce. For the following Viper program:\r\n```\r\nbalance: num[num]\r\ndef foo():\r\n    self.balance[0] = 1\r\n```\r\nThe intermediate LLL program is:\r\n```\r\n[seq,   \r\n  [return,\r\n    0,    \r\n    [lll, \r\n      [seq, \r\n        [seq,\r\n          [mstore, 28, [calldataload, 0]],\r\n          [mstore, 32, 1461501637330902918203684832716283019655932542976],\r\n          [mstore, 64, 170141183460469231731687303715884105727],\r\n          [mstore, 96, -170141183460469231731687303715884105728],\r\n          [mstore, 128, 1701411834604692317316873037158841057270000000000],\r\n          [mstore, 160, -1701411834604692317316873037158841057280000000000]],\r\n        # Line 3\r\n        [if,\r\n          [eq, [mload, 0], 3264763256 <foo>],\r\n          [seq,\r\n            pass,\r\n            [assert, [iszero, callvalue]],\r\n            # Line 4\r\n            [sstore, [add, [sha3_32, 0 <self.balance>], 0], 1], \r\n            # Line 3\r\n            stop]]],\r\n      0]]]\r\n```\r\nThe final bytecode generated (in opcode form):\r\n```\r\n['PUSH2', 0, 189, 'JUMP', 'PUSH1', 0, 'CALLDATALOAD', 'PUSH1', 28, 'MSTORE', 'PUSH21', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'PUSH1', 32, 'MSTORE', 'PUSH16', 127, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 'PUSH1', 64, 'MSTORE', 'PUSH32', 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'PUSH1', 96, 'MSTORE', 'PUSH21', 1, 42, 5, 241, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 171, 244, 28, 0, 'PUSH1', 128, 'MSTORE', 'PUSH32', 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 254, 213, 250, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'PUSH1', 160, 'MSTORE', 'PUSH4', 194, 152, 85, 120, 'PUSH1', 0, 'MLOAD', 'EQ', 'ISZERO', 'PUSH2', 0, 184, 'JUMPI', 'CALLVALUE', 'ISZERO', 'ISZERO', 'PC', 'JUMPI', 'PUSH1', 1, 'PUSH1', 0, 'PUSH1', 0, 'PUSH1', 192, 'MSTORE', 'PUSH1', 192, 'PUSH1', 32, 'SHA3', 'ADD', 'SSTORE', 'STOP', 'JUMPDEST', 'JUMPDEST', 'PUSH2', 0, 4, 'PUSH2', 0, 189, 'SUB', 'PUSH2', 0, 4, 'PUSH1', 0, 'CODECOPY', 'PUSH2', 0, 4, 'PUSH2', 0, 189, 'SUB', 'PUSH1', 0, 'RETURN']\r\n```\r\n### How can it be fixed?\r\n\r\nSimply change the following line:\r\nhttps://github.com/ethereum/viper/blob/b1fe12ddd8706ef3340a103916e3d3f2cc95ceef/viper/compile_lll.py#L203\r\nto:\r\n```\r\no.extend(['PUSH1', MemoryPositions.FREE_VAR_SPACE, 'MSTORE', 'PUSH1', 32, 'PUSH1', MemoryPositions.FREE_VAR_SPACE, 'SHA3']) \r\n```\r\n\r\n#### Cute Animal Picture\r\n\r\n```\r\n               __   __\r\n              __ \\ / __\r\n             /  \\ | /  \\\r\n                 \\|/\r\n            _,.---v---._\r\n   /\\__/\\  /            \\\r\n   \\_  _/ /              \\\r\n     \\ \\_|           @ __|\r\n  hjw \\                \\_\r\n  `97  \\     ,__/       /\r\n     ~~~`~~~~~~~~~~~~~~/~~~~\r\n```\r\n",
+  "closed_by": {
+    "login": "daejunpark",
+    "id": 5491770,
+    "node_id": "MDQ6VXNlcjU0OTE3NzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5491770?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/daejunpark",
+    "html_url": "https://github.com/daejunpark",
+    "followers_url": "https://api.github.com/users/daejunpark/followers",
+    "following_url": "https://api.github.com/users/daejunpark/following{/other_user}",
+    "gists_url": "https://api.github.com/users/daejunpark/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/daejunpark/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/daejunpark/subscriptions",
+    "organizations_url": "https://api.github.com/users/daejunpark/orgs",
+    "repos_url": "https://api.github.com/users/daejunpark/repos",
+    "events_url": "https://api.github.com/users/daejunpark/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/daejunpark/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/448/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/448/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

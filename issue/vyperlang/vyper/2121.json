@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/2121",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/2121/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/2121/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/2121/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/2121",
+  "id": 667540712,
+  "node_id": "MDU6SXNzdWU2Njc1NDA3MTI=",
+  "number": 2121,
+  "title": "Vyper can't serialize ast for programs that contain decimal literals",
+  "user": {
+    "login": "fubuloubu",
+    "id": 3859395,
+    "node_id": "MDQ6VXNlcjM4NTkzOTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3859395?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fubuloubu",
+    "html_url": "https://github.com/fubuloubu",
+    "followers_url": "https://api.github.com/users/fubuloubu/followers",
+    "following_url": "https://api.github.com/users/fubuloubu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fubuloubu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fubuloubu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fubuloubu/subscriptions",
+    "organizations_url": "https://api.github.com/users/fubuloubu/orgs",
+    "repos_url": "https://api.github.com/users/fubuloubu/repos",
+    "events_url": "https://api.github.com/users/fubuloubu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fubuloubu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 479554962,
+      "node_id": "MDU6TGFiZWw0Nzk1NTQ5NjI=",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/bug",
+      "name": "bug",
+      "color": "ee0701",
+      "default": true,
+      "description": "Bug that shouldn't change language semantics when fixed."
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-07-29T04:32:37Z",
+  "updated_at": "2020-07-31T17:10:16Z",
+  "closed_at": "2020-07-31T17:10:16Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n* vyper Version (output of `vyper --version`): 0.2.3\r\n* OS: linux\r\n* Python Version (output of `python --version`): 3.8.4\r\n\r\n### What's your issue about?\r\nThe following program cannot serialize it's AST:\r\n```vyper\r\nvar: public(decimal)\r\n\r\n@external\r\ndef foo(a: decimal):\r\n    self.var += 0.1\r\n```\r\nGives this error:\r\n```bash\r\n$ vyper -f ast DecimalLiteral.vy \r\nTypeError: Object of type Decimal is not JSON serializable\r\n```\r\n\r\n### How can it be fixed?\r\nWhen serializing the `ast.Decimal` node, the `Decimal.value` attribute of the node is a `decimal.Decimal` type, which is not serializable to JSON. Instead, it should be converted to an engineering string via `decimal.Decimal.to_eng_string()`. Unsure if it's possible to convert _back_ from this JSON format, that should be considered in a possible solution.\r\n\r\nI overrided with this fix and it did the trick:\r\n```diff\r\ndiff --git a/vyper/ast/nodes.py b/vyper/ast/nodes.py\r\nindex 6400d721..bdd642f3 100644\r\n--- a/vyper/ast/nodes.py\r\n+++ b/vyper/ast/nodes.py\r\n@@ -701,6 +701,11 @@ class Decimal(Num):\r\n             raise InvalidLiteral(\"Vyper supports a maximum of ten decimal points\", self)\r\n         super().validate()\r\n \r\n+    def to_dict(self):\r\n+        d = super().to_dict()\r\n+        d[\"value\"] = d[\"value\"].to_eng_string()\r\n+        return d\r\n+\r\n \r\n class Hex(Num):\r\n     \"\"\"\r\n```",
+  "closed_by": {
+    "login": "fubuloubu",
+    "id": 3859395,
+    "node_id": "MDQ6VXNlcjM4NTkzOTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3859395?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fubuloubu",
+    "html_url": "https://github.com/fubuloubu",
+    "followers_url": "https://api.github.com/users/fubuloubu/followers",
+    "following_url": "https://api.github.com/users/fubuloubu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fubuloubu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fubuloubu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fubuloubu/subscriptions",
+    "organizations_url": "https://api.github.com/users/fubuloubu/orgs",
+    "repos_url": "https://api.github.com/users/fubuloubu/repos",
+    "events_url": "https://api.github.com/users/fubuloubu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fubuloubu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/2121/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2121/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

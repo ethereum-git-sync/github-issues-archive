@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3144",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3144/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3144/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3144/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3144",
+  "id": 1436383747,
+  "node_id": "I_kwDOBGDvrM5VnXoD",
+  "number": 3144,
+  "title": "`TypeError` when iterating on an empty literal array",
+  "user": {
+    "login": "trocher",
+    "id": 43437004,
+    "node_id": "MDQ6VXNlcjQzNDM3MDA0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43437004?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/trocher",
+    "html_url": "https://github.com/trocher",
+    "followers_url": "https://api.github.com/users/trocher/followers",
+    "following_url": "https://api.github.com/users/trocher/following{/other_user}",
+    "gists_url": "https://api.github.com/users/trocher/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/trocher/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/trocher/subscriptions",
+    "organizations_url": "https://api.github.com/users/trocher/orgs",
+    "repos_url": "https://api.github.com/users/trocher/repos",
+    "events_url": "https://api.github.com/users/trocher/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/trocher/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4038639649,
+      "node_id": "LA_kwDOBGDvrM7wuMAh",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/bug%20-%20typechecker",
+      "name": "bug - typechecker",
+      "color": "51B431",
+      "default": false,
+      "description": "issue with typechecker"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-04T17:03:05Z",
+  "updated_at": "2023-01-06T16:59:53Z",
+  "closed_at": "2023-01-06T16:59:53Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.3.8+commit.6020b8bb\r\n* OS: OSX\r\n* Python Version (output of `python --version`): 3.8.0\r\n\r\n### What's your issue about?\r\n\r\nAlthough it is completely useless, trying to iterate over an empty literal array lead the compiler to output the following error `TypeError: cannot pickle 'module' object`.\r\n\r\nFor example, trying to compile the following contract with `vyper --verbose -f abi,ir,bytecode  foo.vy` will fail with the given error.\r\n```Vyper\r\n@external\r\ndef test():\r\n    for i in []:\r\n        pass\r\n```\r\n```\r\nError compiling: tests/customs/code.vy\r\nTraceback (most recent call last):\r\n  File \"/Users/trocher/Documents/thesis/vyper/venv/bin/vyper\", line 11, in <module>\r\n    load_entry_point('vyper==0.3.8', 'console_scripts', 'vyper')()\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 57, in _parse_cli_args\r\n    return _parse_args(sys.argv[1:])\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 154, in _parse_args\r\n    compiled = compile_files(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 294, in compile_files\r\n    compiler_data = vyper.compile_codes(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/evm/opcodes.py\", line 226, in _wrapper\r\n    return fn(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 141, in compile_codes\r\n    exc_handler(contract_name, exc)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 189, in exc_handler\r\n    raise exception\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 138, in compile_codes\r\n    out[contract_name][output_format] = OUTPUT_FORMATS[output_format](compiler_data)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/output.py\", line 145, in build_abi_output\r\n    abi = compiler_data.vyper_module_folded._metadata[\"type\"].to_abi_dict()\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 107, in vyper_module_folded\r\n    module, storage_layout = self._folded_module\r\n  File \"/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/functools.py\", line 966, in __get__\r\n    val = self.func(instance)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 101, in _folded_module\r\n    return generate_folded_ast(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 229, in generate_folded_ast\r\n    validate_semantics(vyper_module_folded, interface_codes)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/semantics/validation/__init__.py\", line 11, in validate_semantics\r\n    validate_functions(vyper_ast)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/semantics/validation/local.py\", line 62, in validate_functions\r\n    FunctionNodeVisitor(vy_module, node, namespace)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/semantics/validation/local.py\", line 181, in __init__\r\n    self.visit(node)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/semantics/validation/local.py\", line 224, in visit\r\n    super().visit(node)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/semantics/validation/base.py\", line 20, in visit\r\n    visitor_fn(node, *args)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/semantics/validation/local.py\", line 436, in visit_For\r\n    type_ = copy.deepcopy(type_)\r\n  File \"/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/copy.py\", line 161, in deepcopy\r\n    rv = reductor(4)\r\nTypeError: cannot pickle 'module' object\r\n\r\n```\r\n### How can it be fixed?\r\n\r\nWhen the compiler is trying to type check the for loop body using each possible type for iterator value, in this case, as there is no restriction on the type, it even try to assign the type `event` to the iterator, leading to the call to `copy.deepcopy` to fail as it is a `module`\r\nhttps://github.com/vyperlang/vyper/blob/6020b8bbf66b062d299d87bc7e4eddc4c9d1c157/vyper/semantics/validation/local.py#L435-L436\r\nNote that in version `0.3.6` the deepcopy would succeed but the compiler would fail during the very next instruction as `event` does not have a field `is_constant`.",
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3144/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3144/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

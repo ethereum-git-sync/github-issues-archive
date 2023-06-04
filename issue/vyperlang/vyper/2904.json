@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/2904",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/2904/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/2904/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/2904/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/2904",
+  "id": 1267451696,
+  "node_id": "I_kwDOBGDvrM5Li8cw",
+  "number": 2904,
+  "title": "Missing @view decorator for interface ERC20Detailed.py",
+  "user": {
+    "login": "imachonky",
+    "id": 106646858,
+    "node_id": "U_kgDOBltNSg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/106646858?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/imachonky",
+    "html_url": "https://github.com/imachonky",
+    "followers_url": "https://api.github.com/users/imachonky/followers",
+    "following_url": "https://api.github.com/users/imachonky/following{/other_user}",
+    "gists_url": "https://api.github.com/users/imachonky/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/imachonky/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/imachonky/subscriptions",
+    "organizations_url": "https://api.github.com/users/imachonky/orgs",
+    "repos_url": "https://api.github.com/users/imachonky/repos",
+    "events_url": "https://api.github.com/users/imachonky/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/imachonky/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4038645502,
+      "node_id": "LA_kwDOBGDvrM7wuNb-",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/bug%20-%20integration",
+      "name": "bug - integration",
+      "color": "1CA895",
+      "default": false,
+      "description": "a bug affecting downstream tooling"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-06-10T12:03:20Z",
+  "updated_at": "2022-06-10T18:47:00Z",
+  "closed_at": "2022-06-10T18:47:00Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n* vyper Version (output of `vyper --version`): 0.3.3\r\n* OS: linux\r\n* Python Version (output of `python --version`): Python 3.9.5\r\n### What's your issue about?\r\n**Issue**\r\nError using `ERC20Detailed.py` as an interface to a vyper class. Trying to compile the following snippet produces the following error.\r\n```\r\n# @version 0.3.3\r\n\r\nfrom vyper.interfaces import ERC20Detailed\r\n\r\n@view\r\n@external\r\ndef getSymbol() -> String[32]:\r\n    return ERC20Detailed(0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2).symbol()\r\n```\r\n**Error**\r\n```\r\nvyper.exceptions.StateAccessViolation: May not call state modifying function 'symbol' within a constant\r\nfunction.vyper.exceptions.StateAccessViolation: May not call state modifying function 'symbol' within a constant function.\r\n```\r\n**Reason**\r\nThis issue occurs because `ERC20Detailed.py` does not contain `@view` decorator for its interfaces\r\n### How can it be fixed?\r\nAdding `@view` decorator to interface under `vyper.builtin_interfaces.ERC20Detailed.py`\r\n```\r\n@external\r\n@view\r\ndef name() -> String[1]:\r\n    pass\r\n    \r\n@external\r\n@view\r\ndef symbol() -> String[1]:\r\n    pass\r\n    \r\n@external\r\n@view\r\ndef decimals() -> uint8:\r\n    pass\r\n```\r\n**Why?**\r\nRunning `vyper -f interface examples/tokens/ERC20.vy` generates the following\r\n```\r\n...\r\n@view\r\n@external\r\ndef name() -> String[32]:\r\n    pass\r\n    \r\n@view\r\n@external\r\ndef symbol() -> String[32]:\r\n    pass\r\n    \r\n@view\r\n@external\r\ndef decimals() -> uint8:\r\n    pass\r\n...\r\n```\r\n\r\nAdding `@view` decorator to `vyper.builtin_interfaces.ERC20Detailed.py` would make interface consistent.",
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/2904/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2904/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

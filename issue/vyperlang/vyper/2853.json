@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/2853",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/2853/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/2853/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/2853/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/2853",
+  "id": 1233311053,
+  "node_id": "I_kwDOBGDvrM5JgtVN",
+  "number": 2853,
+  "title": "Arrays of struct defs do not give full type info in ABI",
+  "user": {
+    "login": "fubuloubu",
+    "id": 3859395,
+    "node_id": "MDQ6VXNlcjM4NTkzOTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3859395?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fubuloubu",
+    "html_url": "https://github.com/fubuloubu",
+    "followers_url": "https://api.github.com/users/fubuloubu/followers",
+    "following_url": "https://api.github.com/users/fubuloubu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fubuloubu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fubuloubu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fubuloubu/subscriptions",
+    "organizations_url": "https://api.github.com/users/fubuloubu/orgs",
+    "repos_url": "https://api.github.com/users/fubuloubu/repos",
+    "events_url": "https://api.github.com/users/fubuloubu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fubuloubu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4038645502,
+      "node_id": "LA_kwDOBGDvrM7wuNb-",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/bug%20-%20integration",
+      "name": "bug - integration",
+      "color": "1CA895",
+      "default": false,
+      "description": "a bug affecting downstream tooling"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-05-12T00:45:52Z",
+  "updated_at": "2022-06-13T04:42:44Z",
+  "closed_at": "2022-06-13T04:42:44Z",
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.3.3\r\n* OS: osx\r\n* Python Version (output of `python --version`): 3.9.9\r\n\r\n### What's your issue about?\r\n\r\n@unparalleled-js found this issue when adding support for structs in Ape:\r\n\r\n```vyper\r\n# @version ^0.3.3\r\n\r\nstruct MyStruct:\r\n    a: address\r\n    b: bytes32\r\n\r\nstruct NestedStruct:\r\n    t: MyStruct\r\n    foo: uint256\r\n\r\n@view\r\n@external\r\ndef getStructList() -> DynArray[NestedStruct, 2]:\r\n    return [\r\n        NestedStruct({t: MyStruct({a: msg.sender, b: block.prevhash}), foo: 1}),\r\n        NestedStruct({t: MyStruct({a: msg.sender, b: block.prevhash}), foo: 2})\r\n    ]\r\n```\r\nproduces this in the ABI:\r\n\r\n```json\r\n{\"inputs\": [\r\n    {\"name\": \"\", \"type\": \"((address,bytes32),uint256)[]\"}\r\n]}\r\n```\r\n\r\n### How can it be fixed?\r\n\r\nShould produce a struct def ABI like this:\r\n```json\r\n{\"inputs\": [\r\n    {\r\n        \"name\": \"\",\r\n        \"type\": \"tuple[]\",\r\n        \"components\": [\r\n            {\r\n                \"name\": \"t\",\r\n                \"type\": \"tuple\",\r\n                \"components\": [\r\n                    {\"name\": \"a\", \"type\": \"address\"},\r\n                    {\"name\": \"b\", \"type\": \"bytes32\"}\r\n                ]\r\n            },\r\n            {\r\n                \"name\": \"foo\",\r\n                \"type\": \"uint256\",\r\n                \"internalType\": \"uint256\"\r\n            }\r\n        ]\r\n    }\r\n]}\r\n```\r\n\r\nFrom the equivalent Solidity:\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.2;\r\n\r\ncontract TestContractSol {\r\n    struct MyStruct {\r\n        address a;\r\n        bytes32 b;\r\n    }\r\n\r\n    struct NestedStruct {\r\n        MyStruct t;\r\n        uint256 foo;\r\n    }\r\n\r\n    function getStruct() public view returns(MyStruct memory) {\r\n        return MyStruct(msg.sender, blockhash(block.number - 1));\r\n    }\r\n\r\n   function getStructList() public view returns(NestedStruct1[] memory) {\r\n        NestedStruct[] memory data = new NestedStruct1[](2);\r\n        data[0] = NestedStruct(getStruct(), 1);\r\n        data[1] = NestedStruct(getStruct(), 2);\r\n        return data;\r\n    }\r\n}\r\n```",
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/2853/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2853/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

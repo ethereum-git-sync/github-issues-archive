@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3176",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3176/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3176/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3176/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3176",
+  "id": 1481612854,
+  "node_id": "I_kwDOBGDvrM5YT542",
+  "number": 3176,
+  "title": "`Break` outside of loop leads to Compiler Panic",
+  "user": {
+    "login": "trocher",
+    "id": 43437004,
+    "node_id": "MDQ6VXNlcjQzNDM3MDA0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43437004?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/trocher",
+    "html_url": "https://github.com/trocher",
+    "followers_url": "https://api.github.com/users/trocher/followers",
+    "following_url": "https://api.github.com/users/trocher/following{/other_user}",
+    "gists_url": "https://api.github.com/users/trocher/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/trocher/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/trocher/subscriptions",
+    "organizations_url": "https://api.github.com/users/trocher/orgs",
+    "repos_url": "https://api.github.com/users/trocher/repos",
+    "events_url": "https://api.github.com/users/trocher/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/trocher/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4038639649,
+      "node_id": "LA_kwDOBGDvrM7wuMAh",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/bug%20-%20typechecker",
+      "name": "bug - typechecker",
+      "color": "51B431",
+      "default": false,
+      "description": "issue with typechecker"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-12-07T10:49:37Z",
+  "updated_at": "2022-12-07T13:56:22Z",
+  "closed_at": "2022-12-07T13:56:22Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.3.8+commit.046ea166\r\n* OS: OSX\r\n* Python Version (output of `python --version`): 3.8.0\r\n\r\n### What's your issue about?\r\n\r\nHaving a `break` statement outside of a loop leads the compiler to panicking while the same situation with a `continue` statement would raise a ``StructureException: `continue` must be enclosed in a `for` loop``\r\n```Python\r\n@external\r\ndef test():\r\n    break\r\n```\r\n```\r\nError compiling: tests/customs/code.vy\r\nTraceback (most recent call last):\r\n  File \"/Users/trocher/Documents/thesis/vyper/venv/bin/vyper\", line 11, in <module>\r\n    load_entry_point('vyper==0.3.8', 'console_scripts', 'vyper')()\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 57, in _parse_cli_args\r\n    return _parse_args(sys.argv[1:])\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 154, in _parse_args\r\n    compiled = compile_files(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 294, in compile_files\r\n    compiler_data = vyper.compile_codes(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/evm/opcodes.py\", line 226, in _wrapper\r\n    return fn(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 141, in compile_codes\r\n    exc_handler(contract_name, exc)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 189, in exc_handler\r\n    raise exception\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 138, in compile_codes\r\n    out[contract_name][output_format] = OUTPUT_FORMATS[output_format](compiler_data)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/output.py\", line 248, in build_bytecode_output\r\n    return f\"0x{compiler_data.bytecode.hex()}\"\r\n  File \"/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/functools.py\", line 966, in __get__\r\n    val = self.func(instance)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 150, in bytecode\r\n    self.assembly, is_runtime=False, no_bytecode_metadata=self.no_bytecode_metadata\r\n  File \"/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/functools.py\", line 966, in __get__\r\n    val = self.func(instance)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 141, in assembly\r\n    return generate_assembly(self.ir_nodes, self.no_optimize)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 300, in generate_assembly\r\n    assembly = compile_ir.compile_to_assembly(ir_nodes, no_optimize=no_optimize)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 211, in compile_to_assembly\r\n    res = _compile_to_assembly(code)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 502, in _compile_to_assembly\r\n    subcode = _compile_to_assembly(ir)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 535, in _compile_to_assembly\r\n    o.extend(_compile_to_assembly(arg, withargs, existing_labels, break_dest, height))\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 480, in _compile_to_assembly\r\n    _compile_to_assembly(code.args[2], withargs, existing_labels, break_dest, height + 1)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 535, in _compile_to_assembly\r\n    o.extend(_compile_to_assembly(arg, withargs, existing_labels, break_dest, height))\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 342, in _compile_to_assembly\r\n    o.extend(_compile_to_assembly(code.args[1], withargs, existing_labels, break_dest, height))\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 535, in _compile_to_assembly\r\n    o.extend(_compile_to_assembly(arg, withargs, existing_labels, break_dest, height))\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 535, in _compile_to_assembly\r\n    o.extend(_compile_to_assembly(arg, withargs, existing_labels, break_dest, height))\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 705, in _compile_to_assembly\r\n    body_asm = _compile_to_assembly(\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 535, in _compile_to_assembly\r\n    o.extend(_compile_to_assembly(arg, withargs, existing_labels, break_dest, height))\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 189, in apply_line_no_wrapper\r\n    ret = func(*args, **kwargs)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/ir/compile_ir.py\", line 454, in _compile_to_assembly\r\n    raise CompilerPanic(\"Invalid break\")\r\nvyper.exceptions.CompilerPanic: Invalid break\r\n\r\nThis is an unhandled internal compiler error. Please create an issue on Github to notify the developers.\r\nhttps://github.com/vyperlang/vyper/issues/new?template=bug.md\r\n```\r\n\r\n### How can it be fixed?\r\n\r\n`vy_ast.Break` should not be a ignored type of the `FunctionNodeVisitor` and rather a function very similar to `visit_Continue` should ensure that `break` statements are enclosed in loops.\r\nhttps://github.com/vyperlang/vyper/blob/ac2fa147fdfed8590a1eee1d27ceb1b26d6a62b2/vyper/semantics/analysis/local.py#L287-L290",
+  "closed_by": {
+    "login": "fubuloubu",
+    "id": 3859395,
+    "node_id": "MDQ6VXNlcjM4NTkzOTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3859395?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fubuloubu",
+    "html_url": "https://github.com/fubuloubu",
+    "followers_url": "https://api.github.com/users/fubuloubu/followers",
+    "following_url": "https://api.github.com/users/fubuloubu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fubuloubu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fubuloubu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fubuloubu/subscriptions",
+    "organizations_url": "https://api.github.com/users/fubuloubu/orgs",
+    "repos_url": "https://api.github.com/users/fubuloubu/repos",
+    "events_url": "https://api.github.com/users/fubuloubu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fubuloubu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3176/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3176/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

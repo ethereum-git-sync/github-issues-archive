@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/2066",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/2066/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/2066/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/2066/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/2066",
+  "id": 646982014,
+  "node_id": "MDU6SXNzdWU2NDY5ODIwMTQ=",
+  "number": 2066,
+  "title": "Generate Symbol Table",
+  "user": {
+    "login": "fubuloubu",
+    "id": 3859395,
+    "node_id": "MDQ6VXNlcjM4NTkzOTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3859395?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fubuloubu",
+    "html_url": "https://github.com/fubuloubu",
+    "followers_url": "https://api.github.com/users/fubuloubu/followers",
+    "following_url": "https://api.github.com/users/fubuloubu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fubuloubu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fubuloubu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fubuloubu/subscriptions",
+    "organizations_url": "https://api.github.com/users/fubuloubu/orgs",
+    "repos_url": "https://api.github.com/users/fubuloubu/repos",
+    "events_url": "https://api.github.com/users/fubuloubu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fubuloubu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2161345478,
+      "node_id": "MDU6TGFiZWwyMTYxMzQ1NDc4",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/Refactor",
+      "name": "Refactor",
+      "color": "402eaa",
+      "default": false,
+      "description": "Issues related to refactoring the codebase"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2020-06-28T18:40:48Z",
+  "updated_at": "2020-06-28T18:40:48Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Related to: #1950\r\n\r\nHave `Namespace` generate a `SymbolTable` as you're doing type checking:\r\n1. Skip environment variables (or set them to their opcodes?)\r\n2. Set storage variable slots when they're all created in `SymbolTable.storage[var.name]`\r\n3. Set memory variables when they're created in `SymbolTable.memory[function.name][var.name]`\r\n4. Store the highest memory register used when you push onto `Namespace`\r\n5. When you pop off of `Namespace`, store the highest memory register used inside that context\r\n6. Memory is allocated as \"clean\" or \"dirty\", depending on if it was used in a prior context or not\r\n7. \"dirty\" memory must be written to on initialization, \"clean\" does not (if the initial value is the zero value)\r\n8. private functions just push another context frame onto `Namespace`\r\n9. Have `namespace.get_symbol_table() -> SymbolTable` to grab this object\r\n\r\nWe would be able to statically generate `SymbolTable` from just processing the AST/type checking, which would make it much easier to perform the code generation to LLL by having a simple lookup. We could also make guarantees on memory usage since we are able to statically determine sizes due to our design choices.\r\n\r\nOptimization would then be in charge of provably reducing memory usage by making smart choices, starting from a solid base.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/2066/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2066/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

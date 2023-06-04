@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3162",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3162/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3162/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3162/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3162",
+  "id": 1469755727,
+  "node_id": "I_kwDOBGDvrM5XmrFP",
+  "number": 3162,
+  "title": "`immutable` can be declared and never assigned a value",
+  "user": {
+    "login": "trocher",
+    "id": 43437004,
+    "node_id": "MDQ6VXNlcjQzNDM3MDA0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43437004?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/trocher",
+    "html_url": "https://github.com/trocher",
+    "followers_url": "https://api.github.com/users/trocher/followers",
+    "following_url": "https://api.github.com/users/trocher/following{/other_user}",
+    "gists_url": "https://api.github.com/users/trocher/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/trocher/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/trocher/subscriptions",
+    "organizations_url": "https://api.github.com/users/trocher/orgs",
+    "repos_url": "https://api.github.com/users/trocher/repos",
+    "events_url": "https://api.github.com/users/trocher/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/trocher/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4038639649,
+      "node_id": "LA_kwDOBGDvrM7wuMAh",
+      "url": "https://api.github.com/repos/vyperlang/vyper/labels/bug%20-%20typechecker",
+      "name": "bug - typechecker",
+      "color": "51B431",
+      "default": false,
+      "description": "issue with typechecker"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-11-30T14:45:16Z",
+  "updated_at": "2022-11-30T17:05:00Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.3.8+commit.6020b8bb\r\n* OS: OSX\r\n* Python Version (output of `python --version`): 3.8.0\r\n\r\n### What's your issue about?\r\n\r\nThe documentation quotes that immutable values must be assigned a value at construction and cannot be assigned a value after construction. However, using `If` statements or `For` loops, it is possible not to assign a value to an immutable as the compiler only checks that an assignment is present at some point in the constructor but does not perform any control flow analysis to ensure that such assignment will always happen.\r\n\r\nThese two contracts will hence compile and can be deployed even if `a` is never assigned a value.\r\n```Vyper\r\na:immutable(bool)\r\n@external\r\ndef __init__():\r\n    if False:\r\n        a = True\r\n```\r\n```Vyper\r\na:immutable(bool)\r\n@external\r\ndef __init__():\r\n    for x in range(2):\r\n        if x == 0:\r\n            break\r\n        a = True\r\n```\r\n\r\nNote that in the same spirit, it is possible to assign multiple time a value to an immutable using a `For` loop as the assigning statement appears only once in the AST:\r\n```Vyper\r\na:immutable(bool)\r\n@external\r\ndef __init__():\r\n    for x in [True, False]:\r\n        a = x\r\n```\r\n### How can it be fixed?\r\n\r\nOne way to fix this issue would be to forbid immutable to be assigned in `If` statements or in `For` loops. Solidity seems to be prevent the first one only.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3162/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3162/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
