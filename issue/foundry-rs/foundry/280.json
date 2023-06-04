@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/280",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/280/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/280/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/280/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/280",
+  "id": 1085815657,
+  "node_id": "I_kwDOGBlvNc5AuDtp",
+  "number": 280,
+  "title": "bug: payable functions are taking the balance from address(this) instead of the prank address",
+  "user": {
+    "login": "joshieDo",
+    "id": 93316087,
+    "node_id": "U_kgDOBY_j9w",
+    "avatar_url": "https://avatars.githubusercontent.com/u/93316087?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/joshieDo",
+    "html_url": "https://github.com/joshieDo",
+    "followers_url": "https://api.github.com/users/joshieDo/followers",
+    "following_url": "https://api.github.com/users/joshieDo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/joshieDo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/joshieDo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/joshieDo/subscriptions",
+    "organizations_url": "https://api.github.com/users/joshieDo/orgs",
+    "repos_url": "https://api.github.com/users/joshieDo/repos",
+    "events_url": "https://api.github.com/users/joshieDo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/joshieDo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-12-21T13:08:03Z",
+  "updated_at": "2021-12-21T16:23:10Z",
+  "closed_at": "2021-12-21T16:23:10Z",
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "Calling payable functions with pranks take the balance from `address(this)` instead of the prank address. The function still succeeds and `msg.value` and `msg.sender` are correct (same as prank address), but balances do not match after checking.\r\nedit: \r\n* also happens with `startPrank`\r\n* passes successfully even if prank address has 0 balance\r\n\r\nThis fails and should pass.\r\n```\r\nfunction testBarPayable() public {\r\n        address new_sender = address(1);\r\n        vm.deal(new_sender, 10 ether);\r\n        vm.prank(new_sender);\r\n        foo.barPayable{value: 1 ether}(2);\r\n        assertEq(new_sender.balance, 9 ether);\r\n    }\r\n```\r\n\r\nExample contract, and log output below.\r\n\r\n### Log Output\r\n```\r\ncompiling...\r\nsuccess.\r\nRunning 2 tests for MyTest\r\n\u001B[32m[PASS]\u001B[0m testBar() (gas: 4097)\r\n\u001B[32m[PASS]\u001B[0m testBarPayable() (gas: 70632)\r\n\r\nSuccess: testBar()\r\n\r\n\r\nSuccess: testBarPayable()\r\n\r\n  \r\n# 1\r\n  new_sender balance:\r\n  0\r\n  new_sender after balance:\r\n  0\r\n  contract balance:\r\n  1000000000000000000\r\n  --\r\n\r\n  # 2\r\n  new_sender balance:\r\n  0\r\n  new_sender after balance:\r\n  0\r\n  contract balance:\r\n  2000000000000000000\r\n  --\r\n\r\n  # 3\r\n  new_sender balance:\r\n  10000000000000000000\r\n  new_sender after balance:\r\n  10000000000000000000\r\n  contract balance:\r\n  3000000000000000000\r\n  --\r\n\r\n  testContact [address(this)] balance difference:\r\n  3000000000000000000\r\n\r\n\r\n```\r\n### Contract\r\n```\r\n// SPDX-License-Identifier: Unlicense\r\npragma solidity 0.8.11;\r\n\r\nimport \"ds-test/test.sol\";\r\n\r\ninterface Vm {\r\n    function prank(address) external;\r\n\r\n    function deal(address, uint256) external;\r\n\r\n    function startPrank(address) external;\r\n\r\n    function stopPrank() external;\r\n}\r\n\r\ncontract Foo {\r\n    function bar() public {\r\n        require(msg.sender == address(1), \"wrong sender\");\r\n    }\r\n\r\n    function barPayable(uint o) public payable {\r\n        require(msg.sender == address(1), \"wrong sender\");\r\n        require(msg.value != 0);\r\n    }\r\n}\r\n\r\ncontract MyTest is DSTest {\r\n    Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);\r\n    Foo foo;\r\n\r\n    function setUp() public {\r\n        foo = new Foo();\r\n    }\r\n\r\n    function testBar() public {\r\n        address new_sender = address(1);\r\n        vm.prank(new_sender);\r\n        foo.bar();\r\n    }\r\n\r\n    function testBarPayable() public {\r\n        address new_sender = address(1);\r\n        uint256 before = address(this).balance;\r\n        //\r\n        emit log(\"\\n# 1\");\r\n        emit log(\"new_sender balance:\");\r\n        emit log_uint(address(new_sender).balance);\r\n        vm.prank(new_sender);\r\n        foo.barPayable{value: 1 ether}(2);\r\n        emit log(\"new_sender after balance:\");\r\n        emit log_uint(address(new_sender).balance);\r\n        emit log(\"contract balance:\");\r\n        emit log_uint(address(foo).balance);\r\n        emit log(\"--\\n\");\r\n\r\n        emit log(\"# 2\");\r\n        emit log(\"new_sender balance:\");\r\n        emit log_uint(address(new_sender).balance);\r\n        vm.startPrank(new_sender);\r\n        foo.barPayable{value: 1 ether}(2);\r\n        vm.stopPrank();\r\n        emit log(\"new_sender after balance:\");\r\n        emit log_uint(address(new_sender).balance);\r\n        emit log(\"contract balance:\");\r\n        emit log_uint(address(foo).balance);\r\n        emit log(\"--\\n\");\r\n\r\n        emit log(\"# 3\");\r\n        vm.deal(new_sender, 10 ether);\r\n        emit log(\"new_sender balance:\");\r\n        emit log_uint(address(new_sender).balance);\r\n        vm.prank(new_sender);\r\n        foo.barPayable{value: 1 ether}(2);\r\n        emit log(\"new_sender after balance:\");\r\n        emit log_uint(address(new_sender).balance);\r\n        emit log(\"contract balance:\");\r\n        emit log_uint(address(foo).balance);\r\n        emit log(\"--\\n\");\r\n\r\n        emit log(\"testContact [address(this)] balance difference:\");\r\n        emit log_uint(before - address(this).balance);\r\n    }\r\n}\r\n\r\n```",
+  "closed_by": {
+    "login": "brockelmore",
+    "id": 31553173,
+    "node_id": "MDQ6VXNlcjMxNTUzMTcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/31553173?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/brockelmore",
+    "html_url": "https://github.com/brockelmore",
+    "followers_url": "https://api.github.com/users/brockelmore/followers",
+    "following_url": "https://api.github.com/users/brockelmore/following{/other_user}",
+    "gists_url": "https://api.github.com/users/brockelmore/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/brockelmore/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/brockelmore/subscriptions",
+    "organizations_url": "https://api.github.com/users/brockelmore/orgs",
+    "repos_url": "https://api.github.com/users/brockelmore/repos",
+    "events_url": "https://api.github.com/users/brockelmore/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/brockelmore/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/280/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/280/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

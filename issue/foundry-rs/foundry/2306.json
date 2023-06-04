@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/2306",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2306/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2306/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2306/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/2306",
+  "id": 1303842828,
+  "node_id": "I_kwDOGBlvNc5NtxAM",
+  "number": 2306,
+  "title": "`vm.toString(bytes32)` not hex string",
+  "user": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-07-13T19:23:14Z",
+  "updated_at": "2022-07-13T20:12:09Z",
+  "closed_at": "2022-07-13T20:12:09Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (16b4ef6 2022-07-13T00:05:41.265337096Z)\n\n### What command(s) is the bug in?\n\nforge\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nI would expect that `vm.toString(bytes32)` would serialize the bytes32 as a `0x` prefixed hex string (since that is the norm in ethereum tooling) but it seems like its serializing the bytes themselves. The following stack trace shows the problem in the call to `vm.ffi`\r\n\r\n```\r\nRunning 1 test for contracts/test/Hashing.t.sol:Hashing_Test\r\n[FAIL. Reason: Revert] test_hashOutputRootProof_differential() (gas: 15575)\r\nLogs:\r\n  0x9e92700554372be9ae375492d6efb4163f987a3cd09d69d7c6405767fb095703\r\n  0x\r\n\r\nTraces:\r\n  [15575] Hashing_Test::test_hashOutputRootProof_differential()\r\n    ├─ [0] VM::toString(0x00000000000000000002e532f53cc31faa0fb2b5dffd4a95fe7db4c373c5f954)\r\n    │   └─ ← 0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003302efbfbd32efbfbd3cefbfbd1fefbfbd0fefbfbdefbfbdefbfbdefbfbd4aefbfbdefbfbd7defbfbdefbfbd73efbfbdefbfbd5400000000000000000000000000\r\n    ├─ [0] VM::toString(0x416c7e8929095c20034c8080de9b144834685d27e46d48da72aa7cf246718a8c)\r\n    │   └─ ← 0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000032416c7eefbfbd29095c20034cefbfbdefbfbdde9b144834685d27efbfbd6d48efbfbd72efbfbd7cefbfbd4671efbfbdefbfbd0000000000000000000000000000\r\n    ├─ [0] VM::toString(0x14f59951fa28644a8d35c7b515b678f390e6be24262c1dd037d7b3a1ad57f3c9)\r\n    │   └─ ← 0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003614efbfbdefbfbd51efbfbd28644aefbfbd35c7b515efbfbd78efbfbdefbfbd24262c1defbfbd37d7b3efbfbdefbfbd57efbfbdefbfbd00000000000000000000\r\n    ├─ [0] VM::toString(0xe5c77c565a856c2f6784a066f4c7fa0305f332a894dfa48cdcbdc28da8f13b01)\r\n    │   └─ ← 0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003cefbfbdefbfbd7c565aefbfbd6c2f67efbfbdefbfbd66efbfbdefbfbdefbfbd0305efbfbd32efbfbdefbfbddfa4efbfbddcbdc28defbfbdefbfbd3b0100000000\r\n    ├─ [0] console::27b7cf85(9e92700554372be9ae375492d6efb4163f987a3cd09d69d7c6405767fb095703) [staticcall]\r\n    │   └─ ← ()\r\n    ├─ [0] VM::ffi([\"node\", \"dist/scripts/differential-testing.js\", \"hashOutputRootProof\", \"\\u{2}�2�<�\\u{1f}�\\u{f}����J��}��s��T\", \"Al~�)\\t\\\\ \\u{3}L��ޛ\\u{14}H4h]'�mH�r�|�Fq��\", \"\\u{14}��Q�(dJ�5ǵ\\u{15}�x��$&,\\u{1d}�7׳��W��\", \"��|VZ�l/g��f���\\u{3}\\u{5}�2��ߤ�\\u{73d}\\u{8d}��;\\u{1}\"])\r\n    │   └─ ← 0x\r\n    ├─ [0] console::0be77f56(00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000) [staticcall]\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n```\r\n\r\n",
+  "closed_by": {
+    "login": "gakonst",
+    "id": 17802178,
+    "node_id": "MDQ6VXNlcjE3ODAyMTc4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17802178?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gakonst",
+    "html_url": "https://github.com/gakonst",
+    "followers_url": "https://api.github.com/users/gakonst/followers",
+    "following_url": "https://api.github.com/users/gakonst/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gakonst/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gakonst/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gakonst/subscriptions",
+    "organizations_url": "https://api.github.com/users/gakonst/orgs",
+    "repos_url": "https://api.github.com/users/gakonst/repos",
+    "events_url": "https://api.github.com/users/gakonst/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gakonst/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/2306/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2306/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]

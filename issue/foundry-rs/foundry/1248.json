@@ -1,0 +1,140 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/1248",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/1248/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/1248/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/1248/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/1248",
+  "id": 1198706264,
+  "node_id": "I_kwDOGBlvNc5Hcs5Y",
+  "number": 1248,
+  "title": "Warn on falling back to master tag when installing dependencies with errant tag",
+  "user": {
+    "login": "totlsota",
+    "id": 3116579,
+    "node_id": "MDQ6VXNlcjMxMTY1Nzk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3116579?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/totlsota",
+    "html_url": "https://github.com/totlsota",
+    "followers_url": "https://api.github.com/users/totlsota/followers",
+    "following_url": "https://api.github.com/users/totlsota/following{/other_user}",
+    "gists_url": "https://api.github.com/users/totlsota/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/totlsota/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/totlsota/subscriptions",
+    "organizations_url": "https://api.github.com/users/totlsota/orgs",
+    "repos_url": "https://api.github.com/users/totlsota/repos",
+    "events_url": "https://api.github.com/users/totlsota/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/totlsota/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394235,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjM1",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/good%20first%20issue",
+      "name": "good first issue",
+      "color": "0052CC",
+      "default": true,
+      "description": "Good for newcomers"
+    },
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    },
+    {
+      "id": 3759719790,
+      "node_id": "LA_kwDOGBlvNc7gGMVu",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/P-low",
+      "name": "P-low",
+      "color": "D93F0B",
+      "default": false,
+      "description": "Priority: low"
+    },
+    {
+      "id": 3759720552,
+      "node_id": "LA_kwDOGBlvNc7gGMho",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/D-easy",
+      "name": "D-easy",
+      "color": "0E8A16",
+      "default": false,
+      "description": "Difficulty: easy"
+    },
+    {
+      "id": 3777100092,
+      "node_id": "LA_kwDOGBlvNc7hIfk8",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-pm",
+      "name": "Cmd-forge-pm",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge install/update/remove"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-04-09T16:30:27Z",
+  "updated_at": "2022-04-26T08:08:57Z",
+  "closed_at": "2022-04-26T08:08:57Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Describe the feature you would like\n\nThis item is perhaps a minor defect, or a small improvement that may save someone else some confusion. \r\n\r\nI had a contract with imports like:\r\n\r\n```solidity\r\nimport \"@openzeppelin/contracts@3.4.0/...\";\r\n```\r\n\r\nI ran\r\n```bash\r\nforge install OpenZeppelin/openzeppelin-contracts@3.4.0 \r\n```\r\n\r\nThis ran and (seemingly) worked. The contract wouldn't build due to version contracts.\r\n\r\nAfter some confusion, I read the `/lib/openzeppelin-contracts/package.json` which showed the version as `4.5.0` which is the current **master** version.\r\n\r\n```json\r\n{\r\n  \"name\": \"openzeppelin-solidity\",\r\n  \"description\": \"Secure Smart Contract library for Solidity\",\r\n  \"version\": \"4.5.0\",\r\n   ...\r\n```\r\n\r\nI went to github and found the tag which was [**v**3.4.0.](https://github.com/OpenZeppelin/openzeppelin-contracts/releases/tag/v3.4.0) (note the \"v\" that was absent in the original install tag version)\r\n\r\nI tried an intentionally errant tag (note the \"_asdf_\" at the end) and again got the master `4.5.0` version. \r\n ```bash\r\nforge install OpenZeppelin/openzeppelin-contracts@v3.4.0asdf \r\n```\r\n\r\nAfter successfully removing the errant version the correct @tag installed successfully. The version matched in the package.json, and all contracts built:\r\n\r\n ```bash\r\nforge install OpenZeppelin/openzeppelin-contracts@v3.4.0\r\n```\r\n\r\nIMO either fail to install or warn that the requested tag was not installed but a fallback version.\r\n\r\n***\r\n#### `forge remove` left gitmodule issues that required post-hoc cleanup and manual handling\r\n\r\nAfter running `forge remove OpenZeppelin/openzeppelin-contracts`, there was an error when trying to `install` again (I didn't record this exact error). The error message essentially said there was already a module `OpenZeppelin/openzeppelin-contracts`.\r\n\r\nI _basically_ followed this top answer suggested [here on SO](https://stackoverflow.com/questions/1260748/how-do-i-remove-a-submodule). I repeated this a few times while trying/removing, etc. \r\n\r\nThe remove process could also clean up the git modules (maybe?!). That seems a bit kludgy I realise, but I'm not sure what else to recommend.\r\n\n\n### Additional context\n\n_No response_",
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/1248/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/1248/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
