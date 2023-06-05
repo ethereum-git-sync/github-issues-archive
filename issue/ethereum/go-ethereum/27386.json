@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "karalabe",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 6,
   "created_at": "2023-05-30T14:45:40Z",
-  "updated_at": "2023-05-31T10:18:07Z",
-  "closed_at": null,
+  "updated_at": "2023-06-05T06:59:40Z",
+  "closed_at": "2023-06-05T06:59:40Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "When CL requests setting new head which involves processing many blocks, during this time CL will keep sending other requests which pile up as goroutines until the stuck routine is released. This shows in the charts here:\r\n\r\n<img width=\"325\" alt=\"Screenshot 2023-05-30 at 16 30 12\" src=\"https://github.com/ethereum/go-ethereum/assets/1591639/0a0745df-a0b9-42ed-b617-5e066892bed3\">\r\n<img width=\"385\" alt=\"Screenshot 2023-05-30 at 16 30 34\" src=\"https://github.com/ethereum/go-ethereum/assets/1591639/2790a4a4-2d52-40bc-9fa3-2c2bdfd7a433\">\r\n\r\nThis is where the first request gets stuck:\r\n\r\n```\r\ngoroutine 60 [semacquire, 20 minutes]:\r\nsync.runtime_Semacquire(0xde9fc0?)\r\n        runtime/sema.go:62 +0x25\r\nsync.(*WaitGroup).Wait(0xc015094680?)\r\n        sync/waitgroup.go:139 +0x52\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*Downloader).Cancel(0xc015094680)\r\n        github.com/ethereum/go-ethereum/eth/downloader/downloader.go:700 +0x30\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*beaconBackfiller).suspend(0xc01f27e580)\r\n        github.com/ethereum/go-ethereum/eth/downloader/beaconsync.go:74 +0xb9\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*skeleton).sync.func3()\r\n        github.com/ethereum/go-ethereum/eth/downloader/skeleton.go:370 +0x2f\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*skeleton).sync(0xc00daacb60, 0xc0add9a240?)\r\n        github.com/ethereum/go-ethereum/eth/downloader/skeleton.go:448 +0xed3\r\ngithub.com/ethereum/go-ethereum/eth/downloader.(*skeleton).startup(0xc00daacb60)\r\n        github.com/ethereum/go-ethereum/eth/downloader/skeleton.go:271 +0x211\r\ncreated by github.com/ethereum/go-ethereum/eth/downloader.newSkeleton\r\n        github.com/ethereum/go-ethereum/eth/downloader/skeleton.go:233 +0x1da\r\n ```\r\n \r\nThis is where the rest of them are locked out:\r\n\r\n```\r\ngoroutine 155145 [semacquire, 3 minutes]:\r\nsync.runtime_SemacquireMutex(0x0?, 0xe0?, 0x20?)\r\n        runtime/sema.go:77 +0x25\r\nsync.(*Mutex).lockSlow(0xc001946138)\r\n        sync/mutex.go:171 +0x165\r\nsync.(*Mutex).Lock(...)\r\n        sync/mutex.go:90\r\ngithub.com/ethereum/go-ethereum/eth/catalyst.(*ConsensusAPI).newPayload(_, {{0xf6, 0xc8, 0xc4, 0x45, 0x37, 0xbd, 0xc4, 0x50, 0x47, ...}, ...})\r\n        github.com/ethereum/go-ethereum/eth/catalyst/api.go:450 +0x91\r\ngithub.com/ethereum/go-ethereum/eth/catalyst.(*ConsensusAPI).NewPayloadV2(_, {{0xf6, 0xc8, 0xc4, 0x45, 0x37, 0xbd, 0xc4, 0x50, 0x47, ...}, ...})\r\n        github.com/ethereum/go-ethereum/eth/catalyst/api.go:433 +0x178\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "karalabe",
+    "id": 129561,
+    "node_id": "MDQ6VXNlcjEyOTU2MQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/129561?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/karalabe",
+    "html_url": "https://github.com/karalabe",
+    "followers_url": "https://api.github.com/users/karalabe/followers",
+    "following_url": "https://api.github.com/users/karalabe/following{/other_user}",
+    "gists_url": "https://api.github.com/users/karalabe/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/karalabe/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/karalabe/subscriptions",
+    "organizations_url": "https://api.github.com/users/karalabe/orgs",
+    "repos_url": "https://api.github.com/users/karalabe/repos",
+    "events_url": "https://api.github.com/users/karalabe/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/karalabe/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27386/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27386/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
