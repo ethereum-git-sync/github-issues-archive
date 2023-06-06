@@ -140,17 +140,17 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 108,
-    "closed_issues": 139,
+    "open_issues": 78,
+    "closed_issues": 170,
     "state": "open",
     "created_at": "2023-02-13T19:04:13Z",
-    "updated_at": "2023-05-31T14:55:47Z",
+    "updated_at": "2023-06-06T12:13:53Z",
     "due_on": "2023-06-16T07:00:00Z",
     "closed_at": null
   },
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-05-29T18:57:10Z",
-  "updated_at": "2023-05-29T18:59:11Z",
+  "updated_at": "2023-06-06T07:59:37Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -173,5 +173,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1578128097",
+    "html_url": "https://github.com/status-im/status-desktop/issues/10853#issuecomment-1578128097",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/10853",
+    "id": 1578128097,
+    "node_id": "IC_kwDOD5KrTM5eEFLh",
+    "user": {
+      "login": "0x-r4bbit",
+      "id": 445106,
+      "node_id": "MDQ6VXNlcjQ0NTEwNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/445106?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/0x-r4bbit",
+      "html_url": "https://github.com/0x-r4bbit",
+      "followers_url": "https://api.github.com/users/0x-r4bbit/followers",
+      "following_url": "https://api.github.com/users/0x-r4bbit/following{/other_user}",
+      "gists_url": "https://api.github.com/users/0x-r4bbit/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/0x-r4bbit/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/0x-r4bbit/subscriptions",
+      "organizations_url": "https://api.github.com/users/0x-r4bbit/orgs",
+      "repos_url": "https://api.github.com/users/0x-r4bbit/repos",
+      "events_url": "https://api.github.com/users/0x-r4bbit/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/0x-r4bbit/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-06T07:59:37Z",
+    "updated_at": "2023-06-06T07:59:37Z",
+    "author_association": "MEMBER",
+    "body": "Adding some addition info here:\r\n\r\n### Status Desktop\r\n\r\nFirst of all, extending the no-permission-community case should be as simple as changing\r\n\r\nhttps://github.com/status-im/status-desktop/blob/0b280f090e8b01db75c97ffabde543dd6e8e0143/ui/app/AppLayouts/Chat/views/CommunityColumnView.qml#L101-L104\r\n\r\nwith \r\n\r\nhttps://github.com/status-im/status-desktop/blob/0b280f090e8b01db75c97ffabde543dd6e8e0143/ui/app/AppLayouts/Chat/ChatLayout.qml#L90-L92\r\n\r\n`requestToJoinCommunityWithAuthentication()` automatically spins up the authentication modal provided by the keycard module. After entering a password and confirming, this should then trigger \r\n\r\nhttps://github.com/status-im/status-desktop/blob/0b280f090e8b01db75c97ffabde543dd6e8e0143/src/app/modules/main/chat_section/module.nim#L859-L860\r\n\r\nwhich will ultimately perform an async request-to-join using the provided password.\r\n\r\nThe provided password is what makes the difference here. When status-go's `RequestToJoinCommunity()` is called and its arguments include a `password`, it will automatically try to unlock the user accounts keystore using that password and verify the unlocked accounts. For each account, a signature is then created (using its private key), and both are then attached to the `RequestToJoin` message which will be sent to the network.\r\n\r\nThe owner node will then check those accounts accordingly for ownership and necessary funds.\r\n\r\n### status-go\r\n\r\n> We now use a new mechanism for sharing the address that adds the needed chainIDs to check the tokens for the owner, but since there is no permission yet, ie no balance to check, you can make it so it shares no chainID for now.\r\n\r\nMinor correction here: \r\n\r\nAdding the chainIDs to the accounts has not landed in status-go yet and is current being refactored. Once the refactor is done, if the community was a token-permission-community, then we'd obtain a list of wallet + chainID combinations during the process of creating the request to join message. **Again this is being worked on right now** so at the moment, there'll be checks on all supported chains by the owner node.\r\n\r\nHowever, since we're dealing with a community that does **not** have permissions, status-go is simply ignoring the attached accounts at the moment. This needs change.\r\n\r\nThis is the code that checks the wallet addresses if the community in question has `BECOME_MEMBER` permissions. Notice that all of this is ignore if there aren't any such permissions. So to make this work, we'll have to move the conditions around a bit, and also ensure that we **don't** mark the request as declined/reject it mistakenly. \r\n\r\nhttps://github.com/status-im/status-go/blob/15d2b4fe80d256dc0ee599174d1e30161381c589/protocol/communities/manager.go#L1511-L1582\r\n\r\nThen, regarding\r\n\r\n> Then, if the owner adds a permission, it would be the owner's responsibility to check all of Status' known chains and create the chainID array to fulfill the new permissions.\r\n\r\nAs for now, the owner will not actually figure out the chainIDs for other users. It's the users responsibility to provide chain IDs to check on. So if we move from a non-permission to a permission- community, then all existing members will be considered invalid. But since we will have an API that checks on all chains, we could make it a special case for when we move from 0 to > 0 permissions.\r\n\r\nSo only in **that** case, the owner node makes the effort to checks on all chains for all members and trying to figure out all chain IDs.",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1578128097/reactions",
+      "total_count": 2,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 1,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
