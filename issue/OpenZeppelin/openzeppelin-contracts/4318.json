@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4318",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4318/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4318/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4318/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4318",
+  "id": 1743812577,
+  "node_id": "I_kwDOA9tCBs5n8Hfh",
+  "number": 4318,
+  "title": "`EIP712`: `_TYPE_HASH` including `salt`",
+  "user": {
+    "login": "pcaversaccio",
+    "id": 25297591,
+    "node_id": "MDQ6VXNlcjI1Mjk3NTkx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25297591?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pcaversaccio",
+    "html_url": "https://github.com/pcaversaccio",
+    "followers_url": "https://api.github.com/users/pcaversaccio/followers",
+    "following_url": "https://api.github.com/users/pcaversaccio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pcaversaccio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pcaversaccio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pcaversaccio/subscriptions",
+    "organizations_url": "https://api.github.com/users/pcaversaccio/orgs",
+    "repos_url": "https://api.github.com/users/pcaversaccio/repos",
+    "events_url": "https://api.github.com/users/pcaversaccio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pcaversaccio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-06T12:53:37Z",
+  "updated_at": "2023-06-06T12:54:56Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Since `EIP-5267` got merged I wanted to raise a question. In [`EIP-712`](https://eips.ethereum.org/EIPS/eip-712)'s definition of the `domainSeparator` a so-called `salt` is also listed:\r\n\r\n> `bytes32 salt` an disambiguating salt for the protocol. This can be used as a domain separator of last resort.\r\n\r\n`EIP-5267` also supports the `salt` parameters for retrieval via the `fields` parameter. Now, my question: shouldn't we adjust the [`EIP712`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/EIP712.sol) to incorporate this `salt` parameter?\r\n\r\nI.e.:\r\n\r\n```diff\r\n- bytes32 private constant _TYPE_HASH = keccak256(\"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)\");\r\n+ bytes32 private constant _TYPE_HASH = keccak256(\"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)\");\r\n```\r\n\r\nand\r\n\r\n```solidity\r\nfunction _buildDomainSeparator(bytes32 salt) private view returns (bytes32) {\r\n    return keccak256(abi.encode(_TYPE_HASH, _hashedName, _hashedVersion, block.chainid, address(this), salt));\r\n}\r\n```\r\n\r\nThe above are illustrations and _not_ final code suggestions.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4318/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4318/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
