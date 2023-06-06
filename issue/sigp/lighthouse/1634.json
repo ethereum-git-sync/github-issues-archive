@@ -49,21 +49,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2020-09-19T03:18:59Z",
-  "updated_at": "2020-11-09T07:08:06Z",
-  "closed_at": null,
+  "updated_at": "2023-06-06T00:01:21Z",
+  "closed_at": "2023-06-06T00:01:20Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nInside the RPC we handle requests sent from out side over outbound substreams. When a request receives an end of stream signal or an error, the outbound substream state machine transitions to a closing state. This state only indicates that the substream must be closed, but we will hold it until actually closing it. Between both operations the substream could produce other errors: timeouts, peer sending additional stuff, etc. Those errors are only relevant inside the `Behaviour` for peer scoring, but for the application that sent the request, it is already finished and those additional messages are undesired noice. We should ensure that the application receives exactly one message that indicates the request is finished\r\n\r\n## Version\r\n\r\nmaster, 0.2.10\r\n\r\n## Present Behaviour\r\n\r\nit is possible for the application to receive more than one error for a request\r\n\r\n## Expected Behaviour\r\n\r\nreceive just one :)\r\n\r\n## Steps to resolve\r\n\r\ncheck the code to ensure that if a substream is in a closing state, it has already sent a final chunk/error. And when checking timeouts or newly received responses, inform of the error to the behaviour but also indicate that the error should not be propagated to the application.\r\n\r\nSmall worry out of my head.. a handler might get shutdown before sending the errors, but I guess that's out of scope here",
-  "closed_by": null,
+  "closed_by": {
+    "login": "divagant-martian",
+    "id": 26765164,
+    "node_id": "MDQ6VXNlcjI2NzY1MTY0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26765164?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/divagant-martian",
+    "html_url": "https://github.com/divagant-martian",
+    "followers_url": "https://api.github.com/users/divagant-martian/followers",
+    "following_url": "https://api.github.com/users/divagant-martian/following{/other_user}",
+    "gists_url": "https://api.github.com/users/divagant-martian/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/divagant-martian/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/divagant-martian/subscriptions",
+    "organizations_url": "https://api.github.com/users/divagant-martian/orgs",
+    "repos_url": "https://api.github.com/users/divagant-martian/repos",
+    "events_url": "https://api.github.com/users/divagant-martian/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/divagant-martian/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/1634/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/1634/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -157,6 +176,50 @@
     "body": "The rpc still sends both errors and stream terminations to sync but we just handle it, maybe we can close it? ",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/723687114/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1577704855",
+    "html_url": "https://github.com/sigp/lighthouse/issues/1634#issuecomment-1577704855",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/1634",
+    "id": 1577704855,
+    "node_id": "IC_kwDOCFeAzc5eCd2X",
+    "user": {
+      "login": "divagant-martian",
+      "id": 26765164,
+      "node_id": "MDQ6VXNlcjI2NzY1MTY0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26765164?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/divagant-martian",
+      "html_url": "https://github.com/divagant-martian",
+      "followers_url": "https://api.github.com/users/divagant-martian/followers",
+      "following_url": "https://api.github.com/users/divagant-martian/following{/other_user}",
+      "gists_url": "https://api.github.com/users/divagant-martian/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/divagant-martian/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/divagant-martian/subscriptions",
+      "organizations_url": "https://api.github.com/users/divagant-martian/orgs",
+      "repos_url": "https://api.github.com/users/divagant-martian/repos",
+      "events_url": "https://api.github.com/users/divagant-martian/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/divagant-martian/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-06T00:01:20Z",
+    "updated_at": "2023-06-06T00:01:20Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "closing because this doesn't cause any issues even if technically true",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1577704855/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
