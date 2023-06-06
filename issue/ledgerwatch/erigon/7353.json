@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-04-19T23:04:26Z",
-  "updated_at": "2023-05-30T02:29:05Z",
-  "closed_at": null,
+  "updated_at": "2023-06-06T02:47:18Z",
+  "closed_at": "2023-06-06T02:47:18Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nErigon version: `2.43.0-dev-f8f1658f`\r\n\r\nOS & Version: Linux\r\n\r\nCommit hash: f8f1658f8d15c5d27b0bb81dc5aa3f5b02ca4658\r\n\r\nErigon Command (with flags/config):\r\n```yaml\r\nhttp: true\r\nhttp.api: [\"eth\", \"net\", \"web3\", \"engine\", \"debug\", \"trace\", \"erigon\", \"parity\", \"ots\"]\r\nrpc.gascap: 0\r\nexternalcl: true\r\nexperimental.history.v3: true\r\n```\r\n\r\nConcensus Layer: Lighthouse v4.0.1-a53830f\r\n\r\nConcensus Layer Command (with flags/config):\r\n```\r\nlighthouse beacon --http --execution-endpoint http://127.0.0.1:8551 --execution-jwt [...] --checkpoint-sync-url=https://beaconstate.info\r\n```\r\n\r\nChain/Network: mainnet\r\n\r\n#### Expected behaviour\r\nerigon stays in sync with the consensus client\r\n\r\n#### Actual behaviour\r\nsyncing stops after seeing this `err=\"interface conversion: *memdb.MemoryMutation is not kv.TemporalTx`\r\n\r\n#### Steps to reproduce the behaviour\r\nunknown, but it reliably happens after every restart after some time\r\n\r\n#### Backtrace\r\n\r\n```\r\n[INFO] [04-19|22:41:50.449] Timings (slower than 50ms)               Headers=7.625s Bodies=1.018s Execution=2.274s HashState=41.793s IntermediateHashes=42.005s TxLookup=97ms\r\n[INFO] [04-19|22:41:50.449] Tables                                   PlainState=91.3GB AccountChangeSet=272.0KB StorageChangeSet=0B BlockTransaction=46.5GB TransactionLog=0B FreeList=120.0MB ReclaimableSpace=120.0GB\r\n[INFO] [04-19|22:41:50.449] RPC Daemon notified of new headers       from=17083625 to=17083657 hash=0xdd5863659a4d13e509d853a8c63f13435acef21ea9096f94baf3b06740876270 header sending=58.881µs log sending=280ns\r\n[INFO] [04-19|22:41:53.150] [2/15 Headers] Waiting for Consensus Layer...\r\n[INFO] [04-19|22:42:00.082] [2/15 Headers] Handling new payload      height=17083666 hash=0xa95cfea258dbe715ef7cf535641d667f795ee70cd64f167b00c8a5188ac78dfd\r\n[INFO] [04-19|22:42:00.087] [2/15 Headers] Downloading PoS headers... height=17083665 hash=0xeb47793395a678795157823203026c94c1ab5b39bbc500cf18f6d8d521be57b1 requestId=168\r\n[WARN] [04-19|22:42:00.342] Could not validate block                 err=\"interface conversion: *memdb.MemoryMutation is not kv.TemporalTx: missing method DomainGet, trace: [stageloop.go:284 panic.go:884 iface.go:92 iface.go:429 stage_hashstate.go:613 stage_hashstate.go:897 stage_hashstate.go:86 default_stages.go:289 sync.go:358 sync.go:260 stageloop.go:341 backend.go:417 fork_validator.go:270 fork_validator.go:227 stage_headers.go:669 collector.go:231 collector.go:282 collector.go:233 stage_headers.go:683 stage_headers.go:521 stage_headers.go:208 stage_headers.go:142 default_stages.go:36 sync.go:358 sync.go:260 stageloop.go:166 stageloop.go:94 asm_amd64.s:1598]\"\r\n[WARN] [04-19|22:42:00.351] Removing beacon request due to           err=\"interface conversion: *memdb.MemoryMutation is not kv.TemporalTx: missing method DomainGet, trace: [stageloop.go:284 panic.go:884 iface.go:92 iface.go:429 stage_hashstate.go:613 stage_hashstate.go:897 stage_hashstate.go:86 default_stages.go:289 sync.go:358 sync.go:260 stageloop.go:341 backend.go:417 fork_validator.go:270 fork_validator.go:227 stage_headers.go:669 collector.go:231 collector.go:282 collector.go:233 stage_headers.go:683 stage_headers.go:521 stage_headers.go:208 stage_headers.go:142 default_stages.go:36 sync.go:358 sync.go:260 stageloop.go:166 stageloop.go:94 asm_amd64.s:1598]\" requestId=168\r\n[INFO] [04-19|22:42:02.554] [2/15 Headers] Waiting for Consensus Layer...\r\n[INFO] [04-19|22:42:04.617] [2/15 Headers] Waiting for Consensus Layer...\r\n```\r\n\r\n```\r\n$ ./build/bin/integration print_stages --datadir ~/.local/share/erigon --chain mainnet\r\nINFO[04-19|22:59:45.228] logging to file system                   log dir=/home/banteg/.local/share/erigon/logs file prefix=erigon log level=info json=false\r\nINFO[04-19|22:59:50.760] [snapshots] Blocks Stat                  blocks=16993k indices=16993k alloc=2.5GB sys=2.6GB\r\nINFO[04-19|22:59:50.823] [snapshots] History Stat                 blocks=17040k txs=1968m txNum2blockNum=\"32=4650K,64=5314K,96=6114K,128=7158K,160=8040K,192=8931K,224=9863K,256=10543K,288=11113K,320=11673K,352=12184K,384=12647K,416=13175K,448=13681K,480=14208K,481=14225K,482=14241K,484=14275K,488=14345K,496=14481K,512=14760K,513=14776K,514=14793K,516=14828K,520=14897K,528=15034K,544=15298K,545=15315K,548=15368K,552=15441K,560=15584K,576=15904K,577=15926K,578=15944K,580=15984K,584=16073K,592=16238K,608=16584K,609=16605K,610=16626K,610=16626K,611=16645K,612=16667K,612=16667K,613=16687K,614=16708K,615=16730K,616=16750K,616=16750K,617=16772K,618=16793K,619=16815K,620=16834K,621=16855K,622=16876K,623=16896K,624=16917K,624=16917K,625=16936K,626=16956K,626=16956K,627=16977K,628=16997K,628=16997K,629=17020K,630=17040K,630=17040K\" first_history_idx_in_db=0 alloc=2.5GB sys=2.6GB\r\nNote: prune_at doesn't mean 'all data before were deleted' - it just mean stage.Prune function were run to this block. Because 1 stage may prune multiple data types to different prune distance.\r\n\r\n \t\t\t\t stage_at \t prune_at\r\nSnapshots \t\t\t 17083657 \t 0\r\nHeaders \t\t\t 17083657 \t 0\r\nBlockHashes \t\t\t 17083657 \t 0\r\nBodies \t\t\t\t 17083657 \t 0\r\nSenders \t\t\t 17083657 \t 0\r\nExecution \t\t\t 17083657 \t 17083657\r\nTranslation \t\t\t 0 \t\t 0\r\nHashState \t\t\t 17083657 \t 0\r\nIntermediateHashes \t\t 17083657 \t 17083657\r\nAccountHistoryIndex \t\t 0 \t\t 0\r\nStorageHistoryIndex \t\t 0 \t\t 0\r\nLogIndex \t\t\t 0 \t\t 0\r\nCallTraces \t\t\t 0 \t\t 0\r\nTxLookup \t\t\t 17083657 \t 16993000\r\nFinish \t\t\t\t 17083657 \t 0\r\n--\r\nprune distance:\r\n\r\nblocks.v2: blocks=16992999, segments=16992999, indices=16992999\r\n\r\nhistory.v3: true, idx steps: 22.92, lastMaxTxNum=17083657->1975305694, lastBlockInSnap=17040031\r\n\r\nsequence: EthTx=1975305695, NonCanonicalTx=0\r\n\r\nin db: first header 16685400, last header 17083657, first body 16685400, last body 17083657\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7353/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7353/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "This issue is stale because it has been open for 40 days with no activity. Remove stale label or comment, or this will be closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1567680581/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1577814073",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/7353#issuecomment-1577814073",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7353",
+    "id": 1577814073,
+    "node_id": "IC_kwDOC0FsAM5eC4g5",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-06-06T02:47:17Z",
+    "updated_at": "2023-06-06T02:47:17Z",
+    "author_association": "NONE",
+    "body": "This issue was closed because it has been stalled for 7 days with no activity.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1577814073/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
