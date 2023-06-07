@@ -30,7 +30,33 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 985647286,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODY=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/good%20first%20issue",
+      "name": "good first issue",
+      "color": "7057ff",
+      "default": true,
+      "description": "Good for newcomers"
+    },
+    {
+      "id": 2336803064,
+      "node_id": "MDU6TGFiZWwyMzM2ODAzMDY0",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/infra-ci",
+      "name": "infra-ci",
+      "color": "7365BC",
+      "default": false,
+      "description": ""
+    }
   ],
   "state": "open",
   "locked": false,
@@ -39,9 +65,9 @@
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-06-04T16:01:16Z",
-  "updated_at": "2023-06-04T20:13:43Z",
+  "updated_at": "2023-06-07T00:17:50Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -184,6 +210,50 @@
     "body": "This fixes it for me:\r\n\r\n```\r\ndiff --git a/lcli/Dockerfile b/lcli/Dockerfile\r\nindex 98f33f215..485ebfd5b 100644\r\n--- a/lcli/Dockerfile\r\n+++ b/lcli/Dockerfile\r\n@@ -6,7 +6,7 @@ RUN apt-get update && apt-get -y upgrade && apt-get install -y cmake libclang-de\r\n COPY . lighthouse\r\n ARG PORTABLE\r\n ENV PORTABLE $PORTABLE\r\n-RUN cd lighthouse && make install-lcli\r\n+RUN if [ \"$PORTABLE\" = true ] ; then export FEATURES=portable; fi && cd lighthouse && make install-lcli\r\n\r\n FROM ubuntu:22.04\r\n RUN apt-get update && apt-get -y upgrade && apt-get clean && rm -rf /var/lib/apt/lists/*\r\n```\r\n\r\n\r\n```\r\n$ ./lcli-fixed insecure-validators --count 4 --base-dir $(pwd) --node-count 4\r\nValidator 1\r\nWARN: Scrypt parameters are too weak (n: 2, p: 1, r: 8), we recommend (n: 262144, p: 1, r: 8)\r\nValidator 2\r\nWARN: Scrypt parameters are too weak (n: 2, p: 1, r: 8), we recommend (n: 262144, p: 1, r: 8)\r\nValidator 3\r\nWARN: Scrypt parameters are too weak (n: 2, p: 1, r: 8), we recommend (n: 262144, p: 1, r: 8)\r\nValidator 4\r\nWARN: Scrypt parameters are too weak (n: 2, p: 1, r: 8), we recommend (n: 262144, p: 1, r: 8)\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1575697017/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1579635525",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4370#issuecomment-1579635525",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4370",
+    "id": 1579635525,
+    "node_id": "IC_kwDOCFeAzc5eJ1NF",
+    "user": {
+      "login": "michaelsproul",
+      "id": 4452260,
+      "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/michaelsproul",
+      "html_url": "https://github.com/michaelsproul",
+      "followers_url": "https://api.github.com/users/michaelsproul/followers",
+      "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+      "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+      "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+      "repos_url": "https://api.github.com/users/michaelsproul/repos",
+      "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-07T00:17:19Z",
+    "updated_at": "2023-06-07T00:17:19Z",
+    "author_association": "MEMBER",
+    "body": "Good catch, thanks\r\n\r\nWould you mind opening a PR to fix it? My preffered fix would be to remove the `PORTABLE` arg and pass `FEATURES` through from the Dockerfile. The existing makefile will then use those features here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/c547a11b0da48db6fdd03bca2c6ce2448bbcc3a9/Makefile#L53-L58\r\n\r\nWe should also update the Github action that builds the image so that it uses `FEATURES=portable` instead of `PORTABLE=true`:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/c547a11b0da48db6fdd03bca2c6ce2448bbcc3a9/.github/workflows/docker.yml#L131-L148",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1579635525/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
