@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5115",
+  "id": 1744870019,
+  "node_id": "I_kwDOGBlvNc5oAJqD",
+  "number": 5115,
+  "title": "Anvil doesn't compile on Windows due to IPC",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-07T01:30:26Z",
+  "updated_at": "2023-06-07T01:30:45Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nAnvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\n42e7153b0a7aadb779f97b2c0675bc2206f774d6\n\n### What command(s) is the bug in?\n\ncargo install\n\n### Operating System\n\nWindows\n\n### Describe the bug\n\nOn Windows, installing Anvil with `cargo install` fails due to the absence of IPC support in ethers:\r\n\r\n```\r\n$ cargo install --git https://github.com/foundry-rs/foundry --locked anvil\r\n...\r\n   Compiling anvil-core v0.1.0 (C:\\Users\\Michael\\.cargo\\git\\checkouts\\foundry-f7cca724e93059b0\\42e7153\\anvil\\core)\r\nerror[E0412]: cannot find type `Ipc` in crate `ethers::providers`\r\n   --> anvil\\src\\lib.rs:269:76\r\n    |\r\n269 |     pub async fn ipc_provider(&self) -> Option<Provider<ethers::providers::Ipc>> {\r\n    |                                                                            ^^^ not found in `ethers::providers`\r\n\r\nerror[E0599]: no function or associated item named `connect_ipc` found for struct `ethers::ethers_providers::Provider` in the current scope\r\n   --> anvil\\src\\lib.rs:272:34\r\n    |\r\n272 |         let provider = Provider::connect_ipc(&ipc_path).await.unwrap_or_else(|err| {\r\n    |                                  ^^^^^^^^^^^\r\n    |                                  |\r\n    |                                  function or associated item not found in `Provider<_>`\r\n    |                                  help: there is an associated function with a similar name: `connect`\r\n\r\nSome errors have detailed explanations: E0412, E0599.\r\nFor more information about an error, try `rustc --explain E0412`.\r\n```\r\n\r\nThis is remedied by enabling the IPC feature like so:\r\n\r\n```\r\n$ cargo install --git https://github.com/foundry-rs/foundry --locked anvil --features ethers/ipc\r\n```\r\n\r\nIt looks like there's logic to switch IPC _off_ on Windows here:\r\n\r\nhttps://github.com/foundry-rs/foundry/blob/42e7153b0a7aadb779f97b2c0675bc2206f774d6/anvil/Cargo.toml#L69-L73\r\n\r\nHowever, I think this prevents compilation on Windows at all, because the code expects IPC support to be available. If a feature flag were added to anvil for IPC then it could be used to enable/disable the IPC support and prevent the error.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
