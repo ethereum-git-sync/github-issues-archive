@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 8,
+  "comments": 9,
   "created_at": "2023-05-09T18:45:48Z",
-  "updated_at": "2023-06-01T18:58:36Z",
-  "closed_at": null,
+  "updated_at": "2023-06-07T14:00:20Z",
+  "closed_at": "2023-06-07T14:00:20Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (43974b0 2023-05-09T00:17:51.920839000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge create\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nWhen running `forge create` with the `--verify` flag and a `--verifier-url` on a custom chain, I get an error:\r\nETHERSCAN_API_KEY must be set, even if I have set the flag `--etherscan-api-key` or set `ETHERSCAN_API_KEY` as an environment variable.\r\n\r\nIf I add the --verify flag with a known chain that uses blockscout, I get an error on verification:\r\n\r\n\"Received error response: status=0,message=Contract source code not verified, result=None\"\r\n\r\n## Deploying to Scroll Alpha\r\n\r\nI believe scroll alpha's rpc url is a known chain. When deploying  [WETH](https://github.com/gnosis/canonical-weth/blob/master/contracts/WETH9.sol) contract to [the scroll alpha chain](https://guide.scroll.io/developers/verifying-smart-contracts) and verifying it:\r\n\r\n**on latest nightly version:**\r\n```\r\nforge create --rpc-url https://alpha-rpc.scroll.io/l2 \\\r\n  --legacy \\\r\n  --private-key $PRIVATE_KEY \\\r\n  --etherscan-api-key abc \\\r\n  --verifier-url https://blockscout.scroll.io/api? \\\r\n  --verify \\\r\n  src/WETH10.sol:WETH10\r\n```\r\n\r\nThis is the output:\r\n```\r\nDeployer: 0xf69fEc6d858c77e969509843852178bd24CAd2B6\r\nDeployed to: 0x0ef82DaB14798E63F1B99479Ba689e3f6A6fEb6C\r\nTransaction hash: 0xe56b35386af9f9e63d544c08f3bcafddaa9dd9e95b3bebdefafc2789bc9abdcb\r\nStarting contract verification...\r\nWaiting for etherscan to detect contract deployment...\r\nStart verifying contract `0x0ef82dab14798e63f1b99479ba689e3f6a6feb6c` deployed on scroll-alpha-testnet\r\nError:\r\nReceived error response: status=0,message=Contract source code not verified, result=None\r\n```\r\n\r\nIf I go back to version `nightly-94777647f6ea5d34572a1b15c9b57e35b8c77b41` the issue goes away:\r\n\r\n```\r\nfoundryup --version nightly-94777647f6ea5d34572a1b15c9b57e35b8c77b41\r\n\r\nforge create --rpc-url https://alpha-rpc.scroll.io/l2 \\\r\n  --legacy \\\r\n  --private-key $PRIVATE_KEY \\\r\n  --etherscan-api-key abc \\\r\n  --verifier-url https://blockscout.scroll.io/api? \\\r\n  --verify \\\r\n  src/WETH9.sol:WETH9\r\n```\r\n\r\nOutput:\r\n```\r\nDeployer: 0xf69fEc6d858c77e969509843852178bd24CAd2B6\r\nDeployed to: 0x97eb05B8db496B12244BCcf17CF377d00a99b67a\r\nTransaction hash: 0xde25493333138d7a9d63c54a7cc2e583636e71cb02b4bfd66504d01620f36fa0\r\nStarting contract verification...\r\nWaiting for etherscan to detect contract deployment...\r\nStart verifying contract `0x97eb05b8db496b12244bccf17cf377d00a99b67a` deployed on 534353\r\n\r\nSubmitting verification for [src/WETH9.sol:WETH9] \"0x97eb05B8db496B12244BCcf17CF377d00a99b67a\".\r\nSubmitted contract for verification:\r\n\tResponse: `OK`\r\n\tGUID: `97eb05b8db496b12244bccf17cf377d00a99b67a645a9371`\r\n\tURL:\r\n        https://blockscout.scroll.io/api?/address/0x97eb05b8db496b12244bccf17cf377d00a99b67a\r\nContract verification status:\r\nResponse: `OK`\r\nDetails: `Unknown UID`\r\n```\r\n\r\n## Deploying on a custom L2 chain and verifying on blockscout\r\n\r\nWhen running on a **custom l2 chain that I believe forge doesn't recognize**, with the latest version I always get the error.\r\n\r\nHere is the command I run:\r\n\r\n```\r\nETHERSCAN_API_KEY=abc forge create --rpc-url {{ my rpc url }} \\\r\n  --chain-id {{ my chain id }} \\\r\n  --private-key $PRIVATE_KEY \\\r\n  --etherscan-api-key asdfasdf \\\r\n  --verifier-url {{my blockscout verifier url}} \\\r\n  --verify \\\r\n  src/WETH9.sol:WETH9 \r\n```\r\n\r\nI always get an error on verification:\r\n```\r\nStart verifying contract `0x961b527b5e298569dbd7b1d90630cc515eb17a4a` deployed on {{ my custom chain id }}\r\nError: \r\nETHERSCAN_API_KEY must be set\r\n```\r\n\r\nIf I roll back to version `nightly-94777647f6ea5d34572a1b15c9b57e35b8c77b41`\r\n\r\nThe command works successfully and my contract is verified.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4909/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4909/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -412,6 +431,50 @@
     "body": "awesome, thanks for that @kahuang. I've hunted down what seemed to be the last issue on blockscout-etherscan verification: https://github.com/gakonst/ethers-rs/pull/2453\r\n\r\nI've tested deploying quite a few contracts and verifying them across different chains including yours—but I can't seem to verify any contracts on your instance. The same contract with solc and evm version combo that works when verified on other chains doesn't work on yours. More accurately, it throws this error:\r\n\r\n```{ status: \"1\", message: \"OK\", result: \"Unknown UID\" }```\r\n\r\nI think it might be that the instance is not configured properly—there are also some other features broken (search, for example). Is it possible for you to check? Happy to follow up as soon as you do.\r\n\r\nAlso, note that you must not use a solidity version above 0.8.18, nor an evm version higher than london—verification won't work otherwise as your chain doesn't support these. I recommend setting these on your `foundry.toml`.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1572615496/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1580885805",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/4909#issuecomment-1580885805",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4909",
+    "id": 1580885805,
+    "node_id": "IC_kwDOGBlvNc5eOmct",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-07T14:00:20Z",
+    "updated_at": "2023-06-07T14:00:20Z",
+    "author_association": "COLLABORATOR",
+    "body": "Should be fixed with the fixes on ethers. https://github.com/gakonst/ethers-rs/pull/2453 & https://github.com/gakonst/ethers-rs/pull/2426",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1580885805/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
