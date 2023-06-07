@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4384",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4384/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4384/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4384/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4384",
+  "id": 1746540056,
+  "node_id": "I_kwDOCFeAzc5oGhYY",
+  "number": 4384,
+  "title": "Upgrading schema from v13 to v16 makes beacon database inconsistent and unrecoverable",
+  "user": {
+    "login": "ip75",
+    "id": 3886308,
+    "node_id": "MDQ6VXNlcjM4ODYzMDg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3886308?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ip75",
+    "html_url": "https://github.com/ip75",
+    "followers_url": "https://api.github.com/users/ip75/followers",
+    "following_url": "https://api.github.com/users/ip75/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ip75/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ip75/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ip75/subscriptions",
+    "organizations_url": "https://api.github.com/users/ip75/orgs",
+    "repos_url": "https://api.github.com/users/ip75/repos",
+    "events_url": "https://api.github.com/users/ip75/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ip75/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-07T19:29:31Z",
+  "updated_at": "2023-06-07T19:29:31Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\nWhen upgrade database from Lighthouse v3.4.0-38514c0+ to Lighthouse v4.0.1-a53830f I'll get inconsistent and unrecoverable database. \r\n\r\n## Version\r\n\r\nv4.0.1-a53830f\r\nI got precompiled version from https://github.com/sigp/lighthouse/releases/download/v4.0.1/lighthouse-v4.0.1-x86_64-unknown-linux-gnu.tar.gz\r\n\r\n## Present Behaviour\r\n\r\nWhen first start on Lighthouse v4.0.1-a53830f it upgrades schema from v13 to v16 and makes database inconsistent and unrecoverable.\r\n\r\n![image](https://github.com/sigp/lighthouse/assets/3886308/82cd8651-4eaf-4deb-bdcb-50240d6f6f6e)\r\n```\r\nJun 07 18:59:16.172 ERRO Error decoding head block               message: This node has likely missed a hard fork. It will try to revert the invalid blocks and keep running, but any stray blocks and states will not be deleted. Long-term you should consider re-syncing this node., service: beacon\r\nJun 07 18:59:16.172 WARN Reverting invalid head block            fork_epoch: 194048, target_fork: capella, service: beacon\r\nJun 07 18:59:16.173 INFO Reverting block                         slot: 6268148, block_root: 0xefa07c0efb30ebab3575dfcd03e97cee56c9de16480b7fa8ba3c4a4a826082f8, service: beacon\r\nJun 07 18:59:16.221 INFO Reverting block                         slot: 6268065, block_root: 0x038da6b66383d77d6c133a5f5b810b7c559525e49546dc8bf50305f55469d5f4, service: beacon\r\nJun 07 18:59:16.317 INFO Reverting block                         slot: 6260540, block_root: 0x87fc086490d1950a5c355293a89f8ddd2db053662f64c8be3b1d6c15fd8996ed, service: beacon\r\nJun 07 18:59:16.348 INFO Reverting block                         slot: 6236164, block_root: 0x3058147fc81e75b163cbe0f40a43d719de346d6fad87c6cb1bf0566c4689ecd5, service: beacon\r\nJun 07 18:59:16.410 INFO Reverting block                         slot: 6235680, block_root: 0x9d149669ae483b85a159caed8e9ca1e1a287b2cd75d2eff3e79de07902e4a216, service: beacon\r\nJun 07 18:59:16.441 INFO Reverting block                         slot: 6211993, block_root: 0x2081a9b74435a76f9f3d49826491e8071db2a045f3250d84c1f2d88fb6d04057, service: beacon\r\nJun 07 18:59:16.475 INFO Reverting block                         slot: 6211813, block_root: 0xb14a3f641973f6f6a6ff6bb421190cf95309ac556f3fc3eea0957b52b5631d8a, service: beacon\r\nJun 07 18:59:16.513 INFO Reverting block                         slot: 6209582, block_root: 0x8bc7203e123cef451aadcaa541970a5c6c61780c3a9550893daecda7a9bc8166, service: beacon\r\nJun 07 18:59:17.428 WARN Execution endpoint is not synced        last_seen_block_unix_timestamp: 0, endpoint: http://localhost:8551/, auth=true, service: deposit_contract_rpc\r\nJun 07 18:59:17.428 ERRO Error updating deposit contract cache   error: Failed to get remote head and new block ranges: EndpointError(FarBehind), retry_millis: 60000, service: deposit_contract_rpc\r\nJun 07 18:59:18.454 CRIT Failed to start beacon node             reason: Failed to build beacon chain: Error loading finalized block: HotColdDBError(MissingFullBlockExecutionPayloadPruned(0x1171bd9c5f5ed58daf7ac4e07f6a1b7d5e7fb7adc7dde42b9cf9e1735dc884bc, Slot(6209439)))\r\nJun 07 18:59:18.454 INFO Internal shutdown received              reason: Failed to start beacon node\r\nJun 07 18:59:18.454 INFO Shutting down..                         reason: Failure(\"Failed to start beacon node\")\r\nFailed to start beacon node\r\n```\r\n\r\nThis is a first start logs:\r\n```\r\nJun 07 18:02:08.720 INFO Logging to file, path: \"/ssd/.lighthouse/data/beacon/logs/beacon.log\", module: environment:270\r\nJun 07 18:02:08.757 INFO Lighthouse started, version: Lighthouse/v4.0.1-a53830f, module: lighthouse:554\r\nJun 07 18:02:08.757 INFO Configured for network, name: mainnet, module: lighthouse:555\r\nJun 07 18:02:08.767 INFO Data directory initialised, datadir: /ssd/.lighthouse/data, module: beacon_node::config:72\r\nJun 07 18:02:08.797 INFO Deposit contract, address: 0x00000000XXXXXXXXXXXXXXXXXXXXXX, deploy_block: 11184524, module: beacon_node::config:427\r\nJun 07 18:03:47.075 INFO Hot-Cold DB initialized, split_state: 0x173c07e36c2c337a88de6f465f30e4ccef5c3eeca2d220fd13b45e61f5409ccb, split_slot: 6209472, service: freezer_db, module: store::hot_cold_store:198\r\nJun 07 18:03:47.200 DEBG Attempting schema migration, to_version: 16, from_version: 13, service: freezer_db, module: store::hot_cold_store:210\r\nJun 07 18:03:48.026 DEBG Dropping fork choice balances cache, item_count: 4, module: beacon_chain::schema_change::migration_schema_v16:34\r\nJun 07 18:03:49.961 DEBG Garbage collecting 57358 temporary states, service: freezer_db, module: store::garbage_collection:29\r\nJun 07 18:03:51.927 DEBG Loaded execution endpoint, jwt_path: \"/ssd/.ethereum/data/geth/jwtsecret\", endpoint: http://localhost:8551/, service: exec, module: execution_layer:313\r\nJun 07 18:03:52.824 INFO Refusing to checkpoint sync, msg: database already exists, use --purge-db to force checkpoint sync, service: beacon, module: client::builder:207\r\nJun 07 18:03:52.836 INFO Starting beacon chain, method: resume, service: beacon, module: beacon_chain::builder:243\r\nJun 07 18:03:53.030 DEBG Restoring fork choice from persisted, contains_invalid_payloads: false, reset_payload_statuses: OnlyWithInvalidPayload, service: beacon, module: fork_choice::fork_choice:1416\r\nJun 07 18:05:24.994 INFO Block production enabled, method: json rpc via http, endpoint: Auth { endpoint: \"http://localhost:8551/\", jwt_path: \"/ssd/.ethereum/data/geth/jwtsecret\", jwt_id: None, jwt_version: None }, module: beacon_node:111\r\nJun 07 18:05:28.180 WARN Execution endpoint is not synced, last_seen_block_unix_timestamp: 0, endpoint: http://localhost:8551/, auth=true, service: deposit_contract_rpc, module: eth1::service:136\r\nJun 07 18:05:28.180 ERRO Error updating deposit contract cache, error: Failed to get remote head and new block ranges: EndpointError(FarBehind), retry_millis: 60000, service: deposit_contract_rpc, module: eth1::service:729\r\nJun 07 18:05:28.379 ERRO Error decoding head block, message: This node has likely missed a hard fork. It will try to revert the invalid blocks and keep running, but any stray blocks and states will not be deleted. Long-term you should consider re-syncing this node., service: beacon, module: beacon_chain::builder:643\r\nJun 07 18:05:28.379 WARN Reverting invalid head block, fork_epoch: 194048, target_fork: capella, service: beacon, module: beacon_chain::fork_revert:44\r\nJun 07 18:05:28.425 INFO Reverting block, slot: 6268148, block_root: 0xefa07c0efb30ebab3575dfcd03e97cee56c9de16480b7fa8ba3c4a4a826082f8, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:28.457 INFO Reverting block, slot: 6268065, block_root: 0x038da6b66383d77d6c133a5f5b810b7c559525e49546dc8bf50305f55469d5f4, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:28.528 INFO Reverting block, slot: 6260540, block_root: 0x87fc086490d1950a5c355293a89f8ddd2db053662f64c8be3b1d6c15fd8996ed, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:28.591 INFO Reverting block, slot: 6236164, block_root: 0x3058147fc81e75b163cbe0f40a43d719de346d6fad87c6cb1bf0566c4689ecd5, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:28.629 INFO Reverting block, slot: 6235680, block_root: 0x9d149669ae483b85a159caed8e9ca1e1a287b2cd75d2eff3e79de07902e4a216, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:28.667 INFO Reverting block, slot: 6211993, block_root: 0x2081a9b74435a76f9f3d49826491e8071db2a045f3250d84c1f2d88fb6d04057, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:28.693 INFO Reverting block, slot: 6211813, block_root: 0xb14a3f641973f6f6a6ff6bb421190cf95309ac556f3fc3eea0957b52b5631d8a, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:28.723 INFO Reverting block, slot: 6209582, block_root: 0x8bc7203e123cef451aadcaa541970a5c6c61780c3a9550893daecda7a9bc8166, service: beacon, module: beacon_chain::fork_revert:57\r\nJun 07 18:05:32.511 CRIT Failed to start beacon node, reason: Failed to build beacon chain: Error loading finalized block: HotColdDBError(MissingFullBlockExecutionPayloadPruned(0x1171bd9c5f5ed58daf7ac4e07f6a1b7d5e7fb7adc7dde42b9cf9e1735dc884bc, Slot(6209439))), module: lighthouse:574\r\nJun 07 18:05:32.661 INFO Internal shutdown received, reason: Failed to start beacon node, module: environment:463\r\n\r\n```\r\n\r\n## Expected Behaviour\r\n\r\nsuccessful start of beacon mode\r\n\r\n## Steps to resolve\r\n\r\nI don't know. `db prune_payloads` completes successfully.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4384/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4384/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
