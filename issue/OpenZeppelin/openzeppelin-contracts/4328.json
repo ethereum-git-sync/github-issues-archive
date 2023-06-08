@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4328",
+  "id": 1747157135,
+  "node_id": "I_kwDOA9tCBs5oI4CP",
+  "number": 4328,
+  "title": "why is _update replacing _beforeTokenTransfer and _afterTokenTransfer",
+  "user": {
+    "login": "HalfSuperNate",
+    "id": 96854633,
+    "node_id": "U_kgDOBcXiaQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/96854633?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/HalfSuperNate",
+    "html_url": "https://github.com/HalfSuperNate",
+    "followers_url": "https://api.github.com/users/HalfSuperNate/followers",
+    "following_url": "https://api.github.com/users/HalfSuperNate/following{/other_user}",
+    "gists_url": "https://api.github.com/users/HalfSuperNate/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/HalfSuperNate/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/HalfSuperNate/subscriptions",
+    "organizations_url": "https://api.github.com/users/HalfSuperNate/orgs",
+    "repos_url": "https://api.github.com/users/HalfSuperNate/repos",
+    "events_url": "https://api.github.com/users/HalfSuperNate/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/HalfSuperNate/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-08T06:15:45Z",
+  "updated_at": "2023-06-08T06:15:45Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "About: [Remove hooks](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/3838)\r\n\r\nThe issue is now _update is only called once therefore any function that needed to be performed before the token is transferred  it won't happen not trigger.\r\n\r\nHere is an example snippet from [The Sanctuary ERC1155 Contract](https://etherscan.io/address/0x715af60ec1c3c65e294c7d8ef340f14e754c66bb#code)\r\n\r\n`function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override{\r\n        super._beforeTokenTransfer(operator, from, to, ids, amounts, data); // Call parent hook\r\n        require(restricted[operator] == false && restricted[from] == false && restricted[to] == false, \"Operator, From, or To Address is RESTRICTED\"); //checks if the any address in use is restricted\r\n\r\n        for (uint256 i = 0; i < ids.length; i++) {\r\n            if(flagged[ids[i]]){\r\n                revert(\"FID\"); //reverts if a token has been flagged\r\n            }\r\n        }\r\n    }\r\n\r\nfunction bindOnMint(uint _id) public view returns(bool){\r\n        uint256 _batchID;\r\n        for (uint256 i = 0; i < collectionBatchEndID.length; i++) {\r\n            if(i != 0 && _id <= collectionBatchEndID[i] && _id > collectionBatchEndID[i - 1]){\r\n                _batchID = i;\r\n                break;\r\n            }\r\n            if(i <= 0 && _id <= collectionBatchEndID[i]){\r\n                _batchID = i;\r\n                break;\r\n            }\r\n        }\r\n        return bindOnMintBatch[_batchID];\r\n    }\r\n\r\nfunction _afterTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override{\r\n        super._afterTokenTransfer(operator, from, to, ids, amounts, data); // Call parent hook\r\n\r\n        for (uint256 i = 0; i < ids.length; i++) {\r\n            if(bindOnMint(ids[i])){\r\n                flagged[ids[i]] = true;\r\n            }\r\n        }\r\n    }\r\n`",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
