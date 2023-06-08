@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-06-07T14:50:23Z",
-  "updated_at": "2023-06-08T01:49:08Z",
-  "closed_at": null,
+  "updated_at": "2023-06-08T02:04:02Z",
+  "closed_at": "2023-06-08T02:03:03Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "op-node connect to op-geth with followed error\r\n```\r\nt=2023-06-07T14:42:48+0000 lvl=info msg=\"loaded new runtime config values!\" p2p_seq_address=0xAAAA45d9549EDA09E70937013520214382Ffc4A2\r\nt=2023-06-07T14:42:48+0000 lvl=eror msg=\"Error initializing the rollup node\" err=\"403 Forbidden: invalid host specified\\n\"\r\nt=2023-06-07T14:42:48+0000 lvl=eror msg=\"Unable to create the rollup node\"   error=\"403 Forbidden: invalid host specified\\n\"\r\nt=2023-06-07T14:42:48+0000 lvl=crit msg=\"Application failed\"                 message=\"403 Forbidden: invalid host specified\\n\"\r\n```\r\n\r\nI use a docker-compose to run op-geth + op-node\r\n```\r\nversion: '3'\r\n\r\nservices:\r\n  \"op-geth\":\r\n    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-geth:db683328028fc16403fc555844556a42a337a148\r\n    container_name: opt2_1.0_1\r\n    user: \"nobody:nogroup\"\r\n    ports:\r\n      - ${RPCPORT:-8545}:8545\r\n      - ${WS_PORT:-8546}:8546\r\n      - ${AUTH_PORT:-8551}:8551\r\n    volumes:\r\n      - /data/opt2:/data/opt2\r\n    environment:\r\n      - COIN_NAME=opt2\r\n    entrypoint:\r\n      - /usr/local/bin/geth\r\n      - --ws\r\n      - --ws.port=8546\r\n      - --ws.addr=0.0.0.0\r\n      - --ws.origins=\"*\"\r\n      - --http\r\n      - --http.addr=0.0.0.0\r\n      - --http.api=\"eth,net,web3,debug\"\r\n      - --http.port=8545\r\n      - --http.vhosts=\"*\"\r\n      - --http.corsdomain=\"*\"\r\n      - --authrpc.addr=0.0.0.0\r\n      - --authrpc.jwtsecret=/data/opt2/jwt.txt\r\n      - --authrpc.port=8551\r\n      - --authrpc.vhosts=\"*\"\r\n      - --datadir=/data/opt2\r\n      - --verbosity=3\r\n      - --rollup.disabletxpoolgossip=true\r\n      - --rollup.sequencerhttp=https://bedrock-beta-1-sequencer.optimism.io\r\n      - --nodiscover\r\n      - --syncmode=full\r\n      - --maxpeers=0\r\n    restart: always\r\n    logging:\r\n      driver: \"json-file\"\r\n      options:\r\n        max-size: \"400k\"\r\n        max-file: \"10\"\r\n  \"op-node\":\r\n    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:d826cb018955d342779ccc0ebdf878cfa746e765\r\n    container_name: opt-node_1.1.0\r\n    volumes:\r\n      - /data/opt2:/data/opt2\r\n    ports:\r\n      - \"${OP_NODE_RPC_PORT:-9545}:9545\"\r\n    entrypoint:\r\n      - /usr/local/bin/op-node\r\n      - --l1=http://geth:8545\r\n      - --l2=http://op-geth:8551\r\n      - --network=mainnet\r\n      - --rpc.addr=0.0.0.0\r\n      - --rpc.port=9545\r\n      - --l2.jwt-secret=/data/opt2/jwt.txt\r\n      - --log.level=debug\r\n    restart: always\r\n    logging:\r\n      driver: \"json-file\"\r\n      options:\r\n        max-size: \"400k\"\r\n        max-file: \"10\"\r\n    depends_on:\r\n      - op-geth\r\n```\r\n\r\nI try connet http://op-geth:8551 is ok in another container\r\n```\r\n/ # ls /data/opt2/jwt.txt\r\n/data/opt2/jwt.txt\r\n/ # cat /data/opt2/jwt.txt\r\nc751f6cb3e5c0507b65b850956dc3581f02fe498c33afa3d332cd10f5fbad639\r\n/ # curl op-geth:8551\r\nmissing token\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "lcgogo",
+    "id": 8175573,
+    "node_id": "MDQ6VXNlcjgxNzU1NzM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8175573?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lcgogo",
+    "html_url": "https://github.com/lcgogo",
+    "followers_url": "https://api.github.com/users/lcgogo/followers",
+    "following_url": "https://api.github.com/users/lcgogo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lcgogo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lcgogo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lcgogo/subscriptions",
+    "organizations_url": "https://api.github.com/users/lcgogo/orgs",
+    "repos_url": "https://api.github.com/users/lcgogo/repos",
+    "events_url": "https://api.github.com/users/lcgogo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lcgogo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5908/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5908/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -186,6 +205,50 @@
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1581769756/reactions",
       "total_count": 1,
       "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1581778192",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/5908#issuecomment-1581778192",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5908",
+    "id": 1581778192,
+    "node_id": "IC_kwDODjvEJM5eSAUQ",
+    "user": {
+      "login": "lcgogo",
+      "id": 8175573,
+      "node_id": "MDQ6VXNlcjgxNzU1NzM=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8175573?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/lcgogo",
+      "html_url": "https://github.com/lcgogo",
+      "followers_url": "https://api.github.com/users/lcgogo/followers",
+      "following_url": "https://api.github.com/users/lcgogo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/lcgogo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/lcgogo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/lcgogo/subscriptions",
+      "organizations_url": "https://api.github.com/users/lcgogo/orgs",
+      "repos_url": "https://api.github.com/users/lcgogo/repos",
+      "events_url": "https://api.github.com/users/lcgogo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/lcgogo/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-08T02:02:43Z",
+    "updated_at": "2023-06-08T02:04:02Z",
+    "author_association": "NONE",
+    "body": "> The `--http.vhosts=\"*\"` argument is saying that only the literal host `\"*\"` (ie quote-asterisk-quote) can be used to access the host. Docker compose does not strip the quotes.\r\n> \r\n> So you'll need to remove the quotes from all the argument values and it should start working as op-geth will then get just `*` as the value and allow any host.\r\n\r\nMany thanks!\r\nI change op-geth entrypoint as below and the op-node can connect.\r\n```\r\n    entrypoint:\r\n      - /usr/local/bin/geth\r\n      - --ws\r\n      - --ws.port=8546\r\n      - --ws.addr=0.0.0.0\r\n      - --ws.origins\r\n      - \"*\"\r\n      - --http\r\n      - --http.addr=0.0.0.0\r\n      - --http.api\r\n      - \"eth,net,web3,debug\"\r\n      - --http.port=8545\r\n      - --http.vhosts\r\n      - \"*\"\r\n      - --http.corsdomain\r\n      - \"*\"\r\n      - --authrpc.addr=0.0.0.0\r\n      - --authrpc.jwtsecret=/data/opt2/jwt.txt\r\n      - --authrpc.port=8551\r\n      - --authrpc.vhosts\r\n      - \"*\"\r\n      - --datadir=/data/opt2\r\n      - --verbosity=3\r\n      - --rollup.disabletxpoolgossip=true\r\n      - --rollup.sequencerhttp=https://bedrock-beta-1-sequencer.optimism.io\r\n      - --nodiscover\r\n      - --syncmode=full\r\n      - --maxpeers=0\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1581778192/reactions",
+      "total_count": 0,
+      "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
