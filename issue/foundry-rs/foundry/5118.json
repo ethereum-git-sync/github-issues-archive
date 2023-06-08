@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5118",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5118/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5118/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5118/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5118",
+  "id": 1747541007,
+  "node_id": "I_kwDOGBlvNc5oKVwP",
+  "number": 5118,
+  "title": "vm.snapshot / vm.revertTo non deterministic",
+  "user": {
+    "login": "sakulstra",
+    "id": 4396533,
+    "node_id": "MDQ6VXNlcjQzOTY1MzM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4396533?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sakulstra",
+    "html_url": "https://github.com/sakulstra",
+    "followers_url": "https://api.github.com/users/sakulstra/followers",
+    "following_url": "https://api.github.com/users/sakulstra/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sakulstra/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sakulstra/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sakulstra/subscriptions",
+    "organizations_url": "https://api.github.com/users/sakulstra/orgs",
+    "repos_url": "https://api.github.com/users/sakulstra/repos",
+    "events_url": "https://api.github.com/users/sakulstra/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sakulstra/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-08T10:03:59Z",
+  "updated_at": "2023-06-08T10:04:53Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (08a629a 2023-06-03T00:04:22.625130135Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nvm.snapshot\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nThere seems to be an issue with nested snapshots and reverts.\r\nI don't really have an explanation of what is happening exactly.\r\n\r\nI have a testsuite iterating over a list of assets and performing some tasks, including [deposit some link on aave](https://github.com/bgd-labs/aave-helpers/blob/master/src/ProtocolV3TestBase.sol#L141).\r\nNow the interesting thing is, when i create a single snapshot in the beginning and revert to it after testing each asset at some point LINK will exceed supply cap, although i'm always depositing the same amount and reverting to the previous state.\r\n\r\nI assume that somehow:\r\nThese `revertTo`: https://github.com/bgd-labs/aave-helpers/blob/master/src/ProtocolV3TestBase.sol#L147\r\nSeem to mess with this `revertTo`: https://github.com/bgd-labs/aave-helpers/blob/master/src/ProtocolV3TestBase.sol#L115\r\n\r\nThis code fails:\r\n```solidity\r\nuint256 snapshot = vm.snapshot();\r\n    for (uint256 i; i < configs.length; i++) {\r\n      if (_includeInE2e(configs[i])) {\r\n        e2eTestAsset(pool, collateralConfig, configs[i]);\r\n        vm.revertTo(snapshot);\r\n      }\r\n}\r\n```\r\n\r\nThis code works:\r\n```solidity\r\n    for (uint256 i; i < configs.length; i++) {\r\n      if (_includeInE2e(configs[i])) {\r\n        uint256 snapshot = vm.snapshot();\r\n        e2eTestAsset(pool, collateralConfig, configs[i]);\r\n        vm.revertTo(snapshot);\r\n      }\r\n}\r\n```\r\n\r\nAnalysing the code the behavior should be the same as it shouldn't matter if i:\r\n- create a snapshot at the beginning and revert to it at the end of each loop\r\n- create a new snapshot at the beginning of each loop\r\nSo there seems to be an issue with creating snapshots / reverting to a snapshot.\r\n\r\nAs a reproduction you can run: `forge test --match-contract ProtocolV3TestE2ETestAll -vv ` and change the snapshot accordingly.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5118/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5118/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
