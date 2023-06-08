@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5549",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5549/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5549/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5549/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5549",
+  "id": 1747979397,
+  "node_id": "I_kwDODE2jmc5oMAyF",
+  "number": 5549,
+  "title": "Fresh snap sync did not start worldstate heal",
+  "user": {
+    "login": "yorickdowne",
+    "id": 71337066,
+    "node_id": "MDQ6VXNlcjcxMzM3MDY2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/71337066?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yorickdowne",
+    "html_url": "https://github.com/yorickdowne",
+    "followers_url": "https://api.github.com/users/yorickdowne/followers",
+    "following_url": "https://api.github.com/users/yorickdowne/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yorickdowne/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yorickdowne/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yorickdowne/subscriptions",
+    "organizations_url": "https://api.github.com/users/yorickdowne/orgs",
+    "repos_url": "https://api.github.com/users/yorickdowne/repos",
+    "events_url": "https://api.github.com/users/yorickdowne/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yorickdowne/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-08T14:12:34Z",
+  "updated_at": "2023-06-08T14:12:34Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nA fresh sync of mainnet Ethereum on Besu using snap sync got through FastImportBlocksStep, but did not start worldstate heal. It was \"stuck\" here.\r\n\r\n### Steps to Reproduce (Bug)\r\n\r\n- Sync mainnet\r\n- Likely a highly intermittent issue\r\n\r\n### Logs (if a bug)\r\n\r\n```\r\neth-main-execution-1  | 2023-06-06 23:45:55.873+00:00 | EthScheduler-Services-73 (importBlock) | INFO  | FastImportBlocksStep | Block import progress: 17407253 of 17423064 (99%)\r\neth-main-execution-1  | 2023-06-06 23:46:27.843+00:00 | EthScheduler-Services-73 (importBlock) | INFO  | FastImportBlocksStep | Block import progress: 17408453 of 17423064 (99%)\r\neth-main-execution-1  | 2023-06-06 23:48:34.674+00:00 | EthScheduler-Services-78 (importBlock) | INFO  | FastImportBlocksStep | Block import progress: 17415357 of 17423064 (99%)\r\neth-main-execution-1  | 2023-06-07 01:40:37.386+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\neth-main-execution-1  | 2023-06-07 07:40:34.310+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\neth-main-execution-1  | 2023-06-07 13:30:44.083+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\neth-main-execution-1  | 2023-06-07 19:20:40.366+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\neth-main-execution-1  | 2023-06-08 01:10:29.142+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\neth-main-execution-1  | 2023-06-08 07:00:31.256+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\neth-main-execution-1  | 2023-06-08 12:10:36.405+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\n```\r\n\r\nNode restarted at this point\r\n\r\n```\r\neth-main-execution-1  | 2023-06-08 13:59:56.533+00:00 | main | INFO  | DefaultP2PNetwork | Node address 0xcbe24acf964d074e77a3e604410094a053702dfe\r\neth-main-execution-1  | 2023-06-08 13:59:56.536+00:00 | main | INFO  | NetworkRunner | Supported capabilities: [eth/63, eth/64, eth/65, eth/66, eth/67, eth/68], [snap/1]\r\neth-main-execution-1  | 2023-06-08 13:59:56.536+00:00 | main | INFO  | DefaultSynchronizer | Starting synchronizer.\r\neth-main-execution-1  | 2023-06-08 13:59:56.537+00:00 | main | INFO  | FastSyncDownloader | Starting sync\r\neth-main-execution-1  | 2023-06-08 13:59:56.540+00:00 | main | INFO  | SnapWorldStateDownloader | Downloading world state from peers for pivot block 17413930 (0x3b875b5934da29843acb539b2abbf98219eb8bd0d84cb7ebfc0ac5398172189c). State root 0xef1e81850d7759bd982c36eebc37b40073c37b4fa8aa2b9bd272f8fd3a98489b pending requests 0\r\neth-main-execution-1  | 2023-06-08 13:59:56.736+00:00 | main | INFO  | FastSyncTargetManager | Unable to find sync target. Currently checking 0 peers for usefulness.\r\neth-main-execution-1  | 2023-06-08 13:59:56.742+00:00 | main | INFO  | Runner | Ethereum main loop is up.\r\neth-main-execution-1  | 2023-06-08 14:00:12.213+00:00 | nioEventLoopGroup-3-6 | INFO  | SnapWorldDownloadState | Running world state heal process from peers with pivot block 17435984\r\neth-main-execution-1  | 2023-06-08 14:00:20.569+00:00 | Timer-0 | INFO  | DNSResolver | Resolved 2409 nodes\r\neth-main-execution-1  | 2023-06-08 14:00:56.545+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 11427 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:01:56.579+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 335269 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:01:59.349+00:00 | EthScheduler-Services-34 (importBlock) | INFO  | FastImportBlocksStep | Block import progress: 17428304 of 17435984 (99%)\r\neth-main-execution-1  | 2023-06-08 14:02:56.579+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 630472 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:03:01.838+00:00 | EthScheduler-Services-34 (importBlock) | INFO  | FastImportBlocksStep | Block import progress: 17433904 of 17435984 (99%)\r\neth-main-execution-1  | 2023-06-08 14:03:56.579+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 936610 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:04:56.677+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 1334574 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:05:56.683+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 1809978 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:06:56.703+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 2240408 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:07:56.703+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 2705233 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:08:56.707+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 3133786 world state nodes\r\neth-main-execution-1  | 2023-06-08 14:09:56.729+00:00 | EthScheduler-Services-26 (batchPersistTrieNodeData) | INFO  | SnapsyncMetricsManager | Healed 3518179 world state nodes\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Software version: `besu/v23.4.1/linux-x86_64/openjdk-java-17`\r\n* OS Name & Version: Debian 11\r\n* Kernel Version: `5.10.0-23-amd64`\r\n* Docker Version: `24.0.2`\r\n* Consensus Client & Version if using Proof of Stake: `teku/v23.5.0/linux-x86_64/-eclipseadoptium-openjdk64bitservervm-java-17`\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5549/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5549/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
