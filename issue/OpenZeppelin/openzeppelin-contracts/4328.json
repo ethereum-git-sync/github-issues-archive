@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-06-08T06:15:45Z",
-  "updated_at": "2023-06-08T06:15:45Z",
-  "closed_at": null,
+  "updated_at": "2023-06-08T08:08:24Z",
+  "closed_at": "2023-06-08T08:07:18Z",
   "author_association": "NONE",
   "active_lock_reason": null,
-  "body": "About: [Remove hooks](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/3838)\r\n\r\nThe issue is now _update is only called once therefore any function that needed to be performed before the token is transferred  it won't happen not trigger.\r\n\r\nHere is an example snippet from [The Sanctuary ERC1155 Contract](https://etherscan.io/address/0x715af60ec1c3c65e294c7d8ef340f14e754c66bb#code)\r\n\r\n`function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override{\r\n        super._beforeTokenTransfer(operator, from, to, ids, amounts, data); // Call parent hook\r\n        require(restricted[operator] == false && restricted[from] == false && restricted[to] == false, \"Operator, From, or To Address is RESTRICTED\"); //checks if the any address in use is restricted\r\n\r\n        for (uint256 i = 0; i < ids.length; i++) {\r\n            if(flagged[ids[i]]){\r\n                revert(\"FID\"); //reverts if a token has been flagged\r\n            }\r\n        }\r\n    }\r\n\r\nfunction bindOnMint(uint _id) public view returns(bool){\r\n        uint256 _batchID;\r\n        for (uint256 i = 0; i < collectionBatchEndID.length; i++) {\r\n            if(i != 0 && _id <= collectionBatchEndID[i] && _id > collectionBatchEndID[i - 1]){\r\n                _batchID = i;\r\n                break;\r\n            }\r\n            if(i <= 0 && _id <= collectionBatchEndID[i]){\r\n                _batchID = i;\r\n                break;\r\n            }\r\n        }\r\n        return bindOnMintBatch[_batchID];\r\n    }\r\n\r\nfunction _afterTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override{\r\n        super._afterTokenTransfer(operator, from, to, ids, amounts, data); // Call parent hook\r\n\r\n        for (uint256 i = 0; i < ids.length; i++) {\r\n            if(bindOnMint(ids[i])){\r\n                flagged[ids[i]] = true;\r\n            }\r\n        }\r\n    }\r\n`",
-  "closed_by": null,
+  "body": "About: [Remove hooks](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/3838)\r\n\r\nThe issue is now _update is only called once therefore any function that needed to be performed before the token is transferred  it won't happen not trigger.\r\n\r\nHere is an example snippet from [The Sanctuary ERC1155 Contract](https://etherscan.io/address/0x715af60ec1c3c65e294c7d8ef340f14e754c66bb#code)\r\n\r\n```solidity\r\nfunction _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override{\r\n        super._beforeTokenTransfer(operator, from, to, ids, amounts, data); // Call parent hook\r\n        require(restricted[operator] == false && restricted[from] == false && restricted[to] == false, \"Operator, From, or To Address is RESTRICTED\"); //checks if the any address in use is restricted\r\n\r\n        for (uint256 i = 0; i < ids.length; i++) {\r\n            if(flagged[ids[i]]){\r\n                revert(\"FID\"); //reverts if a token has been flagged\r\n            }\r\n        }\r\n    }\r\n\r\nfunction bindOnMint(uint _id) public view returns(bool){\r\n        uint256 _batchID;\r\n        for (uint256 i = 0; i < collectionBatchEndID.length; i++) {\r\n            if(i != 0 && _id <= collectionBatchEndID[i] && _id > collectionBatchEndID[i - 1]){\r\n                _batchID = i;\r\n                break;\r\n            }\r\n            if(i <= 0 && _id <= collectionBatchEndID[i]){\r\n                _batchID = i;\r\n                break;\r\n            }\r\n        }\r\n        return bindOnMintBatch[_batchID];\r\n    }\r\n\r\nfunction _afterTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override{\r\n        super._afterTokenTransfer(operator, from, to, ids, amounts, data); // Call parent hook\r\n\r\n        for (uint256 i = 0; i < ids.length; i++) {\r\n            if(bindOnMint(ids[i])){\r\n                flagged[ids[i]] = true;\r\n            }\r\n        }\r\n    }\r\n```",
+  "closed_by": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1582098926",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4328#issuecomment-1582098926",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4328",
+    "id": 1582098926,
+    "node_id": "IC_kwDOA9tCBs5eTOnu",
+    "user": {
+      "login": "Amxx",
+      "id": 2432299,
+      "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Amxx",
+      "html_url": "https://github.com/Amxx",
+      "followers_url": "https://api.github.com/users/Amxx/followers",
+      "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/Amxx/orgs",
+      "repos_url": "https://api.github.com/users/Amxx/repos",
+      "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Amxx/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-08T08:05:58Z",
+    "updated_at": "2023-06-08T08:08:24Z",
+    "author_association": "COLLABORATOR",
+    "body": "> any function that needed to be performed before the token is transferred\r\n\r\nIf you need to perform an action BEFORE or AFTER the transfer you should just do\r\n```solidity\r\nfunction _update(address from, address to, uint256 amount) internal virtual override returns (bool) {\r\n   // ... your before action here ...\r\n   bool result = super._update(from, to, amount);\r\n   // ... your after action here ...   \r\n   return result;\r\n}\r\n```\r\n(this is for ERC20, it should be very easy to transpose that to ERC1155)\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1582098926/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
