@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4386",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4386/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4386/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4386/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4386",
+  "id": 1749197190,
+  "node_id": "I_kwDOCFeAzc5oQqGG",
+  "number": 4386,
+  "title": "Add new Lighthouse VC API endpoint for updating Graffiti",
+  "user": {
+    "login": "jimmygchen",
+    "id": 742762,
+    "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmygchen",
+    "html_url": "https://github.com/jimmygchen",
+    "followers_url": "https://api.github.com/users/jimmygchen/followers",
+    "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+    "repos_url": "https://api.github.com/users/jimmygchen/repos",
+    "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2336800343,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMzQz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/HTTP-API",
+      "name": "HTTP-API",
+      "color": "5A63A2",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4799962538,
+      "node_id": "LA_kwDOCFeAzc8AAAABHhmdqg",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/gui",
+      "name": "gui",
+      "color": "46A79B",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-09T06:14:46Z",
+  "updated_at": "2023-06-09T06:20:15Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nImplement a new POST endpoint in the Validator Client (VC) to support updating validator Graffiti in the Siren UI.\r\n\r\nThis is a bit tricky because there are currently multiple ways users can set the Graffiti:\r\n1. [Using the \"--graffiti-file\" flag on the validator client](https://lighthouse-book.sigmaprime.io/graffiti.html#1-using-the---graffiti-file-flag-on-the-validator-client)\r\n2. [Setting the graffiti in the validator_definitions.yml](https://lighthouse-book.sigmaprime.io/graffiti.html#2-setting-the-graffiti-in-the-validator_definitionsyml)\r\n3. [Using the \"--graffiti\" flag on the validator client](https://lighthouse-book.sigmaprime.io/graffiti.html#3-using-the---graffiti-flag-on-the-validator-client)\r\n4. [Using the \"--graffiti\" flag on the beacon node](https://lighthouse-book.sigmaprime.io/graffiti.html#4-using-the---graffiti-flag-on-the-beacon-node)\r\n\r\nIf the endpoint only updates the graffiti in-memory, it would be only temporary and the CLI/file override it when the node gets restated. For this to be persistent, we should probably write the changes to a file, as well as updating the value in-memory.\r\n\r\n@michaelsproul suggested that we should write this to the [validator definitions](https://lighthouse-book.sigmaprime.io/graffiti.html#2-setting-the-graffiti-in-the-validator_definitionsyml), which is guaranteed to exist, and this is also consistent with the other POST methods such as [`feerecipient`](https://github.com/sigp/lighthouse/blob/c547a11b0da48db6fdd03bca2c6ce2448bbcc3a9/validator_client/src/http_api/mod.rs#L734-L773). The only source that's higher priority is the `--graffiti-file` flag, so the endpoint could return an error if this value is set, to avoid overriding the changes.\r\n\r\nTo recap, the proposal: \r\n1. Add a new `POST` Lighthouse API endpoint for updating graffiti, suggested path: `POST lighthouse/validator/{pub key}/graffiti`\r\n2. The endpoint writes the new graffiti to the `validator_definitions.yml` file for the specified public key\r\n3. Update the validator graffiti in memory\r\n4. If `--graffiti-file` is set, the endpoint should return an error indicating the change failed",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4386/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4386/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
