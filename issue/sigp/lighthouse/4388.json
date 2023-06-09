@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4388",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4388/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4388/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4388/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4388",
+  "id": 1749859534,
+  "node_id": "I_kwDOCFeAzc5oTLzO",
+  "number": 4388,
+  "title": "Consider reducing the frequency of pending validator indices queries from validator client",
+  "user": {
+    "login": "jimmygchen",
+    "id": 742762,
+    "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmygchen",
+    "html_url": "https://github.com/jimmygchen",
+    "followers_url": "https://api.github.com/users/jimmygchen/followers",
+    "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+    "repos_url": "https://api.github.com/users/jimmygchen/repos",
+    "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1245875191,
+      "node_id": "MDU6TGFiZWwxMjQ1ODc1MTkx",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/val-client",
+      "name": "val-client",
+      "color": "9cd6fc",
+      "default": false,
+      "description": "Relates to the validator client binary"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-09T13:05:36Z",
+  "updated_at": "2023-06-09T13:08:18Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nCurrently the Validator Client (VC) polls the validator states for all inactive validators from the Beacon Node (for indices retrieval), once every slot (12 seconds on mainnet) \r\n\r\nhttps://github.com/sigp/lighthouse/blob/f16795183564a8487c32890f511a24d6abac82e4/validator_client/src/duties_service.rs#L279-L292\r\n\r\nThis is mostly not an issue until the number of _inactive_ validator validators reaches a large number  ~1000, which is probably quite rare. However we've recently seen some performance issues when the endpoint `beacon/states/{state_id}/validators/{validator_id}` is called repeatedly in a short period of time. Here's a [script](https://github.com/michaelsproul/spam/blob/main/src/main.rs) created by @michaelsproul to spam this endpoint aggressively, and it turns out this could cause an OOM on the beacon node. \r\n\r\nThere has been some discussions on how to improve this, potentially queuing the requests, however they might take a while to implement. In the mean time, we can probably reduce the frequency of this query to once or twice per epoch to reduce the performance impact on the node, as validator activation only happens once every epoch, and it may not be necessary to query the indices so often.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4388/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4388/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
