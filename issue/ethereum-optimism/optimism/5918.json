@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-06-08T03:05:57Z",
-  "updated_at": "2023-06-09T10:20:18Z",
-  "closed_at": null,
+  "updated_at": "2023-06-10T03:33:47Z",
+  "closed_at": "2023-06-10T03:33:47Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "I launch local devnet using `make devnet-up` like it says in the docs, and everything starts working _eventually_. Containers start up quickly and I can see in the logs that both L2 and L1 mine blocks as expected, but `L1Block` contract deployed at `0x4200000000000000000000000000000000000015` on L2 does not start getting updated for a long time. Sometimes it takes 5 min, sometimes – 20. It just keeps returning 0 for block number until _something_ happens and it starts updating.\r\n\r\nIt makes my autotests unreliable, because my app needs this value. Currently, I work around the issue by requesting the latest block number directly from L1, but this is not what I ultimately need.\r\n\r\nAny way to fix this?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "rho-cassiopeiae",
+    "id": 84779039,
+    "node_id": "MDQ6VXNlcjg0Nzc5MDM5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/84779039?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rho-cassiopeiae",
+    "html_url": "https://github.com/rho-cassiopeiae",
+    "followers_url": "https://api.github.com/users/rho-cassiopeiae/followers",
+    "following_url": "https://api.github.com/users/rho-cassiopeiae/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rho-cassiopeiae/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rho-cassiopeiae/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rho-cassiopeiae/subscriptions",
+    "organizations_url": "https://api.github.com/users/rho-cassiopeiae/orgs",
+    "repos_url": "https://api.github.com/users/rho-cassiopeiae/repos",
+    "events_url": "https://api.github.com/users/rho-cassiopeiae/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rho-cassiopeiae/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5918/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5918/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -140,6 +159,50 @@
     "body": "L2 blocks are being created.\r\nThe logs are not verbose. I can only see that there's always one transaction in every block, but not the details. Is there a way to see txn data?",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1584339698/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1585447701",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/5918#issuecomment-1585447701",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5918",
+    "id": 1585447701,
+    "node_id": "IC_kwDODjvEJM5egAMV",
+    "user": {
+      "login": "rho-cassiopeiae",
+      "id": 84779039,
+      "node_id": "MDQ6VXNlcjg0Nzc5MDM5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/84779039?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rho-cassiopeiae",
+      "html_url": "https://github.com/rho-cassiopeiae",
+      "followers_url": "https://api.github.com/users/rho-cassiopeiae/followers",
+      "following_url": "https://api.github.com/users/rho-cassiopeiae/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rho-cassiopeiae/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rho-cassiopeiae/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rho-cassiopeiae/subscriptions",
+      "organizations_url": "https://api.github.com/users/rho-cassiopeiae/orgs",
+      "repos_url": "https://api.github.com/users/rho-cassiopeiae/repos",
+      "events_url": "https://api.github.com/users/rho-cassiopeiae/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rho-cassiopeiae/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-10T03:33:47Z",
+    "updated_at": "2023-06-10T03:33:47Z",
+    "author_association": "NONE",
+    "body": "Okay, my bad. It was happening because I wasn't properly cleaning up. Instead of running `make devnet-clean` I was just removing all docker volumes. I think some data is saved to bind mounts instead of volumes, so every time I was upping the environment thinking that it was from genesis, there was actually a lot of importing taking place (stuff from previous runs), which was delaying everything else. With proper cleaning it works as expected.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1585447701/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
