@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4342",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4342/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4342/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4342/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4342",
+  "id": 1751588567,
+  "node_id": "I_kwDOA9tCBs5oZx7X",
+  "number": 4342,
+  "title": "Improve security for Initializer.sol",
+  "user": {
+    "login": "0xPhaze",
+    "id": 103113487,
+    "node_id": "U_kgDOBiVjDw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/103113487?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xPhaze",
+    "html_url": "https://github.com/0xPhaze",
+    "followers_url": "https://api.github.com/users/0xPhaze/followers",
+    "following_url": "https://api.github.com/users/0xPhaze/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xPhaze/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xPhaze/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xPhaze/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xPhaze/orgs",
+    "repos_url": "https://api.github.com/users/0xPhaze/repos",
+    "events_url": "https://api.github.com/users/0xPhaze/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xPhaze/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-03-24T13:44:35Z",
+  "updated_at": "2023-06-11T20:14:02Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Motivation**\r\nVulnerabilities, such as [the Wormhole uninitialized proxy issue](https://medium.com/immunefi/wormhole-uninitialized-proxy-bugfix-review-90250c41a43a) should not happen. Requiring a call to `_disableInitializers()` in a proxy's implementation contract is a confusing and error-prone step.\r\n\r\n**Details**\r\nInitializer.sol should disallow a call to an `initializer` function by default in the implementation contract itself for proxies and clones. This could achieved in the constructor:\r\n\r\n```solidity\r\nabstract contract InitializableUpgradeable {\r\n    // ...\r\n\r\n    constructor() {\r\n        _disableInitializers();\r\n    }\r\n}\r\n```\r\n\r\nOr by including an immutable reference to the implementation address:\r\n```solidity\r\nabstract contract InitializableUpgradeable {\r\n    // ...\r\n\r\n    address private immutable self = address(this);\r\n    \r\n    modifier initializer() {\r\n        require(address(this) != self, \"InitializableUpgradeable: unable to initialize implementation\");\r\n        // ...\r\n    }\r\n}\r\n```\r\n\r\nFor the sake of security, I would propose to not have both Initializer.sol and InitializerUpgradeable.sol co-exist. If for some reason the old behavior should be kept, however, I would recommend to be explicit in the naming of the modifiers. By this I mean naming the two modifiers to something verbose, like `initializerUnsafe` which has the current behavior and `initializerUpgradeable` which disallows calls in the implementation contract.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4342/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4342/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
