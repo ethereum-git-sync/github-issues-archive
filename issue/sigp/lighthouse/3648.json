@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-10-20T17:03:27Z",
-  "updated_at": "2022-10-20T17:08:37Z",
+  "updated_at": "2023-06-13T08:07:37Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1588769752",
+    "html_url": "https://github.com/sigp/lighthouse/issues/3648#issuecomment-1588769752",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/3648",
+    "id": 1588769752,
+    "node_id": "IC_kwDOCFeAzc5esrPY",
+    "user": {
+      "login": "AgeManning",
+      "id": 7454587,
+      "node_id": "MDQ6VXNlcjc0NTQ1ODc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7454587?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/AgeManning",
+      "html_url": "https://github.com/AgeManning",
+      "followers_url": "https://api.github.com/users/AgeManning/followers",
+      "following_url": "https://api.github.com/users/AgeManning/following{/other_user}",
+      "gists_url": "https://api.github.com/users/AgeManning/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/AgeManning/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/AgeManning/subscriptions",
+      "organizations_url": "https://api.github.com/users/AgeManning/orgs",
+      "repos_url": "https://api.github.com/users/AgeManning/repos",
+      "events_url": "https://api.github.com/users/AgeManning/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/AgeManning/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-13T08:07:36Z",
+    "updated_at": "2023-06-13T08:07:36Z",
+    "author_association": "MEMBER",
+    "body": "The issue here gives a decent overview: https://github.com/ethereum/consensus-specs/issues/2749\r\n\r\nDiscovery is based on a kademlia-like routing table. \r\n\r\nCurrently when we do a discovery search, we look for a random target, which means we randomly search the DHT for new nodes and collect useful nodes as we traverse the the DHT. \r\n\r\nSee here in lighthouse code: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/discovery/mod.rs#L348\r\n\r\nAfter spec change, peers on specific subnets can now be found based on their node-ids. I.e the prefix of their node-id determines which subnet they should be subscribed to. This means that instead of doing random searches when looking for peers for a given subnet, we can target specific node-ids. \r\n\r\nWhen we try to discover peers on a given subnet, we call this function: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/discovery/mod.rs#L361\r\n\r\nWhen we go to actually run a subnet query (i.e a search for peers for a given set of subnets) we run this function: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/discovery/mod.rs#L697\r\n\r\nWe ultimately call this function: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/discovery/mod.rs#L756\r\n\r\nWhich sets a random node id as the target for the query. It collects all nodes it finds that match the subnets we are looking for and reports them back. See here: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/discovery/mod.rs#L777\r\n\r\nInstead of using a random node id, we can be smarter and use a random node-id that is pre-fixed with the required bits for nodes on the subnet we are looking for. \r\n\r\nThere are a few tricky parts to this. \r\n\r\nThe first is that given a node-id we can compute the subnet-id at a given epoch that the node is supposed to be subscribed to using this function: https://github.com/sigp/lighthouse/blob/stable/consensus/types/src/subnet_id.rs#L78\r\n\r\nWe would like the inverse, given an epoch and a subnet, what is the node-prefix required? Failing to get this function we can construct a mapping of prefixes to the 64 subnets and use that (which changes per epoch). \r\n\r\nThis change therefore involves discovery having some notion of epochs. \r\n\r\nSecondly - We currently group subnet discoveries. A grouped discovery is not going to work if we are shifting the target node. There has been some simulations that suggest parallel discoveries are just as efficient. So I think we need to remove the concept of grouped discoveries and only have single subnet discoveries but increase the parallelisation of number of searchers. \r\n\r\nWe can increase the parallel queries via: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/discovery/mod.rs#LL62C48-L62C48 and https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/config.rs#L289\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1588769752/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
