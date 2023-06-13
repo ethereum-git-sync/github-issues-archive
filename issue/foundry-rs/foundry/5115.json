@@ -40,7 +40,7 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-06-07T01:30:26Z",
-  "updated_at": "2023-06-07T01:30:45Z",
-  "closed_at": null,
+  "updated_at": "2023-06-13T17:53:15Z",
+  "closed_at": "2023-06-13T17:53:15Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nAnvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\n42e7153b0a7aadb779f97b2c0675bc2206f774d6\n\n### What command(s) is the bug in?\n\ncargo install\n\n### Operating System\n\nWindows\n\n### Describe the bug\n\nOn Windows, installing Anvil with `cargo install` fails due to the absence of IPC support in ethers:\r\n\r\n```\r\n$ cargo install --git https://github.com/foundry-rs/foundry --locked anvil\r\n...\r\n   Compiling anvil-core v0.1.0 (C:\\Users\\Michael\\.cargo\\git\\checkouts\\foundry-f7cca724e93059b0\\42e7153\\anvil\\core)\r\nerror[E0412]: cannot find type `Ipc` in crate `ethers::providers`\r\n   --> anvil\\src\\lib.rs:269:76\r\n    |\r\n269 |     pub async fn ipc_provider(&self) -> Option<Provider<ethers::providers::Ipc>> {\r\n    |                                                                            ^^^ not found in `ethers::providers`\r\n\r\nerror[E0599]: no function or associated item named `connect_ipc` found for struct `ethers::ethers_providers::Provider` in the current scope\r\n   --> anvil\\src\\lib.rs:272:34\r\n    |\r\n272 |         let provider = Provider::connect_ipc(&ipc_path).await.unwrap_or_else(|err| {\r\n    |                                  ^^^^^^^^^^^\r\n    |                                  |\r\n    |                                  function or associated item not found in `Provider<_>`\r\n    |                                  help: there is an associated function with a similar name: `connect`\r\n\r\nSome errors have detailed explanations: E0412, E0599.\r\nFor more information about an error, try `rustc --explain E0412`.\r\n```\r\n\r\nThis is remedied by enabling the IPC feature like so:\r\n\r\n```\r\n$ cargo install --git https://github.com/foundry-rs/foundry --locked anvil --features ethers/ipc\r\n```\r\n\r\nIt looks like there's logic to switch IPC _off_ on Windows here:\r\n\r\nhttps://github.com/foundry-rs/foundry/blob/42e7153b0a7aadb779f97b2c0675bc2206f774d6/anvil/Cargo.toml#L69-L73\r\n\r\nHowever, I think this prevents compilation on Windows at all, because the code expects IPC support to be available. If a feature flag were added to anvil for IPC then it could be used to enable/disable the IPC support and prevent the error.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5115/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
