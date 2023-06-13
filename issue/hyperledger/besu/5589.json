@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5589",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5589/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5589/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5589/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5589",
+  "id": 1754146316,
+  "node_id": "I_kwDODE2jmc5ojiYM",
+  "number": 5589,
+  "title": "Trigger a timeout response after waiting x seconds on RPC calls",
+  "user": {
+    "login": "ahamlat",
+    "id": 5099602,
+    "node_id": "MDQ6VXNlcjUwOTk2MDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5099602?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ahamlat",
+    "html_url": "https://github.com/ahamlat",
+    "followers_url": "https://api.github.com/users/ahamlat/followers",
+    "following_url": "https://api.github.com/users/ahamlat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ahamlat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ahamlat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ahamlat/subscriptions",
+    "organizations_url": "https://api.github.com/users/ahamlat/orgs",
+    "repos_url": "https://api.github.com/users/ahamlat/repos",
+    "events_url": "https://api.github.com/users/ahamlat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ahamlat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362500,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNTAw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/good%20first%20issue",
+      "name": "good first issue",
+      "color": "7057ff",
+      "default": true,
+      "description": "Good for newcomers"
+    },
+    {
+      "id": 4609582991,
+      "node_id": "LA_kwDODE2jmc8AAAABEsCnjw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/RPC",
+      "name": "RPC",
+      "color": "1d76db",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-13T06:35:05Z",
+  "updated_at": "2023-06-13T06:35:27Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nBesu does not trigger a timeout response after some time ex. 30 seconds. When running Eth_getLogs from earliest to latest, Geth responds \"request timed out\" after 30 seconds.  Besu keeps running and hanging the thread. I see some RpcMethodTimeoutException errors got triggered in the logs but it didn't change the output, the client (the caller) was still waiting for a response.\r\n\r\n### Acceptance Criteria\r\n* Besu triggers a timeout response after x seconds, it could be 30 seconds as Geth, but also more  \r\n\r\n### Steps to Reproduce (Bug)\r\nHave a Besu synced node on mainnet and launch this RPC call \r\n```\r\ntime curl -X POST --data '{\r\n        \"method\": \"eth_getLogs\",\r\n        \"params\": [\r\n                {\r\n                        \"fromBlock\": \"earliest\",\r\n                        \"toBlock\": \"latest\",\r\n                        \"address\": \"0x5805883423da1deb9866b4ba6b3749b163d0b472\",\r\n                        \"topics\": [\r\n                                \"0x0559884fd3a460db3073b7fc896cc77986f16e378210ded43186175bf646fc5f\",\r\n                                \"0x000000000000000000000000000000000000000000000000000000000086d862\",\r\n                                \"0x0000000000000000000000000000000000000000000000000000000000001489\"\r\n                        ]\r\n                }\r\n        ],\r\n        \"id\": 1,\r\n        \"jsonrpc\": \"2.0\"\r\n}' http://127.0.0.1:8545/\r\n```\r\n\r\nCompare the result with Geth.\r\n\r\n**Expected behavior:** [What you expect to happen]\r\nTrigger a timeout response after waiting x seconds on an RPC call\r\n\r\n**Actual behavior:** [What actually happens]\r\nThe caller is waiting indefinitely on very slow calls\r\n\r\n**Frequency:** [What percentage of the time does it occur?\r\n100% on some very slow calls.\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.4.0\r\n* Java version: openjdk 17.0.7 2023-04-18\r\n* OS Name & Version: Ubuntu 22.04.1 LTS (Jammy Jellyfish)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5589/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5589/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
