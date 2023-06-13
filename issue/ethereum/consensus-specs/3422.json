@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3422",
+  "repository_url": "https://api.github.com/repos/ethereum/consensus-specs",
+  "labels_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3422/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3422/comments",
+  "events_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3422/events",
+  "html_url": "https://github.com/ethereum/consensus-specs/issues/3422",
+  "id": 1755144849,
+  "node_id": "I_kwDOCOoGbc5onWKR",
+  "number": 3422,
+  "title": "design discussion: keeping experimental features out of mainline testing",
+  "user": {
+    "login": "ralexstokes",
+    "id": 3113781,
+    "node_id": "MDQ6VXNlcjMxMTM3ODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3113781?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ralexstokes",
+    "html_url": "https://github.com/ralexstokes",
+    "followers_url": "https://api.github.com/users/ralexstokes/followers",
+    "following_url": "https://api.github.com/users/ralexstokes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ralexstokes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ralexstokes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ralexstokes/subscriptions",
+    "organizations_url": "https://api.github.com/users/ralexstokes/orgs",
+    "repos_url": "https://api.github.com/users/ralexstokes/repos",
+    "events_url": "https://api.github.com/users/ralexstokes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ralexstokes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-13T15:23:21Z",
+  "updated_at": "2023-06-13T15:23:21Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "As I was working on https://github.com/ethereum/consensus-specs/pull/3421, I was surprised to find that not only did I need to merge into the 4788 feature into the Deneb specs but I also ran into issues with an unrelated feature from EIP-6110.\r\n\r\nLooking a bit more closely, it seems that we should keep \"experimental\" features out of the fork infrastructure for spec testing to avoid this situation as we don't want spec feature authors to have to think about other features when working on their own.\r\n\r\nTo avoid this, it seems that we can keep a repo-wide policy to avoid adding features in as \"phases\" the testing infra is aware of.\r\n\r\nI see two places this is configured:\r\n\r\n1. https://github.com/ethereum/consensus-specs/blob/dev/tests/core/pyspec/eth2spec/test/helpers/constants.py#L47 esp. `ALL_PHASES`, `ALL_FORK_UPGRADES`, `TESTGEN_FORKS`\r\n2. https://github.com/ethereum/consensus-specs/blob/dev/tests/core/pyspec/eth2spec/test/helpers/forks.py\r\n\r\nalthough I *think* the definitions in (2) are just filters/selectors and so aren't as important if they are just defined there. So we can achieve the outcome we want by just being careful with how we define the constants in (1).\r\n\r\nI'm opening this issue in part to document this for future feature authors, but also gather input from the 6110 authors about their testing needs. I hear we wanted to generate test vectors for this feature and so I imagine that is why the edits to constants in (1) happened in the first place. If this is the case and the only way to generate tests is to touch these constants then I'd suggest we either keep feature *tests* on a branch (not the feature spec itself, just tests) or find a way to refactor the testgen infra so phases/forks can live alongside each other and not conflict.\r\n\r\nTagging @mkalinin @hwwhww @djrtwo who may have input here.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3422/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3422/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
