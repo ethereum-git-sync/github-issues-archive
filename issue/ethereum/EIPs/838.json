@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 32,
+  "comments": 33,
   "created_at": "2018-01-20T14:53:48Z",
-  "updated_at": "2022-01-02T03:12:39Z",
+  "updated_at": "2023-06-14T14:10:20Z",
   "closed_at": "2022-01-02T03:12:39Z",
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -1091,8 +1091,8 @@
     "body": "## Current situation\r\n\r\nThis EIP was created on 20.01.2018 and last edited on 23.01.2018. Solidity since released [revert reasons](https://github.com/ethereum/solidity/pull/3364) in `v0.4.22` on the 17.04.2018 and people love them. Currently, the assumption is that every error has the implicit ABI `Error(string)`. And it's parameters gets encoded in the same way as function call arguments using ABI encoding.\r\nTherefore:\r\n\r\n```solidity\r\nrevert(\"Not enough Ether provided.\");\r\n```\r\n\r\nGets encoded as:\r\n\r\n```\r\n0x08c379a0                                                         // Function selector for Error(string)\r\n0x0000000000000000000000000000000000000000000000000000000000000020 // Data offset\r\n0x000000000000000000000000000000000000000000000000000000000000001a // String length\r\n0x4e6f7420656e6f7567682045746865722070726f76696465642e000000000000 // String data\r\n```\r\n\r\n## Motivation\r\n\r\nSometimes that is not enough and people want to include additional data in their on-chain error messages. This is overall consistent with the idea of:\r\n\r\n> moving towards having rich error reporting in contracts @federicobond\r\n\r\nIt's worth mentioning that as @chriseth wrote above this EIP is not intended to be a solution for go-style error handling. It's not a solution for a happy path. Therefore gas costs should not be of the highest priority here. User experience should be.\r\n\r\nBecause we're not talking about error-handling in the scope of the transaction (not separate functions) - it doesn't make sense, in my opinion, to define which errors does the function throw. In any real-life scenario, your function will be interacting with other functions so this list of errors will either become really long or if we introduce the hierarchy as in Java - every function will have the topmost error like `IOError` which is of no use.\r\n\r\nOn the contrary - errors are being thrown by the contracts and they're the one that should be exposing data about their error formats (ABIs).\r\n\r\n## Proposed solution\r\n\r\nEach solidity contract MAY define additional errors.\r\n```solidity\r\nerror UnauthorisedUser(uint userId);\r\nerror InsufficientBalance(uint userId, address token);\r\n```\r\nThe error schema that is used now MAY be explicitly defined:\r\n```solidity\r\nerror Error(string message);\r\n```\r\nbut it doesn't need to be. Similar to default constructor.\r\nThe ABI is described in the EIP itself. When a revert happens it's parameters are being ABI encoded as if it was the call data using the error ABI.\r\n\r\nA high-level language like Solidity can then implement a syntax like this:\r\n```solidity\r\nrevert UnauthorisedUser(userId);\r\nrevert InsufficientBalance(userId, token);\r\nrevert Error(\"Usual revert reason\"); // Results in the same behaviour as `revert(\"Usual revert reason\");`\r\n```\r\nIt can be also used in `require` calls\r\n```solidity\r\nrequire(isAuthorised[userId], UnauthorisedUser(userId));\r\nrequire(balance[userId][token] > 0, InsufficientBalance(userId, token));\r\n```\r\nAnd `revert`s\r\n```solidity\r\nrevert(UnauthorisedUser(userId));\r\nrevert(InsufficientBalance(userId, token));\r\n```\r\n\r\nThis is fully backwards compatible. Old smart contracts can just update to the new version of Solidity and the code will work.\r\n\r\nMoreover - if you don't need additional data and just want error codes - you can define errors without parameters and the revert reason will just be the 4-byte selector.\r\n\r\nClient-side libraries can decode those errors and their parameters with human-readable names if they have the ABI of the contract that initiated an error.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/458919375/reactions",
-      "total_count": 5,
-      "+1": 4,
+      "total_count": 6,
+      "+1": 5,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
