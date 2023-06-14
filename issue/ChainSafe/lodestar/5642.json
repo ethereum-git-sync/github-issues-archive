@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5642",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5642/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5642/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5642/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5642",
+  "id": 1756506799,
+  "node_id": "I_kwDOCD5_Gc5osiqv",
+  "number": 5642,
+  "title": "Beacon node process does not always exit",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-14T09:57:40Z",
+  "updated_at": "2023-06-14T10:08:53Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\r\n\r\nIn some rare cases when the node is running for a longer time it does not exit when receiving a exit signal.\r\n\r\n**Active handles**\r\n\r\n```\r\n[WTF Node?] open handles:\r\n- File descriptors: (note: stdio always exists)\r\n  - fd 2 (tty) (stdio)\r\n  - fd 1 (tty) (stdio)\r\n  - fd 0 (tty)\r\n- Sockets:\r\n  - 135.181.2.45:9000 -> undefined:undefined\r\n  - 135.181.2.45:9000 -> undefined:undefined\r\n.... (45 more)\r\n  - 135.181.2.45:9000 -> undefined:undefined\r\n  - 135.181.2.45:9000 -> 57.128.86.167:45906\r\n  - 135.181.2.45:9000 -> 34.222.49.115:9252\r\n- Servers:\r\n  - 0.0.0.0:9000 (TCP)\r\n    - Listeners:\r\n      - connection: bound onSocket @ file:///home/devops/goerli/lodestar/node_modules/@libp2p/tcp/src/listener.ts:78\r\n- Timers:\r\n  - (30000 ~ 30 s) (anonymous) @ /home/devops/goerli/lodestar/node_modules/retimer/retimer.js:25\r\n```\r\n\r\nThe Sockets that show `135.181.2.45:9000 -> undefined:undefined` can probably be ignored as those are also there if beacon node exits correctly.\r\n\r\n\r\n**Debug logs** \r\n\r\n```\r\nJun-14 09:58:42.886[network]       verbose: Failed to send goodbye peer=16...3dHdMu Timeout\r\nError: Timeout\r\n    at timeoutPromise (file:///home/devops/goerli/lodestar/packages/utils/src/timeout.ts:15:11)\r\n    at runNextTicks (node:internal/process/task_queues:60:5)\r\n    at listOnTimeout (node:internal/timers:538:9)\r\n    at processTimers (node:internal/timers:512:7)\r\n    at withTimeout (file:///home/devops/goerli/lodestar/packages/utils/src/timeout.ts:19:12)\r\n    at PeerManager.goodbyeAndDisconnect (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/peers/peerManager.ts:648:7)\r\n    at async Promise.all (index 50)\r\n    at PeerManager.goodbyeAndDisconnectAllPeers (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/peers/peerManager.ts:223:5)\r\n    at NetworkCore.close (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/core/networkCore.ts:255:5)\r\n    at Network.close (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/network.ts:197:5)\r\nJun-14 09:58:42.887[network]       verbose: Req  done method=goodbye, version=1, encoding=ssz_snappy, client=Lighthouse, peer=16...3dHdMu, requestId=1769\r\nJun-14 09:58:42.887[network]       verbose: Failed to send goodbye peer=16...GW2Ein Timeout\r\nError: Timeout\r\n    at timeoutPromise (file:///home/devops/goerli/lodestar/packages/utils/src/timeout.ts:15:11)\r\n    at withTimeout (file:///home/devops/goerli/lodestar/packages/utils/src/timeout.ts:19:12)\r\n    at PeerManager.goodbyeAndDisconnect (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/peers/peerManager.ts:648:7)\r\n    at async Promise.all (index 54)\r\n    at PeerManager.goodbyeAndDisconnectAllPeers (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/peers/peerManager.ts:223:5)\r\n    at NetworkCore.close (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/core/networkCore.ts:255:5)\r\n    at Network.close (file:///home/devops/goerli/lodestar/packages/beacon-node/src/network/network.ts:197:5)\r\n    at BeaconNode.close (file:///home/devops/goerli/lodestar/packages/beacon-node/src/node/nodejs.ts:316:7)\r\n    at EventTarget.abortController.signal.addEventListener.once (file:///home/devops/goerli/lodestar/packages/cli/src/cmds/beacon/handler.ts:137:11)\r\nJun-14 09:58:42.889[network]         debug: network sent goodbye to all peers\r\nJun-14 09:58:42.889[network]       verbose: Req  done method=goodbye, version=1, encoding=ssz_snappy, client=Teku, peer=16...GW2Ein, requestId=1773\r\nJun-14 09:58:42.932[network]         debug: network peerManager closed\r\nJun-14 09:58:42.934[network]         debug: network gossip closed\r\nJun-14 09:58:43.038[network]         debug: Dialing discovered peer peer=16...HRUh4M\r\nJun-14 09:58:43.038[network]         debug: Dialing discovered peer peer=16...zqJUKj\r\nJun-14 09:58:43.130[network]         debug: network reqResp closed\r\nJun-14 09:58:43.146[network]         debug: Error dialing discovered peer peer=16...m56aPB All promises were rejected\r\nAggregateError: All promises were rejected\r\nJun-14 09:58:43.146[network]         debug: Error dialing discovered peer peer=16...MS9Luf All promises were rejected\r\nAggregateError: All promises were rejected\r\nJun-14 09:58:43.146[network]         debug: Error dialing discovered peer peer=16...HRUh4M All promises were rejected\r\nAggregateError: All promises were rejected\r\nJun-14 09:58:43.152[network]         debug: Error dialing discovered peer peer=16...zqJUKj All promises were rejected\r\nAggregateError: All promises were rejected\r\nJun-14 09:58:43.152[network]         debug: Error dialing discovered peer peer=16...yH119U All promises were rejected\r\nAggregateError: All promises were rejected\r\nJun-14 09:58:43.153[network]         debug: network lib2p closed\r\nJun-14 09:58:43.153[network]         debug: network core closed\r\nJun-14 09:58:43.649[chain]         verbose: Archived finalized state finalizedEpoch=182885\r\nJun-14 09:58:44.617[]                debug: Beacon node closed\r\n```\r\n\r\nWhat looks really suspicious is that we are dialing peers after network is already closed\r\n\r\n```\r\nJun-14 09:58:43.038[network]         debug: Dialing discovered peer peer=16...HRUh4M\r\nJun-14 09:58:43.038[network]         debug: Dialing discovered peer peer=16...zqJUKj\r\n```\r\n\r\n### Expected behavior\r\n\r\nBeacon node should always exit process after [close sequence](https://github.com/ChainSafe/lodestar/blob/82914a1443fa1077d2a217cda9a1248e03084c46/packages/beacon-node/src/node/nodejs.ts#L309) succeeds. No explicit process.exit should be required.\r\n\r\n### Steps to reproduce\r\n\r\nRun beacon node for a while with the following command (or similar)\r\n\r\n```sh\r\n./lodestar beacon \\\r\n    --dataDir /home/devops/goerli/data/beacon \\\r\n    --rest \\\r\n    --rest.address \"0.0.0.0\" \\\r\n    --rest.namespace '*' \\\r\n    --metrics \\\r\n    --execution.urls http://localhost:8551 \\\r\n    --jwt-secret /home/devops/goerli/data/jwtsecret \\\r\n    --logLevel info \\\r\n    --network goerli \\\r\n    --checkpointSyncUrl \"https://beaconstate-goerli.chainsafe.io/\"\r\n```\r\n\r\nCTRL + C to exit gracefully and observe that it is not shutting down even though [close sequence](https://github.com/ChainSafe/lodestar/blob/82914a1443fa1077d2a217cda9a1248e03084c46/packages/beacon-node/src/node/nodejs.ts#L309) is executed successfully.\r\n\r\n### Operating system\r\n\r\nLinux\r\n\r\n### Lodestar version or commit hash\r\n\r\nunstable (bf5842733a738c59a6f9aa147496806fb2d4c98f)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5642/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5642/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
