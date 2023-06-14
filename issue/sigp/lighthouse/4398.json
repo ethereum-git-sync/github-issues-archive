@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4398",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4398/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4398/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4398/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4398",
+  "id": 1755792581,
+  "node_id": "I_kwDOCFeAzc5op0TF",
+  "number": 4398,
+  "title": "Lazy attestation signature decompression",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1999784343,
+      "node_id": "MDU6TGFiZWwxOTk5Nzg0MzQz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/optimization",
+      "name": "optimization",
+      "color": "f9de40",
+      "default": false,
+      "description": "Something to make Lighthouse run more efficiently."
+    },
+    {
+      "id": 2034355093,
+      "node_id": "MDU6TGFiZWwyMDM0MzU1MDkz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/consensus",
+      "name": "consensus",
+      "color": "5e59bf",
+      "default": false,
+      "description": "An issue/PR that touches consensus code, such as state_processing or block verification."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-13T23:33:48Z",
+  "updated_at": "2023-06-13T23:37:48Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWhen I ran Lighthouse under a profiler a while ago, one of the main consumers of CPU time was _attestation signature decoding_, i.e. converting SSZ bytes off the wire into the `AggregateSignature` type that exists inside `Attestation`:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/c547a11b0da48db6fdd03bca2c6ce2448bbcc3a9/consensus/types/src/attestation.rs#L41-L45\r\n\r\nOne of the reasons this is expensive is that encoded signatures are compressed, and decompression is slow.\r\n\r\nWith changes like #3493 set to land soon, many of the aggregate attestations we receive on gossip could be ignored, _before their signatures are even checked_. This provides an opportunity to save some time that would be spent unnecessarily decompressing signatures.\r\n\r\n## Steps to resolve\r\n\r\nWe need to add a new type, or modify the existing types, so that aggregate attestations are initially decoded using a `signature: SignatureBytes` field instead of an `AggregateSignature`. One way to do this would be:\r\n\r\n- Add a new `LazyAttestation` type which uses `SignatureBytes` for the signature instead of `AggregateSignature`. Add a method on this type that converts it to a regular `Attestation` by calling `.decompress()` on the bytes, and then converts to an aggregate signature using [`From`](https://github.com/sigp/lighthouse/blob/c547a11b0da48db6fdd03bca2c6ce2448bbcc3a9/crypto/bls/src/generic_aggregate_signature.rs#L230-L242).\r\n- Add a new `LazySignedAggregateAndProof` type which wraps `LazyAttestation`. Make sure that the gossip decoding uses this type instead of the full `SignedAggregateAndProof`.\r\n- Work out how to skip decompression for unviable attestations before they reach the batch signature verification step [here](https://github.com/sigp/lighthouse/blob/c547a11b0da48db6fdd03bca2c6ce2448bbcc3a9/beacon_node/beacon_chain/src/attestation_verification/batch.rs#L28-L135). This will be the hardest part. We might want to add a step which filters subsets/duplicate aggregates out of the batch before signature verification. This might still waste a bit of time doing decompression if aggregates in the same batch are redundant, but that's probably an acceptable trade-off.\r\n\r\nHopefully these changes might result in lower CPU usage on low-end hardware. Machines with low validator counts that are only subscribed to a few subnets will likely see the most improvement, as the majority of attestations they verify are aggregates",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4398/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4398/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
