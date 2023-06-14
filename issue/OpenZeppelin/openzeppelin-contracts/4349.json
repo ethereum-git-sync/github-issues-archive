@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4349",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4349/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4349/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4349/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4349",
+  "id": 1756241945,
+  "node_id": "I_kwDOA9tCBs5oriAZ",
+  "number": 4349,
+  "title": "Improper custom error handling in `expectRevertCustomError` when using `via-ir`",
+  "user": {
+    "login": "r0qs",
+    "id": 457348,
+    "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/r0qs",
+    "html_url": "https://github.com/r0qs",
+    "followers_url": "https://api.github.com/users/r0qs/followers",
+    "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+    "organizations_url": "https://api.github.com/users/r0qs/orgs",
+    "repos_url": "https://api.github.com/users/r0qs/repos",
+    "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/r0qs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-14T07:25:59Z",
+  "updated_at": "2023-06-14T07:46:27Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "This [line](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/b425a722409fdf4f3e0ec8f42d686f3c0522af19/test/helpers/customError.js#L17) will return `null` and not an `Array` object if there is no match for a custom error message (see [String.prototype.match() documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#return_value)). Thus, it will cause `const match = error.match(/some-regex/)` on line 20 to attempt to access a member of `null` and throw a type error.\r\n\r\n**💻 Environment**\r\nOpenZeppelin commit: b425a722409fdf4f3e0ec8f42d686f3c0522af19\r\nSolidity version: 0.8.19 (0.8.19+commit.7dd6d404.Linux.g++)\r\nRelevant Solidity compiler settings: `{viaIR: true,  optimizer: {enabled: true}}`\r\nHardhat version: 2.14.1\r\nNodeJS version: v18.16.0\r\n\r\n**📝 Details**\r\n\r\nYou can see an example of such a case [here](https://app.circleci.com/pipelines/github/ethereum/solidity/30160/workflows/c604713f-b105-488d-8dd4-5ad9023cd011/jobs/1339276?invite=true#step-109-4343)\r\n\r\nIn this example the error message is: `Returned error: VM Exception while processing transaction: revert with unrecognized return data or custom error` and there is nothing inside single quotes, so the current regex `/'(.*)'/` will not capture anything.\r\n\r\nIt seems like Hardhat [changes the revert messages](https://github.com/NomicFoundation/hardhat/blob/main/packages/hardhat-core/src/internal/hardhat-network/provider/node.ts#L2004) of errors or it is not handling custom errors properly. Because [this comment](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/b425a722409fdf4f3e0ec8f42d686f3c0522af19/test/helpers/customError.js#L12) suggests that you are expecting an error format that is not the one returned when using `via-ir`:\r\n\r\n> // The revert message for custom errors looks like:\r\n> // VM Exception while processing transaction:\r\n> // reverted with custom error 'InvalidAccountNonce(\"0x70997970C51812dc3A010C7d01b50e0d17dc79C8\", 0)\r\n\r\nFor instance, this test https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/proxy/utils/Initializable.test.js#L131, reverts without `via-ir` with: `Error: VM Exception while processing transaction: reverted with custom error 'AlreadyInitialized()'`, while enabling `via-ir`, it reverts with: `Error: Returned error: VM Exception while processing transaction: revert with unrecognized return data or custom error`\r\n\r\n**🔢 Code to reproduce bug**\r\n\r\n```sh\r\ngit clone https://github.com/OpenZeppelin/openzeppelin-contracts.git\r\ncd openzeppelin-contracts\r\ngit reset --hard b425a722409fdf4f3e0ec8f42d686f3c0522af19\r\nnpm install\r\nsed -i \"s|it(\\('can lock contract after initialization'\\)|it.only(\\1|g\" test/proxy/utils/Initializable.test.js\r\n# The options COMPILE_MODE=production and IR=true are required to set the compiler settings as described above in the `Environment` section.\r\nCOMPILE_VERSION=0.8.19 COMPILE_MODE=production IR=true npm run test\r\n```\r\n\r\nHonestly, I think Hardhat shouldn't change the revert messages but just return them as they are, since they already have it here as [ReturnData](https://github.com/NomicFoundation/hardhat/blob/main/packages/hardhat-core/src/internal/hardhat-network/provider/node.ts#L2002), but yeah...",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4349/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4349/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
