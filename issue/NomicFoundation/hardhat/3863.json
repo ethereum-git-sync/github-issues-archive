@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-04-18T09:59:38Z",
-  "updated_at": "2023-04-18T09:59:49Z",
-  "closed_at": null,
+  "updated_at": "2023-06-14T08:58:23Z",
+  "closed_at": "2023-06-14T08:58:22Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\n\n2.14.0\n\n### What happened?\n\npackage.json\r\n```json\r\n{\r\n  \"name\": \"hardhat-template\",\r\n  \"scripts\": {\r\n    \"flatten\": \"npx hardhat flatten\",\r\n  },\r\n  \"license\": \"MIT\",\r\n  \"devDependencies\": {\r\n    \"@ethersproject/abi\": \"^5.4.7\",\r\n    \"@ethersproject/providers\": \"^5.4.7\",\r\n    \"@nomicfoundation/hardhat-chai-matchers\": \"^1.0.0\",\r\n    \"@nomicfoundation/hardhat-network-helpers\": \"^1.0.0\",\r\n    \"@nomicfoundation/hardhat-toolbox\": \"^2.0.0\",\r\n    \"@nomiclabs/hardhat-ethers\": \"^2.0.0\",\r\n    \"@nomiclabs/hardhat-etherscan\": \"^3.0.0\",\r\n    \"@openzeppelin/contracts\": \"4.6.0\",\r\n    \"@typechain/ethers-v5\": \"^10.1.0\",\r\n    \"@typechain/hardhat\": \"^6.1.2\",\r\n    \"@types/chai\": \"^4.2.0\",\r\n    \"@types/mocha\": \">=9.1.0\",\r\n    \"@types/node\": \">=12.0.0\",\r\n    \"chai\": \"^4.2.0\",\r\n    \"dotenv\": \"^16.0.3\",\r\n    \"ethers\": \"^5.4.7\",\r\n    \"hardhat\": \"^2.14.0\",\r\n    \"hardhat-gas-reporter\": \"^1.0.9\",\r\n    \"solidity-coverage\": \"^0.8.0\",\r\n    \"ts-node\": \">=8.0.0\",\r\n    \"typechain\": \"^8.1.0\",\r\n    \"typescript\": \">=4.5.0\"\r\n  }\r\n}\r\n```\r\n\r\nLock.sol\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.9;\r\n\r\n// Uncomment this line to use console.log\r\n// import \"hardhat/console.sol\";\r\n\r\ncontract Lock {\r\n    uint public unlockTime;\r\n    address payable public owner;\r\n\r\n    event Withdrawal(uint amount, uint when);\r\n\r\n    constructor(uint _unlockTime) payable {\r\n        require(\r\n            block.timestamp < _unlockTime,\r\n            \"Unlock time should be in the future\"\r\n        );\r\n\r\n        unlockTime = _unlockTime;\r\n        owner = payable(msg.sender);\r\n    }\r\n\r\n    function withdraw() public {\r\n        // Uncomment this line, and the import of \"hardhat/console.sol\", to print a log in your terminal\r\n        // console.log(\"Unlock time is %o and block timestamp is %o\", unlockTime, block.timestamp);\r\n\r\n        require(block.timestamp >= unlockTime, \"You can't withdraw yet\");\r\n        require(msg.sender == owner, \"You aren't the owner\");\r\n\r\n        emit Withdrawal(address(this).balance, block.timestamp);\r\n\r\n        owner.transfer(address(this).balance);\r\n    }\r\n}\r\n```\r\n\r\nWhen i run `yarn flatten Lock.sol > Flattened.sol`, i got this:\r\n\r\n```solidity\r\nyarn run v1.22.10\r\n$ npx hardhat flatten contracts/Lock.sol\r\n// Sources flattened with hardhat v2.14.0 https://hardhat.org\r\n\r\n// File contracts/Lock.sol\r\n\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.9;\r\n\r\n// Uncomment this line to use console.log\r\n// import \"hardhat/console.sol\";\r\n\r\ncontract Lock {\r\n    uint public unlockTime;\r\n    address payable public owner;\r\n\r\n    event Withdrawal(uint amount, uint when);\r\n\r\n    constructor(uint _unlockTime) payable {\r\n        require(\r\n            block.timestamp < _unlockTime,\r\n            \"Unlock time should be in the future\"\r\n        );\r\n\r\n        unlockTime = _unlockTime;\r\n        owner = payable(msg.sender);\r\n    }\r\n\r\n    function withdraw() public {\r\n        // Uncomment this line, and the import of \"hardhat/console.sol\", to print a log in your terminal\r\n        // console.log(\"Unlock time is %o and block timestamp is %o\", unlockTime, block.timestamp);\r\n\r\n        require(block.timestamp >= unlockTime, \"You can't withdraw yet\");\r\n        require(msg.sender == owner, \"You aren't the owner\");\r\n\r\n        emit Withdrawal(address(this).balance, block.timestamp);\r\n\r\n        owner.transfer(address(this).balance);\r\n    }\r\n}\r\nDone in 2.77s.\r\n```\r\nThere is some commands in Flattened.sol, and there is no problem if i run `npx hardhat flatten ...`\r\n\r\n\n\n### Minimal reproduction steps\n\n```shell\r\nnpm install --save-dev hardhat\r\n\r\nnpx hardhat # Create a TypeScript project\r\n```\r\n\r\nAdd `\"flatten\": \"npx hardhat flatten\"` script into package.json, and run `yarn flatten contracts/Lock.sol > Flattened.sol`\n\n### Search terms\n\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3863/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3863/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1590777575",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/3863#issuecomment-1590777575",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3863",
+    "id": 1590777575,
+    "node_id": "IC_kwDOB7jojM5e0Vbn",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-14T08:58:22Z",
+    "updated_at": "2023-06-14T08:58:22Z",
+    "author_association": "MEMBER",
+    "body": "Hi @tdergouzi, sorry for not responding sooner. What's happening here is that `yarn` sends some of its output to stdout, and so the `>` operator adds those lines to the flattened file too.\r\n\r\nWe should probably add a parameter to the flatten task that lets you pass a file where the flattened code should be created. I opened https://github.com/NomicFoundation/hardhat/issues/4027 to track that.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1590777575/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
