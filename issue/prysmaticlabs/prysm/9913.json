@@ -40,7 +40,7 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "nisdas",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 11,
+  "comments": 12,
   "created_at": "2021-11-16T23:36:03Z",
-  "updated_at": "2023-04-15T20:03:29Z",
-  "closed_at": null,
+  "updated_at": "2023-06-13T22:30:01Z",
+  "closed_at": "2023-06-13T22:29:38Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "# 🐞 Bug Report\r\n\r\n### Description\r\n\r\nHey guys, I've been having an issue with my node for a few months now\r\nEvery now and then I'm missing attestations and I've been looking into why\r\n\r\n![image](https://user-images.githubusercontent.com/2350015/142082524-893238a7-7632-4834-8d52-a0ae798b1eea.png)\r\n\r\nAs you can see in the screenshot above, every few days I'm missing attestations.\r\n\r\nWhen I check out the Validator logs I can see the error why it missed it:\r\n\r\n```\r\nNov 11 18:30:48 ************* validator[*************]: time=\"2021-11-11 18:30:48\" level=info msg=\"Attestation schedule\" attesterDutiesAtSlot=1 prefix=validator pubKeys=[*************] slot=************* slotInEpoch=25 totalAttestersInEpoch=1\r\nNov 11 18:36:17 ************* validator[*************]: time=\"2021-11-11 18:36:17\" level=error msg=\"Could not request attestation to sign at slot\" error=\"rpc error: code = DeadlineExceeded desc = context deadline exceeded\" prefix=validator pubKey=************* slot=*************\r\n```\r\n\r\nApparently the DeadlineExceeded.\r\n\r\nChecking the BeaconChain logs reveals a period of innactivity of about 2 minutes:\r\n\r\n```\r\nNov 11 18:34:40 =******** beacon-chain[=********]: time=\"2021-11-11 18:34:40\" level=info msg=\"Synced new block\" block==********... epoch==******** finalizedEpoch==******** finalizedRoot==********... parentRoot==********... prefix=blockchain slot==******** slotInEpoch=*** version=altair\r\nNov 11 18:34:40 =******** beacon-chain[=********]: time=\"2021-11-11 18:34:40\" level=info msg=\"Finished applying state transition\" attestations=99 prefix=blockchain slot=******** syncBitsCount=505\r\nNov 11 18:34:43 =******** beacon-chain[=********]: time=\"2021-11-11 18:34:43\" level=info msg=\"Peer summary\" activePeers=72 inbound=55 outbound=17 prefix=p2p\r\n\r\n2 minutes of no action here\r\n\r\nNov 11 18:36:17 =******** beacon-chain[=********]: time=\"2021-11-11 18:36:17\" level=info msg=\"Peer summary\" activePeers=71 inbound=55 outbound=17 prefix=p2p\r\nNov 11 18:36:34 =******** beacon-chain[=********]: time=\"2021-11-11 18:36:34\" level=info msg=\"Synced new block\" block==********... epoch==******** finalizedEpoch==******** finalizedRoot==********... parentRoot==********... prefix=blockchain slot==******** slotInEpoch=*** version=altair\r\n```\r\n\r\nWhen I check out Grafana I can indeed see something happening at that time:\r\n\r\n![image](https://user-images.githubusercontent.com/2350015/142082671-34a4a921-c713-4543-a9c2-e29ca537fc6c.png)\r\n\r\nIf I zoom into that:\r\n\r\n![image](https://user-images.githubusercontent.com/2350015/142082728-5ef6f18a-2d4e-4000-8acf-6d1cf30a4501.png)\r\n\r\nYou can see that at the time the attestation was missed there's a period of about 2 minutes with \"No Data\"\r\nThe Geth log is also interesting:\r\n\r\n```\r\nNov 11 18:34:14 Unindexed transactions                   blocks=1  txs=243  tail=*******elapsed=2.822ms\r\nNov 11 18:34:26 Imported new chain segment               blocks=1  txs=422  mgas=*******elapsed=903.182ms   mgasps=28.292  number=****** hash=******* dirty=511.83MiB\r\nNov 11 18:34:26 Unindexed transactions                   blocks=1  txs=184  tail=*******elapsed=16.453ms\r\nNov 11 18:34:35 Imported new chain segment               blocks=1  txs=89   mgas=*******elapsed=240.253ms   mgasps=23.642  number=****** hash=******* dirty=509.74MiB\r\nNov 11 18:34:35 Unindexed transactions                   blocks=1  txs=222  tail=*******elapsed=3.190ms\r\nNov 11 18:36:17 Deep froze chain segment                 blocks=3  elapsed=1m23.486s   number=******* hash=*******\r\nNov 11 18:36:17 Imported new chain segment               blocks=1  txs=178  mgas=******  elapsed=457.927ms   mgasps=30.155  number=****** hash=******* age=1m43s    dirty=509.67MiB\r\nNov 11 18:36:17 Unindexed transactions                   blocks=1  txs=109  tail=****** elapsed=1.914ms\r\nNov 11 18:36:55 Synchronisation failed, dropping peer    peer=****** err=timeout\r\nNov 11 18:37:01 Synchronisation failed, dropping peer    peer=****** err=timeout\r\nNov 11 18:37:07 Imported new chain segment               blocks=1  txs=266  mgas=******  elapsed=48.592s     mgasps=0.423   number=****** hash=******* age=2m22s    dirty=509.16MiB\r\nNov 11 18:37:07 Unindexed transactions                   blocks=1  txs=245  tail=******elapsed=4.214ms\r\nNov 11 18:37:08 Synchronisation failed, dropping peer    peer=****** err=timeout\r\nNov 11 18:37:19 Deep froze chain segment                 blocks=2  elapsed=2.017s      number=******* hash=*******\r\nNov 11 18:37:25 Imported new chain segment               blocks=1  txs=148  mgas=****** elapsed=17.880s     mgasps=0.709   number=****** hash=******* age=2m26s    dirty=508.14MiB\r\nNov 11 18:37:37 Synchronisation failed, dropping peer    peer=****** err=timeout\r\n```\r\n\r\nThe things I find peculiar:\r\n1. Quite some dropping of peers\r\n2. Deep Froze chain segment taking more then a minute\r\n3. Imported new chain segment taking 50 seconds and 18 seconds\r\n\r\n### Has this worked before in a previous version?\r\n\r\nNope\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\nI followed this guide without any issues about a year ago:\r\nhttps://someresat.medium.com/guide-to-staking-on-ethereum-2-0-ubuntu-prysm-56f681646f74\r\n\r\n## 🔥 Error\r\n\r\n```\r\nCould not request attestation to sign at slot\" error=\"rpc error: code = DeadlineExceeded desc = context deadline exceeded\r\n```\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:** Ubuntu 20.04.3 LTS\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\nI last updated my system on: 2021-10-25, so the version that was actual then.\r\n\r\n**Anything else relevant (validator index / public key)?**\r\n\r\nN/A",
-  "closed_by": null,
+  "closed_by": {
+    "login": "james-prysm",
+    "id": 90280386,
+    "node_id": "MDQ6VXNlcjkwMjgwMzg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/90280386?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/james-prysm",
+    "html_url": "https://github.com/james-prysm",
+    "followers_url": "https://api.github.com/users/james-prysm/followers",
+    "following_url": "https://api.github.com/users/james-prysm/following{/other_user}",
+    "gists_url": "https://api.github.com/users/james-prysm/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/james-prysm/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/james-prysm/subscriptions",
+    "organizations_url": "https://api.github.com/users/james-prysm/orgs",
+    "repos_url": "https://api.github.com/users/james-prysm/repos",
+    "events_url": "https://api.github.com/users/james-prysm/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/james-prysm/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/9913/reactions",
     "total_count": 1,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/9913/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -582,6 +601,50 @@
     "body": "@nisdas I can confirm that after switching to an SSD, I haven't missed a single attestation yet! Thanks for your help!\r\n\r\n@devedse can you confirm if you're still experiencing this issue?",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1509947060/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1590138747",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/9913#issuecomment-1590138747",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/9913",
+    "id": 1590138747,
+    "node_id": "IC_kwDOBvuov85ex5d7",
+    "user": {
+      "login": "james-prysm",
+      "id": 90280386,
+      "node_id": "MDQ6VXNlcjkwMjgwMzg2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/90280386?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/james-prysm",
+      "html_url": "https://github.com/james-prysm",
+      "followers_url": "https://api.github.com/users/james-prysm/followers",
+      "following_url": "https://api.github.com/users/james-prysm/following{/other_user}",
+      "gists_url": "https://api.github.com/users/james-prysm/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/james-prysm/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/james-prysm/subscriptions",
+      "organizations_url": "https://api.github.com/users/james-prysm/orgs",
+      "repos_url": "https://api.github.com/users/james-prysm/repos",
+      "events_url": "https://api.github.com/users/james-prysm/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/james-prysm/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-13T22:29:38Z",
+    "updated_at": "2023-06-13T22:30:01Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Closing as a hardware upgrade seemed to resolve. please reopen if not the case.",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1590138747/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
