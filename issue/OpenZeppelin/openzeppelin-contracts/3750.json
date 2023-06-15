@@ -40,7 +40,7 @@
       "description": "Changes that break backwards compatibility of the public API."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -75,22 +75,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 41,
-    "closed_issues": 24,
+    "open_issues": 38,
+    "closed_issues": 35,
     "state": "open",
     "created_at": "2022-05-17T19:52:44Z",
-    "updated_at": "2023-06-07T19:21:47Z",
+    "updated_at": "2023-06-15T07:49:45Z",
     "due_on": null,
     "closed_at": null
   },
-  "comments": 3,
+  "comments": 4,
   "created_at": "2022-10-04T09:59:18Z",
-  "updated_at": "2023-06-08T07:51:00Z",
-  "closed_at": null,
+  "updated_at": "2023-06-15T02:21:39Z",
+  "closed_at": "2023-06-15T02:21:39Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "This topic has probably been discussed already in the past, and reached agreement. But I believe it is worth discussing again since [`4.4.1`](https://github.com/OpenZeppelin/openzeppelin-contracts/releases/tag/v4.4.1) release.\r\n\r\n## Background\r\n\r\nThe `initialize(...)` function of the upgradeable contracts is marked `public`.\r\n\r\n[Someone asked already in the OpenZeppelin forum](https://forum.openzeppelin.com/t/why-is-initialize-public/26025) why this function was not marked `public`. The initial intention as mentioned by @frangio was:\r\n\r\n> We use public because it can be useful to call the function internally if you extend it via inheritance.\r\n\r\n## Suggested changes\r\n\r\nSince the 4.4.1 release and the introduction of the `onlyInitializing` modifier, it feels like the `initialize(...)` function might fit better with the `external` visibility. The reasons and my arguments for this would be:\r\n\r\n- If someone wants to extend via inheritance, it might make more sense that the overridden `initialize(...)` function calls the `internal {...}_init` function, not the parent `public initialize(...)` function.\r\n- `external` instead of `public` would give more the sense of the `initialize(...)` functions to behave like a `constructor` (only called on deployment, so should only be called externally.\r\n- I believe from a security point of view, it might be safer so that it cannot be called internally by accident in the child contract (lack of insights here, so would be interested by opinions).\r\n- it might cost a bit less gas to use `external` over `public` (but this is not the main argument).\r\n\r\nMy **main argument** for changing the `initialize(...)` function to `external` would be about the issue of overriding function visibility (_see screenshots below_). With Solidity\r\n- it is possible to override a function from `external` to `public` (= \"opening it up\") ✅ \r\n- but it is not possible to override a function from `public` to `external` (= \"narrow it down\"). ❌ \r\n\r\nSo people who want to override the function to lock it down cannot currently with the `public` visibility.\r\n\r\n## TLDR;\r\n\r\nWhat are the reasons for keeping the `initialize(...)` function as `public` overall?\r\nWhy not marking it as `external` to prevent the issue of visibility overriding showed in the screenshots below?\r\n\r\nI would be interested to hear your opinions on this suggested change. @Amxx @frangio (anyone else from OZ team)\r\n\r\n## Screenshots\r\n\r\n![Screenshot 2022-10-04 at 10 46 27](https://user-images.githubusercontent.com/31145285/193789523-4b736e59-3192-4145-8192-36950958a03d.png)\r\n\r\n![Screenshot 2022-10-04 at 10 46 41](https://user-images.githubusercontent.com/31145285/193789529-ef426cb1-e12b-4ba2-a80f-282689dac3e2.png)\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "frangio",
+    "id": 481465,
+    "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/frangio",
+    "html_url": "https://github.com/frangio",
+    "followers_url": "https://api.github.com/users/frangio/followers",
+    "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+    "organizations_url": "https://api.github.com/users/frangio/orgs",
+    "repos_url": "https://api.github.com/users/frangio/repos",
+    "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/frangio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3750/reactions",
     "total_count": 1,
@@ -105,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3750/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -228,6 +247,50 @@
     "body": "If we make the function external,  it will no longer be possible to call `super.` when overriding. I'm not sure why we would want that.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1582075661/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 1
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1592241238",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3750#issuecomment-1592241238",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3750",
+    "id": 1592241238,
+    "node_id": "IC_kwDOA9tCBs5e56xW",
+    "user": {
+      "login": "frangio",
+      "id": 481465,
+      "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/frangio",
+      "html_url": "https://github.com/frangio",
+      "followers_url": "https://api.github.com/users/frangio/followers",
+      "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+      "organizations_url": "https://api.github.com/users/frangio/orgs",
+      "repos_url": "https://api.github.com/users/frangio/repos",
+      "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/frangio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-15T02:21:39Z",
+    "updated_at": "2023-06-15T02:21:39Z",
+    "author_association": "MEMBER",
+    "body": "In Contracts 5.0 the contracts that had `initialize()` functions (presets) were removed. So this issue doesn't have any actionables unless we want to change our documentation to recommend using `external` rather than `public`. I don't think there are particularly strong reasons to favor one or the other so I will close this.",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1592241238/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

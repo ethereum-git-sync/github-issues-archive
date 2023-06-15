@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,22 +67,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 43,
-    "closed_issues": 21,
+    "open_issues": 38,
+    "closed_issues": 35,
     "state": "open",
     "created_at": "2022-05-17T19:52:44Z",
-    "updated_at": "2023-06-02T17:21:01Z",
+    "updated_at": "2023-06-15T07:49:45Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 8,
   "created_at": "2023-01-09T20:38:45Z",
-  "updated_at": "2023-06-02T08:15:15Z",
-  "closed_at": null,
+  "updated_at": "2023-06-15T02:39:37Z",
+  "closed_at": "2023-06-15T02:39:36Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "This PR refers to the `next-v5.0` branch. In https://github.com/OpenZeppelin/openzeppelin-contracts/pull/3876 two potential optimizations were identified.\r\n\r\n1. `_asSingletonArray`: Throughout the contract we use:\r\n```solidity\r\n        uint256[] memory ids = _asSingletonArray(id);\r\n        uint256[] memory amounts = _asSingletonArray(amount);\r\n```\r\nWe could combine this into a single function `_asSigletonArrays(id, amount)` and using assembly we would be able to do a single allocation and possibly avoid a couple of bounds checks.\r\n\r\n2. `_unsafeAccess`: In places where we loop over arrays of ids and amounts, we don't need to do bounds checking inside the for loop, so we could define a function to skip it.\r\n\r\nGiven that these are arrays in memory, it's unclear how much of an improvement these optimizations will make, so we have to benchmark to know for sure.\r\n\r\nBased on the results of using `_unsafeAccess` for memory arrays we should consider applying it in other places",
-  "closed_by": null,
+  "closed_by": {
+    "login": "frangio",
+    "id": 481465,
+    "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/frangio",
+    "html_url": "https://github.com/frangio",
+    "followers_url": "https://api.github.com/users/frangio/followers",
+    "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+    "organizations_url": "https://api.github.com/users/frangio/orgs",
+    "repos_url": "https://api.github.com/users/frangio/repos",
+    "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/frangio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3940/reactions",
     "total_count": 0,
@@ -97,7 +116,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3940/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -348,7 +367,7 @@
     },
     "created_at": "2023-06-01T11:53:54Z",
     "updated_at": "2023-06-01T11:53:54Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Hi there, I was taking a look at the potential optimizations and I'm not sure if the improvements are worth it, but here go the results I found.\r\n\r\nRegarding the usage of  `_unsafeAccess`, using the next function for unsafe access:\r\n\r\n``` solidity\r\n\r\n    function unsafeMemoryAccess(uint256[] memory arr, uint256 pos) internal pure returns (uint256 res) {\r\n        /// @solidity memory-safe-assembly\r\n        assembly {\r\n            res := mload(add(add(arr, 0x20), mul(pos, 0x20)))\r\n        }\r\n    }\r\n```\r\n\r\nthe results were:\r\n\r\n```·--------------------------------------------------|---------------------------|-------------|\r\n|               Solc version: 0.8.19               ·  Optimizer enabled: true  ·  Runs: 200  ·\r\n···················································|···························|·············|\r\n|  Methods                                         ·               27 gwei/gas               ·\r\n··························|························|·············|·············|·············|\r\n|  Contract               ·  Method                ·      Min    ·      Max    ·      Avg    ·\r\n··························|························|·············|·············|·············|\r\n|  $ERC1155               ·  safeBatchTransferFrom ·      79580  ·     108008  ·      90701  ·\r\n··························|························|·············|·············|·············|\r\n|  $ERC1155 (optimized)   ·  safeBatchTransferFrom ·      79404  ·     107744  ·      90509  ·\r\n··························|························|·············|·············|·············|\r\n\r\n|  $ERC1155               ·  safeTransferFrom      ·      52744  ·      60144  ·      56678  ·\r\n··························|······················ ·|·············|·············|·············|\r\n|  $ERC1155 (optimized)   ·  safeTransferFrom      ·      52574  ·      59974  ·      56508  ·\r\n··························|······················· |·············|·············|·············|\r\n```\r\n\r\nthe previous result can be checked on [this commit.](https://github.com/OpenZeppelin/openzeppelin-contracts/commit/68a6eaf3d2d22227f5d5519a52f48c6e974aa044) \r\n\r\n\r\nFollowing the discussed improvement regarding `_asSigletonArrays` and using this function:\r\n\r\n``` solidity \r\nfunction _asSingletonArrays(\r\n        uint256 element1,\r\n        uint256 element2\r\n    ) private pure returns (uint256[] memory array1, uint256[] memory array2) {\r\n        /// @solidity memory-safe-assembly\r\n        assembly {\r\n            array1 := mload(0x40)\r\n            mstore(array1, 1)\r\n            mstore(add(array1, 0x20), element1)\r\n\r\n            array2 := add(array1, 0x40)\r\n            mstore(array2, 1)\r\n            mstore(add(array2, 0x20), element2)\r\n\r\n            mstore(0x40, add(array2, 0x40))\r\n        }\r\n    }\r\n```\r\n\r\nthe results were (check it on [this commit ](https://github.com/OpenZeppelin/openzeppelin-contracts/commit/1ec6f50aaf0c36edb753decc1e1551e54d3d48b4)):\r\n\r\n```\r\n·--------------------------------------------------|---------------------------|-------------|\r\n|               Solc version: 0.8.19               ·  Optimizer enabled: true  ·  Runs: 200  ·\r\n···················································|···························|·············|\r\n|  Methods                                         ·               27 gwei/gas               ·\r\n··························|························|·············|·············|·············|\r\n|  Contract               ·  Method                ·      Min    ·      Max    ·      Avg    ·\r\n··························|························|·············|·············|·············|\r\n|  $ERC1155               ·  safeTransferFrom      ·      52744  ·      60144  ·      56678  ·\r\n··························|······················ ·|·············|·············|·············|\r\n|  $ERC1155 (optimized)   ·  safeTransferFrom      ·      52420  ·      59820  ·      56354  ·\r\n··························|······················· |·············|·············|·············|\r\n\r\n```\r\n\r\n\r\nAnd finally using both optimizations the results were (check it [here.](https://github.com/OpenZeppelin/openzeppelin-contracts/compare/master...clauBv23:openzeppelin-contracts:ERC1155-array-optimization)):\r\n\r\n```\r\n·--------------------------------------------------|---------------------------|-------------|\r\n|               Solc version: 0.8.19               ·  Optimizer enabled: true  ·  Runs: 200  ·\r\n···················································|···························|·············|\r\n|  Methods                                         ·               27 gwei/gas               ·\r\n··························|························|·············|·············|·············|\r\n|  Contract               ·  Method                ·      Min    ·      Max    ·      Avg    ·\r\n··························|························|·············|·············|·············|\r\n|  $ERC1155               ·  safeBatchTransferFrom ·      79580  ·     108008  ·      90701  ·\r\n··························|························|·············|·············|·············|\r\n|  $ERC1155 (optimized)   ·  safeBatchTransferFrom ·      79404  ·     107744  ·      90509  ·\r\n··························|························|·············|·············|·············|\r\n\r\n|  $ERC1155               ·  safeTransferFrom      ·      52744  ·      60144  ·      56678  ·\r\n··························|······················ ·|·············|·············|·············|\r\n|  $ERC1155 (optimized)   ·  safeTransferFrom      ·      52250  ·      59650  ·      56184  ·\r\n··························|······················· |·············|·············|·············|\r\n```\r\n\r\nWhit both changes the gas reduction is about 400 for ` safeTransferFrom` and more than 150 for `safeBatchTransferFrom` so, IMHO it could be, at least, considered. \r\nDidn't create a PR to keep OZ repo clean, but I could if this is a green light.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1571910471/reactions",
@@ -436,7 +455,7 @@
     },
     "created_at": "2023-06-02T07:48:16Z",
     "updated_at": "2023-06-02T08:15:15Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "sure, perfect! #4300 created",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1573305451/reactions",
