@@ -58,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,12 +67,31 @@
   "milestone": null,
   "comments": 6,
   "created_at": "2021-06-19T01:10:12Z",
-  "updated_at": "2023-05-09T12:45:16Z",
-  "closed_at": null,
+  "updated_at": "2023-06-16T18:59:50Z",
+  "closed_at": "2023-06-16T18:59:50Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "**Describe the bug**\r\nWhen booting, the DTL sometimes struggles to determine the correct StartingL1BlockNumber, due to problematic query filtering of `this.state.contracts.Lib_AddressManager.queryFilter`.\r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\n1. Configure the DTL like this:\r\n```\r\nDATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'true'\r\nDATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'false'\r\n```\r\n2. Spin up the system: `docker-compose up --renew-anon-volumes`\r\n3. DTL quits with `Unable to find appropriate L1 starting block number` \r\n\r\n**Expected behavior**\r\nRegardless of L1 data origin (local L1, Infura,...), the DTL, when configured to sync from L1, should reliably determine the starting L1 block based on the deployment of the AddressManager\r\n\r\n**Analysis**\r\nThe DTL is looking for topic `0x188466739ff00cc68bfb2367d23ae4b855264264fe1624caa8884399af23454c` aka `AddressSet()`, which may or may not be present/available to `this.state.contracts.Lib_AddressManager.queryFilter`. A more reliable topic to filter for might be `0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0` aka ownershipTransferred, which should be a good indicator of the first L1 block? In testing, filtering for `ownershipTransferred` rather than `AddressSet` has reduced `Unable to find appropriate L1 starting block number` errors. \r\n\r\n**Why does this matter**\r\nAnything that depends on L1 data, including the `Sequencer` and `Verifier`, need the DTL to be able to discover the L1 starting block for correct subsequent function.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/1126/reactions",
     "total_count": 4,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/1126/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {

@@ -40,21 +40,40 @@
       "description": "Category: An issue encountered by customers integrating with Optimism"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 17,
+  "comments": 18,
   "created_at": "2023-03-09T09:20:17Z",
-  "updated_at": "2023-05-17T17:21:52Z",
-  "closed_at": null,
+  "updated_at": "2023-06-16T19:08:16Z",
+  "closed_at": "2023-06-16T19:08:15Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**Describe the bug**\r\nI'm following the [offical docs](https://stack.optimism.io/docs/build/getting-started/#reinitializing-op-geth). but I'm stucking at [this step](https://stack.optimism.io/docs/build/getting-started/#run-op-node)\r\n\r\n**To Reproduce**\r\nI used command following:\r\n```bash\r\n./bin/op-node \\                                                                                                                   ✔  ⬢ 16.19.1   1.20.2  16:07:49 \r\n    --l2=http://localhost:8551 \\\r\n    --l2.jwt-secret=./jwt.txt \\\r\n    --sequencer.enabled \\\r\n    --sequencer.l1-confs=3 \\\r\n    --verifier.l1-confs=3 \\\r\n    --rollup.config=./rollup.json \\\r\n    --rpc.addr=0.0.0.0 \\\r\n    --rpc.port=8547 \\\r\n    --p2p.listen.ip=0.0.0.0 \\\r\n    --p2p.listen.tcp=9003 \\\r\n    --p2p.listen.udp=9003 \\\r\n    --rpc.enable-admin \\\r\n    --p2p.sequencer.key=\"my_sequencer_key\" \\\r\n    --l1=\"https://endpoints.omniatech.io/v1/eth/goerli/public\" \\\r\n    --l1.rpckind=\"alchemy\"\r\n```\r\nThen I get the following errors:\r\n```bash\r\n  ERROR[03-09|16:07:56.953] failed to fetch runtime config data      err=\"failed to fetch unsafe block signing address from system config: failed to verify retrieved proof against state root: value 0 in storage proof does not match proven value at key 0x65a7ed542fb37fe237fdfbdd70b31598523fe5b32879e307bae27a0bd9581c08 (path 31a88f3936348d602f3078126bdcd162c575cb17fb9bbfe2dab00b167bd295c3)\"\r\n```\r\n**Screenshots**\r\nIf applicable, add screenshots to help explain your problem.\r\n<img width=\"2055\" alt=\"Screenshot 2023-03-09 at 16 17 38\" src=\"https://user-images.githubusercontent.com/98303369/223976310-89fdc6b1-b25b-4142-88b0-af24835e5d53.png\">\r\n\r\n**System Specs:**\r\n - OS: MacOS 13.2.1\r\n - Chip M1\r\n\r\n**Additional Context**\r\nI found `0x65a7ed542fb37fe237fdfbdd70b31598523fe5b32879e307bae27a0bd9581c08` and `31a88f3936348d602f3078126bdcd162c575cb17fb9bbfe2dab00b167bd295c3` from the ERROR above are hardcoded in the source code, so am I making a mistake at some step?\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5095/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5095/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -500,13 +519,13 @@
     "body": "The header-fetch error happens when running old op-node software that didn't support the L1 ethereum Shanghai/Capella upgrade yet, and thus fails to verify the blocks past that upgrade (upgrade was March 14 for Goerli L1).\r\n\r\nThe signing-address fetch error (with the \"failed to verify retrieved proof\") is unrelated, and happens when the L1 RPC does not fully support `eth_getProof` (common, happens with Erigon and node providers that use Erigon), or if the `SystemConfig` is not present on the L1 (if you are trying to run an alt op-chain this may be the case).\r\nA work-around is to use the `--l1.trustrpc` flag, to fallback to direct retrieval of the system configuration data, and not verify with a proof. If you trust the RPC you use for L1, that's a valid way to load system configuration. If you do not trust the L1 RPC, and they do not provide support for `eth_getProof`, you should switch to a different RPC provider.\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1549861889/reactions",
-      "total_count": 2,
-      "+1": 0,
+      "total_count": 4,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 2,
+      "heart": 3,
       "rocket": 0,
       "eyes": 0
     },
@@ -808,6 +827,50 @@
     "body": "@protolambda + @smartcontracts is that because I'm using Polygon as L1 or I should use an more up-to-date L1 starting block?\r\n\r\nOr, also, `L1 sysCfg update: receipt 64 has invalid gas used metadata: 0, expected 18446744073680135202` may mean my Alchemy endpoint/RPC ran out of data limit?",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1551788341/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1595160432",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/5095#issuecomment-1595160432",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5095",
+    "id": 1595160432,
+    "node_id": "IC_kwDODjvEJM5fFDdw",
+    "user": {
+      "login": "tynes",
+      "id": 6626818,
+      "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tynes",
+      "html_url": "https://github.com/tynes",
+      "followers_url": "https://api.github.com/users/tynes/followers",
+      "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+      "organizations_url": "https://api.github.com/users/tynes/orgs",
+      "repos_url": "https://api.github.com/users/tynes/repos",
+      "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tynes/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-16T19:08:15Z",
+    "updated_at": "2023-06-16T19:08:15Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "No guarantee that we support polygon as an L1. Please use the latest releases. The `make devnet-up` command works, will build the images locally. If you are having this issue still with ethereum as the L1, please reopen",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1595160432/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

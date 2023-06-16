@@ -58,21 +58,40 @@
       "description": "Module: l2geth"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 9,
+  "comments": 10,
   "created_at": "2022-12-15T18:03:11Z",
-  "updated_at": "2023-04-07T09:42:49Z",
-  "closed_at": null,
+  "updated_at": "2023-06-16T19:11:12Z",
+  "closed_at": "2023-06-16T19:11:11Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**Describe the bug**\r\nl2geth breaks after restarting it. l2geth is working perfectly fine, I restart it and then this shows up in the logs:\r\n\r\n```\r\nINFO [12-15|16:59:29.673] Syncing transaction batch range          start=43668 end=48186\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769274\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769275\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769276\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769277\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769278\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769279\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769280\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769281\r\nERROR[12-15|16:59:29.681] Mismatched transaction                   index=5769282\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769283\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769284\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769285\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769286\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769287\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769288\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769289\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769290\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769291\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769292\r\nERROR[12-15|16:59:29.682] Mismatched transaction                   index=5769293\r\nERROR[12-15|16:59:29.682] Problem committing transaction           msg=\"nonce too low\"\r\nERROR[12-15|16:59:29.682] Got error waiting for transaction to be added to chain msg=\"nonce too low\"\r\nERROR[12-15|16:59:29.682] Could not verify                         error=\"Verifier cannot sync transaction batches to tip: Cannot sync transaction batches to tip: Cannot sync batches: cannot apply batched transaction: Cannot apply batched transaction: nonce too low\"\r\n```\r\n\r\n&#x200B;\r\n\r\n**To Reproduce**\r\n1. Create a new node following the non-Docker configuration described [here](https://community.optimism.io/docs/developers/build/run-a-node/#non-docker-configuration).\r\n2. Create unit files for DTL and l2geth (see code bellow).\r\n3. Start DTL and l2geth by running the following:\r\n    ```\r\n    systemctl daemon-reload\r\n    systemctl start optimism-dtl\r\n    systemctl start optimism-l2geth\r\n    ```\r\n4. Restart l2geth with:\r\n    ```\r\n    systemctl restart optimism-l2geth\r\n    ```\r\n\r\n&#x200B;\r\n\r\n**Expected behavior**\r\nl2geth should continue working properly after restarting it.\r\n\r\n&#x200B;\r\n\r\n**System Specs:**\r\n - OS: Ubuntu 20.04.5 LTS\r\n - Kernel: Linux 5.15.0-1026-aws\r\n - vCPUs: 4\r\n - RAM: 16GB\r\n - Disk: 1500GiB\r\n - Commit hash: af2cf449d1081e85ba346565d343ed7737871e75\r\n\r\n&#x200B;\r\n\r\n**Additional context**\r\nEvery now and then, my Optimism nodes completely break and I have to recreate them from scratch and wait about 6 days for them to sync again. Now, I realize that I can't even safely restart the node without breaking it. I'm not sure if this is a bug or if I'm doing something wrong, but I'm pretty sure that this is not the expected behavior because it's highly unstable.\r\n\r\nIf this instability can't be fixed, I welcome a way to recover nodes from backups. I've tried all sorts of DR solutions but, given that a service restart breaks l2geth, restoring never works since a service restart is implied.\r\n\r\n&#x200B;\r\n\r\n**Env and config files**\r\n\r\nDTL's `.env`:\r\n\r\n```\r\nDATA_TRANSPORT_LAYER__NODE_ENV=production\r\nDATA_TRANSPORT_LAYER__ETH_NETWORK_NAME=mainnet\r\nDATA_TRANSPORT_LAYER__DB_PATH=/chaindata/optimism/packages/data-transport-layer/db\r\nDATA_TRANSPORT_LAYER__ADDRESS_MANAGER=0xdE1FCfB0851916CA5101820A69b13a4E276bd81F\r\nDATA_TRANSPORT_LAYER__POLLING_INTERVAL=5000\r\nDATA_TRANSPORT_LAYER__DANGEROUSLY_CATCH_ALL_ERRORS=true\r\nDATA_TRANSPORT_LAYER__CONFIRMATIONS=12\r\nDATA_TRANSPORT_LAYER__SERVER_HOSTNAME=localhost\r\nDATA_TRANSPORT_LAYER__SERVER_PORT=7878\r\nDATA_TRANSPORT_LAYER__SYNC_FROM_L1=true\r\nDATA_TRANSPORT_LAYER__DEFAULT_BACKEND=l1\r\nDATA_TRANSPORT_LAYER__L1_GAS_PRICE_BACKEND=l1\r\nDATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT=https://mainnet.infura.io/v3/REDACTED_KEY\r\nDATA_TRANSPORT_LAYER__LOGS_PER_POLLING_INTERVAL=2000\r\nDATA_TRANSPORT_LAYER__SYNC_FROM_L2=false\r\nDATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT=https://optimism-mainnet.infura.io/v3/REDACTED_KEY\r\nDATA_TRANSPORT_LAYER__TRANSACTIONS_PER_POLLING_INTERVAL=1000\r\nDATA_TRANSPORT_LAYER__L2_CHAIN_ID=10\r\nDATA_TRANSPORT_LAYER__LEGACY_SEQUENCER_COMPATIBILITY=false\r\n```\r\n\r\nDTL's unit file (`optimism-dtl.service`):\r\n\r\n```\r\n[Unit]\r\nDescription = Optimism's Data Transport Layer\r\nAfter       = network.target\r\nRequires    = network.target\r\n\r\n[Service]\r\nUser             = root\r\nWorkingDirectory = /chaindata/optimism/packages/data-transport-layer\r\nExecStart        = yarn start\r\nStandardOutput   = file:/var/log/optimism/dtl.log\r\nStandardError    = file:/var/log/optimism/dtl-error.log\r\nRestart          = on-failure\r\nRestartSec       = 5\r\nTimeoutStartSec  = 20\r\nTimeoutStopSec   = 20\r\n\r\n[Install]\r\nWantedBy = multi-user.target\r\n```\r\n\r\nl2geth's unit file (`optimism-l2geth.service`):\r\n\r\n```\r\n\r\n[Unit]\r\nDescription = Optimism's L2 Geth\r\nAfter       = network.target\r\nRequires    = network.target\r\n\r\n[Service]\r\nEnvironment=CHAIN_ID=10\r\nEnvironment=DATADIR=/chaindata/optimism/l2geth/gethData\r\nEnvironment=NETWORK_ID=10\r\nEnvironment=NO_DISCOVER=true\r\nEnvironment=NO_USB=true\r\nEnvironment=GASPRICE=0\r\nEnvironment=GCMODE=full\r\nEnvironment=BLOCK_SIGNER_ADDRESS=0x00000398232E2064F896018496b4b44b3D62751F\r\nEnvironment=BLOCK_SIGNER_PRIVATE_KEY=6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27\r\nEnvironment=ETH1_CTC_DEPLOYMENT_HEIGHT=13596466\r\nEnvironment=ETH1_SYNC_SERVICE_ENABLE=true\r\nEnvironment=ROLLUP_ADDRESS_MANAGER_OWNER_ADDRESS=0x9BA6e03D8B90dE867373Db8cF1A58d2F7F006b3A\r\nEnvironment=ROLLUP_BACKEND=l1\r\nEnvironment=ROLLUP_CLIENT_HTTP=http://localhost:7878\r\nEnvironment=ROLLUP_DISABLE_TRANSFERS=false\r\nEnvironment=ROLLUP_ENABLE_L2_GAS_POLLING=false\r\nEnvironment=ROLLUP_GAS_PRICE_ORACLE_OWNER_ADDRESS=0x648E3e8101BFaB7bf5997Bd007Fb473786019159\r\nEnvironment=ROLLUP_MAX_CALLDATA_SIZE=40000\r\nEnvironment=ROLLUP_POLL_INTERVAL_FLAG=1s\r\nEnvironment=ROLLUP_SYNC_SERVICE_ENABLE=true\r\nEnvironment=ROLLUP_TIMESTAMP_REFRESH=5m\r\nEnvironment=ROLLUP_VERIFIER_ENABLE=true\r\nEnvironment=RPC_ADDR=0.0.0.0\r\nEnvironment=RPC_API=eth,rollup,net,web3,debug\r\nEnvironment=RPC_CORS_DOMAIN=*\r\nEnvironment=RPC_ENABLE=true\r\nEnvironment=RPC_PORT=8545\r\nEnvironment=RPC_VHOSTS=*\r\nEnvironment=SEQUENCER_CLIENT_HTTP=https://optimism-mainnet.infura.io/v3/REDACTED_KEY\r\nEnvironment=TARGET_GAS_LIMIT=15000000\r\nEnvironment=USING_OVM=true\r\nEnvironment=WS_ADDR=0.0.0.0\r\nEnvironment=WS_API=eth,rollup,net,web3,debug\r\nEnvironment=WS_ORIGINS=*\r\nEnvironment=WS=true\r\n\r\nUser      = root\r\nExecStart = /chaindata/optimism/l2geth/build/bin/geth \\\r\n  --datadir=$DATADIR \\\r\n  --password=$DATADIR/password \\\r\n  --allow-insecure-unlock \\\r\n  --unlock=$BLOCK_SIGNER_ADDRESS \\\r\n  --mine \\\r\n  --miner.etherbase=$BLOCK_SIGNER_ADDRESS\r\n\r\nStandardOutput  = file:/var/log/optimism/l2geth.log\r\nStandardError   = file:/var/log/optimism/l2geth-error.log\r\nRestart         = on-failure\r\nRestartSec      = 5\r\nTimeoutStartSec = 20\r\nTimeoutStopSec  = 20\r\n\r\n[Install]\r\nWantedBy = multi-user.target\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4500/reactions",
     "total_count": 3,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4500/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -474,6 +493,50 @@
     "body": "@smartcontracts, is it solwed?",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1500125978/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1595164640",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/4500#issuecomment-1595164640",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/4500",
+    "id": 1595164640,
+    "node_id": "IC_kwDODjvEJM5fFEfg",
+    "user": {
+      "login": "tynes",
+      "id": 6626818,
+      "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tynes",
+      "html_url": "https://github.com/tynes",
+      "followers_url": "https://api.github.com/users/tynes/followers",
+      "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+      "organizations_url": "https://api.github.com/users/tynes/orgs",
+      "repos_url": "https://api.github.com/users/tynes/repos",
+      "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tynes/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-16T19:11:11Z",
+    "updated_at": "2023-06-16T19:11:11Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "The bedrock upgrade fixes this",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1595164640/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
