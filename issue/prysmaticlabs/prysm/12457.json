@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "james-prysm",
@@ -79,12 +79,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-05-24T05:22:24Z",
-  "updated_at": "2023-05-25T02:42:27Z",
-  "closed_at": null,
+  "updated_at": "2023-06-15T22:20:02Z",
+  "closed_at": "2023-06-15T22:20:02Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!--💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎\r\n\r\nHellooo! 😄 \r\n\r\nTo help us tend to your issue faster, please search our currently open issues before submitting a new one.\r\nExisting issues often contain information about workarounds, resolution, or progress updates.\r\n\r\n💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎-->\r\n\r\n# 💎 Issue\r\n\r\n### Background\r\n\r\n\r\nWhen calling grpc `MultipleValidatorStatus`, the for loop below is executed for getting the last activated validator index if there are PENDING/DEPOSITIED/PARTIALLY_DEPOISTED validators.\r\n\r\nhttps://github.com/prysmaticlabs/prysm/blob/666188dfea8c5d6ba0d9650b1f4d24c3122906d1/beacon-chain/rpc/prysm/v1alpha1/validator/status.go#L345-L354\r\n\r\nThe problem is that this for loop is executed for each pending validators in `MultipleValidatorStatus` request.\r\n\r\nCurrently, there are more than 70,000 pending validators on the eth network.\r\n<img width=\"251\" alt=\"Screenshot 2023-05-24 at 2 11 06 PM\" src=\"https://github.com/prysmaticlabs/prysm/assets/37792049/a77f7c2a-8bd5-40d3-8d1e-3f209cf71104\">\r\n\r\nSo, if `MultipleValidatorStatus` is requested for 100 pending validators, the code inside the for loop will be executed 70,000 * 100 = 7,000,000 times.\r\n\r\n### Description\r\n\r\nBelow is a flame graph when `MultipleValidatorStatus` is requested for 100 pending validators. Most of the time is spent in the for loop.\r\n<img width=\"1565\" alt=\"Screenshot 2023-05-24 at 2 14 25 PM\" src=\"https://github.com/prysmaticlabs/prysm/assets/37792049/159211df-5cd2-4a42-9737-e5f5f5a7dd70\">\r\n\r\nIt seems that a significant performance improvement can be achieved by replacing the simple for loop with binary search or calculating `lastActivatedvalidatorIndex` only once and reusing it.\r\n\r\nI think this improvement is necessary because the grpc `MultipleValidatorStatus` is called in `AllValidatorsAreExited`, which is executed before performing the roles in the validator-client.\r\n\r\nhttps://github.com/prysmaticlabs/prysm/blob/666188dfea8c5d6ba0d9650b1f4d24c3122906d1/validator/client/runner.go#L94-L103\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "james-prysm",
+    "id": 90280386,
+    "node_id": "MDQ6VXNlcjkwMjgwMzg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/90280386?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/james-prysm",
+    "html_url": "https://github.com/james-prysm",
+    "followers_url": "https://api.github.com/users/james-prysm/followers",
+    "following_url": "https://api.github.com/users/james-prysm/following{/other_user}",
+    "gists_url": "https://api.github.com/users/james-prysm/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/james-prysm/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/james-prysm/subscriptions",
+    "organizations_url": "https://api.github.com/users/james-prysm/orgs",
+    "repos_url": "https://api.github.com/users/james-prysm/repos",
+    "events_url": "https://api.github.com/users/james-prysm/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/james-prysm/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12457/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12457/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
