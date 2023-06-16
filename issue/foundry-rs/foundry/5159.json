@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-06-14T21:08:22Z",
-  "updated_at": "2023-06-14T21:19:37Z",
-  "closed_at": null,
+  "updated_at": "2023-06-15T20:57:28Z",
+  "closed_at": "2023-06-15T20:57:28Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\n_No response_\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nNone\n\n### Describe the bug\n\nWhen doing low level calls, it's expected that you can match the calldata returned with `vm.expectRevert`, but this is not possible—somewhere when reverting on low level calls, the calldata is being lost.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5159/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5159/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "Reproduction:\r\n\r\n```solidity\r\ncontract A {\r\n    function foo() public {\r\n        revert(\"error message\");\r\n    }\r\n}\r\n\r\ncontract MyTest is Test {\r\n    A a;\r\n\r\n    function setUp() public {\r\n        a = new A();\r\n    }\r\n\r\n    // Passes, which makes sense\r\n    function test1() public {\r\n        vm.expectRevert(\"error message\");\r\n        a.foo();\r\n    }\r\n\r\n    // This test fails, and the return data is 512 bytes of zeros\r\n    function test2() public {\r\n        vm.expectRevert(\"error message\"); // <-- We use expectRevert\r\n        (bool ok, bytes memory data) = address(a).call(abi.encodeCall(A.foo, ()));\r\n        assertTrue(ok, \"call should fail\"); //  <-- `ok` flipped from false to true by `vm.expectRevert`\r\n\r\n        bytes memory expectedErr = abi.encodeWithSignature(\"Error(string)\", (\"error message\"));\r\n        console2.logBytes(data);\r\n        console2.logBytes(expectedErr);\r\n        assertEq(data, expectedErr);\r\n    }\r\n\r\n    // This test passes\r\n    function test3() public {\r\n        // No expectRevert here\r\n        (bool ok, bytes memory data) = address(a).call(abi.encodeCall(A.foo, ()));\r\n        assertFalse(ok, \"call should fail\"); // <-- therefore `ok` is false here\r\n\r\n        bytes memory expectedErr = abi.encodeWithSignature(\"Error(string)\", (\"error message\"));\r\n        console2.logBytes(data);\r\n        console2.logBytes(expectedErr);\r\n        assertEq(data, expectedErr);\r\n    }\r\n}\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1591995117/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1593714411",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5159#issuecomment-1593714411",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5159",
+    "id": 1593714411,
+    "node_id": "IC_kwDOGBlvNc5e_ibr",
+    "user": {
+      "login": "mds1",
+      "id": 17163988,
+      "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mds1",
+      "html_url": "https://github.com/mds1",
+      "followers_url": "https://api.github.com/users/mds1/followers",
+      "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+      "organizations_url": "https://api.github.com/users/mds1/orgs",
+      "repos_url": "https://api.github.com/users/mds1/repos",
+      "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mds1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-15T20:57:28Z",
+    "updated_at": "2023-06-15T20:57:28Z",
+    "author_association": "COLLABORATOR",
+    "body": "Closing since this is expected behavior. TLDR is that when you flip the return value, it changes what data solc expects, so dummy data of zeroes is intentionally returned. The book will be updated with more info to clarify things",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1593714411/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
