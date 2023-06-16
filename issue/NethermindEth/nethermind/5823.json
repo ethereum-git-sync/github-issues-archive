@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5823",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5823/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5823/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5823/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/5823",
+  "id": 1760531528,
+  "node_id": "I_kwDOBggaLc5o75RI",
+  "number": 5823,
+  "title": "Gnosis: `eth_getTransactionReceipt` missing `contractAddress`",
+  "user": {
+    "login": "theod-cryptio",
+    "id": 115144374,
+    "node_id": "U_kgDOBtz2tg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/115144374?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/theod-cryptio",
+    "html_url": "https://github.com/theod-cryptio",
+    "followers_url": "https://api.github.com/users/theod-cryptio/followers",
+    "following_url": "https://api.github.com/users/theod-cryptio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/theod-cryptio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/theod-cryptio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/theod-cryptio/subscriptions",
+    "organizations_url": "https://api.github.com/users/theod-cryptio/orgs",
+    "repos_url": "https://api.github.com/users/theod-cryptio/repos",
+    "events_url": "https://api.github.com/users/theod-cryptio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/theod-cryptio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-16T12:21:43Z",
+  "updated_at": "2023-06-16T12:21:43Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Description**\r\nOn the gnosis network, calls to `eth_getTransactionReceipt` on some contract creation transactions (e.g `0xdff4563e305339719107cb3db9e9043d92e6d0159319ef5d2383195c3b69b38a`) have a `null` `contractAddress` field.\r\n\r\n**Steps to Reproduce**\r\n```sh\r\ncurl $RPC --json '{\"method\":\"eth_getTransactionReceipt\",\"params\":[\"0xdff4563e305339719107cb3db9e9043d92e6d0159319ef5d2383195c3b69b38a\"],\"id\":1,\r\n\"jsonrpc\":\"2.0\"}' | jq '.result'\r\n```\r\n\r\n**Actual behavior**\r\nOn a 1.19.2 Neithermind node:\r\n```json\r\n{\r\n    \"transactionHash\": \"0xdff4563e305339719107cb3db9e9043d92e6d0159319ef5d2383195c3b69b38a\",\r\n    \"transactionIndex\": \"0x0\",\r\n    \"blockHash\": \"0x580469139ad0ee63aa99dd91282710d2e856a4546737c1f7b7a54ef5cd31bf12\",\r\n    \"blockNumber\": \"0x1b09d04\",\r\n    \"cumulativeGasUsed\": \"0x29def3\",\r\n    \"gasUsed\": \"0x29def3\",\r\n    \"effectiveGasPrice\": \"0x138eca4807\",\r\n    \"from\": \"0x0f41e71f39e8671d0e301c544007d4d90910e0b7\",\r\n    \"to\": null,\r\n    \"contractAddress\": null,\r\n    \"logs\": [],\r\n    \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"status\": \"0x1\",\r\n    \"type\": \"0x2\"\r\n  }\r\n```\r\n**Expected behavior**\r\nOn an Erigon node:\r\n```json\r\n{\r\n    \"blockHash\": \"0x580469139ad0ee63aa99dd91282710d2e856a4546737c1f7b7a54ef5cd31bf12\",\r\n    \"blockNumber\": \"0x1b09d04\",\r\n    \"contractAddress\": \"0xa1dea36b62dae165072d914527e97fe4e2eed199\",\r\n    \"cumulativeGasUsed\": \"0x29def3\",\r\n    \"effectiveGasPrice\": \"0x138eca4807\",\r\n    \"from\": \"0x0f41e71f39e8671d0e301c544007d4d90910e0b7\",\r\n    \"gasUsed\": \"0x29def3\",\r\n    \"logs\": [],\r\n    \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"status\": \"0x1\",\r\n    \"to\": null,\r\n    \"transactionHash\": \"0xdff4563e305339719107cb3db9e9043d92e6d0159319ef5d2383195c3b69b38a\",\r\n    \"transactionIndex\": \"0x0\",\r\n    \"type\": \"0x2\"\r\n  }\r\n```\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5823/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5823/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
