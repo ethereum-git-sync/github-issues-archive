@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27499",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27499/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27499/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27499/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27499",
+  "id": 1761359374,
+  "node_id": "I_kwDOAOvK985o_DYO",
+  "number": 27499,
+  "title": "Unpacking indexed arguments of an event log dynamically",
+  "user": {
+    "login": "yaziciahmet",
+    "id": 75089142,
+    "node_id": "MDQ6VXNlcjc1MDg5MTQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/75089142?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yaziciahmet",
+    "html_url": "https://github.com/yaziciahmet",
+    "followers_url": "https://api.github.com/users/yaziciahmet/followers",
+    "following_url": "https://api.github.com/users/yaziciahmet/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yaziciahmet/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yaziciahmet/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yaziciahmet/subscriptions",
+    "organizations_url": "https://api.github.com/users/yaziciahmet/orgs",
+    "repos_url": "https://api.github.com/users/yaziciahmet/repos",
+    "events_url": "https://api.github.com/users/yaziciahmet/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yaziciahmet/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-16T21:14:51Z",
+  "updated_at": "2023-06-16T21:14:51Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I am trying to parse the logs of a contract in a fully dynamic manner. Meaning that the only thing I have is the abi of the contract, and the filter query to filter out logs. I would like to parse the returned events dynamically. Here is my attempt so far:\r\n\r\n```\r\nfunc (c *Client) getHistoricalEvents(abiStr string, filterQuery ethereum.FilterQuery) ([]map[string]any, error) {\r\n    contractAbi, err := abi.JSON(strings.NewReader(abiStr))\r\n\tif err != nil {\r\n\t\treturn nil, err\r\n\t}\r\n\r\n\tlogs, err := c.client.FilterLogs(c.ctx, filterQuery)\r\n\tif err != nil {\r\n\t\treturn nil, err\r\n\t}\r\n\r\n\t\r\n\tvar events []map[string]any\r\n\tfor _, log := range logs {\r\n\t\tevent := map[string]any{}\r\n\t\tfor _, evInfo := range contractAbi.Events {\r\n\t\t\tif evInfo.ID.Hex() != log.Topics[0].Hex() {\r\n\t\t\t\tcontinue\r\n\t\t\t}\r\n\r\n\t\t\tif err := contractAbi.UnpackIntoMap(event, evInfo.Name, log.Data); err != nil {\r\n\t\t\t\treturn nil, err\r\n\t\t\t}\r\n\r\n\t\t\tindexedArgCount := 0\r\n\t\t\tfor _, arg := range evInfo.Inputs {\r\n\t\t\t\tif arg.Indexed {\r\n\t\t\t\t\t// i + 1 index due to first topic being function signature\r\n\t\t\t\t\tindexedArgCount += 1\r\n\t\t\t\t\tevent[arg.Name] = log.Topics[indexedArgCount].Hex()\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tbreak\r\n\t\t}\r\n\r\n\t\tevents = append(events, event)\r\n\t}\r\n\r\n\treturn events, nil\r\n}\r\n\r\n```\r\n\r\nWhat I am doing above as steps is simply following:\r\n1. Convert and validate that the provided abi is valid\r\n2. Filter logs by the provided filter query\r\n3. Iterate over returned logs\r\n4. Find which event signature matches the log\r\n5. Unpack the log.Data into map, as stated in the docs, this only unpacks the unindexed arguments\r\n6. Range over the input arguments, and add indexed arguments to the map as well\r\n\r\nThere is one thing I want to do. In the loop where I range over the arguments to add the indexed variables into map as well, I add the variables as hex values. I would much prefer if I was able to get the type of the value and do a proper conversion, and set it to the map that way. I see that type Argument has `Type.GetType()` function which returns reflect.Type, but I am not sure how can I utilize that. So my question in a nutshell is, how can I unpack the indexed arguments with types, and not just have the hex value of them?\r\n\r\nThanks for any type of help!",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27499/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27499/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
