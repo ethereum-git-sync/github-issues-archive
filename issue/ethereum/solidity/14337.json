@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14337",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14337/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14337/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14337/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14337",
+  "id": 1763581576,
+  "node_id": "I_kwDOAm_5kc5pHh6I",
+  "number": 14337,
+  "title": "Contract compilation unusually slow on macOS",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 682993385,
+      "node_id": "MDU6TGFiZWw2ODI5OTMzODU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/performance%20:racehorse:",
+      "name": "performance :racehorse:",
+      "color": "c5def5",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-19T13:45:16Z",
+  "updated_at": "2023-06-19T14:01:13Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "I'm preparing a PR that will parallelize CLI tests and in particular the via-ir equivalence will now get its own run. Comparing that between Ubuntu and macOS, I see that it runs 14x slower on the latter:\r\n- [`~via_ir_equivalence` in `t_ubu_cli`](https://app.circleci.com/pipelines/github/ethereum/solidity/30231/workflows/df459314-b1a3-42d0-965a-4393aa90f727/jobs/1342181/parallel-runs/6?filterBy=ALL): 30 sec\r\n- [`~via_ir_equivalence` in `t_osx_cli`](https://app.circleci.com/pipelines/github/ethereum/solidity/30231/workflows/df459314-b1a3-42d0-965a-4393aa90f727/jobs/1342203/parallel-runs/6?filterBy=ALL): 7 min\r\n\r\nThat's even bigger slowdown than we usually see when building solc, which is \"only\" 3x.\r\n\r\nIt also stands out compared to soltest, where macOS is about 2x slower:\r\n- [`t_ubu_clang_soltest`](https://app.circleci.com/pipelines/github/ethereum/solidity/30231/workflows/df459314-b1a3-42d0-965a-4393aa90f727/jobs/1342189): ~8 min (20 parallel runs, ~25 sec each)\r\n- [`t_osx_soltest`](https://app.circleci.com/pipelines/github/ethereum/solidity/30231/workflows/df459314-b1a3-42d0-965a-4393aa90f727/jobs/1342202): ~16 min\r\n\r\nFor via IR eqvivalence most of the execution time is taken by solc compiling contracts rather than evmone executing them or unrelated things like running clang. It's possible that it's not CI that's the culprit here but rather that solc is unusually slow on macOS.\r\n\r\nThe excessive slowdown does not seem to be caused exclusively by IR compilation. The legacy compilation tests are affected to a similar degree:\r\n- [`~compilation_tests` in `t_ubu_cli`](https://app.circleci.com/pipelines/github/ethereum/solidity/30231/workflows/df459314-b1a3-42d0-965a-4393aa90f727/jobs/1342181/parallel-runs/3?filterBy=ALL): 30 sec\r\n- [`~compilation_tests` in `t_osx_cli`](https://app.circleci.com/pipelines/github/ethereum/solidity/30231/workflows/df459314-b1a3-42d0-965a-4393aa90f727/jobs/1342203/parallel-runs/3?filterBy=ALL): 5 min\r\n\r\n### Reproducing the problem\r\nHere's how to run these particular tests locally:\r\n```bash\r\ntest/cmdlineTests.sh ~via_ir_equivalence ~compilation_tests\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14337/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14337/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
