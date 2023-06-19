@@ -31,6 +31,33 @@
   },
   "labels": [
     {
+      "id": 1690958121,
+      "node_id": "MDU6TGFiZWwxNjkwOTU4MTIx",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/code-quality",
+      "name": "code-quality",
+      "color": "77a7ff",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2336798682,
+      "node_id": "MDU6TGFiZWwyMzM2Nzk4Njgy",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/database",
+      "name": "database",
+      "color": "C01C9D",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2894028867,
+      "node_id": "MDU6TGFiZWwyODk0MDI4ODY3",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/backwards-incompat",
+      "name": "backwards-incompat",
+      "color": "FEF2C0",
+      "default": false,
+      "description": "Backwards-incompatible API change"
+    },
+    {
       "id": 5636045869,
       "node_id": "LA_kwDOCFeAzc8AAAABT-88LQ",
       "url": "https://api.github.com/repos/sigp/lighthouse/labels/tree-states",
@@ -47,9 +74,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-06-19T00:49:57Z",
-  "updated_at": "2023-06-19T00:49:57Z",
+  "updated_at": "2023-06-19T05:25:39Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -72,5 +99,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1596527502",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4413#issuecomment-1596527502",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4413",
+    "id": 1596527502,
+    "node_id": "IC_kwDOCFeAzc5fKROO",
+    "user": {
+      "login": "michaelsproul",
+      "id": 4452260,
+      "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/michaelsproul",
+      "html_url": "https://github.com/michaelsproul",
+      "followers_url": "https://api.github.com/users/michaelsproul/followers",
+      "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+      "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+      "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+      "repos_url": "https://api.github.com/users/michaelsproul/repos",
+      "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-19T05:25:34Z",
+    "updated_at": "2023-06-19T05:25:34Z",
+    "author_association": "MEMBER",
+    "body": "I'd forgotten that the pubkey cache _is_ used in the database for the storage of full states (`store_full_state`/`get_full_state`). For simplicity and to future-proof against validator index re-use in future versions of the protocol I think we should give up on trying to de-duplicate the validator pubkeys from the states. We only ever store a handful of full states at a time, ~N in the freezer database for the last N years of chain history, and 1 in the hot database for the finalized state.\r\n\r\nTherefore I think we can remove `ValidatorTrait` and `CompactBeaconState`, and move the validator pubkey cache back to `beacon_chain`. This will be a breaking schema change for tree-states because the state format on disk will change.",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1596527502/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
