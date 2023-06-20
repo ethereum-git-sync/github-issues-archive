@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-06-14T05:39:16Z",
-  "updated_at": "2023-06-14T05:39:16Z",
+  "updated_at": "2023-06-20T02:12:52Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1598014526",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4401#issuecomment-1598014526",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4401",
+    "id": 1598014526,
+    "node_id": "IC_kwDOCFeAzc5fP8Q-",
+    "user": {
+      "login": "AgeManning",
+      "id": 7454587,
+      "node_id": "MDQ6VXNlcjc0NTQ1ODc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7454587?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/AgeManning",
+      "html_url": "https://github.com/AgeManning",
+      "followers_url": "https://api.github.com/users/AgeManning/followers",
+      "following_url": "https://api.github.com/users/AgeManning/following{/other_user}",
+      "gists_url": "https://api.github.com/users/AgeManning/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/AgeManning/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/AgeManning/subscriptions",
+      "organizations_url": "https://api.github.com/users/AgeManning/orgs",
+      "repos_url": "https://api.github.com/users/AgeManning/repos",
+      "events_url": "https://api.github.com/users/AgeManning/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/AgeManning/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-20T02:06:56Z",
+    "updated_at": "2023-06-20T02:12:52Z",
+    "author_association": "MEMBER",
+    "body": "The configurations we need to add are:\r\n| name | default value | location in code to replace |\r\n|------|-----|-----|\r\n|`gossip_max_size` | 10485760 | [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/config.rs#L23)  EDIT: We use the 10x version as the default and divide by 10 for the pre-merge version.  |\r\n|`max_request_blocks`| 1024 | [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/rpc/methods.rs#L21) |\r\n|`epochs_per_subnet_subscription`| 256 - I think this is already there | N/A |\r\n|`min_epochs_for_block_requests`| 33024 | I dont think we have this, but it should go in [this function](https://github.com/sigp/lighthouse/blob/stable/beacon_node/network/src/beacon_processor/worker/rpc_methods.rs#L285) and the blocks_by_root. @pawanjay176  can help here|\r\n|`max_chunk_size`| 1048576| [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/rpc/protocol.rs#L113)|\r\n|`ttfb_timeout`| 5| [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/rpc/protocol.rs#L120) | \r\n|`resp_timeout`| 10 | [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/rpc/handler.rs#L35) |\r\n|`attestation_propagation_slot_range`|  32|  This is currently not configureable, but we can add it [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/beacon_chain/src/attestation_verification.rs#LL1053C32-L1053C32) - check with @michaelsproul |\r\n|`maximum_gossip_clock_disparity`|  500 |  [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/beacon_chain/src/beacon_chain.rs#L213) @michaelsproul  might be able to help with this one| \r\n|`message_domain_invalid_snappy`| 0x00000000 | we don't use it, but it's [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/config.rs#L43)|\r\n|`message_domain_valid_snappy`| 0x01000000 | [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/config.rs#L44) |\r\n| `subnets_per_node` | 2 - already there I think | N/A |\r\n\r\n\r\nSo what we need to do, is add these fields into the ChainSpec: https://github.com/sigp/lighthouse/blob/stable/consensus/types/src/chain_spec.rs#L32\r\n\r\nWe should add them into the networking section here: https://github.com/sigp/lighthouse/blob/stable/consensus/types/src/chain_spec.rs#L165\r\n\r\nThen for each of the hard-coded networks, i.e mainnet, put in the default values: https://github.com/sigp/lighthouse/blob/stable/consensus/types/src/chain_spec.rs#L473\r\n\r\nFor all the networks, just use the defaults listed above. \r\n\r\n\r\nThen for all the places where we have these values being used in the code, replace them with the values from the chain spec. \r\n\r\nMost places should have access to a generic `EthSpec` type. You can get `ChainSpec` values via: EthSpec::default_spec(). \r\n\r\nSo for example, the first one is `gossip_max_size`. The location for that variable is [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/config.rs#L23). We should remove that constant (and the one underneath it, as its just 10x the value. \r\n\r\nThen in the code that we are using it, like here: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/config.rs#L47 and here: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/config.rs#L457 we need to accept an EthSpec. \r\n\r\nSo, ideally the function could require the generic, i.e \r\n```rust\r\npub fn gossipsub_config<TSpec:EthSpec>(...) { ... }\r\n```\r\nIt gets used [here](https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/service/mod.rs#L242): so you can pass the TSpec into the function. \r\n\r\nThat should resolve the first one. \r\n\r\n@pawanjay176 should be able to help with all of these.  \r\n\r\n\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1598014526/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
