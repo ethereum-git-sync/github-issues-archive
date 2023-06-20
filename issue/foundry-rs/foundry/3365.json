@@ -58,21 +58,40 @@
       "description": "Command: forge verify-contract"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2022-09-26T16:30:57Z",
-  "updated_at": "2022-09-28T12:24:06Z",
-  "closed_at": null,
+  "updated_at": "2023-06-20T18:45:38Z",
+  "closed_at": "2023-06-20T18:45:38Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (9e29032 2022-09-26T00:04:52.53004411Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge verify-contract --flatten \r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nHi, \r\n\r\nI'm trying to verify my contract on a private instance of Blockscout (but same error when using Etherscan too) with a command like this: \r\n\r\n`forge verify-contract --num-of-optimizations 200 --flatten --force --watch --verifier blockscout --verifier-url <url> --compiler-version 0.8.13+commit.abaa5c0e --chain-id <id> --libraries <lib-path>:<lib-name>:<lib-address> --constructor-args 0x <contract-adress> <contract-path>:<contract-name>`\r\n\r\nBut I' m getting this error: \r\n```\r\n2022-09-26T09:41:57.504644Z ERROR etherscan: Failed to deserialize response: invalid type: null, expected a string at line 1 column 48 response=\"{\\\"message\\\":\\\"Something went wrong.\\\",\\\"result\\\":null,\\\"status\\\":\\\"0\\\"}\"\r\n```\r\n\r\nAnd the final error message with the payload:\r\n```\r\n\r\nError:\r\nFailed to submit contract verification, payload:\r\n{\"contractaddress\":\"0xe0a37e9bb40d04ae614535c60dcd69f1dc48cd13\",\"sourceCode\":\"// SPDX-License-Identifier: MIT\\npragma solidity 0.8.13;\\n\\nlibrary BoobaContractLibrary {\\n    function helloMessage() public pure returns (string memory) {\\n        return \\\"Bonjour le monde!\\\";\\n    }\\n}\\n\\ncontract BoobaContract {\\n\\n    constructor()  {}\\n\\n    function hello() public pure returns (string memory) {\\n        return BoobaContractLibrary.helloMessage();\\n    }\\n}\\n\",\"codeformat\":\"solidity-single-file\",\"contractname\":\"BoobaContract\",\"compilerversion\":\"v0.8.13+commit.abaa5c0e\",\"optimizationUsed\":\"1\",\"runs\":\"200\"}\r\n\r\nContext:\r\n- invalid type: null, expected a string at line 1 column 48\r\n```\r\n\r\nAnd it turns out that when I remove the option \"flatten\", the command runs successfully, but the contract remains unverified on Blockscout. \r\n\r\nAny idea why I have this error? \r\n\r\nThanks\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/3365/reactions",
     "total_count": 0,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3365/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -166,6 +185,50 @@
     "body": "Oh sorry, I missed the other issue! Otherwise I have the same error using Etherscan too ( Goerli instance)\r\n\r\nOK, I'll check the output of the `flatten` command. But I had already used the flattened contract (~4000 lines) to successfully check the contract manually in Blockscout UI a few weeks ago.\r\n\r\nI just saw that the problem with #3331 was the use of an incorrect url, so here are the urls I tried:\r\n\r\n- Blockscout: https://api-goerli.etherscan.io\r\n- Etherscan: https://api-goerli.etherscan.io\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1260607502/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1599330713",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/3365#issuecomment-1599330713",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/3365",
+    "id": 1599330713,
+    "node_id": "IC_kwDOGBlvNc5fU9mZ",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-20T18:45:38Z",
+    "updated_at": "2023-06-20T18:45:38Z",
+    "author_association": "COLLABORATOR",
+    "body": "Closing as fixed for now—we recently solved a bunch of issues regarding blockscout verification, including the `null` kink their API had: https://github.com/foundry-rs/foundry/pull/5086",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1599330713/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

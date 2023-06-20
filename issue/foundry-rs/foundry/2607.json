@@ -76,21 +76,40 @@
       "description": "Command: forge script"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2022-08-04T12:55:27Z",
-  "updated_at": "2022-08-23T16:41:42Z",
-  "closed_at": null,
+  "updated_at": "2023-06-20T19:04:21Z",
+  "closed_at": "2023-06-20T19:04:21Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (9b0575e 2022-08-04T00:10:43.515642Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nWhen a library calls another library, the second library gets re-deployed to a new address.\r\n\r\nGiven the code \r\n\r\n```solidity\r\nlibrary Library {\r\n    function foo() external pure returns (uint256) {\r\n        return 42;\r\n    }\r\n}\r\n\r\nlibrary Library2 {\r\n    function foo() external pure returns (uint256) {\r\n        return Library.foo();\r\n    }\r\n}\r\n\r\ncontract Contract {\r\n    function foo() external pure returns (uint256) {\r\n        return Library2.foo();\r\n    }\r\n\r\n    function bar() external pure returns (uint256) {\r\n        return Library.foo();\r\n    }\r\n}\r\n\r\ncontract TestLibrary is Test {\r\n\r\n    Contract c = new Contract();\r\n    function testFoo() public {\r\n        console.log(address(Library), \"lib 1\");\r\n        console.log(address(Library2), \"lib 2\");\r\n\r\n        assertEq(c.foo(), 42);\r\n        assertEq(c.bar(), 42);\r\n        assertEq(Library.foo(), 42);\r\n        assertEq(Library2.foo(), 42);\r\n    }\r\n}\r\n\r\n```\r\n\r\nThe outcome is\r\n<img width=\"654\" alt=\"image\" src=\"https://user-images.githubusercontent.com/241804/182851323-f5159a56-f747-4b8a-a041-5f9af72848c5.png\">\r\n\r\nAs can be seen, most of the calls to the librares go to the expected addresses (`7e84` & `f221`), except when `Library2` calls `Library`, in that case there's a second copy of `Library` in `0x62d6…3691`\r\n\r\nIf I link the lib to a pre-defined address in `foundry.toml` then there's no issue, been using that as a workaround (I then etch the lib code) but of course is not ideal.\r\nI assume this can be also a problem with deployment scripts where the same lib may be deployed multiple times.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/2607/reactions",
     "total_count": 0,
@@ -105,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2607/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -144,6 +163,50 @@
       "+1": 0,
       "-1": 0,
       "laugh": 1,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1599355664",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/2607#issuecomment-1599355664",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/2607",
+    "id": 1599355664,
+    "node_id": "IC_kwDOGBlvNc5fVDsQ",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-20T19:04:20Z",
+    "updated_at": "2023-06-20T19:04:20Z",
+    "author_association": "COLLABORATOR",
+    "body": "Fixed with https://github.com/foundry-rs/foundry/pull/5164 💆 \r\nsee output:\r\n![Screenshot 2023-06-20 at 15 03 49](https://github.com/foundry-rs/foundry/assets/26014927/51716918-778d-480b-b115-6db0d01372c7)\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1599355664/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
       "hooray": 0,
       "confused": 0,
       "heart": 0,

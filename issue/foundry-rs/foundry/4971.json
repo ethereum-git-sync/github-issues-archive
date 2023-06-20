@@ -40,24 +40,43 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-05-18T11:46:32Z",
-  "updated_at": "2023-05-22T13:49:54Z",
-  "closed_at": null,
+  "updated_at": "2023-06-20T18:36:51Z",
+  "closed_at": "2023-06-20T18:36:51Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\n`forge 0.2.0 (db96393 2023-05-11T00:05:59.668094030Z)`\r\n\r\n### What command(s) is the bug in?\r\n\r\n`forge verify-contract`, `forge script --verify ...`\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nHi,\r\nI am getting an issue with verifying libraries that also contain libraries.\r\nHere is the failure output:\r\n\r\n```\r\n❯ forge verify-contract --chain-id 42161  --watch ${CONTRACT_ADDRESS} src/lib/FeeIntegral.sol:FeeIntegralLib --etherscan-api-key ${ETHERSCAN_API_KEY}\r\n\r\nStart verifying contract `0x2d4d37de64a7877260469ec14bd13eb57729d028` deployed on arbitrum\r\n\r\nSubmitting verification for [src/lib/FeeIntegral.sol:FeeIntegralLib] \"0x2d4d37De64a7877260469ec14bd13eB57729D028\".\r\nSubmitted contract for verification:\r\n        Response: `OK`\r\n        GUID: `hmfm5dmj5uzkkv1jhvghbhxatpq6ekfqyajxpdkskx35p38r1g`\r\n        URL:\r\n        https://arbiscan.io/address/0x2d4d37de64a7877260469ec14bd13eb57729d028\r\nContract verification status:\r\nResponse: `NOTOK`\r\nDetails: `Pending in queue`\r\nContract verification status:\r\nResponse: `NOTOK`\r\nDetails: `Fail - Unable to verify. Please check for missing Library or invalid name (i.e names are case senstive). Library was required but suitable match not found`\r\nContract failed to verify.\r\n```\r\nThis library (`0x2d4d37de64a7877260469ec14bd13eb57729d028`), internally links this library: `0x1c0dbe0986a831f36ee2058cb4a3d0b95f93074a`.\r\n\r\nInitially, I attempted to verify through a deployment script, with `forge script Deploy --verify --etherscan-api-key arbitrum`. Following deployment, the first error message showed this:\r\n\r\n```\r\nWe haven't found any matching bytecode for the following contracts: [0x2d4d37de64a7877260469ec14bd13eb57729d028].\r\n\r\nThis may occur when resuming a verification, but the underlying source code or compiler version has changed.\r\n```\r\n\r\nI was successfully able to verify the contract manually on the Arbiscan UI with a flattened version of the contract, by entering in the library as a dependency before verification. otherwise, it also fails there.\r\n\r\nHere are the settings created by Forge:\r\n\r\n```\r\n{\r\n  \"remappings\": [\r\n    \"@openzeppelin-upgradeable/=lib/openzeppelin-contracts-upgradeable/\",\r\n    \"@openzeppelin/=lib/openzeppelin-contracts/\",\r\n    \"ds-test/=lib/forge-std/lib/ds-test/src/\",\r\n    \"erc4626-tests/=lib/openzeppelin-contracts-upgradeable/lib/erc4626-tests/\",\r\n    \"forge-std/=lib/forge-std/src/\",\r\n    \"openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/\",\r\n    \"openzeppelin-contracts/=lib/openzeppelin-contracts/\"\r\n  ],\r\n  \"optimizer\": {\r\n    \"enabled\": true,\r\n    \"runs\": 80\r\n  },\r\n  \"metadata\": {\r\n    \"bytecodeHash\": \"ipfs\"\r\n  },\r\n  \"outputSelection\": {\r\n    \"*\": {\r\n      \"*\": [\r\n        \"evm.bytecode\",\r\n        \"evm.deployedBytecode\",\r\n        \"devdoc\",\r\n        \"userdoc\",\r\n        \"metadata\",\r\n        \"abi\"\r\n      ]\r\n    }\r\n  },\r\n  \"evmVersion\": \"london\",\r\n  \"libraries\": {\r\n    \"src/lib/FeeBuffer.sol\": {\r\n      \"FeeBufferLib\": \"0xa8df1f75458d5b6594f8a79fb15eaf63c7870847\"\r\n    },\r\n    \"src/lib/FeeIntegral.sol\": {\r\n      \"FeeIntegralLib\": \"0x2d4d37de64a7877260469ec14bd13eb57729d028\"\r\n    },\r\n    \"src/lib/FundingFee.sol\": {\r\n      \"FundingFee\": \"0x1c0dbe0986a831f36ee2058cb4a3d0b95f93074a\"\r\n    },\r\n    \"src/lib/PositionMaths.sol\": {\r\n      \"PositionMaths\": \"0x26292fbc81c8d840af1eb49e8199cb9ac7231584\"\r\n    },\r\n    \"src/lib/PositionStats.sol\": {\r\n      \"PositionStatsLib\": \"0x05423d197a925d424ca055cfb79f9440203de962\"\r\n    }\r\n  }\r\n}\r\n```\r\n\r\n\r\n\r\nplease also notice the spelling mistake in `Details`: `case senstive`\r\n\r\nThanks",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4971/reactions",
-    "total_count": 0,
+    "total_count": 2,
     "+1": 0,
     "-1": 0,
     "laugh": 0,
@@ -65,12 +84,55 @@
     "confused": 0,
     "heart": 0,
     "rocket": 0,
-    "eyes": 0
+    "eyes": 2
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4971/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1599308754",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/4971#issuecomment-1599308754",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4971",
+    "id": 1599308754,
+    "node_id": "IC_kwDOGBlvNc5fU4PS",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-20T18:36:51Z",
+    "updated_at": "2023-06-20T18:36:51Z",
+    "author_association": "COLLABORATOR",
+    "body": "With the linker fix, this is now possible. When you're deploying a library `A` that depends on `B`, please append `--libraries` with `<path_to_library>:<library_name>:address>`. See: https://book.getfoundry.sh/reference/forge/forge-inspect?highlight=--libraries#options",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1599308754/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
