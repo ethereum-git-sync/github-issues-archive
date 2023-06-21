@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27528",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27528/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27528/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27528/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27528",
+  "id": 1767354404,
+  "node_id": "I_kwDOAOvK985pV7Ak",
+  "number": 27528,
+  "title": "Post smart contract call transaction using geth with clef signer cause an error [validation failed: Transaction contains data, but the ABI signature could not be found: signature 202d347f not found]",
+  "user": {
+    "login": "AT19947",
+    "id": 97835554,
+    "node_id": "U_kgDOBdTaIg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/97835554?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AT19947",
+    "html_url": "https://github.com/AT19947",
+    "followers_url": "https://api.github.com/users/AT19947/followers",
+    "following_url": "https://api.github.com/users/AT19947/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AT19947/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AT19947/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AT19947/subscriptions",
+    "organizations_url": "https://api.github.com/users/AT19947/orgs",
+    "repos_url": "https://api.github.com/users/AT19947/repos",
+    "events_url": "https://api.github.com/users/AT19947/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AT19947/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-21T11:14:24Z",
+  "updated_at": "2023-06-21T11:45:42Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nVersion: 1.11.5-stable\r\nGit Commit: a38f4108571d1a144dc3cf3faf8990430d109bc4        \r\nGit Commit Date: 20230321\r\nArchitecture: amd64\r\nGo Version: go1.20.2\r\nOperating System: Windows\r\n\r\n\r\nError message:\r\nvalidation failed: Transaction contains data, but the ABI signature could not be found: signature 202d347f not found\r\n\r\n#### Smart contract code:\r\n\r\n\r\n\r\n    // SPDX-License-Identifier: MIT\r\n    pragma solidity <0.9.0;\r\n    \r\n    contract HelloWorld {\r\n    \r\n        string public helloSentence;\r\n        \r\n        constructor() {\r\n            helloSentence = \"Hello World!\";\r\n        }\r\n    \r\n        function sayHello() public view returns (string memory) {\r\n            return helloSentence;\r\n        }\r\n    \r\n        function setHelloSentence(string memory sentence) public {\r\n            helloSentence = sentence;\r\n        }\r\n    }\r\n\r\n\r\n#### js code to call the smartcontarct method:\r\n\r\n\r\n    const { Web3 } = require(\"web3\"); \r\n    const SMART_CONTRACT_ABI = [\r\n    {\r\n      inputs: [],\r\n      stateMutability: \"nonpayable\",\r\n      type: \"constructor\",\r\n    },\r\n    {\r\n      inputs: [],\r\n      name: \"helloSentence\",\r\n      outputs: [\r\n        {\r\n          internalType: \"string\",\r\n          name: \"\",\r\n          type: \"string\",\r\n        },\r\n      ],\r\n      stateMutability: \"view\",\r\n      type: \"function\",\r\n    },\r\n    {\r\n      inputs: [],\r\n      name: \"sayHello\",\r\n      outputs: [\r\n        {\r\n          internalType: \"string\",\r\n          name: \"\",\r\n          type: \"string\",\r\n        },\r\n      ],\r\n      stateMutability: \"view\",\r\n      type: \"function\",\r\n    },\r\n    {\r\n      inputs: [\r\n        {\r\n          internalType: \"string\",\r\n          name: \"sentence\",\r\n          type: \"string\",\r\n        },\r\n      ],\r\n      name: \"setHelloSentence\",\r\n      outputs: [],\r\n      stateMutability: \"nonpayable\",\r\n      type: \"function\",\r\n    },\r\n    ];\r\n  \r\n     const web3 = new Web3(new Web3.providers.HttpProvider(\"http://localhost:55008\"));\r\n     const contract = new web3.eth.Contract(SMART_CONTRACT_ABI,\"0xEdAd9FcE55Fa7D6719E0f1CbC1678Bc6BD2B5A98\");\r\n  \r\n    web3.eth.sendTransaction(\r\n    {\r\n      from: \"0x4aa49d0566cad80ab4e63c3b63b90b89696560f4\",\r\n      to: \"0xEdAd9FcE55Fa7D6719E0f1CbC1678Bc6BD2B5A98\",\r\n      data: contract.methods.setHelloSentence(\"test\").encodeABI(),\r\n    },\r\n    function (err, transactionHash) {\r\n      if (!err) console.log(transactionHash + \" success\");\r\n    }\r\n    )\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27528/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27528/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
