@@ -49,21 +49,40 @@
       "description": "Category: Something about Bedrock"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-03-29T06:10:40Z",
-  "updated_at": "2023-03-29T18:50:57Z",
-  "closed_at": null,
+  "updated_at": "2023-06-21T15:09:39Z",
+  "closed_at": "2023-06-21T15:09:39Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "According to [deposit receipt spec](https://github.com/ethereum-optimism/optimism/blob/develop/specs/deposits.md#deposit-receipt),\r\n> With Regolith, this depositNonce field must always be included.\r\n\r\nRegolith started at [block 6825766](https://goerli-optimism.etherscan.io/block/6825766). [Ref](https://github.com/ethereum-optimism/op-geth/blob/7d8421c82481eebf4eb3153b57a97e9713ddd5d6/params/config.go#L41)\r\n\r\nHowever, deposit transactions(type = `0x7e`)'s receipts do not contain `depositNonce` field after regolith.\r\n\r\nTested at RPC: https://goerli.optimism.io and also alchemy's endpoint.\r\n\r\nExample RPC request:\r\n```bash\r\ncurl --location 'https://goerli.optimism.io' \\\r\n--header 'Content-Type: application/json' \\\r\n--data '{\r\n\t\"jsonrpc\":\"2.0\",\r\n\t\"method\":\"eth_getTransactionReceipt\",\r\n\t\"params\":[\r\n\"0x4dde3647b5cfb1dc55d1ec27a486bcc080dbc7ab3961c58d5bc1b7302199b34d\"\r\n\t],\r\n\t\"id\":1\r\n}'\r\n```\r\n\r\nResponse:\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"result\": {\r\n    \"blockHash\": \"0x1c865534ac82a3c449b2e1406d8640dcb489e00e8318e1bec4c609d4dbf2866c\",\r\n    \"blockNumber\": \"0x6fb23d\",\r\n    \"contractAddress\": null,\r\n    \"cumulativeGasUsed\": \"0xb735\",\r\n    \"effectiveGasPrice\": \"0x32\",\r\n    \"from\": \"0xdeaddeaddeaddeaddeaddeaddeaddeaddead0001\",\r\n    \"gasUsed\": \"0xb735\",\r\n    \"logs\": [],\r\n    \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"status\": \"0x1\",\r\n    \"to\": \"0x4200000000000000000000000000000000000015\",\r\n    \"transactionHash\": \"0x4dde3647b5cfb1dc55d1ec27a486bcc080dbc7ab3961c58d5bc1b7302199b34d\",\r\n    \"transactionIndex\": \"0x0\",\r\n    \"type\": \"0x7e\"\r\n  },\r\n  \"id\": 1\r\n}\r\n```\r\nIt should be\r\n```json\r\n{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 1,\r\n    \"result\": {\r\n        \"blockHash\": \"0x1c865534ac82a3c449b2e1406d8640dcb489e00e8318e1bec4c609d4dbf2866c\",\r\n        \"blockNumber\": \"0x6fb23d\",\r\n        \"contractAddress\": null,\r\n        \"cumulativeGasUsed\": \"0xb735\",\r\n        \"depositNonce\": \"0x31ba14\",   <- mandatory field\r\n        \"effectiveGasPrice\": \"0x32\",\r\n        \"from\": \"0xdeaddeaddeaddeaddeaddeaddeaddeaddead0001\",\r\n        \"gasUsed\": \"0xb735\",\r\n        \"logs\": [],\r\n        \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n        \"status\": \"0x1\",\r\n        \"to\": \"0x4200000000000000000000000000000000000015\",\r\n        \"transactionHash\": \"0x4dde3647b5cfb1dc55d1ec27a486bcc080dbc7ab3961c58d5bc1b7302199b34d\",\r\n        \"transactionIndex\": \"0x0\",\r\n        \"type\": \"0x7e\"\r\n    }\r\n}\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5287/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5287/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -113,6 +132,50 @@
     "body": "This appears to be something about the Alchemy provider (I believe the public endpoint is backed by Alchemy as well though I could be wrong). \n\nWith a local op-geth (running a devnet in this case rather than goerli admittedly) depositNonce is included in the response:\n```\n\ncast receipt --json 0x6d0df35224d4f4da4148eddef4108aab250b31d39e3d5fff266a6b24f42d4711 --rpc-url http://localhost:9545 | jq\n{\n  \"transactionHash\": \"0x6d0df35224d4f4da4148eddef4108aab250b31d39e3d5fff266a6b24f42d4711\",\n  \"transactionIndex\": \"0x0\",\n  \"blockHash\": \"0x6c40d0349d4a6d51d088453a2812963738376434851f44fc0e9c38ad15fcab41\",\n  \"blockNumber\": \"0xb5\",\n  \"from\": \"0xdeaddeaddeaddeaddeaddeaddeaddeaddead0001\",\n  \"to\": \"0x4200000000000000000000000000000000000015\",\n  \"cumulativeGasUsed\": \"0xf9dd\",\n  \"gasUsed\": \"0xf9dd\",\n  \"contractAddress\": null,\n  \"logs\": [],\n  \"status\": \"0x1\",\n  \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\n  \"type\": \"0x7e\",\n  \"effectiveGasPrice\": \"0x0\",\n  \"depositNonce\": \"0xb4\"\n}\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1488035047/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1601022020",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/5287#issuecomment-1601022020",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5287",
+    "id": 1601022020,
+    "node_id": "IC_kwDODjvEJM5fbahE",
+    "user": {
+      "login": "tynes",
+      "id": 6626818,
+      "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tynes",
+      "html_url": "https://github.com/tynes",
+      "followers_url": "https://api.github.com/users/tynes/followers",
+      "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+      "organizations_url": "https://api.github.com/users/tynes/orgs",
+      "repos_url": "https://api.github.com/users/tynes/repos",
+      "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tynes/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-21T15:09:39Z",
+    "updated_at": "2023-06-21T15:09:39Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Closing this due to inactivity, please reopen if still an issue",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1601022020/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
