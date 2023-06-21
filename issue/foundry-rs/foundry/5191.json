@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5191",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5191/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5191/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5191/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5191",
+  "id": 1767268000,
+  "node_id": "I_kwDOGBlvNc5pVl6g",
+  "number": 5191,
+  "title": "`nonce` of contract deployer not updated correctly when deploying contracts with externally linked libraries when using `forge test`",
+  "user": {
+    "login": "WEI-NERD",
+    "id": 131971450,
+    "node_id": "U_kgDOB925eg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/131971450?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/WEI-NERD",
+    "html_url": "https://github.com/WEI-NERD",
+    "followers_url": "https://api.github.com/users/WEI-NERD/followers",
+    "following_url": "https://api.github.com/users/WEI-NERD/following{/other_user}",
+    "gists_url": "https://api.github.com/users/WEI-NERD/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/WEI-NERD/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/WEI-NERD/subscriptions",
+    "organizations_url": "https://api.github.com/users/WEI-NERD/orgs",
+    "repos_url": "https://api.github.com/users/WEI-NERD/repos",
+    "events_url": "https://api.github.com/users/WEI-NERD/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/WEI-NERD/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-21T10:21:38Z",
+  "updated_at": "2023-06-21T10:24:07Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (794f831 2023-06-21T00:11:25.200247000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\n`forge test`\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nI've created a [demo](https://github.com/WEI-NERD/forge-test-bug-nonce) with this issue for reproduction.\r\nWhen using `forge test`, the `nonce` of the contract deployer is not updated correctly when deploying contracts with externally linked libraries.\r\n```Solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nlibrary A {\r\n    function a() public pure returns (uint256) {\r\n        return 1;\r\n    }\r\n}\r\n\r\nlibrary B {\r\n    function b() public pure returns (uint256) {\r\n        return 2;\r\n    }\r\n}\r\n\r\ncontract Counter {\r\n    function lib() public pure returns (uint256, uint256) {\r\n        uint256 a = A.a();\r\n        uint256 b = B.b();\r\n        return (a, b);\r\n    }\r\n}\r\n```\r\nA `counter` contract that uses two externally linked libraries is deployed with a new account in `forge test`, the result shows that the `nonce` of the deployer before the deployment is 0 and 1 after the deployment, and the address of the counter is indeed calculated with the deployer's address and `nonce` of 0.\r\n\r\n![image](https://github.com/foundry-rs/foundry/assets/131971450/4b625bda-03fd-441b-98fa-88c6754910a6)\r\n![image](https://github.com/foundry-rs/foundry/assets/131971450/6cfb9eb3-0deb-42d2-95d0-9304f2dca1ab)\r\n\r\n\r\nHowever, when deploying to test net, the script result shows that library A takes up the address when deployer's `nonce` is 0, and counter is deployed to the address calculated with `nonce` 2.\r\n\r\n![image](https://github.com/foundry-rs/foundry/assets/131971450/71402d2d-65eb-422c-9349-e4681f361767)\r\n![image](https://github.com/foundry-rs/foundry/assets/131971450/d5070df8-12fe-41b4-87bd-f168bf701ad6)\r\n\r\nThe account link is https://goerli.etherscan.io/address/0xaE0bDc4eEAC5E950B67C6819B118761CaAF61946.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5191/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5191/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
