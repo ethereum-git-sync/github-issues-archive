@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,8 +49,8 @@
   "milestone": null,
   "comments": 9,
   "created_at": "2023-05-19T18:46:22Z",
-  "updated_at": "2023-05-30T15:43:56Z",
-  "closed_at": null,
+  "updated_at": "2023-06-21T16:11:14Z",
+  "closed_at": "2023-06-21T16:11:13Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "Apologies for excessive links, have tried to cite all sources\r\n\r\n### Description\r\n\r\n[1186] is inconsistent wrt specification of input to `eth_getProof`. It specifies the 2nd element of the param array a an array of 32-byte keys, and refers to the `eth_getStorageAt` call, which is specced in [1474] and on [the ethereum website]. [1474] specifies the input as a [Quantity].\r\n\r\nCurrently Geth accepts as input all of: \r\n- 32-byte hex strings (1186 `eth_getProof` spec)\r\n- [Quantity] encoded integers (1474 `eth_getStorageAt` spec)\r\n- Non-quantity hex strings of length 2 - 31 bytes (neither spec)\r\n\r\nThe issue arises because `response.storageProof.key` is specced as a [Quantity], however, geth simply [mirrors the input] into the response object. When the input is a non-[Quantity] hex string (e.g. `0x000000005` , the returned `response.storageProof[].key` is also not minimal. This is outside the spec for [Quantity], and is off-spec for 1186\r\n\r\nBoth [1186] and [1474] are currently status Stagnant, and may not be reliable. Permissive deserialization seems desirable. Providing non-canonical returns to the user seems undesirable\r\n\r\nThis was previously mentioned in a [besu issue] as a result of failing hive tests with geth producing non-canonical Quantities in responses. I am unsure if it was ever brought up here. The Besu team opted to change their RPC behavior to [always represent this value as an even-length hex string], which is also off-spec.\r\n\r\nRequested change is to always [Quantity]-serialize the `key` element in the response, rather than simply mirroring the input.\r\n\r\n### Expected behaviour\r\n\r\n`eth_getProof` response object should [Quantity]-encode `storageProof.keys, regardless of whether the input was quantity-encoded\r\n\r\nExpected output :\r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 44,\r\n  \"result\": {\r\n    \"address\": \"0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41\",\r\n    \"accountProof\": [\r\n         ...\r\n    ],\r\n    \"balance\": \"0x0\",\r\n    \"codeHash\": \"0x0370d116c18db61a2f90643faa12e3ae22a0b7d518ce868fe3f85e2f0d299fe5\",\r\n    \"nonce\": \"0x1\",\r\n    \"storageHash\": \"0xd14ec04ecff0cf0846dcb185103fbb656f2612f74cee91a547e03ed037cfff0b\",\r\n    \"storageProof\": [\r\n      {\r\n        \"key\": \"0x5\",  // <----- specced encoding\r\n        \"value\": \"0x0\",\r\n        \"proof\": [\r\n            ...\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}\r\n```\r\n\r\n### Steps to reproduce the behaviour\r\n\r\n```\r\n$ curl localhost:8545 \\     \r\n    -X POST \\                \r\n    -H \"Content-Type: application/json\" \\\r\n    -d '{\"method\":\"eth_getProof\", \"params\":[\"0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41\",[\"0x000000005\"], \"latest\"],\"id\":44,\"jsonrpc\":\"2.0\"}' \\\r\n    | jq\r\n```\r\n\r\n### Actual behaviour\r\n\r\nsee the `0x000000005 `storageProof.key`. This is not a Quantity, and is outside of spec for the endpoint\r\n\r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 44,\r\n  \"result\": {\r\n    \"address\": \"0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41\",\r\n    \"accountProof\": [\r\n         ...\r\n    ],\r\n    \"balance\": \"0x0\",\r\n    \"codeHash\": \"0x0370d116c18db61a2f90643faa12e3ae22a0b7d518ce868fe3f85e2f0d299fe5\",\r\n    \"nonce\": \"0x1\",\r\n    \"storageHash\": \"0xd14ec04ecff0cf0846dcb185103fbb656f2612f74cee91a547e03ed037cfff0b\",\r\n    \"storageProof\": [\r\n      {\r\n        \"key\": \"0x000000005\", // <----- Off-spec encoding\r\n        \"value\": \"0x0\",\r\n        \"proof\": [\r\n            ...\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}\r\n```\r\n\r\n\r\n[1186]: https://eips.ethereum.org/EIPS/eip-1186\r\n[1474]: https://eips.ethereum.org/EIPS/eip-1474\r\n[Quantity]: https://eips.ethereum.org/EIPS/eip-1474#quantity\r\n[the ethereum website]: https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getstorageat\r\n[mirrors the input]: https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L691-L693\r\n[besu issue]: https://github.com/hyperledger/besu/issues/4504\r\n[always represent this value as an even-length hex string]: https://github.com/hyperledger/besu/pull/4564",
@@ -88,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27306/timeline",
   "performed_via_github_app": null,
-  "state_reason": "reopened"
+  "state_reason": "completed"
 }
 [
   {
