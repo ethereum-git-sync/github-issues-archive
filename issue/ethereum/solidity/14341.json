@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14341",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14341/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14341/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14341/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14341",
+  "id": 1766766697,
+  "node_id": "I_kwDOAm_5kc5pTrhp",
+  "number": 14341,
+  "title": "Struct storage initialization - Optimization ",
+  "user": {
+    "login": "quirp",
+    "id": 28508472,
+    "node_id": "MDQ6VXNlcjI4NTA4NDcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/28508472?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/quirp",
+    "html_url": "https://github.com/quirp",
+    "followers_url": "https://api.github.com/users/quirp/followers",
+    "following_url": "https://api.github.com/users/quirp/following{/other_user}",
+    "gists_url": "https://api.github.com/users/quirp/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/quirp/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/quirp/subscriptions",
+    "organizations_url": "https://api.github.com/users/quirp/orgs",
+    "repos_url": "https://api.github.com/users/quirp/repos",
+    "events_url": "https://api.github.com/users/quirp/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/quirp/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-21T05:47:56Z",
+  "updated_at": "2023-06-21T05:47:56Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Optimization \r\nSLOAD Opcodes seemingly can be removed from the struct constructor's instantiation to storage.\r\n## Description\r\nSLOAD opcodes are present when invoking the following struct constructor:\r\n\r\n``` \r\npragma solidity ^0.8.20;\r\ncontract StructGas {\r\n    struct A { \r\n        uint256 a;\r\n        uint128 b;\r\n        uint128 c;\r\n   }\r\n    //struct constructor \r\n    A newStruct  = A( 1, 2, 3);\r\n}\r\n\r\n```\r\nWhen initializing a storage struct via the struct constructor, it seems unnecessary for SLOAD opcodes to be involved. If the intent of the struct constructor is to instantiate an **entire struct**, and in this case to storage, then it seems any information lying in the corresponding struct's storage keys is meant to be destroyed in one atomic operation (sequence of SSTORES). \r\n\r\nOn the other hand, SLOAD's do make sense when independently assigning each struct attribute. For example, \r\n```\r\n.\r\n.\r\n.\r\nfunction hardcodedStructAttributeAssignment() external {\r\n    newStruct.a = 1; // 0 SLOAD                   \r\n    newStruct.b = 2 // 1 SLOAD 2100 gas\r\n    newStruct.c = 3 // 1 SLOAD 100 gas \r\n}\r\n\r\n```\r\nthe b,c attributes will necessarily need to load a shared storage slot, as otherwise the ` newStruct.b = 2 ` would lose the information of the last 128 bits of the slot, and `newStruct.c = 3` would lose the information of the '0x....02' in the first 16 bytes. \r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.20\r\n- Target EVM version (as per compiler settings): London\r\n- Operating system: Remix Browser\r\n\r\n## Steps to Reproduce\r\n\r\n```\r\npragma solidity ^0.8.20;\r\n\r\ncontract StructGasOverhead{\r\n\r\n    struct SLOADTest{\r\n        uint128 a;\r\n        uint128 b;\r\n    }\r\n\r\n    SLOADTest a;\r\n    SLOADTest b;\r\n\r\n    function storeStructWhole() external{\r\n        a = SLOADTest(20,25);\r\n    }\r\n    function storeStructComponent() external{\r\n        b.a = 20;\r\n        b.b = 25;\r\n    }\r\n}\r\n```\r\nUsing the Remix Browser debugging tools, two SLOAD opcodes will appear when executing either of these functions.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14341/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14341/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
