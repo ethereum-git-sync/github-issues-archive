@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6092",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6092/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6092/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6092/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/6092",
+  "id": 1767016731,
+  "node_id": "I_kwDODjvEJM5pUokb",
+  "number": 6092,
+  "title": "op-node: unsafeL2Payloads blocks when receiving a block prior to unsafeL2Head",
+  "user": {
+    "login": "Kelvyne",
+    "id": 8125532,
+    "node_id": "MDQ6VXNlcjgxMjU1MzI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8125532?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Kelvyne",
+    "html_url": "https://github.com/Kelvyne",
+    "followers_url": "https://api.github.com/users/Kelvyne/followers",
+    "following_url": "https://api.github.com/users/Kelvyne/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Kelvyne/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Kelvyne/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Kelvyne/subscriptions",
+    "organizations_url": "https://api.github.com/users/Kelvyne/orgs",
+    "repos_url": "https://api.github.com/users/Kelvyne/repos",
+    "events_url": "https://api.github.com/users/Kelvyne/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Kelvyne/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-21T08:06:51Z",
+  "updated_at": "2023-06-21T08:06:51Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Describe the bug**\r\nWhen activating the unsafeL2Payload queue, op-node stops processing the queue if a payload is older than the rollup's unsafeL2Head.\r\n\r\n**To Reproduce**\r\n\r\nIt happens more frequently when the batches are pushed slower. \r\n\r\n**Expected behavior**\r\n\r\nI'd expect the payload to be dropped and op-node would continue processing the queue\r\n\r\n**System Specs:**\r\n - OS: Mac M1 inside Docker\r\n - Package Version (or commit hash): 62c7f3b05a70027b30054d4c8974f44000606fb7\r\n\r\n**Additional context**\r\n\r\nA way I found to fix this issue is to pop these payloads when processing the queue. I don't know if there is bad side-effects from this diff.\r\n\r\n```dif\r\ndiff --git a/op-node/rollup/derive/engine_queue.go b/op-node/rollup/derive/engine_queue.go\r\nindex 6f6c2fa5e..0e5f67ac3 100644\r\n--- a/op-node/rollup/derive/engine_queue.go\r\n+++ b/op-node/rollup/derive/engine_queue.go\r\n@@ -428,6 +428,11 @@ func (eq *EngineQueue) tryNextUnsafePayload(ctx context.Context) error {\r\n \t\t\teq.log.Info(\"skipping unsafe payload, since it does not build onto the existing unsafe chain\", \"safe\", eq.safeHead.ID(), \"unsafe\", first.ID(), \"payload\", first.ID())\r\n \t\t\teq.unsafePayloads.Pop()\r\n \t\t}\r\n+\r\n+    if uint64(first.BlockNumber) <= eq.unsafeHead.Number {\r\n+      eq.log.Info(\"skipping unsafe payload, since it is older than unsafe head\", \"unsafe\", eq.unsafeHead.ID(), \"unsafe_payload\", first.ID())\r\n+      eq.unsafePayloads.Pop()\r\n+    }\r\n \t\treturn io.EOF // time to go to next stage if we cannot process the first unsafe payload\r\n \t}\r\n```\r\nI would love to submit a PR if this is the way to go.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6092/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6092/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
