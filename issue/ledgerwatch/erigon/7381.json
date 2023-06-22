@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 8,
   "created_at": "2023-04-25T13:19:06Z",
-  "updated_at": "2023-06-14T02:32:05Z",
-  "closed_at": null,
+  "updated_at": "2023-06-22T02:33:17Z",
+  "closed_at": "2023-06-22T02:33:17Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nErigon version: `./erigon --version`\r\nerigon version 2.43.0-stable-1106475e\r\n\r\nOS & Version: Windows/Linux/OSX\r\nLinux - AmazonLinux2 - Kernel v5.10 - AARCH64\r\n\r\nIntegration Command (with flags/config):\r\n`integration mdbx_to_mdbx --chaindata /mnt/data/erigon2/chaindata/ --chaindata.to /mnt/backup/erigon2/chaindata --datadir /dev/shm/erigon-backup`\r\n\r\nChain/Network: \r\nGoerli\r\n\r\n#### Expected behaviour\r\nThis exact command used to perform a compacted backup of chaindata and was still working in December 2022.\r\nI expected it to continue working.\r\n\r\n#### Actual behaviour\r\nNow I notice it does not work anymore on my development environment. It crashes right at the beginning. The error message report a random bucket at each try.\r\n`panic: bucket: HashedStorage, mdbx_cursor_put: MDBX_MAP_FULL: Environment mapsize limit reached`\r\nor\r\n`panic: bucket: IncarnationMap, mdbx_cursor_put: MDBX_MAP_FULL: Environment mapsize limit reached`\r\nor\r\n`panic: bucket: PlainState, mdbx_cursor_put: MDBX_MAP_FULL: Environment mapsize limit reached`\r\nand so on.\r\n\r\nAn obvious change since December explaining the behavior could be the added flags on the opening of the dst DB:\r\nBEFORE:\r\n```\r\nfunc mdbxToMdbx(ctx context.Context, logger log.Logger, from, to string) error {\r\n\tsrc := mdbx2.NewMDBX(logger).Path(from).Flags(func(flags uint) uint { return mdbx.Readonly | mdbx.Accede }).MustOpen()\r\n\tdst := mdbx2.NewMDBX(logger).Path(to).\r\n\t\tWriteMap().\r\n\t\tFlags(func(flags uint) uint { return flags | mdbx.NoMemInit }).\r\n\t\tMustOpen()\r\n\treturn kv2kv(ctx, src, dst)\r\n}\r\n```\r\nNOW:\r\n```\r\nfunc mdbxToMdbx(ctx context.Context, logger log.Logger, from, to string) error {\r\n\tsrc := mdbx2.NewMDBX(logger).Path(from).Flags(func(flags uint) uint { return mdbx.Readonly | mdbx.Accede }).MustOpen()\r\n\tdst := mdbx2.NewMDBX(logger).Path(to).\r\n\t\tWriteMap().\r\n\t\tFlags(func(flags uint) uint { return flags | mdbx.NoMemInit | mdbx.WriteMap | mdbx.Accede }).\r\n\t\tMustOpen()\r\n\treturn kv2kv(ctx, src, dst)\r\n}\r\n```\r\n\r\nWhether or not Erigon is running in parallel does not change anything (it used to work with Erigon running, which was very handy to perform hot backups).\r\n\r\nCould be related to the fact that the database I'm trying to backup is already a restoration from a previous backup (made in December 2022) created with the same integration command.\r\nErigon seem to behave OK but is logging a warning on startup that may or may not be related:\r\n```\r\nINFO] [04-25|12:48:40.344] Opening Database                         label=chaindata path=/mnt/data/erigon2/chaindata\r\n[INFO] [04-25|12:48:40.344] [db] params: growStep=2GB, mapsSize=7TB, shrinkThreshold=-1, pageSize=4KB, label=chaindata, WriteMap=false, Durable=false, NoReadahead=true,\r\nmdbx_setup_dxb:15949 filesize mismatch (expect 535382781952b/130708687p, have 536870912000b/131072000p)\r\n```\r\n\r\n#### Backtrace\r\nfull output of the `integration` command:\r\n````\r\n[root@ip-10-142-194-63 ~]# integration mdbx_to_mdbx --chaindata /mnt/data/erigon2/chaindata/ --chaindata.to /mnt/backup/erigon2/chaindata --datadir /dev/shm/erigon-backup\r\nINFO[04-25|12:56:01.707] logging to file system                   log dir=/dev/shm/erigon-backup/logs file prefix=erigon log level=info json=false\r\npanic: bucket: HashedStorage, mdbx_cursor_put: MDBX_MAP_FULL: Environment mapsize limit reached\r\n\r\ngoroutine 1 [running]:\r\ngithub.com/ledgerwatch/erigon/cmd/integration/commands.kv2kv({0x1897930, 0x4000793340?}, {0x18a4cc8, 0x40008c5040}, {0x18a4cc8, 0x40008c5110})\r\n        github.com/ledgerwatch/erigon/cmd/integration/commands/refetence_db.go:489 +0xa00\r\ngithub.com/ledgerwatch/erigon/cmd/integration/commands.mdbxToMdbx({0x1897930, 0x4000793340}, {0x18a3de0, 0x40004c5d20}, {0xffffdaad149f, 0x1c}, {0xffffdaad14cb, 0x1d})\r\n        github.com/ledgerwatch/erigon/cmd/integration/commands/refetence_db.go:437 +0x20c\r\ngithub.com/ledgerwatch/erigon/cmd/integration/commands.glob..func4(0x2203fc0?, {0x14af57d?, 0x6?, 0x6?})\r\n        github.com/ledgerwatch/erigon/cmd/integration/commands/refetence_db.go:103 +0x8c\r\ngithub.com/spf13/cobra.(*Command).execute(0x2203fc0, {0x40008a2120, 0x6, 0x6})\r\n        github.com/spf13/cobra@v1.7.0/command.go:944 +0x5c8\r\ngithub.com/spf13/cobra.(*Command).ExecuteC(0x2204580)\r\n        github.com/spf13/cobra@v1.7.0/command.go:1068 +0x368\r\ngithub.com/spf13/cobra.(*Command).Execute(...)\r\n        github.com/spf13/cobra@v1.7.0/command.go:992\r\ngithub.com/spf13/cobra.(*Command).ExecuteContext(...)\r\n        github.com/spf13/cobra@v1.7.0/command.go:985\r\nmain.main()\r\n        github.com/ledgerwatch/erigon/cmd/integration/main.go:15 +0x128\r\n````\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7381/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7381/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -368,6 +387,50 @@
     "body": "This issue is stale because it has been open for 40 days with no activity. Remove stale label or comment, or this will be closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1590350414/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1601933955",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/7381#issuecomment-1601933955",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7381",
+    "id": 1601933955,
+    "node_id": "IC_kwDOC0FsAM5fe5KD",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-06-22T02:33:16Z",
+    "updated_at": "2023-06-22T02:33:16Z",
+    "author_association": "NONE",
+    "body": "This issue was closed because it has been stalled for 7 days with no activity.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1601933955/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
