@@ -49,21 +49,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-03-08T15:11:52Z",
-  "updated_at": "2023-06-16T06:53:38Z",
-  "closed_at": null,
+  "updated_at": "2023-06-22T08:19:40Z",
+  "closed_at": "2023-06-22T08:19:39Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "I'm not sure whether this may be a bug or a feature request; I'm looking to move away from `personal_*` methods in geth's RPC to using clef. My use-case is as follows:\r\n\r\n- I create a new eth account using `personal_newAccount`. A different password is generated for each account.\r\n- Funds are sent to the address of the generated account.\r\n- At some moment, I decide this account will no-longer receive funds.\r\n- I send all of the account funds to some fixed address.\r\n\r\nThis procedure is completely non-interactive.\r\n\r\nI'm now migrating to clef. After reading the clef documentation, I understand the following needs to happen:\r\n\r\n- Use the `account_new` RPC method to generate new eth accounts.\r\n- Create a rule file, enroll it using `clef attest ...`, which approves calls to `account_new` and `account_signTransaction` adequately.\r\n- For every new account, call `clef setpw ${account address}` to store the account password in the Clef vault.\r\n\r\n\r\nWhat is unclear to me is the following:\r\n\r\n- How do I programatically provide the account password?\r\n\r\n  From what I gather, I need to write a wrapper application that launches clef with `--stdio-ui`, and provides a password upon `ui_onInputRequired` when the message contains `Please enter a password for the new account to be created`. This seems rather brittle and from what I understand unsupported.\r\n\r\n- How do I avoid race-conditions between storing the password and an RPC requiring access to the account password? This is currently unlikely since funds are typically collected a couple minutes after the account is created, but I can imagine this procedure envolving to require signing some data using the new account before funds are received.\r\n\r\nAn alternative would be for me not needing to generate and provide a password for as long as the credentials were automatically added to the Clef vault. I did not see this in the documentation, so I assume this is not possible. Moreover, it's unclear whether a filesystem snapshot is sufficient to backup the Clef vault.\r\n\r\nBonus question:\r\n\r\n- How do I remove no-longer used accounts? After collecting all funds in the account there's no reason to keep the account around. There seems to be no methods to remove ~~credentials from the Clef vault nor~~ accounts from Clef itself. (Edit: `clef delpw` removes credentials from the Clef vault).",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26832/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26832/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -201,6 +220,50 @@
     "body": "Thanks for your reply.\r\n\r\n> Is there a specific reason you would want to use a full blown \"wallet\" (clef) [vs] manage the keys yourself?\r\n\r\nReduce development time, given that clef was the suggested migration path. Developing software responsible for handling keys takes significantly more time.\r\n\r\nThat said, we've since developed a custom alternative. Feel free to close the issue if you decide this is not a feature set you'd like to support.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1594196732/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1602216706",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/26832#issuecomment-1602216706",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/26832",
+    "id": 1602216706,
+    "node_id": "IC_kwDOAOvK985ff-MC",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-22T08:19:39Z",
+    "updated_at": "2023-06-22T08:19:39Z",
+    "author_association": "MEMBER",
+    "body": "Thanks for getting back to us about it! Closing",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1602216706/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
