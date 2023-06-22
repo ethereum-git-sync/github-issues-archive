@@ -40,17 +40,17 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 9,
   "created_at": "2023-06-08T01:05:41Z",
-  "updated_at": "2023-06-21T10:41:11Z",
-  "closed_at": null,
+  "updated_at": "2023-06-22T13:57:17Z",
+  "closed_at": "2023-06-22T13:57:16Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (08a629a 2023-06-03T00:14:26.563741000Z)\n\n### What command(s) is the bug in?\n\nforge test -vvv\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nOn the latest nightly build `forge 0.2.0 (08a629a 2023-06-03T00:14:26.563741000Z)` a test with `vm.expectEmit(true, true, true, true, address(faucetToken));` throws an unexpected test failure:\r\n\r\n```\r\nFailing tests:\r\nEncountered 1 failing test in tests-foundry/MErc20Delegate.t.sol:MErc20DelegateTest\r\n[FAIL. Reason: Expected an emit, but no logs were emitted afterward. You might have mismatched events or not enough events were emitted.] testDelegatorMintWithPermit() (gas: 98067)\r\n```\r\n\r\nBut on a previous build, `forge 0.2.0 (200b3f4 2023-05-05T00:04:35.225055000Z)` the same test succeeds:\r\n```\r\nRunning 1 test for tests-foundry/MErc20Delegate.t.sol:MErc20DelegateTest\r\n[PASS] testDelegatorMintWithPermit() (gas: 243217)\r\nTest result: ok. 1 passed; 0 failed; finished in 20.64ms\r\n```\r\n\r\nThe full trace of the failing test is:\r\n```\r\nRunning 1 test for tests-foundry/MErc20Delegate.t.sol:MErc20DelegateTest\r\n[FAIL. Reason: Expected an emit, but no logs were emitted afterward. You might have mismatched events or not enough events were emitted.] testDelegatorMintWithPermit() (gas: 98067)\r\nTraces:\r\n  [98067] MErc20DelegateTest::testDelegatorMintWithPermit() \r\n    ├─ [0] VM::addr(<pk>) [staticcall]\r\n    │   └─ ← 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7\r\n    ├─ [31394] FaucetTokenWithPermit::allocateTo(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, 1000000000000000000 [1e18]) \r\n    │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, value: 1000000000000000000 [1e18])\r\n    │   ├─ emit Transfer(from: FaucetTokenWithPermit: [0xF62849F9A0B5Bf2913b396098F7c7019b51A820a], to: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, value: 1000000000000000000 [1e18])\r\n    │   └─ ← ()\r\n    ├─ [585] FaucetTokenWithPermit::balanceOf(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7) [staticcall]\r\n    │   └─ ← 1000000000000000000 [1e18]\r\n    ├─ [11693] MErc20Delegator::balanceOf(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7) [staticcall]\r\n    │   ├─ [9003] MErc20Delegator::delegateToImplementation(0x70a08231000000000000000000000000e05fcc23807536bee418f142d19fa0d21bb0cff7) [staticcall]\r\n    │   │   ├─ [2664] MErc20Delegate::balanceOf(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7) [delegatecall]\r\n    │   │   │   └─ ← 0\r\n    │   │   └─ ← 0x0000000000000000000000000000000000000000000000000000000000000000\r\n    │   └─ ← 0\r\n    ├─ [3307] SigUtils::getTypedDataHash((0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, 0xa0Cb889707d426A7A386870A03bc70d1b0697598, 1000000000000000000 [1e18], 0, 60)) [staticcall]\r\n    │   └─ ← 0x49345408dd9aeed9b3f6faaf9e69dda27c5ff2cb0a911bbb034696bb8ab0ec5f\r\n    ├─ [0] VM::sign(<pk>, 0x49345408dd9aeed9b3f6faaf9e69dda27c5ff2cb0a911bbb034696bb8ab0ec5f) [staticcall]\r\n    │   └─ ← 28, 0x2aacf1c69c85f4ea906db4e805768a09834d5fa5f8e1ffc903c58f01546b4c29, 0x2c4358cc06c878398786959411792542ed5969980d1fd765d3c88a0b95ca82ed\r\n    ├─ [0] VM::expectEmit(true, true, true, true, FaucetTokenWithPermit: [0xF62849F9A0B5Bf2913b396098F7c7019b51A820a]) \r\n    │   └─ ← ()\r\n    ├─ emit Approval(owner: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, spender: MErc20Delegator: [0xa0Cb889707d426A7A386870A03bc70d1b0697598], value: 1000000000000000000 [1e18])\r\n    ├─ [0] VM::prank(0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7) \r\n    │   └─ ← ()\r\n    ├─ [26281] MErc20Delegator::approve(0x0000000000000000000000000000000000000000, 1) \r\n    │   ├─ [24571] MErc20Delegate::approve(0x0000000000000000000000000000000000000000, 1) [delegatecall]\r\n    │   │   ├─ emit Approval(owner: 0xe05fcC23807536bEe418f142D19fa0d21BB0cfF7, spender: 0x0000000000000000000000000000000000000000, value: 1)\r\n    │   │   └─ ← true\r\n    │   └─ ← true\r\n    └─ ← \"Log != expected log\"\r\n\r\nTest result: FAILED. 0 passed; 1 failed; finished in 4.35ms\r\n```\r\n\r\nI don't want to include the complete test, but the section with breakage looks like this:\r\n```\r\n        // Ensure an Approval event was emitted as expected\r\n        vm.expectEmit(true, true, true, true, address(faucetToken));\r\n        emit Approval(user, address(mToken), 1e18);\r\n\r\n        vm.prank(user);\r\n        mErc20Delegator.approve(address(0), 1);\r\n\r\n        // Ensure an Mint event was emitted as expected\r\n        vm.expectEmit(true, true, true, true, address(mToken));\r\n        emit Mint(user, 1e18, 1e18);\r\n\r\n        // Ensure an Transfer event was emitted as expected\r\n        vm.expectEmit(true, true, true, true, address(mToken));\r\n        emit Transfer(address(mToken), user, 1e18);\r\n\r\n        // Go mint as a user with permit\r\n        vm.prank(user);\r\n        mErc20Delegator.mintWithPermit(1e18, deadline, v, r, s);\r\n```\r\n\r\nThanks for your help with this issue!\r\n\r\n",
@@ -88,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5117/timeline",
   "performed_via_github_app": null,
-  "state_reason": "reopened"
+  "state_reason": "completed"
 }
 [
   {
@@ -119,7 +119,7 @@
     },
     "created_at": "2023-06-08T15:41:42Z",
     "updated_at": "2023-06-08T15:41:42Z",
-    "author_association": "COLLABORATOR",
+    "author_association": "MEMBER",
     "body": "Hey @lyoungblood thanks for this! I believe this change has to do with https://github.com/foundry-rs/foundry/pull/4920 — from what I can see here, it's not super clear but it looks like you might have an ordering issue from what I see in the traces?\r\n\r\nIt's worth mentioning that the behavior now is that events are expected to be emitted _in the next call_. So if you're matching multiple events across multiple calls, you need to \"declare\" the events to be matched before the call were they're going to be emitted.\r\n\r\nIf you think this is actually a bug, could you maybe provide a more minimal repro? I'm 100% happy to look into this, just can' determine it from looking at these traces.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1582849794/reactions",
@@ -163,7 +163,7 @@
     },
     "created_at": "2023-06-15T16:21:05Z",
     "updated_at": "2023-06-15T16:21:05Z",
-    "author_association": "COLLABORATOR",
+    "author_association": "MEMBER",
     "body": "Closing—stale and could not reproduce, plus further QA seems this is correct.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1593370114/reactions",
@@ -251,7 +251,7 @@
     },
     "created_at": "2023-06-20T01:42:28Z",
     "updated_at": "2023-06-20T01:42:28Z",
-    "author_association": "COLLABORATOR",
+    "author_association": "MEMBER",
     "body": "Hmmm interesting—I've tried to reproduce this but can't—do you think you can give a smol repro @PaulRBerg ? I think I might know what's going on here but need something I can test against.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1598000659/reactions",
@@ -339,7 +339,7 @@
     },
     "created_at": "2023-06-20T22:51:29Z",
     "updated_at": "2023-06-20T22:51:29Z",
-    "author_association": "COLLABORATOR",
+    "author_association": "MEMBER",
     "body": "Aight ser @PaulRBerg — I took a quick look at this, and it seems like events do differ.\r\n\r\nThe emitted event for the test is the following one:\r\n```solidity\r\n    event InstallPlugin(address owner, IPRBProxy proxy, IPRBProxyPlugin indexed plugin);\r\n```\r\nWhile the emitted test on the registry is this one:\r\n```solidity\r\n    event InstallPlugin(address indexed owner, IPRBProxy indexed proxy, IPRBProxyPlugin indexed plugin);\r\n```\r\n\r\nThe event emitted in the test only has one indexed param, but the event emitted from the contract has 3. `expectEmit` will consider these 2 as different events, so I believe this is correct behavior. Do you think it should not be the case? Also @mds1 can chime on this",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1599680238/reactions",
@@ -387,6 +387,94 @@
     "body": "I agree that if indexed params differ they should be considered different, so a solution here is probably just to make this easier to catch and have a better failure message. Ref https://github.com/foundry-rs/foundry/issues/592#issuecomment-1600602797",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1600604136/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1602370759",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5117#issuecomment-1602370759",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5117",
+    "id": 1602370759,
+    "node_id": "IC_kwDOGBlvNc5fgjzH",
+    "user": {
+      "login": "PaulRBerg",
+      "id": 8782666,
+      "node_id": "MDQ6VXNlcjg3ODI2NjY=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8782666?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/PaulRBerg",
+      "html_url": "https://github.com/PaulRBerg",
+      "followers_url": "https://api.github.com/users/PaulRBerg/followers",
+      "following_url": "https://api.github.com/users/PaulRBerg/following{/other_user}",
+      "gists_url": "https://api.github.com/users/PaulRBerg/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/PaulRBerg/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/PaulRBerg/subscriptions",
+      "organizations_url": "https://api.github.com/users/PaulRBerg/orgs",
+      "repos_url": "https://api.github.com/users/PaulRBerg/repos",
+      "events_url": "https://api.github.com/users/PaulRBerg/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/PaulRBerg/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-22T10:08:14Z",
+    "updated_at": "2023-06-22T10:08:14Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Oh my! I'm sorry for the false alarm, @Evalir. Thanks for tracking the cause down.\r\n\r\nI agree with both of you that Foundry should consider these as different events (since the event topics would be different, I think).\r\n\r\nAnd I also agree that the solution is to throw a more specific error message.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1602370759/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1602688067",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5117#issuecomment-1602688067",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5117",
+    "id": 1602688067,
+    "node_id": "IC_kwDOGBlvNc5fhxRD",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-22T13:57:16Z",
+    "updated_at": "2023-06-22T13:57:16Z",
+    "author_association": "MEMBER",
+    "body": "No problem @PaulRBerg — glad this was just a false alarm haha. I definitely agree—we should give #592 a go and try to be more specific on what failed.\r\n\r\nI'll close this, and let's keep the convo going on 592!",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1602688067/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
