@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14346",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14346/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14346/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14346/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14346",
+  "id": 1769597856,
+  "node_id": "I_kwDOAm_5kc5peeug",
+  "number": 14346,
+  "title": "Arithmetics operator for \"point-vector\" types.",
+  "user": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-22T12:41:39Z",
+  "updated_at": "2023-06-22T13:08:54Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n\r\nAllow the definition of the `add` (and `sub`) operators with 2 differents input types\r\n\r\n## Motivation\r\n\r\nTwo basic concepts in geometry, are Points and Vectors. It makes sens to add, or even subtract 2 vectors, giving a new vector. It also makes sens to add a vector to a point, giving a new point. On the other hand, it does not make sens to add to point (if you do so, you are probably assuming that a point is equivalent to the vector from the origin to it).\r\n\r\nThe same can be said of Timepoints and Durations, which are basically the same object in one dimension.\r\n\r\nIn order to improve the security of time arithmetics (clearly distinguishing times and duration using dedicated UDVT), I wanted to define\r\n\r\n```solidity\r\ntype Timepoint is uint48;\r\ntype Duration is uint40;\r\n```\r\n\r\nand then define the following functions:\r\n```solidity\r\nfunction timepoints_add(Timepoint t, Duration d) pure returns (Timepoint) { return Timepoint.wrap(Timepoint.unwrap(t) + Duration.unwrap(d)); }\r\nfunction timepoints_sub(Timepoint t, Duration d) pure returns (Timepoint) { return Timepoint.wrap(Timepoint.unwrap(t) - Duration.unwrap(d)); }\r\nfunction durations_add(Duration d1, Duration d2) pure returns (Duration) { return Duration.wrap(Duration.unwrap(d1) + Duration.unwrap(d2)); }\r\nfunction durations_sub(Duration d1, Duration d2) pure returns (Duration) { return Duration.wrap(Duration.unwrap(d1) - Duration.unwrap(d2)); }\r\n```\r\n\r\nI then wanted to defined these function as global operators:\r\n```solidity\r\nusing { timepoints_add as +, timepoints_sub as - } for Timepoint global;\r\nusing { durations_add as +, durations_sub as - } for Duration global;\r\n```\r\n\r\nand this is when I got the following errors:\r\n```\r\nTypeError: Wrong parameters in operator definition. The function \"timepoints_add\" needs to have two parameters of type Timepoint and the same data location to be used for the operator +.\r\n\r\nTypeError: Wrong parameters in operator definition. The function \"timepoints_sub\" needs to have one or two parameters of type Timepoint and the same data location to be used for the operator -.\r\n```\r\n\r\nNote that while the first one is very clear, the second one asks \"one or two parameters of type Timepoint\" ... which it does have\r\n\r\n## Specification\r\n\r\nAllow the definition of arithmetic types (add, sub, mul, div, modulo?) that have\r\n- a first parameter for type A (main type) \r\n- a return type A (main type)\r\n- a second parameter of any type (secondary type)\r\n\r\n```function operator_name(A a, B b) pure returns (A)```\r\n\r\n## Backwards Compatibility\r\n\r\nN/A\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14346/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14346/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
