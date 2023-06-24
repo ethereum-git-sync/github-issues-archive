@@ -58,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,12 +67,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2022-08-19T02:13:53Z",
-  "updated_at": "2022-10-20T23:37:55Z",
-  "closed_at": null,
+  "updated_at": "2023-06-23T21:13:49Z",
+  "closed_at": "2023-06-23T21:13:49Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Issue\r\n\r\nSo, if you compile Solidity with `viaIR` turned on, it uses a different representation for internal function pointers.  Instead of them containing actual program counter values, internal functions are now represented by an abstract index.\r\n\r\nFortunately, this index isn't hard to compute.  The order that the functions are given in is just the order they appear in the contract's source, and if they're inherited, base contracts appear before derived contracts.  Note that functions marked `external` are skipped, and so are functions marked `private` if they're in a base contract.  Indexing starts at 1, as 0 is used for the designated invalid function.\r\n\r\n(Thought: I just realized I didn't account for free functions.  Crud.  I'll have to determine how those work; hopefully those don't screw this up too much.  I should probably also test whether internal library functions affect things in any way.  I'm hoping I don't end up having to file issues with Solidity...)\r\n\r\n(They're still 8 bytes, thankfully, even though that was excessive even with the old format and especially excessive now.  Guess they wanted to limit the breakage.)\r\n\r\nAnyway, debugger and decoder should have functionality for handling these.  Note that the main difference will not be in Codec itself, seeing as internal function pointers are decoded with a passed-in lookup table; it's constructing that table that will be different.  (Possibly much of the new code will go in source-map-utils... or maybe Codec's AST utils, it could go there too.)  However, I think we'd also probably want to revise the output format for internal function pointers, which previously assumed that internal function pointers would necessarily be given in terms of PC value.  This would of course be a breaking change to the output format, but since I don't think much external to us is thinking about internal function pointers, I don't think it'd be a big problem.\r\n\r\n## Environment\r\n\r\n* Truffle version (`truffle version`): 5.5.27",
-  "closed_by": null,
+  "closed_by": {
+    "login": "cliffoo",
+    "id": 41348973,
+    "node_id": "MDQ6VXNlcjQxMzQ4OTcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/41348973?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cliffoo",
+    "html_url": "https://github.com/cliffoo",
+    "followers_url": "https://api.github.com/users/cliffoo/followers",
+    "following_url": "https://api.github.com/users/cliffoo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cliffoo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cliffoo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cliffoo/subscriptions",
+    "organizations_url": "https://api.github.com/users/cliffoo/orgs",
+    "repos_url": "https://api.github.com/users/cliffoo/repos",
+    "events_url": "https://api.github.com/users/cliffoo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cliffoo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/trufflesuite/truffle/issues/5466/reactions",
     "total_count": 0,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5466/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -122,6 +141,50 @@
     "body": "So, this has turned out to be more of an issue than I realized -- it turns out that indices are only assigned to functions that get pointed to, which is substantially harder to determine.  We may have to wait for https://github.com/ethereum/solidity/issues/13425 before properly addressing this, although determining that isn't necessarily *impossible*, just a bunch of work.  Still, I'm putting aside for now the problem of finding a proper solution to this.",
     "reactions": {
       "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/1269083356/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/1604979383",
+    "html_url": "https://github.com/trufflesuite/truffle/issues/5466#issuecomment-1604979383",
+    "issue_url": "https://api.github.com/repos/trufflesuite/truffle/issues/5466",
+    "id": 1604979383,
+    "node_id": "IC_kwDOAkfq-c5fqgq3",
+    "user": {
+      "login": "cliffoo",
+      "id": 41348973,
+      "node_id": "MDQ6VXNlcjQxMzQ4OTcz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41348973?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cliffoo",
+      "html_url": "https://github.com/cliffoo",
+      "followers_url": "https://api.github.com/users/cliffoo/followers",
+      "following_url": "https://api.github.com/users/cliffoo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cliffoo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cliffoo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cliffoo/subscriptions",
+      "organizations_url": "https://api.github.com/users/cliffoo/orgs",
+      "repos_url": "https://api.github.com/users/cliffoo/repos",
+      "events_url": "https://api.github.com/users/cliffoo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cliffoo/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-23T21:13:49Z",
+    "updated_at": "2023-06-23T21:13:49Z",
+    "author_association": "MEMBER",
+    "body": "Resolved in [v5.10.1](https://github.com/trufflesuite/truffle/releases/tag/v5.10.1)",
+    "reactions": {
+      "url": "https://api.github.com/repos/trufflesuite/truffle/issues/comments/1604979383/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
