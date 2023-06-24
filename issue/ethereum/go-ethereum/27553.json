@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-06-23T17:21:38Z",
-  "updated_at": "2023-06-23T17:21:38Z",
+  "updated_at": "2023-06-24T16:18:05Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1605618040",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/27553#issuecomment-1605618040",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27553",
+    "id": 1605618040,
+    "node_id": "IC_kwDOAOvK985fs8l4",
+    "user": {
+      "login": "jsvisa",
+      "id": 3627395,
+      "node_id": "MDQ6VXNlcjM2MjczOTU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3627395?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jsvisa",
+      "html_url": "https://github.com/jsvisa",
+      "followers_url": "https://api.github.com/users/jsvisa/followers",
+      "following_url": "https://api.github.com/users/jsvisa/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jsvisa/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jsvisa/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jsvisa/subscriptions",
+      "organizations_url": "https://api.github.com/users/jsvisa/orgs",
+      "repos_url": "https://api.github.com/users/jsvisa/repos",
+      "events_url": "https://api.github.com/users/jsvisa/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jsvisa/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-24T16:18:05Z",
+    "updated_at": "2023-06-24T16:18:05Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "TraceChain is a producer/consumer model: \r\n\r\n1. producer runs in one goroutine,\r\n2. consumers run at most `runtime.NumCPU` goroutines,\r\n3. producer and consumers communicate with channel,\r\n4. the producer sequential traversals the `[from, to]` block range, and fetches the block's statedb then sends it as a task into the channel\r\n5. consumers consuming all available tasks\r\n\r\nAnd TraceChain is IO-heavy tasks, from the logs that you provided:\r\n\r\n```\r\nINFO [06-23|17:16:34.465] Tracing chain segment                    start=17,371,038 end=17,372,038 current=17,371,368 transactions=57710 elapsed=40m8.054471218s\r\nINFO [06-23|17:16:43.209] Tracing chain segment                    start=17,371,038 end=17,372,038 current=17,371,370 transactions=58064 elapsed=40m16.79914958s\r\nINFO [06-23|17:16:51.482] Tracing chain segment                    start=17,371,038 end=17,372,038 current=17,371,372 transactions=58418 elapsed=40m25.071928655s\r\n```\r\n\r\nThe producer handles the blocks in 4s/block, that's too slow. So in my opinion, it's the bottleneck of the producer, and maybe the root cause is the IO usage. Could you please identify the usage of IOutil(eg: `iostat -x 1`)\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1605618040/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
