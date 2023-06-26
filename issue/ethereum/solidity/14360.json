@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14360",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14360/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14360/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14360/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14360",
+  "id": 1774325696,
+  "node_id": "I_kwDOAm_5kc5pwg_A",
+  "number": 14360,
+  "title": "full function signature string and hash, not just selector",
+  "user": {
+    "login": "thedavidmeister",
+    "id": 629710,
+    "node_id": "MDQ6VXNlcjYyOTcxMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/629710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/thedavidmeister",
+    "html_url": "https://github.com/thedavidmeister",
+    "followers_url": "https://api.github.com/users/thedavidmeister/followers",
+    "following_url": "https://api.github.com/users/thedavidmeister/following{/other_user}",
+    "gists_url": "https://api.github.com/users/thedavidmeister/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/thedavidmeister/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/thedavidmeister/subscriptions",
+    "organizations_url": "https://api.github.com/users/thedavidmeister/orgs",
+    "repos_url": "https://api.github.com/users/thedavidmeister/repos",
+    "events_url": "https://api.github.com/users/thedavidmeister/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/thedavidmeister/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-26T09:21:30Z",
+  "updated_at": "2023-06-26T09:29:56Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n\r\nWe already have `function.selector` to get the 4 byte selector of some function (https://docs.soliditylang.org/en/v0.8.20/abi-spec.html#abi-function-selector).\r\n\r\nThis selector is fine for collision resistance within a single contract.\r\n\r\nFor cross referencing against signature databases such as https://openchain.xyz/signatures which are open registries of signature across all possible contract, the collision resistance is too low.\r\n\r\nIt's not difficult to find selectors that collide in these databases, especially when the selectors have been clearly crafted deliberately to collide (e.g. https://openchain.xyz/signatures?query=0x00000000).\r\n\r\nBest would be exposing the source data (abi function signature string) and perhaps intermediate step (the 32 byte hash) that goes into computing a selector in the first place, so that smart contract devs have more flexibility here.\r\n\r\n## Motivation\r\n\r\nWhen applying a pattern of generic support for arbitrary data (my use case is wanting to have initializable proxy/clone contracts with `bytes memory data` as the signature of `initialize`) the caller often needs to know the ABI in order to encode this data.\r\n\r\nIn the case of a generic tool, it's unlikely that the ABI for any arbitrary contract is available. However, often signature are uploaded to signature databases, which provide just enough information to encode some bytes correctly. The response from the signature database won't contain any quality of life information, not even a name or basic description of what each value in the signature is, but at least the tooling could understand something about the structure of the bytes.\r\n\r\nThis pattern is known and has been discussed https://twitter.com/PatrickAlphaC/status/1517156225670078465\r\n\r\n> 💪 This gives us greater flexibility when designing protocols to take arbitrary inputs. \r\n\r\nERC-5750 even specifies that `bytes memory data` is a desirable extension method that interfaces should be compliant with in order to future proof themselves https://eips.ethereum.org/EIPS/eip-5750\r\n\r\nFor example, it specifies that data can be passed to a callback. The callback may well treat the data as an encoded function to call, such as might be found in the callback of an EIP 3156 flash borrower `onFlashLoan` (where opaque bytes are shuffled around between lender/borrower and need to somehow drive the borrower to take action then repay the loan), or some kind of governance contract, etc.\r\n\r\nHowever, 5750 stops short of specifying how an individual contract can permissionlessly advertise exactly how that extension point should be consumed. For situations where the bytes encoding matches some function signature, one could imagine a simple solution where the function selector (available in solidity) of the extension data is emitted as an event, or available as a read only function on an interface.\r\n\r\nBut then, imagine that someone sees your contract advertising a mere 4 byte selector as the structure of its extensible data, then maliciously griefs you by generating and advertising the same selector into a signature database with a completely different ABI. At this point, automated tooling is faced with ambiguity as to how it might encode bytes. Had your contract emitted the full hash of the signature, or the string of the function signature itself, then such an attack would not be possible.\r\n\r\nThe signatures can be crafted manually with strings and keccaks in contract code, but this is fragile to do manually, especially for more complex types such as nested structs. Without going fully down the route of proposing another ERC to define all the above, Solidity could easily provide the function signature string and/or hash natively alongside the existing `selector` feature. If this pattern becomes sufficiently popular and adopted, some future ERC might naturally coalesce, in the meantime, anyone who wants this kind of thing can implement it themselves.\r\n\r\nThe motivation of avoiding manual/fragile code here is essentially the same as when `selector` was originally introduced\r\n\r\n- https://github.com/ethereum/solidity/issues/1447\r\n- https://github.com/ethereum/solidity/issues/1435\r\n- https://github.com/ethereum/solidity/pull/2473\r\n\r\nNote also that the original conversations around \"function signature\" vs. \"cryptographic signature\" being confusing still apply. We would need to be clear to disambiguate in any naming proposed.\r\n\r\n## Specification\r\n\r\nTwo new properties on interface methods, events and errors:\r\n\r\n- `.abiFunctionSignature` => canonical string of the signature e.g. `\"foo(uint256)\"`\r\n- `.fullSelector` => equivalent to `keccak256(foo.abiFunctionSignature)` but perhaps more semantic and efficient as it can be reliably computed at compile time, it's exactly the 32 bytes that are normally truncated down to 4 bytes to compute `.selector`\r\n\r\nTechnically either one of these can be implemented without the other, although if I had to choose only one I'd pick the string representation as we can always do the hashing ourselves, but we can't go back the other way without some kind of registry service. Not enforcing the need for a registry, so that kind of thing would be opt in, seems like it can only be a good thing.\r\n\r\n## Backwards Compatibility\r\n\r\nNo backwards compatibility issues.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14360/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14360/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

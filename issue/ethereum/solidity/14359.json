@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14359",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14359/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14359/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14359/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14359",
+  "id": 1774225230,
+  "node_id": "I_kwDOAm_5kc5pwIdO",
+  "number": 14359,
+  "title": "Unreachable Code warning for abstract contract",
+  "user": {
+    "login": "frontier159",
+    "id": 103474701,
+    "node_id": "U_kgDOBirmDQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/103474701?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/frontier159",
+    "html_url": "https://github.com/frontier159",
+    "followers_url": "https://api.github.com/users/frontier159/followers",
+    "following_url": "https://api.github.com/users/frontier159/following{/other_user}",
+    "gists_url": "https://api.github.com/users/frontier159/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/frontier159/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/frontier159/subscriptions",
+    "organizations_url": "https://api.github.com/users/frontier159/orgs",
+    "repos_url": "https://api.github.com/users/frontier159/repos",
+    "events_url": "https://api.github.com/users/frontier159/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/frontier159/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4438006499,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaa4w",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20effort",
+      "name": "low effort",
+      "color": "ffb1fa",
+      "default": false,
+      "description": "There is not much implementation work to be done. The task is very easy or tiny."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-26T08:28:25Z",
+  "updated_at": "2023-06-26T10:24:38Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWhen an abstract contract function calls a pure virtual function, and a concrete implementation of that function (in a concrete contracts) reverts, the `Warning: Unreachable code.` is shown which is incorrect/misleading.\r\n\r\n## Environment\r\n\r\n- Compiler version: commit https://github.com/ethereum/solidity/commit/a1b79de64235f13e6b06e088fe6365c5a12d13d3\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\npragma solidity ^0.8.20;\r\n// SPDX-License-Identifier: AGPL-3.0-or-later\r\n\r\nabstract contract AbstractContract {\r\n    bool public abstractCalled;\r\n    error Unimplemented();\r\n\r\n    function outer() external {\r\n        inner();\r\n\r\n        abstractCalled = true;\r\n    }\r\n\r\n    function inner() internal virtual;\r\n}\r\n\r\ncontract ChildContract1 is AbstractContract {\r\n    bool public wasCalled;\r\n\r\n    function inner() internal override {\r\n        wasCalled = true;\r\n    }\r\n}\r\n\r\ncontract ChildContract2 is AbstractContract {\r\n\r\n    function inner() internal pure override {\r\n        revert Unimplemented();\r\n    }\r\n}\r\n```\r\n\r\nGives the error:\r\n```\r\nWarning: Unreachable code.\r\n  --> contracts/6_unreachable.sol:11:9:\r\n   |\r\n11 |         abstractCalled = true;\r\n   |         ^^^^^^^^^^^^^^^^^^^^^\r\n```\r\n\r\nHowever when `ChildContract1.outer()` is called, the `wasCalled` is correctly set to true. The warning is misleading.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14359/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14359/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

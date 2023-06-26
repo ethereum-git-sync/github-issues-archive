@@ -1,0 +1,121 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14362",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14362/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14362/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14362/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14362",
+  "id": 1774486117,
+  "node_id": "I_kwDOAm_5kc5pxIJl",
+  "number": 14362,
+  "title": "Truncated JSON output from emscripten binary with `viaIR: true` and both `ir` and `*` selected as outputs",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2376134343,
+      "node_id": "MDU6TGFiZWwyMzc2MTM0MzQz",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/should%20compile%20without%20error",
+      "name": "should compile without error",
+      "color": "c48f13",
+      "default": false,
+      "description": "Error is reported even though it shouldn't. Source is fine."
+    },
+    {
+      "id": 3306843671,
+      "node_id": "MDU6TGFiZWwzMzA2ODQzNjcx",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/solcjs",
+      "name": "solcjs",
+      "color": "C0BF81",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4438003076,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaNhA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20effort",
+      "name": "medium effort",
+      "color": "ff7df7",
+      "default": false,
+      "description": "Default level of effort"
+    },
+    {
+      "id": 4438155599,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjhTw",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20impact",
+      "name": "medium impact",
+      "color": "314aff",
+      "default": false,
+      "description": "Default level of impact"
+    },
+    {
+      "id": 4438488423,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI31Zw",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/must%20have",
+      "name": "must have",
+      "color": "ffa12a",
+      "default": false,
+      "description": "Something we consider an essential part of Solidity 1.0."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-26T10:51:18Z",
+  "updated_at": "2023-06-26T10:51:18Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "The snippet from #14361 has one more weird effect that looks unrelated to that issue. When I select `*` output together with `ir`, enable `viaIR` and pass it to the emscripten binary, the produced JSON is truncated.\r\n\r\nIt only happens when these outputs are both selected at the same time. Changing the snippet to something simple like `contract {}` resolves the problem as well so it's something in the code that triggers it. Unlike in #14361, this happens both with and without optimizer.\r\n\r\nIt's possible that `solc-js` crashes in the process, but there's nothing in the output that would indicate that (no `Killed` or `core dumped` on the console). The fact that it always cuts off at the same point would also indicate that it's the JSON generation that suddenly decides to stop for whatever reason, but then successfully outputs that unfinished content.\r\n\r\n### Environment\r\nTested with `solc-js` 0.8.20 with the binary included in the release.\r\n\r\n### Repro\r\n#### `input.json`\r\n```json\r\n{\r\n    \"language\": \"Solidity\",\r\n    \"sources\": {\r\n        \"A\": {\"content\": \"\r\n            contract C {\r\n                function f2() public {\r\n                    bytes1[2] memory k;\r\n                    k[0] = bytes1(0);\r\n                }\r\n            }\"\r\n        }\r\n    },\r\n    \"settings\": {\r\n        \"viaIR\": true,\r\n        \"outputSelection\": {\r\n            \"*\": {\"*\": [\"ir\", \"*\"]}\r\n        }\r\n    }\r\n}\r\n```\r\n\r\n#### Script\r\n```bash\r\nnpm install solc\r\nemscripten_output=$(cat input.json | npx --no -- solcjs --standard-json)\r\necho \"$emscripten_output\"\r\necho \"$emscripten_output\" | jq\r\n```\r\n\r\n#### Output\r\nThe output from `jq` is:\r\n```\r\nparse error: Unfinished string at EOF at line 2, column 0\r\n```\r\nwhich means that the produced JSON is malformed. And indeed, this is how it ends:\r\n```json\r\n}\\n\\n            function write_to_memory_t_bytes1(memPtr, value) {\\n                mstore(memPtr, cleanup_t_bytes1(value))\\\r\n```\r\n\r\nThis is the content of the `ir` field, which is not terminated. The Standard JSON output just ends abruptly in the middle of it.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14362/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14362/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
