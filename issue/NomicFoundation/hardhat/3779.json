@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-03-19T11:20:14Z",
-  "updated_at": "2023-03-27T16:07:51Z",
+  "updated_at": "2023-06-26T00:17:03Z",
   "closed_at": "2023-03-27T16:07:51Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\n\n2.13.0\n\n### What happened?\n\nI received this error today and can not verify contract... \r\n```\r\nnpx hardhat verify --network goerli --constructor-args arguments.js 0xE8e8d015B999674c7576786eb146CFB17c8035C2\r\nAn unexpected error occurred:\r\n\r\nSyntaxError: Unexpected token < in JSON at position 0\r\n    at JSON.parse (<anonymous>)\r\n    at consumeEnd (/Users/aishmukh/Projects/testdeploy/node_modules/undici/lib/api/readable.js:253:20)\r\n    at BodyReadable.<anonymous> (/Users/aishmukh/Projects/testdeploy/node_modules/undici/lib/api/readable.js:235:7)\r\n    at BodyReadable.emit (node:events:513:28)\r\n    at BodyReadable.emit (/Users/aishmukh/Projects/testdeploy/node_modules/undici/lib/api/readable.js:66:18)\r\n    at endReadableNT (node:internal/streams/readable:1358:12)\r\n    at processTicksAndRejections (node:internal/process/task_queues:83:21)\r\n                                                                                                                              \r\ntestdeploy git:master*  \r\n❯ \r\n```\r\n\r\n\r\narguments.js:\r\n```\r\nmodule.exports = [\r\n    [\"0x1090C62B584c1c9a56E3D8AFd70cf9F2ECee17CC\", \"0x06f10E01E97718730179F53Bc6f8ff6625ACB2f1\"],\r\n    [5, 15],\r\n    \"https://ipfs.vipsland.com/nft/collections/genesis/json/hidden.json\",\r\n    \"https://ipfs.vipsland.com/nft/collections/genesis/json/\",\r\n];\r\n```\r\n\r\nnode version v16.18.1\r\n\r\nhardhat.config.js:\r\n```\r\nrequire(\"@nomiclabs/hardhat-etherscan\");\r\nrequire(\"hardhat-contract-sizer\");\r\nrequire(\"dotenv\").config();\r\nrequire(\"@nomicfoundation/hardhat-toolbox\");\r\n\r\nconst { GOERLI_ALCHEMY_API_KEY, GOERLI_PRIVATE_KEY, ETHERSCANAPIKEY } = process.env;\r\n\r\n\r\n/** @type import('hardhat/config').HardhatUserConfig */\r\n\r\n/** @type import('hardhat/config').HardhatUserConfig */\r\nmodule.exports = {\r\n  solidity: {\r\n    version: '0.8.17',\r\n    settings: {\r\n      optimizer: {\r\n        enabled: true,\r\n        runs: 5\r\n      }\r\n    }\r\n  },\r\n  networks: {\r\n    goerli: {\r\n      url: `https://eth-goerli.g.alchemy.com/v2/${GOERLI_ALCHEMY_API_KEY}`,\r\n      accounts: [GOERLI_PRIVATE_KEY],\r\n      saveDeployments: true,\r\n    },\r\n\r\n  },\r\n  \r\n  etherscan: {\r\n    apiKey: {\r\n      goerli: ETHERSCANAPIKEY,\r\n    },\r\n    customChains: [\r\n      {\r\n        network: \"goerli\",\r\n        chainId: 5,\r\n        urls: {\r\n          apiURL: \"https://api-goerli.etherscan.io/api\",\r\n          browserURL: \"https://goerli.etherscan.io\"\r\n        }\r\n      }\r\n    ]\r\n  },\r\n\r\n  contractSizer: {\r\n    alphaSort: true,\r\n    disambiguatePaths: false,\r\n    runOnCompile: true,\r\n    strict: true,\r\n  }\r\n};\r\n\r\n\r\n```\r\n\r\n\n\n### Minimal reproduction steps\n\n```\r\nnpx hardhat run scripts/deploy.js --network goerli  \r\nnpx hardhat verify --network goerli --constructor-args arguments.js 0xE8e8d015B999674c7576786eb146CFB17c8035C2\r\n```\r\n\n\n### Search terms\n\nverify contract issue",
   "closed_by": {
     "login": "fvictorio",
