@@ -58,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,12 +67,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-06-19T17:08:52Z",
-  "updated_at": "2023-06-20T21:28:56Z",
-  "closed_at": null,
+  "updated_at": "2023-06-26T13:29:00Z",
+  "closed_at": "2023-06-26T13:29:00Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\r\n\r\n2.15.0\r\n\r\n### What happened?\r\n\r\nI'm running into the same issue as this one https://github.com/NomicFoundation/hardhat/issues/1692 from 2 years ago with the correct modification in ethers v6 but the contract.on is not triggered.\r\n\r\n```ts\r\n await new Promise(async (resolve) => {\r\n      contractA.on(\"TokensMinted\", (amount: BigNumber) => {\r\n        // THIS LINE NEVER GETS HIT\r\n        console.log(\"###########\");\r\n        resolve(true);\r\n      });\r\n\r\n      const contractTx: ContractTransaction = await contractA.mint(123);\r\n      const contractReceipt: ContractReceipt = await contractTx.wait();\r\n\r\n      for (const event of contractReceipt.logs!) {\r\n        console.log(event.fragment.name, event.args[0].toString()); // TokensMinted 123\r\n      }\r\n\r\n      // Works\r\n      //  contractA.emit(\"TokensMinted\", 123);\r\n    });\r\n```\r\n\r\nContract:\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity >=0.8.18;\r\n\r\ncontract ContractA {\r\n    event TokensMinted(uint amount);\r\n\r\n    function mint(uint amount) public {\r\n        emit TokensMinted(amount);\r\n    }\r\n}\r\n```\r\n\r\nI'm adding the Promise to ensure to wait until the event is emitted.\r\nFrom the receipt, the event is properly emitted, then it wait indefinitely because the event is never emitted.\r\n\r\nIf I emit the event manually using `contractA.emit(\"TokensMinted\", 123);`, then I get the console.log and the promise is resolved.\r\n\r\n\r\n\r\n### Minimal reproduction steps\r\n\r\nRepo to reproduce the issue easily: https://github.com/lescaudr/ethers-event-issue\r\npnpm install\r\npnpm compile\r\npnpm test\r\n\r\n### Search terms\r\n\r\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4044/reactions",
     "total_count": 0,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4044/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -122,13 +141,13 @@
     "body": "Thank you @lescaudr, I can confirm this. It's an important problem, I'll try to get it fixed asap.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1598762361/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 0,
+      "heart": 1,
       "rocket": 0,
       "eyes": 0
     },
