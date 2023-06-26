@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "tuyennhv",
@@ -79,12 +79,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-06-23T08:45:19Z",
-  "updated_at": "2023-06-26T09:46:09Z",
-  "closed_at": null,
+  "updated_at": "2023-06-26T14:29:59Z",
+  "closed_at": "2023-06-26T14:29:59Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "### Describe the bug\n\nBeacon node prints out the following logs on every startup\r\n\r\n```\r\nJun-23 08:39:23.198[]                 info: Lodestar network=goerli, version=v1.9.0/7c101f0, commit=7c101f062d24900faa03bc641a5cff2e234974ed\r\nJun-23 08:39:23.634[]                 info: Connected to LevelDB database path=/home/devops/goerli/data/beacon/chain-db\r\nJun-23 08:39:33.802[]                 info: Initializing beacon from a valid db state slot=5916704, epoch=184897, stateRoot=0xe784e13511c4c96d45af93ea2449d80c69cdb0d84a7ba301107fcb663ef5e1d0, isWithinWeakSubjectivityPeriod=true\r\nJun-23 08:39:34.283[monitoring]       info: Started monitoring service remote=beaconcha.in, machine=chainsafe-server, interval=300000\r\nJun-23 08:39:49.811[network]          info: discv5 worker started peerId=16Uiu2HAmFeUd79BkNcBcQqMhRRMUCifRfBk9DhVe4JN7pmu2NuAs, listenAddr=/ip4/0.0.0.0/udp/9000, initialENR=enr:-IO4QIpA0-CjTfFbvDllk7l5e7aW1veiVv_l7CHkLRRdX4m-M7uDd6xWoKmd4WmVkof00rooUBYtSLGGcNia3Ou83WADgmlkgnY0iXNlY3AyNTZrMaEDLHFysVCl0mMHSdcb9h_5E0bT-lBmDZnvjJ1F2SkwmOSDdGNwgiMog3VkcIIjKA\r\nJun-23 08:39:54.735[network]          info: PeerId 16Uiu2HAmFeUd79BkNcBcQqMhRRMUCifRfBk9DhVe4JN7pmu2NuAs, Multiaddrs /ip4/0.0.0.0/tcp/9000\r\nJun-23 08:39:54.737[metrics]          info: Starting metrics HTTP server port=8008, address=127.0.0.1\r\nJun-23 08:39:54.858[rest]             info: Started REST API server address=http://0.0.0.0:9596\r\nJun-23 08:39:54.858[rest]             warn: REST API server is exposed, ensure untrusted traffic cannot reach this API\r\nJun-23 08:39:54.858[]                 warn: Low peer count peers=0\r\nJun-23 08:39:54.859[]                 info: Searching peers - peers: 0 - slot: 5916799 - head: (slot -95) 0x6b02…bc58 - exec-block: syncing(9225819 0xbf28…) - finalized: 0x8d65…d58d:184895\r\nJun-23 08:39:55.380[sync]             warn: Node sync has fallen behind by 95 slots\r\nJun-23 08:39:55.864[sync]             warn: Node sync has fallen behind by 95 slots\r\nJun-23 08:39:57.238[sync]             warn: Node sync has fallen behind by 95 slots\r\nJun-23 08:39:57.242[sync]             warn: Node sync has fallen behind by 95 slots\r\nJun-23 08:39:57.702[sync]             warn: Node sync has fallen behind by 95 slots\r\nJun-23 08:39:57.934[sync]             warn: Node sync has fallen behind by 95 slots\r\nJun-23 08:39:59.738[sync]             warn: Node sync has fallen behind by 95 slots\r\nJun-23 08:40:00.325[sync]             warn: Node sync has fallen behind by 96 slots\r\nJun-23 08:40:00.327[sync]             warn: Node sync has fallen behind by 96 slots\r\nJun-23 08:40:01.758[chain]            info: Validated transition configuration with execution client terminalTotalDifficulty=0xa4a470, terminalBlockHash=0x0000000000000000000000000000000000000000000000000000000000000000, terminalBlockNumber=0x0\r\nJun-23 08:40:02.147[sync]             warn: Node sync has fallen behind by 96 slots\r\nJun-23 08:40:06.159[]                 info: Syncing - 6.3 seconds left - 5.25 slots/s - slot: 5916800 - head: (slot -33) 0x5949…f977 - exec-block: valid(9225871 0x6cca…) - finalized: 0x6b02…bc58:184897 - peers: 7\r\nJun-23 08:40:09.455[network]          info: Subscribed gossip core topics\r\nJun-23 08:40:09.459[sync]             info: Subscribed gossip core topics\r\nJun-23 08:40:18.000[]                 info: Synced - slot: 5916801 - head: 0x5cb8…fcf4 - exec-block: valid(9225899 0xad2e…) - finalized: 0x967c…285f:184898 - peers: 6\r\n^CJun-23 08:40:19.666[]                 info: Stopping gracefully, use Ctrl+C again to force process exit\r\n```\r\n\r\nDebug logs:  [debug.log](https://github.com/ChainSafe/lodestar/files/11846506/debug.log)\n\n### Expected behavior\n\nShould not show \"Node sync has fallen behind by x slots\" warnings on every startup.\n\n### Steps to reproduce\n\n```\r\n./lodestar beacon \\\r\n    --dataDir /home/devops/goerli/data/beacon \\\r\n    --rest \\\r\n    --rest.address \"0.0.0.0\" \\\r\n    --rest.namespace '*' \\\r\n    --metrics \\\r\n    --execution.urls http://localhost:8551 \\\r\n    --jwt-secret /home/devops/goerli/data/jwtsecret \\\r\n    --logLevel info \\\r\n    --network goerli \\\r\n    --checkpointSyncUrl \"https://beaconstate-goerli.chainsafe.io/\"  \\\r\n```\n\n### Additional context\n\n_No response_\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nv1.9.0",
-  "closed_by": null,
+  "closed_by": {
+    "login": "tuyennhv",
+    "id": 10568965,
+    "node_id": "MDQ6VXNlcjEwNTY4OTY1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10568965?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tuyennhv",
+    "html_url": "https://github.com/tuyennhv",
+    "followers_url": "https://api.github.com/users/tuyennhv/followers",
+    "following_url": "https://api.github.com/users/tuyennhv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tuyennhv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tuyennhv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tuyennhv/subscriptions",
+    "organizations_url": "https://api.github.com/users/tuyennhv/orgs",
+    "repos_url": "https://api.github.com/users/tuyennhv/repos",
+    "events_url": "https://api.github.com/users/tuyennhv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tuyennhv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5685/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5685/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
