@@ -8,7 +8,7 @@
   "id": 1773034314,
   "node_id": "I_kwDOAOvK985prltK",
   "number": 27558,
-  "title": "Add new subscription mode for eth_subscribe - stateChanges",
+  "title": "Add new subscription mode for eth_subscribe - stateChanges(accountModified)",
   "user": {
     "login": "joohhnnn",
     "id": 68833933,
@@ -49,11 +49,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-06-25T03:28:57Z",
-  "updated_at": "2023-06-25T03:36:40Z",
+  "updated_at": "2023-06-25T18:29:09Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "# Rationale\r\n\r\nCurrently, most dApps rely on periodic data retrieval to obtain the latest updates. However, the frequency of data updates for the majority of cases is not very high. Therefore, performing regular reads to keep the data up to date can impose unnecessary burdens on nodes. By subscribing to specific account state changes, we can alleviate the pressure on nodes while optimizing dApp performance. This approach allows for more efficient monitoring of data updates and ensures that nodes only retrieve data when necessary.\r\n\r\n# Implementation\r\n\r\nDo you have ideas regarding the implementation of this feature?\r\n\r\n\r\n```\r\n{\r\n\"id\": 1,\r\n\"jsonrpc\": \"2.0\",\r\n\"method\": \"eth_subscribe\",\r\n\"params\": [\r\n\"stateChanges\",\r\n{\r\n\"address\": \"0x8320fe7702b96808f7bbc0d4a888ed1468216cfd\", // Address of the account to subscribe to\r\n\"slots\": [\"0x01\"], // Slots to subscribe to (can be empty, which represents any slot changes)\r\n\"detail\": true //  Enable the inclusion of the state change details (latest values)\r\n}\r\n]\r\n}\r\n```\r\n\r\nAre you willing to implement this feature?\r\nYes",
+  "body": "# Rationale\r\n\r\nCurrently, most dApps rely on periodic data retrieval to obtain the latest updates. However, the frequency of data updates for the majority of cases is not very high. Therefore, performing regular reads to keep the data up to date can impose unnecessary burdens on nodes. By subscribing to specific account state changes, we can alleviate the pressure on nodes while optimizing dApp performance. This approach allows for more efficient monitoring of data updates and ensures that nodes only retrieve data when necessary.\r\n\nAlthough we have `debug.GetModifiedAccountsByHash`, if we want to achieve real-time retrieval of the latest data, we have no choice but to make requests for each block.\n\r\n# Implementation\r\n\r\nDo you have ideas regarding the implementation of this feature?\r\n\r\n\r\n```\r\n{\r\n\"id\": 1,\r\n\"jsonrpc\": \"2.0\",\r\n\"method\": \"eth_subscribe\",\r\n\"params\": [\r\n\"stateChanges\",\r\n{\r\n\"account\": \"0x8320fe7702b96808f7bbc0d4a888ed1468216cfd\", // Address of the account to subscribe to\r\n\"slots\": [\"0x01\"], // Slots to subscribe to (can be empty, which represents any slot changes)\r\n\"detail\": true //  Enable the inclusion of the state change details (latest values)\r\n}\r\n]\r\n}\r\n```\r\n\r\nAre you willing to implement this feature?\r\nYes",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27558/reactions",
