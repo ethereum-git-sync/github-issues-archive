@@ -31,13 +31,22 @@
   },
   "labels": [
     {
-      "id": 4937119027,
-      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
-      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
-      "name": "status:triaging",
+      "id": 901960538,
+      "node_id": "MDU6TGFiZWw5MDE5NjA1Mzg=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:bug",
+      "name": "type:bug",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 4937720577,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
+      "name": "status:ready",
       "color": "0E8A16",
       "default": false,
-      "description": ""
+      "description": "This issue is ready to be worked on"
     }
   ],
   "state": "open",
@@ -47,9 +56,9 @@
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-04-13T18:44:15Z",
-  "updated_at": "2023-04-26T14:12:27Z",
+  "updated_at": "2023-06-27T18:53:19Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -211,6 +220,50 @@
     "body": "> Thanks @antazoey, I'll look into this as soon as I can. The memory array in the `debug_tt` entries has always been a pain in the ass 😞\r\n\r\nSorry to hear, but I really appreciate it!\r\n`2.13.0` does work for me for now, but we will need to upgrade at some point!\r\n\r\nThank you :))",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1523493546/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1610050794",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/3858#issuecomment-1610050794",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3858",
+    "id": 1610050794,
+    "node_id": "IC_kwDOB7jojM5f92zq",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-27T18:53:03Z",
+    "updated_at": "2023-06-27T18:53:03Z",
+    "author_association": "MEMBER",
+    "body": "Minimal reproduction:\r\n\r\n```js\r\n  // push0 push0 mstore push0\r\n  const bytecode = \"0x5F5F525F\"\r\n\r\n  const [account] = await network.provider.send(\"eth_accounts\", [])\r\n\r\n  const address = \"0x1234567890123456789012345678901234567890\"\r\n\r\n  await network.provider.send(\"hardhat_setCode\", [address, bytecode])\r\n\r\n  const tx = await network.provider.send(\"eth_sendTransaction\", [{\r\n    from: account,\r\n    to: address\r\n  }])\r\n\r\n  const trace = await network.provider.send(\"debug_traceTransaction\", [tx])\r\n\r\n  console.log(JSON.stringify(trace, null, 2))\r\n```\r\n\r\nThat bytecode pushes two 0s to the stack and executes a `MSTORE`, and the resulting memory entry, instead of having a length of 1, has a length of 256. That's a big clue of what can be going on here.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1610050794/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
