@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11255",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11255/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11255/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11255/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/11255",
+  "id": 1776195791,
+  "node_id": "I_kwDOD5KrTM5p3pjP",
+  "number": 11255,
+  "title": "Ensure not empty chain ID list is attached to revealed accounts",
+  "user": {
+    "login": "0x-r4bbit",
+    "id": 445106,
+    "node_id": "MDQ6VXNlcjQ0NTEwNg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/445106?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0x-r4bbit",
+    "html_url": "https://github.com/0x-r4bbit",
+    "followers_url": "https://api.github.com/users/0x-r4bbit/followers",
+    "following_url": "https://api.github.com/users/0x-r4bbit/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0x-r4bbit/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0x-r4bbit/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0x-r4bbit/subscriptions",
+    "organizations_url": "https://api.github.com/users/0x-r4bbit/orgs",
+    "repos_url": "https://api.github.com/users/0x-r4bbit/repos",
+    "events_url": "https://api.github.com/users/0x-r4bbit/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0x-r4bbit/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2036563458,
+      "node_id": "MDU6TGFiZWwyMDM2NTYzNDU4",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 3955125927,
+      "node_id": "LA_kwDOD5KrTM7rvm6n",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/E:Communities",
+      "name": "E:Communities",
+      "color": "E56631",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-27T06:39:56Z",
+  "updated_at": "2023-06-27T06:39:56Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "There are a few changes that happened to the request membership flow of communities:\r\n\r\n1. Originally, when a community had permissions set up that users need to fulfill to become a member of the community, user nodes would reveal their wallet addresses to the owner node to proof ownership of the necessary requirements.\r\n2. Then, we've improved this mechanism by letting user nodes figure out on which networks (chainIDs) they own the needed funds and attach that information to the request to join. This then allows the owner/admin node only check on those networks instead all by default.\r\n3. Due to the complexity of possible scenarios when it comes to communities that change from non-permissioned to permissioned and member with revealed or no revealed addresses, we've decided that users now have to reveal their addresses regardless. In short, every request to join requires a user to attach wallet addresses (+ signatures to the request), even if the community doesn't have permissions set up (but might in the future)\r\n\r\n@osmaczko has now pointed out the following scenario he's observed that is most likely a bug:\r\n\r\n> 1) alice creates open community\r\n> 2) bob joins open community and reveals his addresses\r\n> 3) alice creates permissions to join which bob satisfies\r\n> 4) bob is removed from community and must request to join again with revealed addresses\r\n> At first glance, the issue is at point 2), in case there are no permissions for community, bob sends revealed addresses with empty array of chain IDs.\r\n> Or am I wrong and 4) is expected?\r\n\r\nThe important part here is **bob sends revealed addresses with empty array of chain IDs**.\r\n\r\nThis state should only happen if a) the community has permissions set up that need to be satisfied to join the community at the time the request to join was made and b) the user sending the request **does not** have the funds.\r\n\r\nThe result is that the revealed accounts don't provide chainIDs on which the requirements are satisfied, which is that empty list.\r\n\r\n**If however**, the community **didn't** have these permissions set up, meaning it's an open community as described in @osmaczko scenario above, then the default should always be the cartesian product of wallet addresse x all supported chain IDs.\r\nWe also have a utility function that does that: https://github.com/status-im/status-go/blob/develop/protocol/communities/manager.go#L4043-L4052\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11255/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11255/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
