@@ -85,7 +85,7 @@
       "description": "Difficulty: average"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -94,12 +94,31 @@
   "milestone": null,
   "comments": 10,
   "created_at": "2022-03-29T15:36:26Z",
-  "updated_at": "2023-05-10T18:54:11Z",
-  "closed_at": null,
+  "updated_at": "2023-06-28T15:23:12Z",
+  "closed_at": "2023-06-28T15:23:12Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\nIt would be nice to have a Forge provided modifier that lets one mark a test as skipped `[SKIP]` depending on some custom condition. The specific use case we need it for is to mark which tests are run on different mainnet forks\r\n\r\nThe code that we currently use looks like this (below) but it marks the skipped tests as passed `[PASS]` \r\n\r\n```\r\n  uint256 BSC_MAINNET = 56;\r\n  uint256 ETH_KOVAN = 42;\r\n  uint256 ETH_RINKEBY = 4;\r\n  uint256 EVMOS_TESTNET = 9000;\r\n\r\n  /// custom modifier for running tests conditionally\r\n  modifier shouldRun(bool run) {\r\n    if (run) {\r\n      _;\r\n    }\r\n  }\r\n\r\n // filter function for a specific chain\r\n  function forChains(uint256 id0) public view returns (bool) {\r\n    return block.chainid == id0;\r\n  }\r\n\r\n // filter function for multiple chains\r\n  function forChains(uint256 id0, uint256 id1) public view returns (bool) {\r\n    return block.chainid == id0 || block.chainid == id1;\r\n  }\r\n\r\n\r\n  // TEST CASES\r\n\r\n\r\n  function testSomething() public {\r\n    // this test will be run on all chains\r\n  }\r\n \r\n  function testSomethingElse() public shouldRun(forChains(BSC, ETH_KOVAN)) {\r\n    // this test will be skipped on EVMOS_TESTNET and ETH_RINKEBY\r\n  }\r\n```\r\n\r\n\r\nI would imagine that we're provided by the forge env either a modifier like `shouldRun(forChains(...))` or some assembly opcode to return from the test marking it as skipped `[SKIP]` and then we can craft the modifier in the same way\r\n\r\n```\r\n  modifier shouldRun(bool run) {\r\n    if (run) {\r\n      _;\r\n    }\r\n    else {\r\n      assembly {\r\n        some_op_code_to_mark_test_as_skipped()\r\n      }\r\n    }\r\n  }\r\n```\r\n\r\n### Additional context\r\n\r\n![image](https://user-images.githubusercontent.com/2662912/160651050-17cb2403-e4b8-47e8-ac4d-9b1c2ba70e31.png)",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/1123/reactions",
     "total_count": 4,
@@ -114,7 +133,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/1123/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
