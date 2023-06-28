@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-05-02T22:25:36Z",
-  "updated_at": "2023-05-02T22:25:50Z",
-  "closed_at": null,
+  "updated_at": "2023-06-28T13:22:38Z",
+  "closed_at": "2023-06-28T13:22:38Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\n\n2.12.6\n\n### What happened?\n\nNot receiving `eth_subscribe` message after 5mins on inactivity. It is working with ganache. \r\nhttps://github.com/NomicFoundation/hardhat/issues/588\r\nThis thread was resolved so I created a new one\r\n\r\n\r\nI've further describe the issue here https://stackoverflow.com/questions/76158051/cannot-listen-to-contract-events-with-ethers-js\n\n### Minimal reproduction steps\n\nThis is the code I've used.\r\n```\r\nconst ERC721Abi = require(\"../solidity/abi/CampaignERC721Abi.json\");\r\nconst { ethers } = require(\"ethers\");\r\nconst wsHelper = require(\"../helpers/wsHelper\");\r\nconst Web3WsProvider = require(\"web3-providers-ws\");\r\n\r\nconst tokenAddress = \"0x464A8eB115BB4f9A95281391ff91FbebAc112e97\";\r\nconst chainId = 1337;\r\n\r\nconst sturdyWs = async () => {\r\n  const options = {\r\n    timeout: 30000, // ms\r\n\r\n    // // Useful for credentialed urls, e.g: ws://username:password@localhost:8546\r\n    // headers: {\r\n    //   authorization: 'Basic username:password'\r\n    // },\r\n\r\n    clientConfig: {\r\n      // Useful if requests are large\r\n      maxReceivedFrameSize: 100000000, // bytes - default: 1MiB\r\n      maxReceivedMessageSize: 100000000, // bytes - default: 8MiB\r\n\r\n      // Useful to keep a connection alive\r\n      keepalive: true,\r\n      keepaliveInterval: 60000, // ms\r\n    },\r\n\r\n    // Enable auto reconnection\r\n    reconnect: {\r\n      auto: true,\r\n      delay: 5000, // ms\r\n      maxAttempts: 5,\r\n      onTimeout: false,\r\n    },\r\n  };\r\n  const ws = new Web3WsProvider(\"ws://127.0.0.1:8545\", options);\r\n  ws.connect();\r\n\r\n  const promise = new Promise((resolve, reject) => {\r\n    ws.on(\"connect\", (m) => {\r\n      console.log(\"open\");\r\n      resolve();\r\n    });\r\n    ws.on(\"error\", (err) => {\r\n      console.log(\"error\", err);\r\n      reject(err);\r\n    });\r\n  });\r\n  ws.on(\"data\", (d) => {\r\n    console.log(d.method, d.params?.subscription, d?.params?.result?.topics);\r\n  });\r\n  await promise;\r\n\r\n  const contract = new ethers.Contract(tokenAddress, ERC721Abi, provider[chainId]);\r\n  const topic = contract.filters.Transfer();\r\n  console.log(\"topic\", topic);\r\n  ws.send(\r\n    {\r\n      jsonrpc: \"2.0\",\r\n      id: 1,\r\n      method: \"eth_subscribe\",\r\n      params: [\"logs\", topic],\r\n    },\r\n    (error, result) => {\r\n      if (error) {\r\n        console.error(error);\r\n      } else {\r\n        console.log(\"result:\", result.result); // subscription id\r\n      }\r\n    }\r\n  );\r\n\r\n  await new Promise((resolve, reject) => {});\r\n};\r\n\r\nrouter.get(\"/test\", async (req, res, next) => {\r\n  try {\r\n    sturdyWs();\r\n    return res.send({});\r\n  } catch (e) {\r\n    console.error(e);\r\n    return res.send({ e });\r\n  }\r\n});\r\n\r\nmodule.exports = router;\r\n\r\n```\n\n### Search terms\n\nwebsocket",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3893/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3893/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1611405519",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/3893#issuecomment-1611405519",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3893",
+    "id": 1611405519,
+    "node_id": "IC_kwDOB7jojM5gDBjP",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-28T13:22:38Z",
+    "updated_at": "2023-06-28T13:22:38Z",
+    "author_association": "MEMBER",
+    "body": "Hi @nischitpra, sorry for not responding sooner.\r\n\r\nI couldn't reproduce this using a plain websocket connection. This is what I ran:\r\n\r\n```js\r\nconst WebSocket = require(\"isomorphic-ws\");\r\n\r\nasync function main() {\r\n  const ws = new WebSocket(\"ws://localhost:8545/\");\r\n\r\n  ws.onopen = function open() {\r\n    ws.send(JSON.stringify({\r\n      jsonrpc: \"2.0\",\r\n      id: 1,\r\n      method: \"eth_subscribe\",\r\n      params: [\"newHeads\"],\r\n    }));\r\n  };\r\n\r\n  ws.onmessage = function incoming(data) {\r\n    console.log(data.data);\r\n  };\r\n}\r\n\r\nmain().catch(console.error);\r\n```\r\n\r\nI started a `hh node`, ran that script, waited five minutes, and mined a block. I got an event, as expected.\r\n\r\nPerhaps the problem is in `web3-providers-ws`? Not sure, but for the time being I'm going to close this issue. Happy to re-open if there is indeed a problem in Hardhat.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1611405519/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
