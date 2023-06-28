@@ -58,21 +58,40 @@
       "description": "Area: cheatcodes"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-04-25T09:58:21Z",
-  "updated_at": "2023-04-25T21:01:53Z",
-  "closed_at": null,
+  "updated_at": "2023-06-27T20:43:44Z",
+  "closed_at": "2023-06-27T20:43:44Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "I encountered a problem where I wrote an FFI test to generate signature information for messages and found that the results were inconsistent with those obtained directly from the command line. My code is as follows:\r\n\r\n```\r\n    function testSignMsg() public {\r\n\r\n        // cast  wallet  sign  --private-key  ca83fda4dff67d424c6c8d1910c51ab87ccc165dba0beaed06693d91557c39da  hello\r\n\r\n        string[] memory cmds = new string[](6);\r\n        cmds[0] = \"cast\";\r\n        cmds[1] = \"wallet\";\r\n        cmds[2] = \"sign\";\r\n        cmds[3] = \"--private-key\";\r\n        cmds[4] = \"ca83fda4dff67d424c6c8d1910c51ab87ccc165dba0beaed06693d91557c39da\";\r\n        cmds[5] = \"hello\";\r\n        bytes memory sign = vm.ffi(cmds);\r\n\r\n        console2.logBytes(sign);\r\n        console2.log(\"sign length:\", sign.length);\r\n        \r\n    }\r\n```\r\nAfter executing the above code, the following results are obtained:\r\n\r\n```\r\n  0x5369676e61747572653a20307834303164336334653735333866353131393237306336626664386465376431353333366132636637613532313464366130336430623432323438663763616637373331646633363932303734656234633863663465326134313436353764646132313465343432373463333761346232633438653630623431646163346361363162\r\n  sign length: 143\r\n```\r\nWhen I execute the following command directly from the command line:\r\n\r\n```\r\n cast  wallet  sign  --private-key  ca83fda4dff67d424c6c8d1910c51ab87ccc165dba0beaed06693d91557c39da  hello\r\n```\r\nThe following results were obtained:\r\n```\r\nSignature: 0x401d3c4e7538f5119270c6bfd8de7d15336a2cf7a5214d6a03d0b42248f7caf7731df3692074eb4c8cf4e2a414657dda214e44274c37a4b2c48e60b41dac4ca61b  # length is 133\r\n```\r\nThe specific screenshot is as follows:\r\n![1682416153342](https://user-images.githubusercontent.com/13655605/234242355-2194cca1-7fce-4499-8d32-65d14493e217.png)\r\n\r\nWhy is this? Can anyone tell me the reason for the mistake? Thank you very much~",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4823/reactions",
     "total_count": 0,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4823/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -122,6 +141,50 @@
     "body": "What's happening is that the full resulting string of `Signature: 0x401d3c4e7538f5119270c6bfd8de7d15336a2cf7a5214d6a03d0b42248f7caf7731df3692074eb4c8cf4e2a414657dda214e44274c37a4b2c48e60b41dac4ca61b` is being converted to bytes. Start chisel and run `bytes(\"Signature: 0x401d3c4e7538f5119270c6bfd8de7d15336a2cf7a5214d6a03d0b42248f7caf7731df3692074eb4c8cf4e2a414657dda214e44274c37a4b2c48e60b41dac4ca61b\")` and you'll see the same value\r\n\r\nYou should be able to work around this by either (1) knowing this is the shape of the return data, so strip off the leading text and decode it accordingly, or by (2) processing the cast output as part of your ffi command by using a simple shell script or something. Would be nice if there was a JSON or silent option to help with this.\r\n\r\nAlso note that for this example you don't need ffi. You can read in the private key from an env var and use `vm.sign`",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1522410662/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1610184806",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/4823#issuecomment-1610184806",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4823",
+    "id": 1610184806,
+    "node_id": "IC_kwDOGBlvNc5f-Xhm",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-27T20:43:44Z",
+    "updated_at": "2023-06-27T20:43:44Z",
+    "author_association": "MEMBER",
+    "body": "Closing as solution was provided—not an issue.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1610184806/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
