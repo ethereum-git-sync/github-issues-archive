@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11305",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11305/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11305/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11305/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/11305",
+  "id": 1778979315,
+  "node_id": "I_kwDOD5KrTM5qCRHz",
+  "number": 11305,
+  "title": "Discussion: find a better way to make token addresses identifiable across chains",
+  "user": {
+    "login": "0x-r4bbit",
+    "id": 445106,
+    "node_id": "MDQ6VXNlcjQ0NTEwNg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/445106?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0x-r4bbit",
+    "html_url": "https://github.com/0x-r4bbit",
+    "followers_url": "https://api.github.com/users/0x-r4bbit/followers",
+    "following_url": "https://api.github.com/users/0x-r4bbit/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0x-r4bbit/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0x-r4bbit/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0x-r4bbit/subscriptions",
+    "organizations_url": "https://api.github.com/users/0x-r4bbit/orgs",
+    "repos_url": "https://api.github.com/users/0x-r4bbit/repos",
+    "events_url": "https://api.github.com/users/0x-r4bbit/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0x-r4bbit/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-06-28T13:42:34Z",
+  "updated_at": "2023-06-28T13:42:34Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "This is a write down of a discussion I had with @endulab so this is not forgotten and whoever is going to work on it (post MVP?) has a starting point.\r\n\r\n**Disclaimer:** This is mostly brainstorming and chances are the ideas are not fleshed out enough. Treat this as a starting point or feel free to discard it completely.\r\n\r\n## The problem\r\n\r\nStatus Desktop has various sections in the app in which it renders ERC20 and ERC721 tokens.\r\nSome of those sections allow users to make selections on those tokens for different actions. \r\nOne of such action is creating community token permissions, where a single permission can have multiple token requirements.\r\n\r\nBecause Status Desktop aims to work with multiple chains, it keeps track of the different contract addresses for any given token.\r\nThis is also the case when creating token permissions. \r\nIf a user selects, say \"USDC\" when creating a token permission, the token permission doesn't just store the contract address of USDC on mainnet, but all known addresses of all supported networks.\r\n\r\nThe way this is done at the moment, is that we try to retrieve all contrract addresses for a given token, using its symbol.\r\n\r\n^ This is where the problem is. A token `symbol` is not guaranteed to be unique, quite the opposite, nobody can prevent anyone from creating tokens that have symbols which are used by other tokens.\r\n\r\nWith the planned feature of token masters and owner and token master tokens that come along with it, chances are even higher that there will be multiple tokens with the same symbol, since Status Desktop will propose a default symbol based on the community name.\r\n\r\nLong story short, there has to be a better mechanism to get hold of all relevant contract addresses for a given token, using a single key.\r\n\r\n## Some ideas\r\n\r\nThe one thing that's truly unique about a token, and by which a token can be identified, is its contract address on a given network.\r\nFor example `0x123..` on chainID `1` is the only token with that address on that chain. The same address could theoretically however, have a different contract on a different chain, so the contract address alone is not a true unique identifier. It always has to be combined with the chain ID.\r\n\r\nSo in a scenario of USDC it could look like this:\r\n\r\n1. CHAINID = 1; ADDRESS = 0x123...\r\n2. CHAINID = 5; ADDRESS = 0x567...\r\n\r\nHow do we find all USDC addresses using a single key? What is that key?\r\n\r\n@endulab and I have brainstormed a bit about this and so far we only came up with two options:\r\n\r\n### Option 1: create a unique hash over all known chainIDs + all known addresses\r\n\r\nIf a chainID+address isn't enough information to get all contract addresses, then one thing we could do is create a single hash/ID based on all known addresses + chain IDs. So something like `keccak256(chaind, address, chainid, address, ...)`\r\n\r\nThen, based on that hash we could keep track of all related addresses. \r\nThe downside of this is that, once the same token is deployed on yet another chain, then the hash is no longer going to be valid.\r\nThis would only be reliable if we know for sure the token in questoin is not going to be deployed on more chains, that is a guarantee we don't have\r\n\r\n### Option 2: create a cartesian product of all chainID+address hashes\r\n\r\nIn the sample scenario above we have two unique keys for USDC. One thing we could do is maintain a map/graph of all those unique IDs that belong to a given token, and then be able to retrieve all contract addresses for that token, given any one of those unique keys.\r\n\r\nFor example, if we have:\r\n\r\n```\r\nID1 = CHAINID1 + ADDRESS1\r\nID2 = CHAINID2 + ADDRESS2\r\n```\r\n\r\nthen we would also have\r\n```\r\ngetContractAddresses(ID1) // ADDRESS1, ADDRESS2\r\ngetContractAddresses(ID2) // ADDRESS1, ADDRESS2",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11305/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11305/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
