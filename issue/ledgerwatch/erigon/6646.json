@@ -40,7 +40,7 @@
       "description": null
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,8 +49,8 @@
   "milestone": null,
   "comments": 28,
   "created_at": "2023-01-21T00:48:31Z",
-  "updated_at": "2023-06-23T02:49:14Z",
-  "closed_at": "2023-06-23T02:49:14Z",
+  "updated_at": "2023-06-29T04:09:16Z",
+  "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nErigon version: `./erigon --version`\r\nv2.35.2\r\n\r\nOS & Version: Windows/Linux/OSX\r\nUbuntu 20.04 (docker-ce 20.10.22)\r\nOS: 64GB RAM\r\ndocker container max memory: 32GB\r\n\r\n#### Expected behaviour\r\nNot to observe unbounded memory increase.\r\n\r\n#### Actual behaviour\r\nMemory keeps increasing until OOM.\r\n\r\n#### Steps to reproduce the behaviour\r\nrun erigon with:\r\n--pprof --chain=mainnet --batchSize=8mb --torrent.conns.perfile=4 --torrent.download.rate=100mb\r\nGOGC=50\r\nGOMEMLIMIT=6000MiB\r\nGODEBUG=gctrace=1\r\n\r\nAfter catching up with latest block, memory is stable at 12GB. gc trace confirms erigon itself only uses 2.9GB.\r\n\r\ngc 321 @7184.801s 0%: 0.53+151+0.020 ms clock, 12+26/908/1809+0.48 ms cpu, 4029->4110->2946 MB, 4472 MB goal, 43 MB stacks, 2 MB globals, 24 P\r\n\r\nRest of RAM is assumed to be used by OS page cache.\r\n\r\nWhile erigon is running, memory consumption grows steadily, until OOM kicks in at 32GB and kills the erigon process. \r\n\r\nTaking a wild guess, could this be caused by libmdbx thinking there is 64GB memory (OS RAM), but in actual fact the docker container is limited at 32GB? Since we can limit GO with the GOMEMLIMIT flag, is there something we can pass to libmdbx to specify the max memory to use?\r\n",
@@ -88,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/6646/timeline",
   "performed_via_github_app": null,
-  "state_reason": "not_planned"
+  "state_reason": "reopened"
 }
 [
   {
