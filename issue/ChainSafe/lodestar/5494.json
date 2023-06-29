@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-05-15T01:42:08Z",
-  "updated_at": "2023-05-15T01:42:18Z",
+  "updated_at": "2023-06-29T04:43:07Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1612422223",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/5494#issuecomment-1612422223",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5494",
+    "id": 1612422223,
+    "node_id": "IC_kwDOCD5_Gc5gG5xP",
+    "user": {
+      "login": "matthewkeil",
+      "id": 18608739,
+      "node_id": "MDQ6VXNlcjE4NjA4NzM5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18608739?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/matthewkeil",
+      "html_url": "https://github.com/matthewkeil",
+      "followers_url": "https://api.github.com/users/matthewkeil/followers",
+      "following_url": "https://api.github.com/users/matthewkeil/following{/other_user}",
+      "gists_url": "https://api.github.com/users/matthewkeil/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/matthewkeil/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/matthewkeil/subscriptions",
+      "organizations_url": "https://api.github.com/users/matthewkeil/orgs",
+      "repos_url": "https://api.github.com/users/matthewkeil/repos",
+      "events_url": "https://api.github.com/users/matthewkeil/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/matthewkeil/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-29T04:43:07Z",
+    "updated_at": "2023-06-29T04:43:07Z",
+    "author_association": "MEMBER",
+    "body": "## Sections of code affected by bug\r\n\r\n`beacon-node/src/api/impl/validator/index.ts`\r\n- Call to `recomputeForkChoiceHead` in `produceBlockV2` before `chain.produceBlock`.\r\n- `produceBlock` calls `produceBlockV2`\r\n\r\n`beacon-node/src/chain/prepareNextSlot.ts`\r\nCall to `recomputeForkChoiceHead` at the top of `prepareForNextSlot`\r\n\r\n`beacon-block/src/api/impl/validator/index.ts`\r\nCall to `forkchoice.updateHead` directly in `produceBlindedBlock`\r\n\r\n## Potential Solution\r\n\r\nWill refactoring #5 and #6 in `importBlock` to be a function that can be called in all places resolve the issue?\r\n#5 is Compute head and if new stateCache.setHeadState\r\n#6 Queue notifyForkchoiceUpdate to engine api \r\n\r\nThe new function could be called `maybeUpdateHead` and would incorporate the `newHead.blockRoot !== oldHead.blockRoot` check, with side effects, and return the results from recomputing.\r\n\r\n## Other notes\r\nShould the call to `forkchoice.updateHead` be swapped for `recomputeForkChoiceHead` so the metrics are updated correctly?",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1612422223/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
