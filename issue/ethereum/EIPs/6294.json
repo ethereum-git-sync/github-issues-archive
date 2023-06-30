@@ -51,7 +51,7 @@
   "created_at": "2023-01-07T23:57:59Z",
   "updated_at": "2023-01-08T02:03:31Z",
   "closed_at": "2023-01-08T01:27:47Z",
-  "author_association": "NONE",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Proposed Change\r\n\r\n## Premise\r\n\r\nThere are case where we need an NFT (the subordinate) which is totally subordinate to a primary NFT (the dominant)\r\nIn 2021, when we started Everdragons2, we had in mind of using the head of the dragons for a PFP token based on the Everdragons2 that you own. Here an example of a full dragon\r\n\r\nhttps://github.com/ndujaLabs/ERC721Subordinate/blob/main/assets/Soolhoth.png\r\n\r\nand just the head\r\n\r\nhttps://github.com/ndujaLabs/ERC721Subordinate/blob/main/assets/Soolhoth_PFP.png\r\n\r\nThe question was, _Should we allow people to transfer the PFP separately from the primary NFT?_ It didn't make much sense. At the same time, how to avoid that?\r\n\r\nThe solution is a token that delegates another token for anything related with the ownership.\r\n\r\n## The interface\r\n\r\n``` solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.9;\r\n\r\n// Authors: Francesco Sullo <francesco@sullo.co>\r\n\r\n// ERC165 interface id is 0x60c8f291\r\ninterface IERC721Subordinate {\r\n\r\n  // A subordinate contract has no control on its own ownership.\r\n  // Whoever owns the main token owns the subordinate token.\r\n\r\n  // The use cases where this is useful are many.\r\n  // Some example:\r\n  // - A token that represents a specific aspect of a dominant token.\r\n  //      In Everdragons2, the dominant token is a dragon. The subordinate token is\r\n  //      a PFP version of the dragon, that must follow the ownership of the dragon.\r\n  // - A token that represent an asset of the dominant token.\r\n  // - A token that adds missed features to the dominant token.\r\n\r\n  // The function dominantToken() returns the address of the main token.\r\n  function dominantToken() external view returns (address);\r\n\r\n  // The dominant token has full control on the subordinate token.\r\n  // All the functions of the subordinate token are delegated to the dominant token.\r\n\r\n  // For example, the function ownerOf(uint256 tokenId) returns the owner of the main token.\r\n\r\n  //    function ownerOf(uint256 tokenId) public view virtual override returns (address) {\r\n  //      return _dominant.ownerOf(tokenId);\r\n  //    }\r\n\r\n}\r\n```\r\n\r\nHaving a standard interface for that allows exchanges to check if the NFT implements it and avoid spending gas due to the revert.\r\n\r\n## Implementations\r\n\r\nI implemented it in \r\n\r\nhttps://github.com/ndujaLabs/erc721subordinate\r\n\r\noverriding ERC721 and ERC721Enumerable, upgradeable and not, from version 4.8.0 of \r\n\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable\r\n\r\n## Discussion\r\n\r\nhttps://ethereum-magicians.org/t/erc721subordinate/12479\r\n",
   "closed_by": {
@@ -163,7 +163,7 @@
     },
     "created_at": "2023-01-08T01:58:01Z",
     "updated_at": "2023-01-08T02:03:31Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Thanks",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/1374684617/reactions",
