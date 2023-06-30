@@ -43,7 +43,7 @@
   "created_at": "2023-01-10T04:22:24Z",
   "updated_at": "2023-01-13T11:47:59Z",
   "closed_at": "2023-01-13T11:47:59Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "maybe related to #1133.\r\n\r\nbaseFeePerGas in block 1 is 0x0b, but gasPrice is 0x0a. \r\n\r\nhttps://github.com/ethereum/tests/blob/e279c3d0a53e2f3055c7d7f72f993b62dde18e36/BlockchainTests/GeneralStateTests/EIPTests/stEIP3860/creationTxInitCodeSizeLimit.json#L116\r\n\r\nhttps://github.com/ethereum/tests/blob/e279c3d0a53e2f3055c7d7f72f993b62dde18e36/BlockchainTests/GeneralStateTests/EIPTests/stEIP3860/creationTxInitCodeSizeLimit.json#L140\r\n\r\nit will violate EIP1559 rule after tx normalization:\r\n```\r\n# ensure that the user was willing to at least pay the base fee\r\nassert transaction.max_fee_per_gas >= block.base_fee_per_gas\r\n```\r\n\r\ninvalid tx will not be included in the block, but the test vector include the tx in the block.\r\nlooks like either baseFeePerGas or gasPrice is incorrect.",
   "closed_by": {
@@ -111,7 +111,7 @@
     },
     "created_at": "2023-01-10T05:31:04Z",
     "updated_at": "2023-01-10T05:31:04Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "looks like many of test cases in BlockchainTests\\GeneralStateTests\\EIPTests\\stEOF also suffer from the same problem.\r\nespecially \"Shanghai\" test cases.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/tests/issues/comments/1376756446/reactions",
