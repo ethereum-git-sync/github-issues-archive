@@ -51,7 +51,7 @@
   "created_at": "2022-10-10T07:03:58Z",
   "updated_at": "2022-11-07T06:59:18Z",
   "closed_at": null,
-  "author_association": "NONE",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "# Rationale\r\n\r\nI attempted to develop test cases for my Go projects. To test locally, I use this [simulator](https://github.com/ethereum/go-ethereum/blob/master/accounts/abi/bind/backends/simulated.go). However, some mathematical calculations in Go and smart contracts differ. I'm not sure why. Only the smart contract's output can be tested using the simulator. I need to go over the code line by line.\r\n\r\n# Implementation\r\n\r\nI've read the code that the simulator uses to call contracts. This [line](https://github.com/ethereum/go-ethereum/blob/564751668aa01f55d39851cbf4673500ec2d4718/accounts/abi/bind/backends/simulated.go#L651) can enable debugging and create its own tracer to capture optcode, call frame, transaction, and so on. \r\nThis is beneficial to Go developers who are interested in Ethereum.\r\n\r\nIssue #25072 is very similar to mine.\r\n\r\nCan we write a function SetVMConfig and use it after creating a simulator like this?\r\n```\r\nsim := backends.NewSimulatedBackend(core.GenesisAlloc{}, 10000000)\r\nsim.SetVMConfig(vm.Config{\r\n    Debug: true,\r\n    Tracer: MyTracer,\r\n})\r\n```\r\nor\r\n```\r\nsim := backends.NewSimulatedBackend(core.GenesisAlloc{}, 10000000, vm.Config{\r\n    Debug: true,\r\n    Tracer: MyTracer,\r\n})\r\n```\r\nand change this [line](https://github.com/ethereum/go-ethereum/blob/564751668aa01f55d39851cbf4673500ec2d4718/accounts/abi/bind/backends/simulated.go#L651)\r\n```\r\nvmEnv := vm.NewEVM(evmContext, txContext, stateDB, b.config, vm.Config{NoBaseFee: true})\r\n```\r\nto\r\n```\r\nvmEnv := vm.NewEVM(evmContext, txContext, stateDB, b.config, vm.Config{\r\n    Debug:     b.blockchain.GetVMConfig().Debug,\r\n    Tracer:    b.blockchain.GetVMConfig().Tracer,\r\n    NoBaseFee: true,\r\n})\r\n```",
   "closed_by": null,
@@ -188,7 +188,7 @@
     },
     "created_at": "2022-11-07T06:59:18Z",
     "updated_at": "2022-11-07T06:59:18Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Yes, merging #25072 would solve our problems.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1305162755/reactions",
