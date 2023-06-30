@@ -67,17 +67,17 @@
       "description": "Command: forge"
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-04-11T00:37:18Z",
-  "updated_at": "2023-05-19T12:16:12Z",
-  "closed_at": "2023-05-19T12:16:12Z",
+  "updated_at": "2023-06-30T13:32:19Z",
+  "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (388c3c0 2023-04-10T00:15:22.461433000Z)\n\n### What command(s) is the bug in?\n\nforge test -m invariant\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nAccording to the [invariant testing documentation](https://book.getfoundry.sh/forge/invariant-testing#function-level-assertions) in the foundry book it is possible to use function-level assertions in a handler. However, this doesn't seem to work. Minimal working example:\r\n\r\n**Counter.sol**\r\n```solidity\r\ncontract Counter {\r\n    uint256 public number;\r\n\r\n    function setNumber(uint256 newNumber) public {\r\n        if(newNumber != 100) {\r\n            number = newNumber;\r\n        } \r\n    }\r\n}\r\n````\r\n\r\n**CounterHandler.sol**\r\n```solidity\r\ncontract CounterHandler is Test {\r\n    Counter counter;\r\n\r\n    constructor(Counter _counter) {\r\n        counter = _counter;\r\n    }\r\n\r\n    function setNumber(uint256 newNumber) public {\r\n        counter.setNumber(newNumber);\r\n        assertEq(uint(0), uint(1));\r\n        assertTrue(false);\r\n    }\r\n}\r\n````\r\n\r\n**CounterInvariants**\r\n```solidity\r\ncontract CounterInvariants is Test {\r\n    Counter counter;\r\n    CounterHandler handler;\r\n\r\n    function setUp() public {\r\n        counter = new Counter();\r\n        handler = new CounterHandler(counter);\r\n        targetContract(address(handler));\r\n    }\r\n\r\n    function invariant_numberNotZero() public {\r\n        assertEq(counter.number() != 100, true);\r\n    }\r\n}\r\n```\r\n\r\nAs shown in the CounterHandler contract I've introduced some assertions that should fail such as `assertTrue(false)` and `assertEq(uint(0), uint(1))`. However, when running the invariant test it will succeed.\r\n<img width=\"716\" alt=\"image\" src=\"https://user-images.githubusercontent.com/11537225/231025564-9db0769d-b7c5-4240-bfe1-af6f0313bb05.png\">\r\n",
@@ -115,7 +115,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4718/timeline",
   "performed_via_github_app": null,
-  "state_reason": "completed"
+  "state_reason": "reopened"
 }
 [
   {
@@ -238,6 +238,50 @@
     "body": "@mds1 pinging this issue again for visibility, would be a huge unlock for invariant testing.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1553180457/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1614658283",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/4718#issuecomment-1614658283",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4718",
+    "id": 1614658283,
+    "node_id": "IC_kwDOGBlvNc5gPbrr",
+    "user": {
+      "login": "mds1",
+      "id": 17163988,
+      "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mds1",
+      "html_url": "https://github.com/mds1",
+      "followers_url": "https://api.github.com/users/mds1/followers",
+      "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+      "organizations_url": "https://api.github.com/users/mds1/orgs",
+      "repos_url": "https://api.github.com/users/mds1/repos",
+      "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mds1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-30T13:32:18Z",
+    "updated_at": "2023-06-30T13:32:18Z",
+    "author_association": "COLLABORATOR",
+    "body": "@Evalir since #4980 was reverted by #5013 I've reopened this since I assume it's still an issue then",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1614658283/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
