@@ -43,7 +43,7 @@
   "created_at": "2021-01-25T12:22:51Z",
   "updated_at": "2021-03-15T11:06:38Z",
   "closed_at": "2021-03-15T11:06:38Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "In the following example:\r\n```\r\npragma experimental SMTChecker;\r\ncontract A {\r\n\tint[] a;\r\n\tfunction f() public {\r\n\t\trequire(a.length == 1 && a[0] == 1);\r\n\t\tint[] storage u = a;\r\n\t\tassert(u[0] == 1); // should hold\r\n\t\tint[] memory b = new int[](2);\r\n\t\ta = b;\r\n\t\tassert(u[0] == 1); // should fail\r\n\t\tA.a = b;\r\n\t\tassert(u[0] == 1); // should fail\r\n\t}\r\n\r\n\tfunction push_v(int x) public {\r\n\t\ta.push(x);\r\n\t}\r\n}\r\n```\r\nSMTChecker currently reports assertion violation for the third assertion, but not the second one. The second assertion should also be reported as violated.\r\n\r\nThe problem is slightly different handling of assignments based on whether or not the contract type is used.",
   "closed_by": {

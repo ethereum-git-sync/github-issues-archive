@@ -158,8 +158,8 @@
     "body": "Slightly simplified repro:\r\n\r\n```solidity\r\ncontract C {\r\n    uint128 u128;\r\n    int8 a;\r\n    int8 b;\r\n    int8 c;\r\n\r\n    bool x = (b = b >> 0) == int8(x ? 0 : 0);\r\n\r\n    int8 d = d << u128;\r\n    int8 e = e << u128;\r\n    int8 f = (a = a << u128);\r\n    int8 g = (c &= (a = a << u128));\r\n    int8 h = a | (c = c >> 0) << (x ? u128 : u128);\r\n}\r\n```\r\n\r\nI couldn't get it any simpler than that. Haven't verified it actually runs into OOM but it does keep running for a long time. It keeps eating more and more memory, but much more slowly than the original repro.\r\n\r\nIt looks like some pathological case in Yul optimizer.\r\n\r\nIt is only reproducible on 0.8.18+. Below that it finishes fast. The only thing in the changelog that looks related is this:\r\n> - Optimizer: Added optimization rule `and(shl(X, Y), shl(X, Z)) => shl(X, and(Y, Z))`.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1442622600/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,

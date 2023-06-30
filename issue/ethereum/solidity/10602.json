@@ -43,7 +43,7 @@
   "created_at": "2020-12-15T09:34:45Z",
   "updated_at": "2020-12-18T08:26:35Z",
   "closed_at": "2020-12-18T08:26:35Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "In the following example\r\n```\r\npragma experimental SMTChecker;\r\n\r\nabstract contract A {\r\n    uint s;\r\n\r\n    function f() public mod(s) {}\r\n    modifier mod(uint x) virtual;\r\n}\r\n\r\ncontract B is A {\r\n    modifier mod(uint x) override {\r\n        require(x == 42);\r\n        _;\r\n        assert(x == 42); // should hold\r\n        assert(x == 0); // should fail\r\n    }\r\n\r\n    function set(uint x) public {\r\n        s = x;\r\n    }\r\n}\r\n```\r\nSMTChecker currently fails to report the assertion violation.\r\nThe problem is that when analysing `B.f` it fails to resolve properly which version of the modifier will be used and analyses it with the modifier `A.mod` instead of `B.mod`.",
   "closed_by": {

@@ -43,7 +43,7 @@
   "created_at": "2020-12-30T13:49:45Z",
   "updated_at": "2021-02-01T17:22:20Z",
   "closed_at": "2021-02-01T17:22:20Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "The following examples current produce false reports from SMTChecker. The reason are missing type constraints on transaction variables in contract deployment phase.\r\n\r\n```\r\npragma experimental SMTChecker;\r\n\r\ncontract C {\r\n\tuint x;\r\n\r\n\tconstructor() {\r\n\t\tx = block.timestamp + 0;\r\n\t}\r\n}\r\n```\r\nproduces\r\n```\r\nWarning: CHC: Overflow (resulting value larger than 2**256 - 1) happens here.\r\nCounterexample:\r\nx = 0\r\n\r\n\r\nTransaction trace:\r\nconstructor()\r\n --> tx2.sol:7:7:\r\n  |\r\n7 | \t\tx = block.timestamp + 0;\r\n  | \t\t    ^^^^^^^^^^^^^^^^^^^\r\n\r\n```\r\neven though the overflow is not possible.\r\n\r\n```\r\npragma experimental SMTChecker;\r\n\r\ncontract C {\r\n\taddress owner;\r\n\r\n\tconstructor() {\r\n\t\towner = msg.sender;\r\n        \tassert(owner >= address(0));\r\n\t}\r\n}\r\n```\r\nproduces \r\n```\r\nWarning: CHC: Assertion violation happens here.\r\nCounterexample:\r\nowner = (- 1)\r\n\r\n\r\n\r\nTransaction trace:\r\nconstructor()\r\n --> tx.sol:8:9:\r\n  |\r\n8 |         assert(owner >= address(0));\r\n  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n\r\n```\r\neven though the assertion is safe and the CEX `owner = (- 1)` does not make sense.",
   "closed_by": {

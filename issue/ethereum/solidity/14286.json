@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 1,
   "created_at": "2023-06-01T08:09:19Z",
-  "updated_at": "2023-06-09T08:15:49Z",
+  "updated_at": "2023-06-26T20:47:11Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,50 +72,6 @@
   "state_reason": null
 }
 [
-  {
-    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1575198926",
-    "html_url": "https://github.com/ethereum/solidity/issues/14286#issuecomment-1575198926",
-    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14286",
-    "id": 1575198926,
-    "node_id": "IC_kwDOAm_5kc5d46DO",
-    "user": {
-      "login": "Prezzy06",
-      "id": 109199199,
-      "node_id": "U_kgDOBoI_Xw",
-      "avatar_url": "https://avatars.githubusercontent.com/u/109199199?v=4",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/Prezzy06",
-      "html_url": "https://github.com/Prezzy06",
-      "followers_url": "https://api.github.com/users/Prezzy06/followers",
-      "following_url": "https://api.github.com/users/Prezzy06/following{/other_user}",
-      "gists_url": "https://api.github.com/users/Prezzy06/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/Prezzy06/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/Prezzy06/subscriptions",
-      "organizations_url": "https://api.github.com/users/Prezzy06/orgs",
-      "repos_url": "https://api.github.com/users/Prezzy06/repos",
-      "events_url": "https://api.github.com/users/Prezzy06/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/Prezzy06/received_events",
-      "type": "User",
-      "site_admin": false
-    },
-    "created_at": "2023-06-03T21:19:11Z",
-    "updated_at": "2023-06-03T21:27:48Z",
-    "author_association": "NONE",
-    "body": "The output of both of your functions are different because they are encoding the struct in different ways.\r\n\r\n```\r\nfunction encodeDecode1() public view returns(bytes32 ) {\r\n            return keccak256(abi.encode(\r\n            DATA_TYPEHASH,\r\n            data1\r\n        ));\r\n}\r\n\r\n```\r\nThis function is using the `abi.encode()` function to encode the entire struct into a single `bytes32` value. This is the most efficient way to encode a struct, but it can be lossy if the struct contains any non-deterministic data, such as a `bytes` or `string` value.\r\n\r\n```\r\nfunction encodeDecode2() public view returns(bytes32 ) {\r\n            return keccak256(abi.encode(\r\n            DATA_TYPEHASH,\r\n            data1.a1,\r\n            data1.num,\r\n            keccak256(data1.nom)\r\n        ));\r\n}\r\n\r\n```\r\nThis function is manually encoding the struct by encoding each member separately. This is less efficient than using `abi.encode()`, but it is more reliable because it does not lose any data.\r\nTo make the output of both functions equal, you can use the `abi.encodePacked()` function to encode the struct without padding. This will ensure that the output of both functions is the same\r\n\r\n```\r\nfunction encodeDecode1() public view returns(bytes32 ) {\r\n            return abi.encodePacked(\r\n            DATA_TYPEHASH,\r\n            data1\r\n        );\r\n}\r\nfunction encodeDecode2() public view returns(bytes32 ) {\r\n            return abi.encodePacked(\r\n            DATA_TYPEHASH,\r\n            data1.a1,\r\n            data1.num,\r\n            data1.nom\r\n        );\r\n}\r\n\r\n```\r\nI think it may have resolved your issue @mbcse ",
-    "reactions": {
-      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1575198926/reactions",
-      "total_count": 0,
-      "+1": 0,
-      "-1": 0,
-      "laugh": 0,
-      "hooray": 0,
-      "confused": 0,
-      "heart": 0,
-      "rocket": 0,
-      "eyes": 0
-    },
-    "performed_via_github_app": null
-  },
   {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1584163779",
     "html_url": "https://github.com/ethereum/solidity/issues/14286#issuecomment-1584163779",
