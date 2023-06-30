@@ -360,13 +360,13 @@
     "body": "Actually I noticed that this package has no default entry point, which is technically not an issue. But by using it with the ESM syntax and following the readme.md examples, one might find this error message not super helpful:\r\n\r\n```\r\nnode src/index.mjs\r\n/Users/timdaub/Projects/replica/node_modules/ethereum-cryptography/index.js:2\r\nthrow new Error(\"This package has no entry-point. Please consult the README.md to learn how to\r\nuse it.\");\r\n```\r\n\r\nThe reason is that before ESM, people were used to e.g. importing actual .js files by specifying them without the file type in the import declaration. It's as it's being done in the readme, e.g.\r\n\r\n```\r\nconst { sha256 } = require(\"ethereum-cryptography/sha256\");\r\n```\r\n\r\nBut with ESM, it's now mandatory to always include a file type extension in the import path too, so when we e.g. want to import `ethereum-cryptography/sha256` using ESM, and we naively assume that we can do it without defining the filetype path, our script will error:\r\n\r\n```\r\nnode src/index.mjs\r\ninternal/process/esm_loader.js:74\r\n    internalBinding('errors').triggerUncaughtException(\r\n                              ^\r\n\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/timdaub/Projects/replica/node_modules/\r\nethereum-cryptography/keccak' imported from /Users/timdaub/Projects/replica/src/index.mjs\r\nDid you mean to import ethereum-cryptography/keccak.js?\r\n```\r\n\r\nThe solution is to export in ESM always WITH the file type extension. So here's the equivalent that works in node 14\r\n\r\n```\r\nimport { keccak256 } from \"ethereum-cryptography/keccak.js\";\r\n```\r\n\r\nIf u want I can send a PR for the readme to that.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/js-ethereum-cryptography/issues/comments/1382830204/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 0,
+      "heart": 1,
       "rocket": 0,
       "eyes": 0
     },
