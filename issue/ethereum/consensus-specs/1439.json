@@ -60,7 +60,7 @@
   "created_at": "2019-10-20T08:10:12Z",
   "updated_at": "2020-02-08T20:17:27Z",
   "closed_at": "2020-02-08T20:17:27Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Following up on conversations with @JustinDrake and @djrtwo, in the [Eth1 Data](https://github.com/ethereum/eth2.0-specs/blob/v0.8.3/specs/validator/0_beacon-chain-validator.md#eth1-data) section of the honest validator guide there is the following:\r\n\r\n> Let get_eth1_data(distance: uint64) -> Eth1Data be the (subjective) function that returns the Eth 1.0 data at distance distance relative to the Eth 1.0 head at the start of the current Eth 1.0 voting period.\r\n\r\nI have two points regarding this text:\r\n\r\n### 1. Clarification\r\n\r\nI wanted to clarify that we're looking for something like this (excuse my shabby pseudo-python):\r\n\r\n```python\r\ndef entire_eth1_chain():\r\n  # Returns all blocks in the eth1 chain in ascending block.number order. Timestamps never decrease.\r\n\r\ndef get_eth1_data(distance):\r\n  time = state.genesis_time + eth1_voting_period_start_slot * SECONDS_PER_SLOT\r\n  last_block_number = [block.number for block in entire_eth1_chain() if block.timestamp >= time][0]\r\n  get_eth1_data_at_block_number(block_number - distance)\r\n```\r\n\r\nI think the primary thing to clarify here is that we observe eth1 block timing using timestamps, as opposed to \"looking at my wall clock when I first see a block\".\r\n\r\n### 2. Eth1 staleness\r\n\r\nA validators Eth1 node can go out of sync, perhaps it's on the wrong chain (eclipse attack) or it's _stale_ and hasn't seen a block in a long time.\r\n\r\nDetecting an eclipse attack is out-of-scope for honest validator guide IMO, but I'm interested in staleness. Particularily:\r\n\r\n1. How to detect when an eth1 node is stale.\r\n2. What to do when you're trying to produce a block on a stale node.\r\n\r\nPerhaps staleness could be defined as:\r\n\r\n```python\r\nimport time\r\n\r\nETH1_STALE_TIME_SECONDS = SLOTS_PER_ETH1_VOTING_PERIOD * 15\r\n\r\ndef eth1_chain_is_stale():\r\n  now = time.time()\r\n  entire_eth1_chain()[-1].timestamp + ETH1_STALE_TIME_SECONDS <= now\r\n```\r\n\r\nRegarding what to do, it's not so clear to me. Perhaps the block proposer should just decide they're unfit to produce and skip the slot -- this would halt the eth2 chain if the eth1 chain did go down for ~4hrs, _but_ that seems pretty unlikely and we'd probably be very socially aware if eth1 halted for even a minute. An alternative method would be to just vote junk like in #1431.",
   "closed_by": {
@@ -172,7 +172,7 @@
     },
     "created_at": "2019-10-29T03:12:03Z",
     "updated_at": "2019-10-29T03:12:03Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "> From that perspective tracking eth1 block numbers locally is a better approach.\r\n\r\nIn this case we still have issues with validators delaying eth2 deposit on-boarding. I don't think there's any scenario where the eth1 miners don't have the ability to suppress/delay/re-order transactions to the deposit contract.\r\n\r\nTracking the times that block numbers arrive locally means you need to have your validator (or some specialized eth1 service) online for 8-12hrs before you can actually start to produce blocks. That combined with using #1431 means that proposers are just going to vote junk data until they have an observation time for ~8hrs worth of blocks, starting from ~4hrs ago. If you use timestamps you can start producing valid eth1 data much faster.\r\n\r\n> There is a number of solutions to stabilize a source of eth1 data; it should be up to a user.\r\n\r\nI agree that it should be \"up to a user\" to determine how they obtain/stabilize their eth1 chain. What I'm trying to do here is establish best practices for when things that are very likely to go wrong (e.g., someones HTTP connection to an eth1 node) do indeed go wrong.\r\n\r\nI'm fine if there's no definition of staleness in the honest validator guide, but I do think there should be some advice about what to do if you don't have a sufficient connection to eth1. (e.g., should you produce junk eth1 data or just produce no blocks?).",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/547236966/reactions",
@@ -260,7 +260,7 @@
     },
     "created_at": "2019-11-04T05:51:53Z",
     "updated_at": "2019-11-04T05:51:53Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "#1464 is not directly related, but similar.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/549230853/reactions",
@@ -348,7 +348,7 @@
     },
     "created_at": "2020-02-08T01:46:43Z",
     "updated_at": "2020-02-08T01:46:43Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "This can be closed due to the new eth1 voting scheme :)",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/583687084/reactions",

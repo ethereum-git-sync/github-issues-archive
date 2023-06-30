@@ -832,7 +832,7 @@
     },
     "created_at": "2019-05-07T05:30:14Z",
     "updated_at": "2019-05-07T05:30:14Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "> > How about introducing namespacing for methods (similar to eth1)?\r\n> \r\n> @mpetrunic - This is a fantastic idea. I will introduce namespacing in my next revision of this API proposal.\r\n\r\nIf we roll with REST-HTTP (#1012) we can achieve this with urls (e.g., `/beacon/foo`, `/validator/bar`).",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/489914208/reactions",
@@ -1184,7 +1184,7 @@
     },
     "created_at": "2019-05-10T04:27:42Z",
     "updated_at": "2019-05-10T04:27:42Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "@mpetrunic good point! I have two potentially interesting thoughts around this:\r\n\r\n### Searching for pubkeys in the validator registry\r\nLighthouse also found this `O(n)` search problem whilst bench-marking deposits processing at large numbers of validators (300k, 4M). When processing a `Deposit`, you need to do the same search through the `validator_registry` to see if the validator already exists. We found this was massively blowing-up our block processing times so we ended up including a [public key cache](https://github.com/sigp/lighthouse/blob/master/eth2/types/src/beacon_state/pubkey_cache.rs) with our `BeaconState`.\r\n\r\nAs a result, we have a map hanging around to do `O(1)` lookups of `pubkey -> validator index` which suits this purpose perfectly.\r\n\r\n### ID'ing validators via pubkey vs. validator index\r\n\r\nThere is an argument that we could use the `validator_index` as a canonical reference to a specific validator, but I'm a little cautious of it because it seems like we might face edge-cases or design decisions that break the invariant that it's impossible for the same `validator_index` to point to a different `pubkey`.\r\n\r\nGiven that a `pubkey` is a really solid unique-ID for a validator, I'm tempted to rely upon it. IIRC @djrtwo was leaning towards `validator_index` so maybe he'd like to throw a hat in the ring.\r\n\r\nOf course, I'm keen to hear other's thoughts too.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/491151300/reactions",

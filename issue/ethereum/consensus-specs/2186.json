@@ -294,7 +294,7 @@
     },
     "created_at": "2021-01-19T21:17:58Z",
     "updated_at": "2021-01-19T21:17:58Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "I can chime in, however @michaelsproul has also had a lot of experience in this area.\r\n\r\nI'm happy to see the YAML files go. Just to be clear, I checked the PR and it seems we're dropping YAML where there's already an equivalent SSZ (plus a few extra cases), but we're keeping it for other metadata stuff (spec constants, etc). Can you please confirm @protolambda?\r\n\r\nFrom #2097:\r\n\r\n> The result is that the test generation outputs go from ~11 GB to ~0.5 GB. Generation time is also faster, since it reduces disk IO by a lot.\r\n\r\nIs this reduction primarily from dropping YAML? Also, is 0.5 GB the uncompressed size? (I assume so, my uncompressed specs dir is ~5GB.)\r\n\r\nI'm going assume we can achieve 0.5GB uncompressed. My suggestion is that we remove YAML but stick with the status quo of `.tar.gz` archives instead of snappy.\r\n\r\nThe current size of the test files is not a concern to me; Github Actions (CI) is fine with it and they fit easily on my computers. If we've dropped that size by 95%, then I think we've made a great gain and there's no outstanding need for a partial compression scheme (e.g. individually compressed files).",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/763147457/reactions",
@@ -426,7 +426,7 @@
     },
     "created_at": "2021-01-19T23:25:57Z",
     "updated_at": "2021-01-19T23:25:57Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "> If you just remove YAML, you go from 6.1 GB to 2 GB. Nice improvement, but not good enough long-term in my opinion.\r\n\r\nOh, yeah. So 0.5gb is still compressed with snappy on individual files.\r\n\r\n> I think we should prepare for 3x-5x the current size in tests if we keep the old approach, and have to dump uncompressed files somewhere on disk.\r\n\r\nPersonally, I'm not concerned about a 5x2gb = 10gb test suite. That's not going to break our CI and I can handle 10gb on all of my computers quite easily. Lighthouse is structured so you can opt in/out of running the spec tests; only developers who really want to do spec stuff need to download those tests. It's generally only our core-devs working on consensus logic who need these tests, everyone else just sees them pass on CI.\r\n\r\nI also don't really mind if we get a bit of a slow-down for snappy, I doubt it'll be very significant. Updating our CI and testing stuff would be an annoyance, but manageable.\r\n\r\nFrom my perspective, individual snappy compression is solving a problem that I don't have. But perhaps there's other users out there which are more affected by the large size and I'm OK with doing some work on my end to make their lives easier.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/763208366/reactions",

@@ -51,7 +51,7 @@
   "created_at": "2019-03-18T05:19:41Z",
   "updated_at": "2019-03-28T23:04:46Z",
   "closed_at": "2019-03-28T23:04:46Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "`state.latest_block_header.signature` is different between producing and processing a block and this is causing block processing to fail because of a mismatch on `block.state_root`.\r\n\r\n### Producing\r\n\r\nWhen calling `per_block_processing`, `state.latest_block_header.signature` is `EMPTY_SIGNATURE`.\r\n\r\nIt's impossible to have the real block signature here as you need the output of `per_block_processing(..)` (the updated state root) before you can produce the `state.latest_block_header.signature` and the value of `state.latest_block_header.signature` changes the state root, which changes the signature, and so on.\r\n\r\n### Processing\r\n\r\nWhen calling `per_block_processing`, `state.latest_block_header.signature` is (hopefully) a real block signature.",
   "closed_by": {
@@ -119,7 +119,7 @@
     },
     "created_at": "2019-03-18T05:43:36Z",
     "updated_at": "2019-03-18T05:47:33Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "Initially, I thought this could be fixed by ensuring that `get_temporary_block_header(..)` uses `EMPTY_SIGNATURE` instead of `block.signature`.\r\n\r\nHowever, that raises another issue: all the hashes in latest block roots are just hashes of:\r\n\r\n- `slot`\r\n- `previous_block_root`\r\n- `block_body_root`\r\n\r\nWe no longer have `signature`, which represented a ton of information (state root, fork, etc).\r\n\r\nI'm guessing this arose as a desire to remove `previous_block_root` as a parameter to `per_slot_processing`. Thinking about that some more, I'm not sure you can avoid passing the previous block (or its signature) to the next state if you want the block signatures in the state. If the block needs to sign across the state, it's impossible for the state to contain the block signature. Your only solution is to store the block signature and pass it into a state that isn't included in the block signature (the next state).",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/473777431/reactions",

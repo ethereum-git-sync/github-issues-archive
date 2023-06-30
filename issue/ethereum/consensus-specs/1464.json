@@ -43,7 +43,7 @@
   "created_at": "2019-11-04T04:57:16Z",
   "updated_at": "2019-11-08T18:16:33Z",
   "closed_at": "2019-11-08T18:16:32Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Part of the description for [Eth1 Data](https://github.com/ethereum/eth2.0-specs/blob/v0.9.0/specs/validator/0_beacon-chain-validator.md#eth1-data) voting is as follows:\r\n\r\n> Let `get_eth1_data(distance: uint64) -> Eth1Data` be the (subjective) function that returns the Eth1 data at distance distance relative to the Eth1 head at the start of the current Eth1 voting period. Let `previous_eth1_distance` be the distance relative to the Eth1 block corresponding to `state.eth1_data.block_hash` at the start of the current Eth1 voting period. An honest block proposer sets `block.eth1_data = get_eth1_vote(state, previous_eth1_distance)` where ...\r\n\r\nThis text uses the `state` variable twice:\r\n\r\n1. `state.eth1_data.block_hash` when determining `previous_eth1_distance`.\r\n1. ` get_eth1_vote(state, previous_eth1_distance)` when setting `block.eth1_data`.\r\n\r\nI claim that these two `state` variables must be distinct, otherwise, in the best-case voting scenario, an exception is raised (see \"_Empty `all_eth1_data` exception_\") .\r\n\r\nI think it comes down to the following line being unclear (imo):\r\n\r\n> Let `previous_eth1_distance` be the distance relative to the Eth1 block corresponding to `state.eth1_data.block_hash` at the start of the current Eth1 voting period.\r\n\r\nAnd to prevent the exception, it should become:\r\n\r\n> Let `prev_state` be the state at the start of the current Eth1 voting period. Let `previous_eth1_distance` be the distance between the Eth1 head at the start of the current Eth1 voting period and the Eth1 block corresponding to `prev_state.eth1_data.block_hash`\r\n\r\nHowever, what I suggested is still somewhat overwhelming to read. It's my opinion that the second paragraph of [Eth1 Data](https://github.com/ethereum/eth2.0-specs/blob/v0.9.0/specs/validator/0_beacon-chain-validator.md#eth1-data) should really be executable code instead of English.\r\n\r\n#### _Empty `all_eth1_data` exception_\r\n\r\nThis describes an exception that is raised when using the `state` at the current slot (i.e., the `state` for the block being produced) as inputs to both `get_eth1_vote(..)` and `previous_eth1_distance`:\r\n\r\n1. The first block proposer in the eth1 voting period chooses `get_eth1_data(ETH1_FOLLOW_DISTANCE)`.\r\n1. All subsequent block proposers select the same eth1 block.\r\n1. After ~`SLOTS_PER_ETH1_VOTING_PERIOD / 2` slots, `state.eth1_data` is set to  `get_eth1_data(ETH1_FOLLOW_DISTANCE)` (as per [`process_eth1_data`](https://github.com/ethereum/eth2.0-specs/blob/v0.9.0/specs/core/0_beacon-chain.md#eth1-data)).\r\n1. Next time `get_eth1_vote` is called, `len(all_eth1_data) == 0` because `previous_eth1_distance == ETH1_FOLLOW_DISTANCE`.\r\n1. The `lambda` in the `max` function raises a `ValueError` because `v` is not in `all_eth1_data`.",
   "closed_by": {
@@ -111,7 +111,7 @@
     },
     "created_at": "2019-11-04T04:57:51Z",
     "updated_at": "2019-11-04T05:26:03Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "~~This was an accidental submission, please give me some time finish it (and perhaps realize it's invalid).~~",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/549224899/reactions",
@@ -155,7 +155,7 @@
     },
     "created_at": "2019-11-04T05:25:52Z",
     "updated_at": "2019-11-04T05:25:52Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "Alrighty, I'm finished with this and would still like to raise it as an issue.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/549227880/reactions",

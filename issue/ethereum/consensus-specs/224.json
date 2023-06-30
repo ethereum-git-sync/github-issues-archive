@@ -51,7 +51,7 @@
   "created_at": "2018-12-04T06:03:08Z",
   "updated_at": "2019-02-13T00:58:24Z",
   "closed_at": "2019-02-13T00:58:24Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "I'm considering integer overflows in Lighthouse and there are cases where I'm making some assumptions about what I _think_ the spec means. \r\n\r\nFor example, consider this code in \"verify attestations\":\r\n\r\n> Verify that `attestation.data.slot <= block.slot - MIN_ATTESTATION_INCLUSION_DELAY`\r\n\r\nAs all of these variables are declared as `uint64` it would be fair to assume that we're going to see potential under-flows in the first few blocks and the behavior of the function will be significantly different depending on whether or not the subtraction saturates or under-flows.\r\n\r\nFrom my perspective it would be nice to see some explicitness around what to do in the case of overflows.\r\n\r\nOr maybe all overflow scenarios have been considered and I'm missing some other checks that are normalizing behavior?",
   "closed_by": {
@@ -163,7 +163,7 @@
     },
     "created_at": "2018-12-04T11:08:44Z",
     "updated_at": "2018-12-04T11:08:44Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "Thank you! :) I'll keep an eye out for your changes, then let you know if I notice any more.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/444062843/reactions",
@@ -471,7 +471,7 @@
     },
     "created_at": "2018-12-06T08:35:32Z",
     "updated_at": "2018-12-06T08:35:32Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "`attestation.data.slot` is \"user supplied input\" so we don't need our clocks to be trillions of years in the future to encounter the overflow introduced by swapping the underflow for an overflow . Someone just needs to craft a dodgy message.\r\n\r\nNaive saturation has the effect that `attestation.data.slot = 0` is always accepted when `block.slot < MIN_ATTESTATION_INCLUSION_DELAY`.\r\n\r\nAssuming we don't want any attestations until the `MIN_ATTESTATION_INCLUSION_DELAY`'th block, my suggestion would be:\r\n```\r\nattestation.data.slot < max(0, block.slot - MIN_ATTESTATION_INCLUSION_DELAY - 1)\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/444791132/reactions",
@@ -603,7 +603,7 @@
     },
     "created_at": "2018-12-11T10:50:54Z",
     "updated_at": "2018-12-11T10:50:54Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "> ```\r\n> attestation.data.slot < max(0, block.slot - MIN_ATTESTATION_INCLUSION_DELAY - 1)\r\n> ```\r\n> \r\n> This still underflows, but good point about distinguishing \"user data\" from internal state, that presumably no longer is tainted.\r\n\r\nI assumed here that the spec uses Python for code examples and that `block.slot` is a Python `int`. This assumption is certainly questionable as the spec also declares `block.slot` to be a `unit64`.\r\n\r\nThis raises an interesting point that the spec uses an effectively undefined type for all `uint<x>` variants. Whilst we can make reasonable assumptions about how a Python `'uint64'` behaves, AFAIK it is ultimately undefined. I'm not up to speed on this modern typed-Python stuff so maybe I'm missing something.\r\n\r\n> \r\n> The way forwards here might be to specify the semantics under no-overflow conditions / unbounded integers (still avoiding underflows), and address the issue in an appendix instead, that may or may not come with the spec.\r\n\r\nThis could work. We could also define \"saturating\" methods that assume the Python the `int` type. This keeps within the bounds of well-defined Python. I take inspiration from Rust's `u64::saturating_sub()` style terminology here.\r\n\r\n```\r\nattestation.data.slot < saturating_sub(block.slot - (MIN_ATTESTATION_INCLUSION_DELAY - 1))\r\n```\r\n\r\nAssuming `MIN_ATTESTATION_INCLUSION_DELAY > 0`. \r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/446158844/reactions",

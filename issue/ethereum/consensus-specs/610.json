@@ -60,7 +60,7 @@
   "created_at": "2019-02-12T08:00:30Z",
   "updated_at": "2019-03-12T12:04:08Z",
   "closed_at": "2019-03-12T12:04:08Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "I found it quite difficult to discern what the `winning_root` function is.\r\n\r\nMy initial confusion arose from the following:\r\n\r\n- It seems that `winning_root` takes `crosslink_committee` because it passes it to `attesting_validator_indices(...)`, however that function does not use it. \r\n- `winning_root(...)` takes `crosslink_committee` as an argument. When `winning_root` is called, it is passed `List[ValidatorIndex]` as the `crosslink_committee`. It was unclear to me where `shard` comes from.\r\n\r\nI came to the conclusion that `crosslink_committee` should really be `Tuple[List[ValidatorIndex], ShardNumber]` and that `shard` in `attesting_validator_indices(..)` is actually `crosslink_committee.shard` (See #609).\r\n\r\nThen, I just made a leap and figured that you're probably looking to pick the shard roots that have the most ETH voted for them.\r\n\r\nAs such, if you wanted to get the `winning_root` for some `shard`, you:\r\n\r\n- Let `attestations` be `current_epoch_attestations + previous_epoch_attestations`.\r\n- Let `shard_balances` be a map of `shard_block_root -> attesting_balance`.\r\n- For each `attestation` in `attestations` if `attestation.shard == shard`:\r\n   - Let `attesting_indices` be `get_attestation_participants(state, a.data, a.aggregation_bitfield)`.\r\n   - Let `attesting_balance` be `get_total_balance(state, attesting_indices)`\r\n   - Do `shard_balances[shard_block_root] += attesting_balance`.\r\n- Let `winning_root` be the `shard_block_root` with the highest `attesting_balance` (ties are broken by favoring lower `shard_block_root` values).\r\n\r\n## Summary\r\n\r\n- I found the definition of `winning_root` to be confusing.\r\n- Can you please confirm my understanding of the intention of the function is correct?",
   "closed_by": {
@@ -216,7 +216,7 @@
     },
     "created_at": "2019-02-13T21:15:18Z",
     "updated_at": "2019-02-13T21:15:38Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "MEMBER",
     "body": "Thanks for the feedback @hwwhww!\r\n\r\n>     3. Just to make it clear, in your approach:\r\n>        > * Do `shard_balances[shard_block_root] += attesting_balance`.\r\n>        \r\n>        \r\n>        It's \"Do `shard_balances[a.data.shard_block_root] += attesting_balance`.\", right?\r\n\r\nCorrect!\r\n\r\n> Agreed with Paul, I've brought up whether it's a good idea to use python code for `winning_root` but got pushed back\r\n\r\nAfter looking at the Python code I agree with @terenc3t's proposal for a Python definition of `winning_root`.\r\n\r\nEDIT: I am satisfied here, feel free to close if you wish.\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/463374351/reactions",

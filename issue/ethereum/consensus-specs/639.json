@@ -51,7 +51,7 @@
   "created_at": "2019-02-16T02:04:45Z",
   "updated_at": "2019-02-22T19:51:10Z",
   "closed_at": "2019-02-22T19:51:10Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Problem\r\n\r\n### Summary\r\n\r\nDuring `GENESIS_EPOCH`, `get_crosslink_committees_at_slot(..)` reads `state.previous_shuffling_epoch` when `epoch == current_epoch`.\r\n\r\n### Detail\r\n\r\n`get_crosslink_committees_at_slot(...)` first checks for `epoch == previous_epoch`, then checks for `epoch == current_epoch`.\r\n\r\nDuring the genesis epoch, `current_epoch == previous_epoch` and the function so uses `state.previous_shuffling_epoch == ZERO_HASH` for shuffling.\r\n\r\nDuring the next epoch (`GENESIS_EPOCH + 1`), when you wish to get the shuffling for `GENESIS_EPOCH`, you also trigger the `current_epoch == previous_epoch` path. However, `state.previous_shuffling_epoch != ZERO_HASH` anymore -- it is now the value that was set during `get_genesis_beacon_state(...)` (a.k.a. `current_shuffling_seed` during `GENESIS_EPOCH`).\r\n\r\n## Proposed Solutions\r\n\r\n1. (Preferred) Swap the `if` statements for so we first check for `epoch == current_epoch`, then `epoch == previous_epoch`.\r\n2. (Seems wrong) During `get_genesis_beacon_state(..)`  ensure `state.previous_shuffling_seed` is also set to `generate_seed(state, GENESIS_EPOCH)`.",
   "closed_by": {
