@@ -40,7 +40,7 @@
       "description": "Something to make Lighthouse run more efficiently."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "jimmygchen",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 8,
+  "comments": 9,
   "created_at": "2023-03-21T07:58:24Z",
-  "updated_at": "2023-05-31T07:09:20Z",
-  "closed_at": null,
+  "updated_at": "2023-06-30T04:20:01Z",
+  "closed_at": "2023-06-30T04:20:01Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nWhen applying a block to fork choice (i.e., adding the block to our in-memory block-tree that we use to select the canonical head), we run a subset of `per_epoch_processing` code to determine the \"unrealized\" justified and finalized checkpoints (a.k.a unrealized *FFG* checkpoints):\r\n\r\nhttps://github.com/sigp/lighthouse/blob/319cc61afeb1dbf3692e280dfa18e7b455542b16/consensus/fork_choice/src/fork_choice.rs#L855-L890\r\n\r\n### *Intermission for background info*\r\n\r\nFFG stands for \"friendly finality gadget\" and it's the method we use for determining finality on the beacon chain. A quick overview goes something like this when we're processing a block:\r\n\r\n- A block has attestations inside it.\r\n- When a block is applied to a state via [`process_block`](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/beacon-chain.md#block-processing), we call [`process_attestation`](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/beacon-chain.md#block-processing) for each attestation.\r\n- When we process an attestation we update either `state.current_epoch_participation` or `state.previous_epoch_participation` with some boolean values for each validator included in that attestation:\r\n   - Did the attestation correctly attest to the \"source\" (see `TIMELY_SOURCE_FLAG_INDEX`)\r\n   - Did the attestation correctly attest to the \"target\" (see `TIMELY_TARGET_FLAG_INDEX`)\r\n   - Did the attestation correctly attest to the \"head\" (see `TIMELY_HEAD_FLAG_INDEX`)\r\n   \r\nThen, when at the end of each epoch we run [`process_epoch`](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/beacon-chain.md#epoch-processing) which, in turn calls `process_justification_and_finalization` which then goes through the `state.current_epoch_participation` and `state.previous_epoch_participation` lists and reduces them into three gwei balances:\r\n\r\n- `total_active_balance`: the sum of the *effective balances* of all active validators.\r\n- `previous_target_balance`: the subset of `total_active_balance` which received a `TIMELY_TARGET_FLAG_INDEX` for an attestation from the *previous* epoch.\r\n- `current_target_balance`: the subset of `total_active_balance` which received a `TIMELY_TARGET_FLAG_INDEX` for an attestation from the *current* epoch.\r\n\r\nThen, we put those three values into [`weigh_justification_and_finalization`](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#justification-and-finalization) to determine if we have enough validator weight voting for the target that we can progress (i.e. increment) the `state.current_justified_checkpoint` or the `state.finalized_checkpoint`.\r\n\r\nWe call the `state.current_justified_checkpoint` and `state.finalized_checkpoint` the *realized FFG checkpoints*, because there also implicitly exists the *unrealized FFG checkpoints*. Let's look at those now.\r\n\r\nSince we only need 2/3rds of validators voting to the target in the current epoch to increase the `state.current_justified_checkpoint`, it follows that we could accrue all those votes in the first ~2/3rd blocks of an epoch even if the rest of the blocks in the epoch were skipped. When we have processed enough blocks with enough attestations to increase our FFG checkpoints during `process_epoch` *even if we never process another block*, then we say that we have \"unrealized\" FFG progression.\r\n\r\nIt turns out that this unrealized FFG progression is quite important and if we're choosing between two blocks to be the head of the canonical chain and one of them has higher FFG progression than another, then we probably want to pick that one.\r\n\r\n## Back to the optimisation\r\n\r\nSo, what we're doing each time we apply a block to fork choice is converting the `state.previous_epoch_participation` and `state.current_epoch_participation` values into gwei values and then checking to see if they're enough to progress our FFG checkpoints.\r\n\r\nThis is wasteful since we're actually doing repeat iterations over the epoch participation arrays for each block we receive. What we *could* do is add a cache onto the `BeaconState` and then maintain an additional three gwei values to track the running `total_active_balance`, `previous_target_balance` and `current_target_balance` that we would *usually* compute at the end of the epoch. I believe we would update those running values when we're [iterating through the attesting indices in `process_attestation`](https://github.com/sigp/lighthouse/blob/319cc61afeb1dbf3692e280dfa18e7b455542b16/consensus/state_processing/src/per_block_processing/process_operations.rs#L149-L168).\r\n\r\nI see the main tasks with this implementation being:\r\n\r\n1. Implementing the incremental balance calculation and testing it.\r\n1. Figuring out how to neatly attach the cache to the `BeaconState` and make sure it's available for fork choice.\r\n1. Handling the fact that *if* we decide to write this cache to disk, then any states that are already in the database won't have the cache.\r\n    1. If we don't decide to write the cache to the DB, we'll have to handle the case where we load a mid-epoch state from disk which is cache-less.\r\n1. Handling the cases when the cache *isn't* available to fork choice (we probably just revert back to the current method).\r\n\r\nI believe that all the other clients (definitely Teku and Prysm) have this implemented, so perhaps reading their impls would be a good place to start.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4118/reactions",
     "total_count": 2,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4118/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -457,6 +476,50 @@
       "hooray": 0,
       "confused": 0,
       "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1614097410",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4118#issuecomment-1614097410",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4118",
+    "id": 1614097410,
+    "node_id": "IC_kwDOCFeAzc5gNSwC",
+    "user": {
+      "login": "paulhauner",
+      "id": 6660660,
+      "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/paulhauner",
+      "html_url": "https://github.com/paulhauner",
+      "followers_url": "https://api.github.com/users/paulhauner/followers",
+      "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+      "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+      "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+      "repos_url": "https://api.github.com/users/paulhauner/repos",
+      "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-30T04:20:01Z",
+    "updated_at": "2023-06-30T04:20:01Z",
+    "author_association": "MEMBER",
+    "body": "Resolved via #4362 🎉 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1614097410/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 1,
       "rocket": 0,
       "eyes": 0
     },
