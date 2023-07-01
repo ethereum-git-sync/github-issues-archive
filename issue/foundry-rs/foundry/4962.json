@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-05-17T16:18:20Z",
-  "updated_at": "2023-06-10T17:59:04Z",
-  "closed_at": null,
+  "updated_at": "2023-07-01T01:18:13Z",
+  "closed_at": "2023-07-01T01:18:13Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (6defdce 2023-05-17T00:12:17.009064000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nWhen creating a binance mainnet fork in my test file, if I specify a block number with `vm.createFork`, the following error message appears:\r\n```\r\n2023-05-17T16:09:17.302491Z ERROR sharedbackend: Failed to send/recv `basic` err=GetAccount(0x5615deb798bb3e4dfa0139dfa1b3d433cc23b72f, \r\n(code: -32000, message: missing trie node b7416b956ad63992bbcd79fce8a5a2272fe012db291728210ea033abdd44e21c (path ), data: None)) address=0x5615deb798bb3e4dfa0139dfa1b3d433cc23b72f\r\n2023-05-17T16:09:17.385844Z ERROR sharedbackend: Failed to send/recv `basic` err=GetAccount(0x5615deb798bb3e4dfa0139dfa1b3d433cc23b72f, \r\n(code: -32000, message: missing trie node b7416b956ad63992bbcd79fce8a5a2272fe012db291728210ea033abdd44e21c (path ), data: None)) address=0x5615deb798bb3e4dfa0139dfa1b3d433cc23b72f\r\nThe application panicked (crashed).\r\nMessage:  called `Option::unwrap()` on a `None` value\r\nLocation: /Users/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/revm-3.1.1/src/journaled_state.rs:133\r\n\r\nThis is a bug. Consider reporting it at https://github.com/foundry-rs/foundry\r\n\r\nBacktrace omitted. Run with RUST_BACKTRACE=1 environment variable to display it.\r\nRun with RUST_BACKTRACE=full to include source snippets.\r\n```\r\nNote that, If no block number is specified in `vm.createFork`, no error message appears and fork is created and run successfully. So the issue seems to only arise when a block number is input. My json-rpc url is provided by ChainStack.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/4962/reactions",
     "total_count": 1,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4962/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "Hi @bzpassersby , thanks for reporting this! I've managed to reproduce the error. \r\n\r\nThe root cause of the issue is that the ChainStack RPC service doesn't provide [archive nodes](https://ethereum.org/en/developers/docs/nodes-and-clients/archive-nodes/) for their free tier, but forking from older blocks is only supported with archive nodes. If you need to fork from a specific block, you could try try to upgrade your ChainStack plan or use a different provider such as Alchemy, Ankr or Infura that provide archive nodes for free for development.\r\n\r\nI'm working on a PR to improve error reporting when a user tries to fork from an older block with a non-archive node.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1585755420/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1615329601",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/4962#issuecomment-1615329601",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/4962",
+    "id": 1615329601,
+    "node_id": "IC_kwDOGBlvNc5gR_lB",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-01T01:18:13Z",
+    "updated_at": "2023-07-01T01:18:13Z",
+    "author_association": "MEMBER",
+    "body": "Closing—this was improved recently and is an RPC issue fundamentally.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1615329601/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
