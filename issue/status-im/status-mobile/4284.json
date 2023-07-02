@@ -107,7 +107,7 @@
   "created_at": "2018-05-15T16:08:27Z",
   "updated_at": "2018-06-04T11:09:29Z",
   "closed_at": "2018-06-04T11:09:29Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "If users try to add an existing account that they already imported, but with a different password, they are stuck in the \"recover\" screen and they don't receive any error.\r\n\r\nError printed in the logs:\r\n```\r\n:account-recovered {\"address\":\"xxx\",\"pubkey\":\"\",\"mnemonic\":\"x y z\",\"error\":\"could not decrypt key with given passphrase\"}\r\n```\r\n\r\nSteps to reproduce it:\r\n\r\n1. Create a new account with password `000000`\r\n2. Copy your 12 mnemonic words\r\n3. Log out\r\n4. Click on \"Add existing account\"\r\n5. Use the 12 mnmonic words taken on step 2, and use password `111111` (different from the previous one)\r\n6. You are stuck on that screen without any error message.\r\n\r\nReason:\r\n\r\n`status-go` does the following:\r\n\r\n1. receives the 12 words\r\n2. generates the keys\r\n3. derives the address\r\n4. check if the address is already imported\r\n5. if it is, it tries to decrypt the key with password `111111`\r\n6. it fails because it's been previously encrypted with password `000000`\r\n\r\nOne quick solution can be showing an error to the user, but we should ask UX/UI team.",
   "closed_by": {
