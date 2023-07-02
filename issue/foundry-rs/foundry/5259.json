@@ -30,7 +30,33 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 3394554570,
+      "node_id": "LA_kwDOGBlvNc7KVMrK",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/A-fuzzing",
+      "name": "A-fuzzing",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Area: fuzzing"
+    },
+    {
+      "id": 3593644915,
+      "node_id": "LA_kwDOGBlvNc7WMqtz",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/Cmd-forge-test",
+      "name": "Cmd-forge-test",
+      "color": "006B75",
+      "default": false,
+      "description": "Command: forge test"
+    },
+    {
+      "id": 3703752787,
+      "node_id": "LA_kwDOGBlvNc7cwshT",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/C-forge",
+      "name": "C-forge",
+      "color": "5319E7",
+      "default": false,
+      "description": "Command: forge"
+    }
   ],
   "state": "open",
   "locked": false,
@@ -39,9 +65,9 @@
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-06-29T20:25:35Z",
-  "updated_at": "2023-06-30T18:23:15Z",
+  "updated_at": "2023-07-02T13:56:07Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -228,6 +254,50 @@
     "body": "I mean `assert` as in the native solidity method. I believe the issue is indeed related to #4718.\r\n\r\nThe reason why I need `assert` instead of `assertEq` is that I am trying to use BOTH echidna and foundry on the same invariant tests in order to avoid code repetition.\r\n\r\nYou can take a look at my [test suite here](https://github.com/aviggiano/fuzzer-evaluation/tree/main/protocols/uniswap-v2/test).\r\n\r\nBasically, I have a `FoundryInvariantTests.sol` contract that extends from `forge-std/Test.sol`, and that contract deploys [`targetContract`s](https://github.com/aviggiano/fuzzer-evaluation/blob/main/protocols/uniswap-v2/test/FoundryInvariantTests.t.sol#L22) to be fuzzed by foundry. \r\n\r\nThen, it uses handlers that call Uniswap v2 contracts (such as `UniswapV2Pair`), which has itself some `require`s. \r\n\r\nFor example, Uniswap will revert when trying to swap 0 tokens, with the following message: `UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT`.\r\n\r\nI do not want foundry to fail on this error.\r\n\r\nThe reason is that my handler is already returning return value of the proxy call (e.g. with [`address(_target).call(_calldata)`](https://github.com/aviggiano/fuzzer-evaluation/blob/main/protocols/uniswap-v2/test/User.sol#L12)) to the `targetContract`\r\n\r\nThis is why differentiating between `Panic(uint256)` and `Error(string)` would be useful.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1614783235/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1616671749",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5259#issuecomment-1616671749",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5259",
+    "id": 1616671749,
+    "node_id": "IC_kwDOGBlvNc5gXHQF",
+    "user": {
+      "login": "mds1",
+      "id": 17163988,
+      "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mds1",
+      "html_url": "https://github.com/mds1",
+      "followers_url": "https://api.github.com/users/mds1/followers",
+      "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+      "organizations_url": "https://api.github.com/users/mds1/orgs",
+      "repos_url": "https://api.github.com/users/mds1/repos",
+      "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mds1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-02T13:56:06Z",
+    "updated_at": "2023-07-02T13:56:06Z",
+    "author_association": "COLLABORATOR",
+    "body": "I see, thanks for the explanation.\r\n\r\nAs of echidna v2.1.1 there should be compatibility with foundry style invariant tests (search \"foundry\" on echidna releases page), so I don't think any changes to foundry should be required for this goal.\r\n\r\nRegardless, my hesitation around supporting this is that it feels like a dangerous distinction, and I don't know why you'd want to rely on it: A test assertion failure such as `assert(x * y == k)` is [indistinguishable](https://docs.soliditylang.org/en/latest/control-structures.html#panic-via-assert-and-error-via-require) from a solidity-generated assertion failure (e.g. arithmetic overflow). The latter feels like you'd want it to be ignored, otherwise e.g. large values generated by the fuzzer are considered assertion failures of the same kind as `assert(x * y == k)` failures. Whereas a test assertion failure from `assertEq` is unambiguous.\r\n\r\nAm I misunderstanding something about how echidna works? It seems odd that they're ok with not being able to distinguish those two types of reverts. \r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1616671749/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
