@@ -280,15 +280,15 @@
     "body": "I recently put together a script to show how this can be done by inspecting the events of the ERC721 contract, originally posted in https://github.com/OpenZeppelin/openzeppelin-contracts/issues/2563#issuecomment-791979493. The code is for Ethers but can be easily ported to Web3.js.\r\n\r\n```javascript\r\nasync function listTokensOfOwner({ token: tokenAddress, account }) {\r\n  const token = await ethers.getContractAt(ERC721.abi, tokenAddress, ethers.provider);\r\n\r\n  console.error(await token.name(), 'tokens owned by', account);\r\n\r\n  const sentLogs = await token.queryFilter(\r\n    token.filters.Transfer(account, null),\r\n  );\r\n  const receivedLogs = await token.queryFilter(\r\n    token.filters.Transfer(null, account),\r\n  );\r\n\r\n  const logs = sentLogs.concat(receivedLogs)\r\n    .sort(\r\n      (a, b) =>\r\n        a.blockNumber - b.blockNumber ||\r\n        a.transactionIndex - b.TransactionIndex,\r\n    );\r\n\r\n  const owned = new Set();\r\n\r\n  for (const log of logs) {\r\n    const { from, to, tokenId } = log.args;\r\n    \r\n    if (addressEqual(to, account)) {\r\n      owned.add(tokenId.toString());\r\n    } else if (addressEqual(from, account)) {\r\n      owned.delete(tokenId.toString());\r\n    }\r\n  }\r\n\r\n  console.log([...owned].join('\\n'));\r\n};\r\n```\r\n\r\n![console output](https://user-images.githubusercontent.com/481465/110213055-29122980-7e7d-11eb-87b2-87e4338ea206.png)\r\n\r\nThe code is in [frangio/erc721-list](https://github.com/frangio/erc721-list).",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/799623364/reactions",
-      "total_count": 23,
-      "+1": 17,
+      "total_count": 26,
+      "+1": 18,
       "-1": 0,
       "laugh": 0,
       "hooray": 6,
-      "confused": 0,
+      "confused": 1,
       "heart": 0,
       "rocket": 0,
-      "eyes": 0
+      "eyes": 1
     },
     "performed_via_github_app": null
   },
