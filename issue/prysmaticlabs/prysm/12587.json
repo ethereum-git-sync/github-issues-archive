@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12587",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12587/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12587/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12587/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12587",
+  "id": 1784838071,
+  "node_id": "I_kwDOBvuov85qYne3",
+  "number": 12587,
+  "title": "Make Prysm unit tests great again",
+  "user": {
+    "login": "terencechain",
+    "id": 21316537,
+    "node_id": "MDQ6VXNlcjIxMzE2NTM3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21316537?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/terencechain",
+    "html_url": "https://github.com/terencechain",
+    "followers_url": "https://api.github.com/users/terencechain/followers",
+    "following_url": "https://api.github.com/users/terencechain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/terencechain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/terencechain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/terencechain/subscriptions",
+    "organizations_url": "https://api.github.com/users/terencechain/orgs",
+    "repos_url": "https://api.github.com/users/terencechain/repos",
+    "events_url": "https://api.github.com/users/terencechain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/terencechain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3533498087,
+      "node_id": "LA_kwDOBvuov87SnObn",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Merge",
+      "name": "Merge",
+      "color": "92E643",
+      "default": false,
+      "description": "PRs related to the great milestone the merge"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-02T20:29:33Z",
+  "updated_at": "2023-07-02T20:29:33Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Opening this issue to track current unit tests weakness more granularly.  I'll categorize them on several points, and please add more if anyone has more.\r\n\r\n1.) These unit tests are flakey. Here are the flakey ones we've seen. Flakey tests are often a drain to test time which leads to productivity loss \r\n```\r\n//beacon-chain/monitor:go_default_test                                   FAILED in 9.4s\r\n//beacon-chain/operations/attestations:go_default_test                   FAILED in 0.9s\r\n//beacon-chain/operations/attestations/kv:go_default_test                FAILED in 0.4s\r\n//beacon-chain/rpc/prysm/v1alpha1/validator:go_default_test              FAILED in 6.4s\r\n//beacon-chain/sync/initial-sync:go_default_test                         FAILED in 174.0s\r\n//beacon-chain/sync/initial-sync:go_raceon_test                          FAILED in 4.2s\r\n//testing/endtoend/components:go_default_test                            FAILED in 30.5s\r\n```\r\n\r\n2.) These unit tests timeout due to test size config. As we add more unit tests, we might need to invest why the increased of the time rather than update the bazel config\r\n```\r\n//validator/client:go_default_test                                      TIMEOUT in 60.0s\r\n```\r\n\r\n3.) These tests often take too long and can be reduced which I'll go over on (4)\r\n```\r\n//beacon-chain/blockchain:go_raceoff_test                                PASSED in 51.6s\r\n//async:go_default_test                                                  PASSED in 13.8s\r\n//beacon-chain/core/altair:go_default_test                               PASSED in 31.9s\r\n//beacon-chain/p2p:go_default_test                                       PASSED in 19.5s\r\n//beacon-chain/rpc/eth/beacon:go_default_test                            PASSED in 24.2s\r\n//beacon-chain/rpc/eth/validator:go_default_test                         PASSED in 33.6s\r\n//beacon-chain/slasher:go_default_test                                   PASSED in 32.7s\r\n//beacon-chain/state/stategen:go_default_test                            PASSED in 14.7s\r\n//cmd/validator/accounts:go_default_test                                 PASSED in 20.9s\r\n//time/slots:go_default_test                                             PASSED in 21.8s\r\n//beacon-chain/core/blocks:go_default_test                               PASSED in 29.8s\r\n//beacon-chain/core/helpers:go_default_test                              PASSED in 76.7s\r\n//beacon-chain/sync:go_default_test                                      PASSED in 36.7s\r\n//beacon-chain/sync/initial-sync:go_default_test                         PASSED in 121s\r\n```\r\n\r\n4.) As I look into this issue, low-hanging fruit to reduce test time without sacrificing test quality is to cache deterministic generated deposits and keys. On a fast computer, generating 2048 keys took 800ms, and 16384 keys took 10s. We don't need to cache 16384 keys, but in the most common cases, tests use 2048 keys, and there are. We can quickly reduce `bazel test //...` time by 5-10mins here.\r\n\r\nNote: `DeterministicGenesisState` does have `cachedDeposits`, but it never worked. On every new test run, the cache gets reset to empty",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12587/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12587/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
