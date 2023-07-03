@@ -775,8 +775,8 @@
     "body": "I like YieldBox's approach. As @Amxx said, it is essentially a virtual initial deposit that is locked forever (as long as the offset is immutable). So it can effectively mitigate both this issue and #3800 at no cost (zero \"security budget\")!\r\n\r\nHowever, in its current form, I don't think it properly handles the _negative_ interest case. Suppose that a vault deploys its assets to under-collateralized lending protocols (for better APY) and later some of their loans become default, resulting in a loss of principal, i.e., totalAssets < totalSupply. Now, suppose that all the users attempt to withdraw all their (remaining) assets. Then, the last few unlucky users will never be able to withdraw, and their shares will be permanently locked.\r\n\r\nFor example, after the loss of principal, suppose that totalAssets = 1e18, totalSupply = 3e18, and assetOffset = supplyOffset = 1e18, where Alice, Bob, and Charlie's share is equally 1e18 respectively. Suppose Alice and Bob redeem all their shares, then they will get 5e17 respectively. Later, Charlie attempts to redeem his shares, but it will revert because the vault's real balance is zero, and asset transfer will fail (even if convertToAsset(1e18) = 5e17 = 1e18 * (0 + 1e18) / (1e18 + 1e18)).\r\n\r\nSimply put, the \"virtual initial depositor\" can only gain but not lose, so some real users (i.e., the last remaining users) will lose more than they should, if not all, in case of negative interest.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1304420140/reactions",
-      "total_count": 3,
-      "+1": 3,
+      "total_count": 4,
+      "+1": 4,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
