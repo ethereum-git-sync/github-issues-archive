@@ -1,8 +1,137 @@
 {
-  "message": "API rate limit exceeded for user ID 93719879.",
-  "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3599",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3599/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3599/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3599/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/3599",
+  "id": 1550656524,
+  "node_id": "I_kwDOB7jojM5cbSQM",
+  "number": 3599,
+  "title": "Add hardhat_dumpState and hardhat_loadState RPC methods",
+  "user": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 947230177,
+      "node_id": "MDU6TGFiZWw5NDcyMzAxNzc=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:blocked",
+      "name": "status:blocked",
+      "color": "0E8A16",
+      "default": false,
+      "description": "Blocked by other issues or external reasons"
+    },
+    {
+      "id": 947232611,
+      "node_id": "MDU6TGFiZWw5NDcyMzI2MTE=",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:feature",
+      "name": "type:feature",
+      "color": "FBCA04",
+      "default": false,
+      "description": "Feature request"
+    },
+    {
+      "id": 4745762096,
+      "node_id": "LA_kwDOB7jojM8AAAABGt6VMA",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/blocked-reason:needs-rethnet",
+      "name": "blocked-reason:needs-rethnet",
+      "color": "B60205",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-01-20T10:52:06Z",
+  "updated_at": "2023-06-02T16:21:16Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Continuation of #2425.\r\n\r\nThese methods already exist in Anvil, and we want to use the same format that is used there (both for compatibility reasons and because it's not tied to any implementation details).\r\n\r\nThis format, as far as I can tell, is this object:\r\n\r\n```json\r\n{\r\n  \"accounts\": {\r\n    \"0x0000000000000000000000000000000000000000\": {\r\n      \"nonce\": 0,\r\n      \"balance\": \"0xa1f24a420c00\",\r\n      \"code\": \"0x\",\r\n      \"storage\": {}\r\n    },\r\n    \"0x5fbdb2315678afecb367f032d93f642f64180aa3\": {\r\n      \"nonce\": 1,\r\n      \"balance\": \"0x0\",\r\n      \"code\": \"0x608060405234801561001057600080fd5b50600436106100365760003560e01c80630c55699c1461003b578063371303c014610059575b600080fd5b610043610063565b604051610050919061009b565b60405180910390f35b610061610069565b005b60005481565b60008081548092919061007b906100e5565b9190505550565b6000819050919050565b61009581610082565b82525050565b60006020820190506100b0600083018461008c565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b60006100f082610082565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8203610122576101216100b6565b5b60018201905091905056fea2646970667358221220ce715c269a6493f974b0599f932508687267018b4e3881d45acf952eac8aa45364736f6c63430008110033\",\r\n      \"storage\": {\r\n        \"0x0\": \"0x2\"\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nBut stringified and hex-encoded.\r\n\r\nAs with the Anvil implementation, loading the state should merge it with the current state, not completely override it. That is: existing accounts/state slots that are not part of the loaded state shouldn't be erased. Also, this will only work for local (non-forked) instances, at least at the beginning.\r\n\r\n---\r\n\r\nImplementing this right now is hard because we can't enumerate the list of accounts from the state Trie (because we are using key hashing). So the alternative would be to wrap the state manager to keep track of all the modifications.\r\n\r\nSince that would be risky and not straightforward to do, and it's something we'll throw away after adding rethnet, I think we should wait until rethnet is ready to do this.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3599/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3599/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
 }
-{
-  "message": "API rate limit exceeded for user ID 93719879.",
-  "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
-}
+[
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1574003539",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/3599#issuecomment-1574003539",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3599",
+    "id": 1574003539,
+    "node_id": "IC_kwDOB7jojM5d0WNT",
+    "user": {
+      "login": "netzulo",
+      "id": 11871932,
+      "node_id": "MDQ6VXNlcjExODcxOTMy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11871932?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/netzulo",
+      "html_url": "https://github.com/netzulo",
+      "followers_url": "https://api.github.com/users/netzulo/followers",
+      "following_url": "https://api.github.com/users/netzulo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/netzulo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/netzulo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/netzulo/subscriptions",
+      "organizations_url": "https://api.github.com/users/netzulo/orgs",
+      "repos_url": "https://api.github.com/users/netzulo/repos",
+      "events_url": "https://api.github.com/users/netzulo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/netzulo/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-06-02T16:21:15Z",
+    "updated_at": "2023-06-02T16:21:15Z",
+    "author_association": "NONE",
+    "body": "was looking for continuation of 2425, thank you in advance.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1574003539/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]
