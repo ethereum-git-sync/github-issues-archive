@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-06-26T17:26:41Z",
-  "updated_at": "2023-06-26T17:36:45Z",
-  "closed_at": null,
+  "updated_at": "2023-07-03T17:09:54Z",
+  "closed_at": "2023-07-03T17:09:53Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (2e18681 2023-06-26T00:15:26.624789000Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nwith contract:\r\n\r\n```\r\n// SPDX-License-Identifier: Unlicense\r\npragma solidity 0.8.19;\r\n\r\ncontract PairCreate2 {\r\n    address token0 = address(1);\r\n    address token1 = address(2);\r\n    address token2 = address(3);\r\n\r\n    function get() public view returns (bytes32) {\r\n        return keccak256(abi.encode(token0, token1, token2));\r\n    }\r\n}\r\n```\r\n\r\nwhen I run:\r\n```\r\nbytes32 codeHash = keccak256(abi.encodePacked(type(PairCreate2).creationCode));\r\n```\r\n\r\nI'm getting \r\n- `0xfa89e78a3ca345c172b534c026da629c2d6c95c082c0ee1513de40ce094d3ddd` on local (MacOS)\r\n- `0x5b602d45fd57b8eb570c29f924207a8c71178821f47c383902a09e96e5101280 ` on github Action\r\n\r\nturns out it is because creation code is different:\r\n```\r\n# on local\r\n0x6080604052600080546001600160a01b03199081166001908117909255815481166002908117909255815416600317905534801561003c57600080fd5b5060c38061004b6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80636d4ce63c14602d575b600080fd5b607b60008054600154600254604080516001600160a01b0394851660208201529284169083015291909116606082015260800160405160208183030381529060405280519060200120905090565b60405190815260200160405180910390f3fea2646970667358221220933cc20e5944098fc221ea6911d04c45b160e44c25d2e5e84b33ce11fdd0441764736f6c63430008130033\r\n```\r\n\r\n```\r\n# in github Action\r\n0x6080604052600080546001600160a01b03199081166001908117909255815481166002908117909255815416600317905534801561003c57600080fd5b5060c38061004b6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80636d4ce63c14602d575b600080fd5b607b60008054600154600254604080516001600160a01b0394851660208201529284169083015291909116606082015260800160405160208183030381529060405280519060200120905090565b60405190815260200160405180910390f3fea26469706673582212205c814b3dcdbc82f57524b8e65ef6adaf93577ed4b599811836ff63c8d53992f364736f6c63430008130033\r\n```\r\n\r\nso for some reason creation code (small part of it) for the same contract differs:\r\n```\r\n...933cc20e5944098fc221ea6911d04c45b160e44c25d2e5e84b33ce11fdd04417...\r\nVS \r\n...5c814b3dcdbc82f57524b8e65ef6adaf93577ed4b599811836ff63c8d53992f3...\r\n```\r\n\r\nin CI I'm using always recent version of foundry:\r\n```\r\n      - name: Install Foundry\r\n        uses: foundry-rs/foundry-toolchain@v1\r\n        with:\r\n          version: nightly\r\n```\r\n\r\nand on local I just updated to recent:\r\n```\r\nfoundryup: installing foundry (version nightly, tag nightly-2e1868193aa22096ba8778a6ba4ac5aae5806a32)\r\nfoundryup: downloading latest forge, cast, anvil, and chisel\r\n######################################################################################################################################################################################################### 100.0%\r\nfoundryup: downloading manpages\r\n######################################################################################################################################################################################################### 100.0%\r\nfoundryup: installed - forge 0.2.0 (2e18681 2023-06-26T00:15:26.624789000Z)\r\nfoundryup: installed - cast 0.2.0 (2e18681 2023-06-26T00:15:26.624789000Z)\r\nfoundryup: installed - anvil 0.1.0 (2e18681 2023-06-26T00:15:48.317978000Z)\r\nfoundryup: installed - chisel 0.1.1 (2e18681 2023-06-26T00:15:48.448996000Z)\r\n```\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5219/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5219/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1618902209",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5219#issuecomment-1618902209",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5219",
+    "id": 1618902209,
+    "node_id": "IC_kwDOGBlvNc5gfnzB",
+    "user": {
+      "login": "mds1",
+      "id": 17163988,
+      "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mds1",
+      "html_url": "https://github.com/mds1",
+      "followers_url": "https://api.github.com/users/mds1/followers",
+      "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+      "organizations_url": "https://api.github.com/users/mds1/orgs",
+      "repos_url": "https://api.github.com/users/mds1/repos",
+      "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mds1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-03T17:09:53Z",
+    "updated_at": "2023-07-03T17:09:53Z",
+    "author_association": "COLLABORATOR",
+    "body": "This is the solidity metadata hash, you can learn more about it below. Both creation codes are identical except for a hash of the metadata. Metadata hash is not executable code so the actual executable code is identical\r\n- https://docs.soliditylang.org/en/latest/metadata.html\r\n- https://book.getfoundry.sh/reference/config/solidity-compiler#bytecode_hash",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1618902209/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
