@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "asdacap",
@@ -79,12 +79,31 @@
   "milestone": null,
   "comments": 13,
   "created_at": "2023-03-30T18:06:37Z",
-  "updated_at": "2023-04-19T17:04:05Z",
-  "closed_at": null,
+  "updated_at": "2023-07-03T07:20:52Z",
+  "closed_at": "2023-07-03T07:20:52Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "I am trying to sync a full Archive node of Mainnet, and have been doing so for approx. 1.5 months. I am currently about Dec 2021, and block speed has fallen slowly to a crawl at <0.5BPS.\r\n\r\nI am asking for some empirical data from those who have synced Mainnet in Archive mode, is this speed to be expected on modern hardware, or is something wrong with my configuration?\r\n\r\nExample Block Process:\r\n`2023-03-30 18:34:49.7610|Processed   13749184 |    1,401ms of   1,401ms, mgasps   29.00 total   14.47, tps  461.78 total  220.68, bps    0.71 total    0.47, recv queue 4971, proc queue 2000`\r\n\r\nNethermind Version: `v1.17.3`.\r\nOS: `Windows 11`\r\nHardware: `Ryzen 7950X` (so 16 core, 32 thread) with `128GB RAM`\r\n\r\nI am using the standard mainnet_archive.cfg configuration:\r\n```\r\n\"MemoryHint\": 2048000000\r\n\"Pruning\": {\r\n    \"Mode\": \"None\"\r\n```\r\n\r\n\r\nThe disk drives are a RAID0 tiered stripe of 2x 4TB NVMe, and 2x 8TB SSD, giving 22TB of space.\r\n\r\nHere is an output for run of DISKSPD with the usual settings for determining general IOPS:\r\n\r\n```\r\nD:\\diskspd_test\\diskspd.exe -b8K -d60 -o32 -t8 -h -r -w25 -L -c10G D:\\dskspd_test\\1\r\n\r\nTotal IO\r\nthread |       bytes     |     I/Os     |    MiB/s   |  I/O per s |  AvgLat  | LatStdDev |  file\r\n-----------------------------------------------------------------------------------------------------\r\n     0 |     23661674496 |      2888388 |     376.00 |   48128.33 |    0.664 |     0.420 | D:\\dskspd_test\\1 (10240MiB)\r\n     1 |     22893346816 |      2794598 |     363.79 |   46565.54 |    0.687 |     0.425 | D:\\dskspd_test\\1 (10240MiB)\r\n....\r\n     7 |     23454048256 |      2863043 |     372.70 |   47706.02 |    0.670 |     0.416 | D:\\dskspd_test\\1 (10240MiB)\r\n-----------------------------------------------------------------------------------------------------\r\ntotal:      183708631040 |     22425370 |    2919.27 |  373667.13 |    0.685 |     0.479\r\n\r\nRead IO\r\nthread |       bytes     |     I/Os     |    MiB/s   |  I/O per s |  AvgLat  | LatStdDev |  file\r\n-----------------------------------------------------------------------------------------------------\r\n     0 |     17741996032 |      2165771 |     281.93 |   36087.58 |    0.685 |     0.427 | D:\\dskspd_test\\1 (10240MiB)\r\n     1 |     17168326656 |      2095743 |     272.82 |   34920.73 |    0.707 |     0.436 | D:\\dskspd_test\\1 (10240MiB)\r\n....\r\n     7 |     17587281920 |      2146885 |     279.48 |   35772.89 |    0.691 |     0.426 | D:\\dskspd_test\\1 (10240MiB)\r\n-----------------------------------------------------------------------------------------------------\r\ntotal:      137766076416 |     16817148 |    2189.21 |  280219.03 |    0.706 |     0.489\r\n\r\nWrite IO\r\nthread |       bytes     |     I/Os     |    MiB/s   |  I/O per s |  AvgLat  | LatStdDev |  file\r\n-----------------------------------------------------------------------------------------------------\r\n     0 |      5919678464 |       722617 |      94.07 |   12040.75 |    0.603 |     0.393 | D:\\dskspd_test\\1 (10240MiB)\r\n     1 |      5725020160 |       698855 |      90.98 |   11644.81 |    0.625 |     0.385 | D:\\dskspd_test\\1 (10240MiB)\r\n....\r\n     7 |      5866766336 |       716158 |      93.23 |   11933.12 |    0.608 |     0.376 | D:\\dskspd_test\\1 (10240MiB)\r\n-----------------------------------------------------------------------------------------------------\r\ntotal:       45942554624 |      5608222 |     730.06 |   93448.10 |    0.621 |     0.441\r\n```\r\n\r\nWith a 75% read to 25% write spread of 350K IOPS/SEC at 8K size, this should not be a bottleneck for Nethermind, or am I mistaken?\r\n\r\nRAM consumption is fully pegged of course, often pushing into page file on another dedicated NVMe disk.\r\n\r\nAm I wrong in expecting mainnet to sync at this speed? This is basically telling me that when I am at head, blocks will take ~1.5 seconds to process?\r\n\r\nHere are the IOPS while Nethermind is running:\r\n![image](https://user-images.githubusercontent.com/1643692/228923910-c37814c3-d8fc-4b25-b26a-5b297a671814.png)\r\n\r\nAnd also a reporting showing that the majority of reads are not even touching the SSD layer of storage, coming almost totally from NVMe:\r\n![image](https://user-images.githubusercontent.com/1643692/228924076-a0242aa9-bf5d-47c5-ad57-74ea71e54b59.png)\r\n\r\nMy state/0 contains approx 200K *.sst files, incase this is relevant.\r\n\r\nI feel like there is something wrong with either my hardware configuration (do I just need 4x the memory, or the Nethermind configuration I'm running). Being able to interop with the chain at the DB level with C# through the Trie directly is something that I've been sticking it out with Nethermind for, maybe you can help me get this node synced before the estimated time of another 2 months.\r\n\r\nMany thanks for all your hard work on Nethermind.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "asdacap",
+    "id": 1841324,
+    "node_id": "MDQ6VXNlcjE4NDEzMjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1841324?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/asdacap",
+    "html_url": "https://github.com/asdacap",
+    "followers_url": "https://api.github.com/users/asdacap/followers",
+    "following_url": "https://api.github.com/users/asdacap/following{/other_user}",
+    "gists_url": "https://api.github.com/users/asdacap/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/asdacap/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/asdacap/subscriptions",
+    "organizations_url": "https://api.github.com/users/asdacap/orgs",
+    "repos_url": "https://api.github.com/users/asdacap/repos",
+    "events_url": "https://api.github.com/users/asdacap/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/asdacap/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5516/reactions",
     "total_count": 1,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5516/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
