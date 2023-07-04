@@ -33,7 +33,7 @@
 
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -41,10 +41,10 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-03-29T15:29:08Z",
-  "updated_at": "2023-04-04T09:28:46Z",
+  "updated_at": "2023-07-04T00:16:34Z",
   "closed_at": "2023-04-04T09:28:46Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\n\n2.13.x\n\n### What happened?\n\nVery strangely, when testing for a call to revert using ethers' `sendTransaction`, the error thrown escapes from the expected `revertedWith`, `reverted`, basically, `reverted*`.\r\n\r\nI couldn't quite understand how this is happening. My workaround to this problem is by using a `try/catch` but it's not pretty.\n\n### Minimal reproduction steps\n\nHere's an example to illustrate the problem:\r\n\r\n```\r\nconst signer = (await ethers.getSigners())[0]\r\n\r\n// Here's an intentionally malfunctioned data that will trigger the contract's call to revert with some reason\r\nconst malfunctionedData = '0x....';\r\n\r\nconst tx = signer.sendTransaction({\r\n  to: contractAddress,\r\n  data: malfunctionedData\r\n})\r\n\r\n// Now, here's the issue. The following test fails because the error escapes the expect and it wasn't caught within the test.  \r\nawait expect(tx).to.be.revertedWith('Invalid token ID')\r\n```\r\nThe call made via `sendTransaction` did revert but the error is thrown instead of being caught by the `expect`. The error is printed in the console instead:\r\n```\r\nError: cannot estimate gas; transaction may fail or may require manual gas limit [ See: https://links.ethers.org/v5-errors-UNPREDICTABLE_GAS_LIMIT ] (error={\"reason\":\"VM Exception while processing transaction: reverted with reason string 'Invalid token ID'\",\"code\":\"UNPREDICTABLE_GAS_LIMIT\"........\r\n```\r\n\r\nIf I had made the call by using a typical function call like so, it would have worked:\r\n```\r\nconst tx = contract.transferFrom('0xAlice', '0xBob', 123)\r\n\r\n// Passes the test because revert was caught by expect\r\nawait expect(tx).to.be.revertedWith('Invalid token ID')\r\n```\r\nIn this example, the test passed because it reverted as expected; the error didn't escape and get thrown to the console like it did with `sendTransaction`.\n\n### Search terms\n\nethers, expect, revert",
   "closed_by": {
     "login": "fvictorio",

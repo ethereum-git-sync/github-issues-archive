@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-03-06T11:37:19Z",
-  "updated_at": "2023-04-04T10:19:15Z",
+  "updated_at": "2023-07-04T00:16:31Z",
   "closed_at": "2023-04-04T10:19:14Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\n\n2.12.7\n\n### What happened?\n\nWhile writing unit tests for my contracts I did run in an unexpected behavior.\r\nA call to an non existing function did revert the transaction (as expected), but there was no reason so the caller is left in the dark about the reason of the revert. It did pop up on existing unit tests after upgrading the hardhat version older versions did revert with the reason \"Transaction reverted: function returned an unexpected amount of data\".\r\nI did also try different versions of the solidity compiler without any effect even the compiler used before gives the same result using the current hardhat version.\n\n### Minimal reproduction steps\n\nUse the openzeppelin contracts and run this test\r\n```\r\nit(\"SafeERC20.increaseAllowance: Should revert on increaseAllowance\", async () =>\r\n\t\t{\r\n\t\t\t// Arrange\r\n\t\t\tconst signers = await ethers.getSigners();\r\n\t\t\tconst alice = signers[0];\r\n\t\t\tconst safeERC20WrapperFactory = await ethers.getContractFactory(\"SafeERC20Wrapper\");\r\n\t\t\tconst SafeERC20Wrapper = await safeERC20WrapperFactory.deploy(alice.address);\r\n\t\t\t// Act\r\n\t\t\tconst result = SafeERC20Wrapper.increaseAllowance(0);\r\n\t\t\t// Assert\r\n\t\t\tawait expect(result).revertedWith(\"Transaction reverted: function returned an unexpected amount of data\");\r\n\t\t});\r\n```\r\nThe error I am getting is: \"AssertionError: Expected transaction to be reverted with reason 'Transaction reverted: function returned an unexpected amount of data', but it reverted without a reason\".\r\nThe Message itself is not that important only the fact that there is now no reason anymore.\r\n\r\n\r\nSafeERC20Wrapper was a helper class for my tests\r\n```\r\ncontract SafeERC20Wrapper is ISafeERC20Wrapper, Context\r\n{\r\n\tusing SafeERC20 for IERC20;\r\n\tIERC20 private _token;\r\n\r\n\tconstructor(IERC20 token) {\r\n\t\t_token = token;\r\n\t}\r\n\r\n\tfunction increaseAllowance(uint256 amount) override public\r\n\t{\r\n\t\t_token.safeIncreaseAllowance(address(0), amount);\r\n\t}\r\n}\r\n```\r\nand initializes with an wallet address that does not hold a contract\r\n\n\n### Search terms\n\nrevert without reason",
   "closed_by": {
     "login": "fvictorio",
