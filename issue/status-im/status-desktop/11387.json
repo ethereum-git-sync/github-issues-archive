@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "micieslak",
@@ -122,22 +122,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 129,
-    "closed_issues": 67,
+    "open_issues": 123,
+    "closed_issues": 78,
     "state": "open",
     "created_at": "2022-09-28T20:32:56Z",
-    "updated_at": "2023-07-03T15:41:13Z",
+    "updated_at": "2023-07-04T14:08:06Z",
     "due_on": "2023-08-18T07:00:00Z",
     "closed_at": null
   },
   "comments": 0,
   "created_at": "2023-07-03T14:35:35Z",
-  "updated_at": "2023-07-03T14:35:36Z",
-  "closed_at": null,
+  "updated_at": "2023-07-04T13:32:39Z",
+  "closed_at": "2023-07-04T13:32:39Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "# Bug Report\r\n\r\n## Description\r\n\r\nCurrently the trick with `Binding` components is used:\r\n```\r\n            Instantiator {\r\n                id: instantiator\r\n\r\n                model: SortFilterProxyModel {\r\n                    sourceModel: root.tokensModel\r\n                    filters: ValueFilter {\r\n                        roleName: \"contractUniqueKey\"\r\n                        value: tokenViewPage.tokenKey\r\n                    }\r\n                }\r\n\r\n                delegate: QtObject {\r\n                    component Bind: Binding { target: view }\r\n                    readonly property list<Binding> bindings: [\r\n                        Bind { property: \"tokenOwnersModel\"; value: model.tokenOwnersModel },\r\n                        Bind { property: \"tokenType\"; value: model.tokenType },\r\n                        Bind { property: \"airdropKey\"; value: model.symbol } // TO BE REMOVED: When airdrop backend is ready to use token key instead of symbol\r\n                    ]\r\n\r\n                    component BindToken: Binding { target: view.token }\r\n                    readonly property list<Binding> tokenBindings: [\r\n                        BindToken { property: \"type\"; value: model.tokenType === Constants.TokenType.ERC20\r\n                                                             ? TokenObject.Type.Asset : TokenObject.Type.Collectible},\r\n                        BindToken { property: \"key\"; value: model.contractUniqueKey },\r\n                        BindToken { property: \"deployState\"; value: model.deployState },\r\n ...\r\n                    ]\r\n                }\r\n            }\r\n\r\n```\r\n\r\nIt works in most cases but it has some drawbacks as well:\r\n- in this approach when model has no requested value (e.g. `model.accountAddress` is undefined), there is no error nor warning, the problems is hidden and hard to detect\r\n- when the token in deleted in the meantime (it will be the case when having multiple users privileged to manage tokens), user still see the token without any sign that it's already deleted\r\n\r\nTo address that, different approach (instantiating whole view as a Repeater delegate) could be used.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "micieslak",
+    "id": 20650004,
+    "node_id": "MDQ6VXNlcjIwNjUwMDA0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20650004?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/micieslak",
+    "html_url": "https://github.com/micieslak",
+    "followers_url": "https://api.github.com/users/micieslak/followers",
+    "following_url": "https://api.github.com/users/micieslak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/micieslak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/micieslak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/micieslak/subscriptions",
+    "organizations_url": "https://api.github.com/users/micieslak/orgs",
+    "repos_url": "https://api.github.com/users/micieslak/repos",
+    "events_url": "https://api.github.com/users/micieslak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/micieslak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/11387/reactions",
     "total_count": 0,
@@ -152,7 +171,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11387/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
