@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5301",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5301/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5301/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5301/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5301",
+  "id": 1789510079,
+  "node_id": "I_kwDOGBlvNc5qqcG_",
+  "number": 5301,
+  "title": "Contract failed to verify. make: *** [deploy] Error 1",
+  "user": {
+    "login": "ThomasHeim11",
+    "id": 106417552,
+    "node_id": "U_kgDOBlfNkA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/106417552?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ThomasHeim11",
+    "html_url": "https://github.com/ThomasHeim11",
+    "followers_url": "https://api.github.com/users/ThomasHeim11/followers",
+    "following_url": "https://api.github.com/users/ThomasHeim11/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ThomasHeim11/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ThomasHeim11/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ThomasHeim11/subscriptions",
+    "organizations_url": "https://api.github.com/users/ThomasHeim11/orgs",
+    "repos_url": "https://api.github.com/users/ThomasHeim11/repos",
+    "events_url": "https://api.github.com/users/ThomasHeim11/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ThomasHeim11/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-05T13:01:41Z",
+  "updated_at": "2023-07-05T13:02:20Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\n forge 0.2.0 (bf56869 2023-07-05T00:05:02.811991000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\n make deploy ARGS=\"--network sepolia\"\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nI tried to deploy and verify multiple smart contracts using `make deploy ARGS=\"--network sepolia` and i got this error:\r\n\r\n```\r\nStart verification for (3) contracts\r\nStart verifying contract `0x5d1bf24d8cd4d0e6ae7223df6815fefa8daa8da7` deployed on sepolia\r\n\r\nSubmitting verification for [src/libraries/OracleLib.sol:OracleLib] \"0x5d1Bf24d8cd4d0e6AE7223DF6815FEfA8daA8dA7\".\r\nSubmitted contract for verification:\r\n        Response: `OK`\r\n        GUID: `z9w3me7mt8pdvwqt6gbxaes6ygqcpcqf9hve3gi3irykcj75dy`\r\n        URL:\r\n        https://sepolia.etherscan.io/address/0x5d1bf24d8cd4d0e6ae7223df6815fefa8daa8da7\r\nContract verification status:\r\nResponse: `NOTOK`\r\nDetails: `Pending in queue`\r\nContract verification status:\r\nResponse: `NOTOK`\r\nDetails: `Other Exception - Please contact us for more information.`\r\nContract failed to verify.\r\nmake: *** [deploy] Error 1\r\n```\r\nI had this issue 2 weeks ago and I resolved it by updating `Foundryup` but it looks like the same error is back. I have tried to update both Foundry and Foundryup but it did not solve the issue. \r\n\r\nHer are my setup\r\nfoundry.tolm : \r\n\r\n\r\n```\r\n[profile.default]\r\nsrc = \"src\"\r\nout = \"out\"\r\nlibs = [\"lib\"]\r\nremappings = ['@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/', '@openzeppelin/contracts=lib/openzeppelin-contracts/contracts']\r\n\r\n[etherscan]\r\nmainnet = { key = \"${ETHERSCAN_API_KEY}\" }\r\nsepolia = {key = \"${ETHERSCAN_API_KEY}\"}\r\n\r\n[rpc_endpoints]\r\nsepolia = \"${SEPOLIA_RPC_URL}\"\r\n\r\n[invariant]\r\nruns = 128\r\ndepth = 128\r\nfail_on_revert = true\r\n\r\n```\r\n\r\nMakefile:\r\n\r\n```\r\n-include .env\r\n\r\n.PHONY: all test clean deploy fund help install snapshot format anvil \r\n\r\nDEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80\r\n\r\nhelp:\r\n\t@echo \"Usage:\"\r\n\t@echo \"  make deploy [ARGS=...]\\n    example: make deploy ARGS=\\\"--network sepolia\\\"\"\r\n\t@echo \"\"\r\n\t@echo \"  make fund [ARGS=...]\\n    example: make deploy ARGS=\\\"--network sepolia\\\"\"\r\n\r\nall: clean remove install update build\r\n\r\n# Clean the repo\r\nclean  :; forge clean\r\n\r\n# Remove modules\r\nremove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m \"modules\"\r\n\r\ninstall :; forge install chainaccelorg/foundry-devops@0.0.11 --no-commit && forge install smartcontractkit/chainlink-brownie-contracts@0.6.1 --no-commit && forge install foundry-rs/forge-std@v1.5.3 --no-commit && forge install openzeppelin/openzeppelin-contracts@v4.8.3 --no-commit\r\n\r\n# Update Dependencies\r\nupdate:; forge update\r\n\r\nbuild:; forge build\r\n\r\ntest :; forge test \r\n\r\ncoverage :; forge coverage --report debug > coverage-report.txt\r\n\r\nsnapshot :; forge snapshot\r\n\r\nformat :; forge fmt\r\n\r\nanvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1\r\n\r\nNETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast\r\n\r\nifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)\r\n\tNETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv\r\nendif\r\n\r\ndeploy:\r\n\t@forge script script/DeploySCD.s.sol:DeploySCD $(NETWORK_ARGS)\r\n\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5301/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5301/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
