@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5889",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5889/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5889/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5889/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/5889",
+  "id": 1789179608,
+  "node_id": "I_kwDOBggaLc5qpLbY",
+  "number": 5889,
+  "title": "Remove hashes of requested and not received transactions from cache",
+  "user": {
+    "login": "marcindsobczak",
+    "id": 77129288,
+    "node_id": "MDQ6VXNlcjc3MTI5Mjg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/77129288?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marcindsobczak",
+    "html_url": "https://github.com/marcindsobczak",
+    "followers_url": "https://api.github.com/users/marcindsobczak/followers",
+    "following_url": "https://api.github.com/users/marcindsobczak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marcindsobczak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marcindsobczak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marcindsobczak/subscriptions",
+    "organizations_url": "https://api.github.com/users/marcindsobczak/orgs",
+    "repos_url": "https://api.github.com/users/marcindsobczak/repos",
+    "events_url": "https://api.github.com/users/marcindsobczak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marcindsobczak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1286932566,
+      "node_id": "MDU6TGFiZWwxMjg2OTMyNTY2",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/network",
+      "name": "network",
+      "color": "0e556b",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2019353920,
+      "node_id": "MDU6TGFiZWwyMDE5MzUzOTIw",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/low%20priority",
+      "name": "low priority",
+      "color": "C2E0C6",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-05T09:43:28Z",
+  "updated_at": "2023-07-05T10:44:50Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "When we receive `NewPooledTransactionHashesMessage`, we are requesting not known transactions in `GetPooledTransactionsMessage`. In response, peer is sending transactions in `PooledTransactionsMessage`.\r\nHash of every requested transaction is cached (`_pendingHashes` in `PooledTxsRequestor`) to avoid multiple requests for the same transaction.\r\nBut if peer will not send such transaction to us, we don't have any logic for removing it from cache to make possible requesting it again. Would be nice to add it.\r\n\r\n### More context and ideas:\r\nWe are not pairing `GetPooledTransactionsMessage` with received `PooledTransactionsMessage`. We would need to know which hashes we sent to which peer in message with which msgID and compare after receiving response. So maybe create dictionary with peer as a key and as a value another dictionary with msgID and list of hashes? And after receiving `PooledTransactionsMessage` get msgID-hashes dictionary by peer, get hashes by msgID, and compare hashes and remove from `_pendingHashes` missing ones.\r\nOn the other hand it is not a big issue - we are requesting transactions from the peer which sent hashes to us, so it should have this transactions, at least most of them - it can not send them to us if\r\n1) transaction was included in block in the meantime (so not a problem - we don't need it anymore)\r\n2) transaction was evicted from the pool (so not a big problem, it will not be included in close future)\r\n3) we disconnected in the meantime - rerequesting would be usuful here - we would need to add logic for not receiving response too - if we don't receive response in let's say 10s, then remove all hashes from cache\r\n4) response would be too big - it will not happen for `eth68` and newer and on mainnet, goerli, sepolia etc. we are already using `eth68`, on nethermind-only networks we would move to `eth68` after implementing snap server or with Cancun fork, so `eth67` and older would be deprecated within about ~6months.\r\n\r\nAnother thing is that our `_pendingHashes` cache has capacity of 16k hashes so is clearing quite often anyway\r\n\r\n\r\n\r\n\r\nWe can create dictionary\r\n`Dictionary<reqID,hashes[]>`\r\nAdd to it when sending `GetPooledTransactionsMessage` and after receiving `PooledTransactionsMessage` compare hashes of received txs with hashes sent and missing ones remove from `_pendingHashes`.\r\nMore problematic would be handling timeouts - in case of no response we need to remove all hashes sent in `GetPooledTransactionsMessage` from `_pendingHashes`. That would be harder part.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5889/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5889/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
