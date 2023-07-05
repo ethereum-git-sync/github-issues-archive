@@ -40,7 +40,7 @@
       "description": "Something to make Lighthouse run more efficiently."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "jimmygchen",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-04-03T02:16:22Z",
-  "updated_at": "2023-04-06T08:35:10Z",
-  "closed_at": null,
+  "updated_at": "2023-07-05T05:25:35Z",
+  "closed_at": "2023-07-05T05:25:35Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nPresently the VC will poll for attestation duties each slot. Our polling achieves:\r\n\r\n- On the first poll after the VC starts, we always learn the current- and next-epoch duties.\r\n- On the first poll of the epoch, we always learn the next-epoch duties.\r\n- Occasionally, during any poll, we might learn of a re-org than changes either the next- or current-epoch duties. Such epochs are very uncommon on mainnet.\r\n\r\nLooking at the [`/eth/v1/validator/duties/attester/{epoch}`](https://ethereum.github.io/beacon-APIs/#/Validator/getAttesterDuties) endpoint, we see that its structure is:\r\n\r\n\r\n#### Request Body: An array of the validator indices for which to obtain the duties. \r\n```json\r\n[\r\n  \"1\"\r\n]\r\n```\r\n\r\n*Note: we also included the `epoch` in the URL.*\r\n\r\n#### Response Body\r\n\r\n```json\r\n{\r\n  \"dependent_root\": \"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2\",\r\n  \"execution_optimistic\": false,\r\n  \"data\": [\r\n    {\r\n      \"pubkey\": \"0x93247f2209abcacf57b75a51dafae777f9dd38bc7053d1af526f220a7489a6d3a2753e5f3e8b1cfe39b56f43611df74a\",\r\n      \"validator_index\": \"1\",\r\n      \"committee_index\": \"1\",\r\n      \"committee_length\": \"1\",\r\n      \"committees_at_slot\": \"1\",\r\n      \"validator_committee_index\": \"1\",\r\n      \"slot\": \"1\"\r\n    }\r\n  ]\r\n}\r\n```\r\n\r\nIn our current implementation, the request will contain all validators managed by the VC. I claim that, in the best case, we could only send a request for *one* validator and know whether or not all the other validators need updating.\r\n\r\nI claim this because a set of shuffling is uniquely identified by `(epoch, dependent_root)` (see \"Background Info\" below if this isn't clear to you). We already use this assumption in the VC:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/a53830fd60a119bf3f659b253360af8027128e83/validator_client/src/duties_service.rs#L740-L749\r\n\r\nWith the above statement we're filtering out any duties that are already have the same `(epoch, dependent_root)` signature. So, our current flow goes like:\r\n\r\n- Download all`duties/attester` for all validators.\r\n- Filter out any duties with a known `(epoch, dependent_root)`.\r\n- Update the `duties_service.attesters` with any new duties ([reference](https://github.com/sigp/lighthouse/blob/a53830fd60a119bf3f659b253360af8027128e83/validator_client/src/duties_service.rs#L762-L787)).\r\n\r\nI propose that we should instead:\r\n\r\n- Download `duties/attester` for `INITIAL_DUTIES_QUERY_SIZE = 1` validators.\r\n- Find any validators which have conflicting `(epoch, dependent_root)` values.\r\n- If there are any conflicting validators, send a second `duties/attester` request for those validators.\r\n- Update the `duties_service.attesters` with any new duties which resulted from the *first or second* request.\r\n\r\nIn the case where we don't expect the duties to change (i.e., it's not the first request after VC boot, it's not the first request of an epoch and there wasn't a re-org) then we should reduce the bandwidth by a factor of the number of validators in that VC (e.g., if the VC has 100 validators then they request/response should be ~100x smaller).\r\n\r\n## Additional Details\r\n\r\nThere's some extra detail regarding the first request of `INITIAL_DUTIES_QUERY_SIZE`. I propose that we should *actually* make this query of size `max(INITIAL_DUTIES_QUERY_SIZE, num_uninitialized_validators)` where `num_uninitialized_validators` is the count of validators for which we don't already know their duties for that epoch. This will be *all validators* when booting for the first time or querying for the \"next epoch\". It'll avoid us doing the second request when we know we need the duties for all validators.\r\n\r\n## Background Info\r\n\r\nWhilst the term \"dependent root\" doesn't appear in the specification, it exists as a concept in [`get_beacon_committee`](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#beacon-state-accessors). We use `dependant_root` to refer to the block root at the same slot as `get_seed` uses to load the `randao_mix` as used as the input to `compute_committee`.\r\n\r\nThe argument is that any chain which has `dependant_root` in its history will always return the same result for `get_beacon_committee` given the same `epoch.`\r\n\r\nHere's a scrappy diagram that might help:\r\n\r\n![IMG_1651](https://user-images.githubusercontent.com/6660660/229396488-545c17de-b36c-48d2-bfe2-632de9d4ecb4.png)\r\n\r\n\r\nThe term \"dependent root\" was introduced to the API some time after we'd implemented the concept in Lighthouse for keying our internal shuffling caches. Internally, we will sometimes refer to it as the \"shuffling decision\" root ([example](https://github.com/sigp/lighthouse/blob/3a24ca5f14c6e6d6612fd43eca82aa0c1e6aba16/consensus/types/src/shuffling_id.rs#L20)).",
-  "closed_by": null,
+  "closed_by": {
+    "login": "jimmygchen",
+    "id": 742762,
+    "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmygchen",
+    "html_url": "https://github.com/jimmygchen",
+    "followers_url": "https://api.github.com/users/jimmygchen/followers",
+    "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+    "repos_url": "https://api.github.com/users/jimmygchen/repos",
+    "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4157/reactions",
     "total_count": 1,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4157/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -237,6 +256,50 @@
       "hooray": 0,
       "confused": 0,
       "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1621046749",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4157#issuecomment-1621046749",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4157",
+    "id": 1621046749,
+    "node_id": "IC_kwDOCFeAzc5gnzXd",
+    "user": {
+      "login": "jimmygchen",
+      "id": 742762,
+      "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jimmygchen",
+      "html_url": "https://github.com/jimmygchen",
+      "followers_url": "https://api.github.com/users/jimmygchen/followers",
+      "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+      "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+      "repos_url": "https://api.github.com/users/jimmygchen/repos",
+      "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-05T05:25:35Z",
+    "updated_at": "2023-07-05T05:25:35Z",
+    "author_association": "MEMBER",
+    "body": "Completed in #4170 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1621046749/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
       "rocket": 0,
       "eyes": 0
     },
