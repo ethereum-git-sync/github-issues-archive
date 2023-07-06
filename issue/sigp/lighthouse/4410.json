@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-06-16T15:01:23Z",
-  "updated_at": "2023-07-03T04:39:06Z",
-  "closed_at": null,
+  "updated_at": "2023-07-06T00:46:22Z",
+  "closed_at": "2023-07-06T00:46:21Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nwe have a testnet network and use lighthouse to run beacon node, but in this latest version we get InsufficientPeers unable to connect to first beacon node.\r\n\r\n```\r\n1 Node Geth\r\n2 LH Beacon Node\r\n1 LH Validator Node\r\n```\r\n\r\nLogs BN: \r\n```\r\nJun 16 14:49:53.039 INFO Sync committee message                  validator: 42, src: api, slot: 650, epoch: 20, delay_ms: 14, head: 0x23d1…05df, service: val_mon\r\nJun 16 14:49:53.039 WARN Could not publish message               error: InsufficientPeers, service: libp2p\r\nJun 16 14:49:53.042 INFO Sync committee message                  validator: 42, src: api, slot: 650, epoch: 20, delay_ms: 14, head: 0x23d1…05df, service: val_mon\r\nJun 16 14:49:53.042 WARN Could not publish message               error: InsufficientPeers, service: libp2p\r\n```\r\nLogs VC: \r\n```\r\nJun 16 15:00:28.053 INFO Successfully published block            slot: 862, graffiti: Some(\"Testnet\"), attestations: 1, deposits: 0, block_type: Blinded, service: block\r\nJun 16 15:00:29.014 INFO Successfully published attestations     type: unaggregated, slot: 862, committee_index: 0, head_block: 0x07bc8fabdfa9d9782e262309cc9619aad9416780325e15471f21f34c9da6a0ad, validator_indices: [13, 45], count: 2, service: attestation\r\nJun 16 15:00:29.501 INFO Connected to beacon node(s)             synced: 1, available: 1, total: 1, service: notifier\r\nJun 16 15:00:29.501 INFO All validators active                   slot: 862, epoch: 26, total_validators: 64, active_validators: 64, current_epoch_proposers: 32, service: notifier\r\nJun 16 15:00:29.889 INFO Successfully published sync committee messages, slot: 862, head_block: 0x07bc8fabdfa9d9782e262309cc9619aad9416780325e15471f21f34c9da6a0ad, count: 64, service: sync_committee\r\nJun 16 15:00:30.019 INFO Successfully published attestation      type: aggregated, slot: 862, committee_index: 0, head_block: 0x07bc8fabdfa9d9782e262309cc9619aad9416780325e15471f21f34c9da6a0ad, signatures: 2, aggregator: 13, service: attestation\r\nJun 16 15:00:30.019 INFO Successfully published attestation      type: aggregated, slot: 862, committee_index: 0, head_block: 0x07bc8fabdfa9d9782e262309cc9619aad9416780325e15471f21f34c9da6a0ad, signatures: 2, aggregator: 45, service: attestation\r\nJun 16 15:00:30.020 INFO Successfully published sync contributions, slot: 862, num_signers: 128, beacon_block_root: 0x07bc…a0ad, subnet: 3, service: sync_committee\r\n```\r\n\r\n## Version\r\n```\r\nLighthouse v4.2.0-c547a11\r\nBLS library: blst-portable\r\nSHA256 hardware acceleration: false\r\nAllocator: jemalloc\r\nProfile: maxperf\r\nSpecs: mainnet (true), minimal (false), gnosis (true)\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "avenbreaks",
+    "id": 93043826,
+    "node_id": "U_kgDOBYu8cg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/93043826?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/avenbreaks",
+    "html_url": "https://github.com/avenbreaks",
+    "followers_url": "https://api.github.com/users/avenbreaks/followers",
+    "following_url": "https://api.github.com/users/avenbreaks/following{/other_user}",
+    "gists_url": "https://api.github.com/users/avenbreaks/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/avenbreaks/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/avenbreaks/subscriptions",
+    "organizations_url": "https://api.github.com/users/avenbreaks/orgs",
+    "repos_url": "https://api.github.com/users/avenbreaks/repos",
+    "events_url": "https://api.github.com/users/avenbreaks/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/avenbreaks/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4410/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4410/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "This is the expected behaviour with the above setup, because the beacon node that has the 64 validators connected will try to publish attestations to other beacon nodes subscribed to the same attestation subnets, and it's likely that the other beacon node is not listening to any of those topics even though it's connected as a peer, because it has no validators connected to it. You could make the warning go away by adding `--subscribe-all-subnets`, so it receives all attestations, but I think it is unnecessary if there's no validator connected to that beacon node.\r\n\r\nAlso worth noting that each Beacon Node should connect to its own EL / geth node.",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1617286043/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1622747698",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4410#issuecomment-1622747698",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4410",
+    "id": 1622747698,
+    "node_id": "IC_kwDOCFeAzc5guSoy",
+    "user": {
+      "login": "avenbreaks",
+      "id": 93043826,
+      "node_id": "U_kgDOBYu8cg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93043826?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/avenbreaks",
+      "html_url": "https://github.com/avenbreaks",
+      "followers_url": "https://api.github.com/users/avenbreaks/followers",
+      "following_url": "https://api.github.com/users/avenbreaks/following{/other_user}",
+      "gists_url": "https://api.github.com/users/avenbreaks/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/avenbreaks/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/avenbreaks/subscriptions",
+      "organizations_url": "https://api.github.com/users/avenbreaks/orgs",
+      "repos_url": "https://api.github.com/users/avenbreaks/repos",
+      "events_url": "https://api.github.com/users/avenbreaks/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/avenbreaks/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-06T00:46:21Z",
+    "updated_at": "2023-07-06T00:46:21Z",
+    "author_association": "NONE",
+    "body": "solved! thankyou",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1622747698/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

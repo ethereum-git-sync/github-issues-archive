@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4473",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4473/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4473/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4473/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4473",
+  "id": 1790572611,
+  "node_id": "I_kwDOCFeAzc5qufhD",
+  "number": 4473,
+  "title": "Spurious `Error whilst producing block` when using block relays",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 2336802021,
+      "node_id": "MDU6TGFiZWwyMzM2ODAyMDIx",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/UX-and-logs",
+      "name": "UX-and-logs",
+      "color": "DB9046",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 5676700781,
+      "node_id": "LA_kwDOCFeAzc8AAAABUluUbQ",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/v4.3.1",
+      "name": "v4.3.1",
+      "color": "FE5F2B",
+      "default": false,
+      "description": "ETA July 2023"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-06T00:37:23Z",
+  "updated_at": "2023-07-06T00:37:23Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nThe Lighthouse v4.3.0 validator client will sometimes log an error message when publishing a block that came from an MEV relay:\r\n\r\n> Jul 06 00:18:23.968 ERRO Error whilst producing block            info: this error may or may not result in a missed block, block_slot: XXX, error: \\\"Some endpoints failed, num_failed: 4 https://node1 => RequestFailed(Irrecoverable(\\\\\\\"Error from beacon node when publishing block: ServerMessage(ErrorMessage { code: 400, message: \\\\\\\\\\\\\\\"BAD_REQUEST: Unsupported endpoint version: v1\\\\\\\\\\\\\\\", stacktraces: [] })\\\\\\\")) ...\r\n\r\nThis strange error is the result of several subtleties:\r\n\r\n1. In Lighthouse v4.3.0 we changed the block publishing API to properly check gossip validity before publishing (#4264). This includes ruling out _duplicate blocks_. When publishing a builder block, the relay publishes it to the network _before_ returning it back to the proposer, so many blocks are detected as duplicates and rejected.\r\n2. Due to another bug in our HTTP route handlers (#3404) the true error message is lost when conveying it to the validator client. We know how to fix this class of error now, and just need to roll out the fix over the whole HTTP API (this might interact with #4462).\r\n\r\n## Version\r\n\r\nLighthouse v4.3.0\r\n\r\n## Present Behaviour\r\n\r\nThe aforementioned error will be logged by the VC. The block _should still be integrated into the chain_ (assuming the builder does their job and there's no re-org).\r\n\r\nThe beacon node will log this warning, which can be used to quickly check that a block proposal didn't fail for another reason:\r\n\r\n> WARN Not publishing block, not gossip verified     slot => xxx, error => BlockIsAlreadyKnown\r\n\r\n## Expected Behaviour\r\n\r\nWe are still discussing the best way to handle this, but our hope is that we'll be able to distinguish valid duplicate blocks, blocks that are still in the process of being imported, and invalid duplicate blocks. The HTTP return codes in each case might end up being 200, 202 and 400 respectively. The `DuplicateCache` will be helpful in identifying the \"in progress\" blocks.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4473/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4473/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
