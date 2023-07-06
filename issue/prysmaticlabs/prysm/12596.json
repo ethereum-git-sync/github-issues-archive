@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12596",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12596/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12596/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12596/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12596",
+  "id": 1790535735,
+  "node_id": "I_kwDOBvuov85quWg3",
+  "number": 12596,
+  "title": "Missing on sync committee - Failed to find peers",
+  "user": {
+    "login": "fabrice-quadrata",
+    "id": 106488900,
+    "node_id": "U_kgDOBljkRA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/106488900?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fabrice-quadrata",
+    "html_url": "https://github.com/fabrice-quadrata",
+    "followers_url": "https://api.github.com/users/fabrice-quadrata/followers",
+    "following_url": "https://api.github.com/users/fabrice-quadrata/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fabrice-quadrata/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fabrice-quadrata/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fabrice-quadrata/subscriptions",
+    "organizations_url": "https://api.github.com/users/fabrice-quadrata/orgs",
+    "repos_url": "https://api.github.com/users/fabrice-quadrata/repos",
+    "events_url": "https://api.github.com/users/fabrice-quadrata/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fabrice-quadrata/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129904,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDQ=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Bug",
+      "name": "Bug",
+      "color": "ee0701",
+      "default": false,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-05T23:59:18Z",
+  "updated_at": "2023-07-06T00:11:48Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "# 🐞 Bug Report\r\n\r\n### Description\r\nI'm experiencing sporadic sync committee misses with my Prysm node. (29% proposed, 71% missed on my recent committee).\r\nIt appears to be due to not being able to find sync committee peers. \r\n\r\nI have already excluding the following:\r\n- no problems with normal attestations\r\n- my peer count is steady at 100 (for normal p2p attestations)\r\n- CPU & my RAM shown good metrics\r\n- internet latency was low\r\n- I tried adding `--minimum-peers-per-subnet=10` and `--p2p-max-peers=100` (up from 60) \r\n\r\nI first experienced it with `4.0.5`, tried restarting with `4.0.6`, which improved shortly after restarting for a few epochs and then missed once again due to no sync peers found.\r\n\r\n\r\n### Has this worked before in a previous version?\r\n\r\nYes, I had once been in a sync committee (it was likely prior to 4.0.3), did not have the issue.\r\n\r\n<!-- Did this behavior use to work in the previous version? -->\r\n<!-- ✍️--> Yes, the previous version in which this bug was not present was: I think before 4.0.3\r\n\r\n## 🔬 Minimal Reproduction\r\nNot able to reproduce\r\n\r\n## 🔥 Error\r\n\r\n```\r\nJun 30 02:59:00 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:00\" level=info msg=\"Finished applying state transition\" attestations=128 payloadHash=0xad0d2da84205 prefix=blockchain slot=6774593 syn>\r\nJun 30 02:59:03 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:03\" level=error msg=\"Failed to find peers\" error=\"unable to find requisite number of peers for topic /eth2/bba4da96/sync_committee_3/s>\r\nJun 30 02:59:03 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:03\" level=warning msg=\"Sync Committee Message is too old to broadcast, discarding it\" error=\"sync message is too late\r\nJun 30 02:59:03 pznuc prysm-beaconchain-4.0.6[885614]: sync message time 2023-06-30 02:58:47 -0700 PDT (slot 6774592) not within allowable range of 2023-06-30 02:58:59 -0700 PDT (slot 6774593) to 2023-06-30 02:59>\r\nJun 30 02:59:09 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:09\" level=info msg=\"Peer summary\" activePeers=109 inbound=92 outbound=17 prefix=p2p\r\nJun 30 02:59:13 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:13\" level=info msg=\"Synced new block\" block=0x5c4bc5ec... epoch=211706 finalizedEpoch=211704 finalizedRoot=0xa2c9eec2... prefix=blockc>\r\nJun 30 02:59:13 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:13\" level=info msg=\"Finished applying state transition\" attestations=128 payloadHash=0xc3116cea419c prefix=blockchain slot=6774594 syn>\r\nJun 30 02:59:16 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:16\" level=error msg=\"Failed to find peers\" error=\"unable to find requisite number of peers for topic /eth2/bba4da96/sync_committee_3/s>\r\nJun 30 02:59:16 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:16\" level=warning msg=\"Sync Committee Message is too old to broadcast, discarding it\" error=\"sync message is too late\r\nJun 30 02:59:16 pznuc prysm-beaconchain-4.0.6[885614]: sync message time 2023-06-30 02:58:59 -0700 PDT (slot 6774593) not within allowable range of 2023-06-30 02:59:11 -0700 PDT (slot 6774594) to 2023-06-30 02:59>\r\nJun 30 02:59:25 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:25\" level=info msg=\"Synced new block\" block=0x70653e8e... epoch=211706 finalizedEpoch=211704 finalizedRoot=0xa2c9eec2... prefix=blockc>\r\nJun 30 02:59:25 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:25\" level=info msg=\"Finished applying state transition\" attestations=66 payloadHash=0xff790655a4c4 prefix=blockchain slot=6774595 sync>\r\nJun 30 02:59:27 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:27\" level=error msg=\"Failed to find peers\" error=\"unable to find requisite number of peers for topic /eth2/bba4da96/sync_committee_3/s>\r\nJun 30 02:59:27 pznuc prysm-beaconchain-4.0.6[885614]: time=\"2023-06-30 02:59:27\" level=warning msg=\"Sync Committee Message is too old to broadcast, discarding it\" error=\"sync message is too late\r\nJun 30 02:59:27 pznuc prysm-beaconchain-4.0.6[885614]: sync message time 2023-06-30 02:59:11 -0700 PDT (slot 6774594) not within allowable range of 2023-06-30 02:59:23 -0700 PDT (slot 6774595) to 2023-06-30 02:59>\r\nlines 121-174\r\n```\r\n\r\n![image](https://github.com/prysmaticlabs/prysm/assets/106488900/31a381fa-b523-45a2-a0dc-a0c99dd081ba)\r\n<img width=\"723\" alt=\"image\" src=\"https://github.com/prysmaticlabs/prysm/assets/106488900/22f75e16-0929-45d6-bfea-bf6b422dff75\">\r\n\r\n\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:**\r\n\r\n<pre>\r\n  <code>\r\nArch Linux\r\n  </code>\r\n</pre>\r\n\r\n**What version of Prysm are you running? (Which release)**\r\n\r\n<pre>\r\n  <code>\r\n4.0.6 (but tried with 4.0.5)\r\n  </code>\r\n</pre>\r\n\r\n**Anything else relevant (validator index / public key)?**\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12596/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12596/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
