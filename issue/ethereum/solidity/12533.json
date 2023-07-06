@@ -85,21 +85,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 17,
+  "comments": 18,
   "created_at": "2022-01-14T03:52:31Z",
-  "updated_at": "2022-12-08T15:38:04Z",
-  "closed_at": null,
+  "updated_at": "2023-07-06T10:36:06Z",
+  "closed_at": "2023-07-06T10:36:06Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nCompiling Solidity with `viaIR: true` but the optimizer turned off results in bytecode that uses an enormous number of stack slots and runs into \"stack too deep\" errors with high frequency, in situations where the Solidity compiler would normally have plenty of stack space left (see repro example below).\r\n\r\nBasically what's going on here seems to be that, when`viaIR` is set to true, the Solidity compiler generates code that doesn't discard intermediate results after it's done with them.  Ordinarily, Solidity divides each stackframe into a lower area for local variables, and a higher area for working state, and the latter only sticks around as necessary.  But with `viaIR: true`, it's all mixed together, and none of it is discarded promptly.\r\n\r\nFor instance, with the code below (but with the lines about `w` removed so that it actually compiles with `viaIR: true`), the line `uint x = 1`, which would normally result in a single 1 being placed on the stack, in the slot representing `x`, instead results in *two* 1s being placed on the stack; presumably, one for the literal and one for `x`, and the one for the literal then doesn't go away.  All sorts of other intermediate results just remain on the stack as well, even after there's no more need for them, such as the value of `x+y`, the signature of `Num` (multiple times), and the literal `88`.\r\n\r\nAnd, of course, one result of using so many stack slots and not discarding anything is that it's really to hit stack too deep errors, in situations where the Solidity compiler wouldn't normally be anywhere near such an error.\r\n\r\nThanks!\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.11\r\n- Target EVM version (as per compiler settings): default\r\n- Framework/IDE (e.g. Truffle or Remix): Truffle\r\n\r\n## Steps to Reproduce\r\n\r\nHere's an exampe of a contract that won't compile with `viaIR` on due to stack-too-deep errors:\r\n\r\n```solidity\r\n//SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract StackTest {\r\n\r\n  event Num(uint);\r\n\r\n  function doStuff() public {\r\n    uint x = 1;\r\n    uint y = 2;\r\n    uint z = 3;\r\n    uint w = 4;\r\n    emit Num(w);\r\n    emit Num(z);\r\n    emit Num(x);\r\n    emit Num(y);\r\n    emit Num(x + y);\r\n    emit Num(88);\r\n  }\r\n}\r\n```\r\n\r\nCompiling with `viaIR: true` yields the error message:\r\n\r\n```\r\nYulException: Variable var_x_42 is 3 slot(s) too deep inside the stack.\r\n```\r\n\r\nMeanwhile, with `viaIR: false`, this compiles just fine, because the compiler isn't wasting huge numbers of stack slots.\r\n\r\nI'll skip including repro steps for the other stuff, but if you just take the above contract and delete the lines mentioning `w`, you'll get the contract I observed them with.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "NunoFilipeSantos",
+    "id": 2582498,
+    "node_id": "MDQ6VXNlcjI1ODI0OTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2582498?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/NunoFilipeSantos",
+    "html_url": "https://github.com/NunoFilipeSantos",
+    "followers_url": "https://api.github.com/users/NunoFilipeSantos/followers",
+    "following_url": "https://api.github.com/users/NunoFilipeSantos/following{/other_user}",
+    "gists_url": "https://api.github.com/users/NunoFilipeSantos/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/NunoFilipeSantos/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/NunoFilipeSantos/subscriptions",
+    "organizations_url": "https://api.github.com/users/NunoFilipeSantos/orgs",
+    "repos_url": "https://api.github.com/users/NunoFilipeSantos/repos",
+    "events_url": "https://api.github.com/users/NunoFilipeSantos/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/NunoFilipeSantos/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/12533/reactions",
     "total_count": 2,
@@ -114,7 +133,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/12533/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -853,6 +872,50 @@
     "body": "More information on this:\r\n\r\nUsing a nightly version and `optimizerSteps: \":\"`, we still get some test failures. As far as I can tell, they are all related to having less descriptive sourcemaps.\r\n\r\nParticularly important for us is that the jump types are not as useful with the IR codegen. For example, given this contract:\r\n\r\n```solidity\r\ncontract C {\r\n\r\n  uint i = 0;\r\n\r\n  function test() public {\r\n\r\n\r\n    revert();\r\n    i += 1;\r\n  }\r\n\r\n}\r\n```\r\n\r\nIf we call the `test` function, we expect one of the executed opcodes to have a corresponding sourcemap with an \"into function\" `j` value. But all the jumps in that execution are marked as internal jumps.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1342915434/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1623440281",
+    "html_url": "https://github.com/ethereum/solidity/issues/12533#issuecomment-1623440281",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/12533",
+    "id": 1623440281,
+    "node_id": "IC_kwDOAm_5kc5gw7uZ",
+    "user": {
+      "login": "NunoFilipeSantos",
+      "id": 2582498,
+      "node_id": "MDQ6VXNlcjI1ODI0OTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2582498?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/NunoFilipeSantos",
+      "html_url": "https://github.com/NunoFilipeSantos",
+      "followers_url": "https://api.github.com/users/NunoFilipeSantos/followers",
+      "following_url": "https://api.github.com/users/NunoFilipeSantos/following{/other_user}",
+      "gists_url": "https://api.github.com/users/NunoFilipeSantos/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/NunoFilipeSantos/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/NunoFilipeSantos/subscriptions",
+      "organizations_url": "https://api.github.com/users/NunoFilipeSantos/orgs",
+      "repos_url": "https://api.github.com/users/NunoFilipeSantos/repos",
+      "events_url": "https://api.github.com/users/NunoFilipeSantos/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/NunoFilipeSantos/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-06T10:36:06Z",
+    "updated_at": "2023-07-06T10:36:06Z",
+    "author_association": "MEMBER",
+    "body": "This was solved by https://github.com/ethereum/solidity/issues/13972 .",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1623440281/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
