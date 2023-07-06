@@ -58,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "fvictorio",
@@ -105,12 +105,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-07-02T16:27:51Z",
-  "updated_at": "2023-07-05T11:44:41Z",
-  "closed_at": null,
+  "updated_at": "2023-07-06T17:29:28Z",
+  "closed_at": "2023-07-06T17:29:28Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\r\n\r\n2.16.1\r\n\r\n### What happened?\r\n\r\nUpdate of https://github.com/NomicFoundation/hardhat/issues/4044. After the fix, new issues are:\r\n- Doesn't trigger when you have an indexed value\r\n- If you trigger multiple events, the first one is emitted.\r\n\r\nContact\r\n```solidity\r\ncontract ContractA {\r\n    event EventNumber(uint amount);\r\n    event EventAddress(address player);\r\n    event EventAddressIndexed(address indexed player);\r\n\r\n    function testWithNumber(uint amount) public {\r\n        emit EventNumber(amount);\r\n    }\r\n\r\n    function testWithEventAddress() public {\r\n        emit EventAddress(msg.sender);\r\n    }\r\n\r\n    function testWithEventAddressIndexed() public {\r\n        emit EventAddressIndexed(msg.sender);\r\n    }\r\n\r\n    function testWithMultipleEvents() public {\r\n        emit EventNumber(1337);\r\n        emit EventNumber(5);\r\n        emit EventAddress(msg.sender);\r\n    }\r\n}\r\n\r\n```\r\n\r\nUsing the following test:\r\n```ts\r\nawait new Promise(async (resolve) => {\r\n      contractA.on(\"EventNumber\", (amount: BigNumber) => {\r\n        console.log(`- Received events testWithNumber with amount: ${amount}`);\r\n      });\r\n      contractA.on(\"EventAddress\", (address) => {\r\n        console.log(\r\n          `- Received events testWithEventAddress with value: ${address}`\r\n        );\r\n      });\r\n      contractA.on(\"EventAddressIndexed\", (address) => {\r\n        console.log(\r\n          `- Received events testWithEventAddressIndexed with value: ${address}`\r\n        );\r\n      });\r\n\r\n      console.log(\"\\n## Triggering test event with a number...\");\r\n      await contractA.testWithNumber(123);\r\n      await wait(1000);\r\n      console.log(\"\\n## Triggering test event with an address...\");\r\n      await contractA.testWithEventAddress();\r\n      await wait(1000);\r\n      console.log(\"\\n## Triggering test event with an address indexed...\");\r\n      await contractA.testWithEventAddressIndexed();\r\n      await wait(1000);\r\n      console.log(\"\\n## Triggering test with 2 events...\");\r\n      await contractA.testWithMultipleEvents();\r\n      await wait(1000);\r\n    });\r\n```\r\n\r\nActual behavior:\r\n```t\r\n## Triggering test event with a number...\r\n- Received events testWithNumber with amount: 123\r\n\r\n## Triggering test event with an address...\r\n- Received events testWithEventAddress with value: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266\r\n\r\n## Triggering test event with an address indexed...\r\n\r\n## Triggering test with 2 events...\r\n- Received events testWithNumber with amount: 1337\r\n```\r\n\r\nExpected Behavior:\r\n```t\r\n## Triggering test event with a number...\r\n- Received events testWithNumber with amount: 123\r\n\r\n## Triggering test event with an address...\r\n- Received events testWithEventAddress with value: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266\r\n\r\n## Triggering test event with an address indexed...\r\n- Received events testWithEventAddressIndexed with value: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266\r\n\r\n## Triggering test with 2 events...\r\n- Received events testWithNumber with amount: 1337\r\n- Received events testWithNumber with amount: 5\r\n- Received events testWithEventAddress with value: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266\r\n\r\n```\r\n\r\n### Minimal reproduction steps\r\n\r\ngit clone -b issue-2 https://github.com/lescaudr/ethers-event-issue\r\n\r\n- `pnpm install`\r\n- `npx hardhat compile`\r\n- `npx hardhat test`\r\n\r\n### Search terms\r\n\r\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4098/reactions",
     "total_count": 0,
@@ -125,7 +144,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4098/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
