@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7336",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7336/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7336/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7336/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7336",
+  "id": 1791838759,
+  "node_id": "I_kwDOCM9I9M5qzUon",
+  "number": 7336,
+  "title": "VC with multiple failover BNs: improve error detection",
+  "user": {
+    "login": "tbenr",
+    "id": 15999009,
+    "node_id": "MDQ6VXNlcjE1OTk5MDA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/15999009?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tbenr",
+    "html_url": "https://github.com/tbenr",
+    "followers_url": "https://api.github.com/users/tbenr/followers",
+    "following_url": "https://api.github.com/users/tbenr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tbenr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tbenr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tbenr/subscriptions",
+    "organizations_url": "https://api.github.com/users/tbenr/orgs",
+    "repos_url": "https://api.github.com/users/tbenr/repos",
+    "events_url": "https://api.github.com/users/tbenr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tbenr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-06T16:04:12Z",
+  "updated_at": "2023-07-06T16:06:52Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "When request are relayed via `relayRequest` method, we are going to respond back with the first successful response via `getFirstSuccessfulResponseFromFailovers`.\r\n\r\nThe problem is that an error can also be at application level, not only at networking level (ie: the `SafeFuture` can resolve successfully but it might have a value representing an error).\r\n\r\nIn particular, when submitting an attestation via `SafeFuture<List<SubmitDataError>> sendSignedAttestations`, we may consider a \"first successful response\" as a BN that actually returned a non-zero list of errors.\r\n\r\nIt happened in real scenario where a Teku VC was using 2 secondary BNs, one Teku and one LH.\r\n- LH BN responded with: `tech.pegasys.teku.validator.client.duties.RestApiReportedException: Verification: UnknownHeadBlock { beacon_block_root: <redacted> }`.\r\n- Teku BN seemed to returned no errors.\r\n\r\nSince LH probably returned earlier since the head was unknown for them, we took it as the \"first successful response\".\r\n\r\nSo VC printed `Validator   *** Failed to produce attestation  Slot: <redacted>` even if the attestations where published correctly via Teku BN.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7336/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7336/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
