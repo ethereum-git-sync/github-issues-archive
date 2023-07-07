@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-07-07T14:10:12Z",
-  "updated_at": "2023-07-07T14:12:40Z",
-  "closed_at": null,
+  "updated_at": "2023-07-07T17:25:55Z",
+  "closed_at": "2023-07-07T17:25:54Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (42fb694 2023-07-04T04:05:19.933539600Z)\n\n### What command(s) is the bug in?\n\nforge build\n\n### Operating System\n\nWindows\n\n### Describe the bug\n\ntl;dr - Whilst compiling with Foundry, we ended up producing bytecode which is dissimilar to compiling directly using solc binaries. Any chance we might be missing any settings in the json-input?\r\n\r\nSource: https://github.com/FraxFinance/frax-governance/tree/4e3189bfaae1a667f8f0e993d374a04907ef7d12\r\n\r\nReplace foundry.toml with:\r\n\r\n```\r\n[profile.default]\r\n# The source directory\r\nsrc = 'src'\r\n# The artifact directory\r\nout = 'out'\r\n# A list of paths to look for libraries in\r\nlibs = ['lib']\r\n# Whether or not to enable `vm.ffi`\r\nffi = true\r\n# Enables or disables via-ir\r\nvia-ir = true\r\n# Enables or disables the optimizer\r\noptimizer = true\r\n# The number of optimizer runs\r\noptimizer_runs = 20_000\r\n# Improves verification\r\nbytecode_hash = \"none\"\r\n# Contracts to track with --gas-report\r\ngas_reports = [\"FraxGovernorAlpha\", \"FraxGovernorOmega\", \"VeFxsVotingDelegation\", \"FraxGuard\"]\r\n# EVM version\r\nevm_version = \"london\"\r\n# Version to compile with\r\nsolc_version = \"0.8.19\"\r\ncbor_metadata = false\r\n\r\n# See more config options https://github.com/foundry-rs/foundry/tree/master/config\r\n\r\n[fmt]\r\nline_length = 1000 # This gets overriden by prettier afterwards\r\ntab_width = 4\r\nbracket_spacing = true\r\nint_types = \"long\"\r\nnumber_underscore = \"thousands\"\r\n```\r\n\r\nWith this, we could compile bytecode identical to on-chain bytecode. However, transforming this to json-input and manually compiling with solc 0.8.19 binaries, we ended up with a different set of bytecode.\r\n\r\n[arbitrum-frax.txt](https://github.com/foundry-rs/foundry/files/11982729/arbitrum-frax.txt)\r\n\r\nMainly the settings being:\r\n\r\n```\r\n  \"settings\": {\r\n    \"remappings\": [\r\n      \"@gnosis.pm/=lib/safe-contracts/\",\r\n      \"@openzeppelin/=lib/openzeppelin-contracts/\",\r\n      \"ds-test/=lib/frax-standard-solidity/lib/forge-std/lib/ds-test/src/\",\r\n      \"erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\r\n      \"forge-std/=lib/frax-standard-solidity/lib/forge-std/src/\",\r\n      \"frax-standard-solidity/=lib/frax-standard-solidity/src/\",\r\n      \"frax-std/=lib/frax-standard-solidity/src/\",\r\n      \"openzeppelin-contracts/=lib/openzeppelin-contracts/\",\r\n      \"openzeppelin/=lib/openzeppelin-contracts/contracts/\",\r\n      \"safe-contracts/=lib/safe-contracts/contracts/\",\r\n      \"safe-tools/=lib/safe-tools/src/\",\r\n      \"solady/=lib/safe-tools/lib/solady/src/\",\r\n      \"solmate/=lib/safe-tools/lib/solady/lib/solmate/src/\"\r\n    ],\r\n    \"optimizer\": {\r\n      \"enabled\": true,\r\n      \"runs\": 20000\r\n    },\r\n    \"metadata\": {\r\n      \"appendCBOR\": false,\r\n      \"bytecodeHash\": \"none\"\r\n    },\r\n    \"outputSelection\": {\r\n      \"*\": {\r\n        \"*\": [\r\n          \"evm.bytecode\",\r\n          \"evm.deployedBytecode\",\r\n          \"devdoc\",\r\n          \"userdoc\",\r\n          \"metadata\",\r\n          \"abi\"\r\n        ]\r\n      }\r\n    },\r\n    \"evmVersion\": \"london\",\r\n    \"viaIR\": true,\r\n    \"libraries\": {}\r\n  }\r\n```\r\n\r\n\r\nThe diff (https://difff.jp/en/vqb56.html) here - Feel free to ignore the immutables since we'd process that during verification time - However the small diffs seems to be indicating there's some settings that is being missed out. Though I think the settings line up - optimizer enabled, runs at 20k, appendCBOR false with no bytecodehash, evmVersion being London and enabled viaIR..... Any chance we might be missing anything?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Enigmatic331",
+    "id": 28551011,
+    "node_id": "MDQ6VXNlcjI4NTUxMDEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/28551011?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Enigmatic331",
+    "html_url": "https://github.com/Enigmatic331",
+    "followers_url": "https://api.github.com/users/Enigmatic331/followers",
+    "following_url": "https://api.github.com/users/Enigmatic331/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Enigmatic331/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Enigmatic331/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Enigmatic331/subscriptions",
+    "organizations_url": "https://api.github.com/users/Enigmatic331/orgs",
+    "repos_url": "https://api.github.com/users/Enigmatic331/repos",
+    "events_url": "https://api.github.com/users/Enigmatic331/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Enigmatic331/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5327/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5327/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -113,6 +132,50 @@
       "heart": 0,
       "rocket": 0,
       "eyes": 1
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1625719371",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5327#issuecomment-1625719371",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5327",
+    "id": 1625719371,
+    "node_id": "IC_kwDOGBlvNc5g5oJL",
+    "user": {
+      "login": "Enigmatic331",
+      "id": 28551011,
+      "node_id": "MDQ6VXNlcjI4NTUxMDEx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28551011?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Enigmatic331",
+      "html_url": "https://github.com/Enigmatic331",
+      "followers_url": "https://api.github.com/users/Enigmatic331/followers",
+      "following_url": "https://api.github.com/users/Enigmatic331/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Enigmatic331/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Enigmatic331/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Enigmatic331/subscriptions",
+      "organizations_url": "https://api.github.com/users/Enigmatic331/orgs",
+      "repos_url": "https://api.github.com/users/Enigmatic331/repos",
+      "events_url": "https://api.github.com/users/Enigmatic331/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Enigmatic331/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-07T17:25:54Z",
+    "updated_at": "2023-07-07T17:25:54Z",
+    "author_association": "NONE",
+    "body": "Hah... Dug around for the past couple hours, and good news, it isn't Foundry (whew). :)\r\n\r\nWas able to narrow it down to one file now, when included/excluded, seem to result in bytecode diffs. (attaching in case you might be curious)\r\n\r\n[2.txt](https://github.com/foundry-rs/foundry/files/11984370/2.txt)\r\n[1.txt](https://github.com/foundry-rs/foundry/files/11984373/1.txt)\r\n\r\nWish I know better what might be going on. 🥲  Might need to ping the Solidity team...\r\n\r\nClosing this. And thanks Matthias, --build-info was helpful! We can ask users to provide it the next time they have issues verifying their contracts, makes it easier for us to quickly identify if it's a setting issue, etc.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1625719371/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
     },
     "performed_via_github_app": null
   }
