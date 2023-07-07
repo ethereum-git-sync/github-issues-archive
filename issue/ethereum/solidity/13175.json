@@ -31,6 +31,15 @@
   },
   "labels": [
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -49,21 +58,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2022-06-20T16:09:57Z",
-  "updated_at": "2023-06-30T12:04:31Z",
-  "closed_at": null,
+  "updated_at": "2023-07-07T12:04:49Z",
+  "closed_at": "2023-07-07T12:04:48Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nConsider following struct:\r\n\r\n```sol\r\nstruct Foo {\r\n    bool val1;\r\n    bool val2;\r\n    bool val3;\r\n    bool val4;\r\n}\r\n```\r\n\r\nWhen abiencoded value Foo(true, true, false, true) translates into `0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001`, while it could be just `1101`.\r\n\r\n## Motivation\r\n\r\nSince gas usage is a big topic almost all big ethereum projects use tight structs packing to save caller funds. You can see it in the wild everywhere, e.g. [1Inch limit orders](https://github.com/1inch/limit-order-protocol/blob/179b4fef24bec0a043b45e5d7a4412de6cc7864c/contracts/OrderRFQMixin.sol#L23) encodes order Id and timestamp into `Order.info` or [Uniswap V3 swaps](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L547) encodes zeroForOne and oneForZero fees into `feeProtocol` field. There are other examples in the wild. Since it's a repeatable pattern which is kinda error-prone and dull I think it just might be worthwhile to move this to compiler and code generation.\r\n\r\n## Specification\r\n\r\nIntroduce new keyword `packed` that changes ABI representation and field access. It might look like:\r\n\r\n```sol\r\nstruct packed Foo {\r\n    bool val1;\r\n    bool val2;\r\n    bool val3;\r\n    bool val4;\r\n}\r\n```\r\n\r\nThis struct should be only 4 bytes long. When abiencoded it might look like `00000000000000000000000000000000000000000000000000000000000001101` or `11010000000000000000000000000000000000000000000000000000000000000` depending on if we want `bytes` or `uint` zeroing pattern. Compiler is responsible for generating appropriate bit shifts and masks when reading and writing fields:\r\n\r\n```sol\r\nfoo.val2 = true; // foo = foo & (1 << 1)\r\n```\r\n\r\nNote that unlike current behavior this should affect calldata representation as well as inner storage.\r\n\r\n## Backwards Compatibility\r\n\r\nSince this proposal introduces a new keyword it doesn't change meaning for any existing code.\r\n\r\nRelated: #11691\r\n\r\n\r\n## Additional considerations\r\n\r\nIt may be also worthwhile to consider packed arrays like:\r\n\r\n```sol\r\nfunction bar(uint8[] packed calldata foo) external {\r\n}\r\n```\r\n\r\nso it doesn't put padding zeroes between elements, but unaligned access from those might be tricky and come with surprise costs.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13175/reactions",
     "total_count": 0,
@@ -78,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13175/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -201,6 +229,50 @@
     "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1614556525/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1625313312",
+    "html_url": "https://github.com/ethereum/solidity/issues/13175#issuecomment-1625313312",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13175",
+    "id": 1625313312,
+    "node_id": "IC_kwDOAm_5kc5g4FAg",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-07-07T12:04:47Z",
+    "updated_at": "2023-07-07T12:04:47Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1625313312/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
