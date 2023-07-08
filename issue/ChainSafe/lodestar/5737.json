@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-07-08T00:28:31Z",
-  "updated_at": "2023-07-08T00:29:20Z",
+  "updated_at": "2023-07-08T13:53:36Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1627305176",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/5737#issuecomment-1627305176",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5737",
+    "id": 1627305176,
+    "node_id": "IC_kwDOCD5_Gc5g_rTY",
+    "user": {
+      "login": "nflaig",
+      "id": 38436224,
+      "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nflaig",
+      "html_url": "https://github.com/nflaig",
+      "followers_url": "https://api.github.com/users/nflaig/followers",
+      "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+      "organizations_url": "https://api.github.com/users/nflaig/orgs",
+      "repos_url": "https://api.github.com/users/nflaig/repos",
+      "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nflaig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-08T13:53:36Z",
+    "updated_at": "2023-07-08T13:53:36Z",
+    "author_association": "MEMBER",
+    "body": "Thanks for the detailed report.\r\n\r\nI tried to reproduce this but the result looks as expected for me\r\n\r\n```js\r\nimport { toHexString } from \"@chainsafe/ssz\";\r\nimport { getClient, ApiError } from \"@lodestar/api\";\r\nimport { config } from \"@lodestar/config/default\";\r\nimport { ssz } from \"@lodestar/types\";\r\n\r\nconst api = getClient({ baseUrl: \"http://localhost:9596\" }, { config });\r\nconst slot = process.argv[2];\r\n\r\nconst blockRes = await api.beacon.getBlockV2(slot);\r\nApiError.assert(blockRes);\r\n\r\nconst blockStateRoot = toHexString(blockRes.response.data.message.stateRoot);\r\nconsole.log(\"BeaconBlock stateRoot:    \", blockStateRoot);\r\n\r\nconst stateRes = await api.debug.getStateV2(slot);\r\nApiError.assert(stateRes);\r\n\r\nconst stateRoot = toHexString(ssz.capella.BeaconState.hashTreeRoot(stateRes.response.data));\r\nconsole.log(\"BeaconState hashTreeRoot: \", stateRoot);\r\n\r\nconsole.assert(stateRoot === blockStateRoot);\r\n```\r\n\r\n```sh\r\n> node index.js 6832476\r\nBeaconBlock stateRoot:     0xa80fa56b5f84f323e97eeb10b642190f2fb03b964eca38616e85e6c6e465bf26\r\nBeaconState hashTreeRoot:  0xa80fa56b5f84f323e97eeb10b642190f2fb03b964eca38616e85e6c6e465bf26\r\n\r\n> node index.js 6833329\r\nBeaconBlock stateRoot:     0xc6bf36c98decce99faf8c06a6491de3552daad8cc8f94f216bcd55a3be0ba4ee\r\nBeaconState hashTreeRoot:  0xc6bf36c98decce99faf8c06a6491de3552daad8cc8f94f216bcd55a3be0ba4ee\r\n\r\n> node index.js 6833350\r\nBeaconBlock stateRoot:     0xab26e7b7811b8c48e94edb0d4f2ab3e38969416c47f30b08dcd6a50c472790e4\r\nBeaconState hashTreeRoot:  0xab26e7b7811b8c48e94edb0d4f2ab3e38969416c47f30b08dcd6a50c472790e4\r\n```\r\n\r\nI have checked multiple slots and the results are always correct. Might be an issue with the data for specific slot 6491104 you checked.\r\n\r\nFrom where are you pulling the historic state and is it a Lodestar beacon node?",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1627305176/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
