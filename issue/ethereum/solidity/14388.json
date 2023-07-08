@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14388",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14388/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14388/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14388/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14388",
+  "id": 1794944755,
+  "node_id": "I_kwDOAm_5kc5q_K7z",
+  "number": 14388,
+  "title": "IR Optimizer failed to remove inline assembly code after ``return``",
+  "user": {
+    "login": "hpumengzhao",
+    "id": 36286293,
+    "node_id": "MDQ6VXNlcjM2Mjg2Mjkz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/36286293?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hpumengzhao",
+    "html_url": "https://github.com/hpumengzhao",
+    "followers_url": "https://api.github.com/users/hpumengzhao/followers",
+    "following_url": "https://api.github.com/users/hpumengzhao/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hpumengzhao/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hpumengzhao/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hpumengzhao/subscriptions",
+    "organizations_url": "https://api.github.com/users/hpumengzhao/orgs",
+    "repos_url": "https://api.github.com/users/hpumengzhao/repos",
+    "events_url": "https://api.github.com/users/hpumengzhao/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hpumengzhao/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-08T13:36:33Z",
+  "updated_at": "2023-07-08T13:36:33Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nFor the following contract\r\n```solidity\r\npragma solidity ^0.8.0;\r\n\r\ncontract UnreachableCode {\r\n    uint256 globalVar = 10;\r\n\r\n    function foo(uint256 x) public {\r\n        if (x < 5) {\r\n            for (uint i = 0; i < 3; i++) {\r\n                globalVar = globalVar + i;\r\n            }\r\n        } else if (x < 10) {\r\n            while (globalVar > 0) {\r\n                globalVar = globalVar - 1;\r\n                if (globalVar == 5) {\r\n                    break;\r\n                }\r\n            }\r\n        } else {\r\n            return;\r\n        }\r\n\r\n        return ;\r\n        unreachableCode();\r\n    }\r\n\r\n    function unreachableCode() private pure  {\r\n        uint256 y = 5;\r\n        return ;\r\n        assembly {\r\n            let ptr := mload(0x40)\r\n            mstore(ptr, y)\r\n        }\r\n    }\r\n}\r\n```\r\nThe optimizer failed to remove the \r\n```solidity\r\n        assembly {\r\n            let ptr := mload(0x40)\r\n            mstore(ptr, y)\r\n        }\r\n```\r\n## Environment\r\n\r\n- Compiler version: 0.8.19\r\n- Framework/IDE (e.g. Truffle or Remix):Remix\r\n- Compiler config\r\n```json\r\n{\r\n\t\"language\": \"Solidity\",\r\n\t\"settings\": {\r\n\t\t\"viaIR\": true, \r\n\t\t\"optimizer\": {\r\n\t\t\t\"enabled\": true,\r\n\t\t\t\"runs\": 200\r\n\t\t},\r\n\t\t\"outputSelection\": {\r\n\t\t\t\"*\": {\r\n\t\t\t\"\": [\"ast\"],\r\n\t\t\t\"*\": [\"abi\", \"metadata\", \"devdoc\", \"userdoc\", \"storageLayout\", \"evm.legacyAssembly\", \"evm.bytecode\", \"evm.deployedBytecode\", \"evm.methodIdentifiers\", \"evm.gasEstimates\", \"evm.assembly\"]\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14388/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14388/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
