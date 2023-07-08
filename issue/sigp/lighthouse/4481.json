@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4481",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4481/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4481/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4481/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4481",
+  "id": 1794524137,
+  "node_id": "I_kwDOCFeAzc5q9kPp",
+  "number": 4481,
+  "title": "Add logic to prune all historic states",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2336798682,
+      "node_id": "MDU6TGFiZWwyMzM2Nzk4Njgy",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/database",
+      "name": "database",
+      "color": "C01C9D",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 5636045869,
+      "node_id": "LA_kwDOCFeAzc8AAAABT-88LQ",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/tree-states",
+      "name": "tree-states",
+      "color": "91FCA5",
+      "default": false,
+      "description": "Upcoming state and database overhaul"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-07T23:16:44Z",
+  "updated_at": "2023-07-07T23:22:08Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nIt would be useful for several purposes to be able to drop all of the states in the freezer DB. Some uses include:\r\n\r\n- Recover from database corruption (e.g. due to https://github.com/sigp/lighthouse/issues/3011).\r\n- Enable historic block pruning (see https://github.com/sigp/lighthouse/pull/4158).\r\n- Save space by running without historic states (https://github.com/sigp/lighthouse/issues/3211).\r\n- Migrate from stable Lighthouse to `tree-states`\r\n\r\n## Steps to resolve\r\n\r\nI think for forwards-compatibility with tree-states it would be best to implement the deletion as several iterators over the relevant columns, which just delete everything in the column without parsing it. Basically:\r\n\r\n```rust\r\nfor column in relevant {\r\n  for key in db.iter_column(column) {\r\n    to_delete.push(key);\r\n  }\r\n}\r\n```\r\n\r\nWhere `relevant` consists of:\r\n\r\n* `DBColumn::BeaconStateSummary` (where the `ColdStateSummary` is stored)\r\n* `DBColumn::BeaconState` (where the `PartialBeaconState` is stored)\r\n* `DBColumn::BeaconRestorePoint` (where the restore point -> state root index is stored)\r\n* `DBColumn::BeaconStateRoots`\r\n* `DBColumn::BeaconHistoricalRoots`\r\n* `DBColumn::BeaconRandaoMixes`\r\n* `DBColumn::BeaconHistoricalSummaries`\r\n\r\nI think on `unstable` the beacon block roots should be left intact, as we expect them to exist whenever we've stored historic _blocks_ in the DB.\r\n\r\nAtomically with those deletions we should _update_ the `state_upper_limit` in the `Anchor` to reflect the fact that those states are gone. I think setting it to `u64::MAX` could be a good way to signal a new mode of operation where \"this node isn't storing any historic states\". Alternatively, we set it to the next restore point slot (or snapshot slot for tree-states) which is `>= split.slot`. Either way, we need this block of logic from the tree-states branch that prevents the finalization migration from trying to write bad states:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/079cd67df26bd66a97f9244f540f5108c8314d9e/beacon_node/store/src/hot_cold_store.rs#L2204-L2211\r\n\r\nI think we probably also want to solve the alignment issues for checkpoint sync first, otherwise we'll have to avoid deleting all the states when the split point is at a skipped slot. See: https://github.com/sigp/lighthouse/issues/3210#issuecomment-1588303226.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4481/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4481/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
