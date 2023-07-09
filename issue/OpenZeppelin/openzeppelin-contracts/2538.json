@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2021-02-24T14:21:38Z",
-  "updated_at": "2021-02-25T16:37:26Z",
-  "closed_at": null,
+  "updated_at": "2023-07-08T22:24:14Z",
+  "closed_at": "2023-07-08T22:24:14Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "**🧐 Motivation**\r\nUnlike the transparent proxy, the `_BEACON_SLOT` that is part of the BeaconProxy design doesn't need to be updated to update the proxy. Its rather the opposite:\r\n- Upgrades are to be performed in the beacon's storage space\r\n- Changed to the `_BEACON_SLOT` could, if performed incorrectly by the implementation, break the proxy.\r\n\r\nIn some cases the ability to update the `_BEACON_SLOT` might be a welcomed feature... but in other cases, it might be a cost (an sload is required) and an eventual security issue.\r\n\r\n**📝 Details**\r\nFor cases where upgradeability of the `_BEACON_SLOT` is not requiered, the beacon address could be stored using an immutable variable. This would provide a new `ImmutableBeaconProxy` implementation\r\n\r\n```\r\ncontract ImmutableBeaconProxy is Proxy {\r\n    IBeacon immutable private _beacon;\r\n\r\n    constructor(address beacon, bytes memory data) payable {\r\n        require(\r\n            Address.isContract(beacon),\r\n            \"BeaconProxy: beacon is not a contract\"\r\n        );\r\n        require(\r\n            Address.isContract(IBeacon(beacon).implementation()),\r\n            \"BeaconProxy: beacon implementation is not a contract\"\r\n        );\r\n\r\n        _beacon = IBeacon(beacon);\r\n\r\n        if (data.length > 0) {\r\n            // cannot call `_implementation()` because immutable variables cannot be read during construction.\r\n            Address.functionDelegateCall(IBeacon(beacon).implementation(), data, \"BeaconProxy: function call failed\");\r\n        }\r\n    }\r\n\r\n    function _implementation() internal view override returns (address) {\r\n        return _beacon.implementation();\r\n    }\r\n}\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2538/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2538/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
