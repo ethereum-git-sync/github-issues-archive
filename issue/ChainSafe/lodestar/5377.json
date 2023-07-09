@@ -47,13 +47,13 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-04-18T14:41:12Z",
-  "updated_at": "2023-05-12T16:05:26Z",
+  "updated_at": "2023-07-09T11:54:10Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "**Problem**\r\n\r\nIt has been reported by some users that their Lodestar BN takes up to 40 minutes to get to max peers (50).\r\n\r\n**Logs**\r\n\r\n[beacon-log-peering-issues.txt](https://github.com/ChainSafe/lodestar/files/11262965/beacon-log-peering-issues.txt)\r\n\r\n**Discord**\r\n\r\n- https://discord.com/channels/593655374469660673/743858262864167062/1089588530856067102\r\n- https://discord.com/channels/593655374469660673/743858262864167062/1095501765358661722\r\n- https://discord.com/channels/593655374469660673/605818244036821012/1092710957324701706\r\n- https://discord.com/channels/593655374469660673/593655641445367808/1106598080498892830\r\n",
+  "body": "**Problem**\r\n\r\nIt has been reported by some users that their Lodestar BN takes up to 40 minutes to get to max peers (50).\r\n\r\n**Logs**\r\n\r\n- [beacon-log-peering-issues.txt](https://github.com/ChainSafe/lodestar/files/11262965/beacon-log-peering-issues.txt)\r\n- [beacon-2023-04-03-full-peering-issues.log](https://www.dropbox.com/scl/fi/past4nw8ue0eti4dlp01n/beacon-2023-04-03-full-peering-issues.log?rlkey=cbs0q62b7i4bkqg5b9bo0nqyh&dl=0)\r\n\r\n**Discord**\r\n\r\n- https://discord.com/channels/593655374469660673/743858262864167062/1089588530856067102\r\n- https://discord.com/channels/593655374469660673/743858262864167062/1095501765358661722\r\n- https://discord.com/channels/593655374469660673/605818244036821012/1092710957324701706\r\n- https://discord.com/channels/593655374469660673/593655641445367808/1106598080498892830\r\n",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5377/reactions",
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1627692962",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/5377#issuecomment-1627692962",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5377",
+    "id": 1627692962,
+    "node_id": "IC_kwDOCD5_Gc5hBJ-i",
+    "user": {
+      "login": "nflaig",
+      "id": 38436224,
+      "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nflaig",
+      "html_url": "https://github.com/nflaig",
+      "followers_url": "https://api.github.com/users/nflaig/followers",
+      "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+      "organizations_url": "https://api.github.com/users/nflaig/orgs",
+      "repos_url": "https://api.github.com/users/nflaig/repos",
+      "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nflaig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-09T11:52:36Z",
+    "updated_at": "2023-07-09T11:52:36Z",
+    "author_association": "MEMBER",
+    "body": "It looks like the problem here is that the node is not able to range sync.\r\n\r\nThere are a lot of beacon_blocks_by_range errors\r\n```\r\nApr-03 08:42:45.452[network]       \u001B[36mverbose\u001B[39m: Req  error method=beacon_blocks_by_range, encoding=ssz_snappy, client=Unknown, peer=16...tknFJJ, requestId=670 code=REQUEST_ERROR_DIAL_TIMEOUT\r\nError: REQUEST_ERROR_DIAL_TIMEOUT\r\n    at file:///usr/app/packages/reqresp/src/request/index.ts:116:15\r\n    at sendRequest (file:///usr/app/packages/reqresp/src/request/index.ts:104:20)\r\n    at ReqRespBeaconNode.sendRequest (file:///usr/app/packages/reqresp/src/ReqResp.ts:152:7)\r\n    at collectSequentialBlocksInRange (file:///usr/app/packages/beacon-node/src/network/reqresp/utils/collectSequentialBlocksInRange.ts:14:20)\r\n    at beaconBlocksMaybeBlobsByRange (file:///usr/app/packages/beacon-node/src/network/reqresp/beaconBlocksMaybeBlobsByRange.ts:36:20)\r\n    at wrapError (file:///usr/app/packages/beacon-node/src/util/wrapError.ts:18:32)\r\n    at SyncChain.sendBatch (file:///usr/app/packages/beacon-node/src/sync/range/chain.ts:400:19)\r\n```\r\n\r\nTime to first byte timeouts\r\n\r\n```\r\nApr-03 08:39:30.822[network]       \u001B[36mverbose\u001B[39m: Req  error method=beacon_blocks_by_range, encoding=ssz_snappy, client=Lighthouse, peer=16...ZDf5pb, requestId=55 code=REQUEST_ERROR_TTFB_TIMEOUT\r\nError: REQUEST_ERROR_TTFB_TIMEOUT\r\n    at getError (file:///usr/app/packages/reqresp/src/request/index.ts:176:29)\r\n    at EventTarget.abortHandler (file:///usr/app/packages/reqresp/src/utils/abortableSource.ts:26:48)\r\n    at EventTarget.[nodejs.internal.kHybridDispatch] (node:internal/event_target:735:20)\r\n    at EventTarget.dispatchEvent (node:internal/event_target:677:26)\r\n    at abortSignal (node:internal/abort_controller:308:10)\r\n    at AbortController.abort (node:internal/abort_controller:338:5)\r\n    at Timeout.<anonymous> (file:///usr/app/packages/reqresp/src/request/index.ts:162:64)\r\n    at listOnTimeout (node:internal/timers:569:17)\r\n    at processTimers (node:internal/timers:512:7)\r\n```\r\n\r\nTimeout between `<response_chunk>` exceeded\r\n\r\n```\r\nApr-03 08:39:35.002[sync]          \u001B[36mverbose\u001B[39m: Batch download error id=Finalized, startEpoch=191862, status=Downloading method=beacon_blocks_by_range, encoding=ssz_snappy, peer=16Uiu2HAmVqjEaG7SRVEe7hBmLWeyDaUoN1bSXaYppEJ3D1JeNcAH, code=REQUEST_ERROR_RESP_TIMEOUT\r\nError: REQUEST_ERROR_RESP_TIMEOUT\r\n    at sendRequest (file:///usr/app/packages/reqresp/src/request/index.ts:219:13)\r\n    at ReqRespBeaconNode.sendRequest (file:///usr/app/packages/reqresp/src/ReqResp.ts:152:7)\r\n    at collectSequentialBlocksInRange (file:///usr/app/packages/beacon-node/src/network/reqresp/utils/collectSequentialBlocksInRange.ts:14:20)\r\n    at beaconBlocksMaybeBlobsByRange (file:///usr/app/packages/beacon-node/src/network/reqresp/beaconBlocksMaybeBlobsByRange.ts:36:20)\r\n    at wrapError (file:///usr/app/packages/beacon-node/src/util/wrapError.ts:18:32)\r\n    at SyncChain.sendBatch (file:///usr/app/packages/beacon-node/src/sync/range/chain.ts:400:19)\r\n```\r\n\r\nLodestar sents beacon_blocks_by_range requests to nodes where the connection is already being closed\r\n\r\n```\r\nApr-03 08:42:19.636[network]       \u001B[36mverbose\u001B[39m: Req  error method=beacon_blocks_by_range, encoding=ssz_snappy, client=Teku, peer=16...fTwKhq, requestId=659 code=REQUEST_ERROR_DIAL_ERROR, error=the connection is being closed\r\nError: the connection is being closed\r\n    at ConnectionImpl.newStream (file:///usr/app/node_modules/libp2p/src/connection/index.ts:110:21)\r\n    at Libp2pNode.dialProtocol (file:///usr/app/node_modules/libp2p/src/libp2p.ts:374:29)\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at runNextTicks (node:internal/process/task_queues:64:3)\r\n    at listOnTimeout (node:internal/timers:538:9)\r\n    at processTimers (node:internal/timers:512:7)\r\n    at file:///usr/app/packages/reqresp/src/request/index.ts:107:22\r\n    at withTimeout (file:///usr/app/packages/utils/src/timeout.ts:19:12)\r\n    at sendRequest (file:///usr/app/packages/reqresp/src/request/index.ts:104:20)\r\n    at ReqRespBeaconNode.sendRequest (file:///usr/app/packages/reqresp/src/ReqResp.ts:152:7)\r\n```\r\n\r\nIssue does not seem to be isolated to a specific client\r\n\r\nSummary of the beacon_blocks_by_range error logs per client:\r\n\r\n- Prysm: 487 occurrences\r\n- Teku: 40 occurrences\r\n- Lodestar: 10 occurrences\r\n- Nimbus: 102 occurrences\r\n- Lighthouse: 1674 occurrences\r\n\r\nDisconnect reasons:\r\n\r\n- \"Client has too many peers\": 1936 occurrences\r\n- \"Internal fault\": 150 occurrences\r\n- \"Peer banned this node\": 32 occurrences\r\n- \"INCOMPATIBLE_FORKS ours\": 26 occurrences\r\n- \"Peer score too low\": 20 occurrences\r\n- \"Client shutdown\": 15 occurrences\r\n- \"Irrelevant network\": 10 occurrences\r\n\r\n\r\nDisconnect reason is predominantly \"Client has too many peers\"\r\n\r\n\r\nWhy are there so many timeouts\r\n- Network might be slow, low bandwidth?\r\n- Lodestar sends too many concurrent batch download requests causing network congestion?\r\n- Lodestar suffers from high event loop lag / high I/O lag during range sync?",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1627692962/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
