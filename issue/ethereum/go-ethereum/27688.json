@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-07-10T09:37:03Z",
-  "updated_at": "2023-07-10T09:37:40Z",
+  "updated_at": "2023-07-10T15:45:58Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +72,92 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1629153890",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/27688#issuecomment-1629153890",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688",
+    "id": 1629153890,
+    "node_id": "IC_kwDOAOvK985hGupi",
+    "user": {
+      "login": "s1na",
+      "id": 1591639,
+      "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/s1na",
+      "html_url": "https://github.com/s1na",
+      "followers_url": "https://api.github.com/users/s1na/followers",
+      "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+      "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+      "organizations_url": "https://api.github.com/users/s1na/orgs",
+      "repos_url": "https://api.github.com/users/s1na/repos",
+      "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/s1na/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-10T15:04:19Z",
+    "updated_at": "2023-07-10T15:04:41Z",
+    "author_association": "MEMBER",
+    "body": "Hey thanks for the report and charts. We have some aggregate bloom filters for ranges of blocks that should prevent looking into too many blocks for an event that doesn't exist wastelessly. My guess is those are overflown. But interesting you say this slowdown is not seen on mainnet. We should reproduce this as a first step.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1629153890/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1629225995",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/27688#issuecomment-1629225995",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688",
+    "id": 1629225995,
+    "node_id": "IC_kwDOAOvK985hHAQL",
+    "user": {
+      "login": "MattKetmo",
+      "id": 334996,
+      "node_id": "MDQ6VXNlcjMzNDk5Ng==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/334996?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MattKetmo",
+      "html_url": "https://github.com/MattKetmo",
+      "followers_url": "https://api.github.com/users/MattKetmo/followers",
+      "following_url": "https://api.github.com/users/MattKetmo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MattKetmo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MattKetmo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MattKetmo/subscriptions",
+      "organizations_url": "https://api.github.com/users/MattKetmo/orgs",
+      "repos_url": "https://api.github.com/users/MattKetmo/repos",
+      "events_url": "https://api.github.com/users/MattKetmo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MattKetmo/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-10T15:45:58Z",
+    "updated_at": "2023-07-10T15:45:58Z",
+    "author_association": "NONE",
+    "body": "About `Goerli` vs `Mainnet`, I notice the volume of logs has some huge spikes for a month on goerli. So indeed might have some optimisations to do when that happens. \r\n\r\n```sql\r\nSELECT\r\ndate_trunc('day', block_time) AS day,\r\nCOUNT(*) AS vol\r\nFROM goerli.logs\r\nWHERE block_time > date '2023-03-01'\r\nGROUP BY date_trunc('day', block_time)\r\n```    \r\n\r\n![CleanShot 2023-07-10 at 17 40 22](https://github.com/ethereum/go-ethereum/assets/334996/a41d4c37-a673-4eb3-969a-eb1054f1ee7c)\r\n\r\n```sql\r\nSELECT\r\ndate_trunc('day', block_time) AS day,\r\nCOUNT(*) AS vol\r\nFROM ethereum.logs\r\nWHERE block_time > date '2023-03-01'\r\nGROUP BY date_trunc('day', block_time)\r\n```\r\n\r\n![CleanShot 2023-07-10 at 17 40 57](https://github.com/ethereum/go-ethereum/assets/334996/2965ea94-8fd9-446c-a70a-e0ed3c7a774c)\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1629225995/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 1
+    },
+    "performed_via_github_app": null
+  }
 ]
