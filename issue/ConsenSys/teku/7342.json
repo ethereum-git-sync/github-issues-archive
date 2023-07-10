@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-07-07T13:53:49Z",
-  "updated_at": "2023-07-10T13:45:36Z",
-  "closed_at": null,
+  "updated_at": "2023-07-10T17:49:18Z",
+  "closed_at": "2023-07-10T17:49:18Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "<!-- \r\nBy filing an Issue, you are expected to comply with the Code of Conduct, \r\nincluding treating everyone with respect:\r\nhttps://github.com/ConsenSys/teku/blob/master/CODE-OF-CONDUCT.md\r\n\r\nNot all sections will apply to all issue types.\r\n-->\r\n\r\n### Description\r\nSometimes [processData(final NodeId nodeId, final RpcStream rpcStream, final ByteBuf data)](https://github.com/ConsenSys/teku/blob/0e50d2ec0a3bcc2d815284c65167c59f3f9f3c3e/networking/eth2/src/main/java/tech/pegasys/teku/networking/eth2/rpc/core/Eth2OutgoingRequestHandler.java#L125) in response handler is called before the handler's is state prepared in [handleInitialPayloadSent(final RpcStream stream)](https://github.com/ConsenSys/teku/blob/0e50d2ec0a3bcc2d815284c65167c59f3f9f3c3e/networking/eth2/src/main/java/tech/pegasys/teku/networking/eth2/rpc/core/Eth2OutgoingRequestHandler.java#L102). So data arrives but we haven't toggled the state yet. \r\n\r\nI'm pretty stuck in solving this:\r\n- we couldn't synchronize flushing the data sent and changing the state\r\n- handler runs in one thread, if I try to poll state with delay, it blocks state changing too\r\n\r\n### Steps to Reproduce (Bug)\r\nWe get this kind of errors while running `BeaconBlocksByRangeIntegrationTest` and similar tests. Not sure how often we could catch it in production",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Nashatyrev",
+    "id": 8173857,
+    "node_id": "MDQ6VXNlcjgxNzM4NTc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8173857?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Nashatyrev",
+    "html_url": "https://github.com/Nashatyrev",
+    "followers_url": "https://api.github.com/users/Nashatyrev/followers",
+    "following_url": "https://api.github.com/users/Nashatyrev/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Nashatyrev/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Nashatyrev/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Nashatyrev/subscriptions",
+    "organizations_url": "https://api.github.com/users/Nashatyrev/orgs",
+    "repos_url": "https://api.github.com/users/Nashatyrev/repos",
+    "events_url": "https://api.github.com/users/Nashatyrev/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Nashatyrev/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/7342/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7342/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "`handleInitialPayloadSent` is initiated on netty `Channel.write()` future completion. While `processData` is invoked on received response(s): `ChannelInboundHandler.channelRead`\r\n\r\nThe response `read` event may potentially happen prior to `write` promise completion on a zero-latency connection. \r\n\r\nA speculative example: you are sending a request on a stream A (e.g. Muxer frame `#10`) and another protocol is then immediately sending another (larger) message on a stream B (e.g. Muxer frame `#11`). Both frames are stick together (on a transport level) and transmitted as a single buffer. The muxer frame `#10` write completion would occur when the whole buffer is written. But at the moment when the whole buffer transmission is completed the part of the buffer corresponding to the Muxer frame `#10` might already be handled and responded by the remote side. \r\n\r\nIt looks like we need to treat both callbacks `handleInitialPayloadSent` and `processData` as asynchronous and handle any kind of their receiving order",
     "reactions": {
       "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1629002531/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1629043261",
+    "html_url": "https://github.com/Consensys/teku/issues/7342#issuecomment-1629043261",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7342",
+    "id": 1629043261,
+    "node_id": "IC_kwDOCM9I9M5hGTo9",
+    "user": {
+      "login": "Nashatyrev",
+      "id": 8173857,
+      "node_id": "MDQ6VXNlcjgxNzM4NTc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8173857?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Nashatyrev",
+      "html_url": "https://github.com/Nashatyrev",
+      "followers_url": "https://api.github.com/users/Nashatyrev/followers",
+      "following_url": "https://api.github.com/users/Nashatyrev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Nashatyrev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Nashatyrev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Nashatyrev/subscriptions",
+      "organizations_url": "https://api.github.com/users/Nashatyrev/orgs",
+      "repos_url": "https://api.github.com/users/Nashatyrev/repos",
+      "events_url": "https://api.github.com/users/Nashatyrev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Nashatyrev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-10T14:06:45Z",
+    "updated_at": "2023-07-10T14:06:45Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Just for the record, the case could be reproduced with the following patch \r\n```patch\r\nIndex: networking/p2p/src/main/java/tech/pegasys/teku/networking/p2p/libp2p/rpc/RpcHandler.java\r\nIDEA additional info:\r\nSubsystem: com.intellij.openapi.diff.impl.patch.CharsetEP\r\n<+>UTF-8\r\n===================================================================\r\ndiff --git a/networking/p2p/src/main/java/tech/pegasys/teku/networking/p2p/libp2p/rpc/RpcHandler.java b/networking/p2p/src/main/java/tech/pegasys/teku/networking/p2p/libp2p/rpc/RpcHandler.java\r\n--- a/networking/p2p/src/main/java/tech/pegasys/teku/networking/p2p/libp2p/rpc/RpcHandler.java\t(revision cde5f979ad7e2a9350ba51e666e6400f0252b5da)\r\n+++ b/networking/p2p/src/main/java/tech/pegasys/teku/networking/p2p/libp2p/rpc/RpcHandler.java\t(date 1688997200925)\r\n@@ -115,6 +115,8 @@\r\n                       })\r\n                   .orInterrupt(closeInterruptor, timeoutInterruptor)\r\n                   .thenWaitFor(controller -> controller.getRpcStream().writeBytes(initialPayload))\r\n+                  .thenWaitFor(c -> asyncRunner.getDelayedFuture(Duration.ofMillis(10)))\r\n                   .orInterrupt(closeInterruptor, timeoutInterruptor)\r\n                   // closing the stream in case of any errors or interruption\r\n                   .whenException(err -> closeStreamAbruptly(streamPromise.getStream().join()));\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1629043261/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
