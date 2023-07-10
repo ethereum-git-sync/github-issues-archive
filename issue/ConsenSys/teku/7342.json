@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-07-07T13:53:49Z",
-  "updated_at": "2023-07-07T15:54:11Z",
+  "updated_at": "2023-07-10T13:45:36Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1629002531",
+    "html_url": "https://github.com/Consensys/teku/issues/7342#issuecomment-1629002531",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7342",
+    "id": 1629002531,
+    "node_id": "IC_kwDOCM9I9M5hGJsj",
+    "user": {
+      "login": "Nashatyrev",
+      "id": 8173857,
+      "node_id": "MDQ6VXNlcjgxNzM4NTc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8173857?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Nashatyrev",
+      "html_url": "https://github.com/Nashatyrev",
+      "followers_url": "https://api.github.com/users/Nashatyrev/followers",
+      "following_url": "https://api.github.com/users/Nashatyrev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Nashatyrev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Nashatyrev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Nashatyrev/subscriptions",
+      "organizations_url": "https://api.github.com/users/Nashatyrev/orgs",
+      "repos_url": "https://api.github.com/users/Nashatyrev/repos",
+      "events_url": "https://api.github.com/users/Nashatyrev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Nashatyrev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-10T13:45:36Z",
+    "updated_at": "2023-07-10T13:45:36Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "`handleInitialPayloadSent` is initiated on netty `Channel.write()` future completion. While `processData` is invoked on received response(s): `ChannelInboundHandler.channelRead`\r\n\r\nThe response `read` event may potentially happen prior to `write` promise completion on a zero-latency connection. \r\n\r\nA speculative example: you are sending a request on a stream A (e.g. Muxer frame `#10`) and another protocol is then immediately sending another (larger) message on a stream B (e.g. Muxer frame `#11`). Both frames are stick together (on a transport level) and transmitted as a single buffer. The muxer frame `#10` write completion would occur when the whole buffer is written. But at the moment when the whole buffer transmission is completed the part of the buffer corresponding to the Muxer frame `#10` might already be handled and responded by the remote side. \r\n\r\nIt looks like we need to treat both callbacks `handleInitialPayloadSent` and `processData` as asynchronous and handle any kind of their receiving order",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1629002531/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
