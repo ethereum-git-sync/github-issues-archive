@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27688",
+  "id": 1796371847,
+  "node_id": "I_kwDOAOvK985rEnWH",
+  "number": 27688,
+  "title": "getLogs timeouts since block 9160000 on Goerli",
+  "user": {
+    "login": "MattKetmo",
+    "id": 334996,
+    "node_id": "MDQ6VXNlcjMzNDk5Ng==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/334996?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MattKetmo",
+    "html_url": "https://github.com/MattKetmo",
+    "followers_url": "https://api.github.com/users/MattKetmo/followers",
+    "following_url": "https://api.github.com/users/MattKetmo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MattKetmo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MattKetmo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MattKetmo/subscriptions",
+    "organizations_url": "https://api.github.com/users/MattKetmo/orgs",
+    "repos_url": "https://api.github.com/users/MattKetmo/repos",
+    "events_url": "https://api.github.com/users/MattKetmo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MattKetmo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-10T09:37:03Z",
+  "updated_at": "2023-07-10T09:37:40Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hello I noticed since block **9160000** on **Goerli** the `eth_getLogs` requests are becoming extremely slow.\r\n\r\n## System information\r\n\r\n- Geth version: `1.12.0-stable (e501b3)` \r\n- CL client & version: e.g. lighthouse/prysm\r\n- OS & Version: Linux\r\n\r\n## Steps to reproduce the behaviour\r\n\r\nExample using `eth_getLogs` with a non-existing address & topic on a 100k block range (result should be empty logs)\r\n\r\nWith geth, timeout after 30s:\r\n\r\n```bash\r\nETH_EL_ADDR=\"http://localhost:8545\"\r\n\r\ncurl -X POST \"$ETH_EL_ADDR\" -H \"Content-Type: application/json\" \\\r\n  --data '{\"method\":\"eth_getLogs\",\"params\":[{\"address\": \"0x1234567890123456789012345678901234567890\", \"fromBlock\": \"0x'$(printf \"%x\" 9160000)'\", \"toBlock\": \"0x'$(printf \"%x\" 9260000)'\", \"topics\": [\"0x1234567890123456789012345678901234567890123456789012345678901234\"]}],\"id\":1,\"jsonrpc\":\"2.0\"}'\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32002,\"message\":\"request timed out\"}}%\r\n```\r\n\r\nSame example with Erigon, correct response under 1s:\r\n```bash\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":[]}\r\n```\r\n\r\n## Actual behaviour\r\n\r\nFor comparison, I made some benchmark using different block range & different contracts.\r\n\r\nHere is the script I used to produce the data:\r\n\r\n```bash\r\nETH_EL_ADDR=\"http://localhost:8545\"\r\n\r\n# Example with Deposit events\r\nADDRESS=\"0xFF50ED3D0EC03AC01D4C79AAD74928BFF48A7B2B\"\r\nTOPIC=\"0x649BBC62D0E31342AFEA4E5CD82D4049E7E1EE912FC0889AA790803BE39038C5\"\r\n\r\nfor i in {0..36}; do\r\n  from=$(( 8960000 + $i * 10000 ))\r\n  to=$(( $from + 10000 ))\r\n  echo -n \"$from\\t$to\\t\"\r\n\r\n  start=$(date +%s)\r\n  result=$(curl -sX POST \"$ETH_EL_ADDR\" -H \"Content-Type: application/json\" --data '{\"method\":\"eth_getLogs\",\"params\":[{\"address\": \"'$(echo $ADDRESS)'\", \"fromBlock\": \"0x'$(printf \"%x\" $from)'\", \"toBlock\": \"0x'$(printf \"%x\" $to)'\", \"topics\": [\"'$(echo $TOPIC)'\"]}],\"id\":1,\"jsonrpc\":\"2.0\"}' | jq -c 'if has(\"error\") then .error else .result | length end')\r\n  end=$(date +%s)\r\n  echo \"$(($end - $start))\\t$result\"\r\ndone\r\n\r\n```\r\n\r\n### 1. The Deposit contract with 10k block range\r\n\r\n(This is a very frequent event)\r\n\r\n![image](https://github.com/ethereum/go-ethereum/assets/334996/c3a67173-538e-4fe7-b675-20ae475f95b4)\r\n\r\n<details><summary>Details</summary>\r\n\r\n\r\nBLOCK NUMBER | TO | RESPONSE TIME | RESULT\r\n-- | -- | -- | --\r\n8960000 | 8970000 | 2 | 336\r\n8970000 | 8980000 | 3 | 666\r\n8980000 | 8990000 | 4 | 2034\r\n8990000 | 9000000 | 1 | 665\r\n9000000 | 9010000 | 7 | 2223\r\n9010000 | 9020000 | 0 | 601\r\n9020000 | 9030000 | 5 | 1648\r\n9030000 | 9040000 | 6 | 233\r\n9040000 | 9050000 | 4 | 481\r\n9050000 | 9060000 | 4 | 626\r\n9060000 | 9070000 | 1 | 505\r\n9070000 | 9080000 | 1 | 279\r\n9080000 | 9090000 | 9 | 501\r\n9090000 | 9100000 | 2 | 588\r\n9100000 | 9110000 | 3 | 271\r\n9110000 | 9120000 | 3 | 418\r\n9120000 | 9130000 | 3 | 888\r\n9130000 | 9140000 | 1 | 319\r\n9140000 | 9150000 | 2 | 524\r\n9150000 | 9160000 | 1 | 102\r\n9160000 | 9170000 | 30 | {\"code\":-32002,\"message\":\"request timed out\"}\r\n9170000 | 9180000 | 13 | 1749\r\n9180000 | 9190000 | 3 | 4317\r\n9190000 | 9200000 | 2 | 395\r\n9200000 | 9210000 | 19 | 1048\r\n9210000 | 9220000 | 28 | 5288\r\n9220000 | 9230000 | 10 | 895\r\n9230000 | 9240000 | 30 | {\"code\":-32002,\"message\":\"request timed out\"}\r\n9240000 | 9250000 | 28 | 1768\r\n9250000 | 9260000 | 2 | 603\r\n9260000 | 9270000 | 1 | 616\r\n9270000 | 9280000 | 18 | 726\r\n9280000 | 9290000 | 8 | 3142\r\n9290000 | 9300000 | 20 | 684\r\n9300000 | 9310000 | 6 | 1894\r\n9310000 | 9320000 | 23 | 134\r\n9320000 | 9330000 | 3 | 111\r\n\r\n\r\n\r\n</details> \r\n\r\n### 2. My contract with 10k block range\r\n\r\n(This event is emitted occasionally)\r\n\r\n![image](https://github.com/ethereum/go-ethereum/assets/334996/6934cd39-1f7b-4a0b-a495-21018245918c)\r\n\r\n<details><summary>Details</summary>\r\n\r\nFROM | TO | RESPONSE TIME | RESULT\r\n-- | -- | -- | --\r\n8960000 | 8970000 | 0 | 0\r\n8970000 | 8980000 | 1 | 0\r\n8980000 | 8990000 | 0 | 0\r\n8990000 | 9000000 | 0 | 0\r\n9000000 | 9010000 | 5 | 0\r\n9010000 | 9020000 | 0 | 0\r\n9020000 | 9030000 | 0 | 0\r\n9030000 | 9040000 | 2 | 0\r\n9040000 | 9050000 | 1 | 1\r\n9050000 | 9060000 | 1 | 0\r\n9060000 | 9070000 | 0 | 2\r\n9070000 | 9080000 | 1 | 0\r\n9080000 | 9090000 | 11 | 0\r\n9090000 | 9100000 | 1 | 0\r\n9100000 | 9110000 | 3 | 0\r\n9110000 | 9120000 | 2 | 0\r\n9120000 | 9130000 | 0 | 0\r\n9130000 | 9140000 | 0 | 0\r\n9140000 | 9150000 | 0 | 0\r\n9150000 | 9160000 | 0 | 0\r\n9160000 | 9170000 | 22 | 0\r\n9170000 | 9180000 | 13 | 0\r\n9180000 | 9190000 | 0 | 1\r\n9190000 | 9200000 | 1 | 0\r\n9200000 | 9210000 | 6 | 2\r\n9210000 | 9220000 | 22 | 0\r\n9220000 | 9230000 | 6 | 0\r\n9230000 | 9240000 | 30 | {\"code\":-32002,\"message\":\"request timed out\"}\r\n9240000 | 9250000 | 23 | 0\r\n9250000 | 9260000 | 0 | 1\r\n9260000 | 9270000 | 0 | 0\r\n9270000 | 9280000 | 8 | 2\r\n9280000 | 9290000 | 11 | 0\r\n9290000 | 9300000 | 16 | 0\r\n9300000 | 9310000 | 4 | 4\r\n9310000 | 9320000 | 23 | 0\r\n\r\n</details> \r\n\r\n\r\n### 3. Random (non-existing) contract address\r\n\r\n(this event is never emitted)\r\n\r\n![image](https://github.com/ethereum/go-ethereum/assets/334996/05f30206-69cd-418e-8c36-e49b5952790b)\r\n\r\n<details><summary>Details</summary>\r\n\r\nBLOCK NUBMER | TO | RESPONSE TIME | RESULT\r\n-- | -- | -- | --\r\n8960000 | 8970000 | 0 | 0\r\n8970000 | 8980000 | 0 | 0\r\n8980000 | 8990000 | 0 | 0\r\n8990000 | 9000000 | 1 | 0\r\n9000000 | 9010000 | 3 | 0\r\n9010000 | 9020000 | 0 | 0\r\n9020000 | 9030000 | 1 | 0\r\n9030000 | 9040000 | 1 | 0\r\n9040000 | 9050000 | 1 | 0\r\n9050000 | 9060000 | 0 | 0\r\n9060000 | 9070000 | 1 | 0\r\n9070000 | 9080000 | 1 | 0\r\n9080000 | 9090000 | 7 | 0\r\n9090000 | 9100000 | 1 | 0\r\n9100000 | 9110000 | 2 | 0\r\n9110000 | 9120000 | 2 | 0\r\n9120000 | 9130000 | 1 | 0\r\n9130000 | 9140000 | 0 | 0\r\n9140000 | 9150000 | 0 | 0\r\n9150000 | 9160000 | 1 | 0\r\n9160000 | 9170000 | 21 | 0\r\n9170000 | 9180000 | 16 | 0\r\n9180000 | 9190000 | 0 | 0\r\n9190000 | 9200000 | 1 | 0\r\n9200000 | 9210000 | 7 | 0\r\n9210000 | 9220000 | 20 | 0\r\n9220000 | 9230000 | 9 | 0\r\n9230000 | 9240000 | 30 | {\"code\":-32002,\"message\":\"request timed out\"}\r\n9240000 | 9250000 | 23 | 0\r\n9250000 | 9260000 | 1 | 0\r\n9260000 | 9270000 | 1 | 0\r\n9270000 | 9280000 | 10 | 0\r\n9280000 | 9290000 | 12 | 0\r\n9290000 | 9300000 | 17 | 0\r\n9300000 | 9310000 | 3 | 0\r\n9310000 | 9320000 | 27 | 0\r\n\r\n\r\n</details> \r\n\r\nAs you can see, no matter if the filtered event is emitted a lot or not at all, geth is having trouble to fetch those logs on Goerli always starting from block 9160000 (until latest block).\r\n\r\nI haven't figured out what happened at that time, it's quite recent (June 11th 2023).\r\n\r\nMainnet is not impacted (yet).\r\n\r\n\r\n## Expected behaviour\r\n\r\nUsing `eth_getLogs` on a 100k block range with an event emitted occasionally should not time out and respond under 1s.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27688/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
