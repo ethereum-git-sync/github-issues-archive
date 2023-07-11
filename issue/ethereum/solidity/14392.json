@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-07-10T08:24:14Z",
-  "updated_at": "2023-07-10T08:25:20Z",
-  "closed_at": null,
+  "updated_at": "2023-07-11T03:29:36Z",
+  "closed_at": "2023-07-11T03:29:36Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Currently, the `\"abi\"` output selector is a no-op when `language=Yul`.\r\n\r\nThis is a problem for yul source verification: while blockchain explorers like etherscan and blockscout support standard-json input for verification, they choke if there is no ABI present in the output (though, as of [blockscout#6444][bs], it looks like blockscout _does_ support yul verification, despite the lack of abi).\r\n\r\nSince contracts written in plain Yul have no way to specify an ABI in any manner recognizable to the compiler, it would be nice if solc accepted `abi` as a standard-json input field and simply spit it out on the other side when compiling with `language=Yul` (maybe also validate the json to ensure it matches the schema of a json abi object).\r\n\r\nBy doing this there's some implications (potential attacks) for explorers that allow source verification via standard-json: e.g. an attacker compiles their solidity contract to yul and source-verifies the very hard-to-read IR instead of the actual solidity code. That said, a similar obfuscation technique is already possible by writing a solidity contract and wrapping the body of every external function inside an `assembly` block (albeit a bit more work).\r\n\r\nI might be barking up the wrong tree with this, as it would be \"cleaner\" to simply beseech the aforementioned explorers to update their API and allow for some kind of `abi` parameter, but adding this very small feature to the compiler itself would _transparently_ fix the problems with all of the explorer sites currently deployed, allowing for Yul source verification.\r\n\r\nI suppose this also brings up an ethical concern: this may qualify as a kind of surreptitious soft-fork for explorers, which perhaps adds an undesired feature without their knowledge. Though, they can always explicitly blacklist `language=Yul` if they want to.\r\n\r\nIn any case, another major benefit of this is that newer languages which compile to Yul do not need to wait for explorer integration. This includes projects like [fe], which uses solc as a backend for the final yul->bytecode codegen step.\r\n\r\n[bs]: https://github.com/blockscout/blockscout/pull/6444\r\n[fe]: https://github.com/ethereum/fe",
-  "closed_by": null,
+  "closed_by": {
+    "login": "chjj",
+    "id": 470564,
+    "node_id": "MDQ6VXNlcjQ3MDU2NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/470564?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chjj",
+    "html_url": "https://github.com/chjj",
+    "followers_url": "https://api.github.com/users/chjj/followers",
+    "following_url": "https://api.github.com/users/chjj/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chjj/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chjj/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chjj/subscriptions",
+    "organizations_url": "https://api.github.com/users/chjj/orgs",
+    "repos_url": "https://api.github.com/users/chjj/repos",
+    "events_url": "https://api.github.com/users/chjj/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chjj/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14392/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14392/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
 
