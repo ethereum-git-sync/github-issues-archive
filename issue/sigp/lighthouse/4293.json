@@ -58,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "jmcph4",
@@ -103,14 +103,33 @@
     }
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-05-15T23:42:01Z",
-  "updated_at": "2023-06-12T23:12:59Z",
-  "closed_at": null,
+  "updated_at": "2023-07-11T06:12:29Z",
+  "closed_at": "2023-07-11T06:12:29Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nThe beacon-apis spec recently added a v2 block publishing endpoint which includes the ability to validate blocks before broadcasting them: https://github.com/ethereum/beacon-APIs/pull/317\r\n\r\nIt is expected that this will be used by MEV relays in order to mitigate unbundling attacks.\r\n\r\nCurrently the relays are running forks of Prysm and Lighthouse: https://github.com/sigp/lighthouse/pull/4168.\r\n\r\n## Steps to resolve\r\n\r\nDrawing on the existing implementation from @realbigsean's branch, implement the new `POST /eth/v2/beacon/blocks` and `POST /eth/v2/beacon/blinded_blocks` endpoints. We also need to add some tests of the basic scenarios: trying to broadcast a block that is gossip-valid but holistically invalid (e.g. has an invalid state root), trying to broadcast a block that is valid but equivocates.\r\n\r\nIn terms of parts of the codebase affected:\r\n\r\n- `beacon_node/http_api/src/publish_blocks.rs`: this is where the impl of the API should happen. We should try to share as much as possible between the v1 and v2 endpoints.\r\n- `beacon_node/http_api/src/lib.rs`: wiring for the v1/v2 endpoints\r\n- `common/eth2`: HTTP client implementation (for accessing the new API).\r\n- `beacon_node/http_api/tests/interactive_tests.rs`: probably the best place for the tests (or maybe `lib.rs`, or a new file).\r\n\r\nOne complication I foresee with the equivocation test is controlling the timing: we want the honest block to pass gossip validation _before_ the equivocating block is processed. But then we want the equivocating block to be processed _before_ the honest block attempts broadcast. We may need to manually inject some events/state in order to simulate this (aside from just supplying the blocks).\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "jmcph4",
+    "id": 717268,
+    "node_id": "MDQ6VXNlcjcxNzI2OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/717268?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jmcph4",
+    "html_url": "https://github.com/jmcph4",
+    "followers_url": "https://api.github.com/users/jmcph4/followers",
+    "following_url": "https://api.github.com/users/jmcph4/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jmcph4/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jmcph4/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jmcph4/subscriptions",
+    "organizations_url": "https://api.github.com/users/jmcph4/orgs",
+    "repos_url": "https://api.github.com/users/jmcph4/repos",
+    "events_url": "https://api.github.com/users/jmcph4/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jmcph4/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4293/reactions",
     "total_count": 0,
@@ -125,7 +144,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4293/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -244,7 +263,7 @@
     },
     "created_at": "2023-06-07T11:38:32Z",
     "updated_at": "2023-06-07T11:38:32Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "I would like to work on this.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1580614367/reactions",
@@ -294,6 +313,50 @@
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1580673810/reactions",
       "total_count": 1,
       "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1630201793",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4293#issuecomment-1630201793",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4293",
+    "id": 1630201793,
+    "node_id": "IC_kwDOCFeAzc5hKufB",
+    "user": {
+      "login": "jmcph4",
+      "id": 717268,
+      "node_id": "MDQ6VXNlcjcxNzI2OA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/717268?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jmcph4",
+      "html_url": "https://github.com/jmcph4",
+      "followers_url": "https://api.github.com/users/jmcph4/followers",
+      "following_url": "https://api.github.com/users/jmcph4/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jmcph4/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jmcph4/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jmcph4/subscriptions",
+      "organizations_url": "https://api.github.com/users/jmcph4/orgs",
+      "repos_url": "https://api.github.com/users/jmcph4/repos",
+      "events_url": "https://api.github.com/users/jmcph4/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jmcph4/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-11T06:12:29Z",
+    "updated_at": "2023-07-11T06:12:29Z",
+    "author_association": "COLLABORATOR",
+    "body": "Closed by #4316 -- support landed in [4.3.0 (Priest Witherspoon)](https://github.com/sigp/lighthouse/releases/tag/v4.3.0).",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1630201793/reactions",
+      "total_count": 0,
+      "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
