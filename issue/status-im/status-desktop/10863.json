@@ -58,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -112,22 +112,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 116,
-    "closed_issues": 112,
+    "open_issues": 115,
+    "closed_issues": 116,
     "state": "open",
     "created_at": "2022-09-28T20:32:56Z",
-    "updated_at": "2023-07-10T18:44:27Z",
+    "updated_at": "2023-07-11T11:30:57Z",
     "due_on": "2023-08-18T07:00:00Z",
     "closed_at": null
   },
   "comments": 6,
   "created_at": "2023-05-30T16:08:15Z",
-  "updated_at": "2023-07-10T17:31:57Z",
-  "closed_at": null,
+  "updated_at": "2023-07-11T11:30:57Z",
+  "closed_at": "2023-07-11T11:30:57Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "### Description\r\n\r\nThe mobile team created a new API to get the unfurling data from URLs. Instead of having the receiver fetch the data from the websites, it's the sender that fetches it, then sends it with the message. It's way better for privacy, but it also enables more websites to be unfurled.\r\n\r\nHere is the initial work with the new APIs: https://github.com/status-im/status-go/pull/3471\r\n\r\n```go\r\n\r\n// GetTextURLs parses text and returns a deduplicated and (somewhat) normalized\r\n// slice of URLs. The returned URLs can be used as cache keys by clients.\r\nfunc (api *PublicAPI) GetTextURLs(text string) []string {\r\n\treturn linkpreview.GetURLs(text)\r\n}\r\n\r\n// UnfurlURLs uses a best-effort approach to unfurl each URL. Failed URLs will\r\n// be removed from the response.\r\n//\r\n// This endpoint expects the client to send URLs normalized by GetTextURLs.\r\nfunc (api *PublicAPI) UnfurlURLs(urls []string) ([]common.LinkPreview, error) {\r\n\treturn api.service.messenger.UnfurlURLs(urls)\r\n```\r\n\r\nHere is the follow up PR that adds support to more hosts: https://github.com/status-im/status-go/pull/3530\r\n\r\nFor full context, here is the mobile issue: https://github.com/status-im/status-mobile/issues/15469\r\nand follow up one: https://github.com/status-im/status-mobile/issues/15918\r\n\r\nIf your need help, you can ask @ilmotta , who did an amazing job on this.\r\n\r\n---\r\n\r\n### Steps\r\n\r\n#### Step 1\r\nSo, the first step, is that when typing the message, when we detect a link in the input (with a debounce throttle), we call the new status-go API to get the link data.\r\n\r\nThen, when we send the message, we need to add the data to the message payload. It should also already be supported on status-go.\r\n\r\n#### Step 2\r\n\r\nMoved to a separate issue:\r\n- https://github.com/status-im/status-desktop/issues/11474\r\n\r\n#### Out of scope\r\n\r\n- New design of the unfurling component (gonna be done by the UI team)\r\n- Removing the individual settings for the whitelisted sites (can be done in another PR after) (https://github.com/status-im/status-desktop/issues/10864)\r\n- adding the setting for senders to opt in to send that type of data (https://github.com/status-im/status-desktop/issues/10866)\r\n- opting out of sending the individual link data, ie choosing which links to send data for (this will need the updated design)\r\n\r\n### Acceptance Criteria\r\n\r\n- The sender is now responsible for sending the link data. What this means:\r\n  - We get the link data when creating message in the input, with a debounce\r\n  - When the message is sent, the new data is attached to it and propagated to other users\r\n- The receivers no longer fetch the data themselves\r\n  - The link will still show as normal (or not in the special cases of images only)\r\n  - The receiver uses the data directly from the Message and updates its model\r\n- The unfurled image/whatever still shows as before (some unfurls might not be pretty depending on whether or not they need the new design)\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "igor-sirotin",
+    "id": 25482501,
+    "node_id": "MDQ6VXNlcjI1NDgyNTAx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25482501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/igor-sirotin",
+    "html_url": "https://github.com/igor-sirotin",
+    "followers_url": "https://api.github.com/users/igor-sirotin/followers",
+    "following_url": "https://api.github.com/users/igor-sirotin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/igor-sirotin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/igor-sirotin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/igor-sirotin/subscriptions",
+    "organizations_url": "https://api.github.com/users/igor-sirotin/orgs",
+    "repos_url": "https://api.github.com/users/igor-sirotin/repos",
+    "events_url": "https://api.github.com/users/igor-sirotin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/igor-sirotin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/10863/reactions",
     "total_count": 2,
@@ -142,7 +161,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/10863/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
