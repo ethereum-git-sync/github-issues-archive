@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5922",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5922/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5922/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5922/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/5922",
+  "id": 1798670984,
+  "node_id": "I_kwDOBggaLc5rNYqI",
+  "number": 5922,
+  "title": "JSON RPC Timeout not respected via WebSocket",
+  "user": {
+    "login": "zktaiga",
+    "id": 125817027,
+    "node_id": "U_kgDOB3_Qww",
+    "avatar_url": "https://avatars.githubusercontent.com/u/125817027?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zktaiga",
+    "html_url": "https://github.com/zktaiga",
+    "followers_url": "https://api.github.com/users/zktaiga/followers",
+    "following_url": "https://api.github.com/users/zktaiga/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zktaiga/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zktaiga/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zktaiga/subscriptions",
+    "organizations_url": "https://api.github.com/users/zktaiga/orgs",
+    "repos_url": "https://api.github.com/users/zktaiga/repos",
+    "events_url": "https://api.github.com/users/zktaiga/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zktaiga/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-11T10:56:53Z",
+  "updated_at": "2023-07-11T11:15:06Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Description**\r\nUnsure if this is intended or not, but it is problematic when using libraries to perform queries over WS. Querying a large from-to range will be handled by upstream libraries such as go-ethereum over HTTP, but WS will get stuck indefinitely. Consumers may choose to add their own timeout but the current behavior of HTTP vs WS seems inconsistent from one another.\r\n\r\n**Steps to Reproduce**\r\n1. If on good hardware, set your timeout to something small, e.g. 5s\r\n2. Run my reproducer with a 100k batch size, first via HTTP and then via WS:\r\n```go\r\npackage main\r\n\r\nimport (\r\n\t\"context\"\r\n\t\"fmt\"\r\n\t\"log\"\r\n\t\"math/big\"\r\n\r\n\t\"github.com/ethereum/go-ethereum\"\r\n\t\"github.com/ethereum/go-ethereum/common\"\r\n\t\"github.com/ethereum/go-ethereum/ethclient\"\r\n)\r\n\r\nfunc main() {\r\n\tclient, err := ethclient.Dial(\"http://nethermind:8545\")\r\n\tif err != nil {\r\n\t\tlog.Fatalf(\"Failed to connect to the Ethereum client: %v\", err)\r\n\t}\r\n\r\n\tcontractAddress := common.HexToAddress(\"0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D\")\r\n\tquery := ethereum.FilterQuery{\r\n\t\tFromBlock: big.NewInt(9203578),\r\n\t\tToBlock:   big.NewInt(9203578 + 100_000),\r\n\t\tAddresses: []common.Address{\r\n\t\t\tcontractAddress,\r\n\t\t},\r\n\t}\r\n\r\n\tlogs, err := client.FilterLogs(context.Background(), query)\r\n\tif err != nil {\r\n\t\tlog.Fatalf(\"Failed to filter logs: %v\", err)\r\n\t}\r\n\r\n\tfmt.Printf(\"Number of events: %v\\n\", len(logs))\r\n}\r\n```\r\n\r\n**Actual behavior**\r\nConsumer libraries get stuck when using WS.\r\n\r\n**Expected behavior**\r\nTime out JSON RPC queries via WS.\r\n\r\n**Screenshots**\r\nIf applicable, please include screenshots to help illustrate the problem.\r\n\r\n**Desktop (please complete the following information):**\r\nPlease provide the following information regarding your setup:\r\n - Operating System: Arch\r\n - Version: 1.19.2\r\n - Installation Method: Sedge\r\n - Consensus Client: N/A\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5922/reactions",
+    "total_count": 2,
+    "+1": 2,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5922/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
