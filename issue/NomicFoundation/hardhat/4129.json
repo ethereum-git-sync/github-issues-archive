@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4129",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4129/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4129/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4129/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/4129",
+  "id": 1797899786,
+  "node_id": "I_kwDOB7jojM5rKcYK",
+  "number": 4129,
+  "title": "Unexpected behavior may occur when running the compile task multiple times within the same process",
+  "user": {
+    "login": "schaable",
+    "id": 1165424,
+    "node_id": "MDQ6VXNlcjExNjU0MjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1165424?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/schaable",
+    "html_url": "https://github.com/schaable",
+    "followers_url": "https://api.github.com/users/schaable/followers",
+    "following_url": "https://api.github.com/users/schaable/following{/other_user}",
+    "gists_url": "https://api.github.com/users/schaable/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/schaable/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/schaable/subscriptions",
+    "organizations_url": "https://api.github.com/users/schaable/orgs",
+    "repos_url": "https://api.github.com/users/schaable/repos",
+    "events_url": "https://api.github.com/users/schaable/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/schaable/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4937119027,
+      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
+      "name": "status:triaging",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-11T01:16:12Z",
+  "updated_at": "2023-07-11T01:16:24Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Version of Hardhat\n\n2.16.1\n\n### What happened?\n\nRunning `hre.run(\"compile\")` multiple times within the same process can lead to the generation of invalid artifacts. This issue can occur in test files or other scripts executed within a single process. The problem lies with the `_validArtifacts` property in `packages/hardhat-core/src/internal/artifacts.ts`, which retains irrelevant data after compilation.\r\n\r\nA possible fix would be to clear the `_validArtifacts` variable either at the beginning or the end of the compilation process.\n\n### Minimal reproduction steps\n\nCreate a script which:\r\n1 . Compiles the contract:\r\n```typescript\r\nawait this.env.run(\"compile\");\r\n```\r\n2. Renames the contract:\r\n```typescript\r\nconst pathToContract = path.join(\"contracts\", \"Lock.sol\");\r\nlet contract = fs.readFileSync(pathToContract, \"utf-8\");\r\ncontract = contract.replace(\"contract Lock\", \"contract Demo\");\r\nfs.writeFileSync(pathToContract, contract, \"utf-8\");\r\n```\r\n3. Compiles the contract again:\r\n```typescript\r\nawait this.env.run(\"compile\");\r\n```\r\n\r\nThe `artifacts` folder will contain two artifacts, one for contract `Lock` and one for contract `Demo`.\n\n### Search terms\n\ncompile artifacts ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4129/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4129/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
