@@ -77,9 +77,9 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-05-02T09:38:51Z",
-  "updated_at": "2023-05-09T11:57:39Z",
+  "updated_at": "2023-07-12T19:38:12Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -102,5 +102,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1633099303",
+    "html_url": "https://github.com/NethermindEth/nethermind/issues/5637#issuecomment-1633099303",
+    "issue_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5637",
+    "id": 1633099303,
+    "node_id": "IC_kwDOBggaLc5hVx4n",
+    "user": {
+      "login": "emlautarom1",
+      "id": 31224949,
+      "node_id": "MDQ6VXNlcjMxMjI0OTQ5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31224949?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/emlautarom1",
+      "html_url": "https://github.com/emlautarom1",
+      "followers_url": "https://api.github.com/users/emlautarom1/followers",
+      "following_url": "https://api.github.com/users/emlautarom1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/emlautarom1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/emlautarom1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/emlautarom1/subscriptions",
+      "organizations_url": "https://api.github.com/users/emlautarom1/orgs",
+      "repos_url": "https://api.github.com/users/emlautarom1/repos",
+      "events_url": "https://api.github.com/users/emlautarom1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/emlautarom1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-12T19:34:08Z",
+    "updated_at": "2023-07-12T19:38:12Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "I'm able to reproduce the issue using the following JS script that leverages `ethers`:\r\n\r\n```javascript\r\nconst ethers = require(\"ethers\");\r\n\r\n(async () => {\r\n    [\r\n        { client: \"Localhost\", url: \"http://127.0.0.1:8545/\" },\r\n        { client: \"Official\", url: \"https://rpc.gnosischain.com/\" },\r\n        { client: \"Gateway\", url: \"https://rpc.gnosis.gateway.fm\" },\r\n        { client: \"BlockPi\", url: \"https://gnosis.blockpi.network/v1/rpc/public\" },\r\n        { client: \"Blast\", url: \"https://gnosis-mainnet.public.blastapi.io\" },\r\n        { client: \"Pokt\", url: \"https://gnosischain-rpc.gateway.pokt.network\" },\r\n        { client: \"Ankr\", url: \"https://rpc.ankr.com/gnosis\" }\r\n    ].forEach(async ({ client, url }) => await estimateGas(client, url));\r\n})();\r\n\r\nasync function estimateGas(client, url) {\r\n    let body = {\r\n        \"from\": \"0xbbeedb6d8e56e23f5812e59d1b6602f15957271f\",\r\n        \"to\": \"0x828cf988de33bf93527533852e95e2da449ec171\",\r\n        \"data\": \"0x6a761202000000000000000000000000828cf988de33bf93527533852e95e2da449ec171000000000000000000000000000000000000000000000000000000e8d4a51000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014bb80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041e0a9f565f27a4fd5743e5b7ad92f4217467bc5a7a419c7e159a5950de845ad9b0e88bf1c5549d5335ca087c010a7560a5caf991ba88850d10cb1e2d6196b4a151b00000000000000000000000000000000000000000000000000000000000000\"\r\n    }\r\n\r\n    let response = await ethers.utils.fetchJson(url, `{ \"id\": 42, \"jsonrpc\": \"2.0\", \"method\": \"eth_estimateGas\", \"params\": [${JSON.stringify(body)} ] }`);\r\n    let estimation = parseInt(response.result, 16);\r\n    console.log(`Client '${client}' estimated '${estimation}'`);\r\n}\r\n```\r\n\r\nThe interesting part is that all RPC providers return `59074`, while on localhost I tried:\r\n- Nethermind on 43660b6a730730b9cd561f116cf546660fabe6da \r\n- Erigon on https://github.com/ledgerwatch/erigon/commit/084acc1af2e853ee4a57dbdd6920b6a1e58ef85c (latest stable at the moment).\r\n\r\nIn this case, both clients return `29400`. It would be really useful to know what client are those RPC providers using to be able to debug where is that estimation coming from.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1633099303/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
