@@ -30,7 +30,15 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 5670208842,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfiFSg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-investigate",
+      "name": "meta-investigate",
+      "color": "A64CF6",
+      "default": false,
+      "description": "Issues found that require further investigation and may not have a specific resolution/fix"
+    }
   ],
   "state": "open",
   "locked": false,
@@ -39,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-06-14T09:57:40Z",
-  "updated_at": "2023-07-11T12:37:58Z",
+  "updated_at": "2023-07-12T07:17:02Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -203,6 +211,50 @@
     "body": "Reopening as issue does not yet seem to be resolved.\r\n\r\nLooks like we are pinging peers after sending goodbye\r\n\r\n```\r\nJun-25 02:58:27.655[network]         \u001B[34mdebug\u001B[39m: Req  dialing peer method=goodbye, version=1, encoding=ssz_snappy, client=Lighthouse, peer=16...VYqoz3, requestId=295952\r\n```\r\n```\r\nJun-25 02:58:27.903[network]         \u001B[34mdebug\u001B[39m: Req  received method=ping, client=Lighthouse, peer=16...VYqoz3, requestId=295961\r\nJun-25 02:58:27.903[network]       \u001B[36mverbose\u001B[39m: Resp done method=ping, client=Lighthouse, peer=16...VYqoz3, requestId=295961\r\n```\r\n\r\nor still dialing peers while disconnecting (`goodbyeAndDisconnectAllPeers`)\r\n```\r\nJun-25 02:58:28.311[network]         \u001B[34mdebug\u001B[39m: Req  dialing peer method=metadata, version=2, encoding=ssz_snappy, client=Unknown, peer=16...ohL5Xo, requestId=295963\r\n```\r\n\r\nBased on the current network close sequence it looks like we close the peer manager after disconnecting peers which could explain this behavior\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/85ff3cf17e9f8338865cc66f129f9e60e0ec029b/packages/beacon-node/src/network/core/networkCore.ts#L253-L256\r\n\r\nas only after closing, the intervals and event listeners are removed\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/85ff3cf17e9f8338865cc66f129f9e60e0ec029b/packages/beacon-node/src/network/peers/peerManager.ts#L203-L212\r\n\r\nChanging the order of the closing sequence will likely fix the issue, but extensive testing is required as this issue is hard to reproduce.",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1630749223/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1631977838",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/5642#issuecomment-1631977838",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5642",
+    "id": 1631977838,
+    "node_id": "IC_kwDOCD5_Gc5hRgFu",
+    "user": {
+      "login": "nflaig",
+      "id": 38436224,
+      "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nflaig",
+      "html_url": "https://github.com/nflaig",
+      "followers_url": "https://api.github.com/users/nflaig/followers",
+      "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+      "organizations_url": "https://api.github.com/users/nflaig/orgs",
+      "repos_url": "https://api.github.com/users/nflaig/repos",
+      "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nflaig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-12T07:17:01Z",
+    "updated_at": "2023-07-12T07:17:01Z",
+    "author_association": "MEMBER",
+    "body": "Proposed solution https://github.com/ChainSafe/lodestar/issues/5642#issuecomment-1630749223 does not resolve the issue.\r\n\r\nThe problem seems to be with [libp2p](https://github.com/libp2p/js-libp2p) which in the end must take care of closing all connections / removing tcp listeners. There are several closed but also open issues regarding connections not being closed properly.\r\n- https://github.com/libp2p/js-libp2p/issues/433\r\n- https://github.com/libp2p/js-libp2p/issues/436\r\n\r\nThis comment https://github.com/libp2p/js-libp2p/issues/436#issuecomment-432624680 summarizes open tasks but there was no progress in a while.\r\n\r\nFor now,  we just have to explicitly exit process until upstream issues are fixed.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1631977838/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
