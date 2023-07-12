@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7880",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7880/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7880/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7880/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/7880",
+  "id": 1800358703,
+  "node_id": "I_kwDOC0FsAM5rT0sv",
+  "number": 7880,
+  "title": "Polygon archive-node bor-mainnet, Error after start with snapshots",
+  "user": {
+    "login": "MrFreezeDZ",
+    "id": 138854125,
+    "node_id": "U_kgDOCEa-7Q",
+    "avatar_url": "https://avatars.githubusercontent.com/u/138854125?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MrFreezeDZ",
+    "html_url": "https://github.com/MrFreezeDZ",
+    "followers_url": "https://api.github.com/users/MrFreezeDZ/followers",
+    "following_url": "https://api.github.com/users/MrFreezeDZ/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MrFreezeDZ/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MrFreezeDZ/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MrFreezeDZ/subscriptions",
+    "organizations_url": "https://api.github.com/users/MrFreezeDZ/orgs",
+    "repos_url": "https://api.github.com/users/MrFreezeDZ/repos",
+    "events_url": "https://api.github.com/users/MrFreezeDZ/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MrFreezeDZ/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-12T07:27:06Z",
+  "updated_at": "2023-07-12T07:27:31Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `./erigon --version`\r\nerigon version 2.48.0-stable-084acc1a\r\n\r\nOS & Version: Windows/Linux/OSX\r\nRunning in GKE with image thorax/erigon:v2.48.0\r\n\r\nCommit hash: \r\nBuild info                               git_branch=heads/v2.48.0 git_tag=v2.48.0-dirty git_commit=084acc1af2e853ee4a57dbdd6920b6a1e58ef85c\r\n\r\nErigon Command (with flags/config):\r\nerigon --chain=bor-mainnet --datadir=/data/ --bor.heimdall=http://heimdallrest --http --ws --http.api=eth,admin,debug,net,trace,web3,erigon,txpool --authrpc.addr=0.0.0.0 --authrpc.vhosts=heimdallrest --maxpeers=500 --torrent.download.rate=300mb --authrpc.jwtsecret=/secret/jwt.hex\r\n\r\nConcensus Layer:\r\nHeimdall (image: 0xpolygon/heimdall:0.3.4)\r\n\r\nConcensus Layer Command (with flags/config):\r\n/usr/bin/heimdalld start --home=/heimdall-home\r\n\r\nChain/Network: \r\nBor-Mainnet\r\n\r\n#### Expected behaviour\r\nAfter downloading and extracting the snapshot https://snapshot-download.polygon.technology/erigon-mainnet-archive-2023-05-23.tar.zst Erigon should start without errors and read the previous downloaded database.\r\n\r\n\r\n#### Actual behaviour\r\nFollowing log entries when starting:\r\n[INFO] [07-12|07:18:10.548] logging to file system                   log dir=/data/logs file prefix=erigon log level=info json=false\r\n[INFO] [07-12|07:18:10.548] Build info                               git_branch=heads/v2.48.0 git_tag=v2.48.0-dirty git_commit=084acc1af2e853ee4a57dbdd6920b6a1e58ef85c\r\n[INFO] [07-12|07:18:10.548] Starting Erigon on Bor Mainnet... \r\n[INFO] [07-12|07:18:10.550] Maximum peer count                       ETH=500 total=500\r\n[INFO] [07-12|07:18:10.550] starting HTTP APIs                       APIs=eth,admin,debug,net,trace,web3,erigon,txpool\r\n[INFO] [07-12|07:18:10.550] torrent verbosity                        level=WRN\r\n[INFO] [07-12|07:18:12.654] Set global gas cap                       cap=50000000\r\n[INFO] [07-12|07:18:12.656] [Downloader] Runnning with               ipv6-enabled=true ipv4-enabled=true download.rate=300mb upload.rate=4mb\r\n[INFO] [07-12|07:18:12.657] Opening Database                         label=chaindata path=/data/chaindata\r\n[INFO] [07-12|07:18:12.665] Re-Opening DB in exclusive mode to apply migrations \r\n[INFO] [07-12|07:18:12.673] Apply migration                          name=txs_v3\r\npage_alloc_slowpath:10501 unable alloc 23 pages, flags 0x2, errcode -30792\r\n[EROR] [07-12|07:18:16.621] Erigon startup                           err=\"migrator.Apply.Up: txs_v3, mdbx_txn_commit_ex: MDBX_MAP_FULL: Environment mapsize limit reached\"\r\nmigrator.Apply.Up: txs_v3, mdbx_txn_commit_ex: MDBX_MAP_FULL: Environment mapsize limit reached\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\nDownload the snapshot, extract it and start erigon with it.\r\n\r\nI believe it is the same issue like mentioned in this comment: https://github.com/ledgerwatch/erigon/issues/2545#issuecomment-1582120183\r\n\r\nThe downloaded Snapshot archive has a file size of 1.9TB and lies in /data/downloaded-snapshots.\r\nThe extracted sizes can be seen here, which is the result of the command \"du -h /data\":\r\n2.0G    /data/snapshots/db\r\n4.0K    /data/snapshots/history\r\n666.0G  /data/snapshots\r\n4.0K    /data/temp\r\n1.9T    /data/downloaded-snapshots\r\n60.0G   /data/bor\r\n5.7T    /data/chaindata\r\n220.0K  /data/logs\r\n8.3T    /data\r\n\r\n\r\n\r\n#### Backtrace\r\n\r\n````\r\n[backtrace]\r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7880/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7880/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

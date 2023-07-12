@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-07-11T02:02:46Z",
-  "updated_at": "2023-07-11T10:48:56Z",
-  "closed_at": null,
+  "updated_at": "2023-07-12T03:35:58Z",
+  "closed_at": "2023-07-12T03:35:57Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nErigon version: v2.48.0\r\nOS & Version: Linux\r\nCommit hash: \r\nErigon Command (with flags/config): `${nodeServiceDir}/bin/erigon --datadir=${nodeServiceDir}/erigon --chain=mainnet --prune=hrtc --authrpc.jwtsecret=${nodeServiceDir}/erigon/jwt.hex --rpc.gascap=600000000 --rpc.evmtimeout=30s --rpc.batch.limit=100 --rpc.returndata.limit=104857600 --http=true --http.api 'eth,net,web3,debug,trace,txpool' --http.addr ${listeningAddr} --http.corsdomain '*' --http.vhosts '*' --ws --authrpc.addr localhost --port 31300 --http.port 31301 --private.api.addr='' --authrpc.port=31303 --torrent.port=31304 --p2p.allowed-ports 31306,31318`\r\n\r\nConcensus Layer: lighthouse\r\nConcensus Layer Command (with flags/config): `${nodeServiceDir}/bin/lighthouse bn -d ${nodeServiceDir}/lighthouse --network mainnet --execution-endpoint http://127.0.0.1:31303 --execution-jwt ${nodeServiceDir}/erigon/jwt.hex --checkpoint-sync-url=https://sync-mainnet.beaconcha.in --port 31309 --http --http-port 31307`\r\n\r\nChain/Network: mainnet\r\n\r\n#### Expected behaviour\r\n\r\n\r\n#### Actual behaviour\r\nThe memory of erigon2.48 version grows very fast. After analysis, rpchelper.distributeLog continues to increase memory and does not release it.\r\npprof command execution steps\r\n```\r\n~/t1/erigon # go tool pprof http://localhost:6060/debug/pprof/heap\r\nFetching profile over HTTP from http://localhost:6060/debug/pprof/heap\r\nSaved profile in /root/pprof/pprof.erigon.alloc_objects.alloc_space.inuse_objects.inuse_space.004.pb.gz\r\nFile: erigon\r\nBuild ID: 0bdbb52af0840c55a0c2b432c5589ae097907a33\r\nType: inuse_space\r\nTime: Jul 11, 2023 at 1:53am (UTC)\r\nEntering interactive mode (type \"help\" for commands, \"o\" for options)\r\n(pprof) list\r\ncommand list requires an argument\r\n(pprof) top\r\nShowing nodes accounting for 33782.72MB, 96.92% of 34857.50MB total\r\nDropped 857 nodes (cum <= 174.29MB)\r\nShowing top 10 nodes out of 37\r\n      flat  flat%   sum%        cum   cum%\r\n30625.55MB 87.86% 87.86% 30625.55MB 87.86%  github.com/ledgerwatch/erigon/turbo/rpchelper.(*LogsFilterAggregator).distributeLog.func1\r\n 1683.76MB  4.83% 92.69%  1683.76MB  4.83%  github.com/ledgerwatch/erigon-lib/compress.newPatternTable (inline)\r\n  928.07MB  2.66% 95.35%   928.07MB  2.66%  github.com/ledgerwatch/erigon/turbo/rpchelper.(*Filters).AddLogs.func1\r\n  278.01MB   0.8% 96.15%  1961.26MB  5.63%  github.com/ledgerwatch/erigon-lib/compress.buildCondensedPatternTable\r\n  261.90MB  0.75% 96.90%   261.90MB  0.75%  bytes.growSlice\r\n    3.19MB 0.0091% 96.91%   214.35MB  0.61%  encoding/json.Marshal\r\n       1MB 0.0029% 96.91%  2034.56MB  5.84%  github.com/ledgerwatch/erigon-lib/compress.NewDecompressor\r\n    0.70MB 0.002% 96.92%   928.77MB  2.66%  github.com/ledgerwatch/erigon/turbo/rpchelper.(*SyncMap[...]).Do\r\n    0.56MB 0.0016% 96.92%   456.28MB  1.31%  github.com/ledgerwatch/erigon/rpc.(*handler).handleCallMsg\r\n         0     0% 96.92%   215.72MB  0.62%  bytes.(*Buffer).Write\r\n(pprof) list distributeLog.func1\r\nTotal: 34.04GB\r\nROUTINE ======================== github.com/ledgerwatch/erigon/turbo/rpchelper.(*LogsFilterAggregator).distributeLog.func1 in github.com/ledgerwatch/erigon/turbo/rpchelper/logsfilter.go\r\n   29.91GB    29.91GB (flat, cum) 87.86% of Total\r\n         .          .    131:\t\t\t\treturn nil\r\n         .          .    132:\t\t\t}\r\n         .          .    133:\t\t}\r\n         .          .    134:\t\tvar topics []libcommon.Hash\r\n         .          .    135:\t\tfor _, topic := range eventLog.Topics {\r\n   12.60GB    12.60GB    136:\t\t\ttopics = append(topics, gointerfaces.ConvertH256ToHash(topic))\r\n         .          .    137:\t\t}\r\n         .          .    138:\t\tif filter.allTopics == 0 {\r\n         .          .    139:\t\t\tif !a.chooseTopics(filter, topics) {\r\n         .          .    140:\t\t\t\treturn nil\r\n         .          .    141:\t\t\t}\r\n         .          .    142:\t\t}\r\n   17.30GB    17.30GB    143:\t\tlg := &types2.Log{\r\n         .          .    144:\t\t\tAddress:     gointerfaces.ConvertH160toAddress(eventLog.Address),\r\n         .          .    145:\t\t\tTopics:      topics,\r\n         .          .    146:\t\t\tData:        eventLog.Data,\r\n         .          .    147:\t\t\tBlockNumber: eventLog.BlockNumber,\r\n         .          .    148:\t\t\tTxHash:      gointerfaces.ConvertH256ToHash(eventLog.TransactionHash),\r\n(pprof)\r\n```\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n\r\n#### Backtrace\r\n\r\n````\r\n[backtrace]\r\n````\r\n![mem75g](https://github.com/ledgerwatch/erigon/assets/24621599/59f91e24-138e-4fae-b2fa-01110d6efc92)\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "sundafa",
+    "id": 24621599,
+    "node_id": "MDQ6VXNlcjI0NjIxNTk5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/24621599?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sundafa",
+    "html_url": "https://github.com/sundafa",
+    "followers_url": "https://api.github.com/users/sundafa/followers",
+    "following_url": "https://api.github.com/users/sundafa/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sundafa/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sundafa/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sundafa/subscriptions",
+    "organizations_url": "https://api.github.com/users/sundafa/orgs",
+    "repos_url": "https://api.github.com/users/sundafa/repos",
+    "events_url": "https://api.github.com/users/sundafa/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sundafa/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7870/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7870/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "Do you use `eth_newFilter` RPC call a lot perhaps, without cleaning them up. It looks from the profile like there are lots of active filters created, and they are not polled, so Erigon keeps 128 or 256 logs for each active filters, which creates apparent memory leak. Creating filters is considered therefore a \"dangerous\" API, for this exact reason and should either be avoided or used with extra care",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1630600143/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1631798891",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/7870#issuecomment-1631798891",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7870",
+    "id": 1631798891,
+    "node_id": "IC_kwDOC0FsAM5hQ0Zr",
+    "user": {
+      "login": "sundafa",
+      "id": 24621599,
+      "node_id": "MDQ6VXNlcjI0NjIxNTk5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24621599?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sundafa",
+      "html_url": "https://github.com/sundafa",
+      "followers_url": "https://api.github.com/users/sundafa/followers",
+      "following_url": "https://api.github.com/users/sundafa/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sundafa/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sundafa/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sundafa/subscriptions",
+      "organizations_url": "https://api.github.com/users/sundafa/orgs",
+      "repos_url": "https://api.github.com/users/sundafa/repos",
+      "events_url": "https://api.github.com/users/sundafa/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sundafa/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-12T03:35:57Z",
+    "updated_at": "2023-07-12T03:35:57Z",
+    "author_association": "NONE",
+    "body": "thank you for your reply\r\nI will pay attention to this kind of problem in the future",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1631798891/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
