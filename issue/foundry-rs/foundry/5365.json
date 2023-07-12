@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5365",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5365/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5365/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5365/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5365",
+  "id": 1800341455,
+  "node_id": "I_kwDOGBlvNc5rTwfP",
+  "number": 5365,
+  "title": "Anvil does not revert or report certain revm failures",
+  "user": {
+    "login": "aathan",
+    "id": 24279435,
+    "node_id": "MDQ6VXNlcjI0Mjc5NDM1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/24279435?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/aathan",
+    "html_url": "https://github.com/aathan",
+    "followers_url": "https://api.github.com/users/aathan/followers",
+    "following_url": "https://api.github.com/users/aathan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/aathan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/aathan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/aathan/subscriptions",
+    "organizations_url": "https://api.github.com/users/aathan/orgs",
+    "repos_url": "https://api.github.com/users/aathan/repos",
+    "events_url": "https://api.github.com/users/aathan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/aathan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-12T07:15:27Z",
+  "updated_at": "2023-07-12T07:39:25Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nAnvil\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [ ] Foundry\r\n- [ ] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nnightly-c78a811a8af95fb1e029427583a07b2ca3a3fa51\r\n\r\n### What command(s) is the bug in?\r\n\r\nanvil\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nTL;DR\r\n\r\nbased on observed behaviors and only a cursory understanding of the code, my *conjecture* is that anvil may contain any or all of the following problems:\r\n\r\n* seems to have a design that assumes it can identify all invalid transactions before passing them to revm (`TransactionValidator`)\r\n* it's not clear if `TransactionValidator` is intended to catch ALL semantically invalid transaction or also ALL transactions that would fail if passed to `revm` *while also ignoring revm errors either intentionally or due to a bug*\r\n* if either, this seems brittle, because what revm considers invalid may change silently/unexpectedly and anvil can't hope to have complete test coverage of all possible permutations of parameters\r\n* revm may or may not be returning error codes for certain transaction failures (such as out of gas, or tx.gas>block.gas). If it is not, this may be a bug that should be reported to revm.\r\n* either due to an unintentional bug or due to this foregoing design choice (i.e., a feature) anvil either ignores certain errors revm is returning or revm doesn't generate errors in certain cases\r\n\r\nI'll also note that there is another possible explanation to the behaviors I've observed:\r\n\r\n* instead of any of the above, anvil may be squelching certain transactions after the `TransactionValidator` runs, before passing them to `revm` *without reporting the failure anywhere*\r\n\r\nSee below for longer explanation.\r\n=====\r\n\r\nWhile debugging the implementation of `--disable-block-gas-limit` discussed in https://github.com/foundry-rs/foundry/issues/5341 it became apparent that anvil is probably not always catching and reporting failed `revm` transaction executions.\r\n\r\nOne way to see this is to configure/code anvil such that its TransactionValidator accepts a transaction who's tx gas > block gas. Then, I think revm fails to execute the transaction in some way, but anvil doesn't ever report that failure back to the submitter. The transaction I believe stays in some \"still executing\" state of some sort.\r\n\r\nThis may not be a \"bug\" per-se in that Anvil's design may be that the `TransactionValidator` should never let through a transaction that  for some `revm` mediated reason (such as the tx.gas>block.gas). Also, it may be that `revm` is specifically designed such that it silently fails if invalid transaction are let through.\r\n\r\nHowever, I am not familiar with the internals of `revm`. On general principles, I find that to be an unlikely design choice on the part of `revm`. I think it's more likely/better that `revm` DOES/SHOULD report errors if you ask it to execute a transaction that fails for any reason.\r\n\r\nIf I'm right, then I've observed that Anvil will essentially \"hang\" the submitted transaction.\r\n\r\nTo test this, implement the change in https://github.com/foundry-rs/foundry/issues/5341#issuecomment-1627741061 without the change in https://github.com/foundry-rs/foundry/issues/5341#issuecomment-1631913430 and send through a transaction that exceeds the block gas limit while running anvil with `--disable-block-gas-limit` E.g., you could set the block gas limit to `1` and send any non-empty transaction through. ***\r\n\r\nThis will effectively allow a transaction through that exceeds the block gas limit. Whatever it is that `revm` does when this occurs is not trapped by anvil, and the result is a transaction that is never completed. For example, if hardhat is being used to send the transaction it will `await` that transaction receipt forever.\r\n\r\nFor example, below I describe the test I was using. It triggers the behavior if run against an anvil that has been built as described above. I.e., the TransactionValidator modification allows the overlimit transaction but anvil does not set the block gas limit to U256::max_value(). Per the description in https://github.com/foundry-rs/foundry/issues/5341, something in anvil or revm limits the block gas to less than the `19999999` passed in the tx (even if `--block-gas` specifies e.g. `20000000`). Thus, the described tx seems to get to revm, but doesn't actually run.\r\n\r\nOk, my test was to run `anvil --fork-url https://api.avax.network/ext/bc/C/rpc --base-fee 1 --inline-logs --disable-block-gas-limit` after making the changes described in the paragraph above that is marked with *** and built from a modified revm, such that:\r\n\r\n```\r\npub fn sstore<SPEC: Spec>(interpreter: &mut Interpreter, host: &mut dyn Host) {\r\n    println!(\"sstore\");\r\n```\r\n\r\nThen, implement some toy contract\r\n\r\n```\r\ncontract Toy {\r\n    address[2] public impls;\r\n    event Foo(address,address,address,address);\r\n\r\n    function runStore() public {\r\n        impls[0] = address(2);\r\n    }\r\n\r\n    constructor(...){\r\n        impls[0]=address(1);\r\n        emit Foo(address(0),address(0),address(0),address(0));\r\n```\r\n\r\nand in a hardhat.js I do:\r\n\r\n```\r\nasync function init() {\r\n    console.log('deploying')\r\n    const signers = await ethers.getSigners()\r\n    signer = signers[0]\r\n    const depl = await getContractFactory(signer, 'Toy')\r\n        .deploy(...,{\r\n            gasLimit: 19999999,\r\n            gasPrice: ethers.utils.parseUnits('10', 'gwei'),\r\n        })\r\n    console.log(\"1\")\r\n    let m = network.provider.send('evm_mine')\r\n    await m\r\n    let x = depl.runStore() // this hangs\r\n    await x\r\n    console.log(\"2\")\r\n```\r\n\r\nAs written above the output from Anvil is:\r\n\r\n```\r\nListening on 127.0.0.1:8545\r\neth_accounts\r\neth_chainId\r\neth_blockNumber\r\neth_chainId\r\neth_sendTransaction\r\n\r\n    Block Number: 32492941\r\n    Block Hash: 0xe97f624d21d740c06ed4ef2edd43d7c6afa8794e133c8ac157cfe63f131254be\r\n    Block Time: \"Wed, 12 Jul 2023 05:24:30 +0000\"\r\n\r\neth_chainId\r\neth_getTransactionByHash\r\nevm_mine\r\n\r\n    Block Number: 32492942\r\n    Block Hash: 0x78e72148e6f53307456ef2c9abf5935f92642bafa022aed78e8b2c0c4d98bb41\r\n    Block Time: \"Wed, 12 Jul 2023 05:24:31 +0000\"\r\n\r\neth_chainId\r\neth_getTransactionReceipt\r\neth_chainId\r\neth_getTransactionReceipt\r\neth_chainId\r\neth_getTransactionCount\r\neth_blockNumber\r\neth_chainId\r\neth_chainId\r\neth_getTransactionReceipt\r\neth_chainId\r\neth_getTransactionCount\r\neth_blockNumber\r\neth_chainId\r\neth_blockNumber\r\neth_chainId\r\n...\r\n```\r\n\r\nNotice that there is no output that says \"sstore\"  The `eth_blockNumber,eth_chainId,...` calls repeat forever.\r\n\r\nThere is no syntactically valid ordering of the lines between `console.log(\"1\")` and `consoloe.log(\"2\")` that doesn't hang.\r\nIf the `await x` is above the `await m` then it waits forever and never outputs the second `Block Number...` block, so I know the \"mining\" is doing something ... but what?. If I give the `--no-mine` parameter, Anvil  doesn't output either `Block Number` block.\r\n\r\nWhat seems to be the case is that the block is mined, but the tx is silently never executed and its status as a failed transaction is lost to anvil and to the submitter.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5365/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5365/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
