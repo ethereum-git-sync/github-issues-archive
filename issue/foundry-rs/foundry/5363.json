@@ -49,11 +49,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-07-12T00:20:38Z",
-  "updated_at": "2023-07-12T00:20:38Z",
+  "updated_at": "2023-07-12T14:02:10Z",
   "closed_at": null,
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
-  "body": "### Component\n\nForge\n\n### Describe the feature you would like\n\nSee https://github.com/gakonst/ethers-rs/issues/2508 for details/rationale on the request here\r\n\r\nforge batching is not necessarily dependent on that ethers-rs feature, as even without it forge could presumably convert batches calls into multicalls. This could result in significant performance improvements for RPC-heavy scripts and fork tests\n\n### Additional context\n\n_No response_",
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\nSee https://github.com/gakonst/ethers-rs/issues/2508 for details/rationale on the request here\r\n\r\nforge batching is not necessarily dependent on that ethers-rs feature, as even without it forge could presumably convert batches calls into multicalls. This could result in significant performance improvements for RPC-heavy scripts and fork tests\r\n\r\nCurrently instead of `eth_call` we simulate the call and use `eth_getStorageAt` as needed. This is suboptimal than just using `eth_call` directly because:\r\n- Alchemy prices `eth_getStorageAt` at 17 CUPS but `eth_call` is 26, so any tx reading 2+ slots is currently paying more (and running slower due to multiple requests) than necessary, especially when you consider that we can batch `eth_call`s but can't batch `eth_getStorageAt`\r\n- Simulating might not give the right result for chains where some opcodes behave differently than on mainnet  (e.g. NUMBER returns L2 block number on optimism but L1 block number on arbitrum)\r\n\r\nSo I think the best path forward is:\r\n1. Replace the current behavior to use `eth_call` instead\r\n2. Then, batch `eth_call`s. The approach here would be:\r\n  - Collect all consecutive staticcalls, stop collecting when there's a state changing operation\r\n  - If Multicall3 is available on the chain, batch calls with it. If Multicall3 is not available on the chain, either use `eth_call` state overrides to place it there as part of the call, or just send normal requests without Multicall3 \r\n\r\n\r\n### Additional context\r\n\r\n_No response_",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5363/reactions",
