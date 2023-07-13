@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27715",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27715/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27715/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27715/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27715",
+  "id": 1802476999,
+  "node_id": "I_kwDOAOvK985rb53H",
+  "number": 27715,
+  "title": "SubscribeFilterLogs incomplete log.Data",
+  "user": {
+    "login": "TechXTT",
+    "id": 71842793,
+    "node_id": "MDQ6VXNlcjcxODQyNzkz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/71842793?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/TechXTT",
+    "html_url": "https://github.com/TechXTT",
+    "followers_url": "https://api.github.com/users/TechXTT/followers",
+    "following_url": "https://api.github.com/users/TechXTT/following{/other_user}",
+    "gists_url": "https://api.github.com/users/TechXTT/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/TechXTT/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/TechXTT/subscriptions",
+    "organizations_url": "https://api.github.com/users/TechXTT/orgs",
+    "repos_url": "https://api.github.com/users/TechXTT/repos",
+    "events_url": "https://api.github.com/users/TechXTT/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/TechXTT/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-13T08:22:46Z",
+  "updated_at": "2023-07-13T09:12:08Z",
+  "closed_at": "2023-07-13T09:12:01Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: v1.12.0-stable\r\nCL client & version:\r\nOS & Version: OSX(Apple chip)\r\nCommit hash : v1.12.0\r\n\r\n#### Expected behaviour\r\nlog.Data for event should look like:\r\ncontractABI.UnpackIntoMap(lockEventMap, event.Name, vLog.Data) leads to:\r\n```\r\nlockEventMap:  map[assetID:1 token:0x0165878A594ca255338adfa4d48449f69242Eb8F amount:100 targetChain:2 user:0x70997970C51812dc3A010C7d01b50e0d17dc79C8]\r\n```\r\ncontractABI.UnpackIntoInterface(lockEventInterface, event.Name, vLog.Data) leads to:\r\n```\r\nLock([1 0x0165878A594ca255338adfa4d48449f69242Eb8F 100 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 2])\r\n```\r\n#### Actual behaviour\r\nlog.Data for event looks like:\r\ncontractABI.UnpackIntoMap(lockEventMap, event.Name, vLog.Data) leads to:\r\n```\r\nlockEventMap:  map[amount:100 targetChain:2 user:0x70997970C51812dc3A010C7d01b50e0d17dc79C8]\r\n```\r\ncontractABI.UnpackIntoInterface(lockEventInterface, event.Name, vLog.Data) leads to:\r\n```\r\nLock([<nil> <nil> 100 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 2])\r\n```\r\n\r\nWorks with ethers.js\r\n\r\n#### Steps to reproduce the behaviour\r\nhttps://github.com/TechXTT/contract-observer [Observer]\r\nhttps://github.com/SamBorisov/Bridge/tree/Bridge2 [Bridge](Use branch->Bridge2)\r\nTo run Bridge:\r\n```\r\nnpm i\r\nnpx hardhat node\r\n```\r\n\r\nSeparate shell:\r\n```\r\nnpx hardhat deploy-Bridge-testnet \r\n```\r\n\r\nCheck if bridge address is the same as in env.example in Observer\r\nMake a .env file using the .env.example\r\n\r\nTo run Observer:\r\n```\r\ngo mod download\r\ngo run cmd/main.go\r\n```\r\n\r\nAdd scripts/test-event.js:\r\n```\r\nconst { ethers } = require(\"hardhat\");\r\n\r\nasync function testEvent() {\r\n  const [deployer, executor, observerAddresses1] = await ethers.getSigners();\r\n\r\n  const bridgeABI =\r\n    require(\"../artifacts/contracts/Bridge.sol/Bridge.json\").abi;\r\n\r\n  const bridge = new ethers.Contract(\r\n    \"0x5FbDB2315678afecb367f032d93F642f64180aa3\",\r\n    bridgeABI,\r\n    deployer\r\n  );\r\n\r\n  const assetID = 1;\r\n  const targetChain = 2;\r\n  const amount = 1000;\r\n\r\n  ERC20PresetMinterPauser = await ethers.getContractFactory(\r\n    \"ERC20PresetMinterPauser\"\r\n  );\r\n\r\n  await bridge\r\n    .connect(deployer)\r\n    .grantRole(bridge.OBSERVER_ROLE(), observerAddresses1.address);\r\n\r\n  token = await ERC20PresetMinterPauser.deploy(\"Test Token\", \"TTK\");\r\n  await bridge.connect(deployer).addAsset(assetID, token.address, false);\r\n  await token.mint(executor.address, amount);\r\n  await token.connect(executor).approve(bridge.address, amount);\r\n\r\n  await bridge.connect(executor).lock(assetID, 100, targetChain);\r\n}\r\n\r\nmodule.exports = testEvent;\r\n```\r\n\r\nEdit hardhat.config.js:\r\nAdd Before `module.exports` :\r\n```\r\ntask(\"run-test-event\", \"Run test event script\")\r\n    .setAction(async (taskArguments, hre, runSuper) => {\r\n        const testEvent = require(\"./scripts/test-event\");\r\n        await testEvent(taskArguments);\r\n    });\r\n```\r\n\r\nSame shell as the other `npx hardhat` command run:\r\n```\r\nnpx hardhat run-test-event\r\n```\r\n(If you run it again without restarting the node, you will need to comment line 28 of test-event.js: \r\n`//await bridge.connect(deployer).addAsset(assetID, token.address, false);`\r\n\r\n#### Backtrace\r\n\r\n````\r\nlockEventMap:  map[amount:100 targetChain:2 user:0x70997970C51812dc3A010C7d01b50e0d17dc79C8]\r\nError parsing assetID\r\nError parsing token\r\n````\r\n\r\nWhen submitting logs: please submit them as text and not screenshots.\r\n",
+  "closed_by": {
+    "login": "TechXTT",
+    "id": 71842793,
+    "node_id": "MDQ6VXNlcjcxODQyNzkz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/71842793?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/TechXTT",
+    "html_url": "https://github.com/TechXTT",
+    "followers_url": "https://api.github.com/users/TechXTT/followers",
+    "following_url": "https://api.github.com/users/TechXTT/following{/other_user}",
+    "gists_url": "https://api.github.com/users/TechXTT/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/TechXTT/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/TechXTT/subscriptions",
+    "organizations_url": "https://api.github.com/users/TechXTT/orgs",
+    "repos_url": "https://api.github.com/users/TechXTT/repos",
+    "events_url": "https://api.github.com/users/TechXTT/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/TechXTT/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27715/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27715/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
