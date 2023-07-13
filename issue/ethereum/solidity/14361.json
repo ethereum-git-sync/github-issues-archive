@@ -67,7 +67,7 @@
       "description": "Default level of impact"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "cameel",
@@ -140,22 +140,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 14,
-    "closed_issues": 4,
+    "open_issues": 13,
+    "closed_issues": 7,
     "state": "open",
     "created_at": "2023-03-13T14:22:54Z",
-    "updated_at": "2023-06-26T10:54:38Z",
+    "updated_at": "2023-07-13T10:22:16Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 8,
   "created_at": "2023-06-26T10:25:21Z",
-  "updated_at": "2023-06-28T14:59:04Z",
-  "closed_at": null,
+  "updated_at": "2023-07-13T10:20:04Z",
+  "closed_at": "2023-07-13T10:20:03Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Discovered in the via IR bytecode comparison PR (#14355). The PR revealed that [unoptimized via IR produces slightly different bytecode on some platforms](https://app.circleci.com/pipelines/github/ethereum/solidity/30336/workflows/5a907609-222a-4e5a-aa40-13ec169ac1f5/jobs/1346462) (specifically emscripten and macOS).\r\n\r\nI investigated [`288_conditional_with_all_types_sol`](https://github.com/ethereum/solidity/blob/develop/test/libsolidity/syntaxTests/nameAndTypeResolution/288_conditional_with_all_types.sol) and in this case the differences are caused by functions being ordered differently in the generated IR. \r\n\r\n### Repro\r\n#### Input\r\n##### `input.json`\r\n```json\r\n{\r\n    \"language\": \"Solidity\",\r\n    \"sources\": {\r\n        \"A\": {\"content\": \"\r\n            contract C {\r\n                function f2() public {\r\n                    bytes1[2] memory k;\r\n                    k[0] = bytes1(0);\r\n                }\r\n            }\"\r\n        }\r\n    },\r\n    \"settings\": {\r\n        \"optimizer\": {\"enabled\": false},\r\n        \"viaIR\": true,\r\n        \"outputSelection\": {\r\n            \"*\": {\"*\": [\r\n                \"ir\",\r\n                \"evm.assembly\",\r\n                \"evm.bytecode.object\"\r\n            ]}\r\n        }\r\n    }\r\n}\r\n```\r\n\r\n##### Script\r\n\r\n<details>\r\n\r\n```bash\r\nnpm install solc\r\n\r\nemscripten_output=$(cat input.json | npx --no -- solcjs --standard-json)\r\nlinux_output=$(cat input.json | solc --standard-json)\r\n\r\nemscripten_bytecode=$(echo \"$emscripten_output\" | jq --raw-output .contracts.A.C.evm.bytecode.object | fold --width 80)\r\nemscripten_ir=$(echo \"$emscripten_output\" | jq --raw-output .contracts.A.C.ir)\r\nemscripten_asm=$(echo \"$emscripten_output\" | jq --raw-output .contracts.A.C.evm.assembly)\r\n\r\nlinux_bytecode=$(echo \"$linux_output\" | jq --raw-output .contracts.A.C.evm.bytecode.object | fold --width 80)\r\nlinux_ir=$(echo \"$linux_output\" | jq --raw-output .contracts.A.C.ir)\r\nlinux_asm=$(echo \"$linux_output\" | jq --raw-output .contracts.A.C.evm.assembly)\r\n\r\necho \"=== BYTECODE DIFF ===\"\r\ndiff --color --unified <(echo \"$emscripten_bytecode\") <(echo \"$linux_bytecode\")\r\necho \"=== IR DIFF ===\"\r\ndiff --color --unified <(echo \"$emscripten_ir\") <(echo \"$linux_ir\")\r\necho \"=== ASM DIFF ===\"\r\ndiff --color --unified <(echo \"$emscripten_asm\") <(echo \"$linux_asm\")\r\n```\r\n\r\n</details>\r\n\r\n#### Output\r\n##### Versions\r\n```\r\n0.8.20+commit.a1b79de6.Emscripten.clang\r\n```\r\n```\r\nsolc, the solidity compiler commandline interface\r\nVersion: 0.8.20+commit.a1b79de6.Linux.g++\r\n```\r\n\r\n##### Bytecode diff\r\n```diff\r\n@@ -13,11 +13,11 @@\r\n 01a7818361017f565b5050919050565b5f6101b96002610187565b905090565b5f81905091905056\r\n 5b5f7fff000000000000000000000000000000000000000000000000000000000000008216905091\r\n 9050565b5f8160f81b9050919050565b5f61021861021361020e846101be565b6101f2565b6101c7\r\n-565b9050919050565b7f4e487b710000000000000000000000000000000000000000000000000000\r\n-00005f52603260045260245ffd5b5f60029050919050565b5f6102608261024c565b831061026f57\r\n-61026e61021f565b5b6020830280830191505092915050565b5f819050919050565b5f8190509190\r\n-50565b5f6102ab6102a66102a1846101be565b610288565b61027f565b9050919050565b6102bb82\r\n+565b9050919050565b5f819050919050565b5f819050919050565b5f61024b610246610241846101\r\n+be565b610228565b61021f565b9050919050565b7f4e487b71000000000000000000000000000000\r\n+000000000000000000000000005f52603260045260245ffd5b5f60029050919050565b5f61029382\r\n+61027f565b83106102a2576102a1610252565b5b6020830280830191505092915050565b6102bb82\r\n 6101c7565b81525050565b60025f6102cc6101ae565b8091505f6102d9816101fe565b83805f8361\r\n-02f8816102f36102ed85610291565b86610256565b6102b2565b505050505050505050565bfea264\r\n+02f8816102f36102ed85610231565b86610289565b6102b2565b505050505050505050565bfea264\r\n 6970667358221220a48f1dac064e7879796321b58551b9e9892676c3ba4d848e77dd46134e985a74\r\n 64736f6c63430008140033\r\n```\r\n\r\n##### IR diff\r\n```diff\r\n@@ -168,6 +168,18 @@\r\n                 converted := cleanup_t_bytes1(shift_left_248(cleanup_t_rational_0_by_1(value)))\r\n             }\r\n\r\n+            function cleanup_t_uint256(value) -> cleaned {\r\n+                cleaned := value\r\n+            }\r\n+\r\n+            function identity(value) -> ret {\r\n+                ret := value\r\n+            }\r\n+\r\n+            function convert_t_rational_0_by_1_to_t_uint256(value) -> converted {\r\n+                converted := cleanup_t_uint256(identity(cleanup_t_rational_0_by_1(value)))\r\n+            }\r\n+\r\n             function panic_error_0x32() {\r\n                 mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)\r\n                 mstore(4, 0x32)\r\n@@ -190,18 +202,6 @@\r\n                 addr := add(baseRef, offset)\r\n             }\r\n\r\n-            function cleanup_t_uint256(value) -> cleaned {\r\n-                cleaned := value\r\n-            }\r\n-\r\n-            function identity(value) -> ret {\r\n-                ret := value\r\n-            }\r\n-\r\n-            function convert_t_rational_0_by_1_to_t_uint256(value) -> converted {\r\n-                converted := cleanup_t_uint256(identity(cleanup_t_rational_0_by_1(value)))\r\n-            }\r\n-\r\n             function write_to_memory_t_bytes1(memPtr, value) {\r\n                 mstore(memPtr, cleanup_t_bytes1(value))\r\n             }\r\n```\r\n\r\n##### Assembly diff\r\n\r\n<details>\r\n\r\n```diff\r\n@@ -358,12 +358,17 @@\r\n       pop\r\n       jump     // out\r\n     tag_22:\r\n-      mstore(0x00, 0x4e487b7100000000000000000000000000000000000000000000000000000000)\r\n-      mstore(0x04, 0x32)\r\n-      revert(0x00, 0x24)\r\n+      0x00\r\n+      dup2\r\n+      swap1\r\n+      pop\r\n+      swap2\r\n+      swap1\r\n+      pop\r\n+      jump     // out\r\n     tag_23:\r\n       0x00\r\n-      0x02\r\n+      dup2\r\n       swap1\r\n       pop\r\n       swap2\r\n@@ -373,45 +378,31 @@\r\n     tag_24:\r\n       0x00\r\n       tag_85\r\n-      dup3\r\n-      tag_23\r\n-      jump     // in\r\n-    tag_85:\r\n-      dup4\r\n-      lt\r\n       tag_86\r\n-      jumpi\r\n       tag_87\r\n-      tag_22\r\n+      dup5\r\n+      tag_18\r\n       jump     // in\r\n     tag_87:\r\n+      tag_23\r\n+      jump     // in\r\n     tag_86:\r\n-      0x20\r\n-      dup4\r\n-      mul\r\n-      dup1\r\n-      dup4\r\n-      add\r\n-      swap2\r\n-      pop\r\n-      pop\r\n-      swap3\r\n-      swap2\r\n-      pop\r\n-      pop\r\n-      jump     // out\r\n-    tag_25:\r\n-      0x00\r\n-      dup2\r\n+      tag_22\r\n+      jump     // in\r\n+    tag_85:\r\n       swap1\r\n       pop\r\n       swap2\r\n       swap1\r\n       pop\r\n       jump     // out\r\n+    tag_25:\r\n+      mstore(0x00, 0x4e487b7100000000000000000000000000000000000000000000000000000000)\r\n+      mstore(0x04, 0x32)\r\n+      revert(0x00, 0x24)\r\n     tag_26:\r\n       0x00\r\n-      dup2\r\n+      0x02\r\n       swap1\r\n       pop\r\n       swap2\r\n@@ -421,22 +412,31 @@\r\n     tag_27:\r\n       0x00\r\n       tag_91\r\n+      dup3\r\n+      tag_26\r\n+      jump     // in\r\n+    tag_91:\r\n+      dup4\r\n+      lt\r\n       tag_92\r\n+      jumpi\r\n       tag_93\r\n-      dup5\r\n-      tag_18\r\n+      tag_25\r\n       jump     // in\r\n     tag_93:\r\n-      tag_26\r\n-      jump     // in\r\n     tag_92:\r\n-      tag_25\r\n-      jump     // in\r\n-    tag_91:\r\n-      swap1\r\n+      0x20\r\n+      dup4\r\n+      mul\r\n+      dup1\r\n+      dup4\r\n+      add\r\n+      swap2\r\n+      pop\r\n       pop\r\n+      swap3\r\n       swap2\r\n-      swap1\r\n+      pop\r\n       pop\r\n       jump     // out\r\n     tag_28:\r\n@@ -483,11 +483,11 @@\r\n       tag_100\r\n       tag_101\r\n       dup6\r\n-      tag_27\r\n+      tag_24\r\n       jump     // in\r\n     tag_101:\r\n       dup7\r\n-      tag_24\r\n+      tag_27\r\n       jump     // in\r\n     tag_100:\r\n       tag_28\r\n```\r\n\r\n</details>",
-  "closed_by": null,
+  "closed_by": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14361/reactions",
     "total_count": 0,
@@ -170,7 +189,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14361/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
