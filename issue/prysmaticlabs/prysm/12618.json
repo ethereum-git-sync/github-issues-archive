@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12618",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12618/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12618/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12618/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12618",
+  "id": 1802421141,
+  "node_id": "I_kwDOBvuov85rbsOV",
+  "number": 12618,
+  "title": "getStateV2 returns invalid json data",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-13T07:52:55Z",
+  "updated_at": "2023-07-13T07:52:55Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!--💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎\r\n\r\nHellooo! 😄 \r\n\r\nTo help us tend to your issue faster, please search our currently open issues before submitting a new one.\r\nExisting issues often contain information about workarounds, resolution, or progress updates.\r\n\r\n💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎-->\r\n\r\n# 🐞 Bug Report\r\n\r\n### Description\r\n\r\ngetStateV2 (`/eth/v2/debug/beacon/states/{state_id}`) beacon API returns invalid json data. The ssz response is correct but looks like only for finalized states.\r\n\r\nIt looks like `historical_roots` are incorrect, see https://github.com/ChainSafe/lodestar/issues/5737#issuecomment-1630655103.\r\n\r\nFor more context: https://github.com/ChainSafe/lodestar/issues/5737\r\n\r\n### Has this worked before in a previous version?\r\n\r\nHaven't tested this on older releases\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\n```js\r\nimport { toHexString } from \"@chainsafe/ssz\";\r\nimport { getClient, ApiError } from \"@lodestar/api\";\r\nimport { config } from \"@lodestar/config/default\";\r\nimport { ssz } from \"@lodestar/types\";\r\n\r\nconst api = getClient({ baseUrl: \"http://localhost:9596\" }, { config });\r\nconst slot = process.argv[2];\r\n\r\nconst blockRes = await api.beacon.getBlockV2(slot);\r\nApiError.assert(blockRes);\r\n\r\nconst blockStateRoot = toHexString(blockRes.response.data.message.stateRoot);\r\nconsole.log(\"BeaconBlock stateRoot:    \", blockStateRoot);\r\n\r\nconst stateRes = await api.debug.getStateV2(slot);\r\nApiError.assert(stateRes);\r\n\r\nconst stateRoot = toHexString(ssz.capella.BeaconState.hashTreeRoot(stateRes.response.data));\r\nconsole.log(\"BeaconState hashTreeRoot: \", stateRoot);\r\n\r\nconsole.assert(stateRoot === blockStateRoot);\r\n```\r\n```sh\r\n> node index.js 6867382\r\nBeaconBlock stateRoot:     0x09acf082469c79474b0ba7a5331a1f44396023fca4d7673bcc149a11f1afe925\r\nBeaconState hashTreeRoot:  0x5e627692595b926a5c807b7a258a40121896da1db4c48f66833cc8f97b490dc3\r\nAssertion failed\r\n```\r\n\r\n## 🔥 Error\r\n\r\nThere is no error\r\n\r\n## 🌍  Your Environment\r\n\r\n**Operating System:** Linux\r\n\r\n**What version of Prysm are you running? (Which release)** v4.0.5\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12618/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12618/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
