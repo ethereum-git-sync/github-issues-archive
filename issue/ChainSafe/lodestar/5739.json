@@ -40,7 +40,7 @@
       "description": "Issues to track feature requests."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "tuyennhv",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-07-09T14:24:02Z",
-  "updated_at": "2023-07-11T14:35:37Z",
-  "closed_at": null,
+  "updated_at": "2023-07-14T18:23:04Z",
+  "closed_at": "2023-07-14T18:23:04Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Problem description\n\nWhen gossip blocks are late, node has to download block through `beacon_block_by_root`\r\n\r\n<img width=\"795\" alt=\"Screenshot 2023-07-09 at 21 07 09\" src=\"https://github.com/ChainSafe/lodestar/assets/10568965/34bec5c6-36a9-46d5-a2a9-26e802184d20\">\r\n\r\ngossip attestations have to be reprocessed at the same time which send too many signature sets to bls worker thread pool, job length is consistently at >= 500\r\n\r\n<img width=\"793\" alt=\"Screenshot 2023-07-09 at 21 12 44\" src=\"https://github.com/ChainSafe/lodestar/assets/10568965/5e80a790-5f1d-4e8b-969c-59bd041a7565\">\r\n\r\nwhich cause bls job wait time to be very high during that time\r\n\r\n<img width=\"798\" alt=\"Screenshot 2023-07-09 at 21 13 08\" src=\"https://github.com/ChainSafe/lodestar/assets/10568965/18cedc3d-55ca-483b-8df5-8f39c3373d05\">\r\n\r\nwhich cause `sumitPoolAttestations` time to be very high too\r\n\r\n<img width=\"794\" alt=\"Screenshot 2023-07-09 at 21 15 02\" src=\"https://github.com/ChainSafe/lodestar/assets/10568965/65a547c0-8f73-467a-9bb2-5eed6bdc2ca6\">\r\n\r\nthe submission was late so attestations are not included in any AggregateAndProof (below is `timely_target_no_aggregate_inclusion` type in attestation performance summary panel)\r\n\r\n<img width=\"787\" alt=\"Screenshot 2023-07-09 at 21 17 54\" src=\"https://github.com/ChainSafe/lodestar/assets/10568965/a9d09bc8-5074-4424-9f4c-ea82d4c7d53c\">\r\n\r\n\n\n### Solution description\n\nroot cause of the issue is gossip performance, however we could prioritize verifying bls signatures from `submitPoolAttestations` api\r\n\r\nwith https://github.com/ChainSafe/lodestar/pull/5734, it should take <7ms per slot to validate 64 signature sets of same attestation data, we could consider `verifyOnMainThread` option for `submitPoolAttestations` api\n\n### Additional context\n\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "wemeetagain",
+    "id": 1348242,
+    "node_id": "MDQ6VXNlcjEzNDgyNDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1348242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wemeetagain",
+    "html_url": "https://github.com/wemeetagain",
+    "followers_url": "https://api.github.com/users/wemeetagain/followers",
+    "following_url": "https://api.github.com/users/wemeetagain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wemeetagain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wemeetagain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wemeetagain/subscriptions",
+    "organizations_url": "https://api.github.com/users/wemeetagain/orgs",
+    "repos_url": "https://api.github.com/users/wemeetagain/repos",
+    "events_url": "https://api.github.com/users/wemeetagain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wemeetagain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5739/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5739/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
