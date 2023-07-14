@@ -31,6 +31,15 @@
   },
   "labels": [
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -40,21 +49,40 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2016-04-04T22:32:30Z",
-  "updated_at": "2023-07-06T12:05:12Z",
-  "closed_at": null,
+  "updated_at": "2023-07-14T12:04:53Z",
+  "closed_at": "2023-07-14T12:04:53Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Memory can be allocated using the `new` keyword in Solidity, but in the inline assembly part is has to be done by hand.\n\nThe example code in the docs for doing this:\n\n```\nfunction getcode(address _addr) returns (bytes o_code) {\n                assembly {\n                        // retrieve the size of the code, this needs assembly\n                        let size := extcodesize(_addr)\n                        // allocate output byte array - this could also be done without assembly\n                        // by using o_code = new bytes(size)\n                        o_code := mload(0x40)\n                        // new \"memory end\" including padding\n                        mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), bnot(0x1f))))\n                        // store length in memory\n                        mstore(o_code, size)\n                        // actually retrieve the code, this needs assembly\n                        extcodecopy(_addr, add(o_code, 0x20), 0, size)\n                }\n}\n```\n\nI don't want to duplicate such code, so I rather resort to the following code structure (this is based on the sample code):\n\n```\nfunction getcode(address _addr) returns (bytes o_code) {\n            uint size;\n            assembly {\n                size := extcodesize(_addr)\n            }\n\n            o_code = new bytes(size);\n\n            assembly {\n                extcodecopy(_addr, add(o_code, 0x20), 0, size)\n            }\n        }\n}\n```\n\nI think it would make sense having some shortcut for this accessible from assembly. Such as:\n\n```\no_code := $allocate(size)\n```\n\nor\n\n```\no_code := __allocate(size)\n```\n\nThe prefix is to make a distinction between an opcode and the builtin helper.\n\nMaybe it would make sense having macros? :)\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/474/reactions",
     "total_count": 0,
@@ -69,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/474/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -280,6 +308,50 @@
     "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1623564950/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1635766691",
+    "html_url": "https://github.com/ethereum/solidity/issues/474#issuecomment-1635766691",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/474",
+    "id": 1635766691,
+    "node_id": "IC_kwDOAm_5kc5hf9Gj",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-07-14T12:04:52Z",
+    "updated_at": "2023-07-14T12:04:52Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1635766691/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
