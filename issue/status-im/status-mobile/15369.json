@@ -42,8 +42,8 @@
     {
       "id": 2948932638,
       "node_id": "MDU6TGFiZWwyOTQ4OTMyNjM4",
-      "url": "https://api.github.com/repos/status-im/status-mobile/labels/Activity%20center",
-      "name": "Activity center",
+      "url": "https://api.github.com/repos/status-im/status-mobile/labels/E:MActivityCenter",
+      "name": "E:MActivityCenter",
       "color": "d4c5f9",
       "default": false,
       "description": ""
@@ -58,8 +58,8 @@
       "description": ""
     }
   ],
-  "state": "open",
-  "locked": false,
+  "state": "closed",
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -67,8 +67,8 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-03-15T19:46:49Z",
-  "updated_at": "2023-03-16T13:32:27Z",
-  "closed_at": null,
+  "updated_at": "2023-07-14T12:21:10Z",
+  "closed_at": "2023-07-14T12:21:10Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "# Problem\r\n\r\nWhen the Activity Center has more than a handful notifications (e.g. 10), opening it can sometimes cause the modal animation to not be displayed to the user. This behavior can be observed in real devices, as well as in emulators, both in iOS and Android.\r\n\r\n### Solution\r\n\r\n1. The theory goes that we should reduce the weight of rendering notifications when the AC first opens, which would allow re-frame to do the more important work of rendering the AC modal, with all the tabs, etc. So one of the simplest ideas is to just reduce the time to render each individual notification and see if it solves the animation problem.\r\n\r\n2. Another approach or even a complementary approach to point `1)` could be to animate the layout *entering* state of notifications. I've experimented with this in the past, and we can get interesting results, but keep in mind there's a known bug in layout animations for Reanimated FlatList. See my comment for more details https://github.com/status-im/status-mobile/issues/14683#issuecomment-1371515070.\r\n\r\n3. Yet another complimentary option is to only pay the cost of mounting the AC once, and reuse it when the bell icon is pressed a second time. By itself, this idea won't solve the clumsy animation when first opening an AC full of notifications, but if implemented correctly it can lead to nice improvements. But **this solution should probably be avoided** because it puts more pressure on Reagent and re-frame to keep the UI in sync with the app state, even if the AC is hidden. There are ways to circumvent this problem of course.\r\n\r\n4. We can or even should consider rendering less notifications when first opening the AC. Due to the way pagination is currently implemented, when the AC is opened, at most 8 notifications are fetched for the first page, and if the FlatList bottom threshold is reached `onEndReachedThreshold`, the second page is fetched and at most 16 (8 + 8) notifications are rendered. Ideally, we should render only the bare minimum when opening the AC. This problem is not exclusive of the AC. In theory, we could come up with a more general solution for paginating a FlatList that doesn't blindly fetch the full second page.\r\n",
@@ -87,7 +87,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/15369/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {

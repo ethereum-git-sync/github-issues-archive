@@ -49,17 +49,17 @@
       "description": ""
     }
   ],
-  "state": "open",
-  "locked": false,
+  "state": "closed",
+  "locked": true,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2021-03-05T13:28:25Z",
-  "updated_at": "2022-12-05T17:46:31Z",
-  "closed_at": null,
+  "updated_at": "2023-07-14T09:48:10Z",
+  "closed_at": "2023-07-14T09:48:10Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "In this PR we've removed messages offloading on viewabe changed\r\nhttps://github.com/status-im/status-react/pull/11754/files#diff-84be73c73188c18f0e2140a6bd999af01997782bb12ebe7379a74be57a51fe9fL34\r\n\r\nWhy message offloading was disabled in this PR\r\n\r\nit conflicts with endreached event, we offload messages and then endreached event fired and we load 20 messages again. This happens also when sending message, send message, then offload, readd all messages, then endreache, add 20 more, receiving each new messages or sending each new message cause this chain of events\r\nre-adding all messages is really expensive , readding one messages is ±6ms so, if we offload 5 messages in the end of the list and we have 300 messages we just re-add 300 messages , ±1800 ms\r\nProbably we still need to offload messages in one case, when we are in the chat for a long time and receive lots of new messages, we need to find a way how to pop messages from the arrray and do not re-add all messages in that case, but because messages will be offloaded when user switch a chat or just go back to chats list, i guess we can leave with it, and implement properly in another PR, test shows that adding messages time grows not so fast with having more messages, the only place where it grows is subscription, for 300 messages it might take up to 100-200ms on low end android device\r\n\r\n\r\nMy suggestion would be\r\n\r\nRemove all messages which older than first-hidden-message-clock + 20 if we have more than first-hidden-message-clock + 40 messages. We need two buffers, first 20 messages buffer for endreached event, if we removed all messages up to first-hidden-message-clock this event will be dispatched and we'll load 20 more, so we don't want that and we keep +20, and we want to check if we have more than +40 so we offload only once per 20 messages and not for every new message.\r\n\r\nAlso, we need to find a different way of removing messages, because the current way there we readding all messages is too expensive, I believe we could find the index of a message and remove all messages one by one using an iterator, and recalculate only the latest message, this should work",
@@ -78,7 +78,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/11846/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -157,6 +157,50 @@
     "body": "yes",
     "reactions": {
       "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1337842362/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1635602946",
+    "html_url": "https://github.com/status-im/status-mobile/issues/11846#issuecomment-1635602946",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/11846",
+    "id": 1635602946,
+    "node_id": "IC_kwDOAx4p2c5hfVIC",
+    "user": {
+      "login": "cammellos",
+      "id": 1017008,
+      "node_id": "MDQ6VXNlcjEwMTcwMDg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1017008?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cammellos",
+      "html_url": "https://github.com/cammellos",
+      "followers_url": "https://api.github.com/users/cammellos/followers",
+      "following_url": "https://api.github.com/users/cammellos/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cammellos/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cammellos/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cammellos/subscriptions",
+      "organizations_url": "https://api.github.com/users/cammellos/orgs",
+      "repos_url": "https://api.github.com/users/cammellos/repos",
+      "events_url": "https://api.github.com/users/cammellos/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cammellos/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-14T09:48:04Z",
+    "updated_at": "2023-07-14T09:48:04Z",
+    "author_association": "MEMBER",
+    "body": "This is probably best to re-evaluate once development settles as it will need to have some ux/ui input, moving to discussion",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1635602946/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

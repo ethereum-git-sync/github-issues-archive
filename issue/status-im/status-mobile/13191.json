@@ -58,21 +58,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-03-22T10:28:18Z",
-  "updated_at": "2022-04-04T16:36:10Z",
-  "closed_at": null,
+  "updated_at": "2023-07-14T10:26:26Z",
+  "closed_at": "2023-07-14T10:26:26Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Implement functionality that handles the syncing of the `gifs/favorite-gifs` and `gifs/recent-gifs` settings.\r\n\r\n### Background\r\n\r\nIn `status-go` syncing of settings has been implemented, and additional setting sync *should be* a relatively straightforward process. The initial work for syncing of the `gifs/favorite-gifs` and `gifs/recent-gifs` settings has been implemented on the `status-go` side.\r\n\r\nSee https://github.com/status-im/status-go/pull/2478 and https://github.com/status-im/status-react/pull/13053\r\n\r\nHowever additional work needs to be done on these two setting fields to get robust behaviour:\r\n\r\n- [ ] Liaise with Desktop to get sample for testing\r\n- [ ] Establish a consensus on what should happen if there are differences between the gif data payloads\r\n  - Example: `gifs/favorite-gifs` may contain 3 gifs on device A and 4 gifs on device B, and both sets have 2 gifs in common and the other gifs are unique. What should happen when syncing this data?\r\n    - Overwrite the data with first being the winner\r\n    - Combine the data into a merged set\r\n\r\n### `status-go` Implementation\r\n\r\nCurrently the `gifs/favorite-gifs` and `gifs/recent-gifs` setting have thier sync functionality disabled:\r\n\r\n```go\r\nGifFavourites = SettingField{\r\n\treactFieldName: \"gifs/favorite-gifs\",\r\n\tdBColumnName:   \"gif_favorites\",\r\n\tvalueHandler:   JSONBlobHandler,\r\n\t// TODO resolve issue 8 https://github.com/status-im/status-react/pull/13053#issuecomment-1065179963\r\n\t//  The reported issue is not directly related, but I suspect that gifs suffer the same issue\r\n\tsyncProtobufFactory: &SyncProtobufFactory{\r\n\t\tinactive:          true, // Remove after issue is resolved\r\n\t\tfromInterface:     gifFavouritesProtobufFactory,\r\n\t\tfromStruct:        gifFavouritesProtobufFactoryStruct,\r\n\t\tvalueFromProtobuf: BytesFromSyncProtobuf,\r\n\t\tprotobufType:      protobuf.SyncSetting_GIF_FAVOURITES,\r\n\t},\r\n}\r\nGifRecents = SettingField{\r\n\treactFieldName: \"gifs/recent-gifs\",\r\n\tdBColumnName:   \"gif_recents\",\r\n\tvalueHandler:   JSONBlobHandler,\r\n\t// TODO resolve issue 8 https://github.com/status-im/status-react/pull/13053#issuecomment-1065179963\r\n\t//  The reported issue is not directly related, but I suspect that gifs suffer the same issue\r\n\tsyncProtobufFactory: &SyncProtobufFactory{\r\n\t\tinactive:          true, // Remove after issue is resolved\r\n\t\tfromInterface:     gifRecentsProtobufFactory,\r\n\t\tfromStruct:        gifRecentsProtobufFactoryStruct,\r\n\t\tvalueFromProtobuf: BytesFromSyncProtobuf,\r\n\t\tprotobufType:      protobuf.SyncSetting_GIF_RECENTS,\r\n\t},\r\n}\r\n```\r\n\r\nTo reactivate the `gifs/favorite-gifs` and `gifs/recent-gifs` functionality in `status-go` simply remove the `inactive` field from the `SyncProtobufFactory`\r\n\r\n**NOTE:** the TODO comment referring to [Issue 8](https://github.com/status-im/status-react/pull/13053#issuecomment-1065179963) has been resolved, but the rest of the functionality to make gif syncing work has not been fully implemented. That's your job now 😎 ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "cammellos",
+    "id": 1017008,
+    "node_id": "MDQ6VXNlcjEwMTcwMDg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1017008?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cammellos",
+    "html_url": "https://github.com/cammellos",
+    "followers_url": "https://api.github.com/users/cammellos/followers",
+    "following_url": "https://api.github.com/users/cammellos/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cammellos/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cammellos/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cammellos/subscriptions",
+    "organizations_url": "https://api.github.com/users/cammellos/orgs",
+    "repos_url": "https://api.github.com/users/cammellos/repos",
+    "events_url": "https://api.github.com/users/cammellos/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cammellos/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-mobile/issues/13191/reactions",
     "total_count": 0,
@@ -87,8 +106,51 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/13191/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1635642865",
+    "html_url": "https://github.com/status-im/status-mobile/issues/13191#issuecomment-1635642865",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/13191",
+    "id": 1635642865,
+    "node_id": "IC_kwDOAx4p2c5hfe3x",
+    "user": {
+      "login": "cammellos",
+      "id": 1017008,
+      "node_id": "MDQ6VXNlcjEwMTcwMDg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1017008?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cammellos",
+      "html_url": "https://github.com/cammellos",
+      "followers_url": "https://api.github.com/users/cammellos/followers",
+      "following_url": "https://api.github.com/users/cammellos/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cammellos/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cammellos/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cammellos/subscriptions",
+      "organizations_url": "https://api.github.com/users/cammellos/orgs",
+      "repos_url": "https://api.github.com/users/cammellos/repos",
+      "events_url": "https://api.github.com/users/cammellos/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cammellos/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-14T10:19:40Z",
+    "updated_at": "2023-07-14T10:19:40Z",
+    "author_association": "MEMBER",
+    "body": "Closing for now, as that's something we wont be working as of now until designs are clearer on gifs usage",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1635642865/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

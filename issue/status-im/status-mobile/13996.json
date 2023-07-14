@@ -49,17 +49,17 @@
       "description": ""
     }
   ],
-  "state": "open",
-  "locked": false,
+  "state": "closed",
+  "locked": true,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 8,
+  "comments": 9,
   "created_at": "2022-09-13T14:32:48Z",
-  "updated_at": "2022-10-24T04:49:07Z",
-  "closed_at": null,
+  "updated_at": "2023-07-14T11:09:49Z",
+  "closed_at": "2023-07-14T11:09:49Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Problem\r\n\r\nAs years went by, the Status Mobile codebase accumulated many different flavors of naming schemes for re-frame ****events****. There are events using fully qualified keywords, namespaced keywords, non-namespaced keywords, events starting with nouns, sometimes with verbs, and so on.\r\n\r\n- PRs have more back and forth discussions about how events should be named.\r\n- Some events have too common names, thus polluting the global registry with names that could be easily reused by mistake in other parts of the app, thus causing silent bugs. For example: `:close-chat`.\r\n- Many events use Fully Qualified Keywords, which is known to make file renames more brittle and subject to bugs. Tools like `lsp-clojure` can help, but not everyone uses it.\r\n- External contributors have a harder time knowing how to name events. This increases the cost for first contribution.\r\n\r\n### Out of scope\r\n\r\nThis issue doesn't care about how all the many events are organized in the codebase. Even though this too is extremely important, it only cares about a proper naming convention that works for the Status Mobile team.\r\n\r\n### Things we should keep in mind\r\n\r\n1.  Some events are respecting the namespace they're part of. For example `src/status_im/multiaccounts/recover/core.cljs` defines `:multiaccounts.recover/re-encrypt-pressed`. Sometimes the keyword needs to broken down a bit further (see point 2).\r\n\r\n2.  It's common to have event namespaces responsible for more than one *thing*, in practice, this means there's often a need to add a noun to the keyword, to make it clear what we're referring to in the same namespace. For instance, `status-im.bootnodes.core` namespace defines the events `:bootnodes.callback/qr-code-scanned` and `:bootnodes.ui/delete-pressed`, hence we can clearly see `bootnode` and `ui` are two different *things*.\r\n\r\n3.  There's a reasonably well known article about some of the issues of fully qualifying keywords. Fully qualified keywords can also be problematic for consumers of the namespace, as we can see from Clojure's 1.11 release, which added the option `:as-alias` (similar to `:as` in `require`) to help with circular dependencies. <https://vvvvalvalval.github.io/posts/clojure-key-namespacing-convention-considered-harmful.html>\r\n\r\n4.  Events can use different verb conjugations (e.g. past tense or present tense). For example, `:status-im.add-new.core/qr-code-scanned`, when successful, dispatches `:status-im.add-new.core/qr-code-handled`. There's always a way to convert between different conjugations though, so it's a matter of establishing a convention.\r\n\r\n5.  Effects usually dispatch subsequent *success* and/or *error* events. It's common in re-frame to add a suffix to the original event name, like `-success`. This is a very strong convention in re-frame apps, even suggested in re-frame's documentation.\r\n\r\n### Implementation\r\n\r\nWe all know the famous quote from [Phil Karlton](https://www.karlton.org/2017/12/naming-things-hard/), that naming things is one of the most difficult things in Computer Science.\r\n\r\nWe believe **there's no right or wrong in how events are named**, and that it's simply a matter of defining a convention that's flexible enough and easy to follow. We don't want to define a hard rule that covers 100% of all use cases.\r\n\r\n### Convention 1 (suggestion)\r\n\r\n**This is just a suggestion among many others**, feel free to suggest anything else, but please, try to share examples and a little bit of explanation on why you think it might be better.\r\n\r\n1. Name event keywords with part of the fully qualified namespace, but not all of it. This patterns can scale well as the codebase grows and it's an easy rule to follow and make consistent. **Whenever you look at an event name, you can be pretty sure where it's defined**.\r\n\r\n```clojure\r\n;; In src/status_im/multiaccounts/create/core.cljs\r\n    \r\n;; Old\r\n(dispatch [:multiaccount-generate-and-derive-addresses-success])\r\n    \r\n;; New\r\n(dispatch [:multiaccounts.create/generate-and-derive-addresses-success])\r\n```\r\n\r\n2. Name the event keyword in the present tense, as a verb, expressing what it does, not what happened, just like you would name a function. The book Elements of Clojure, by Zach Tellman has an interesting section on how to name functions. Additionally, naming them for what they do can help decouple them from lower level concepts, such as which React Native event was fired, which in turn can help come up with more stable keywords.\r\n\r\n```clojure\r\n;; Old\r\n(dispatch [:intro-wizard/on-key-selected (:id acc)])\r\n\r\n;; New\r\n(dispatch [:intro-wizard/mark-as-selected (:id acc)])\r\n```\r\n\r\n3. Add logical contexts to event keywords when necessary, even though they are not in the fully qualified namespace.\r\n\r\n```clojure\r\n;; In src/status_im/multiaccounts/login/core.clj\r\n(dispatch [:multiaccounts.login.callback/<xyz>])\r\n(dispatch [:multiaccounts.login.ui/<xyz>])\r\n```\r\n\r\n4. When an event can succeed or fail, name them the same as the originating event, but add the `-success` or `-error` suffixes, respectively.\r\n\r\n## Acceptance Criteria\r\n\r\nThis issue can be closed once we can define a convention and a strategy on how to eliminate this tech debt, as well as an example PR showing some namespaces using the newly established convention.\r\n\r\nWe have around 900 events defined in the codebase, so it's definitely too much work to redefine all of them, even if we consider that 50% of them are perfectly fine.\r\n\r\n",
@@ -78,7 +78,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/13996/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -428,6 +428,50 @@
       "hooray": 0,
       "confused": 0,
       "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1635704425",
+    "html_url": "https://github.com/status-im/status-mobile/issues/13996#issuecomment-1635704425",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/13996",
+    "id": 1635704425,
+    "node_id": "IC_kwDOAx4p2c5hft5p",
+    "user": {
+      "login": "cammellos",
+      "id": 1017008,
+      "node_id": "MDQ6VXNlcjEwMTcwMDg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1017008?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cammellos",
+      "html_url": "https://github.com/cammellos",
+      "followers_url": "https://api.github.com/users/cammellos/followers",
+      "following_url": "https://api.github.com/users/cammellos/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cammellos/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cammellos/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cammellos/subscriptions",
+      "organizations_url": "https://api.github.com/users/cammellos/orgs",
+      "repos_url": "https://api.github.com/users/cammellos/repos",
+      "events_url": "https://api.github.com/users/cammellos/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cammellos/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-14T11:09:41Z",
+    "updated_at": "2023-07-14T11:09:41Z",
+    "author_association": "MEMBER",
+    "body": "I'll move this to a discussion, feel free to create issues if there's anything that needs to be addressed",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1635704425/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
       "rocket": 0,
       "eyes": 0
     },
