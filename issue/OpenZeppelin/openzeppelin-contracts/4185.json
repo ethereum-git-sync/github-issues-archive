@@ -40,7 +40,7 @@
       "description": "Changes that break backwards compatibility of the public API."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -75,22 +75,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 31,
-    "closed_issues": 45,
+    "open_issues": 33,
+    "closed_issues": 51,
     "state": "open",
     "created_at": "2022-05-17T19:52:44Z",
-    "updated_at": "2023-06-29T16:00:39Z",
+    "updated_at": "2023-07-13T21:54:24Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 10,
   "created_at": "2023-04-16T08:49:15Z",
-  "updated_at": "2023-06-16T09:24:38Z",
-  "closed_at": null,
+  "updated_at": "2023-07-13T20:52:05Z",
+  "closed_at": "2023-07-13T20:52:05Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "This issue is about the `Rounding` enum part of the math library:\r\n\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts/blob/8d633cb7d169f2f8595b273660b00b69e845c2fe/contracts/utils/math/Math.sol#L10-L14\r\n\r\nI'd like to provide some feedback:\r\n\r\n- Given that the math library in OZ exclusively supports unsigned integers, I see no need for both `Rounding.Down` and `Rounding.Zero`. They essentially mean the same thing for positive numbers.\r\n- Independent of the first point, the term `Rounding.Zero` is ambiguous. To understand that it means \"toward zero,\" one must examine the source code, as it could be mistaken for \"away from zero.\"\r\n- The words \"down\" and \"up\" can create confusion. As stated by Wikipedia:\r\n\r\n> For positive x, round-down is equivalent to round-toward-zero, while round-up is equivalent to round-away-from-zero. For negative x, round-down corresponds to round-away-from-zero, and round-up corresponds to round-toward-zero.\r\n\r\nComplicating the matter, the ICU has further [butchered](https://unicode-org.github.io/icu/userguide/format_parse/numbers/rounding-modes.html) these terms by defining \"down\" as \"rounded towards the next smaller absolute value\" (which Wikipedia refers to as \"toward zero\"), and \"up\" as \"rounded towards the next greater absolute value\" (which Wikipedia refers to as \"away from zero\"). This can be misleading, as \"down\" typically implies \"toward negative infinity,\" and \"up\" implies \"toward positive infinity.\"\r\n\r\nTo address all of these issues, I recommend adhering to the [`Intl.NumberFormat V3`](https://github.com/tc39/proposal-intl-numberformat-v3/tree/842e01#rounding-modes-ecma-402-419) standard, which replaces the terms \"down\" and \"up\" with \"trunc\" and \"expand\", respectively:\r\n\r\n```solidity\r\nenum Rounding {\r\n    Expand, // away from zero\r\n    Trunc // toward zero\r\n}\r\n```\r\n\r\nOr like this (more verbose, but clear):\r\n\r\n```solidity\r\nenum Rounding {\r\n    AwayFromZero,\r\n    TowardZero\r\n}\r\n```\r\n\r\nOr like this (given that only unsigned numbers are supported):\r\n\r\n```solidity\r\nenum Rounding {\r\n    Ceil, // toward positive infinity\r\n    Floor, // toward negative infinity\r\n}\r\n```\r\n\r\nHowever, I wouldn't go with the last option if you plan on supporting signed numbers in the future.\r\n\r\nA good related discussion about this topic can be found here: https://github.com/tc39/proposal-intl-numberformat-v3/issues/7",
-  "closed_by": null,
+  "closed_by": {
+    "login": "frangio",
+    "id": 481465,
+    "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/frangio",
+    "html_url": "https://github.com/frangio",
+    "followers_url": "https://api.github.com/users/frangio/followers",
+    "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+    "organizations_url": "https://api.github.com/users/frangio/orgs",
+    "repos_url": "https://api.github.com/users/frangio/repos",
+    "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/frangio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185/reactions",
     "total_count": 0,
@@ -105,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4185/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
