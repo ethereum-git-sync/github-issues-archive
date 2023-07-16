@@ -40,33 +40,6 @@
       "description": null
     },
     {
-      "id": 768896403,
-      "node_id": "MDU6TGFiZWw3Njg4OTY0MDM=",
-      "url": "https://api.github.com/repos/status-im/status-mobile/labels/developer-xp",
-      "name": "developer-xp",
-      "color": "475cc6",
-      "default": false,
-      "description": null
-    },
-    {
-      "id": 793864892,
-      "node_id": "MDU6TGFiZWw3OTM4NjQ4OTI=",
-      "url": "https://api.github.com/repos/status-im/status-mobile/labels/devops",
-      "name": "devops",
-      "color": "71b503",
-      "default": false,
-      "description": null
-    },
-    {
-      "id": 1311328202,
-      "node_id": "MDU6TGFiZWwxMzExMzI4MjAy",
-      "url": "https://api.github.com/repos/status-im/status-mobile/labels/nix",
-      "name": "nix",
-      "color": "0052cc",
-      "default": false,
-      "description": ""
-    },
-    {
       "id": 4052503522,
       "node_id": "LA_kwDOAx4p2c7xjEvi",
       "url": "https://api.github.com/repos/status-im/status-mobile/labels/E:MobileBuild",
@@ -85,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": {
     "login": "jakubgs",
@@ -130,10 +103,10 @@
     }
   ],
   "milestone": null,
-  "comments": 15,
+  "comments": 16,
   "created_at": "2021-11-05T10:51:34Z",
-  "updated_at": "2023-07-14T09:57:20Z",
-  "closed_at": "2023-07-14T09:57:20Z",
+  "updated_at": "2023-07-16T11:06:45Z",
+  "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "When @Jonathansoufer tried to build on his Mac with M1 `aarch64` CPU it fails with:\r\n```\r\nNo Android SDK tarballs are available for system architecture: aarch64-darwin\r\n```\r\nWhich is caused by this `if` in Android SDK derivation:\r\n```nix\r\n{\r\n  # Determine the Android os identifier from Nix's system identifier\r\n  os = if stdenv.system == \"x86_64-linux\" then \"linux\"\r\n    else if stdenv.system == \"x86_64-darwin\" then \"macosx\"\r\n    else throw \"No Android SDK tarballs are available for system architecture: ${stdenv.system}\";\r\n}\r\n```\r\nhttps://github.com/NixOS/nixpkgs/blob/65135081/pkgs/development/mobile/androidenv/compose-android-packages.nix#L31-L34\r\n\r\nSince currently packages do not appear to include any `aarch64-darwin` builds:\r\nhttps://github.com/NixOS/nixpkgs/blob/65135081/pkgs/development/mobile/androidenv/repo.json\r\n\r\n__EDIT__: The current solution is to simply not use an `arm64` shell to run builds, but instead use the [Rosetta 2](https://en.wikipedia.org/wiki/Rosetta_(software)) dynamic binary translator through the `arch -x86_64` command or [`Terminal x86` application](https://www.notion.so/Run-x86-Apps-including-homebrew-in-the-Terminal-on-Apple-Silicon-8350b43d97de4ce690f283277e958602).",
@@ -171,7 +144,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/12794/timeline",
   "performed_via_github_app": null,
-  "state_reason": "completed"
+  "state_reason": "reopened"
 }
 [
   {
@@ -822,6 +795,50 @@
     "body": "This seems to have been addressed, closing for now",
     "reactions": {
       "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1635614568/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1637054124",
+    "html_url": "https://github.com/status-im/status-mobile/issues/12794#issuecomment-1637054124",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/12794",
+    "id": 1637054124,
+    "node_id": "IC_kwDOAx4p2c5hk3as",
+    "user": {
+      "login": "jakubgs",
+      "id": 2212681,
+      "node_id": "MDQ6VXNlcjIyMTI2ODE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2212681?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jakubgs",
+      "html_url": "https://github.com/jakubgs",
+      "followers_url": "https://api.github.com/users/jakubgs/followers",
+      "following_url": "https://api.github.com/users/jakubgs/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jakubgs/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jakubgs/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jakubgs/subscriptions",
+      "organizations_url": "https://api.github.com/users/jakubgs/orgs",
+      "repos_url": "https://api.github.com/users/jakubgs/repos",
+      "events_url": "https://api.github.com/users/jakubgs/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jakubgs/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-16T11:05:58Z",
+    "updated_at": "2023-07-16T11:06:45Z",
+    "author_association": "MEMBER",
+    "body": "This has not been resolved. We only created a workaround using the `NIXPKGS_SYSTEM_OVERRIDE` environment variable in:\r\n\r\n* https://github.com/status-im/status-mobile/pull/16237\r\n\r\nThe actual underlying issue is still there, there is no Android SDK for Darwin aarch64.",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1637054124/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
