@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-05-29T13:48:30Z",
-  "updated_at": "2023-07-09T02:56:55Z",
-  "closed_at": null,
+  "updated_at": "2023-07-16T03:00:40Z",
+  "closed_at": "2023-07-16T03:00:40Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**Requirement:**\r\nOur objective is to utilize the createFilter method of contract events in order to filter the events emitted by the contract.\r\n\r\n**Problem Statement:**\r\nWe are currently facing an issue while attempting to filter the events emitted by the contract using the createFilter method. Our setup involves an archive node through erigon. We have a script in place that successfully achieves this task when we utilize RPC endpoints provided by other providers like chainstack or Ankr. However, when we use our own node URL, we are unable to obtain any results from the filtering process.\r\n\r\n**Script:**\r\n```\r\nimport json\r\nfrom web3 import Web3\r\nfrom web3.middleware import geth_poa_middleware\r\n\r\nabi = '[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"}]'\r\n\r\nnode_provider_url = \"https://\" \r\nw3 = Web3(Web3.HTTPProvider(node_provider_url))\r\n\r\ndef get_event_txn(contract_address):\r\n    checksum_addr = w3.toChecksumAddress(contract_address)\r\n    w3.middleware_onion.inject(geth_poa_middleware, layer=0)\r\n    contract = w3.eth.contract(address=checksum_addr, abi=json.loads(abi))\r\n    arg_list = []\r\n    start_block = 16341846\r\n    end_block = 16342200\r\n    print(\"Start Block ---- \", start_block)\r\n    print(\"End Block ---- \", end_block)\r\n    print(\"*************************************************\")\r\n    event_filter = contract.events.Transfer.createFilter(fromBlock=start_block, toBlock=end_block).get_all_entries()\r\n    print(event_filter)\r\n    for event in event_filter:\r\n        arg_list.append(event)\r\n\r\n    return arg_list\r\n\r\nevent_details = get_event_txn('0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599')\r\nfor event in event_details:\r\n    print(event)\r\n```\r\n\r\n**Result from other node provider:**\r\n![Screenshot from 2023-05-29 19-06-24](https://github.com/ledgerwatch/erigon/assets/128302698/aeb90960-d1d1-4a6a-a87c-abe9cf137cd8)\r\n\r\n\r\n**Result from own node:**\r\n![Screenshot from 2023-05-29 19-07-14](https://github.com/ledgerwatch/erigon/assets/128302698/3fdb3041-1cdc-4d55-a532-4f2bbbaa2651)\r\n\r\n\r\n**Here are the hardware details of our node for more information:**\r\n\r\nMachine SKU: Standard_L16as_v3\r\nvCPU: 16\r\nRAM: 128GB\r\nDisk attached: 16 TB\r\n\r\n**How we can enable this in our node ?**\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "This issue is stale because it has been open for 40 days with no activity. Remove stale label or comment, or this will be closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1627582982/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1636967064",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/7599#issuecomment-1636967064",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7599",
+    "id": 1636967064,
+    "node_id": "IC_kwDOC0FsAM5hkiKY",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-07-16T03:00:40Z",
+    "updated_at": "2023-07-16T03:00:40Z",
+    "author_association": "NONE",
+    "body": "This issue was closed because it has been stalled for 7 days with no activity.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1636967064/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
