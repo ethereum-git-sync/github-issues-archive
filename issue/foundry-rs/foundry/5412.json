@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5412",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5412/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5412/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5412/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5412",
+  "id": 1806658626,
+  "node_id": "I_kwDOGBlvNc5rr2xC",
+  "number": 5412,
+  "title": "`deal` call won't revert on ERC20 total supply overflow",
+  "user": {
+    "login": "LilaRest",
+    "id": 48853371,
+    "node_id": "MDQ6VXNlcjQ4ODUzMzcx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/48853371?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/LilaRest",
+    "html_url": "https://github.com/LilaRest",
+    "followers_url": "https://api.github.com/users/LilaRest/followers",
+    "following_url": "https://api.github.com/users/LilaRest/following{/other_user}",
+    "gists_url": "https://api.github.com/users/LilaRest/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/LilaRest/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/LilaRest/subscriptions",
+    "organizations_url": "https://api.github.com/users/LilaRest/orgs",
+    "repos_url": "https://api.github.com/users/LilaRest/repos",
+    "events_url": "https://api.github.com/users/LilaRest/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/LilaRest/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-16T17:25:14Z",
+  "updated_at": "2023-07-16T17:25:25Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [x] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nHi!\r\nJust figured that overflowing the total supply of an ERC20 won't revert if done with the `deal` cheatcode. Instead it will cause total supply to became 0, while some wallets may still have balances > 0.\r\n\r\nHere is a minimal reproduction:\r\n```solidity\r\nfunction testFuzz_dealWontRevert(uint256 amount1, uint256 amount2) public {\r\n    deal(address(myToken), address(1234), amount1);\r\n    deal(address(myToken), address(1234), amount2);\r\n}\r\n```\r\nThis fuzz test contains a lot of possible scenarios where `deal` call would make the total supply exceeds `type(uint256).max`. However, this test passes successfully.\r\n\r\nI just spent 1 hour trying to figure this out, it was totally breaking the behavior of my contract :sweat_smile: \r\n\r\nIf this can be easily solved by bounding `amount2` (see below), it'd be awesome to have clean error report to makes tests debugging easier.\r\n```solidity\r\nfunction testFuzz_dealWontRevert(uint256 amount1, uint256 amount2) public {\r\n    deal(address(myToken), address(1234), amount1);\r\n    amount2 = bound(amount2, 0, type(uint256).max - myToken.totalSupply());\r\n    deal(address(myToken), address(1234), amount2);\r\n}\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5412/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5412/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
