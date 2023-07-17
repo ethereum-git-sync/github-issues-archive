@@ -67,21 +67,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-06-30T12:41:35Z",
-  "updated_at": "2023-07-11T13:33:36Z",
-  "closed_at": null,
+  "updated_at": "2023-07-17T09:29:28Z",
+  "closed_at": "2023-07-17T09:29:28Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\r\n\r\n2.15.0\r\n\r\n### What happened?\r\n\r\nDurring a task to deploy on mumbai testnet, I want to wait for 5 or 20 transactions before to run the verify task.\r\n\r\nBut it's seem that the wait function doesn't work.\r\nI've try to put 100 in the wait function but the programm pass directly to the next steps...\r\n\r\nMy dependencies : \r\n```\r\n\"dependencies\": {\r\n    \"@nomicfoundation/hardhat-toolbox\": \"^3.0.0\",\r\n    \"@openzeppelin/contracts\": \"^4.9.1\"\r\n  },\r\n  \"devDependencies\": {\r\n    \"@nomicfoundation/hardhat-chai-matchers\": \"2.0.1\",\r\n    \"@nomicfoundation/hardhat-ethers\": \"3.0.2\",\r\n    \"@nomicfoundation/hardhat-network-helpers\": \"1.0.8\",\r\n    \"@nomicfoundation/hardhat-verify\": \"1.0.2\",\r\n    \"@nomiclabs/hardhat-etherscan\": \"^3.1.7\",\r\n    \"@typechain/ethers-v6\": \"0.4.0\",\r\n    \"@typechain/hardhat\": \"8.0.0\",\r\n    \"@types/chai\": \"^4.3.5\",\r\n    \"@types/mocha\": \"^10.0.1\",\r\n    \"chai\": \"4.2.0\",\r\n    \"dotenv\": \"^16.1.4\",\r\n    \"ethers\": \"^6.6.0\",\r\n    \"hardhat\": \"^2.15.0\",\r\n    \"hardhat-gas-reporter\": \"1.0.8\",\r\n    \"mocha\": \"^10.2.0\",\r\n    \"solidity-coverage\": \"0.8.1\",\r\n    \"ts-node\": \"^10.9.1\",\r\n    \"typechain\": \"8.2.0\",\r\n    \"typescript\": \"^5.1.3\"\r\n  }\r\n```\r\n\r\nI've check the `wait` function and I found that the `confirms` param is not used :\r\n<img width=\"290\" alt=\"image\" src=\"https://github.com/NomicFoundation/hardhat/assets/64586968/51d86fe1-b13a-470e-92e3-99295e8ea7b8\">\r\n\r\nMaybe by passing the argument to the super function it will work ? I've never really use classes in TS\r\n\r\n### Minimal reproduction steps\r\n\r\nWrite a task to deploy on the mumbai network like this :\r\n\r\n```\r\nimport { task } from \"hardhat/config\";\r\n\r\n...\r\n\r\ntask(\"deploy-collection-generator\")\r\n  .setAction(async (taskArgs, hre) => {\r\n    const CollectionGenerator = await hre.ethers.getContractFactory(\r\n      \"CollectionGenerator\"\r\n    );\r\n    const collectionGenerator = await CollectionGenerator.deploy();\r\n    await collectionGenerator.waitForDeployment();\r\n\r\n    let collectionGeneratorAddress = await collectionGenerator.getAddress();\r\n\r\n    console.log(\"CollectionGenerator deployed to:\", collectionGeneratorAddress);\r\n\r\n    let res = await collectionGenerator.deploymentTransaction()?.wait(20);\r\n\r\n    console.log(res);\r\n\r\n    await hre.run(\"verify:verify\", {\r\n      address: collectionGeneratorAddress,\r\n      constructorArguments: [controller6022Address, wETHAddress],\r\n    });\r\n  });\r\n```\r\n\r\nThe res variable will be display a millisecond after the collection address. To my opinions, it didn't wait\r\n\r\nAs a result, I got the following error from the verify task :\r\n<img width=\"364\" alt=\"image\" src=\"https://github.com/NomicFoundation/hardhat/assets/64586968/1a7a6c8e-3370-4f08-aa82-ce7f1dd44c37\">\r\n\r\n\r\nThanks for this librarie, it's awesome\r\n\r\nHave a good day ;)\r\n\r\n### Search terms\r\n\r\nwait deploy deployement hardhat",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4093/reactions",
     "total_count": 0,
@@ -96,7 +115,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4093/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -263,6 +282,50 @@
     "body": "In the meantime, this workaround might be useful:\r\n\r\n```js\r\nconst deploymentTx = contract.deploymentTransaction();\r\n\r\nawait provider.waitForTransaction(deploymentTx.hash, 3);\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1622077132/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1637683239",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4093#issuecomment-1637683239",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4093",
+    "id": 1637683239,
+    "node_id": "IC_kwDOB7jojM5hnRAn",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-17T09:29:28Z",
+    "updated_at": "2023-07-17T09:29:28Z",
+    "author_association": "MEMBER",
+    "body": "This is working now with `ethers@6.6.4`.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1637683239/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
