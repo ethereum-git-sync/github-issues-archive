@@ -58,7 +58,7 @@
       "description": "ETA July 2023"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "jmcph4",
@@ -105,12 +105,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-07-11T03:48:54Z",
-  "updated_at": "2023-07-11T22:09:16Z",
-  "closed_at": null,
+  "updated_at": "2023-07-17T02:52:04Z",
+  "closed_at": "2023-07-17T02:52:04Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nWhen invoked in non-release profiles, `lcli` panics by default during argument parsing. This is most likely due to an error in Clap: https://github.com/clap-rs/clap/issues/1546.\r\n\r\nCredit to @jimmygchen for the discovery.\r\n\r\n## Version\r\n\r\n```\r\n$ rustc --version\r\nrustc 1.70.0 (90c541806 2023-05-31)\r\n$ git rev-parse HEAD\r\ndfcb3363c757671eb19d5f8e519b4b94ac74677a\r\n$ cargo run --bin lighthouse -- --version\r\nLighthouse v4.3.0-dfcb336\r\nBLS library: blst\r\nSHA256 hardware acceleration: true\r\nAllocator: system\r\nProfile: debug\r\nSpecs: mainnet (true), minimal (false), gnosis (false)\r\n```\r\n\r\n## Present Behaviour\r\n\r\n```\r\n$ cargo run --profile dev --bin lcli\r\nthread 'main' panicked at 'Global arguments cannot be required.\r\n\r\n\t'spec' is marked as global and required', /home/jmcph4/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-2.34.0/src/app/parser.rs:208:9\r\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\r\n$ echo $?\r\n101\r\n```\r\n\r\n## Expected Behaviour\r\n\r\nLighthouse should not panic on this condition, but instead display the default help text and return a `1` exit code. Compare the above behaviour to the release profile behaviour:\r\n\r\n```\r\n$ cargo run --profile release --bin lcli\r\nFailed to run lcli: Unknown subcommand . See --help.\r\n$ echo $?\r\n1\r\n```\r\n\r\n## Steps to resolve\r\n\r\nAs per [this comment](https://github.com/clap-rs/clap/issues/1546#issuecomment-852783756) on the Clap ticket, removing all instances of both `required` and `default_value` should work:\r\n\r\n```diff\r\ndiff --git a/lcli/src/main.rs b/lcli/src/main.rs\r\nindex d072beaa4..4206a2f47 100644\r\n--- a/lcli/src/main.rs\r\n+++ b/lcli/src/main.rs\r\n@@ -38,7 +38,6 @@ fn main() {\r\n                 .long(\"spec\")\r\n                 .value_name(\"STRING\")\r\n                 .takes_value(true)\r\n-                .required(true)\r\n                 .possible_values(&[\"minimal\", \"mainnet\", \"gnosis\"])\r\n                 .default_value(\"mainnet\")\r\n                 .global(true),\r\n@@ -361,7 +360,6 @@ fn main() {\r\n                         .index(2)\r\n                         .value_name(\"BIP39_MNENMONIC\")\r\n                         .takes_value(true)\r\n-                        .required(true)\r\n                         .default_value(\r\n                             \"replace nephew blur decorate waste convince soup column \\\r\n                             orient excite play baby\",\r\n@@ -382,7 +380,6 @@ fn main() {\r\n                         .help(\"The block hash used when generating an execution payload. This \\\r\n                             value is used for `execution_payload_header.block_hash` as well as \\\r\n                             `execution_payload_header.random`\")\r\n-                        .required(true)\r\n                         .default_value(\r\n                             \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n                         ),\r\n@@ -400,7 +397,6 @@ fn main() {\r\n                         .value_name(\"INTEGER\")\r\n                         .takes_value(true)\r\n                         .help(\"The base fee per gas field in the execution payload generated.\")\r\n-                        .required(true)\r\n                         .default_value(\"1000000000\"),\r\n                 )\r\n                 .arg(\r\n@@ -409,7 +405,6 @@ fn main() {\r\n                         .value_name(\"INTEGER\")\r\n                         .takes_value(true)\r\n                         .help(\"The gas limit field in the execution payload generated.\")\r\n-                        .required(true)\r\n                         .default_value(\"30000000\"),\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "jmcph4",
+    "id": 717268,
+    "node_id": "MDQ6VXNlcjcxNzI2OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/717268?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jmcph4",
+    "html_url": "https://github.com/jmcph4",
+    "followers_url": "https://api.github.com/users/jmcph4/followers",
+    "following_url": "https://api.github.com/users/jmcph4/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jmcph4/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jmcph4/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jmcph4/subscriptions",
+    "organizations_url": "https://api.github.com/users/jmcph4/orgs",
+    "repos_url": "https://api.github.com/users/jmcph4/repos",
+    "events_url": "https://api.github.com/users/jmcph4/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jmcph4/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4488/reactions",
     "total_count": 1,
@@ -125,7 +144,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4488/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
