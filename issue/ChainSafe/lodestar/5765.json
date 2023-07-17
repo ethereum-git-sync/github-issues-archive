@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5765",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5765/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5765/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5765/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5765",
+  "id": 1807594082,
+  "node_id": "I_kwDOCD5_Gc5rvbJi",
+  "number": 5765,
+  "title": "Consecutive HTTP requests cause socket hang up on node v20",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-17T11:46:45Z",
+  "updated_at": "2023-07-17T11:46:45Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nConsecutive HTTP requests cause socket hang up on node v20. This only happens with some servers, so far I could only reproduce this with Lighthouse.\r\n\n\n### Expected behavior\n\nNo socket hang up / requests failures\n\n### Steps to reproduce\n\nRunning the following script will cause the first request to pass but the second one fails with socket hang up error\r\n\r\n```ts\r\nimport { getClient } from \"@lodestar/api\";\r\nimport { config } from \"@lodestar/config/default\";\r\n\r\nconst lighthouse = \"http://localhost:5052\"\r\nconst api = getClient({ baseUrl: lighthouse }, { config });\r\n\r\nawait api.beacon.getBlockV2(\"head\");\r\nawait api.beacon.getBlockV2(\"head\");\r\n```\r\n```sh\r\n> node index.js \r\n\r\n/home/nico/projects/test/debug-getStatev2/node_modules/node-fetch/lib/index.js:1505\r\n                        reject(new FetchError(`request to ${request.url} failed, reason: ${err.message}`, 'system', err));\r\n                               ^\r\nFetchError: request to http://localhost:5052/eth/v2/beacon/blocks/head failed, reason: socket hang up\r\n    at ClientRequest.<anonymous> (/home/nico/projects/test/debug-getStatev2/node_modules/node-fetch/lib/index.js:1505:11)\r\n    at ClientRequest.emit (node:events:512:28)\r\n    at Socket.socketOnEnd (node:_http_client:519:9)\r\n    at Socket.emit (node:events:524:35)\r\n    at endReadableNT (node:internal/streams/readable:1378:12)\r\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {\r\n  type: 'system',\r\n  errno: 'ECONNRESET',\r\n  code: 'ECONNRESET'\r\n}\r\n\r\nNode.js v20.4.0\r\n```\r\n\r\nYielding to macro queue in-between the two requests does not produce an error\r\n```ts\r\n// ...\r\nawait api.beacon.getBlockV2(\"head\");\r\nsetTimeout(async () => await api.beacon.getBlockV2(\"head\"), 0);\r\n```\n\n### Additional context\n\nThe issue is already reported upstream\r\n\r\n- https://github.com/node-fetch/node-fetch/issues/1735\r\n- https://github.com/nodejs/node/issues/47130\r\n\r\nThere are also some [suggested workarounds](https://github.com/node-fetch/node-fetch/issues/1735) but those can't easily applied in our case since we are using cross-fetch and require browser compatiblity.\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\n6e014217f9df78c0916299d357588a5bbab05d88",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5765/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5765/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
