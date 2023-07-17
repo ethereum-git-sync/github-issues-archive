@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11550",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11550/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11550/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11550/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/11550",
+  "id": 1807448497,
+  "node_id": "I_kwDOD5KrTM5ru3mx",
+  "number": 11550,
+  "title": "Updated fees panel and transaction summary dialog for airdropping, minting, burning, remotely destructing",
+  "user": {
+    "login": "benjthayer",
+    "id": 110033914,
+    "node_id": "U_kgDOBo77-g",
+    "avatar_url": "https://avatars.githubusercontent.com/u/110033914?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjthayer",
+    "html_url": "https://github.com/benjthayer",
+    "followers_url": "https://api.github.com/users/benjthayer/followers",
+    "following_url": "https://api.github.com/users/benjthayer/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjthayer/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjthayer/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjthayer/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjthayer/orgs",
+    "repos_url": "https://api.github.com/users/benjthayer/repos",
+    "events_url": "https://api.github.com/users/benjthayer/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjthayer/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-17T10:19:57Z",
+  "updated_at": "2023-07-17T10:20:59Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "With the advent of the Owner token and TokenMaster token, the way fees are taken through contract interactions has changed. \r\n\r\nInstead of the token being bound to the address that is selected in the minting form, the Owner and TokenMaster instead select the account from which to pay gas fees for contract interactions with the token. \r\n\r\nThe latest fee panels and transaction summary dialogs have been rolled out into the following flows:\r\n- Airdrop\r\n- Mint (Owner token and normal token mint)\r\n- Remote destruction\r\n- Burn\r\n\r\nThe **fees** panel has been made into a component to make it easier to see the variants used throughout these flows:\r\nhttps://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?type=design&node-id=35302-601554&mode=design&t=izrFg3DNSH3R21mU-4\r\n\r\n<img width=\"1246\" alt=\"Screenshot 2023-07-17 at 11 20 49\" src=\"https://github.com/status-im/status-desktop/assets/110033914/84b46c9d-efde-4e10-b555-2859ed2aa611\">\r\n\r\nStates:\r\n- Placeholder (use if the fee cannot be fetched until the user has input some value - e.g. number of tokens to burn)\r\n- Single fee line item - price being fetched/calculated\r\n- Single fee line item default - showing fee and account selector\r\n- Single fee line item validated - user doesn't have enough funds in select account on requisite network\r\n- Single fee line item - price being updated after user interaction with dialog (e.g. changes burn amount)\r\n- Single fee line item validated - fee exceeds block gas limit\r\n- Multi line fee item - all of the above states + differentiated validation per network for insufficient funds on selected account and fee exceeding block gas limit\r\n\r\nThe fetch (skeleton load) state should only be used if the fee fetch/update is not instantaneous.\r\nWhile the dialog is in view, the fees should update according to the block time which will be different depending on the network being used for the transaction. Again, the loading state should only be used if the refresh of the fee is not instantaneous. \r\n\r\nA flow showing how the fee panel should look under the various conditions is shown here (in the context of airdrop):\r\nhttps://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?type=design&node-id=35302-602386&mode=design&t=izrFg3DNSH3R21mU-4\r\n\r\n--\r\n\r\nThe same with the **Tx summary transaction dialog**:\r\nhttps://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?type=design&node-id=35333-606277&mode=design&t=izrFg3DNSH3R21mU-4\r\n<img width=\"1254\" alt=\"Screenshot 2023-07-17 at 11 01 14\" src=\"https://github.com/status-im/status-desktop/assets/110033914/7bab7ec9-3c4c-4061-981f-4a45698f4f53\">\r\n\r\n--\r\n\r\n**Flows updated with the above:**\r\n\r\n**Airdrop**\r\nhttps://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?type=design&node-id=22602-495365&mode=design&t=izrFg3DNSH3R21mU-4\r\n\r\n**Mint, airdrop and remotely destruct Owner / TokenMaster tokens**\r\nhttps://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?type=design&node-id=34794-589770&mode=design&t=izrFg3DNSH3R21mU-4\r\n- Note that during the minting of the Owner token, the Community founder no longer selects the address to be used for all future interactions with the token - they simply select the account to be used to pay the gas fees and to have the Owner token airdropped to them on. The Owner token mint form is the only exception to the fee panel where the account selector is not included in the fees panel. This is because the Community founder is selecting the account to use for both the fees and the airdrop - so it is not solely relevant to fees.\r\n\r\n**Mint, airdrop and remotely destruct collectibles and assets** \r\nhttps://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?type=design&node-id=29373-560281&mode=design&t=izrFg3DNSH3R21mU-4\r\n- Note that during the minting of a token, the Owner/TokenMaster no longer selects the address to be used for all future interactions with the token - they simply select the account to be used to pay the gas fees and to have the Owner token airdropped to them on. The mint form for the Owner and TokenMaster are therefore identical.\r\n\r\nFor the remote destruction of a token, note that the dialog has been changed significantly to allow the fees panel to stay in view. All views and interactions for this dialog have been documented here:\r\nhttps://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?type=design&node-id=29468-618133&mode=design&t=izrFg3DNSH3R21mU-4\r\n\r\n<img width=\"594\" alt=\"Screenshot 2023-07-17 at 11 14 59\" src=\"https://github.com/status-im/status-desktop/assets/110033914/322bd5ea-6068-400e-b740-ea089955938b\">\r\n\r\ncc @micieslak @John-44 @noeliaSD ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11550/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11550/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
