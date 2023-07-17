@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 7,
   "created_at": "2023-07-13T03:32:56Z",
-  "updated_at": "2023-07-14T08:49:50Z",
-  "closed_at": null,
+  "updated_at": "2023-07-17T09:56:34Z",
+  "closed_at": "2023-07-17T09:56:34Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: v1.12.0 as library\r\nCL client & version: -\r\nOS & Version: Linux & macOS\r\nCommit hash : v1.12.0\r\n\r\n#### Expected behaviour\r\n\r\nA valid transaction stored in a block on the mainnet should be parseable.\r\n\r\n#### Actual behaviour\r\n\r\n```client.getTransactionByHash``` panics for a valid transaction stored in a block on the mainnet with ```panic: invalid transaction v, r, s values```\r\n\r\nSame thing happens for this particular transaction with the popular ethers.js library, [this](https://github.com/ethers-io/ethers.js/issues/4223) issue.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nComplete, ready to run copy-paste code:\r\n\r\n```sh\r\n#!/bin/sh\r\n\r\n# SET TMP PROJECT PATH\r\nTMP_PATH=/tmp/ethissue\r\n\r\n# CREATE CLEAN TMP PROJECT WITH VERSION TO BE TESTED\r\nrm -rf $TMP_PATH\r\nmkdir -p $TMP_PATH\r\ncd $TMP_PATH\r\ngo mod init ethissue\r\n\r\n# WRITE TEST SCRIPT\r\ncat <<EOF > \"${TMP_PATH}/main.go\"\r\npackage main\r\n\r\nimport (\r\n  \"context\"\r\n  \"fmt\"\r\n\r\n  \"github.com/ethereum/go-ethereum/common\"\r\n  \"github.com/ethereum/go-ethereum/core/types\"\r\n  \"github.com/ethereum/go-ethereum/ethclient\"\r\n)\r\n\r\nfunc main() {\r\n  client, _ := ethclient.Dial(\"https://eth.llamarpc.com\")\r\n\r\n  // previous transaction in relation to the bad tx (block 100,019)\r\n  goodTxBefore, _, err := client.TransactionByHash(context.Background(), common.HexToHash(\"0x6d837b8496d4ae6bfad610e6647cc66faa2d1f3676f2fca24174c1c7cc1bb233\"))\r\n  if err != nil {\r\n    panic(err)\r\n  }\r\n  sender, err := types.Sender(types.LatestSignerForChainID(goodTxBefore.ChainId()), goodTxBefore)\r\n  if err != nil {\r\n    panic(err)\r\n  }\r\n  fmt.Println(sender)\r\n\r\n  // next transaction in relation to the bad tx (block 100,031)\r\n  goodTxAfter, _, err := client.TransactionByHash(context.Background(), common.HexToHash(\"0x92fd0b59813c1ed4ee485414a9545edfb701fc1e81ed252e00484895637c4a3f\"))\r\n  if err != nil {\r\n    panic(err)\r\n  }\r\n  sender, err = types.Sender(types.LatestSignerForChainID(goodTxAfter.ChainId()), goodTxAfter)\r\n  if err != nil {\r\n    panic(err)\r\n  }\r\n  fmt.Println(sender)\r\n\r\n  // bad transaction (block 100,023)\r\n  badTxBetween2goodTxes, _, err := client.TransactionByHash(context.Background(), common.HexToHash(\"0xce8a2163e2563c7fc783371985fff9fd8194d7e27c4be1adb06520ca2e816e9a\"))\r\n  if err != nil {\r\n    panic(err)\r\n  }\r\n  sender, err = types.Sender(types.LatestSignerForChainID(badTxBetween2goodTxes.ChainId()), badTxBetween2goodTxes)\r\n  if err != nil {\r\n    panic(err)\r\n  }\r\n  fmt.Println(sender)\r\n}\r\nEOF\r\n\r\n# FETCH DEPS\r\ngo get\r\n\r\n# RUN AND INSPECT OUTPUT\r\ngo run \"${TMP_PATH}/main.go\"\r\n\r\n```\r\n\r\n#### Backtrace\r\n\r\n````\r\ngithub.com/ethereum/go-ethereum/core/types.recoverPlain (/gopath/pkg/mod/github.com/ethereum/go-ethereum@v1.12.0/core/types/transaction_signing.go:564)\r\ngithub.com/ethereum/go-ethereum/core/types.HomesteadSigner.Sender (/gopath/pkg/mod/github.com/ethereum/go-ethereum@v1.12.0/core/types/transaction_signing.go:501)\r\ngithub.com/ethereum/go-ethereum/core/types.eip2930Signer.Sender (/gopath/pkg/mod/github.com/ethereum/go-ethereum@v1.12.0/core/types/transaction_signing.go:335)\r\ngithub.com/ethereum/go-ethereum/core/types.londonSigner.Sender (/gopath/pkg/mod/github.com/ethereum/go-ethereum@v1.12.0/core/types/transaction_signing.go:260)\r\ngithub.com/ethereum/go-ethereum/core/types.cancunSigner.Sender (/gopath/pkg/mod/github.com/ethereum/go-ethereum@v1.12.0/core/types/transaction_signing.go:192)\r\ngithub.com/ethereum/go-ethereum/core/types.(*cancunSigner).Sender (:1)\r\ngithub.com/ethereum/go-ethereum/core/types.Sender (/gopath/pkg/mod/github.com/ethereum/go-ethereum@v1.12.0/core/types/transaction_signing.go:147)\r\nmain.safeBlockArchiver (/project/scraper/safeblockarchiver.go:77)\r\n````\r\n\r\nWhen submitting logs: please submit them as text and not screenshots.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "karalabe",
+    "id": 129561,
+    "node_id": "MDQ6VXNlcjEyOTU2MQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/129561?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/karalabe",
+    "html_url": "https://github.com/karalabe",
+    "followers_url": "https://api.github.com/users/karalabe/followers",
+    "following_url": "https://api.github.com/users/karalabe/following{/other_user}",
+    "gists_url": "https://api.github.com/users/karalabe/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/karalabe/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/karalabe/subscriptions",
+    "organizations_url": "https://api.github.com/users/karalabe/orgs",
+    "repos_url": "https://api.github.com/users/karalabe/repos",
+    "events_url": "https://api.github.com/users/karalabe/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/karalabe/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27714/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27714/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
