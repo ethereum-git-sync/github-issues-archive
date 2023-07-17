@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5768",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5768/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5768/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5768/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5768",
+  "id": 1808127811,
+  "node_id": "I_kwDOCD5_Gc5rxddD",
+  "number": 5768,
+  "title": "Metrics server is listening on IPv6 interface and not shutting down",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-17T16:25:55Z",
+  "updated_at": "2023-07-17T17:16:50Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\r\n\r\nIt looks like Lodestar beacon node metrics server starts listening on IPv6 interface.\r\n\r\n```sh\r\ndevops@Ubuntu-2204-jammy-amd64-base:~/goerli/lodestar$ lsof -i :8008\r\nCOMMAND     PID   USER   FD   TYPE    DEVICE SIZE/OFF NODE NAME\r\nnode    2301537 devops  102u  IPv6 973623086      0t0  TCP localhost.localdomain:8008->localhost.localdomain:56578 (ESTABLISHED)\r\nnode    2301537 devops  128u  IPv6 973428666      0t0  TCP *:8008 (LISTEN)\r\n```\r\n\r\n```sh\r\ndevops@Ubuntu-2204-jammy-amd64-base:~/goerli/lodestar$ sudo netstat -ltnp | grep -w ':8008'\r\ntcp6       0      0 :::8008                 :::*                    LISTEN      2301537/node\r\n```\r\n\r\nIt is also no longer possible to shut down the process, even force closing does not help. Had to use `kill -9` to close process as just `kill` didn't do anything.\r\n\r\n```\r\nJul-17 17:08:54.000[]                 info: Synced - slot: 6092144 - head: 0xe00e…5e94 - exec-block: valid(9361504 0x8772…) - finalized: 0x7710…765c:190377 - peers: 51\r\n^CJul-17 17:09:01.307[]                 info: Stopping gracefully, use Ctrl+C again to force process exit\r\nJul-17 17:09:06.176[]                 info: Synced - slot: 6092145 - head: (slot -1) 0xe00e…5e94 - exec-block: valid(9361504 0x8772…) - finalized: 0x7710…765c:190377 - peers: 50\r\n^CJul-17 17:09:10.028[]                 info: Forcing process exit\r\n^C^C^C^C^C./lodestar: line 7: 2357120 Killed                  node --trace-deprecation --max-old-space-size=4096 ./packages/cli/bin/lodestar.js \"$@\r\n```\r\n\r\n### Expected behavior\r\n\r\nMetrics server should not be listening on IPv6 and beacon node should cleanly shut down when receiving SIGTERM / SIGINT.\r\n\r\n### Steps to reproduce\r\n\r\nRunning with default network and listen options, metrics are enabled\r\n\r\n```sh\r\n./lodestar beacon \\\r\n    --dataDir /home/devops/goerli/data/beacon \\\r\n    --metrics \\\r\n    --execution.urls http://localhost:8551 \\\r\n    --jwt-secret /home/devops/goerli/data/jwtsecret \\\r\n    --logLevel info \\\r\n    --network goerli \\\r\n    --checkpointSyncUrl \"https://beaconstate-goerli.chainsafe.io/\"\r\n```\r\n\r\nThe metrics server listen on IPv6 happens consistently but I am not able to reproduce the process not shutting down all the time.\r\n\r\n### Additional context\r\n\r\nRelated PR that likely introduced problem\r\n- https://github.com/ChainSafe/lodestar/pull/5758\r\n\r\n\r\n### Operating system\r\n\r\nLinux\r\n\r\n### Lodestar version or commit hash\r\n\r\nec8153153c83d082cb89fca682d502e709e3f415",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5768/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5768/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
