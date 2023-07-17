@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7903",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7903/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7903/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7903/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/7903",
+  "id": 1807124990,
+  "node_id": "I_kwDOC0FsAM5rton-",
+  "number": 7903,
+  "title": "Bug with eth_newFilter and eth_getFilterLogs",
+  "user": {
+    "login": "wuzhong-zhu",
+    "id": 19160757,
+    "node_id": "MDQ6VXNlcjE5MTYwNzU3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19160757?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wuzhong-zhu",
+    "html_url": "https://github.com/wuzhong-zhu",
+    "followers_url": "https://api.github.com/users/wuzhong-zhu/followers",
+    "following_url": "https://api.github.com/users/wuzhong-zhu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wuzhong-zhu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wuzhong-zhu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wuzhong-zhu/subscriptions",
+    "organizations_url": "https://api.github.com/users/wuzhong-zhu/orgs",
+    "repos_url": "https://api.github.com/users/wuzhong-zhu/repos",
+    "events_url": "https://api.github.com/users/wuzhong-zhu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wuzhong-zhu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-17T07:03:22Z",
+  "updated_at": "2023-07-17T07:03:22Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `erigon/2.48.0/linux-amd64/go1.20.5` \r\n\r\nOS & Version:Linux\r\n\r\nChain/Network: Polygon\r\n\r\n#### Expected behaviour\r\n`eth_getFilterLogs` re-executes the block and collects log information. Using [this transaction](https://polygonscan.com/tx/0xc2d7dac2549545c9179fa019481614d5fd4742dd33256d4a5bae069112941d6c#eventlog) as an example.\r\n\r\nAgainst a regular Geth node, running the following command:\r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"method\": \"eth_newFilter\",\r\n  \"params\": [\r\n    {\r\n      \"topics\": [\r\n        \"0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\"\r\n      ],\r\n      \"fromBlock\": \"0x2B13F9E\",\r\n      \"toBlock\": \"0x2B13F9E\",\r\n      \"address\": [\r\n        \"0xF25212E676D1F7F89Cd72fFEe66158f541246445\"\r\n      ]\r\n    }\r\n  ],\r\n  \"id\": 31\r\n}\r\n```\r\nand \r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"method\": \"eth_getFilterLogs\",\r\n  \"params\": [\r\n    \"0xFILTER_ID_HERE\"\r\n  ],\r\n  \"id\": 31\r\n}\r\n```\r\nreturns the following result:\r\n`{\"jsonrpc\":\"2.0\",\"id\":31,\"result\":[{\"address\":\"0xf25212e676d1f7f89cd72ffee66158f541246445\",\"topics\":[\"0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\",\"0x00000000000000000000000025e6bc33060c1fee8e08532d0c1c32c4cbf10e2c\",\"0x00000000000000000000000059e242d352ae13166b4987ae5c990c232f7f7cd6\"],\"data\":\"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"blockNumber\":\"0x2b13f9e\",\"transactionHash\":\"0xc2d7dac2549545c9179fa019481614d5fd4742dd33256d4a5bae069112941d6c\",\"transactionIndex\":\"0x27\",\"blockHash\":\"0xe296a39e37071bbcf0fc925d9b1190e70d8a5f959156b238ed3b0596f702f147\",\"logIndex\":\"0x93\",\"removed\":false}]}`\r\n\r\n\r\n#### Actual behaviour\r\n`eth_getFilterLogs` always returns an empty array as a result.\r\n```\r\n{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 31,\r\n    \"result\": []\r\n}\r\n```\r\n\r\n\r\n#### Backtrace\r\nCalling eth_getLogs against the same node returns accurate result\r\n````\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"method\": \"eth_getLogs\",\r\n  \"params\": [\r\n    {\r\n      \"topics\": [\r\n        \"0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\"\r\n      ],\r\n      \"fromBlock\": \"0x2B13F9E\",\r\n      \"toBlock\": \"0x2B13F9E\",\r\n      \"address\": [\r\n        \"0xF25212E676D1F7F89Cd72fFEe66158f541246445\"\r\n      ]\r\n    }\r\n  ],\r\n  \"id\": 31\r\n}\r\n````\r\nResult:\r\n```\r\n\r\n{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 31,\r\n    \"result\": [\r\n        {\r\n            \"address\": \"0xf25212e676d1f7f89cd72ffee66158f541246445\",\r\n            \"topics\": [\r\n                \"0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\",\r\n                \"0x00000000000000000000000025e6bc33060c1fee8e08532d0c1c32c4cbf10e2c\",\r\n                \"0x00000000000000000000000059e242d352ae13166b4987ae5c990c232f7f7cd6\"\r\n            ],\r\n            \"data\": \"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\r\n            \"blockNumber\": \"0x2b13f9e\",\r\n            \"transactionHash\": \"0xc2d7dac2549545c9179fa019481614d5fd4742dd33256d4a5bae069112941d6c\",\r\n            \"transactionIndex\": \"0x27\",\r\n            \"blockHash\": \"0xe296a39e37071bbcf0fc925d9b1190e70d8a5f959156b238ed3b0596f702f147\",\r\n            \"logIndex\": \"0x93\",\r\n            \"removed\": false\r\n        }\r\n    ]\r\n}\r\n```\r\nSo it shouldn't be an issue with the state availability.\r\n\r\nAny suggestion is appreciated. Thanks!",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7903/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7903/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
