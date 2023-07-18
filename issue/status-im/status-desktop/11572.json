@@ -1,0 +1,146 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11572",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11572/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11572/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11572/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/11572",
+  "id": 1810380786,
+  "node_id": "I_kwDOD5KrTM5r6Dfy",
+  "number": 11572,
+  "title": "DRAFT Make sure we only have one control node at a time by adding an internal signal with installation_id",
+  "user": {
+    "login": "jrainville",
+    "id": 11926403,
+    "node_id": "MDQ6VXNlcjExOTI2NDAz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11926403?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jrainville",
+    "html_url": "https://github.com/jrainville",
+    "followers_url": "https://api.github.com/users/jrainville/followers",
+    "following_url": "https://api.github.com/users/jrainville/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jrainville/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jrainville/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jrainville/subscriptions",
+    "organizations_url": "https://api.github.com/users/jrainville/orgs",
+    "repos_url": "https://api.github.com/users/jrainville/repos",
+    "events_url": "https://api.github.com/users/jrainville/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jrainville/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2987757762,
+      "node_id": "MDU6TGFiZWwyOTg3NzU3NzYy",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/to%20analyze",
+      "name": "to analyze",
+      "color": "5CC421",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 3047427135,
+      "node_id": "MDU6TGFiZWwzMDQ3NDI3MTM1",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/feature",
+      "name": "feature",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4548141040,
+      "node_id": "LA_kwDOD5KrTM8AAAABDxcf8A",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/messenger-team",
+      "name": "messenger-team",
+      "color": "232858",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 5732739708,
+      "node_id": "LA_kwDOD5KrTM8AAAABVbKqfA",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/E:DImportCommunityNewFlow",
+      "name": "E:DImportCommunityNewFlow",
+      "color": "7CB99C",
+      "default": false,
+      "description": "Implementation of the new Import community flow for private and public keys"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-07-18T17:15:24Z",
+  "updated_at": "2023-07-18T18:04:12Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nCurrently, we use the private key to import a community and make it the control node. This brings the possibility that multiple control nodes could exist at the same time.\r\n\r\n@osmaczko and I thought of a way to make it so that only one device would be the control node, even if two or more devices share the same account (chatKey).\r\nThat way would be to send, in parallel to the community description, a signal that would contain the installation_id of the device which is the control node. Each device has an ID that should be different.\r\n\r\nThe signal's object structure could look something like:\r\n```js\r\n{\r\n  communityID: string,\r\n  installationID: string,\r\n  clock: unit64,\r\n  signature: string\r\n}\r\n```\r\n\r\nWe could send it to the same topic as the community one for descriptions. Members that are not owners would just ignore the signal.\r\n\r\nThe proposed way would be that when we import the privateKey (clicking the \"Make this device the control node for Community\" button here https://www.figma.com/file/17fc13UBFvInrLgNUKJJg5/Kuba%E2%8E%9CDesktop?node-id=31166%3A626222&mode=dev), that node becomes the control node and sends the signal.\r\n\r\nTo make sure that the process is secure, we'd need to sign the signal with the community private key, but we also need to add the account's signature. That signature would be to confirm that you are indeed the same account using a different device. \r\nQuestion: what happens in the case of importing from a different account? We also need to only have one control node. I guess we still listen to the signal and we remove our private key. It just makes it so that if your community privateKey is stolen, we actively have a mechanism to kick out the legitimate owner, but then again, if you lose the privateKey, you pretty much screwed the whole community already, so it's not a big deal.\r\n\r\nWe'd need to add a new table that would just contain communityIDs, installationIDs and a clock. Maybe we need the publicKey of the owner's account too, in case of a different account transferred to. Owners of the community would save those. The owner with the highest clock gets to be the control node. Every other owner deletes their privateKey, or maybe they just stop using it?\r\n\r\nWe decided to not put those inside the community description, because only owners care or need that information, so we didn't want to pollute the description.\r\n\r\nWe do have to send that signal periodically like the description however, in case one of the owners was offline for a while. We can send it parallel to the description like so:\r\n```go\r\npublishOrg() {\r\n   sendCommunityDescription()\r\n   sendDevicesSyncInfo()\r\n} \r\n```\r\n\r\nThis is still to analyze, so feel free to add comments, questions or suggestions.\r\n\r\n### Acceptance Criteria\r\n\r\nTBD\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11572/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11572/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1640643151",
+    "html_url": "https://github.com/status-im/status-desktop/issues/11572#issuecomment-1640643151",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/11572",
+    "id": 1640643151,
+    "node_id": "IC_kwDOD5KrTM5hyjpP",
+    "user": {
+      "login": "jrainville",
+      "id": 11926403,
+      "node_id": "MDQ6VXNlcjExOTI2NDAz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11926403?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jrainville",
+      "html_url": "https://github.com/jrainville",
+      "followers_url": "https://api.github.com/users/jrainville/followers",
+      "following_url": "https://api.github.com/users/jrainville/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jrainville/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jrainville/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jrainville/subscriptions",
+      "organizations_url": "https://api.github.com/users/jrainville/orgs",
+      "repos_url": "https://api.github.com/users/jrainville/repos",
+      "events_url": "https://api.github.com/users/jrainville/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jrainville/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-18T17:16:14Z",
+    "updated_at": "2023-07-18T17:16:14Z",
+    "author_association": "MEMBER",
+    "body": "@MishkaRogachev FYI, this is related to the privateKey deletion work you are working on. Your work is still needed, but maybe we won't need the Nim part anymore, so just focus on the Go part for now.",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1640643151/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 1
+    },
+    "performed_via_github_app": null
+  }
+]
