@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14418",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14418/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14418/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14418/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14418",
+  "id": 1808954542,
+  "node_id": "I_kwDOAm_5kc5r0nSu",
+  "number": 14418,
+  "title": "Allow Custom Errors inheritance",
+  "user": {
+    "login": "ernestognw",
+    "id": 33379285,
+    "node_id": "MDQ6VXNlcjMzMzc5Mjg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33379285?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ernestognw",
+    "html_url": "https://github.com/ernestognw",
+    "followers_url": "https://api.github.com/users/ernestognw/followers",
+    "following_url": "https://api.github.com/users/ernestognw/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ernestognw/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ernestognw/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ernestognw/subscriptions",
+    "organizations_url": "https://api.github.com/users/ernestognw/orgs",
+    "repos_url": "https://api.github.com/users/ernestognw/repos",
+    "events_url": "https://api.github.com/users/ernestognw/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ernestognw/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-18T02:30:57Z",
+  "updated_at": "2023-07-18T02:52:15Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n\r\nCurrently, there's no way of doing error inheritance, this proposal would allow users to define an error extending from another in something similar to the following format:\r\n\r\n```solidity\r\n// .selector == bytes4(keccak256(\"InsufficientBalance(uint256)\"))\r\nerror InsufficientBalance(uint256 value)\r\n\r\n// .selector == bytes4(keccak256(\"ERC20InsufficientBalance(uint256),InsufficientBalance(uint256)\"))\r\nerror ERC20InsufficientBalance(uint256 value) is InsufficientBalance(value)\r\n```\r\n\r\n## Motivation\r\n\r\nThere's already some interest in standardized custom errors as seen in [the EIP-6093 discussions](https://ethereum-magicians.org/t/eip-6093-custom-errors-for-commonly-used-tokens/12043/17), and having a way of inheriting from these standard errors would allow some business logic customization \r\n\r\n## Specification\r\n\r\nA custom error should be allowed to extend from another similarly to the way contracts are extended:\r\n\r\n```solidity\r\n// Contract definition\r\ncontract Test { ... }\r\ncontract TestExtended is Test { ... }\r\n\r\n// Constructor\r\nconstructor(uint256 value) {}\r\nconstructor(uint256 value, uint256 another value) Test(value) {}\r\n\r\n// Errors\r\nerror InsufficientBalance(uint256 value)\r\nerror ERC20InsufficientBalance(uint256 value) is InsufficientBalance(value)\r\n```\r\n\r\nWhen an error is single (doesn't inherit), the selector remains the same, but for inheriting errors the selector can be computed by the first 4 bytes of the keccak256 of the error names comma separated following the same inheritance order as in contracts inheritance.\r\n\r\n```solidity\r\n// From an original selector, selector remains\r\n// bytes4(keccak256(\"InsufficientBalance(uint256)\"))\r\n// And for a child, the string follows the C3 linearization algorithm\r\n// bytes4(keccak256(\"ERC20InsufficientBalance(uint256),InsufficientBalance(uint256)\"))\r\n```\r\n\r\nAlternatively, the inherited selectors can be ordered in the same way as error names and put in memory before the rest of the arguments so the origin of the error can be traced to a specific contract. This way extending from standard errors without losing the selector would be possible.\r\n\r\n## Backwards Compatibility\r\n\r\nNot breaking",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14418/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14418/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
