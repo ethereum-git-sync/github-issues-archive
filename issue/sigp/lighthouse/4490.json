@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "AgeManning",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 9,
+  "comments": 10,
   "created_at": "2023-07-11T14:28:57Z",
-  "updated_at": "2023-07-19T00:28:40Z",
-  "closed_at": null,
+  "updated_at": "2023-07-19T08:21:16Z",
+  "closed_at": "2023-07-19T08:21:16Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nI have one pair of nodes (Nethermind + Lighthouse) for Sepolia and it's running flawlessly. High number of connected peers and  `/lighthouse/nat` returns `{\"data\":true}`\r\nOn the other hand I have three pair of nodes (Nethermind + Lighthouse) for Gnosis and there is an issue with low peer count.  `/lighthouse/nat` returns `{\"data\":false}`\r\n\r\nConfigs and versions are the same for all nodes, of course except `--network=sepolia` and `--network=gnosis` and all nodes are synced.\r\n\r\n## Version\r\n\r\nLighthouse -> `v4.3.0`\r\nNethermind -> `1.19.3`\r\n\r\n## Present Behaviour\r\n\r\nAll nodes are running on the same EKS (AWS k8s) cluster with enabled wide range of TCP and UDP ports. Using telnet and nmap shows that all ports are open, but only sepolia node  returns `{\"data\":true}` on `/lighthouse/nat` endpoint.\r\n\r\nNodes are deployed using latest (1.0.5) [lighthouse Helm chart](https://github.com/ethpandaops/ethereum-helm-charts/tree/master/charts/lighthouse)\r\nNotable part of `values.yaml`\r\n```\r\nmode: \"beacon\"\r\n\r\np2pNodePort:\r\n  enabled: true\r\n\r\nextraArgs:\r\n  - --network=gnosis\r\n  - --execution-endpoint=http://gnosis-nethermind:8551\r\n  - --validator-monitor-auto\r\n  - --subscribe-all-subnets\r\n  - --import-all-attestations\r\n\r\ncheckpointSync:\r\n  enabled: true\r\n  url: \"https://checkpoint.gnosischain.com/\"\r\n```\r\n\r\nCommand used to start gnosis node\r\n```\r\nlighthouse beacon_node --datadir=/data --disable-upnp --disable-enr-auto-update --enr-address=$EXTERNAL_IP --enr-tcp-port=$EXTERNAL_PORT --enr-udp-port=$EXTERNAL_PORT --listen-address=0.0.0.0 --port=\r\n9000 --discovery-port=9000 --http --http-address=0.0.0.0 --http-port=5052 --execution-jwt=/data/jwt.hex --metrics --metrics-address=0.0.0.0 --metrics-port=5054 --checkpoint-sync-url=https://checkpoint.gnosischain.com/ --network=gnos\r\nis --execution-endpoint=http://gnosis-nethermind:8551 --validator-monitor-auto --subscribe-all-subnets --import-all-attestations\r\n```\r\nCommand used to start sepolia node\r\n```\r\nlighthouse beacon_node --datadir=/data --disable-upnp --disable-enr-auto-update --enr-address=$EXTERNAL_IP --enr-tcp-port=$EXTERNAL_PORT --enr-udp-port=$EXTERNAL_PORT --listen-address=0.0.0.0 --port=\r\n9000 --discovery-port=9000 --http --http-address=0.0.0.0 --http-port=5052 --execution-jwt=/data/jwt.hex --metrics --metrics-address=0.0.0.0 --metrics-port=5054 --checkpoint-sync-url=https://sepolia.checkpoint-sync.ethpandaops.io/ --\r\nnetwork=sepolia --execution-endpoint=http://sepolia-nethermind:8551 --validator-monitor-auto --subscribe-all-subnets --import-all-attestations\r\n```\r\n\r\n`EXTERNAL_IP` and `EXTERNAL_PORT` are properly set and used.\r\n\r\n## Expected Behaviour\r\n\r\nBoth sepolia and gnosis Lighthouse should return `{\"data\":true}` on `/lighthouse/nat` endpoint and have high number of connected (inbound and outbound) peers.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "vandot",
+    "id": 9026558,
+    "node_id": "MDQ6VXNlcjkwMjY1NTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9026558?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vandot",
+    "html_url": "https://github.com/vandot",
+    "followers_url": "https://api.github.com/users/vandot/followers",
+    "following_url": "https://api.github.com/users/vandot/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vandot/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vandot/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vandot/subscriptions",
+    "organizations_url": "https://api.github.com/users/vandot/orgs",
+    "repos_url": "https://api.github.com/users/vandot/repos",
+    "events_url": "https://api.github.com/users/vandot/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vandot/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4490/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4490/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -450,8 +469,8 @@
     "body": "Ok yep, thanks for the logs. \r\nSo I had a quick look through. The way discovery works, is that it sends messages to all the peers it finds and it gets back a response where the peers tell us what ip and port we sent our messages on. \r\n\r\nIf they all agree that we are sending messages on X:Y, then we set our ENR to say we are contactable at X:Y. Your node is sending messages to peers with different port mappings. I.e peers are reporting your packets coming from X:A, X:B, X:C etc. This is typical for a node behind a symmetric NAT. \r\n\r\nI think your problem lies in your SNAT configuration. If you can get your SNAT to specify a single source port, this will solve your problem. This way all packets coming from your node will look to originate from the same port (which is forwarded) and your ENR will be changed to this ip/port. ",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1641086646/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -494,6 +513,50 @@
     "body": "You can see the ports change for yourself, by looking for the PONG response in the logs. The PONG details the IP and PORT of what your peers see as the source of the messages you are sending to them. ",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1641087297/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1641643251",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4490#issuecomment-1641643251",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4490",
+    "id": 1641643251,
+    "node_id": "IC_kwDOCFeAzc5h2Xzz",
+    "user": {
+      "login": "vandot",
+      "id": 9026558,
+      "node_id": "MDQ6VXNlcjkwMjY1NTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9026558?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/vandot",
+      "html_url": "https://github.com/vandot",
+      "followers_url": "https://api.github.com/users/vandot/followers",
+      "following_url": "https://api.github.com/users/vandot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/vandot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/vandot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/vandot/subscriptions",
+      "organizations_url": "https://api.github.com/users/vandot/orgs",
+      "repos_url": "https://api.github.com/users/vandot/repos",
+      "events_url": "https://api.github.com/users/vandot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/vandot/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-19T08:21:15Z",
+    "updated_at": "2023-07-19T08:21:15Z",
+    "author_association": "NONE",
+    "body": "Thanks for the help. I will close this issue now.",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1641643251/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
