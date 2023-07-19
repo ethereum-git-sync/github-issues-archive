@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5434",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5434/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5434/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5434/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5434",
+  "id": 1812141101,
+  "node_id": "I_kwDOGBlvNc5sAxQt",
+  "number": 5434,
+  "title": "Testing try/catch block with `mockCall` and `mockCallRevert` not behaving as expected",
+  "user": {
+    "login": "Bolee95",
+    "id": 20232629,
+    "node_id": "MDQ6VXNlcjIwMjMyNjI5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20232629?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Bolee95",
+    "html_url": "https://github.com/Bolee95",
+    "followers_url": "https://api.github.com/users/Bolee95/followers",
+    "following_url": "https://api.github.com/users/Bolee95/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Bolee95/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Bolee95/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Bolee95/subscriptions",
+    "organizations_url": "https://api.github.com/users/Bolee95/orgs",
+    "repos_url": "https://api.github.com/users/Bolee95/repos",
+    "events_url": "https://api.github.com/users/Bolee95/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Bolee95/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-19T14:58:12Z",
+  "updated_at": "2023-07-19T14:58:12Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (c835a3d 2023-07-17T00:21:00.033122754Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nHi,\r\nI'm trying to test an `ERC-1155` smart contract, which after token transfer checks target implements `IERC1155Receiver` interface. I'm trying to do it without writing a mock contract, but by using `vm.mockCall` or `vm.mockCallRevert` in order to revert or return the magic value that `ERC-1155` checks. \r\n```solidity\r\n    function _doSafeTransferAcceptanceCheck(\r\n        address operator,\r\n        address from,\r\n        address to,\r\n        uint256 id,\r\n        uint256 amount,\r\n        bytes memory data\r\n    ) private {\r\n        if (to.isContract()) {\r\n            try IERC1155Receiver(to).onERC1155Received(operator, from, id, amount, data) returns (\r\n                bytes4 response\r\n            ) {\r\n                if (response != IERC1155Receiver.onERC1155Received.selector)\r\n                    revert TransferOfERC1155Rejected();\r\n            } catch Error(string memory reason) {\r\n                revert(reason);\r\n            } catch {\r\n                revert TransferToNonERC1155Receiver();\r\n            }\r\n        }\r\n    }\r\n```\r\n\r\nThe test code is the following:\r\n```solidity\r\nfunction test_safeTransferFrom_revertsWhenSenderContractRevertsWithReason() public {\r\n        address from = address(1);\r\n        address dummy1155Receiver = address(100);\r\n        vm.etch(dummy1155Receiver, abi.encode(0x01));\r\n        assertTrue(dummy1155Receiver.code.length > 0);\r\n\r\n        erc1155d.exposed_mintBatch(from, ArrayUtils._asUint256Array(1, 1), \"\");\r\n        vm.mockCallRevert(\r\n            dummy1155Receiver,\r\n            abi.encodeWithSelector(\r\n                IERC1155Receiver.onERC1155Received.selector,\r\n                from,\r\n                from,\r\n                1,\r\n                1,\r\n                \"\"\r\n            ),\r\n            \"Error\"\r\n        );\r\n        vm.expectRevert(\"Error\");\r\n        vm.prank(from);\r\n        erc1155d.safeTransferFrom(from, dummy1155Receiver, 1, 1, \"\");\r\n    }\r\n\r\n```\r\n\r\nThe trace for when the test is executed is the following:\r\n```\r\n[FAIL. Reason: Error != expected error: 0xacdfb75a != Error] test_safeTransferFrom_revertsWhenSenderContractRevertsWithReason() (gas: 48141)\r\nTraces:\r\n  [913757] ERC1155DTest::setUp() \r\n    ├─ [858498] → new ERC1155DExposed@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f\r\n    │   └─ ← 4288 bytes of code\r\n    └─ ← ()\r\n\r\n  [48141] ERC1155DTest::test_safeTransferFrom_revertsWhenSenderContractRevertsWithReason() \r\n    ├─ [0] VM::etch(0x0000000000000000000000000000000000000064, 0x0000000000000000000000000000000000000000000000000000000000000001) \r\n    │   └─ ← ()\r\n    ├─ [28418] ERC1155DExposed::exposed_mintBatch(0x0000000000000000000000000000000000000001, [1], 0x) \r\n    │   ├─ emit TransferBatch(operator: ERC1155DTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], from: 0x0000000000000000000000000000000000000000, to: 0x0000000000000000000000000000000000000001, ids: [1], values: [1])\r\n    │   └─ ← ()\r\n    ├─ [0] VM::mockCallRevert(0x0000000000000000000000000000000000000064, 0x, 0x4572726f72) \r\n    │   └─ ← ()\r\n    ├─ [0] VM::expectRevert(Error) \r\n    │   └─ ← ()\r\n    ├─ [0] VM::prank(0x0000000000000000000000000000000000000001) \r\n    │   └─ ← ()\r\n    ├─ [5357] ERC1155DExposed::safeTransferFrom(0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000064, 1, 1, 0x) \r\n    │   ├─ emit TransferSingle(operator: 0x0000000000000000000000000000000000000001, from: 0x0000000000000000000000000000000000000001, to: 0x0000000000000000000000000000000000000064, id: 1, value: 1)\r\n    │   ├─ [0] 0x0000000000000000000000000000000000000064::onERC1155Received(0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000001, 1, 1, 0x) \r\n    │   │   └─ ← 0x4572726f72\r\n    │   └─ ← \"TransferToNonERC1155Receiver()\"\r\n    └─ ← \"Error != expected error: 0xacdfb75a != Error\"\r\n```\r\n\r\nAs can be seen in the trace, `dummyERC1155Receiver` did return the \"Error\" string, as set via `mockCallRevert`, but for some reason, the wrong catch block was invoked (the one when the revert reason is not found).\r\n\r\nWhatever the input of `mockCall` or `mockCallRevert`, the execution will revert as the call to the `dummyERC1155Receiver` failed immediately. I even tried using a real contract implementing `IERC1155Receiver` instead of using `etch`, but the result is always the same. Returning the correct magic value also results in a revert.\r\n\r\nI haven't found any of the existing issues that may be an answer to this. \r\nPlease let me know if more info is needed.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5434/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5434/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
