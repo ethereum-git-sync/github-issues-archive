@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27746",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27746/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27746/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27746/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27746",
+  "id": 1810860062,
+  "node_id": "I_kwDOAOvK985r74ge",
+  "number": 27746,
+  "title": "callTracer reports inaccurate gasUsed",
+  "user": {
+    "login": "geomad",
+    "id": 7707517,
+    "node_id": "MDQ6VXNlcjc3MDc1MTc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7707517?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/geomad",
+    "html_url": "https://github.com/geomad",
+    "followers_url": "https://api.github.com/users/geomad/followers",
+    "following_url": "https://api.github.com/users/geomad/following{/other_user}",
+    "gists_url": "https://api.github.com/users/geomad/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/geomad/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/geomad/subscriptions",
+    "organizations_url": "https://api.github.com/users/geomad/orgs",
+    "repos_url": "https://api.github.com/users/geomad/repos",
+    "events_url": "https://api.github.com/users/geomad/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/geomad/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-18T23:24:03Z",
+  "updated_at": "2023-07-18T23:24:03Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\nGeth version:  v 1.12.0\r\n\r\nThe gas reported from `debug_traceCall` with `callTracer` is often innacurate.\r\nI wrote a script that takes the `index 0` tx of every block and then call `callTracer` on it on the previous block, which should almost always result in the same gas and here are the results:\r\n```\r\nactual gas: 201547 trace gas: 114291\r\nactual gas: 33952 trace gas: 33952\r\nactual gas: 160332 trace gas: 149916\r\nactual gas: 350319 trace gas: 170771\r\nactual gas: 174309 trace gas: 174309\r\nactual gas: 184034 trace gas: 184034\r\nactual gas: 255780 trace gas: 247448\r\nactual gas: 21000 trace gas: 21000\r\nactual gas: 213557 trace gas: 121879\r\n```\r\nThe script: \r\n```\r\nweb3.eth.subscribe('newBlockHeaders')\r\n    .on(\"data\", async function (blockHeader) {\r\n      let block = await web3.eth.getBlock(blockHeader.number);\r\n      let firstTx = await web3.eth.getTransaction(block.transactions[0])\r\n      let firstTxReceipt = await web3.eth.getTransactionReceipt(firstTx.hash)\r\n      let tx = {\r\n        from: firstTx.from,\r\n        to: firstTx.to,\r\n        value: web3.utils.toHex(firstTx.value),\r\n        data: firstTx.input,\r\n        type: web3.utils.toHex(firstTx.type)\r\n      }\r\n      if (firstTx.accessList) tx.accessList = firstTx.accessList\r\n      let trace = await web3.debug.traceCall(tx, web3.utils.toHex(blockHeader.number - 1), {\r\n        tracer: 'callTracer',\r\n        tracerConfig: { onlyTopCall: true }\r\n      })\r\n      console.log(\"actual gas:\", firstTxReceipt.gasUsed.toString(), \"trace gas:\", new BN(trace.gasUsed).toString())\r\n    })\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27746/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27746/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
