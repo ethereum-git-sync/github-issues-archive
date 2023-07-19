@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5437",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5437/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5437/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5437/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5437",
+  "id": 1812539207,
+  "node_id": "I_kwDOGBlvNc5sCSdH",
+  "number": 5437,
+  "title": "Improve support for cast storage with local bytecode match",
+  "user": {
+    "login": "wadealexc",
+    "id": 18387287,
+    "node_id": "MDQ6VXNlcjE4Mzg3Mjg3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/18387287?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wadealexc",
+    "html_url": "https://github.com/wadealexc",
+    "followers_url": "https://api.github.com/users/wadealexc/followers",
+    "following_url": "https://api.github.com/users/wadealexc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wadealexc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wadealexc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wadealexc/subscriptions",
+    "organizations_url": "https://api.github.com/users/wadealexc/orgs",
+    "repos_url": "https://api.github.com/users/wadealexc/repos",
+    "events_url": "https://api.github.com/users/wadealexc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wadealexc/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-19T18:56:45Z",
+  "updated_at": "2023-07-19T18:59:05Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nCast\r\n\r\n### Describe the feature you would like\r\n\r\nFrom the docs description of `cast storage`: \r\n\r\n> Emit the slot number to get the full storage layout (requires contract to be verified on Etherscan with a Solidity version > 0.6.5 or you must be in a Forge project with a local contract matching the deployed bytecode).\r\n\r\nIn practice, the local option for `cast storage` doesn't function very well. There are 2 main cases:\r\n\r\n1. If the target contract is a proxy, the storage layout you want is the implementation contract's. But if the proxy is defined in your local project (even via import from openzeppelin), the fetched bytecode will get a local match and give you results based on the proxy's layout. This is in contrast to the etherscan lookup logic, which [handles this pretty well](https://github.com/foundry-rs/foundry/blob/master/common/src/abi.rs#L332) since etherscan's API lets you fetch the implementation contract.\r\n2. If the target contract has `immutable` variables or other changes to bytecode that occur during the constructor, the deployed bytecode probably won't find a match in your local artifacts, since the comparison [checks for an exact bytecode match](https://github.com/foundry-rs/foundry/blob/0e72b71580da73d3d89c9b9aaa1bc832831e0da7/cli/src/cmd/cast/storage.rs#L107-L111).\r\n\r\nSuggested improvements:\r\n1. Ability to supply a flag to `cast storage` that forces the etherscan lookup, in case the local lookup returns weird results like the ones described above. This one's easy to implement, and I'd be happy open a PR for this if there's interest.\r\n2. Somehow have a fuzzier bytecode match in the local lookup - one that matches regardless of constructor-set values. I'm not sure what this looks like in practice.\r\n\r\n### Additional context\r\n\r\nIn case you're interested in reproducing the things that prompted me to open this issue, what I did was fork this repo: https://github.com/Layr-Labs/eigenlayer-contracts\r\n\r\nAnd I'm trying to do mainnet storage lookups for contracts defined there. For example: `cast storage 0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc`, which points to a contract behind a proxy (`StrategyBaseTVLLimits.sol`)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5437/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5437/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
