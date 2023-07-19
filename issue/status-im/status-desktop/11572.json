@@ -74,9 +74,9 @@
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-07-18T17:15:24Z",
-  "updated_at": "2023-07-18T18:04:12Z",
+  "updated_at": "2023-07-19T10:10:00Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -140,6 +140,50 @@
       "heart": 0,
       "rocket": 0,
       "eyes": 1
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1641808074",
+    "html_url": "https://github.com/status-im/status-desktop/issues/11572#issuecomment-1641808074",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/11572",
+    "id": 1641808074,
+    "node_id": "IC_kwDOD5KrTM5h3ADK",
+    "user": {
+      "login": "0x-r4bbit",
+      "id": 445106,
+      "node_id": "MDQ6VXNlcjQ0NTEwNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/445106?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/0x-r4bbit",
+      "html_url": "https://github.com/0x-r4bbit",
+      "followers_url": "https://api.github.com/users/0x-r4bbit/followers",
+      "following_url": "https://api.github.com/users/0x-r4bbit/following{/other_user}",
+      "gists_url": "https://api.github.com/users/0x-r4bbit/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/0x-r4bbit/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/0x-r4bbit/subscriptions",
+      "organizations_url": "https://api.github.com/users/0x-r4bbit/orgs",
+      "repos_url": "https://api.github.com/users/0x-r4bbit/repos",
+      "events_url": "https://api.github.com/users/0x-r4bbit/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/0x-r4bbit/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-19T10:10:00Z",
+    "updated_at": "2023-07-19T10:10:00Z",
+    "author_association": "MEMBER",
+    "body": "This is a nice write-up. Here's a short summary just to make sure I understood it right.\r\nThe flow would be:\r\n\r\n1. Account A using node A owns a private key for community A\r\n2. Account A recovers its account on node B, resulting in (owned) communities being synced (let's ignore the fact that we're syncing the private key atm)\r\n3. Account A then imports the community's private key in node B, making it the control node.\r\n4. node B then sends the described signal saying \"I'm the new control node\"\r\n5. node A receives that signal, verifies its integrity and removes its own private key, resulting it in no longer being a control node\r\n\r\n^ Is this correct?\r\n\r\n> To make sure that the process is secure, we'd need to sign the signal with the community private key, but we also need to add the account's signature. That signature would be to confirm that you are indeed the same account using a different device.\r\n\r\nIf we had a distinction between **signer** and **sender** then we wouldn't need that signature. But that would probably require additional larger changes.\r\n\r\n> Question: what happens in the case of importing from a different account? We also need to only have one control node. I guess we still listen to the signal and we remove our private key. It just makes it so that if your community privateKey is stolen, we actively have a mechanism to kick out the legitimate owner, but then again, if you lose the privateKey, you pretty much screwed the whole community already, so it's not a big deal.\r\n\r\nSo this question actually changes the protocol described above and would remove the need of that sender's signature entirely. If my node receives a \"control node change\" signal that was signed by the community private key, but was done using an account that is not the same as my current control node, then we don't need to verify the sender's signature because we already know the signal was signed by the community and can be considered legit (of course, if the key was stolen, then that malicious account has this power).\r\n\r\nIf we introduce this notion of control node which is tied to the installation/device id, then I think we should indeed not limit those signals to be sent only by one account (the original creator of the community). I should be able to make my node a control node, even with a different account, if I own the private key of that community.\r\n\r\n> We do have to send that signal periodically\r\n\r\nWhy is that?\r\nAlso gotta keep in mind that the first control node will also produce these signals.\r\n\r\n### Some additional questions\r\n\r\n**Should we introduce some sort of ACK?**\r\nImagine I have my control node and I import the private key into some other node.\r\nNow, that other node will send the control node change signal, but for whatever reason the current control node doesn't receive that message.\r\nUntil the original control node receives the message, there'll be a state of multiple control nodes in existence. This can introduce some nasty side effects, especially with regards to the archive protocol. Now consider more than one additional control node. Things just get more hairy from here.\r\nMaybe we should introduce some sort of ACK signal, so that the new control node only behaves like one once the original one gave green light.\r\n\r\n**How do we ensure correctness of archive data?**\r\nAlright so here's one that worries me. As discussed on a call recently, the archive protocol has been designed with only one control node in mind. Because of that, it's crucial that we ensure new control nodes have downloaded the entire archive before they start producing archives themselves.\r\n\r\nWithout going into too much detail, here's why:\r\n\r\nThe original control node has created archives and a corresponding torrent with metadata, describing where do find any particular archive in the torrent. This means for example that it has information that says something like:\r\n\r\n```\r\narchive1: locationStart:locationEnd\r\n```\r\n`locationStart` and `locationEnd` are the bytes for `archive1` somewhere in that one big BLOB of all aggregated archives that the control node has ever created.\r\n\r\nNon-control nodes will use that information to find archives and import them into their own databases.\r\nNow, if a new control node comes along and starts to create archives before it actually managed to download all existing archives first, what's going to happen is that will likely produce metadata that conflicts with existing archives known to non-control nodes.\r\n\r\nFor example, the new control node might produce:\r\n\r\n```\r\narchive99: 0:119\r\n```\r\nMeaning, `archive99`'s bytes are the first 120 of the torrent file, even though the data should live somewhere else because `0- ...` is already occupied by previous archives (but the new control node just doesn't know about this).\r\n\r\nThis will most likely break the protocol.\r\n\r\nSo generally, we need to ensure a control node never starts doing archive work if:\r\n\r\n1. It is known that there's another control node active and\r\n2. that other control node has created archives before and\r\n3. the new control node hasn't downloaded all existing archives yet",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1641808074/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
     },
     "performed_via_github_app": null
   }
