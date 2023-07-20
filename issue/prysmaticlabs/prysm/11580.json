@@ -40,7 +40,7 @@
       "description": "Api related tasks"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "nalepae",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2022-10-26T18:16:23Z",
-  "updated_at": "2023-04-27T16:26:27Z",
-  "closed_at": null,
+  "updated_at": "2023-07-20T15:52:07Z",
+  "closed_at": "2023-07-20T15:52:07Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Abstract\r\nThis ticket aims to synthesize design decisions concerning the following macro task:\r\n_**Rewrite the validator client code to be compatible with the Beacon API instead of prysmaticlabs' internal API.**_\r\n\r\nSmaller specific implementation tickets will eventually be written when the design phase is finished.\r\n\r\nThis task has been proposed by @potuz to be part of the [Ethereum Protocol Fellowship](https://github.com/eth-protocol-fellows/cohort-three/blob/master/projects/project-ideas.md#by-potuz).\r\nDay to day discussion are available in [#epf-support](https://discord.com/channels/476244492043812875/1034494554461712456) channel of Prysm Discord.\r\n\r\n## Background (copyright @kasey)\r\n\r\nWhen Prysm first started we advocated strongly for gRPC to be used for validator <> beacon communication, but in the end the standard enshrined an OpenAPI spec known as the Beacon Node API ([here](https://ethereum.github.io/beacon-APIs/) and [here](https://github.com/ethereum/beacon-APIs/)).\r\n\r\nBut the gRPC design remained deeply embedded in our validator code, and so to this day the validator uses a set of prysm-specific gRPC methods to communicate with the beacon node. This means that our validator is not interoperable with the other beacon node implementations.\r\n\r\nWhen we decided to fully support the standard Beacon Node API (to support other validator implementations, block explorer backends etc), we tried to use an open source project called [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) to generate stubs etc for an http/1.1 implementation that would be compatible with the OpenAPI specs.\r\n\r\nThe problem is, gRPC and OpenAPI don't map cleanly, so we wound up with a lot of middleware and hacks to bridge the gaps, and furthermore, some of the encoding requirements (eg hashes encoded as `0x` prefixed strings, hex-encoded numeric values) had a big mismatch with how [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) works out of the box.\r\n\r\nWe also needed to customize the generated code so that dependencies needed to import custom types from our [ssz encoding library](https://github.com/prysmaticlabs/fastssz) would be present, resulting in the need to maintain [a fork of grpc-gateway](https://github.com/prysmaticlabs/grpc-gateway).\r\n\r\nThe [grpc-gateway](https://github.com/prysmaticlabs/grpc-gateway) communicates over a localhost port which has weird implementation details (like worrying about the size of transmitted values between gRPC <> OpenAPI), and introduces a lot of complexity that winds up being more of a maintenance burden than it's worth.\r\n\r\nSo what we want to do is distill more generic handlers out of the gRPC stubs, and use those handlers to serve both gRPC and OpenAPI implementations.\r\n\r\n## Design document\r\n\r\nDesign document available [here](https://hackmd.io/MgKkDRnLSfiCGvfs99VANw?view).\r\n\r\n## Other references\r\n[prsym internal grpc usage](https://www.notion.so/arbitrum/6c59afd914b342e49d923680b00cf6bc?v=bb74b62c05124f2bb3bc5f8c118569b1)\r\n[prysm eth beacon api usage](https://www.notion.so/arbitrum/8e27d141f7f645a784debda5e52f296f?v=c4818cf877b44500948b40f34c2d6dfe)\r\n\r\nhttps://hackmd.io/@pavignol/SJh-plvNo \r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "rkapka",
+    "id": 28876818,
+    "node_id": "MDQ6VXNlcjI4ODc2ODE4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/28876818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rkapka",
+    "html_url": "https://github.com/rkapka",
+    "followers_url": "https://api.github.com/users/rkapka/followers",
+    "following_url": "https://api.github.com/users/rkapka/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rkapka/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rkapka/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rkapka/subscriptions",
+    "organizations_url": "https://api.github.com/users/rkapka/orgs",
+    "repos_url": "https://api.github.com/users/rkapka/repos",
+    "events_url": "https://api.github.com/users/rkapka/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rkapka/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11580/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/11580/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
