@@ -49,7 +49,7 @@
       "description": "This issue is ready to be worked on"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 7,
   "created_at": "2022-12-30T21:47:54Z",
-  "updated_at": "2023-05-03T17:50:28Z",
-  "closed_at": null,
+  "updated_at": "2023-07-20T12:47:37Z",
+  "closed_at": "2023-07-20T12:47:37Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "The error manifests with the following error when calling `debug_traceTransaction`:\r\n```\r\n\terr: Error: restoreForkBlockContext called when checkpointed\r\n\tat checkpointedError (/usr/src/app/node_modules/hardhat/internal/hardhat-network/provider/fork/ForkStateManager.js:15:39)\r\n```\r\n\r\nIt took me a bit of debugging but I found out that the error happens because `HttpProvider` doesn't handle rateLimitting errors correctly.\r\nI'm getting two types of rateLimitting errors from Alchemy.\r\n\r\n\r\n1. Normal 429 response. This is supposed to be handled in https://github.com/NomicFoundation/hardhat/blob/main/packages/hardhat-core/src/internal/core/providers/http.ts#L184, however the implemntation assumes that there is `Retry-After` response header. Alchemy docs (https://docs.alchemy.com/reference/throughput#option-2-retry-after) specifically say that this response should be available, but these are the response headers that I'm actually getting:\r\n```\r\n{\r\n  date: 'Thu, 29 Dec 2022 12:23:16 GMT',\r\n  'content-type': 'application/json',\r\n  'content-length': '248',\r\n  connection: 'keep-alive',\r\n  'x-alchemy-trace-id': '469ec7ad3503e37d37fb6a5e2e4c91cf',\r\n  'cf-cache-status': 'DYNAMIC',\r\n  server: 'cloudflare',\r\n  'cf-ray': '78128188e9265b4d-IAD'\r\n}\r\n```\r\n\r\nAs a result the error is just returned.\r\n\r\nTo work around this issue I implemented an exponential back-off as suggested by the later part of the Alchemy docs (https://docs.alchemy.com/reference/throughput#option-4-exponential-backoff)\r\n\r\nMy suggested fix for this issue goes as follows:\r\n\r\n```\r\ndiff --git a/packages/hardhat-core/src/internal/core/providers/http.ts b/packages/hardhat-core/src/internal/core/providers/http.ts\r\nindex bff610414..9cfad9462 100644\r\n--- a/packages/hardhat-core/src/internal/core/providers/http.ts\r\n+++ b/packages/hardhat-core/src/internal/core/providers/http.ts\r\n@@ -189,7 +189,7 @@ export class HttpProvider extends EventEmitter implements EIP1193Provider {\r\n         // https://undici.nodejs.org/#/?id=garbage-collection\r\n         // It's not clear how to \"cancel\", so we'll just consume:\r\n         await response.body.text();\r\n-        const seconds = this._getRetryAfterSeconds(response);\r\n+        const seconds = this._getRetryAfterSeconds(response, retryNumber);\r\n         if (seconds !== undefined && this._shouldRetry(retryNumber, seconds)) {\r\n           return await this._retry(request, seconds, retryNumber);\r\n         }\r\n@@ -260,12 +260,13 @@ export class HttpProvider extends EventEmitter implements EIP1193Provider {\r\n   }\r\n \r\n   private _getRetryAfterSeconds(\r\n-    response: Dispatcher.ResponseData\r\n+    response: Dispatcher.ResponseData,\r\n+    retryNumber: number\r\n   ): number | undefined {\r\n     const header = response.headers[\"retry-after\"];\r\n \r\n     if (header === undefined || header === null) {\r\n-      return undefined;\r\n+      return Math.min(2 ** retryNumber, MAX_RETRY_AWAIT_SECONDS);\r\n     }\r\n \r\n     const parsed = parseInt(header, 10);\r\n```\r\n\r\n\r\n\r\n2. Rate limiting error when using `HttpProvider.sendBatch(..)` method. \r\n\r\nForkStateManager is using batch requests. Sadly Alchemy sometimes returns a 200 response with a response body like:\r\n```\r\n[\r\n  {\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 236,\r\n    \"result\": \"0x\"\r\n  },\r\n  {\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 237,\r\n    \"error\": {\r\n      \"code\": 429,\r\n      \"message\": \"Your app has exceeded its compute units per second capacity. If you have retries enabled, you can safely ignore this message. If not, check out https://docs.alchemyapi.io/guides/rate-limits\"\r\n    }\r\n  },\r\n  {\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 238,\r\n    \"result\": \"0x33fe288aee4bf\"\r\n  }\r\n]\r\n```\r\n\r\nHttpProvider has no logic  to handle an error returned like that. To workaround this issue I've made the following changes to the implementation:\r\n```\r\ndiff --git a/packages/hardhat-core/src/internal/core/providers/http.ts b/packages/hardhat-core/src/internal/core/providers/http.ts\r\nindex bff610414..b3fe22f04 100644\r\n--- a/packages/hardhat-core/src/internal/core/providers/http.ts\r\n+++ b/packages/hardhat-core/src/internal/core/providers/http.ts\r\n@@ -120,16 +120,32 @@ export class HttpProvider extends EventEmitter implements EIP1193Provider {\r\n       return jsonRpcRequest;\r\n     });\r\n \r\n-    const jsonRpcResponses = await this._fetchJsonRpcResponse(requests);\r\n-\r\n-    for (const response of jsonRpcResponses) {\r\n-      if (isErrorResponse(response)) {\r\n-        error.message = response.error.message;\r\n-        error.code = response.error.code;\r\n-        error.data = response.error.data;\r\n-        // eslint-disable-next-line @nomiclabs/hardhat-internal-rules/only-hardhat-error\r\n-        throw error;\r\n+    let jsonRpcResponses;\r\n+    let retryNumber = 0;\r\n+    const seconds = 1;\r\n+    let needsToRetry = false;\r\n+    do {\r\n+      if (retryNumber > 0) {\r\n+        await new Promise((resolve) => setTimeout(resolve, 1000 * seconds));\r\n+      }\r\n+      jsonRpcResponses = await this._fetchJsonRpcResponse(requests);\r\n+      needsToRetry = false;\r\n+      for (const response of jsonRpcResponses) {\r\n+        if (isErrorResponse(response)) {\r\n+          error.message = response.error.message;\r\n+          error.code = response.error.code;\r\n+          error.data = response.error.data;\r\n+          if (response.error.code === 429) {\r\n+            needsToRetry = true;\r\n+          } else {\r\n+            // eslint-disable-next-line @nomiclabs/hardhat-internal-rules/only-hardhat-error\r\n+            throw error;\r\n+          }\r\n+        }\r\n       }\r\n+    } while (needsToRetry && this._shouldRetry(++retryNumber, seconds));\r\n+    if (needsToRetry) {\r\n+      throw error;\r\n     }\r\n\r\n```\r\n\r\nThe idea of this changes is to retry the batch request if any of partial responses comes back with error.code = 429. Since there is no Retry-After header or other mechanism of specifying how long the client should wait, I decided to just wait 1 second (for simplicity sake). \r\n\r\n\r\n\r\nWith these two fixes in place I'm able to consistently get debug_traceTransaction output from ethereum mainnet using Alchemy endpoint. I'd love these changes to be incorporated into upstream, so that I don't have to maintain my own patches.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3501/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3501/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
