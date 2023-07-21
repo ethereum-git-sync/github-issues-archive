@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5783",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5783/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5783/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5783/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5783",
+  "id": 1815386393,
+  "node_id": "I_kwDOCD5_Gc5sNJkZ",
+  "number": 5783,
+  "title": "\"Cannot set headers after they are sent to the client\" during shutdown",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-21T08:25:31Z",
+  "updated_at": "2023-07-21T08:25:31Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nWhen shutting down the beacon node it can happen that the following error is thrown. \r\n\r\n```\r\n[node-1-cl-lodestar] [8460]: Eph 6/0 2.220[node-1-cl-lodestar] �[31merror�[39m: uncaughtException: Cannot set headers after they are sent to the client\r\nError: Cannot set headers after they are sent to the client\r\n    at new NodeError (node:internal/errors:405:5)\r\n    at ServerResponse.setHeader (node:_http_outgoing:648:11)\r\n    at ServerResponse.writeHead (node:_http_server:381:21)\r\n    at onSendEnd (/home/runner/actions-runner/_work/lodestar/lodestar/node_modules/fastify/lib/reply.js:597:7)\r\n    at onSendHook (/home/runner/actions-runner/_work/lodestar/lodestar/node_modules/fastify/lib/reply.js:530:5)\r\n    at fallbackErrorHandler (/home/runner/actions-runner/_work/lodestar/lodestar/node_modules/fastify/lib/error-handler.js:127:3)\r\n    at handleError (/home/runner/actions-runner/_work/lodestar/lodestar/node_modules/fastify/lib/error-handler.js:61:5)\r\n    at onErrorHook (/home/runner/actions-runner/_work/lodestar/lodestar/node_modules/fastify/lib/reply.js:743:5)\r\n    at Reply.send (/home/runner/actions-runner/_work/lodestar/lodestar/node_modules/fastify/lib/reply.js:133:5)\r\n    at defaultErrorHandler (/home/runner/actions-runner/_work/lodestar/lodestar/node_modules/fastify/lib/error-handler.js:92:9) Cannot set headers after they are sent to the client\r\nError: Cannot set headers after they are sent to the client\r\n```\r\n\r\nSee [node-1-cl-lodestar.log](https://github.com/ChainSafe/lodestar/files/12111895/node-1-cl-lodestar.log) from [this sim tests run](https://github.com/ChainSafe/lodestar/actions/runs/5613234520). This error seems to happen quite frequently in sim tests.\r\n\r\nThere was a previous issue https://github.com/ChainSafe/lodestar/issues/5706 and an attempt to fix it https://github.com/ChainSafe/lodestar/pull/5722 but the error still happens.\r\n\r\nFrom the stack trace it looks like there is no attempt to set headers in our code but it happens when fastify is trying to send a reply.\r\n\r\nA likely cause of this is that we are not gracefully shutting down existing connections\r\nhttps://github.com/ChainSafe/lodestar/blob/50551d35670f7a63b37203ae9681b1650fdbf1ac/packages/beacon-node/src/api/rest/base.ts#L159\r\n\r\nI see two solutions to this\r\n1. Check upstream if a fix can be applied in fastify, there should not be an attempt to write headers if socket is destroyed, e.g. by checking if `req.raw.destroyed` is set to true.\r\n2. We have to more gracefully shut down our server, e.g. by using [http-graceful-shutdown](https://www.npmjs.com/package/http-graceful-shutdown) or [http-terminator](https://www.npmjs.com/package/http-terminator). This might increase the time the node requires to shut down but it is possible to set a low timeout 1-2 seconds so it should not be an issue.\n\n### Expected behavior\n\nNo error when shutting down the node and ideally should more gracefully close connections to clients.\n\n### Steps to reproduce\n\nThis is hard to reproduce as it depends on the timing. It seems to happen quite frequently in sim tests.\n\n### Additional context\n\n_No response_\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nunstable (6a5225f89ff3f207e12fde53155c79779c48f975)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5783/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5783/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
