@@ -148,9 +148,9 @@
     "due_on": null,
     "closed_at": null
   },
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-07-20T10:24:11Z",
-  "updated_at": "2023-07-20T11:57:23Z",
+  "updated_at": "2023-07-21T13:05:31Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -173,5 +173,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1645551392",
+    "html_url": "https://github.com/ethereum/solidity/issues/14433#issuecomment-1645551392",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14433",
+    "id": 1645551392,
+    "node_id": "IC_kwDOAm_5kc5iFR8g",
+    "user": {
+      "login": "cameel",
+      "id": 137030,
+      "node_id": "MDQ6VXNlcjEzNzAzMA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cameel",
+      "html_url": "https://github.com/cameel",
+      "followers_url": "https://api.github.com/users/cameel/followers",
+      "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+      "organizations_url": "https://api.github.com/users/cameel/orgs",
+      "repos_url": "https://api.github.com/users/cameel/repos",
+      "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cameel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-21T13:01:32Z",
+    "updated_at": "2023-07-21T13:05:31Z",
+    "author_association": "MEMBER",
+    "body": "As a first step, we need to extract source code and expectations from `SolidityNatspecJSON.cpp`. That's almost 100 cases and doing that by hand would be very tedious. Instead I wrote a one-off parser using Python's [pyparsing](https://pyparsing-docs.readthedocs.io) library to deal with the problem.\r\n\r\nThe script itself will not be useful after we run it once so I will not be submitting it as a part of my upcoming PR. It might be still serve as a template for writing similar one-off parsers though so I'm posting it here for future reference.\r\n\r\n### Parser script\r\nScript expects the content of `SolidityNatspecJSON.cpp` on standard input. The file needs to be prepared for parsing by:\r\n- Removing everything before the first `BOOST_AUTO_TEST_CASE`\r\n- Removing everything after the final `}` of the last `BOOST_AUTO_TEST_CASE`\r\n- Removing the `dev_explicit_inehrit_complex` case - this one's more complex and needs to be dealt with manually.\r\n\r\nThe script will create an input `.sol` file for every test case and put devdoc and userdoc expectations in separate `.json` files.\r\n\r\nError expectations are ignored - the current tests do not specify error messages and I will make `isoltest` just generate them instead.\r\n\r\nJSON files are passed through Python's JSON parser to convert them to a uniform style. Solidity files obviously are not so they will have inconsistent indentation.\r\n\r\n```python\r\n#!/usr/bin/env python\r\n\r\nimport json\r\nfrom textwrap import dedent\r\nimport sys\r\n\r\nimport pyparsing as pp\r\n\r\npp.ParserElement.inlineLiteralsUsing(pp.Suppress)\r\n\r\nCPP_STRING = (\r\n    pp.QuotedString(quote_char='\"', esc_char='\\\\', multiline=True)\r\n    | pp.QuotedString(quote_char='R\"(', end_quote_char=')\"', multiline=True)\r\n    | pp.QuotedString(quote_char='R\"X(', end_quote_char=')X\"', multiline=True)\r\n    | pp.QuotedString(quote_char='R\"R(', end_quote_char=')R\"', multiline=True)\r\n    | pp.QuotedString(quote_char='R\"ABCDEF(', end_quote_char=')ABCDEF\"', multiline=True)\r\n);\r\nIDENTIFIER = pp.Word(pp.identchars + pp.nums)\r\nBOOL_LITERAL = pp.Literal('true') | pp.Literal('false')\r\n\r\nSTRING_VARIABLE = pp.Group(\r\n    pp.Suppress('char') - 'const' - '*'\r\n    - IDENTIFIER('variable_name') - '='\r\n    - pp.Group(CPP_STRING[...])('content') - ';'\r\n)\r\nCHECK_NATSPEC_CALL = pp.Group(\r\n    pp.Suppress('checkNatspec') - '('\r\n    - IDENTIFIER('source_variable_name') - ','\r\n    - CPP_STRING('contract_name') - ','\r\n    - IDENTIFIER('natspec_variable_name') - ','\r\n    - BOOL_LITERAL('userdoc_flag')\r\n    - ')' - ';'\r\n)\r\nEXPECT_NATSPEC_ERROR_CALL = pp.Group(\r\n    pp.Suppress('expectNatspecError') - '('\r\n    - IDENTIFIER('source_variable_name')\r\n    - ')' - ';'\r\n)\r\n\r\nTEST_STEP = (\r\n    STRING_VARIABLE('string_variable')\r\n    | CHECK_NATSPEC_CALL('positive_expectation')\r\n    | EXPECT_NATSPEC_ERROR_CALL('negative_expectation')\r\n)\r\nTEST_BODY = '{' - TEST_STEP[...]('steps') + '}'\r\nTEST_HEADER = pp.Suppress('BOOST_AUTO_TEST_CASE') - '(' - IDENTIFIER('name') - ')'\r\nNATSPEC_TEST = pp.Group(TEST_HEADER - TEST_BODY)\r\nTEST_FILE = NATSPEC_TEST[...]\r\n\r\ndef format_error(exception):\r\n    line_number_prefix = f\"{exception.lineno} | \"\r\n    return dedent(f\"\"\"\\\r\n        {exception}\r\n        {line_number_prefix}{exception.line}\r\n        {' ':{len(line_number_prefix) + exception.col - 1}}^\r\n    \"\"\")\r\n\r\ntry:\r\n    ast = TEST_FILE.parse_string(sys.stdin.read(), parse_all=True)\r\nexcept pp.ParseException as exception:\r\n    sys.exit(format_error(exception))\r\nexcept pp.ParseSyntaxException as exception:\r\n    sys.exit(format_error(exception))\r\n\r\nfor test_case in ast:\r\n    variables = {\r\n        step.variable_name: dedent(''.join(step.content))\r\n        for step in test_case.steps\r\n        if step.get_name() == 'string_variable'\r\n    }\r\n\r\n    expectations = {'userdoc': {}, 'devdoc': {}}\r\n    for step in test_case.steps:\r\n        if step.get_name() == 'positive_expectation':\r\n            assert step.source_variable_name == 'sourceCode'\r\n            expectation_kind = 'userdoc' if step.userdoc_flag == 'true' else 'devdoc'\r\n            expectations[expectation_kind][step.contract_name] = json.loads(variables[step.natspec_variable_name])\r\n\r\n    input_file_name = test_case.name + '.json'\r\n    print(f\"{input_file_name}\")\r\n    with open(input_file_name, 'w') as input_file:\r\n        input_file.write(variables['sourceCode'])\r\n\r\n    for expectation_kind in expectations.keys():\r\n        for contract, expectation in expectations[expectation_kind].items():\r\n            expectation_file_name = f\"{test_case.name}_{contract}_{expectation_kind}.json\".lower()\r\n            print(f\"    {expectation_file_name}\")\r\n            with open(expectation_file_name, 'w') as expectation_file:\r\n                json.dump(expectation, expectation_file, indent=4)\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1645551392/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
