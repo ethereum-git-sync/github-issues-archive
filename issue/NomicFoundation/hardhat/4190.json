@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4190",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4190/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4190/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4190/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/4190",
+  "id": 1816351036,
+  "node_id": "I_kwDOB7jojM5sQ1E8",
+  "number": 4190,
+  "title": "HardHat AutoGasManager's fee estimation breaks on low-traffic chains",
+  "user": {
+    "login": "roberto-bayardo",
+    "id": 10271917,
+    "node_id": "MDQ6VXNlcjEwMjcxOTE3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10271917?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/roberto-bayardo",
+    "html_url": "https://github.com/roberto-bayardo",
+    "followers_url": "https://api.github.com/users/roberto-bayardo/followers",
+    "following_url": "https://api.github.com/users/roberto-bayardo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/roberto-bayardo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/roberto-bayardo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/roberto-bayardo/subscriptions",
+    "organizations_url": "https://api.github.com/users/roberto-bayardo/orgs",
+    "repos_url": "https://api.github.com/users/roberto-bayardo/repos",
+    "events_url": "https://api.github.com/users/roberto-bayardo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/roberto-bayardo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4937119027,
+      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
+      "name": "status:triaging",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-21T20:29:28Z",
+  "updated_at": "2023-07-21T20:29:39Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version of Hardhat\n\n2.17.0\n\n### What happened?\n\nHardhat's `AutomaticGasProvider` seems to use its own algorithm based on eth_FeeHistory to compute maxPriorityFeePerGas and MaxFeePerGas. When the most recent block is empty, the code ends up returning \"0\" for maxPriorityFeePerGas, producing a transaction that will be immediately rejected by almost all node transaction pools with \"transaction underpriced\" errors.\r\n\r\nWe looked into this because of several reports of this error from people who are following the Base contract deployment guide [here](https://docs.base.org/guides/deploy-smart-contracts). I imagine this issue also arises on other development / testnet chains where traffic is low.\r\n\r\nObviously one can work around this by specifying your own gas price in the hardhat user config (we're updating or docs right now to do this), but better for auto-estimation to always work.\r\n\r\nTo that end, one option would be to leverage the eth_maxPriorityFeePerGas RPC method to get the node-computed estimate. These algorithms are already well tuned and more likely to do the right thing than any roll-your-own approach.  A simpler option would be to just hard-code a non-trivial minimum on the value always suggested (e.g. .1 gwei).\n\n### Minimal reproduction steps\n\nUse hardhat to submit a transaction to a low-traffic chain (e.g. a devnet) when configured to use the \"auto\" gas price mode. If the current block is empty the transaction will fail with \"transaction underpriced\".  Some example output containing additional instrumentation demonstrating the failure:\r\n\r\n```\r\nfee history: {\r\n  baseFeePerGas: [ '0x32', '0x32' ],\r\n  gasUsedRatio: [ 0.0015637666666666666 ],\r\n  oldestBlock: '0x17d47a',\r\n  reward: [ [ '0x0' ] ]\r\n}\r\nsuggesteEip1559Values { maxFeePerGas: 63n, maxPriorityFeePerGas: 0n }\r\n\r\nResult: \r\n\r\nProviderError: transaction underpriced\r\n    at HttpProvider.request (/Users/bayardo/tmp/node_modules/hardhat/src/internal/core/providers/http.ts:88:21)\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at async HardhatEthersSigner.sendTransaction (/Users/bayardo/tmp/node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:125:18)\r\n    at async ContractFactory.deploy (/Users/bayardo/tmp/node_modules/ethers/src.ts/contract/factory.ts:112:22)\r\n    at async main (/Users/bayardo/tmp/scripts/deploy.ts:4:15)\r\n```\n\n### Search terms\n\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4190/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4190/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
