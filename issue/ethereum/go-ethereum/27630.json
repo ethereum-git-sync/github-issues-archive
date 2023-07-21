@@ -49,11 +49,11 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-06-30T14:45:06Z",
-  "updated_at": "2023-07-15T09:53:03Z",
+  "updated_at": "2023-07-21T06:15:22Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "# Rationale\r\n\r\nThink about this case, you need to create accesslist for the second tx.\r\n\r\nLet's say two txs are tx0 & tx1, tx0 has an impact on tx1 execution, if tx0 failed, tx1 fails.\r\n\r\n`eth_createAccessList` can be used to create acceelist before you send tx0, but for tx1, you can't do it in the same way, because tx0's state changes are not applied, tx1 will fail.\r\n\r\n# Implementation\r\n\r\nMaybe it can be done by extend\r\n\r\n```go\r\nCreateAccessList(ctx context.Context, msg ethereum.CallMsg)\r\n```\r\n\r\nto \r\n\r\n```go\r\nCreateAccessList(ctx context.Context, msg ethereum.CallMsg, stateOverrides ...*ethapi.StateOverride)\r\n```\r\n\r\nSo I can find the state changes by tx0, then call `eth_createAccessList` with the state changes. e.g. erc20 balance changes.",
+  "body": "# Rationale\r\n\r\nThink about this case, you need to create accesslist for the second tx.\r\n\r\nLet's say two txs are tx0 & tx1, tx0 has an impact on tx1 execution, if tx0 failed, tx1 fails (e.g. router approve tx & swap tx).\r\n\r\n`eth_createAccessList` can be used to create acceelist before you send tx0, but for tx1, you can't do it in the same way, because tx0's state changes are not applied, tx1 will fail.\r\n\r\n# Implementation\r\n\r\nMaybe it can be done by extend\r\n\r\n```go\r\nCreateAccessList(ctx context.Context, msg ethereum.CallMsg)\r\n```\r\n\r\nto \r\n\r\n```go\r\nCreateAccessList(ctx context.Context, msg ethereum.CallMsg, stateOverrides ...*ethapi.StateOverride)\r\n```\r\n\r\nSo first I can find the state changes by tx0, then call `eth_createAccessList` with the state changes. e.g. approved balance / erc20 balance changes.",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27630/reactions",
