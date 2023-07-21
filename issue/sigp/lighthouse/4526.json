@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4526",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4526/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4526/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4526/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4526",
+  "id": 1815248676,
+  "node_id": "I_kwDOCFeAzc5sMn8k",
+  "number": 4526,
+  "title": "Add the \"attestation simulator\" performance metric",
+  "user": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-21T06:46:28Z",
+  "updated_at": "2023-07-21T06:46:28Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nI think it would be interesting if the BN would \"pretend\" to create an attestation every slot and then look at how that attestation would have performed.\r\n\r\nIn detail, I think we should call [`BeaconChain::produce_unaggregated_attestation`](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/beacon_node/beacon_chain/src/beacon_chain.rs#L1557-L1561) 4s into each slot and store the resulting `attestation.data`. Then, in `ValidatorMonitor::process_valid_state` we could see if the `attestation.data` matches the head/target/source.\r\n\r\nSome things to consider:\r\n\r\n- If we use the `ValidatorMonitor` then it'll only run when the user has the validator monitor enabled. That seems reasonable to me.\r\n- We probably want to only check the head/target/source once the `state.slot` is some slots beyond `attestation.data.slot` to defend against re-orgs. I'd suggest 16 slots as a trade-off between being safe enough and fast enough. I'm open to suggestion though!\r\n\r\n## Extra Info\r\n\r\n### Attestation reward details\r\n\r\nWhen I talk about \"matching the head/target/source\" I'm talking about whether the attestation meets the requirements to be given rewards. The [Altair specs](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/beacon-chain.md#participation-flag-indices) define the \"Participation Flag Indices\". If a validator has one of those flags set, then they receive rewards. You can see them getting set in [`get_attestation_participation_flag_indices`](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/beacon-chain.md#get_attestation_participation_flag_indices).\r\n\r\n### Timer example\r\n\r\nHere's an example of a task on the `BeaconChain` that runs periodically each slot:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/beacon_node/beacon_chain/src/proposer_prep_service.rs#L27-L72\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4526/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4526/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
