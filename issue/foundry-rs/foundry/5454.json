@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5454",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5454/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5454/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5454/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5454",
+  "id": 1816850518,
+  "node_id": "I_kwDOGBlvNc5sSvBW",
+  "number": 5454,
+  "title": "expectRevert fails on internal calls (jumps) if public calls are performed first",
+  "user": {
+    "login": "xenoliss",
+    "id": 33523487,
+    "node_id": "MDQ6VXNlcjMzNTIzNDg3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33523487?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/xenoliss",
+    "html_url": "https://github.com/xenoliss",
+    "followers_url": "https://api.github.com/users/xenoliss/followers",
+    "following_url": "https://api.github.com/users/xenoliss/following{/other_user}",
+    "gists_url": "https://api.github.com/users/xenoliss/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/xenoliss/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/xenoliss/subscriptions",
+    "organizations_url": "https://api.github.com/users/xenoliss/orgs",
+    "repos_url": "https://api.github.com/users/xenoliss/repos",
+    "events_url": "https://api.github.com/users/xenoliss/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/xenoliss/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-22T18:10:21Z",
+  "updated_at": "2023-07-22T18:16:26Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [x ] Foundry\r\n- [ x] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (6e09b4e 2023-07-22T00:17:34.012434229Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test --mc TestPoc\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nHi,\r\n\r\nMost of my application is composed of Solidity Libraries that exposed internal methods so that logic can be shared without inheritance accros different components.\r\n\r\nWhile writing unit tests I noticed some weird behavior regarding the `expectRevert` cheatcode applied on internal methods. Here is a simple example PoC to demonstrate it: \r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.21;\r\n\r\nimport \"forge-std/Test.sol\";\r\n\r\nlibrary MyLib {\r\n  error MyError();\r\n\r\n  function myMethodWithPublicCall(MyContract mc) internal returns (uint256 a) {\r\n    a = mc.myFunc(12);\r\n    revert MyError();\r\n  }\r\n\r\n  function myMethodWithoutPublicCall() internal returns (uint256 a) {\r\n    a = 12;\r\n    revert MyError();\r\n  }\r\n}\r\n\r\ncontract MyContract {\r\n  function myFunc(uint256 a) external returns (uint256 _a) {\r\n    _a = a;\r\n  }\r\n}\r\n\r\ncontract TestPoc is Test {\r\n  MyContract private _mc;\r\n\r\n  function setUp() public {\r\n    _mc = new MyContract();\r\n  }\r\n\r\n  function testRevert_myMethodWithPublicCall_MyError() public {\r\n    vm.expectRevert(MyLib.MyError.selector);\r\n    MyLib.myMethodWithPublicCall(_mc);\r\n  }\r\n\r\n  function testRevert_myMethodWithoutPublicCall_MyError() public {\r\n    vm.expectRevert(MyLib.MyError.selector);\r\n    MyLib.myMethodWithoutPublicCall();\r\n  }\r\n}\r\n```\r\n\r\nRunning `forge test --mc TestPoc` outputs the following:\r\n```\r\nRunning 2 tests for test/TestPoc.t.sol:TestPoc\r\n[FAIL. Reason: Call did not revert as expected] testRevert_myMethodWithPublicCall_MyError() (gas: 8390)\r\nTraces:\r\n  [8390] TestPoc::testRevert_myMethodWithPublicCall_MyError() \r\n    ├─ [0] VM::expectRevert(MyError()) \r\n    │   └─ ← ()\r\n    ├─ [235] MyContract::myFunc(12) \r\n    │   └─ ← 12\r\n    └─ ← \"Call did not revert as expected\"\r\n\r\n[PASS] testRevert_myMethodWithoutPublicCall_MyError() (gas: 3164)\r\nTest result: FAILED. 1 passed; 1 failed; 0 skipped; finished in 2.83ms\r\nRan 1 test suites: 1 tests passed, 1 failed, 0 skipped (2 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/TestPoc.t.sol:TestPoc\r\n[FAIL. Reason: Call did not revert as expected] testRevert_myMethodWithPublicCall_MyError() (gas: 8390)\r\n\r\nEncountered a total of 1 failing tests, 1 tests succeeded\r\n```\r\n\r\nThe test passes for the version that does not perform a public call **before** the error is raised. On the contrary if a public call is performed before (and this calls does not revert with the expected error), then the test fails.\r\n\r\nWhat I would have imagined is `expectRevert` to behave the same way as `expectEmit`. `expectEmit` does not care if the very next event emitted it the one you are expecting. It only cares about two things:\r\n1. The expected event is emitted **at some point** within the transaction\r\n2. If several events are expected, you can omit some of them, but the ordering **must** match.\r\n\r\nWould be really helpful to be able to use `expectRevert` so that if the expected error is raised at some point within the transaction, the test passes.\r\n\r\nFor now I'm using `testFail` but not a fan of it. I am aware I could maybe wrap all my libraries in contracts and exposes their internal methods but as I sad my entire application is 90% made of libs so that's quite painfull.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5454/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5454/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
