@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14442",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14442/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14442/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14442/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14442",
+  "id": 1817170634,
+  "node_id": "I_kwDOAm_5kc5sT9LK",
+  "number": 14442,
+  "title": "Custom Errors support in `require`",
+  "user": {
+    "login": "SteMak",
+    "id": 26607726,
+    "node_id": "MDQ6VXNlcjI2NjA3NzI2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26607726?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/SteMak",
+    "html_url": "https://github.com/SteMak",
+    "followers_url": "https://api.github.com/users/SteMak/followers",
+    "following_url": "https://api.github.com/users/SteMak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/SteMak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/SteMak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/SteMak/subscriptions",
+    "organizations_url": "https://api.github.com/users/SteMak/orgs",
+    "repos_url": "https://api.github.com/users/SteMak/repos",
+    "events_url": "https://api.github.com/users/SteMak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/SteMak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-23T15:26:32Z",
+  "updated_at": "2023-07-23T15:49:14Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n\r\nSince Gas-efficient Custom Errors were added in `solidity 0.8.4`, the `require` statement has become mostly unused. The `if (!condition) revert CustomError()` pattern sometimes looks branchy and makes requirement understanding somewhat harder.\r\n```js\r\nrequire(min <= value && value <= max, \"Value not within bounds\");\r\n// comparing to\r\nif (min > value || value > max) revert NotWithinBounds(min, max, value);\r\n```\r\n\r\nI found a [workaround](https://github.com/SteMak/solidity_ensure), however, it consumes some more Gas compared to ordinary Custom Errors usage.\r\n\r\n## Motivation\r\n\r\nI propose implementing Custom Errors support for the `require` statement, providing Custom Error as the second parameter instead of an error message.\r\n```js\r\nerror NotWithinBounds(uint256 min, uint256 max, uint256 actual);\r\n\r\nfunction checkBounds(uint256 min, uint256 max, uint256 value) external pure {\r\n  require(min <= value && value <= max, NotWithinBounds(min, max, value));\r\n}\r\n```\r\n\r\n## Specification\r\n\r\nThere are several opportunities:\r\n- Make error an ordinary type lazy loads on `revert` burning\r\n  ```js\r\n  // Bytes error message is not calculated there\r\n  require(condition, CustomError(params));\r\n\r\n  function require(bool condition, error err) pure {\r\n    if (!condition) revert err; // Bytes error message is generated here\r\n  }\r\n  ```\r\n- Implement inline functions #12297\r\n  ```js\r\n  require(condition, () => revert CustomError(params));\r\n\r\n  function require(bool condition, function() pure handler) pure {\r\n    if (!condition) handler();\r\n  }\r\n  ```\r\n- Make the transformation below in compile time\r\n  ```js\r\n  require(condition, CustomError(params));\r\n  // changed to\r\n  if (!condition) revert CustomError(params);\r\n  ```\r\n\r\n## Backwards Compatibility\r\n\r\nAs Solidity allows function overloading, the creation of `require(bool, error, or other suitable type)` should not break backward compatibility.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14442/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14442/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
