@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-08-02T20:06:16Z",
-  "updated_at": "2022-08-02T20:06:16Z",
+  "updated_at": "2023-07-24T00:41:43Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1647031999",
+    "html_url": "https://github.com/sigp/lighthouse/issues/3414#issuecomment-1647031999",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/3414",
+    "id": 1647031999,
+    "node_id": "IC_kwDOCFeAzc5iK7a_",
+    "user": {
+      "login": "paulhauner",
+      "id": 6660660,
+      "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/paulhauner",
+      "html_url": "https://github.com/paulhauner",
+      "followers_url": "https://api.github.com/users/paulhauner/followers",
+      "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+      "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+      "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+      "repos_url": "https://api.github.com/users/paulhauner/repos",
+      "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-24T00:41:42Z",
+    "updated_at": "2023-07-24T00:41:42Z",
+    "author_association": "MEMBER",
+    "body": "I think this should be a feature of the [`ValidatorMonitor`](https://github.com/sigp/lighthouse/blob/stable/beacon_node/beacon_chain/src/validator_monitor.rs) because it already has a list of monitored validators and is set up to receive the necessary information for determining missed blocks.\r\n\r\nThe core missed-block detection logic should probably run in [`ValidatorMonitor::process_valid_state`](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/beacon_node/beacon_chain/src/validator_monitor.rs#L397-L399). There are some things we need to consider here:\r\n\r\n1. How do we detect a missed block (a.k.a. a \"skipped slot\")?\r\n1. How do we know who the proposer was for the skipped slot?\r\n1. How to reduce false-positives.\r\n1. De-bouncing alerts.\r\n\r\n## 1. Detecting missed blocks\r\n\r\nFor (1), this is fairly straight-forward. The `state.block_roots()` field is a list of block roots for the past 8,192 slots. As a general example, let us assume that `ValidatorMonitor::process_valid_state` recieves a state with `state.slot = 32`. If we want to know the block root of the block at slot `16`, we can call [`state.get_block_root(Slot::new(16))`](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/types/src/beacon_state.rs#L979-L985).\r\n\r\nAs an example of detecting missed slots/blocks, let us assume there is a *skipped-slot* (i.e. a missing block) at slot 17. Calling `state.get_block_root(Slot::new(17))` will return the exact same block root as our earlier call with `Slot::new(16)`. Therefore, we know that slot `N` was skipped/missed if `get_block_root(N) == get_block_root(N - 1)`. Here's a visual representation:\r\n\r\n```rust\r\nblock_roots = [\r\n  0xabc,  // Slot N+0: Skipped status unknown.\r\n  0xdef,  // Slot N+1: Not skipped\r\n  0x012,  // Slot N+2: Not skipped\r\n  0x012,  // Slot N+3: Skipped\r\n  0x012,  // Slot N+4: Skipped\r\n  0x345   // Slot N+5: Not Skipped\r\n]\r\n```\r\n\r\n## 2. Discovering the proposer of a missed block\r\n\r\nRegarding (2), once we know a slot was skipped, we must determine the proposer for that skipped slot. Knowing the  proposer allows us to determine if the validator is a [\"monitored validator\"](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/beacon_node/beacon_chain/src/validator_monitor.rs#L817-L823) and is worth creating an alert for.\r\n\r\nLet us assume from step (1) we learned that slot `N` has been skipped. The naive method to find the proposer is to call [`state.get_beacon_proposer_index(N)`](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/types/src/beacon_state.rs#L774-L789). However, that method is computationally expensive and should be avoided. Instead, I think we should use the `BeaconProposerCache`. We can see an example of it being used here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/beacon_node/beacon_chain/src/beacon_chain.rs#L3877-L3880\r\n\r\nThere are two complications with using this cache. Firstly, the cache might not contain the value that we want. In this case, I think we simply log a warning and then abort the effort to determine the proposer. The cache is large enough that it *shouldn't* miss and I think it'll only miss when the chain is unhealthy and I don't like starting to perform expensive computations when the chain is unhealthy.\r\n\r\nThe second complication is determining the `shuffling_decision_block: Hash256` to provide to `BeaconProposerCache::get_slot`. When the `state.slot()` is in the same epoch as the missed slot `N`, we can simply call [`BeaconState::proposer_shuffling_decision_root`](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/types/src/beacon_state.rs#L616-L630). However, that function will not work when the missed slot `N` is in an earlier epoch. This is fairly simple to fix, we just need to re-implement `BeaconState::proposer_shuffling_decision_root` to use `N.epoch()` rather than [`state.current_epoch()`](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/types/src/beacon_state.rs#L635).\r\n\r\n## 3. Reducing false-positives\r\n\r\nLet's consider a simple and common fork on the beacon chain:\r\n\r\n```\r\n     |--B\r\nA <--\r\n     |-------C\r\n```\r\n\r\nThe following is true about this chain:\r\n\r\n- There is a block `A` which is the parent of both block `B` and `C`.\r\n- Block `C` has \"forked-out\" block `B` by building atop `A`.\r\n- There are two forks, one where `B` exists and one where it does not.\r\n\r\nOur `ValidatorMonitor` will call `process_valid_state` for all of these blocks (`A`, `B` and `C`). When it processes `C` it will declare there was a skipped slot at `B`. This is great if it turns out that `C` is the canonical chain, but it's a false-positive if `B` is the canonical chain.\r\n\r\nThis problem is hard to solve. We could completely remove false-positives by only creating alerts for *finalized slots*. However, finalization takes at least two epochs, so now our alerting system has a two-epoch lag (~13 mins). We are in a trade-off space between a *fast* alerting system and an *correct* alerting system.\r\n\r\nI propose we find a happy-medium only alerting for missed blocks if they are some `MISSED_BLOCK_LAG_SLOTS` behind `state.slot()`. I propose we set `MISSED_BLOCK_LAG_SLOTS = 4`, however I don't feel strongly about that.\r\n\r\nThis means that we need forks to span 4 slots before we start to create false-positive logs. Such forks are uncommon and I believe that false-positives are acceptable in this case. The four slots will introduce a 48 second lag to our alerts, which I think is totally acceptable.\r\n\r\n## 4. Debouncing alerts\r\n\r\nWhen we detecting missed blocks in `ValidatorMonitor::process_valid_state`, I think we should a range of slots for missed blocks. I propose that we check a total of `SLOTS_PER_EPOCH - MISSED_BLOCK_LAG_SLOTS` slots each time (that would be `32 - 4 == 28` slots with current values). Ensuring we don't go back more than an epoch means we are less likely to get misses on the `BeaconProposerCache`.\r\n\r\nBecause we're checking a range of slots each time, it's likely that we'll discover the same missed block more than once. To avoiding creating a new alert/Prometheus metric each time, I suggest that we add a `HashSet<(Epoch, ValidatorIndex, Slot)>` to the `ValidatorMonitor` that allows us to record each time we log an alert and avoid re-logging it again in the future.\r\n\r\nWhenever we add a cache like this we need to make sure we prune it, otherwise we'll create a memory leak. I propose that each time we run `ValidatorMonitor::process_valid_state` we get the `state.finalized_checkpoint().epoch` and remove any entries from the `HashSet` that have a `Slot` prior to the finalized epoch.",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1647031999/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
