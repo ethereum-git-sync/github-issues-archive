@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14444",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14444/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14444/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14444/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14444",
+  "id": 1817760224,
+  "node_id": "I_kwDOAm_5kc5sWNHg",
+  "number": 14444,
+  "title": "Inconsistent gas usage for conversion of calldata to memory in external call and internal call.",
+  "user": {
+    "login": "charlesxsh",
+    "id": 8362565,
+    "node_id": "MDQ6VXNlcjgzNjI1NjU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8362565?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charlesxsh",
+    "html_url": "https://github.com/charlesxsh",
+    "followers_url": "https://api.github.com/users/charlesxsh/followers",
+    "following_url": "https://api.github.com/users/charlesxsh/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charlesxsh/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charlesxsh/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charlesxsh/subscriptions",
+    "organizations_url": "https://api.github.com/users/charlesxsh/orgs",
+    "repos_url": "https://api.github.com/users/charlesxsh/repos",
+    "events_url": "https://api.github.com/users/charlesxsh/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charlesxsh/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-24T06:50:00Z",
+  "updated_at": "2023-07-24T06:53:20Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nInconsistent gas usage for conversion of calldata to memory in external call and internal call. This is observed after 0.8.0. In 0.7.6, their gas usages are the consistent.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.17\r\n- Target EVM version (as per compiler settings): any\r\n- Framework/IDE (e.g. Truffle or Remix): Remix\r\n- EVM execution environment / backend / blockchain client: any\r\n- Operating system: any\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\n\r\ncontract Dummy {\r\n    function iacceptmem(uint256[] memory amounts) internal {\r\n    }\r\n   \r\n    function test1(uint256[] memory amounts) external {\r\n        iacceptmem(amounts);\r\n    }\r\n\r\n    function test2(uint256[] calldata amounts) external {\r\n        iacceptmem(amounts);\r\n    }\r\n\r\n}\r\n\r\n\r\ncontract Tester {\r\n    Dummy d = new Dummy();\r\n\r\n    function call_test1() external {\r\n        uint256[] memory data = new uint256[](1000);\r\n        d.test1(data);\r\n    }\r\n\r\n    function call_test2() external {\r\n        uint256[] memory data = new uint256[](1000);\r\n        d.test2(data);\r\n    }\r\n}\r\n```\r\n\r\nIf you deploy Tester and call `call_test1` and `call_test2`, you will find that execution cost of `call_test2` is 295126, but `call_test1` is 517391. From yul, we can see they both have the conversion from calldata to memory once. But what is the difference is `call_test10` is converting before `iacceptmem` call, `call_test9` is converting at before executing the `test9`.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14444/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14444/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
