@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-07-24T06:50:00Z",
-  "updated_at": "2023-07-25T05:36:22Z",
-  "closed_at": null,
+  "updated_at": "2023-07-25T11:15:28Z",
+  "closed_at": "2023-07-25T10:47:01Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nInconsistent gas usage for conversion of calldata to memory in external call and internal call. This is observed after 0.8.0. In 0.7.6, their gas usages are the consistent.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.17\r\n- Target EVM version (as per compiler settings): any\r\n- Framework/IDE (e.g. Truffle or Remix): Remix\r\n- EVM execution environment / backend / blockchain client: any\r\n- Operating system: any\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\n\r\ncontract Dummy {\r\n    function iacceptmem(uint256[] memory amounts) internal {\r\n    }\r\n   \r\n    function test1(uint256[] memory amounts) external {\r\n        iacceptmem(amounts);\r\n    }\r\n\r\n    function test2(uint256[] calldata amounts) external {\r\n        iacceptmem(amounts);\r\n    }\r\n\r\n}\r\n\r\n\r\ncontract Tester {\r\n    Dummy d = new Dummy();\r\n\r\n    function call_test1() external {\r\n        uint256[] memory data = new uint256[](1000);\r\n        d.test1(data);\r\n    }\r\n\r\n    function call_test2() external {\r\n        uint256[] memory data = new uint256[](1000);\r\n        d.test2(data);\r\n    }\r\n}\r\n```\r\n\r\nIf you deploy Tester and call `call_test1` and `call_test2`, you will find that execution cost of `call_test2` is 295126, but `call_test1` is 517391. From yul, we can see they both have the conversion from calldata to memory once. But what is the difference is `call_test2` is converting before `iacceptmem` call, `call_test1` is converting at before executing the `test1`.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "r0qs",
+    "id": 457348,
+    "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/r0qs",
+    "html_url": "https://github.com/r0qs",
+    "followers_url": "https://api.github.com/users/r0qs/followers",
+    "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+    "organizations_url": "https://api.github.com/users/r0qs/orgs",
+    "repos_url": "https://api.github.com/users/r0qs/repos",
+    "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/r0qs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14444/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14444/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1649599171",
+    "html_url": "https://github.com/ethereum/solidity/issues/14444#issuecomment-1649599171",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14444",
+    "id": 1649599171,
+    "node_id": "IC_kwDOAm_5kc5iUuLD",
+    "user": {
+      "login": "r0qs",
+      "id": 457348,
+      "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/r0qs",
+      "html_url": "https://github.com/r0qs",
+      "followers_url": "https://api.github.com/users/r0qs/followers",
+      "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+      "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+      "organizations_url": "https://api.github.com/users/r0qs/orgs",
+      "repos_url": "https://api.github.com/users/r0qs/repos",
+      "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/r0qs/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-25T10:47:01Z",
+    "updated_at": "2023-07-25T11:15:28Z",
+    "author_association": "MEMBER",
+    "body": "Hi @charlesxsh,\r\n\r\nthanks for reaching out, however this is not an issue. A possible reason of the gas difference can be the switch to [ABIEncoderV2](https://docs.soliditylang.org/en/latest/080-breaking-changes.html#silent-changes-of-the-semantics) which has more validation on calldata arguments, but there is no reason to believe those two functions should have equal cost. The fact that they had in previous releases is just coincidence.\r\n\r\nI'm cross-posting a discussion that we have with @ekpyron about your example that may help to understand what is happening:\r\n```\r\nThe first function copies from calldata to memory before entering the function, passing around merely \r\na memory reference.\r\nThe second one keeps things in calldata at first (while performing some validation on it) and then does \r\na full copy to memory later on the `iacceptmem` call.\r\nI don't see how anything else could be happening there and why that would have same cost.\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1649599171/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
