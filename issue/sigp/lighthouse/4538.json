@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4538",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4538/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4538/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4538/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4538",
+  "id": 1819715606,
+  "node_id": "I_kwDOCFeAzc5sdqgW",
+  "number": 4538,
+  "title": "Improve transport connection errors",
+  "user": {
+    "login": "AgeManning",
+    "id": 7454587,
+    "node_id": "MDQ6VXNlcjc0NTQ1ODc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7454587?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AgeManning",
+    "html_url": "https://github.com/AgeManning",
+    "followers_url": "https://api.github.com/users/AgeManning/followers",
+    "following_url": "https://api.github.com/users/AgeManning/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AgeManning/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AgeManning/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AgeManning/subscriptions",
+    "organizations_url": "https://api.github.com/users/AgeManning/orgs",
+    "repos_url": "https://api.github.com/users/AgeManning/repos",
+    "events_url": "https://api.github.com/users/AgeManning/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AgeManning/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647284,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODQ=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "default": true,
+      "description": "New feature or request"
+    },
+    {
+      "id": 985647285,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODU=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/help%20wanted",
+      "name": "help wanted",
+      "color": "008672",
+      "default": true,
+      "description": "Extra attention is needed"
+    },
+    {
+      "id": 2336800125,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMTI1",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/t%20Networking",
+      "name": "t Networking",
+      "color": "40E0D0",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-25T07:23:12Z",
+  "updated_at": "2023-07-25T07:23:12Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nLibp2p spits out some rather nasty std::io Errors, which make our logs pretty hard to digest. It would be nice to try and grab the useful information of the wrapped errors and print it in a consumable way. \r\n\r\nThe main one I'm worried about are transport errors that occur often when we attempt connections to peers. The main culprit, is in the DailFailure event. \r\n\r\nSee the error here: \r\nhttps://github.com/divagant-martian/lighthouse/blob/libp2p-0.52/beacon_node/lighthouse_network/src/peer_manager/network_behaviour.rs#L135\r\n\r\nThe error is a DialError and the main ones of issue are the Transport variants. The printed version looks like this:\r\n```\r\nTransport([(\"/ip4/x.x.x.x/tcp/9000/p2p/16Uiu2HAm414GH2X4sLtWyRujBak6euCdZiWfbjCRnpLyk4L4Hw6i\", Other(Custom { kind: Other, error: Custom { kind: Other, error: Other(Left(Right(Select(ProtocolError(IoError(Os { code: 104, kind: ConnectionReset, message: \"Connection reset by peer\" })))))) } }))])\r\n```\r\n\r\nIt would be nice to extract this kind of variant to something of the form:\r\n```\r\nTransport error: Connection reset by peer\r\n```\r\nThe error contains a vec<(Multiaddr, TransportError)> and we can probably ignore the multiaddrs and it is probably fine to just print the first error. Although we might want to include a count, like errors: 3 (if there were 3 errors in the vec). \r\n\r\nI'd imagine this could be done via a wrapper struct, but the std::io::Errors that are nested start getting harder to deal with. \r\n\r\ni.e:\r\n```rust\r\n// A wrapper struct that prints a dial error nicely.\r\nstruct ClearDialError(DialError);\r\n\r\nimpl std::fmt::Display for ClearDialError {\r\n    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {\r\n        match self.0 {\r\n            DialError::Transport(errors) => {\r\n                for (multiaddr, transport_error) in errors {\r\n                    match transport_error {\r\n                        TransportError::MultiaddrNotSupported(multiaddr_error) => {\r\n                            write!(f, \"Multiaddr not supported: {multiaddr_error}\")?;\r\n                        }\r\n                        TransportError::Other(io_error) => {\r\n                            // Pull out the most inner error\r\n        }\r\n    }\r\n}\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4538/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4538/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
