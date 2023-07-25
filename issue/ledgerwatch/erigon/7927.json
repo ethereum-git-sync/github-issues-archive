@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7927",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7927/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7927/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7927/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/7927",
+  "id": 1819935271,
+  "node_id": "I_kwDOC0FsAM5segIn",
+  "number": 7927,
+  "title": "initial sync progress gone after reboot when sync is not finished",
+  "user": {
+    "login": "MrFreezeDZ",
+    "id": 138854125,
+    "node_id": "U_kgDOCEa-7Q",
+    "avatar_url": "https://avatars.githubusercontent.com/u/138854125?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MrFreezeDZ",
+    "html_url": "https://github.com/MrFreezeDZ",
+    "followers_url": "https://api.github.com/users/MrFreezeDZ/followers",
+    "following_url": "https://api.github.com/users/MrFreezeDZ/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MrFreezeDZ/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MrFreezeDZ/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MrFreezeDZ/subscriptions",
+    "organizations_url": "https://api.github.com/users/MrFreezeDZ/orgs",
+    "repos_url": "https://api.github.com/users/MrFreezeDZ/repos",
+    "events_url": "https://api.github.com/users/MrFreezeDZ/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MrFreezeDZ/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-25T09:42:07Z",
+  "updated_at": "2023-07-25T09:55:50Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `erigon version 2.48.0-stable-084acc1a`\r\n\r\nOS & Version: `Alpine Linux v3.17` (Kubernetes (GKE) running image https://hub.docker.com/r/thorax/erigon) \r\n96GB RAM\r\n4 CPUs\r\n10 TB SSD (in Kubernetes so the IOPS is not optimal I guess)\r\n\r\nCommit hash: `git_branch=heads/v2.48.0 git_tag=v2.48.0-dirty git_commit=084acc1af2e853ee4a57dbdd6920b6a1e58ef85c`\r\n\r\nErigon Command (with flags/config):\r\n```\r\nerigon --chain=bor-mainnet --datadir=/data/ --bor.heimdall=http://heimdallrest --authrpc.vhosts=heimdallrest --authrpc.jwtsecret=/secret/jwt.hex --db.size.limit=8TB --maxpeers=500 --torrent.download.rate=300mb --h\r\nttp --ws --http.api=eth,admin,debug,net,trace,web3,erigon,txpool --authrpc.addr=0.0.0.0\r\n```\r\n\r\nConcensus Layer:\r\nHeimdall\r\n\r\nConcensus Layer Command (with flags/config):\r\n`heimdalld start --home=/heimdall-home`\r\n\r\nChain/Network: \r\nBor-Mainnet\r\n\r\n#### Expected behaviour\r\nAt least when a sync stage X/15 reports DONE, the sync progress is restarted from the last finished stage after a reboot.\r\n\r\n\r\n#### Actual behaviour\r\nAfter the reboot in sync stage 12/15 and after over 200 hours of sync time Erigon begins syncing again from the previous downloaded snapshot from 23th of may 2023.\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\nReboot Erigon after one of the first 11 finished sync stages. \r\n\r\n#### Backtrace\r\nJust the logs where you can see the reboot and then beginning the sync again from the start.\r\n````\r\n[INFO] [07-24|13:14:08.225] [txpool] stat                            pending=10000 baseFee=30000 queued=30000 alloc=9.6GB sys=17.3GB\r\n[INFO] [07-24|13:14:11.087] [12/15 StorageHistoryIndex] ETL [2/2] Loading into=StorageHistory current_prefix=2ab0e9e4\r\n[INFO] [07-24|13:14:34.063] [12/15 StorageHistoryIndex] ETL [2/2] Loading into=StorageHistory current_prefix=2ab0e9e4\r\n[INFO] [07-24|13:15:04.062] [12/15 StorageHistoryIndex] ETL [2/2] Loading into=StorageHistory current_prefix=2ab0e9e4\r\n[INFO] [07-24|13:15:08.251] [txpool] stat                            pending=10000 baseFee=30000 queued=30000 alloc=12.6GB sys=17.3GB\r\n[INFO] [07-24|13:15:34.062] [12/15 StorageHistoryIndex] ETL [2/2] Loading into=StorageHistory current_prefix=2ab0e9e4\r\n[INFO] [07-24|13:15:36.979] Got interrupt, shutting down... \r\n[INFO] [07-24|13:15:36.988] Exiting... \r\n[INFO] [07-24|13:15:36.988] Exiting Engine... \r\n[INFO] [07-24|13:15:36.992] RPC server shutting down \r\n[INFO] [07-24|13:15:36.992] RPC server shutting down \r\n[INFO] [07-24|13:15:36.996] RPC server shutting down \r\n[INFO] [07-24|13:15:37.024] Engine HTTP endpoint close               url=[::]:8551\r\n[INFO] [07-24|13:15:37.024] HTTP endpoint closed                     url=127.0.0.1:8545\r\n[INFO] [07-24|13:22:43.702] logging to file system                   log dir=/data/logs file prefix=erigon log level=info json=false\r\n[INFO] [07-24|13:22:43.710] Build info                               git_branch=heads/v2.48.0 git_tag=v2.48.0-dirty git_commit=084acc1af2e853ee4a57dbdd6920b6a1e58ef85c\r\n[INFO] [07-24|13:22:43.710] Starting Erigon on Bor Mainnet... \r\n[INFO] [07-24|13:22:43.716] Maximum peer count                       ETH=500 total=500\r\n[INFO] [07-24|13:22:43.716] starting HTTP APIs                       APIs=eth,admin,debug,net,trace,web3,erigon,txpool\r\n[INFO] [07-24|13:22:43.716] torrent verbosity                        level=WRN\r\n[INFO] [07-24|13:22:45.819] Set global gas cap                       cap=50000000\r\n[INFO] [07-24|13:22:45.821] [Downloader] Runnning with               ipv6-enabled=true ipv4-enabled=true download.rate=300mb upload.rate=4mb\r\n[INFO] [07-24|13:22:45.821] Opening Database                         label=chaindata path=/data/chaindata\r\n[INFO] [07-24|13:23:06.797] Initialised chain configuration          config=\"{ChainID: 137, Homestead: 0, DAO: <nil>, Tangerine Whistle: 0, Spurious Dragon: 0, Byzantium: 0, Constantinople: 0, Petersburg: 0, Istanbul: 3395000, Muir Gl\r\nacier: 3395000, Berlin: 14750000, London: 23850000, Arrow Glacier: <nil>, Gray Glacier: <nil>, Terminal Total Difficulty: <nil>, Merge Netsplit: <nil>, Shanghai: <nil>, Cancun: <nil>, Prague: <nil>, Engine: bor}\" genesis=0xa9c28ce2141\r\nb56c474f1dc504bee9b01eb1bd7d1a507580d5519d4437a97de1b\r\n[INFO] [07-24|13:23:14.653] Initialising Ethereum protocol           network=137\r\n[INFO] [07-24|13:23:25.708] Starting private RPC server              on=127.0.0.1:9090\r\n[INFO] [07-24|13:23:25.708] new subscription to logs established \r\n[INFO] [07-24|13:23:25.708] rpc filters: subscribing to Erigon events \r\n[INFO] [07-24|13:23:25.709] new subscription to newHeaders established \r\n[INFO] [07-24|13:23:25.709] Reading JWT secret                       path=/secret/jwt.hex\r\n[INFO] [07-24|13:23:25.709] New txs subscriber joined \r\n[INFO] [07-24|13:23:25.709] HTTP endpoint opened for Engine API      url=[::]:8551 ws=true ws.compression=true\r\n[INFO] [07-24|13:23:25.710] HTTP endpoint opened                     url=127.0.0.1:8545 ws=true ws.compression=true grpc=false\r\n[INFO] [07-24|13:23:25.731] [1/15 Snapshots] Fetching torrent files metadata \r\n[INFO] [07-24|13:23:25.755] Started P2P networking                   version=67 self=enode://5c7e7f86397bdd12efc18dddd7b2154a0b93c971ede780f587b3e70f3a196bae42a99cb859e4518296e24a6663a41a26c79311128e8ab2f497567abc5da7a29b@127.0.0.1:0 \r\nname=erigon/v2.48.0-stable-084acc1a/linux-amd64/go1.20.5\r\n[INFO] [07-24|13:23:25.764] Started P2P networking                   version=68 self=enode://5c7e7f86397bdd12efc18dddd7b2154a0b93c971ede780f587b3e70f3a196bae42a99cb859e4518296e24a6663a41a26c79311128e8ab2f497567abc5da7a29b@127.0.0.1:0 \r\nname=erigon/v2.48.0-stable-084acc1a/linux-amd64/go1.20.5\r\n[INFO] [07-24|13:23:34.858] [snapshots] Blocks Stat                  blocks=42967k indices=42967k alloc=3.2GB sys=6.1GB\r\n[INFO] [07-24|13:23:34.858] [2/15 Headers] Waiting for headers...    from=43057508\r\n[INFO] [07-24|13:23:35.181] Span with given block number is not loaded fetching span=6728\r\n[INFO] [07-24|13:23:54.859] [2/15 Headers] Wrote block headers       number=43058472 blk/second=48.200 alloc=3.5GB sys=6.1GB\r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7927/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7927/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
