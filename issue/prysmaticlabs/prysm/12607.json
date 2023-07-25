@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-07-10T08:06:21Z",
-  "updated_at": "2023-07-11T16:30:48Z",
-  "closed_at": null,
+  "updated_at": "2023-07-25T08:50:12Z",
+  "closed_at": "2023-07-25T08:50:12Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "I'm getting missed block proposals and I'd like to find out the reason. It used to be working fine with Prysm 4.0.5 and mev-boost 1.5.\r\nI don't have debug logs atm but maybe someone could give me a hint what is happening between 12:51:47 and 12:51:50. I have a too long delay \"sinceSlotStartTime=3.937088591s\" which exceeded the inclusion time of 4000ms on the mev block builder site so they rejected my request. I ended up with a missing block proposal.\r\n\r\nEL and CL are running on an NVMe disk (no i/o problems) and my internet connection was absolutely ok during this period of time.\r\n\r\nDo you think I should reduce the max peers of the beacon-node from default to a lower value? I've been looking for a solution since sunday afternoon but I have no clue what the reason could be. Any help would be much appreciated.\r\n\r\nLog:\r\nJul  9 12:51:47 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:47.346+02:00\" level=info msg=\"http: GET /eth/v1/builder/header/6839657/0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a/0xa4c0aa10574634b297291afa6381b6f7988d68c1231ad7d661ddc4e3811955dd8bcb187e7ca30ab2ca293f6782340d27 200\" duration=0.261881 method=GET path=/eth/v1/builder/header/6839657/0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a/0xa4c0aa10574634b297291afa6381b6f7988d68c1231ad7d661ddc4e3811955dd8bcb187e7ca30ab2ca293f6782340d27 status=200 version=v1.6\r\n**Jul  9 12:51:47 eth2-staking1 prysm.sh[18884]: time=\"2023-07-09 12:51:47\" level=info msg=\"Received header with bid\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 builderPubKey=0x9000009807ed12c1f08bf4e81c6da3ba8e3fc3d953898ce0102433094e5f22f21102ec057841fcb81978ed1ea0fa8246 prefix=\"rpc/validator\" sinceSlotStartTime=352.211673ms slot=6839657 validator=150260 value=73251364603025494\r\nJul  9 12:51:48 eth2-staking1 influxd-systemd-start.sh[1635]: [httpd] 127.0.0.1 - geth [09/Jul/2023:12:51:48 +0200] \"GET /ping HTTP/1.1\" 204 0 \"-\" \"InfluxDBClient\" 9ac731db-1e46-11ee-b1d6-1c697aa60ddc 18\r\nJul  9 12:51:50 eth2-staking1 prysm.sh[18884]: time=\"2023-07-09 12:51:50\" level=warning msg=\"removing invalid exit from pool\" error=\"non-active validator cannot exit\"\r\nJul  9 12:51:50 eth2-staking1 prysm.sh[18884]: message repeated 15 times: [ time=\"2023-07-09 12:51:50\" level=warning msg=\"removing invalid exit from pool\" error=\"non-active validator cannot exit\"]**\r\nJul  9 12:51:50 eth2-staking1 prysm.sh[18884]: time=\"2023-07-09 12:51:50\" level=info msg=\"Finished building block\" prefix=\"rpc/validator\" sinceSlotStartTime=3.937088591s slot=6839657 validator=150260\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.955+02:00\" level=debug msg=\"getPayload request starts\" method=getPayload version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=info msg=\"submitBlindedBlock request start - 3965 milliseconds into slot 6839657\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 genesisTime=1606824023 method=getPayload msIntoSlot=3965 parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotTimeSec=12 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://aestus.live/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://bloxroute.max-profit.blxrbdn.com/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://relay.ultrasound.money/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://builder-relay-mainnet.blocknative.com/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://relay.edennetwork.io/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://boost-relay.flashbots.net/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://bloxroute.ethical.blxrbdn.com/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://bloxroute.regulated.blxrbdn.com/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://mainnet-relay.securerpc.com/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:50 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:50.965+02:00\" level=debug msg=\"calling getPayload\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://agnostic-relay.net/eth/v1/builder/blinded_blocks\" version=v1.6\r\nJul  9 12:51:51 eth2-staking1 mev-boost[1446]: time=\"2023-07-09T12:51:51.28+02:00\" level=warning msg=\"error making request to relay, retrying\" blockHash=0xd3a7f536bceeebb3031aaddaae6b82727b590b1609dc4e8d963847ee0c495088 error=\"HTTP error response: 400 / {\\\"code\\\":400,\\\"message\\\":\\\"timestamp too late\\\"}\\n\" method=getPayload parentHash=0x717236ab3c866d23d2456cb0eb26ec4443655eadb8cfcd0d066988f8a0d1508a slot=6839657 slotUID=af58d3ed-1f7d-43c4-b891-2270e0dd28cc ua=Prysm/v4.0.6/a75e78ddb42a8142763552c3799097c20c02e5d0 url=\"https://bloxroute.max-profit.blxrbdn.com/eth/v1/builder/blinded_blocks\" version=v1.6",
-  "closed_by": null,
+  "closed_by": {
+    "login": "nisdas",
+    "id": 33201827,
+    "node_id": "MDQ6VXNlcjMzMjAxODI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33201827?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nisdas",
+    "html_url": "https://github.com/nisdas",
+    "followers_url": "https://api.github.com/users/nisdas/followers",
+    "following_url": "https://api.github.com/users/nisdas/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nisdas/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nisdas/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nisdas/subscriptions",
+    "organizations_url": "https://api.github.com/users/nisdas/orgs",
+    "repos_url": "https://api.github.com/users/nisdas/repos",
+    "events_url": "https://api.github.com/users/nisdas/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nisdas/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12607/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12607/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -140,6 +159,50 @@
     "body": "Me including many others have already been using v4.0.6 with mevboost v1.0.6 and still experiencing missing block proposals.\r\nI think it got worse with the newest version. Let's hope for an update.",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1631135981/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1649401054",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/12607#issuecomment-1649401054",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12607",
+    "id": 1649401054,
+    "node_id": "IC_kwDOBvuov85iT9ze",
+    "user": {
+      "login": "nisdas",
+      "id": 33201827,
+      "node_id": "MDQ6VXNlcjMzMjAxODI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33201827?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nisdas",
+      "html_url": "https://github.com/nisdas",
+      "followers_url": "https://api.github.com/users/nisdas/followers",
+      "following_url": "https://api.github.com/users/nisdas/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nisdas/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nisdas/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nisdas/subscriptions",
+      "organizations_url": "https://api.github.com/users/nisdas/orgs",
+      "repos_url": "https://api.github.com/users/nisdas/repos",
+      "events_url": "https://api.github.com/users/nisdas/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nisdas/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-25T08:49:41Z",
+    "updated_at": "2023-07-25T08:49:41Z",
+    "author_association": "MEMBER",
+    "body": "@Neq900 This is resolved with v4.0.7, so closing this issue. If its still not the case I will reopen it",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1649401054/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
