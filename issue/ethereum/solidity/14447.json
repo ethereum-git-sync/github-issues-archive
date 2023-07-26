@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "pgebal",
@@ -96,12 +96,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-07-25T10:22:47Z",
-  "updated_at": "2023-07-26T06:46:08Z",
-  "closed_at": null,
+  "updated_at": "2023-07-26T15:45:45Z",
+  "closed_at": "2023-07-26T15:45:45Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nFor some cases model checker unrolls a loop even after it should complete.\r\n\r\n## Environment\r\n\r\n- Compiler version: commit 83fe3d4011e3d14385f83aef0c32a0d894273501\r\n\r\n## Steps to Reproduce\r\nrun compiler with `--model-checker-engine bmc --model-checker-bmc-loop-iterations 5 --model-checker-solvers z3` on the following contract:\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity >=0.0;\r\ncontract C\r\n{\r\n\tuint x;\r\n\tuint y;\r\n\r\n\tfunction condition() private returns(bool) {\r\n\t\tx = (x + 1) % 2;\r\n\t\treturn (x == 1);\r\n\t}\r\n\r\n\tfunction f() public {\r\n\t\trequire(x == 0);\r\n\t\trequire(y == 0);\r\n\t\tfor (; condition();) {\r\n\t\t\t++y;\r\n\t\t}\r\n\t\tassert(y == 1);\r\n\t}\r\n}\r\n```\r\nI expect the assertion `y == 1` to hold but it fails, `y > 1` holds and it shouldn't.\r\nThere is a similar bug in `while` and `do while` loops.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "pgebal",
+    "id": 23142088,
+    "node_id": "MDQ6VXNlcjIzMTQyMDg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/23142088?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pgebal",
+    "html_url": "https://github.com/pgebal",
+    "followers_url": "https://api.github.com/users/pgebal/followers",
+    "following_url": "https://api.github.com/users/pgebal/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pgebal/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pgebal/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pgebal/subscriptions",
+    "organizations_url": "https://api.github.com/users/pgebal/orgs",
+    "repos_url": "https://api.github.com/users/pgebal/repos",
+    "events_url": "https://api.github.com/users/pgebal/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pgebal/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14447/reactions",
     "total_count": 0,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14447/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
