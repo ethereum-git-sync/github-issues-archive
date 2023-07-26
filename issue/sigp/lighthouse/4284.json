@@ -30,7 +30,15 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 4771662300,
+      "node_id": "LA_kwDOCFeAzc8AAAABHGnJ3A",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/builder%20API",
+      "name": "builder API",
+      "color": "C9A283",
+      "default": false,
+      "description": ""
+    }
   ],
   "state": "open",
   "locked": false,
@@ -39,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-05-13T22:07:37Z",
-  "updated_at": "2023-05-13T22:07:37Z",
+  "updated_at": "2023-07-26T13:30:42Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -64,5 +72,92 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1651768165",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4284#issuecomment-1651768165",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4284",
+    "id": 1651768165,
+    "node_id": "IC_kwDOCFeAzc5ic_tl",
+    "user": {
+      "login": "Gua00va",
+      "id": 105484243,
+      "node_id": "U_kgDOBkmP0w",
+      "avatar_url": "https://avatars.githubusercontent.com/u/105484243?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Gua00va",
+      "html_url": "https://github.com/Gua00va",
+      "followers_url": "https://api.github.com/users/Gua00va/followers",
+      "following_url": "https://api.github.com/users/Gua00va/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Gua00va/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Gua00va/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Gua00va/subscriptions",
+      "organizations_url": "https://api.github.com/users/Gua00va/orgs",
+      "repos_url": "https://api.github.com/users/Gua00va/repos",
+      "events_url": "https://api.github.com/users/Gua00va/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Gua00va/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-26T13:05:47Z",
+    "updated_at": "2023-07-26T13:05:54Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "hey @jimmygchen , is this related to #4525 ?",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1651768165/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1651810198",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4284#issuecomment-1651810198",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4284",
+    "id": 1651810198,
+    "node_id": "IC_kwDOCFeAzc5idJ-W",
+    "user": {
+      "login": "jimmygchen",
+      "id": 742762,
+      "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jimmygchen",
+      "html_url": "https://github.com/jimmygchen",
+      "followers_url": "https://api.github.com/users/jimmygchen/followers",
+      "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+      "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+      "repos_url": "https://api.github.com/users/jimmygchen/repos",
+      "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-26T13:28:54Z",
+    "updated_at": "2023-07-26T13:30:22Z",
+    "author_association": "MEMBER",
+    "body": "This is a different one, this is for the `submitBlindedBlock` **request**  from the Beacon Node to the Builder in the builder block proposal flow, i.e. `POST /eth/v2/builder/blinded_blocks\r\n` in the below diagram. \r\n\r\nWe currently don't send this HTTP header in the request, and is an optional header [in the spec](https://github.com/ethereum/builder-specs/blob/7b269305e1e54f22ddb84b3da2f222e20adf6e4f/apis/builder/blinded_blocks.yaml#L15) that would make it easier for the builder to deserialize the request body.\r\n\r\n```mermaid\r\nsequenceDiagram\r\n    participant validator\r\n    participant beacon_node\r\n    participant mev_boost\r\n    Title: Block Proposal with Builder API\r\n    validator->>beacon_node: GET v2/validator/blinded_blocks/{slot}\r\n    beacon_node->>mev_boost: GET v1/builder/header/{slot}/{parent_hash}/{pubkey}\r\n    mev_boost-->>beacon_node: returns bid & blinded payload\r\n    beacon_node-->>validator: returns blinded block\r\n    Note over validator: signs the blinded block\r\n    validator->>beacon_node: POST beacon/blinded_blocks\r\n    beacon_node->>mev_boost: POST /eth/v2/builder/blinded_blocks\r\n    Note right of beacon_node: sends signed blinded beacon block\r\n    mev_boost-->>beacon_node: returns revealed payload\r\n    Note over beacon_node: construct block and broadcast block\r\n```\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1651810198/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
