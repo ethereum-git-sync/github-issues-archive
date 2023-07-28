@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5814",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5814/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5814/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5814/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5814",
+  "id": 1825675073,
+  "node_id": "I_kwDOCD5_Gc5s0ZdB",
+  "number": 5814,
+  "title": "Wasted epoch transition in PrepareNextSlotScheduler",
+  "user": {
+    "login": "tuyennhv",
+    "id": 10568965,
+    "node_id": "MDQ6VXNlcjEwNTY4OTY1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10568965?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tuyennhv",
+    "html_url": "https://github.com/tuyennhv",
+    "followers_url": "https://api.github.com/users/tuyennhv/followers",
+    "following_url": "https://api.github.com/users/tuyennhv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tuyennhv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tuyennhv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tuyennhv/subscriptions",
+    "organizations_url": "https://api.github.com/users/tuyennhv/orgs",
+    "repos_url": "https://api.github.com/users/tuyennhv/repos",
+    "events_url": "https://api.github.com/users/tuyennhv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tuyennhv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-28T04:21:25Z",
+  "updated_at": "2023-07-28T04:21:25Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nThere were some wasted epoch transition on mainnet\r\n\r\n<img width=\"792\" alt=\"Screenshot 2023-07-28 at 11 17 43\" src=\"https://github.com/ChainSafe/lodestar/assets/10568965/dd263a85-ea4e-4f84-8303-f4427c1fcc01\">\r\n\r\nIt caused us to run more than 1 epoch transitions per epoch\r\n\r\n<img width=\"798\" alt=\"Screenshot 2023-07-28 at 11 18 25\" src=\"https://github.com/ChainSafe/lodestar/assets/10568965/a8ef4b18-c3df-4645-8d15-d44cd000d1e9\">\r\n\r\nThe wasted epoch transition came from PrepareNextSlotScheduler:\r\n\r\n```\r\nJul-27 03:21:57.906[chain]         ^[[36mverbose^[[39m: Running prepareForNextSlot nextEpoch=217719, prepareSlot=6967008, headSlot=6967006, headRoot=0x8df37f2d2eea02a6ca6c155d650cee5c1d9ba96164981efd01d9e679517f30d8, isEpochTransition=true\r\n```\r\n\r\nbefore that gossip block was received and processing:\r\n```\r\nJul-27 03:21:52.704[network]       ^[[36mverbose^[[39m: Received gossip block slot=6967007, root=0x19c2…0e58, curentSlot=6967007, peerId=16Uiu2HAm7EKWpUiMrXpjUSZ75Y1Bcr3ncLJMZRX6gT754cbC4L7R, delaySec=5.171000003814697, recvToVal=0.5329999923706055\r\n```\n\n### Expected behavior\n\nIn that case PrepareNextSlotScheduler should wait for the last block of previous epoch to be processed before start its run\n\n### Steps to reproduce\n\n_No response_\n\n### Additional context\n\nFull log\r\n\r\n```\r\nJul-27 03:21:47.000[chain]         ^[[36mverbose^[[39m: Clock slot slot=6967007\r\nJul-27 03:21:52.704[network]       ^[[36mverbose^[[39m: Received gossip block slot=6967007, root=0x19c2…0e58, curentSlot=6967007, peerId=16Uiu2HAm7EKWpUiMrXpjUSZ75Y1Bcr3ncLJMZRX6gT754cbC4L7R, delaySec=5.171000003814697, recvToVal=0.5329999923706055\r\nJul-27 03:21:54.050[chain]         ^[[36mverbose^[[39m: Transitioned gossip block slot=6967007, recvToTransition=1.878999948501587\r\nJul-27 03:21:54.083[chain]         ^[[36mverbose^[[39m: Verified block signatures slot=6967007, recvToSigVer=1.9119999408721924\r\nJul-27 03:21:54.083[chain]           ^[[34mdebug^[[39m: Persist block to hot DB slot=6967007, root=0x19c2c2a4bf74a77fd269561eeac9289c067febed23f3a91fdc082efff7c10e58\r\n\r\nJul-27 03:21:57.753[sync]          ^[[36mverbose^[[39m: Added unknown block to pendingBlocks root=0x19c2c2a4bf74a77fd269561eeac9289c067febed23f3a91fdc082efff7c10e58\r\nJul-27 03:21:57.906[chain]         ^[[36mverbose^[[39m: Running prepareForNextSlot nextEpoch=217719, prepareSlot=6967008, headSlot=6967006, headRoot=0x8df37f2d2eea02a6ca6c155d650cee5c1d9ba96164981efd01d9e679517f30d8, isEpochTransition=true\r\n\r\nJul-27 03:22:00.206[chain]         ^[[36mverbose^[[39m: Verified execution payload slot=6967007, recvToVerifiedExecPayload=8.035000085830688\r\nJul-27 03:22:00.431[chain]         ^[[36mverbose^[[39m: New chain head slot=6967007, root=0x19c2c2a4bf74a77fd269561eeac9289c067febed23f3a91fdc082efff7c10e58, delaySec=13.430999994277954\r\nJul-27 03:22:00.431[chain]         ^[[36mverbose^[[39m: Imported block slot=6967007, recvToImportedBlock=8.259999990463257\r\nJul-27 03:22:00.431[chain]         ^[[36mverbose^[[39m: Block processed slot=6967007, root=0x19c2c2a4bf74a77fd269561eeac9289c067febed23f3a91fdc082efff7c10e58, delaySec=13.430999994277954\r\n```\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nv1.9.2",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5814/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5814/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
