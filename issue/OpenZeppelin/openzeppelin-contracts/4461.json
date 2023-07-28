@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 7,
   "created_at": "2023-07-17T16:35:16Z",
-  "updated_at": "2023-07-27T23:15:47Z",
-  "closed_at": null,
+  "updated_at": "2023-07-28T11:03:56Z",
+  "closed_at": "2023-07-28T11:03:55Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "If we look at the implementation of `_update` function, we see that it allows emission of a non-sense event when the `ids` and `values` are empty: \r\n\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts/blob/121be5dd09caa2f7ce731f0806b0e14761023bd6/contracts/token/ERC1155/ERC1155.sol#L176-L182\r\n\r\nEven though the standard only requires for length equality for `_mintBatch` and `_burnBatch`, it seems the `TransferBatch` is redundant. Moreover, [the for-loop](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/121be5dd09caa2f7ce731f0806b0e14761023bd6/contracts/token/ERC1155/ERC1155.sol#L156C10-L156C10) prevents any changes of state for these empty values.\r\n\r\nThe example of a real world TX with this behavior: https://goerli.etherscan.io/tx/0xa6ad6588edb4abd8ca45f30d2f026ba20b68a3002a5870dbd30cc3752568483b#eventlog\r\n\r\nShould we revert the transaction and apply stricter requirements of non-emptiness of `ids` and `values`? Or should we just skip the event-emitting logic for empty arrays?\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "atapin",
+    "id": 1181403,
+    "node_id": "MDQ6VXNlcjExODE0MDM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1181403?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/atapin",
+    "html_url": "https://github.com/atapin",
+    "followers_url": "https://api.github.com/users/atapin/followers",
+    "following_url": "https://api.github.com/users/atapin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/atapin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/atapin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/atapin/subscriptions",
+    "organizations_url": "https://api.github.com/users/atapin/orgs",
+    "repos_url": "https://api.github.com/users/atapin/repos",
+    "events_url": "https://api.github.com/users/atapin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/atapin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4461/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4461/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -316,6 +335,50 @@
     "body": "In what sense is this an edge case for indexers? I would expect it to be trivially handled correctly, resulting in zero changes to balances and ownership.\r\n\r\nIn fact, I would argue that only with the suggested change empty arrays become an edge case, in which `safeBatchTransferFrom` doesn't emit an event, which you would otherwise expect for all invocations of the function.\r\n\r\nI suggest to keep this simple and emit the event unconditionally.\r\n\r\n> As NOOP things are not expected to emit events.\r\n\r\nI don't think this is true because tokens can emit `Transfer` events with value=0.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1654732865/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1655498971",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4461#issuecomment-1655498971",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4461",
+    "id": 1655498971,
+    "node_id": "IC_kwDOA9tCBs5irOjb",
+    "user": {
+      "login": "atapin",
+      "id": 1181403,
+      "node_id": "MDQ6VXNlcjExODE0MDM=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1181403?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/atapin",
+      "html_url": "https://github.com/atapin",
+      "followers_url": "https://api.github.com/users/atapin/followers",
+      "following_url": "https://api.github.com/users/atapin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/atapin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/atapin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/atapin/subscriptions",
+      "organizations_url": "https://api.github.com/users/atapin/orgs",
+      "repos_url": "https://api.github.com/users/atapin/repos",
+      "events_url": "https://api.github.com/users/atapin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/atapin/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-28T11:03:55Z",
+    "updated_at": "2023-07-28T11:03:55Z",
+    "author_association": "NONE",
+    "body": "@frangio I see your points. Let's close this ticket then.\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1655498971/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
