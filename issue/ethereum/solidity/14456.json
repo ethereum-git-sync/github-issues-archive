@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14456",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14456/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14456/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14456/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14456",
+  "id": 1827259264,
+  "node_id": "I_kwDOAm_5kc5s6cOA",
+  "number": 14456,
+  "title": "[feature] Solidity configuration file",
+  "user": {
+    "login": "llllvvuu",
+    "id": 5601392,
+    "node_id": "MDQ6VXNlcjU2MDEzOTI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5601392?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/llllvvuu",
+    "html_url": "https://github.com/llllvvuu",
+    "followers_url": "https://api.github.com/users/llllvvuu/followers",
+    "following_url": "https://api.github.com/users/llllvvuu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/llllvvuu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/llllvvuu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/llllvvuu/subscriptions",
+    "organizations_url": "https://api.github.com/users/llllvvuu/orgs",
+    "repos_url": "https://api.github.com/users/llllvvuu/repos",
+    "events_url": "https://api.github.com/users/llllvvuu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/llllvvuu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-29T01:30:18Z",
+  "updated_at": "2023-07-29T02:05:46Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!--## Prerequisites\r\n\r\n- First, many thanks for taking part in the community. We really appreciate that.\r\n- We realize there is a lot of data requested here. We ask only that you do your best to provide as much information as possible so we can better help you.\r\n- Support questions are better asked in one of the following locations:\r\n    - [Solidity chat](https://gitter.im/ethereum/solidity)\r\n    - [Stack Overflow](https://ethereum.stackexchange.com/)\r\n- Ensure the issue isn't already reported (check `feature` and `language design` labels).\r\n- If you feel uncertain about your feature request, perhaps it's better to open a language design or feedback forum thread via the issue selector, or by going to the forum directly.\r\n    - [Solidity forum](https://forum.soliditylang.org/)\r\n\r\n*Delete the above section and the instructions in the sections below before submitting*\r\n-->\r\n\r\n## Abstract\r\n\r\nI propose that configuration related to the language toolchain live with Solidity, rather than with frameworks. This is inspired by the TypeScript ecosystem, in which `tsconfig.json` and `package.json` are canonical, and TypeScript tooling can just look at those for any project, whereas files like `.eslintrc.json`, `.prettierrc.json`, and `webpack.config.js` are optional and specific to the particular tooling, since they are only needed by the respective tools.\r\n\r\n## Motivation\r\n\r\nFramework configuration should live with frameworks; for example it would make no sense to put fuzzer settings in a `solidity.toml` file. However, Solidity configuration should IMO live in a Solidity configuration file, so that Solidity dev tooling can be framework-agnostic.\r\n* There are a number of competing LSPs [[1]](https://github.com/juanfranblanco/vscode-solidity) [[2]](https://github.com/NomicFoundation/hardhat-vscode) [[3]](https://ackeeblockchain.com/woke/docs/latest/language-server/). None of these care about framework features, yet all of them must implement framework detection and therefore there is a lot of redundant effort and logic that goes into simply reading the language.\r\n* `solc --lsp` is unlikely to be competitive with these LSPs, since it doesn't implement framework detection, nor should it (it should be framework-agnostic).\r\n* If you develop a new framework, you have to go upstream to a bunch of third-party IDE tooling before your framework becomes nice to adopt, otherwise Solidity just won't work.\r\n* It is probably annoying to go framework-less. Likely what you would do is accumulate a variety of shell scripts or Makefile that contain the command-line flags that you want to use, and these would be opaque to IDE tooling.\r\n* Tools like [`crytic-compile`](https://github.com/crytic/crytic-compile) should probably not need to exist. That seems like a symptom of something.\r\n* The [\"Solidity Compiler\" section of `foundry.toml`](https://book.getfoundry.sh/reference/config/solidity-compiler) should not need to exit\r\n\r\n## Specification\r\nSolidity would look for the nearest `solidity.toml`, unless a `--config` file is passed in. \r\n\r\nAny `solc` CLI args could also be specified in the `[solc]` section of `solidity.toml` (analogous to `tsconfig.json` `compilerOptions` - especially analogous to \"moduleResolution\", \"baseUrl\", and \"paths\" - doesn't have to be the current remappings syntax specifically). Values passed in via the CLI take precedence over values specified in `[solc]`. One consequence of this is that frameworks can still be opinionated e.g. about auto-detection of remappings and `solc` version, by adding command-line flags as before, or by modifying the `solidity.toml` file so that framework-agnostic IDE tooling could pick it up.\r\n\r\nIf any non-`solc` sections are included in `solidity.toml`, they are ignored by `solc`. This is similar to how one may add plugin configurations in `package.json` (e.g. `husky`) or `pyproject.toml` (e.g. `tool.black`).\r\n\r\nOne should also be able to specify the `solc` version under `[solc]`, which would behave like [the \"engine\"/\"engineStrict\" field in package.json](https://www.marcusoft.net/2015/03/packagejson-and-engines-and-enginestrict.html); the `solc` binary would mostly ignore this field or at most print out a warning if the version doesn't match; the field would exist for the benefit of other tooling.\r\n\r\n## Backwards Compatibility\r\n\r\nIf `solidity.toml` doesn't exist, there should be no changes to `solc` behavior. Thus users would have to opt in to see behavior changes.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14456/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14456/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
