@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27802",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27802/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27802/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27802/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27802",
+  "id": 1827354348,
+  "node_id": "I_kwDOAOvK985s6zbs",
+  "number": 27802,
+  "title": "crypto: manipulated signature still pass the verification ",
+  "user": {
+    "login": "xumy29",
+    "id": 43508150,
+    "node_id": "MDQ6VXNlcjQzNTA4MTUw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43508150?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/xumy29",
+    "html_url": "https://github.com/xumy29",
+    "followers_url": "https://api.github.com/users/xumy29/followers",
+    "following_url": "https://api.github.com/users/xumy29/following{/other_user}",
+    "gists_url": "https://api.github.com/users/xumy29/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/xumy29/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/xumy29/subscriptions",
+    "organizations_url": "https://api.github.com/users/xumy29/orgs",
+    "repos_url": "https://api.github.com/users/xumy29/repos",
+    "events_url": "https://api.github.com/users/xumy29/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/xumy29/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-29T07:04:14Z",
+  "updated_at": "2023-07-29T07:04:14Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGo-ethereum version: v1.10.17\r\nOS & Version: macOS Monterey 12.4\r\n\r\n#### Code\r\n```go\r\npackage main\r\n\r\nimport (\r\n\t\"fmt\"\r\n\r\n\t\"github.com/ethereum/go-ethereum/common/hexutil\"\r\n\t\"github.com/ethereum/go-ethereum/crypto\"\r\n)\r\n\r\nvar (\r\n\tprivateKeyHex string = \"0406fd4b37b0fef67a4cd1ca447452a0fbe81ec972e8437c2d278614295d2412\"\r\n\ttestmsg              = hexutil.MustDecode(\"0xce0677bb30baa8cf067c88db9811f4333d131bf8bcf12fe7065d211dce971008\")\r\n)\r\n\r\nfunc SignHash(hash []byte) []byte {\r\n\tprivateKey, err := crypto.HexToECDSA(privateKeyHex)\r\n\tif err != nil {\r\n\t\tfmt.Println(\"Error converting private key:\", err)\r\n\t\treturn []byte{}\r\n\t}\r\n\tsig, err := crypto.Sign(hash, privateKey)\r\n\tif err != nil {\r\n\t\tfmt.Println(\"Error sign: \", err)\r\n\t\treturn []byte{}\r\n\t}\r\n\r\n\treturn sig\r\n}\r\n\r\nfunc VerifySignature(msgHash []byte, sig []byte) bool {\r\n\t// manipulate sig for test\r\n\tfmt.Printf(\"original sig: %v\\n\", sig)\r\n\tsig[5] = 0\r\n\tsig[35] = 0\r\n\tsig[40] = 0\r\n\tsig[44] = 0\r\n\tfmt.Printf(\"manipulated sig: %v\\n\", sig)\r\n\r\n\t// recover pubkey\r\n\tpubKeyBytes, err := crypto.Ecrecover(msgHash, sig)\r\n\tif err != nil {\r\n\t\tfmt.Printf(\"ecrecover err: %v\\n\", err)\r\n\t}\r\n\r\n\tvalid := crypto.VerifySignature(pubKeyBytes, msgHash, sig[:len(sig)-1])\r\n\r\n\treturn valid\r\n}\r\n\r\nfunc main() {\r\n\tsig := SignHash(testmsg)\r\n\tif VerifySignature(testmsg, sig) {\r\n\t\tfmt.Printf(\"verify pass.\\n\")\r\n\t} else {\r\n\t\tfmt.Printf(\"verify doesn't pass.\\n\")\r\n\t}\r\n}\r\n\r\n```\r\n#### Expected behaviour\r\nWhen manipulating several bytes of the signature, the verification should not pass.\r\n\r\n#### Actual behaviour\r\nThe verification still pass.\r\n\r\n#### Steps to reproduce the behaviour\r\nrun the code.\r\n\r\n#### Backtrace\r\n\r\n````\r\n[backtrace]\r\n````\r\n\r\nWhen submitting logs: please submit them as text and not screenshots.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27802/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27802/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
