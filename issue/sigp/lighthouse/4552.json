@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4552",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4552/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4552/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4552/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4552",
+  "id": 1827901553,
+  "node_id": "I_kwDOCFeAzc5s85Bx",
+  "number": 4552,
+  "title": "Unable To Sync with Checkpoint",
+  "user": {
+    "login": "aerielabio",
+    "id": 137320312,
+    "node_id": "U_kgDOCC9XeA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137320312?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/aerielabio",
+    "html_url": "https://github.com/aerielabio",
+    "followers_url": "https://api.github.com/users/aerielabio/followers",
+    "following_url": "https://api.github.com/users/aerielabio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/aerielabio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/aerielabio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/aerielabio/subscriptions",
+    "organizations_url": "https://api.github.com/users/aerielabio/orgs",
+    "repos_url": "https://api.github.com/users/aerielabio/repos",
+    "events_url": "https://api.github.com/users/aerielabio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/aerielabio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-30T11:30:57Z",
+  "updated_at": "2023-07-30T11:32:08Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\nSo, im using Prysm+Geth as my primary node\r\nIts a devnet node. Now i want to sync it with my lighthouse+erigon ( without validator )\r\nI tried to provide all the necessary files into `--testnet-dir` , such as config.yml, genesis.ssz, deposit_contract.txt , and deploy_block.txt , but whenever i tried to run my lighthouse node using `--checkpoint-sync-url=http://myPrismBeaconIp:andItsPort` , it keeps giving me an error.\r\n\r\nHere is the log, and im using docker for both of them ( prysm+geth & lighthouse+erigon )\r\n\r\n```\r\nFO Logging to file                         path: \"/consensus/beacon/logs/beacon.log\"\r\nJul 30 10:58:13.404 INFO Lighthouse started                      version: Lighthouse/v4.3.0-dfcb336\r\nJul 30 10:58:13.404 INFO Configured for network                  name: custom (/consensus)\r\nJul 30 10:58:13.404 INFO Data directory initialised              datadir: /consensus\r\nJul 30 10:58:13.405 WARN Proposer-only mode enabled              info: Do not connect a validator client to this node unless via the --proposer-nodes flag\r\nJul 30 10:58:13.405 INFO Deposit contract                        address: 0xaeaef9b19b2161552aa335f01ab3cb794b2ce604, deploy_block: 0\r\nJul 30 10:58:13.414 DEBG Loaded execution endpoint               jwt_path: \"/misc/jwt.hex\", endpoint: http://erigon:8551/, service: exec\r\nJul 30 10:58:13.424 INFO Starting checkpoint sync                remote_url: http://myPrismBeaconIp:andItsPort/, service: beacon\r\nJul 30 10:58:13.433 DEBG Downloading finalized block             service: beacon\r\nJul 30 10:58:13.436 DEBG Downloaded finalized block              service: beacon\r\nJul 30 10:58:13.436 DEBG Searching for aligned checkpoint block  block_slot: 320, service: beacon\r\nJul 30 10:58:13.439 DEBG Downloaded aligned finalized block      block_slot: 320, block_root: 0xc2115060c03ebf7d84e36a3e33218800b1334c38096bd68fcd4615efbdd94ad3, service: beacon\r\nJul 30 10:58:13.439 DEBG Downloading finalized state             state_root: 0x7e7254b3ac9369b33f9155534945a48df55371b27327d060804600d6d89d7217, service: beacon\r\nJul 30 10:58:14.342 DEBG Downloaded finalized state              service: beacon\r\nJul 30 10:58:14.343 INFO Loaded checkpoint block and state       state_root: 0x7e7254b3ac9369b33f9155534945a48df55371b27327d060804600d6d89d7217, block_root: 0xc2115060c03ebf7d84e36a3e33218800b1334c38096bd68fcd4615efbdd94ad3, slot: 320, service: beacon\r\nJul 30 10:58:14.390 CRIT Failed to start beacon node             reason: Snapshot state root does not match block, expected: 0x7e7254b3ac9369b33f9155534945a48df55371b27327d060804600d6d89d7217, got: 0x2f6989e1102cb29cbe3594b9cb9cd65037bebf272aecdbfb1435259ab6944769\r\nJul 30 10:58:14.390 TRCE Async task completed                    task: beacon_node\r\nJul 30 10:58:14.390 INFO Internal shutdown received              reason: Failed to start beacon node\r\nJul 30 10:58:14.390 INFO Shutting down..                         reason: Failure(\"Failed to start beacon node\")\r\n```\r\n\r\nHere's the command that i execute on my docker-compose file\r\n\r\n```\r\n- lighthouse\r\n      - bn\r\n      - --testnet-dir=/consensus\r\n      - --datadir=/consensus\r\n      - --http-address=0.0.0.0\r\n      - --http-allow-origin=*\r\n      - --http-port=5052\r\n      - --port=${CL_P2P_PORT:-9000}\r\n      - --metrics\r\n      - --metrics-address=0.0.0.0\r\n      - --metrics-port=8008\r\n      - --execution-endpoint=http://erigon:${EE_PORT}\r\n      - --execution-jwt=/misc/jwt.hex\r\n      - --suggested-fee-recipient=0x1DfBcxxxxx\r\n      - --checkpoint-sync-url=http://139.99.70.206:3501\r\n      - --libp2p-addresses=${CL_PEER}\r\n      - --boot-nodes=${CL_ENR}\r\n      - --disable-deposit-contract-sync\r\n      - --enable-private-discovery\r\n      - --subscribe-all-subnets\r\n      - --debug-level=trace\r\n      - --target-peers=0\r\n      - --proposer-only\r\n      - --eth1\r\n\r\n```\r\nAm i doing it wrong ? like is there something i missed ? \r\nOr its just not supported for syncing a prysm+geth devnet using lighthouse+erigon setup ?\r\n\r\nAny helps or suggestion would be really appreciated :D \r\nThanks guys\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4552/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4552/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
