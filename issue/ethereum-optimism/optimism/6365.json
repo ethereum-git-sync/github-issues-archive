@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-07-20T05:47:24Z",
-  "updated_at": "2023-07-28T16:18:40Z",
-  "closed_at": null,
+  "updated_at": "2023-07-31T01:13:17Z",
+  "closed_at": "2023-07-31T01:13:17Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\nI want to trigger a contract call while bridging the ERC20 token, but `extraData` of `finalizeBridgeERC20()` function is used only as the purpose of event argument(https://github.com/ethereum-optimism/optimism/blob/427f15ba8c56286d647eaa28197144b192623657/packages/contracts-bedrock/contracts/universal/StandardBridge.sol#L274C24-L274C34\r\n) and not used for calldata. So it's inconvenient for implementing various dapp.\r\n\r\nI wonder if it's because of security reasons or gas cost issues, but `CrossDomainMessenger` has that feature, so I don't think it's that problem either, so why didn't you implement this feature? Is there another problem?\r\n\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "egonspace",
+    "id": 24305489,
+    "node_id": "MDQ6VXNlcjI0MzA1NDg5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/24305489?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/egonspace",
+    "html_url": "https://github.com/egonspace",
+    "followers_url": "https://api.github.com/users/egonspace/followers",
+    "following_url": "https://api.github.com/users/egonspace/following{/other_user}",
+    "gists_url": "https://api.github.com/users/egonspace/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/egonspace/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/egonspace/subscriptions",
+    "organizations_url": "https://api.github.com/users/egonspace/orgs",
+    "repos_url": "https://api.github.com/users/egonspace/repos",
+    "events_url": "https://api.github.com/users/egonspace/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/egonspace/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6365/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6365/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -228,6 +247,50 @@
     "body": "I definitely understand that this would be much cheaper to batch the 2 operations into a single operation. It is possible to do so with a single operation but I am not sure of the security implications of allowing arbitrary extra data to be passed through the bridge calls. This could be considered for a feature in the future, but we would be 100% sure that there are not security issues with this. Until this time, developers will need to send 2 deposits, one for the bridge and one for the call. Note that these will execute atomically on L2 together",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1655958912/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1657350219",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/6365#issuecomment-1657350219",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6365",
+    "id": 1657350219,
+    "node_id": "IC_kwDODjvEJM5iyShL",
+    "user": {
+      "login": "egonspace",
+      "id": 24305489,
+      "node_id": "MDQ6VXNlcjI0MzA1NDg5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24305489?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/egonspace",
+      "html_url": "https://github.com/egonspace",
+      "followers_url": "https://api.github.com/users/egonspace/followers",
+      "following_url": "https://api.github.com/users/egonspace/following{/other_user}",
+      "gists_url": "https://api.github.com/users/egonspace/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/egonspace/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/egonspace/subscriptions",
+      "organizations_url": "https://api.github.com/users/egonspace/orgs",
+      "repos_url": "https://api.github.com/users/egonspace/repos",
+      "events_url": "https://api.github.com/users/egonspace/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/egonspace/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-31T01:13:17Z",
+    "updated_at": "2023-07-31T01:13:17Z",
+    "author_association": "NONE",
+    "body": "The bigger issue is not the transaction cost, but the fact that there's no discernible correlation between the two deposits in the called function.\r\nI sympathize with the security issue anyway. But I think we can solve it by putting a proxy contract in the middle, but I can't sure it either. I hope you continue to think about this problem. Thank you!",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1657350219/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
