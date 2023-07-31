@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5826",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5826/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5826/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5826/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5826",
+  "id": 1829908875,
+  "node_id": "I_kwDOCD5_Gc5tEjGL",
+  "number": 5826,
+  "title": "Better error handling for no builder bids on /eth/v1/builder/header",
+  "user": {
+    "login": "philknows",
+    "id": 58080811,
+    "node_id": "MDQ6VXNlcjU4MDgwODEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58080811?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/philknows",
+    "html_url": "https://github.com/philknows",
+    "followers_url": "https://api.github.com/users/philknows/followers",
+    "following_url": "https://api.github.com/users/philknows/following{/other_user}",
+    "gists_url": "https://api.github.com/users/philknows/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/philknows/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/philknows/subscriptions",
+    "organizations_url": "https://api.github.com/users/philknows/orgs",
+    "repos_url": "https://api.github.com/users/philknows/repos",
+    "events_url": "https://api.github.com/users/philknows/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/philknows/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-31T19:49:33Z",
+  "updated_at": "2023-07-31T19:49:33Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nCurrently, we always assume that we receive a JSON body from the /eth/v1/builder/header API. When using `--builder` and mev-boost returns `no bids received`, we get a 204 (no content) response and it triggers `Unexpected end of JSON input` on Lodestar. \r\n\r\n\n\n### Expected behavior\n\nWe should have a more graceful response to no bids. It should not show up as an `error:` and should likely be downgraded to either `warn:` or lower in accordance with new error logging policy #5359 implemented by #5299. The stacktrace is probably better moved to `debug` or `verbose` as it should feel less intrusive to not receive bids or not meet the `min-bid` threshold. \n\n### Steps to reproduce\n\n_No response_\n\n### Additional context\n\nExample (beacon-node):\r\n```ts\r\nJul-23 12:07:02.474[rest]            error: Req req-46b8 produceBlindedBlock error  invalid json response body at http://127.0.0.1:18550/eth/v1/builder/header/XXXXXXX/0x12345abcdef/0x12345abcdef reason: Unexpected end of JSON input\r\n2023-07-23 12:07:02    \r\nFetchError: invalid json response body at http://127.0.0.1:18550/eth/v1/builder/header/XXXXXXX/0x12345abcdef/0x12345abcdef reason: Unexpected end of JSON input\r\n2023-07-23 12:07:02    \r\n    at /usr/app/node_modules/node-fetch/lib/index.js:272:32\r\n2023-07-23 12:07:02    \r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n2023-07-23 12:07:02    \r\n    at HttpClient.requestWithBody (file:///usr/app/packages/api/src/utils/client/httpClient.ts:298:20)\r\n2023-07-23 12:07:02    \r\n    at Object.request [as getHeader] (file:///usr/app/packages/api/src/utils/client/client.ts:69:23)\r\n2023-07-23 12:07:02    \r\n    at ExecutionBuilderHttp.getHeader (file:///usr/app/packages/beacon-node/src/execution/builder/http.ts:99:17)\r\n2023-07-23 12:07:02    \r\n    at BeaconChain.produceBlockBody (file:///usr/app/packages/beacon-node/src/chain/produceBlock/produceBlockBody.ts:167:26)\r\n2023-07-23 12:07:02    \r\n    at BeaconChain.produceBlockWrapper (file:///usr/app/packages/beacon-node/src/chain/chain.ts:495:39)\r\n2023-07-23 12:07:02    \r\n    at Object.produceBlindedBlock (file:///usr/app/packages/beacon-node/src/api/impl/validator/index.ts:220:37)\r\n2023-07-23 12:07:02    \r\n    at Object.handler (file:///usr/app/packages/api/src/utils/server/genericJsonServer.ts:45:23)\r\n```\r\n\r\nExample mev-boost:\r\n```ts\r\n2023-07-23 12:07:01    \r\ntime=\"2023-07-23T12:07:01.904Z\" level=info msg=\"getHeader request start - 14904 milliseconds into slot XXXXXXX\" genesisTime=1606824023 method=getHeader msIntoSlot=14904 parentHash=0x123456 pubkey=0xabcdef slot=XXXXXXX slotTimeSec=12 slotUID=123-456-789-abcdef ua=Lodestar/v1.9.2/72beda1 version=v1.6\r\n2023-07-23 12:07:02    \r\ntime=\"2023-07-23T12:07:02.13Z\" level=info msg=\"no bid received\" method=getHeader parentHash= pubkey=0xabcdef slot=XXXXXXX slotUID=123-456-789-abcdef ua=Lodestar/v1.9.2/72beda1 version=v1.6\r\n2023-07-23 12:07:02    \r\ntime=\"2023-07-23T12:07:02.13Z\" level=info msg=\"http: GET /eth/v1/builder/header/XXXXXXX/0x12345abcdef 204\" duration=0.225498 method=GET path=/eth/v1/builder/header/XXXXXXX//0x12345abcdef/0x12345abcdef status=204 version=v1.6\r\n```\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nv1.9.2",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5826/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5826/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
