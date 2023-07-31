@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-07-29T02:54:41Z",
-  "updated_at": "2023-07-29T02:54:41Z",
-  "closed_at": null,
+  "updated_at": "2023-07-31T13:22:13Z",
+  "closed_at": "2023-07-31T13:22:12Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (0e33b3e 2023-07-26T00:20:00.310757040Z)\n\n### What command(s) is the bug in?\n\nforge test $SEPOLIA_RPC_URL\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\ncommand: forge test $SEPOLIA_RPC_URL\r\nerror:\r\n```\r\nThe application panicked (crashed).\r\nMessage:  Could not instantiate forked environment: \r\nCould not instantiate forked environment with fork url: https://eth-sepolia.g.alchemy.com/v2\r\n\r\nContext:\r\n- Error #0: Failed to get latest block number\r\n- Error #1: error sending request for url (https://eth-sepolia.g.alchemy.com/v2): error trying to connect: tcp connect error: Connection refused (os error 111)\r\n- Error #2: error trying to connect: tcp connect error: Connection refused (os error 111)\r\n- Error #3: tcp connect error: Connection refused (os error 111)\r\n- Error #4: Connection refused (os error 111)\r\nLocation: /home/runner/work/foundry/foundry/evm/src/executor/opts.rs:64\r\n\r\nThis is a bug. Consider reporting it at https://github.com/foundry-rs/foundry\r\n\r\nBacktrace omitted. Run with RUST_BACKTRACE=1 environment variable to display it.\r\nRun with RUST_BACKTRACE=full to include source snippets.\r\nAborted\r\n```\r\n\r\nI used WSL2. \r\nIn .bashrc，I set the proxy in the following way:\r\n```\r\nexport http_proxy=\"http://windows_ip:7890\"\r\nexport https_proxy=\"http://windows_ip:7890\"\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5503/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5503/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1658364046",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5503#issuecomment-1658364046",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5503",
+    "id": 1658364046,
+    "node_id": "IC_kwDOGBlvNc5i2KCO",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-07-31T13:22:12Z",
+    "updated_at": "2023-07-31T13:22:12Z",
+    "author_association": "MEMBER",
+    "body": "Right, there are two things here:\r\n- forge being unable to connect is because you're probably not setting the `env` var correctly—try defining it on your `foundry.toml` or using `--fork-url`.\r\n- We could probably make `evm_env` fail a bit more gracefully\r\n\r\nClosing, this is an user issue (but we'll make the second change)",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1658364046/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
