@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5506",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5506/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5506/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5506/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5506",
+  "id": 1828095382,
+  "node_id": "I_kwDOGBlvNc5s9oWW",
+  "number": 5506,
+  "title": "expectEmit fails",
+  "user": {
+    "login": "Craigson",
+    "id": 4640172,
+    "node_id": "MDQ6VXNlcjQ2NDAxNzI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4640172?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Craigson",
+    "html_url": "https://github.com/Craigson",
+    "followers_url": "https://api.github.com/users/Craigson/followers",
+    "following_url": "https://api.github.com/users/Craigson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Craigson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Craigson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Craigson/subscriptions",
+    "organizations_url": "https://api.github.com/users/Craigson/orgs",
+    "repos_url": "https://api.github.com/users/Craigson/repos",
+    "events_url": "https://api.github.com/users/Craigson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Craigson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-30T21:38:05Z",
+  "updated_at": "2023-07-30T21:38:05Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (d93312b 2023-07-30T00:26:55.660686000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nAfter running `foundryup` for the first time in a while, all of my tests containing `vm.expectEmit` are suddenly failing.  I cannot create a new test to reproduce the issue, as the behavior in the new test is as expected.  I have read through #5117 and other similar issues, but none seem to apply to my use case.  Here is my test:\r\n\r\n```solidity\r\n    // should fail performing an admin action while still pending\r\n    function testCallingAdminFunctionAsPendingAdminFails(uint256 eoaUint) public {\r\n        address eoa = _generateRandomEoa(eoaUint);\r\n\r\n        _deployDummyIntegration();\r\n        address newAdmin = makeAddr(\"newAdmin\");\r\n        vm.startPrank(integrationDeployer);\r\n        vm.expectEmit(true, true, false, true);\r\n        emit SecurityAdminTransferStarted(integrationDeployer,newAdmin);\r\n        dummyIntegration.transferSecurityAdministration(newAdmin);\r\n        vm.stopPrank();\r\n\r\n        assertEq(newAdmin, dummyIntegration.pendingSecurityAdmin(), \"SA02: not pending admin\");\r\n\r\n        vm.startPrank(newAdmin);\r\n        vm.expectRevert(bytes(\"SA01: security admin only\"));\r\n        dummyIntegration.transferSecurityAdministration(eoa);\r\n        vm.stopPrank();\r\n    }\r\n```\r\n\r\nI have confirmed that both events, defined in my contract, and my test file, are identical.\r\n\r\n```solidity\r\n    event SecurityAdminTransferStarted(address indexed oldAdmin, address indexed pendingAdmin);\r\n```\r\n\r\nI tried moving the event definition into the test file, and still no dice.  From the console output, we can see that the event is fired inside the first call being made, and the args match exactly.\r\n\r\n```\r\n    ├─ [0] VM::addr(<pk>) [staticcall]\r\n    │   └─ ← newAdmin: [0x67ED0Ac45b537A79406E01656d90659325455585]\r\n    ├─ [0] VM::label(newAdmin: [0x67ED0Ac45b537A79406E01656d90659325455585], newAdmin)\r\n    │   └─ ← ()\r\n    ├─ [0] VM::startPrank(0xA4B9D41Efb6b3d2C684f3909bdA5356f4F58a899)\r\n    │   └─ ← ()\r\n    ├─ [0] VM::expectEmit(true, true, false, true)\r\n    │   └─ ← ()\r\n    ├─ emit SecurityAdminTransferStarted(oldAdmin: 0xA4B9D41Efb6b3d2C684f3909bdA5356f4F58a899, pendingAdmin: newAdmin: [0x67ED0Ac45b537A79406E01656d90659325455585])\r\n    ├─ [22386] DummyIntegration::transferSecurityAdministration(newAdmin: [0x67ED0Ac45b537A79406E01656d90659325455585])\r\n    │   ├─ emit SecurityAdminTransferStarted(oldAdmin: 0xA4B9D41Efb6b3d2C684f3909bdA5356f4F58a899, pendingAdmin: newAdmin: [0x67ED0Ac45b537A79406E01656d90659325455585])\r\n    │   └─ ← ()\r\n    └─ ← \"Log != expected log\"\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 109.19ms\r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/foundry/MyTest.t.sol:MyTestTest\r\n[FAIL. Reason: Expected an emit, but the call reverted instead. Ensure you're testing the happy path when using the `expectEmit` cheatcode. Counterexample: calldata=0x5710534d0000000000000000000000000000000000000000000000000000000000000000, args=[0]] testCallingAdminFunctionAsPendingAdminFails(uint256) (runs: 0, μ: 0, ~: 0)\r\n```\r\n\r\nThe reason seems to indicate that the issue has to do with the call reverting, but that is expected behaviour with the `expectRevert` included. As a sanity check, the test still fails when the `expectRevert` portion of the test is commented out.\r\n\r\nAttempting to reproduce the error was unsuccessful, as the behavior is as expected and the test passes:\r\n\r\n```solidity\r\npragma solidity 0.8.19;\r\n\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract EmitContract {\r\n     event TestEvent(address indexed sender, uint256 indexed value);\r\n\r\n     function shouldEmit(uint256 val) public {\r\n       emit TestEvent(msg.sender, val);\r\n     }\r\n}\r\n\r\ninterface IEvents {\r\n     event TestEvent(address indexed sender, uint256 indexed value);\r\n}\r\n\r\ncontract EmitTest is Test, IEvents {\r\n\r\n\r\n    EmitContract emitContract;\r\n\r\n    function setUp() public {\r\n      emitContract = new EmitContract();\r\n    }\r\n    function testEvent(uint256 val) public {\r\n\r\n       address eoa = makeAddr(\"eoa\");\r\n       vm.startPrank(eoa);\r\n       vm.expectEmit(true, true, false, true);\r\n       emit TestEvent(eoa, val);\r\n       emitContract.shouldEmit(val);\r\n       vm.stopPrank();\r\n    }\r\n}\r\n```\r\n\r\nI have tried expecting the emission with all values set to false, and without any args, and the result is the same.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5506/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5506/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
