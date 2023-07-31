@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14458",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14458/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14458/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14458/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14458",
+  "id": 1828042867,
+  "node_id": "I_kwDOAm_5kc5s9bhz",
+  "number": 14458,
+  "title": "How Gas units are calculated in Smart Contracts",
+  "user": {
+    "login": "unipsilo",
+    "id": 101010744,
+    "node_id": "U_kgDOBgVNOA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/101010744?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/unipsilo",
+    "html_url": "https://github.com/unipsilo",
+    "followers_url": "https://api.github.com/users/unipsilo/followers",
+    "following_url": "https://api.github.com/users/unipsilo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/unipsilo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/unipsilo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/unipsilo/subscriptions",
+    "organizations_url": "https://api.github.com/users/unipsilo/orgs",
+    "repos_url": "https://api.github.com/users/unipsilo/repos",
+    "events_url": "https://api.github.com/users/unipsilo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/unipsilo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 275027668,
+      "node_id": "MDU6TGFiZWwyNzUwMjc2Njg=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/documentation%20:book:",
+      "name": "documentation :book:",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-30T19:26:30Z",
+  "updated_at": "2023-07-30T19:26:30Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Consider the following contract written with solidity in remix.ethereum.org\r\n\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity >=0.8.2 <0.9.0;\r\n\r\ncontract Sum {\r\n\r\n    uint public sum;\r\n    uint private first;\r\n    uint private second;\r\n\r\nfunction setNumbers(uint a, uint b)public {\r\n\r\n        first=a;\r\n        second=b;\r\n    }\r\n\r\n    function add() public{\r\n\r\n        sum= first+second;\r\n    }\r\n\r\n}\r\n\r\nAfter the deploy, i have this from Metamask:\r\n![metamask](https://github.com/ethereum/solidity/assets/101010744/1bb10f19-c02a-44e1-a0cd-1cd2b1b3c90d)\r\n\r\n\r\n\r\nAnd the bytecode from remix  (Total 536 bytes)\r\n\r\n0x608060405234801561001057600080fd5b506101f8806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c806307d01c3a146100465780634f2be91f14610064578063a378c8981461006e575b600080fd5b61004e61008a565b60405161005b91906100d3565b60405180910390f35b61006c610090565b005b6100886004803603810190610083919061011f565b6100a8565b005b60005481565b6002546001546100a0919061018e565b600081905550565b81600181905550806002819055505050565b6000819050919050565b6100cd816100ba565b82525050565b60006020820190506100e860008301846100c4565b92915050565b600080fd5b6100fc816100ba565b811461010757600080fd5b50565b600081359050610119816100f3565b92915050565b60008060408385031215610136576101356100ee565b5b60006101448582860161010a565b92505060206101558582860161010a565b9150509250929050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000610199826100ba565b91506101a4836100ba565b92508282019050808211156101bc576101bb61015f565b5b9291505056fea264697066735822122066bf42d24b9ddb1454ff5a1a748bee45d9f6ca583f4ee7e2bda77c1715968e5064736f6c63430008120033\r\n\r\n\r\n\r\nNow, what I would like is to find the gas units used, not directly from remix or metamask but to know exactly for what it was used. \r\nI found out from different sources that:\r\n\r\nEvery transaction is 21000 gas.\r\nThe creation is 32000 gas.\r\nFor each non zero byte the gas units used are: N*16 (N is the number of non zero bytes)\r\nFor each zero byte : n*4 (n = number of zero bytes)\r\nCost of runtime bytecode which is: runtimeBytecode*200\r\nOpcode cost for initialization code which I found thanks to remix from the debug section.\r\n\r\n\r\nThe opcodes:\r\n![opcodes](https://github.com/ethereum/solidity/assets/101010744/56caefff-1f85-44dc-8dd5-cebc68d97949)\r\n\r\nWith a total of 147. (It also gives the number of deployed bytecode, 0x01f8 is 504 in decimal)\r\n\r\n\r\nSo given these costs and the bytecode the cost would be:\r\n  21.000\t\t          Gtransaction\r\n  32.000\t\t          Gcreate\r\n    7.328\t\t          Non zero bytes (458 * 16)\r\n       312\t\t         Zero bytes (78 * 4)\r\n100.800\t\t         Deployed Bytecode Cost (504 * 200)\r\n       147\t\t         Opcode cost for initialization code\r\n\r\n161.587\t\t         Total\r\n161.621\t\t         Total expected (from metamask)\r\n(-34)\r\n\r\nI can't seem to find the mistake, or maybe I’m missing something? \r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14458/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14458/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
