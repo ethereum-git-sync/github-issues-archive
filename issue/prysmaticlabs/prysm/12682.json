@@ -8,7 +8,7 @@
   "id": 1830289878,
   "node_id": "I_kwDOBvuov85tGAHW",
   "number": 12682,
-  "title": "Remove dependency on forked gRPC gateway",
+  "title": "Deprecate and remove grpc-gateway (JSON responses to gRPC services)",
   "user": {
     "login": "prestonvanloon",
     "id": 7246818,
@@ -49,11 +49,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-08-01T01:11:07Z",
-  "updated_at": "2023-08-01T01:20:03Z",
+  "updated_at": "2023-08-01T13:21:15Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "# 🚀 Feature Request\r\n\r\n### Description\r\n\r\nFor several years, Prysm has used a fork of gRPC gateway with a replace statement in go.mod. The original context can be found in https://github.com/prysmaticlabs/prysm/pull/8697. The gist of how that context relates to this issue is that the fork of grpc-gateway has some crude limited support for certain cast types in Prysm as well as some proto definitions that probably could be included here within the prysm repo. Additionally, there seems to be some changes with regards to event streaming.\r\n\r\nSee the diff between the upstream grpc-gateway and Prysm's fork. https://github.com/grpc-ecosystem/grpc-gateway/compare/main...prysmaticlabs:grpc-gateway:master\r\n\r\n### Describe the solution you'd like\r\n\r\nWe need to evaluate if we need this fork dependency now that the JSON API is extremely different than using grpc-gateway as we did many years ago. It appears as if we can remove this dependency on the fork of grpc-gateway and move any relevant protos into Prysm's proto directory as needed. \r\n\r\n- [ ] Remove dependency on Prysm's forked grpc-gateway\r\n- [ ] Move still-relevant protos into prysm\r\n- [ ] Ensure no breaking changes with regards to the events API streaming service (grpc and json via grpc gateway) or plan deprecation of the events stream via grpc-gateway. \r\n\r\n### Describe alternatives you've considered\r\n\r\nNone\r\n",
+  "body": "# 🚀 Feature Request\r\n\r\n### Description\r\n\r\nFor several years, Prysm has used a fork of gRPC gateway with a replace statement in go.mod. The original context can be found in https://github.com/prysmaticlabs/prysm/pull/8697. The gist of how that context relates to this issue is that the fork of grpc-gateway has some crude limited support for certain cast types in Prysm as well as some proto definitions that probably could be included here within the prysm repo. Additionally, there seems to be some changes with regards to event streaming.\r\n\r\nSee the diff between the upstream grpc-gateway and Prysm's fork. https://github.com/grpc-ecosystem/grpc-gateway/compare/main...prysmaticlabs:grpc-gateway:master\r\n\r\n### Describe the solution you'd like\r\n\r\nThe Beacon APIs have become the standard interface for accessing JSON data from beacon nodes. As such, Prysm no longer needs to offer grpc-gateway JSON translations of gRPC request / responses after the completion of standard API support in Prysm.\r\n\r\n- [ ] Announce deprecation plan at least 1 release prior to removal\r\n- [ ] Remove usages of grpc-gateway entirely\r\n- [ ] Remove dependency on Prysm's forked grpc-gateway\r\n- [ ] Move still-relevant protos into prysm ([proto/gateway/event_source.proto](https://github.com/prysmaticlabs/grpc-gateway/blob/master/proto/gateway/event_source.proto))\r\n- [ ] Ensure no breaking changes with regards to the events API streaming service \r\n\r\n### Describe alternatives you've considered\r\n\r\nUsers can access JSON data via the standard beacon APIs. See: https://github.com/prysmaticlabs/prysm/issues/12635\r\n",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12682/reactions",
