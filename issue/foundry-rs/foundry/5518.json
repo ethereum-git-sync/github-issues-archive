@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5518",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5518/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5518/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5518/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5518",
+  "id": 1831046884,
+  "node_id": "I_kwDOGBlvNc5tI47k",
+  "number": 5518,
+  "title": "Next block after `evm_revert` does not have increased timestamp",
+  "user": {
+    "login": "michprev",
+    "id": 7281754,
+    "node_id": "MDQ6VXNlcjcyODE3NTQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7281754?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michprev",
+    "html_url": "https://github.com/michprev",
+    "followers_url": "https://api.github.com/users/michprev/followers",
+    "following_url": "https://api.github.com/users/michprev/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michprev/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michprev/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michprev/subscriptions",
+    "organizations_url": "https://api.github.com/users/michprev/orgs",
+    "repos_url": "https://api.github.com/users/michprev/repos",
+    "events_url": "https://api.github.com/users/michprev/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michprev/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-01T11:18:32Z",
+  "updated_at": "2023-08-01T11:18:32Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nAnvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nanvil 0.1.0 (25d3ce7 2023-08-01T00:20:13.496244391Z)\n\n### What command(s) is the bug in?\n\nanvil --prune-history 100 --steps-tracing --silent --port 36655\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nIt seems that the next block mined after an `evm_revert` JSON-RPC request does not have the timestamp increased. I believe this can be considered a bug since timestamps of blocks mined without `evm_snapshot` and `evm_revert` are always increased by 1.\r\n\r\nI think this may be the relevant part of the code:\r\nhttps://github.com/foundry-rs/foundry/blob/9a4bb7f54563d73b23b597098dcaf1e590905e85/anvil/src/eth/backend/mem/mod.rs#L625-L629\r\n\r\nThe current behavior is (described in [Woke](https://ackeeblockchain.com/woke/docs/latest/testing-framework/overview/) testing framework):\r\n```python\r\nfrom woke.testing import *\r\n\r\n@default_chain.connect()\r\ndef test_reverting():\r\n    t1 = default_chain.blocks[\"latest\"].timestamp\r\n    with default_chain.snapshot_and_revert():\r\n        default_chain.mine()\r\n\r\n    t2 = default_chain.blocks[\"latest\"].timestamp\r\n    assert t1 == t2\r\n\r\n    default_chain.mine()\r\n    t3 = default_chain.blocks[\"latest\"].timestamp\r\n    assert t3 == t2\r\n```\r\nwhile the expected behavior is\r\n```python\r\n    assert t3 == t2 + 1\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5518/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5518/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
