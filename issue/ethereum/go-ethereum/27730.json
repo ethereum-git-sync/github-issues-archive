@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 8,
   "created_at": "2023-07-15T15:09:52Z",
-  "updated_at": "2023-07-26T10:54:15Z",
-  "closed_at": null,
+  "updated_at": "2023-08-01T09:32:34Z",
+  "closed_at": "2023-08-01T09:32:34Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "this issue\r\n```\r\nError: rlp: input string too short for common.Address, decoding into (types.Transactions)[0](types.BlobTx).To\r\n (StateTests/stEIP4844-blobtransactions/createBlobhashTx, fork: Cancun, TrInfo: d: 0, g: 0, v: 0, TrData: ` :raw 0x00..`)\r\n```\r\n\r\nis that I managed to crash t8n. instead it should detect malicious transaction and put rejectedTransaction information.\r\n\r\ninputs:\r\nhttps://drive.google.com/file/d/1eVT-FYewYUsg91YrF3ZuCGhtVSRu3jE1/view?usp=drive_link",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27730/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27730/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -368,6 +387,50 @@
     "body": "it is not transaction ish. it is a perfectly valid transaction just that one check is missing. like we already have with intrinsic gas. ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1651546337/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1659937655",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/27730#issuecomment-1659937655",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27730",
+    "id": 1659937655,
+    "node_id": "IC_kwDOAOvK985i8KN3",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-01T09:32:34Z",
+    "updated_at": "2023-08-01T09:32:34Z",
+    "author_association": "MEMBER",
+    "body": "If you omit an rlp-field (the `to`), it will try to parse the `to` out of the next field, which is the `value`. The `value` is a bigint, meaning it has a dynamic-size encoding. So it's a couple of bytes. \r\nSo then, we try to read that as `to`: expecting to read a fixed-size `20`-bytes field. And the field is not large enough. \r\n\r\nThe \"overall\" rlp structure is valid, yes, but the \"local\" rlp structure of the blob tx is not valid. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1659937655/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
