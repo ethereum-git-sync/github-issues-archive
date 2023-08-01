@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5515",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5515/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5515/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5515/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5515",
+  "id": 1830734748,
+  "node_id": "I_kwDOGBlvNc5tHsuc",
+  "number": 5515,
+  "title": "bug(forge): `tx.origin` set using `startPrank` is not reset to `DefaultSender` after calling a `prank`-ed call",
+  "user": {
+    "login": "minaminao",
+    "id": 20497787,
+    "node_id": "MDQ6VXNlcjIwNDk3Nzg3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20497787?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/minaminao",
+    "html_url": "https://github.com/minaminao",
+    "followers_url": "https://api.github.com/users/minaminao/followers",
+    "following_url": "https://api.github.com/users/minaminao/following{/other_user}",
+    "gists_url": "https://api.github.com/users/minaminao/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/minaminao/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/minaminao/subscriptions",
+    "organizations_url": "https://api.github.com/users/minaminao/orgs",
+    "repos_url": "https://api.github.com/users/minaminao/repos",
+    "events_url": "https://api.github.com/users/minaminao/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/minaminao/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-01T08:28:26Z",
+  "updated_at": "2023-08-01T08:45:24Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [ ] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (25d3ce7 2023-08-01T00:20:16.462585000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nmacOS (Intel)\r\n\r\n### Describe the bug\r\n\r\n\r\nWhen the following test\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nimport {Test, Vm} from \"forge-std/Test.sol\";\r\n\r\ncontract ContractTest is Test {\r\n    function test() public {\r\n        address player = makeAddr(\"player\");\r\n        SenderLogger senderLogger = new SenderLogger();\r\n\r\n        senderLogger.log(); // Log(ContractTest, DefaultSender)\r\n        vm.startPrank(player, player);\r\n        senderLogger.log(); // Log(player, player)\r\n        new Contract().f();\r\n        senderLogger.log(); // Log(ContractTest, player) <- ?!\r\n        vm.stopPrank(); // FAIL. Reason: No prank in progress to stop\r\n    }\r\n}\r\n\r\ncontract Contract {\r\n    Vm public constant vm = Vm(address(bytes20(uint160(uint256(keccak256(\"hevm cheat code\"))))));\r\n\r\n    function f() public {\r\n        vm.prank(msg.sender);\r\n    }\r\n}\r\n\r\ncontract SenderLogger {\r\n    event Log(address, address);\r\n\r\n    function log() public {\r\n        emit Log(msg.sender, tx.origin);\r\n    }\r\n}\r\n```\r\n\r\nis run, the following output is printed.\r\n\r\n```sh\r\n$ forge test -vvvvv\r\n[⠢] Compiling...\r\n[⠃] Compiling 1 files with 0.8.21\r\n[⠒] Solc 0.8.21 finished in 1.76s\r\nCompiler run successful!\r\n\r\nRunning 1 test for test/Counter.t.sol:ContractTest\r\n[FAIL. Reason: No prank in progress to stop] test() (gas: 162941)\r\nTraces:\r\n  [162941] ContractTest::test() \r\n    ├─ [0] VM::addr(<pk>) [staticcall]\r\n    │   └─ ← player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C]\r\n    ├─ [0] VM::label(player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C], player) \r\n    │   └─ ← ()\r\n    ├─ [33087] → new SenderLogger@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f\r\n    │   └─ ← 165 bytes of code\r\n    ├─ [1451] SenderLogger::log() \r\n    │   ├─ emit Log(: ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], : DefaultSender: [0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38])\r\n    │   └─ ← ()\r\n    ├─ [0] VM::startPrank(player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C], player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C]) \r\n    │   └─ ← ()\r\n    ├─ [1451] SenderLogger::log() \r\n    │   ├─ emit Log(: player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C], : player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C])\r\n    │   └─ ← ()\r\n    ├─ [54305] → new Contract@0xce110ab5927CC46905460D930CCa0c6fB4666219\r\n    │   └─ ← 271 bytes of code\r\n    ├─ [472] Contract::f() \r\n    │   ├─ [0] VM::prank(player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C]) \r\n    │   │   └─ ← ()\r\n    │   └─ ← ()\r\n    ├─ [1451] SenderLogger::log() \r\n    │   ├─ emit Log(: ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], : player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C])\r\n    │   └─ ← ()\r\n    ├─ [0] VM::stopPrank() \r\n    │   └─ ← \"No prank in progress to stop\"\r\n    └─ ← \"No prank in progress to stop\"\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 1.06ms\r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/Counter.t.sol:ContractTest\r\n[FAIL. Reason: No prank in progress to stop] test() (gas: 162941)\r\n\r\nEncountered a total of 1 failing tests, 0 tests succeeded\r\n```\r\n\r\nAs can see from the wrong log after calling `Contract::f()`\r\n\r\n```\r\nemit Log(: ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], : player: [0x44E97aF4418b7a17AABD8090bEA0A471a366305C])\r\n```\r\n\r\n`tx.origin` is not reset from `player` to `DefaultSender`.\r\n`vm.prank(msg.sender, msg.sender)` gives the same result.\r\n\r\nI think the trigger is to call `vm.prank` in another contract.\r\nIn the above code, the contract is `Contract`.\r\n\r\nFull source: https://github.com/minaminao/foundry-bug-reports/tree/main/2023-08-broken-prank",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5515/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5515/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
