@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/234",
+  "repository_url": "https://api.github.com/repos/ethereum/execution-spec-tests",
+  "labels_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/234/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/234/comments",
+  "events_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/234/events",
+  "html_url": "https://github.com/ethereum/execution-spec-tests/issues/234",
+  "id": 1830039261,
+  "node_id": "I_kwDOIQGLK85tFC7d",
+  "number": 234,
+  "title": "Invalid gas limit on Blockchain tests when a custom genesis gas limit is used",
+  "user": {
+    "login": "marioevz",
+    "id": 11726710,
+    "node_id": "MDQ6VXNlcjExNzI2NzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marioevz",
+    "html_url": "https://github.com/marioevz",
+    "followers_url": "https://api.github.com/users/marioevz/followers",
+    "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+    "organizations_url": "https://api.github.com/users/marioevz/orgs",
+    "repos_url": "https://api.github.com/users/marioevz/repos",
+    "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marioevz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-07-31T21:17:17Z",
+  "updated_at": "2023-07-31T21:17:17Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "When using a custom genesis environment to set a custom gas limit, it results in an invalid gas limit value being set for blocks 1 and after, since no gas limit is specified for these later blocks, the default is used, which would be outside of the allowed increase/decrease of gas limit in a 1 block period.\r\n\r\nE.g. if `gas_limit` is set to 10_000_000_000 in `genesis_environment`, and no `gas_limit` is set for any of the blocks in the test, the environment gas limit for block 1 reverts to the default value (100_000_000_000_000_000) in this line: https://github.com/ethereum/execution-spec-tests/blob/d88a26ddb1a03d881f841b43cdb686a705ba3f0a/src/ethereum_test_tools/spec/blockchain_test.py#L268\r\n\r\nThe default `gas_limit` is much higher than the allowed increase per block, therefore the block is invalid, and the block processing will fail:\r\n```\r\nblock #1 insertion into chain failed: invalid gas limi\r\nt: have 100000000000000000, want 10000000000 +-= 9765624\r\n```\r\n\r\nWe need to either:\r\n1) take into account the parent gas used before setting a default value in the block 1\r\n2) check the gas limit delta from block to block and warn the tester when the value is invalid",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/234/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/execution-spec-tests/issues/234/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
