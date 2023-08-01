@@ -56,6 +56,15 @@
       "color": "17A590",
       "default": false,
       "description": "implementation of the new wallet settings UI"
+    },
+    {
+      "id": 5745583027,
+      "node_id": "LA_kwDOD5KrTM8AAAABVnajsw",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/E:Desktop%20Wallet%20Sync",
+      "name": "E:Desktop Wallet Sync",
+      "color": "6983CC",
+      "default": false,
+      "description": "Wallet account syncing"
     }
   ],
   "state": "open",
@@ -103,13 +112,13 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-01T12:34:41Z",
-  "updated_at": "2023-08-01T12:34:41Z",
+  "updated_at": "2023-08-01T13:49:41Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "https://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?node-id=15235%3A285624&mode=dev\r\n\r\nhttps://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?node-id=15285%3A324706&mode=dev",
+  "body": "https://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?node-id=15235%3A285624&mode=dev\r\n\r\nhttps://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?node-id=15285%3A324706&mode=dev\r\n\r\nCovers migrating profile or seed phrase related keypair to a Keycard from the Settings/Wallet, as well as migrating them from a keycard to the app.\r\n\r\nCorresponding options for those keyapairs:\r\n- `Move keypair to Keycard`\r\n- `Stop using Keycard`",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/11737/reactions",
@@ -128,5 +137,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1660315080",
+    "html_url": "https://github.com/status-im/status-desktop/issues/11737#issuecomment-1660315080",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/11737",
+    "id": 1660315080,
+    "node_id": "IC_kwDOD5KrTM5i9mXI",
+    "user": {
+      "login": "saledjenic",
+      "id": 86303051,
+      "node_id": "MDQ6VXNlcjg2MzAzMDUx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86303051?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/saledjenic",
+      "html_url": "https://github.com/saledjenic",
+      "followers_url": "https://api.github.com/users/saledjenic/followers",
+      "following_url": "https://api.github.com/users/saledjenic/following{/other_user}",
+      "gists_url": "https://api.github.com/users/saledjenic/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/saledjenic/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/saledjenic/subscriptions",
+      "organizations_url": "https://api.github.com/users/saledjenic/orgs",
+      "repos_url": "https://api.github.com/users/saledjenic/repos",
+      "events_url": "https://api.github.com/users/saledjenic/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/saledjenic/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-01T13:25:39Z",
+    "updated_at": "2023-08-01T13:25:39Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "@benjthayer I was about to start developing this feature, then I've found these two flows here:\r\n- https://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=15700-370222&mode=design&t=q7dxa9km9KQvcPW9-0\r\n- https://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=15715-368814&mode=design&t=q7dxa9km9KQvcPW9-0\r\n\r\nwhich are still WIP, but just want to share here how I see those 2 flows:\r\n- migrating **profile keypair** from keycard to desktop:\r\n  1. user needs to provide the correct keycard (one associated with the profile)\r\n  2. user needs to provide the correct seed phrase to confirm the he is the owner of the profile keypair and that we can build necessary master keystore file\r\n  3. user needs to provide a desired password he wants to use to login the app\r\n  4. once we have collected all those details, we can do the migration\r\n  5. the last step of migration will be app restart (cause in that case we re-encrypted db and keystore files)\r\n- migrating **regular keypair** from keycard to desktop (this is much simpler case and we have 2 options here and need to decide which one we want to apply):\r\n  - **option A**:\r\n  1. user doesn't need to provide a keycard in this case at all, the app already knows all necessary details to migrate a regular keypair to the app\r\n  2. we just need to remove associated keycards' details for this keypair and mark it as a non operable keypair and add it to the list of keypairs which require import to use on this device (this list: https://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=15777-376966&mode=design&t=qQrvQwnv1rtcqwow-0)\r\n  - **option B**:\r\n  1. user doesn't need to provide a keycard in this case as well, the app already knows all necessary details to migrate a regular keypair to the app\r\n  2. user needs to provide the correct seed phrase for this keypair\r\n  3. user needs to authenticate this action\r\n  4. once we have collected all those details, we can do the migration",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1660315080/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
