@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5833",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5833/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5833/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5833/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5833",
+  "id": 1831297334,
+  "node_id": "I_kwDOCD5_Gc5tJ2E2",
+  "number": 5833,
+  "title": "Error decoding ENRs from mainnet/bootstrap_nodes.txt",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-01T13:30:48Z",
+  "updated_at": "2023-08-01T13:31:40Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\r\n\r\nLast week a PR was merged (https://github.com/eth-clients/eth2-networks/pull/86) that added IP and location information to bootnodes.\r\n\r\nThis causes the following error on Lodestar when adding the `--network.connectToDiscv5Bootnodes` flag on a mainnet node.\r\n\r\n```\r\n✖ Error: invalid remainder\r\n    at Module.decode (/home/nico/projects/ethereum/lodestar/node_modules/rlp/src/index.ts:75:11)\r\n    at decode (file:///home/nico/projects/ethereum/lodestar/node_modules/@chainsafe/discv5/src/enr/enr.ts:157:31)\r\n    at Function.decodeTxt (file:///home/nico/projects/ethereum/lodestar/node_modules/@chainsafe/discv5/src/enr/enr.ts:350:37)\r\n    at getDiscv5Multiaddrs (file:///home/nico/projects/ethereum/lodestar/packages/beacon-node/src/network/libp2p/index.ts:28:21)\r\n    at createNodeJsLibp2p (file:///home/nico/projects/ethereum/lodestar/packages/beacon-node/src/network/libp2p/index.ts:56:50)\r\n    at Function.init (file:///home/nico/projects/ethereum/lodestar/packages/beacon-node/src/network/core/networkCore.ts:141:20)\r\n    at Function.init (file:///home/nico/projects/ethereum/lodestar/packages/beacon-node/src/network/network.ts:150:9)\r\n    at Function.init (file:///home/nico/projects/ethereum/lodestar/packages/beacon-node/src/node/nodejs.ts:228:21)\r\n    at Object.beaconHandler [as handler] (file:///home/nico/projects/ethereum/lodestar/packages/cli/src/cmds/beacon/handler.ts:75:18)\r\n```\r\n\r\nThe values passed to `ENR.decodeTxt`\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/67b6e79bc6abcdfc864f0ab4800b66c578a718fd/packages/beacon-node/src/network/libp2p/index.ts#L27\r\n\r\nlook like below, which explains why decoding fails\r\n\r\n```\r\n'enr:-LK4QKWrXTpV9T78hNG6s8AM6IO4XH9kFT91uZtFg1GcsJ6dKovDOr1jtAAFPnS2lvNltkOGA9k29BUN7lFh_sjuc9QBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC1MD8qAAAAAP__________gmlkgnY0gmlwhANAdd-Jc2VjcDI1NmsxoQLQa6ai7y9PMN5hpLe5HmiJSlYzMuzP7ZhwRiwHvqNXdoN0Y3CCI4yDdWRwgiOM # 364117223 | aws-eu-central-1-frankfurt'\r\n```\r\n\r\n\r\n\r\n### Expected behavior\r\n\r\nDecoding ENRs from bootnodes file (`shared/mainnet/bootstrap_nodes.txt`) should not throw an error.\r\n\r\n### Steps to reproduce\r\n\r\nStart Lodestar with `--network=mainnet` and `--network.connectToDiscv5Bootnodes` flag.\r\n\r\n### Additional context\r\n\r\nRelated PR that causes the issue\r\n- https://github.com/eth-clients/eth2-networks/pull/86\r\n\r\n### Operating system\r\n\r\nLinux\r\n\r\n### Lodestar version or commit hash\r\n\r\nv1.9.2 and unstable (67b6e79bc6abcdfc864f0ab4800b66c578a718fd)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5833/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5833/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
