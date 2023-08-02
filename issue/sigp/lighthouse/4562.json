@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4562",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4562/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4562/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4562/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4562",
+  "id": 1832198178,
+  "node_id": "I_kwDOCFeAzc5tNSAi",
+  "number": 4562,
+  "title": "Remove the `MaxRequestBlocks` type",
+  "user": {
+    "login": "AgeManning",
+    "id": 7454587,
+    "node_id": "MDQ6VXNlcjc0NTQ1ODc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7454587?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AgeManning",
+    "html_url": "https://github.com/AgeManning",
+    "followers_url": "https://api.github.com/users/AgeManning/followers",
+    "following_url": "https://api.github.com/users/AgeManning/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AgeManning/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AgeManning/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AgeManning/subscriptions",
+    "organizations_url": "https://api.github.com/users/AgeManning/orgs",
+    "repos_url": "https://api.github.com/users/AgeManning/repos",
+    "events_url": "https://api.github.com/users/AgeManning/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AgeManning/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2336800125,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMTI1",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/t%20Networking",
+      "name": "t Networking",
+      "color": "40E0D0",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-02T00:07:26Z",
+  "updated_at": "2023-08-02T00:07:33Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\n#4426 shifts a lot of the network configuration constants into the configuration file. There are some configurations still remaining to shift. One is the `max_request_blocks` configuration. \r\n\r\nThis one is a little bit trickier because we have specified a `MaxRequestBlocks` type as `typenum::U1024` and we use it inside an `ssz_types::VariableList`. \r\n\r\nThe way that I see we can remedy this, is in most cases to use a `VariableList<_,Usize::max>` kind of deal. The second type parameter just sets an upper bound on how many elements we can ssz decode. Although it would be nice to set this to whatever is in the configuration file, this might not be easy to do. There are two easy paths:\r\n1. We can set some upper limit, which the configuration file cannot exceed. i.e `U1024`. The configuration can set lower bounds and it will be fine. \r\n2. We leave the struct unbounded by setting the largest possible value there. \r\n\r\nIn principle, if we are careful, we shouldn't need to rely on this type to limit the number of elements to decode. The inbound RPC should be bounded by the configuration file and we shouldn't be adding excess elements anyway. So although this type bound is nice, it shouldn't be strictly necessary, provided we have the checks when reading or requesting these objects on the RPC. \r\n\r\nThis needs to be checked. \r\n\r\nAlso open to any other solutions people may have. Maybe we can convert an arbitrary uint from configuration to its closest (rounded up) typenum and use that value?",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4562/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4562/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
