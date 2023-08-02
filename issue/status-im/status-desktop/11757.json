@@ -1,0 +1,137 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11757",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11757/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11757/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11757/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/11757",
+  "id": 1832896118,
+  "node_id": "I_kwDOD5KrTM5tP8Z2",
+  "number": 11757,
+  "title": "Wallet: delete the data for removed accounts from db",
+  "user": {
+    "login": "anastasiyaig",
+    "id": 82375995,
+    "node_id": "MDQ6VXNlcjgyMzc1OTk1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/82375995?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/anastasiyaig",
+    "html_url": "https://github.com/anastasiyaig",
+    "followers_url": "https://api.github.com/users/anastasiyaig/followers",
+    "following_url": "https://api.github.com/users/anastasiyaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/anastasiyaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/anastasiyaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/anastasiyaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/anastasiyaig/orgs",
+    "repos_url": "https://api.github.com/users/anastasiyaig/repos",
+    "events_url": "https://api.github.com/users/anastasiyaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/anastasiyaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2331339531,
+      "node_id": "MDU6TGFiZWwyMzMxMzM5NTMx",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/wallet-team",
+      "name": "wallet-team",
+      "color": "b60205",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 3047427135,
+      "node_id": "MDU6TGFiZWwzMDQ3NDI3MTM1",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/feature",
+      "name": "feature",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 5745579465,
+      "node_id": "LA_kwDOD5KrTM8AAAABVnaVyQ",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/E:Desktop%20DB%20Improvement",
+      "name": "E:Desktop DB Improvement",
+      "color": "C6AB09",
+      "default": false,
+      "description": "Add a dedicated db for wallet"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-08-02T10:23:32Z",
+  "updated_at": "2023-08-02T10:24:14Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nNormally i do testing with the same account that i keep collecting funds on.  I had some accounts added as w/o for this seed phrase, but then i deleted them, however these addresses data is still present in my DB (it shows now 12 accounts when UI shows 6)\r\n\r\nWe had a conversation about it with @saledjenic and @stefandunca and there was a decision to implement the data removal for deleted accounts, so if there is any balance/transfers related request which reads/joining the accounts from the keypairs_accounts we should update it with AND removed = 0 just to avoid making a JOIN on accounts which are removed\r\n\r\n```\r\nSELECT SUBSTR(HEX(address), 0, 5), datetime(timestamp, 'unixepoch'), SUBSTR(HEX(tx_from_address), 0, 5), SUBSTR(HEX(tx_to_address), 0, 5), HEX(tx_hash) FROM transfers  GROUP BY address ORDER BY timestamp DESC;\r\n```\r\n\r\nAnd in UI I do have 6 accounts added to wallet now: \r\n\r\n<img width=\"1312\" alt=\"Screenshot 2023-08-02 at 12 10 30\" src=\"https://github.com/status-im/status-desktop/assets/82375995/647733c1-21f2-4375-b3c4-2e6652da1980\">\r\n\r\n\r\n\r\nSUBSTR(HEX(address), 0, 5) | datetime(timestamp, 'unixepoch') | SUBSTR(HEX(tx_from_address), 0, 5) | SUBSTR(HEX(tx_to_address), 0, 5) | HEX(tx_hash)\r\n-- | -- | -- | -- | --\r\n6C4D | 2023-07-31 14:51:00 | F38D | 6C4D | 6AFC25A3E45E613A39009A244515EDC8C591C2BC74241CC54CBD6D560CD0C3AC\r\nD8D6 | 2023-07-25 19:53:24 | 0000 | D8D6 | 250F162866A175AFA3EEBB7BFAFD2B2DD7E64DF6E826A3AFC227CECEBB697AAD\r\n06C1 | 2023-07-24 00:37:35 | 0000 | 06C1 | 85917685E64DE83EFB06C5059E1FBBACE41779609B750169B7CEBB4D5F17627A\r\n1F90 | 2023-07-23 16:53:00 | EED8 | 1F90 | 4D7EC3352C4754C5B2C61227D614003AADC547F78C9B2F64673DCD4FC697CE22\r\n01D7 | 2023-07-20 16:58:48 | 01D7 | 4DFA | 0CFBEFF460B132A6B81F724ABBEFD3518F5AC8874359BE0CD12E3F2307304C29\r\nF38D | 2023-07-19 15:07:36 | F38D | 1D43 | D03FED938974509A3F6A9F017A2D5D02DB87E8E0EDFDFCF67EE6F3538A821C53\r\n92D8 | 2023-07-19 10:43:00 | F38D | 92D8 | DC08C08107B17A44FD95886E845445288740C3D485786AF6C3695D4355DA9C6E\r\n6005 | 2023-07-19 03:42:47 | 6005 | 2FC6 | E32E0CDAD70F067C827E79D454081FB3AE55BC3BFF5A95586C04EEB0805C4529\r\nBAA4 | 2023-06-27 00:14:47 | BF10 | BAA4 | 34F68F8AC2B5CB46E4D6EE1BDC28538F6EFE217F37357C2F3D44020ED31FA7D3\r\n5F77 | 2023-06-21 09:00:59 | F89D | 5F77 | 5BE68A71BD95E068C69267C1D90979DB3D25079C1F4D5A71DAD07DFFF19F5E1E\r\nEA12 | 2023-06-13 19:33:24 | 2730 | EA12 | 732020BC51FF421CA9BCBC1CEE2A2D091D5F8DE8778CB1039FC379C5AD883866\r\nC1F0 | 2023-05-17 08:45:23 | C1F0 | 3240 | 77F06EFF316DAB171346D71AE3CE7C4BE588129FEBD26B97E651F2AF5858C33F\r\n\r\n</body></html>",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11757/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11757/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1661952749",
+    "html_url": "https://github.com/status-im/status-desktop/issues/11757#issuecomment-1661952749",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/11757",
+    "id": 1661952749,
+    "node_id": "IC_kwDOD5KrTM5jD2Lt",
+    "user": {
+      "login": "anastasiyaig",
+      "id": 82375995,
+      "node_id": "MDQ6VXNlcjgyMzc1OTk1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82375995?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/anastasiyaig",
+      "html_url": "https://github.com/anastasiyaig",
+      "followers_url": "https://api.github.com/users/anastasiyaig/followers",
+      "following_url": "https://api.github.com/users/anastasiyaig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/anastasiyaig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/anastasiyaig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/anastasiyaig/subscriptions",
+      "organizations_url": "https://api.github.com/users/anastasiyaig/orgs",
+      "repos_url": "https://api.github.com/users/anastasiyaig/repos",
+      "events_url": "https://api.github.com/users/anastasiyaig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/anastasiyaig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-02T10:24:14Z",
+    "updated_at": "2023-08-02T10:24:14Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "@alaibe i logged that as a feature, please assign the possible doable milestone ",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1661952749/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]
