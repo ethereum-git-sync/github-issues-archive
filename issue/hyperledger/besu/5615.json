@@ -85,7 +85,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "gtebrean",
@@ -132,12 +132,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-06-17T06:26:06Z",
-  "updated_at": "2023-07-26T14:27:43Z",
-  "closed_at": null,
+  "updated_at": "2023-08-02T03:37:27Z",
+  "closed_at": "2023-08-02T03:37:26Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nMissing transaction field `type` when using websockets `eth_subscribe`  with `[\"newPendingTransactions\",{\"includeTransactions\":true}]` .\r\n\r\n### Steps to Reproduce (Bug)\r\nReproducible using [`websocat`](https://github.com/vi/websocat)\r\n```\r\necho '{\"method\":\"eth_subscribe\",\"params\":[\"newPendingTransactions\",{\"includeTransactions\":true}],\"id\":1,\"jsonrpc\":\"2.0\"}' | websocat --no-close ws://<server>:<port> | jq\r\n```\r\n\r\nTransaction output sample on Besu:\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"method\": \"eth_subscription\",\r\n  \"params\": {\r\n    \"subscription\": \"0x21\",\r\n    \"result\": {\r\n      \"from\": \"0x46bc3e6c2f954fc9ab6d6c03d34592524b7b7bbd\",\r\n      \"gas\": \"0x26c1f\",\r\n      \"gasPrice\": \"0x596831eb\",\r\n      \"hash\": \"0xf0ae2220686b34dc10f0e1c91df3ea74efc57fe243124d26cb09ff921b16fee7\",\r\n      \"input\": \"0x\",\r\n      \"nonce\": \"0x2\",\r\n      \"to\": \"0x1643e812ae58766192cf7d2cf9567df2c37e9b7f\",\r\n      \"value\": \"0x38d7ea4c68000\",\r\n      \"v\": \"0x2d\",\r\n      \"r\": \"0xc1dedbc918f1179379da6d684cf788a50d200073b8f78aa44c5fe148c360c784\",\r\n      \"s\": \"0x6011be2beda392a630095039f8d5ba4b9c58fc21e0eb3bdea3a9482ec88828d8\"\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nQuerying the same tx using `eth_getTransactionByHash` **does return the `type` field**:\r\n```\r\ncurl -X POST --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_getTransactionByHash\",\"params\":[\"0xf0ae2220686b34dc10f0e1c91df3ea74efc57fe243124d26cb09ff921b16fee7\"],\"id\":1}' http://<server>:<port>\r\n```\r\n```json\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : 1,\r\n  \"result\" : {\r\n    \"blockHash\" : \"0x3a264992cd8d03271c618a01dc94c0a1a12de0d5526ad9f7d2dcece2135ef6a3\",\r\n    \"blockNumber\" : \"0x8c43e8\",\r\n    \"chainId\" : \"0x5\",\r\n    \"from\" : \"0x46bc3e6c2f954fc9ab6d6c03d34592524b7b7bbd\",\r\n    \"gas\" : \"0x26c1f\",\r\n    \"gasPrice\" : \"0x596831eb\",\r\n    \"hash\" : \"0xf0ae2220686b34dc10f0e1c91df3ea74efc57fe243124d26cb09ff921b16fee7\",\r\n    \"input\" : \"0x\",\r\n    \"nonce\" : \"0x2\",\r\n    \"to\" : \"0x1643e812ae58766192cf7d2cf9567df2c37e9b7f\",\r\n    \"transactionIndex\" : \"0xd\",\r\n    \"type\" : \"0x0\",\r\n    \"value\" : \"0x38d7ea4c68000\",\r\n    \"v\" : \"0x2d\",\r\n    \"r\" : \"0xc1dedbc918f1179379da6d684cf788a50d200073b8f78aa44c5fe148c360c784\",\r\n    \"s\" : \"0x6011be2beda392a630095039f8d5ba4b9c58fc21e0eb3bdea3a9482ec88828d8\"\r\n  }\r\n}\r\n```\r\n\r\n### Versions (Add all that apply)\r\n`besu/v23.4.0/linux-x86_64/openjdk-java-17`\r\n\r\nIt's also worth noting that both geth and nethermind now support a new boolean argument in both `newPendingTransactions` and `newHeads` in order to recieve the full transactions/blocks respectively (replacing `includeTransactions`), for more info see https://github.com/NethermindEth/nethermind/pull/5299",
-  "closed_by": null,
+  "closed_by": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5615/reactions",
     "total_count": 0,
@@ -152,7 +171,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5615/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
