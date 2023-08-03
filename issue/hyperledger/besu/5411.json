@@ -76,17 +76,17 @@
       "description": "GH issues worked on by Chupacabara Team"
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 14,
+  "comments": 16,
   "created_at": "2023-05-01T21:34:40Z",
-  "updated_at": "2023-07-04T23:21:07Z",
-  "closed_at": "2023-07-04T23:06:30Z",
+  "updated_at": "2023-08-03T19:35:00Z",
+  "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "While testing out an unrelated fix with the unstable branch of nimbus, I observed at least three separate backward sync issues on our **sepolia** validating node. Note, I've only seen this issue on Sepolia and it was probably triggered by nimbus not getting peers before falling > 64 blocks behind the beacon chain which switches it into \"far wall\" sync mode, rather than lock-step sync.\r\n\r\nIt's worth noting that when nimbus is restarted, it requests a lot of `eth_getLogs` until it refills its deposit cache, which may be having some impact. When I enabled DEBUG during the backward sync issues, the eth_getLogs calls were ongoing so it seems related.\r\n\r\nThere's a thread discussing it with tersec from nimbus, starting about here https://discord.com/channels/595666850260713488/1093963476948496455/1101258732190572676\r\n\r\n###  Observations\r\n\r\n(1) Node offline during upgrade so I'd expect a small backwards sync (or lock-step sync depending on client). During this expected backwards sync though, we got lots of messages like this...\r\n```\r\n{\"@timestamp\":\"2023-04-27T00:11:12,580\",\"level\":\"INFO\",\"thread\":\"vert.x-worker-thread-0\",\"class\":\"BackwardSyncContext\",\"message\":\"Starting a new backward sync session\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:11:12,903\",\"level\":\"INFO\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"BackwardSyncStep\",\"message\":\"Backward sync phase 1 of 2 completed, downloaded a total of 200 headers. Peers: 14\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:11:14,769\",\"level\":\"INFO\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"BackwardSyncContext\",\"message\":\"Backward sync phase 2 of 2, 1.45% completed, imported 1 blocks of at least 69 (current head 3368103, target head 3368171). Peers: 12\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:11:17,887\",\"level\":\"INFO\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"BackwardSyncContext\",\"message\":\"Backward sync phase 2 of 2 completed, imported a total of 66 blocks. Peers: 14\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:11:17,916\",\"level\":\"INFO\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"BackwardSyncContext\",\"message\":\"Backward sync phase 2 of 2 completed, imported a total of 67 blocks. Peers: 14\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:11:17,953\",\"level\":\"INFO\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"BackwardSyncContext\",\"message\":\"Backward sync phase 2 of 2 completed, imported a total of 68 blocks. Peers: 12\",\"throwable\":\"\"}\r\n```\r\n\r\nNeed to confirm, but I believe teku will give us the latest hash they have once they are in sync and we get a consistent set of % complete logs for phase 2 of 2 with one completed message at the end. Something about the pattern of requests nimbus is sending is causing multiple completed logs.\r\n\r\n(2)  Besu is \"in sync\" as evidenced by being able to propose but then is frequently being switched to backwards sync mode presumably by being given a hash that we don't have a parent for. \r\n\r\n(3) The reorg logs, which suggests it's being thrashed between forks potentially...\r\n\r\n(2) and (3) both could be same root cause, or maybe all 3 are same cause.\r\n\r\nrelevant logs for (2) and (3)... \r\n```\r\n{\"@timestamp\":\"2023-04-27T00:47:24,089\",\"level\":\"INFO\",\"thread\":\"vert.x-worker-thread-0\",\"class\":\"AbstractEngineGetPayload\",\"message\":\"Fetch block proposal by identifier: 0x0068b3ffaea1c01c, hash: 0xd1fb6c37bf03b2ed56bfd07699e9097119f143b600f4a33e4010edee3261a75a, number: 3368337, coinbase: 0x3826539cbd8d68dcf119e80b994557b4278cec9f, transaction count: 1\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:47:24,107\",\"level\":\"INFO\",\"thread\":\"vert.x-worker-thread-0\",\"class\":\"AbstractEngineNewPayload\",\"message\":\"Imported #3,368,337 / 1 tx / 16 ws / base fee 7 wei / 82,582 (0.3%) gas / (0xd1fb6c37bf03b2ed56bfd07699e9097119f143b600f4a33e4010edee3261a75a) in 0.003s. Peers: 13\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:47:24,241\",\"level\":\"WARN\",\"thread\":\"vert.x-worker-thread-0\",\"class\":\"DefaultBlockchain\",\"message\":\"Chain Reorganization +192 new / -0 old\r\n       Old - hash: 0xbca29e861aabf1b975cde3ee6f147a86ad8de3bfab1a39bfb2d98594a72eb63d, height: 3368145\r\n       New - hash: 0xd1fb6c37bf03b2ed56bfd07699e9097119f143b600f4a33e4010edee3261a75a, height: 3368337\r\n  Ancestor - hash: 0xbca29e861aabf1b975cde3ee6f147a86ad8de3bfab1a39bfb2d98594a72eb63d, height: 3368145\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:47:24,670\",\"level\":\"WARN\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"DefaultBlockchain\",\"message\":\"Chain Reorganization +0 new / -192 old\r\n       Old - hash: 0xd1fb6c37bf03b2ed56bfd07699e9097119f143b600f4a33e4010edee3261a75a, height: 3368337\r\n       New - hash: 0xbca29e861aabf1b975cde3ee6f147a86ad8de3bfab1a39bfb2d98594a72eb63d, height: 3368145\r\n  Ancestor - hash: 0xbca29e861aabf1b975cde3ee6f147a86ad8de3bfab1a39bfb2d98594a72eb63d, height: 3368145\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:47:26,555\",\"level\":\"INFO\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"BackwardSyncContext\",\"message\":\"Backward sync phase 2 of 2 completed, imported a total of 116 blocks. Peers: 12\",\"throwable\":\"\"}\r\n{\"@timestamp\":\"2023-04-27T00:47:27,713\",\"level\":\"INFO\",\"thread\":\"nioEventLoopGroup-3-9\",\"class\":\"BackwardSyncContext\",\"message\":\"Backward sync phase 2 of 2, -53.45% completed, imported -62 blocks of at least 116 (current head 3368154, target head 3368332). Peers: 13\",\"throwable\":\"\"}\r\n```\r\n\r\n### Full logs\r\n[besu-23.1.2.log](https://github.com/hyperledger/besu/files/11396589/besu-23.1.2.log)\r\n[nimbus-ea8ef5-2.log](https://github.com/hyperledger/besu/files/11396591/nimbus-ea8ef5-2.log)\r\n\r\n\r\n### Nimbus versions differing behaviour\r\n\r\n* The [unstable](https://github.com/status-im/nimbus-eth2/tree/unstable) branch I tested was what produced these logs\r\n* [v23.4.0](https://github.com/status-im/nimbus-eth2/releases/tag/v23.4.0) seems to show similar behaviour\r\n* [v23.3.2](https://github.com/status-im/nimbus-eth2/releases/tag/v23.3.2) didn't seem to have as many problems\r\n\r\n---\r\n\r\n### Update 06/05/2023\r\n\r\nFurther testing with targeted besu debug logging enabled, using the following log RPC:\r\n```\r\ncurl --retry-delay 50 --retry-connrefused --location \\\r\n     --request POST 'http://127.0.0.1:8545' \\\r\n     --header 'Content-Type: application/json' \\\r\n     --data-raw '{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"method\": \"admin_changeLogLevel\",\r\n    \"params\": [\r\n        \"DEBUG\", [\r\n          \"org.hyperledger.besu.ethereum.eth.sync.backwardsync\",\r\n          \"org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.engine.AbstractEngineNewPayload\",\r\n          \"org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.engine.AbstractEngineForkchoiceUpdated\"\r\n        ]\r\n    ],\r\n    \"id\": 1\r\n}'\r\n```\r\n\r\nBesu was version 23.4.0 for all three nimbus versions.\r\nRan the same test on the three different nimbus versions on non-validating sepolia node, the test was just to restart nimbus:\r\n\r\n* [v23.4.0-ea8ef579](https://github.com/status-im/nimbus-eth2/commit/ea8ef579) (from unstable branch)\r\n* [v23.4.0](https://github.com/status-im/nimbus-eth2/releases/tag/v23.4.0)\r\n* [v23.3.2](https://github.com/status-im/nimbus-eth2/releases/tag/v23.3.2)\r\n\r\nLogs attached here: https://we.tl/t-RZMmscEG1A\r\n\r\nIn all cases, there was less noise than on the validating node which suggests validating (with lots of validators) may exacerbate the problems.",
@@ -124,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5411/timeline",
   "performed_via_github_app": null,
-  "state_reason": "completed"
+  "state_reason": "reopened"
 }
 [
   {
@@ -731,6 +731,94 @@
     "body": "> Something else we could try in besu is not triggering backwards sync when we receive a newPayload (only when receiving FCU)\r\n\r\nI tested this out in #5666 and ~while it did eventually get back into sync, it took 2 hours following a simple restart of besu, so I don't think this is a silver bullet, and arguably worse than before.~\r\n\r\n~Going to close this for now as I think any further progress in the short term may need to come from the nimbus side. We have a medium term goal of improving/rewriting our backward sync procedure, so not syncing on newPayload is certainly something we could explore further as part of that.~\r\n\r\nCorrection, I think my first test was invalid because I have realised it actually wasn't properly in sync before I started the test.\r\nTwo subsequent \"restart besu\" tests have worked a lot more smoothly! I will feed this back to the team to work out next steps.",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1620817201/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1664521568",
+    "html_url": "https://github.com/hyperledger/besu/issues/5411#issuecomment-1664521568",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/5411",
+    "id": 1664521568,
+    "node_id": "IC_kwDODE2jmc5jNpVg",
+    "user": {
+      "login": "siladu",
+      "id": 2893793,
+      "node_id": "MDQ6VXNlcjI4OTM3OTM=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2893793?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/siladu",
+      "html_url": "https://github.com/siladu",
+      "followers_url": "https://api.github.com/users/siladu/followers",
+      "following_url": "https://api.github.com/users/siladu/following{/other_user}",
+      "gists_url": "https://api.github.com/users/siladu/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/siladu/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/siladu/subscriptions",
+      "organizations_url": "https://api.github.com/users/siladu/orgs",
+      "repos_url": "https://api.github.com/users/siladu/repos",
+      "events_url": "https://api.github.com/users/siladu/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/siladu/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-03T19:30:22Z",
+    "updated_at": "2023-08-03T19:30:22Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Reopening this since it is still an issue, at least on Sepolia. \r\n\r\nThis is one solution that will solve it however: https://github.com/hyperledger/besu/issues/5687",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1664521568/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1664529281",
+    "html_url": "https://github.com/hyperledger/besu/issues/5411#issuecomment-1664529281",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/5411",
+    "id": 1664529281,
+    "node_id": "IC_kwDODE2jmc5jNrOB",
+    "user": {
+      "login": "siladu",
+      "id": 2893793,
+      "node_id": "MDQ6VXNlcjI4OTM3OTM=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2893793?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/siladu",
+      "html_url": "https://github.com/siladu",
+      "followers_url": "https://api.github.com/users/siladu/followers",
+      "following_url": "https://api.github.com/users/siladu/following{/other_user}",
+      "gists_url": "https://api.github.com/users/siladu/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/siladu/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/siladu/subscriptions",
+      "organizations_url": "https://api.github.com/users/siladu/orgs",
+      "repos_url": "https://api.github.com/users/siladu/repos",
+      "events_url": "https://api.github.com/users/siladu/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/siladu/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-03T19:34:01Z",
+    "updated_at": "2023-08-03T19:35:00Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "There's also been some more recent testing https://github.com/hyperledger/besu/pull/5699#issuecomment-1658497632\r\nwhich has shown some changes in how nimbus send newPayloads, but the outcome is the same, for a simple restart at least.\r\n\r\n> When restarting Besu with Nimbus as a CL, Besu receives new payload calls on chainhead+2 blocks. This triggers a backward sync for each new payload because the parent of the block doesn't exist in the blockchain. Eventually, Besu is able to recover from this loop of backward syncs with one block (see logs below).",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1664529281/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
