@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4507",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4507/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4507/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4507/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4507",
+  "id": 1835510883,
+  "node_id": "I_kwDOA9tCBs5tZ6xj",
+  "number": 4507,
+  "title": "Inconsistent write-event pattern usage in Governor extensions",
+  "user": {
+    "login": "vladyan18",
+    "id": 13525908,
+    "node_id": "MDQ6VXNlcjEzNTI1OTA4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13525908?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vladyan18",
+    "html_url": "https://github.com/vladyan18",
+    "followers_url": "https://api.github.com/users/vladyan18/followers",
+    "following_url": "https://api.github.com/users/vladyan18/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vladyan18/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vladyan18/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vladyan18/subscriptions",
+    "organizations_url": "https://api.github.com/users/vladyan18/orgs",
+    "repos_url": "https://api.github.com/users/vladyan18/repos",
+    "events_url": "https://api.github.com/users/vladyan18/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vladyan18/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-03T18:10:16Z",
+  "updated_at": "2023-08-03T18:15:09Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**📝 Details**\r\n<!-- Please describe your feature request in detail. -->\r\nHello again :) For some reason, in the extension contracts for Governor, pattern \"state variable change -> event\" is not followed. For example: \r\n\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts/blob/21716722ad78ee3e9bf21a5b47ff420323c8fe27/contracts/governance/extensions/GovernorSettings.sol#L85-L88\r\n\r\nThe event is emitted before the value actually changes. At the same time, it is important to note that in other modules of the library, events are emitted strictly after the changes.\r\n\r\nI can assume that such a variant is implemented for the sake of saving gas or minimizing lines of code - so as not to read the storage once again. However, according to my estimates, this **does not save gas**. At least, if the changing value (`_votingDelay` in this case) is packed into the same slot along with some other value, the compiler still has to read the entire slot before repacking the new value into it. So i think that something like this can be more optimal:\r\n\r\n```solidity\r\n function _setVotingDelay(uint48 newVotingDelay) internal virtual { \r\n     uint48 oldVotingDelay = _votingDelay;\r\n     _votingDelay = newVotingDelay; \r\n     emit VotingDelaySet(oldVotingDelay, newVotingDelay); \r\n } \r\n```\r\n\r\n**tldr:** I think current version actually uses more gas, and it's different from the rest of the codebase.\r\n\r\nMaybe I'm wrong and there is a reason for this approach, in which case it might make sense to explain it.\r\n\r\n<!-- Make sure that you have reviewed the OpenZeppelin Contracts Contributor Guidelines. -->\r\n<!-- https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/CONTRIBUTING.md -->\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4507/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4507/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
