@@ -49,7 +49,7 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-08-01T16:10:38Z",
-  "updated_at": "2023-08-03T12:41:05Z",
+  "updated_at": "2023-08-03T15:02:09Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -143,9 +143,9 @@
       "site_admin": false
     },
     "created_at": "2023-08-02T11:45:16Z",
-    "updated_at": "2023-08-02T11:45:16Z",
+    "updated_at": "2023-08-03T15:02:09Z",
     "author_association": "MEMBER",
-    "body": "@HiroyukiNaito This is not quite correct. The `block_id` can be one of: `\"head\" (canonical head in node's view), \"genesis\", \"finalized\", <slot>, <hex encoded blockRoot with 0x prefix>`, see https://ethereum.github.io/beacon-APIs/#/Beacon/getBlockAttestations for further details. \r\nIf you provide a number like 2900001 it will query for the block in the slot. To query for a specific block you have to provide the hex encoded block root with 0x prefix.\r\n\r\n@araskachoi Regarding your issue, I need to check what the expected behavior is if the slot you query for does not have a block, I would expect that it should throw a \"not found\" error and not return the block of a previous slot. Returning data from another slot seems like a bug.",
+    "body": "@HiroyukiNaito This is not quite correct. The `block_id` can be one of: `\"head\" (canonical head in node's view), \"genesis\", \"finalized\", <slot>, <hex encoded blockRoot with 0x prefix>`, see https://ethereum.github.io/beacon-APIs/#/Beacon/getBlockAttestations for further details. \r\nIf you provide a number like 2900001 it will query for the block in the slot. To query for a specific block you have to provide the hex encoded block root with 0x prefix.\r\n\r\n@araskachoi Regarding your issue, I need to check what the expected behavior is if the slot you query for does not have a block, I would expect that it should throw a \"not found\" error and not return the block of a previous slot. Returning data from another slot seems like a bug.\r\n\r\n**Edit:** I was thinking for some reason the API you called is `/eth/v2/beacon/blocks/{block_id}` which should not give you a block of a different slot but will throw if the slot is empty. As Lion mentioned the block itself contains data like attestations with different slot numbers.",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1662060526/reactions",
       "total_count": 0,
@@ -192,8 +192,8 @@
     "body": "Block `2900001` may includes attestations from any slot in the range `[2900001 - 1, 2900001 - 32]`. It is not possible for block at slot N to include attestations at slot N",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1663913770/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
