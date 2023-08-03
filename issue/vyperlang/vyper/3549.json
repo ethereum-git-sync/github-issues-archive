@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3549",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3549/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3549/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3549/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3549",
+  "id": 1835433752,
+  "node_id": "I_kwDOBGDvrM5tZn8Y",
+  "number": 3549,
+  "title": "Keep the vyper compiler version signature in the runtime code",
+  "user": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-03T17:09:22Z",
+  "updated_at": "2023-08-03T17:31:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Simple Summary\r\n\r\nPer @banteg on [twitter](https://twitter.com/bantg/status/1687122054183636993) I learned that vyper 0.3.10 plans to move the version metdata from the initcode to creation code (ref https://github.com/vyperlang/vyper/pull/3471)\r\n\r\nI suggest keeping this in the initcode.\r\n\r\n## Motivation\r\n\r\n1. Finding initcode is much harder than finding runtime code. Given an address, it's trivial to query for it's runteime code using `eth_getCode` and parse the vyper version out of it. It's much harder to binary search across all blocks to find when a contract was deployed, then trace each transaction in that block to find creation code (You could of course rely on etherscan or other data providers, to provide this, but IMO minimizing reliance on other services and ensuring data is easy to find is a better approach)\r\n\r\n2. My understanding is that the rationale was that moving it to the creation code was either (1) cheaper, and/or (2) more robust since there's no initcode size limit.\r\n    1. On (1), the cost difference here is negligible. In both cases the total bytecode being deployed is the same, and the only difference is a few less bytes being returned from the constructor. Compared to the cost of a contract deployment, this will be an unnoticeable savings\r\n    2. On (2), [EIP-3680](https://eips.ethereum.org/EIPS/eip-3860) is now live which limits initcode size to 2x the runtime size, so if bytecode size was a limit moving it to creation code does help since 2x is a lot bigger. I'd argue the few bytes savings is likely to not be the deciding factor in many cases (there are of course exceptions)\r\n\r\nMy opinion is that the gas savings from (2) don't outweigh the benefits of having the version in the runtime code, as easy access to contract version numbers can be critical and time-sensitive during exploits. Additionally often times you might fetch code from an RPC and use tools like heimdall-rs or whatsabi to analyze it (there are many tools that operate on runtime code), so having more info in runtime code avoids introducing reliace on e.g. etherscan \r\n\r\nFrom talking with @big-tech-sux, some arguments on the other side are that currently the version is at the end of the runtime code, but followed by immutables. So you still need the source, immutables layout, or a regex to parse the version. One idea is to move the version to the end after immutables, but it makes the implementation a bit more complicated and complexity compounds\r\n\r\nUltimately I just wanted to raise the other side of the decision here since I didn't see it much discussed in the PR, and IME often times you have runtime code from a node + local tools but don't want to introduce indexers to provide e.g. creation code.\r\n\r\n## Specification\r\n\r\nI think just revert https://github.com/vyperlang/vyper/pull/3471? Basically, ensure the CBOR encoded vyper version (and other other metadata) is present in deployed code, not creation code.\r\n\r\n## Backwards Compatibility\r\n\r\nMy understanding is that 0.3.9 has the behavior being requested here, so there are no backwards compatibility issues unless 0.3.10 is released with the behavior from https://github.com/vyperlang/vyper/pull/3471\r\n\r\n## Dependencies\r\n\r\nN/A\r\n\r\n## References\r\n\r\nTwitter convos (nothing new here, all the same info as above, just linking the threads for completeness)\r\n- https://twitter.com/bantg/status/1687145281865883649\r\n- https://twitter.com/msolomon44/status/1687135929465761792\r\n\r\n## Copyright\r\n\r\nCopyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3549/reactions",
+    "total_count": 4,
+    "+1": 4,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3549/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
