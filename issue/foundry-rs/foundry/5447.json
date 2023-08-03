@@ -40,7 +40,7 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 4,
   "created_at": "2023-07-21T09:59:07Z",
-  "updated_at": "2023-08-02T21:29:19Z",
-  "closed_at": null,
+  "updated_at": "2023-08-03T20:35:46Z",
+  "closed_at": "2023-08-03T20:35:46Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [x] Foundry\r\n- [x] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\n`forge 0.2.0 (02e430c 2023-07-21T00:24:08.481175000Z)`\r\n\r\n### What command(s) is the bug in?\r\n\r\n`forge build`\r\n\r\n### Operating System\r\n\r\nmacOS Silicon\r\n\r\n### Describe the bug\r\n\r\n## Problem\r\n\r\n#5397 added support for remapping contexts (closing #1855), however, the implementation does not handle all edge cases yet.\r\n\r\nSuppose you have a project structure like this:\r\n\r\n```tree\r\nproject/\r\n└── lib/\r\n    ├── foo/\r\n    │   └── lib/\r\n    │       └── openzeppelin-contracts  \r\n    └── bar/\r\n        └── lib/\r\n            └── openzeppelin-contracts\r\n```\r\n\r\nIn both `foo` and `bar`, `openzeppelin-contracts` is remapped to the following:\r\n\r\n```bash\r\n@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\r\n```\r\n\r\nThe bug is that only one of the two remappings gets resolved, not both.\r\n\r\n## Error Log\r\n\r\nSneak peek:\r\n\r\n>  Unable to resolve imports: \"@openzeppelin/contracts/token/ERC20/IERC20.sol\"\r\n\r\nSee the full log [here](https://app.warp.dev/block/NzkoqBiRAVrpY7IW8d5M0r).\r\n\r\nThe issue is that only the `v2-core` remapping appears in the auto-detected remappings:\r\n\r\n```bash\r\nlib/v2-core:@openzeppelin/contracts/=/Users/prb/Sablier/examples/lib/v2-core/lib/openzeppelin-contracts/contracts/\r\n```\r\n\r\n## Reproduce\r\n\r\n1. Clone [sablier-labs/examples](https://github.com/sablier-labs/examples) at commit [eae781](https://github.com/sablier-labs/examples/commit/eae781627e15d963a62c1545fe0944ad94d5519c)\r\n2. Remove the `permit2` remapping in `remappings.txt`\r\n3. Run `forge build`",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5447/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5447/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -236,8 +255,8 @@
     "body": "I'm afraid that I don't have any repro smaller than the Sablier examples repo. However, what should matter is the `IERC20` import. You should be able to focus on that.\r\n\r\nIt is also difficult to provide a small repro due to the nature of this bug - it gets activated when there are nested deps with shared deps between them.\r\n\r\nRe Foundry version - I ran `foundryup` now and I observed the same behavior when running `forge build`.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1662988080/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
