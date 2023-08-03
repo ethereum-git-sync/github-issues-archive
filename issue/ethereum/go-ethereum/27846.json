@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27846",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27846/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27846/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27846/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27846",
+  "id": 1835322450,
+  "node_id": "I_kwDOAOvK985tZMxS",
+  "number": 27846,
+  "title": "Make EWMA metrics synchronous",
+  "user": {
+    "login": "zeim839",
+    "id": 50573884,
+    "node_id": "MDQ6VXNlcjUwNTczODg0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/50573884?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zeim839",
+    "html_url": "https://github.com/zeim839",
+    "followers_url": "https://api.github.com/users/zeim839/followers",
+    "following_url": "https://api.github.com/users/zeim839/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zeim839/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zeim839/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zeim839/subscriptions",
+    "organizations_url": "https://api.github.com/users/zeim839/orgs",
+    "repos_url": "https://api.github.com/users/zeim839/repos",
+    "events_url": "https://api.github.com/users/zeim839/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zeim839/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-03T15:51:32Z",
+  "updated_at": "2023-08-03T15:57:55Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "```go\r\n// Tick ticks the clock to update the moving average.  It assumes it is called\r\n// every five seconds.\r\nfunc (a *StandardEWMA) Tick() {\r\n\tcount := a.uncounted.Load()\r\n\ta.uncounted.Add(-count)\r\n\tinstantRate := float64(count) / float64(5*time.Second)\r\n\ta.mutex.Lock()\r\n\tdefer a.mutex.Unlock()\r\n\tif a.init {\r\n\t\ta.rate += a.alpha * (instantRate - a.rate)\r\n\t} else {\r\n\t\ta.init = true\r\n\t\ta.rate = instantRate\r\n\t}\r\n}\r\n```\r\nSee [metrics/ewma.go:L97-L111](https://github.com/ethereum/go-ethereum/blob/master/metrics/ewma.go#L97C1-L111C2).  \r\n\r\nGeth implements a time-sensitive (meaning metrics decay over time) EWMA via a concurrent clock that decays the EWMA every 5 seconds (see [metrics/meter.go](https://github.com/ethereum/go-ethereum/blob/master/metrics/meter.go#L289-L304)). This is problematic because:\r\n\r\nWhy should this feature exist?\r\n1. Metrics are delayed by up to 5 seconds.\r\n2. There's a background thread that's constantly updating EWMAs, even when their values are not being read.\r\n\r\nWhat are the use-cases?\r\n1. One less concurrent thread to worry about (and consequently an improvement in performance).\r\n2. EWMA metrics are more precise.\r\n\r\n# Implementation\r\n\r\nDo you have ideas regarding the implementation of this feature?\r\n\r\nYes, compute the EWMA on-demand by keeping a timestamp of the last time the `Update()` function was called. Then, whenever `Rate()` is called,  the rate will be calculated with respect to how much time has elapsed. \r\n\r\n```go\r\nfunc (a *StandardEWMA) Rate() float64 {\r\n        // init is set to true the first time Update() is called. \r\n        // Note that, unless and until Update() is called for the first time, the rate will remain 0. \r\n        // The original implementation behaves in exactly the same way.\r\n\tif !a.init {\r\n\t\treturn 0\r\n\t}\r\n\r\n\t// Calculate periods since last update.\r\n\tlastTime := a.timestamp.Load()\r\n\tcurrentTime := time.Now().UTC().UnixNano()\r\n\r\n        // 5-second periods. This is equivalent to Tick()-ing every 5 seconds.\r\n\tperiods := math.Floor(float64(currentTime-lastTime) / float64(5e9))\r\n\r\n\t// Calculate new rate based on time since last update.\r\n\t// [(1-alpha)^periods] * a.rate\r\n\tcurrentRate := math.Pow(1-a.alpha, periods) * a.rate\r\n\r\n\treturn currentRate * float64(time.Second)\r\n}\r\n```\r\n\r\nWhere `a.timestamp` is a UnixNano timestamp stored as an atomic Int64, which will be updated (along with `rate`), whenever `Update()` is called. Keep in mind that, since calling `Update()` will affect the rate immediately, the output of the new `Rate()` function will slightly differ from the current implementation. In other words, the two implementations are not the same; but they'll _eventually_ be the same. I don't believe this will be a problem since `Rate()` will now reflect a more recently updated (i.e more accurate) EWMA value. \r\n\r\nMoreover, the intervals could be withdrawn altogether, such that `periods` becomes: `periods := float64(currentTime-lastTime)`. The alpha can then be modified so that the EWMA decays at the same rate as the current implementation, except `Rate()` will be accurate to the nearest nanosecond (as opposed to the nearest 5-second interval).\r\n\r\n**Are you willing to implement this feature?**\r\n\r\nYes, let me know your thoughts/comments and I'll be more than willing to open a PR. ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27846/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27846/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
