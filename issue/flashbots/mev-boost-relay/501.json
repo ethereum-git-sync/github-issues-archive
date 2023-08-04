@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/501",
+  "repository_url": "https://api.github.com/repos/flashbots/mev-boost-relay",
+  "labels_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/501/labels{/name}",
+  "comments_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/501/comments",
+  "events_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/501/events",
+  "html_url": "https://github.com/flashbots/mev-boost-relay/issues/501",
+  "id": 1836797840,
+  "node_id": "I_kwDOHXha9s5te0-Q",
+  "number": 501,
+  "title": "Getting payloads when asked for them when not using postgres for payload storage",
+  "user": {
+    "login": "alextes",
+    "id": 2011351,
+    "node_id": "MDQ6VXNlcjIwMTEzNTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2011351?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/alextes",
+    "html_url": "https://github.com/alextes",
+    "followers_url": "https://api.github.com/users/alextes/followers",
+    "following_url": "https://api.github.com/users/alextes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/alextes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/alextes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/alextes/subscriptions",
+    "organizations_url": "https://api.github.com/users/alextes/orgs",
+    "repos_url": "https://api.github.com/users/alextes/repos",
+    "events_url": "https://api.github.com/users/alextes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/alextes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5515148557,
+      "node_id": "LA_kwDOHXha9s8AAAABSLp9DQ",
+      "url": "https://api.github.com/repos/flashbots/mev-boost-relay/labels/proposal",
+      "name": "proposal",
+      "color": "1F6D5F",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-04T13:57:52Z",
+  "updated_at": "2023-08-04T13:57:52Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "When getting a payload request from a proposer we check Redis, Memcached, and Postgres for the payload. If we're not finding the payload in any of them, we check if we even received a bid. Now, normally, with _all_ payloads stored in Postgres this would be fine (save a small race condition). If we do find a bid, we have a problem, if we don't find a bid, we never received the bid and it's understandable we don't have a payload.\r\n\r\nHowever, if one turns off payload storage in postgres, you're suddenly in a bind. Redis doesn't store every payload, only those which were at one time the top bid of the relay. So now if Redis doesn't have the payload, you cannot tell whether you never got the bid, or managed to store the bid but not the payload.\r\n\r\nYou can see the commit I wrote in our fork to see how we're currently dealing with this conundrum. We basically assume it's not the critical case, and keep an eye on Redis errors. Our general position is:\r\n- Not great 😅 , but not terrible. Our logs show Redis failing due to an error eight times in the past month due to a timeout, and of those times it is unclear how many, if any, happen to fail at the critical point. This would mean a pipeline with a SET payload command before SET bid command gets shipped, gets executed, but just at the border of those two fails to complete.\r\n- If you don't care about latency, you can just use postgres and avoid the headache. If you care about latency and you want to improve this situation, there are multiple options. One is to store every payload in a faster store. Like a second Redis or Memcached. This is almost what memcached currently does, as it skips whatever Redis skips (after we solve #500 to be precise). This is especially prudent if you'd like to serve bids your relay doesn't relay, but others have, that the proposer asks you for anyway. Another option is to not serve other relays bids, track which bids you've served, and that way it is clear whether we should or should not have a payload, without relying on how storage is handled exactly.\r\n\r\nYou can [see the commit](https://github.com/ultrasoundmoney/mev-boost-relay/commit/9fa0fd32b35819388ae9db6669482afb2d894003) I wrote to have the logging and responses make more sense in our postgres-payloads-disabled case. \r\n\r\nSidenote: the code notes more recent versions of mev-boost don't ask relays for payloads for bids they didn't receive from those relays, but this is naturally hard to rely on, given the wide and sensitive deployment of mev-boost. Nevermind operators may disagree with this stance and fork to have more resilient get payload logic.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/501/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/flashbots/mev-boost-relay/issues/501/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
