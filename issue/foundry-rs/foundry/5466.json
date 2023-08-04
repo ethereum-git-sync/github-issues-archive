@@ -40,36 +40,55 @@
       "description": "Type: feature"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-07-25T07:15:27Z",
-  "updated_at": "2023-07-25T07:56:07Z",
-  "closed_at": null,
+  "updated_at": "2023-08-04T03:55:16Z",
+  "closed_at": "2023-08-04T03:55:16Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Describe the feature you would like\n\nThis came up in the support chat and I think it's a reasonable feature to support:\r\n\r\n> Is there a forge command to create test files? If not does forge add test <contract name> seem like a valuable addition?\r\n\r\nCreating test file typically involves repeated steps:\r\n\r\n1. Creating the test file\r\n2. Adding the necessary imports\r\n3. Adding the setup code for the test contract\r\n\r\n^ This is the most minimal case, but depending on how tests should be structure, this can take different forms. Here are some ideas on what this could look like:\r\n\r\n### Creating a simple test file\r\n\r\nFor example, if I have a `contract Counter` that lives in `src/Counter.sol` and say I run\r\n\r\n```\r\n$ forge create-test Counter\r\n```\r\n\r\nThen this would create `test/Counter.t.sol` with the following content:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nimport \"forge-std/Test.sol\";\r\nimport \"../src/Counter.sol\";\r\n\r\ncontract CounterTest is Test {\r\n    Counter public counter;\r\n\r\n    function setUp() public {\r\n        counter = new Counter();\r\n    }\r\n}\r\n```\r\n\r\nSo in a \"convention over configuration\" fashion, this would derive the test contracts name and file name based on the to-be-tested contract.\r\n\r\n#### Appendix: Scaffold test functions for methods as well\r\n\r\nWe could probably even be smart, look into the existing contract, figure out all functions that need test and add dedicated (failing) `test*` functions as well.\r\n\r\nSo given a source that looks like:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\ncontract Counter {\r\n    uint256 public number;\r\n\r\n    function setNumber(uint256 newNumber) public {\r\n        number = newNumber;\r\n    }\r\n\r\n    function increment() public {\r\n        number++;\r\n    }\r\n}\r\n```\r\n\r\nWe can figure out that `setNumber()` and `increment()` need to be tested, so when generating a test file, the contents would look like this:\r\n\r\n```solidity\r\npragma solidity ^0.8.13;\r\n\r\nimport \"forge-std/Test.sol\";\r\nimport \"../src/Counter.sol\";\r\n\r\ncontract CounterTest is Test {\r\n    Counter public counter;\r\n\r\n    function setUp() public {\r\n        counter = new Counter();\r\n    }\r\n\r\n   function test_setNumber() public {\r\n     assert(false, \"NOT IMPLEMENTED\")\r\n   }\r\n\r\n   function test_increment() public {\r\n     assert(false, \"NOT IMPLEMENTED\")\r\n   }\r\n}\r\n```\r\n\r\nIf we go down that route, we might even take it yet a step further.\r\n\r\n### Support different scaffold types\r\n\r\nThere a various styles and best practices when writing tests in foundry. While the draft above sets up simple test files that get you going, they probably don't scale very well when the contracts to be tested are big.\r\n\r\nOne of the practices one can see in bigger projects is that every contract function to be tested gets its own test contract so it can be used as \"describe()\" block.\r\n\r\nFor example, the `Counter` example above, could then be written as (ignore the fact that this is overkill for this kind of contract):\r\n\r\n```solidity\r\npragma solidity ^0.8.13;\r\n\r\nimport \"forge-std/Test.sol\";\r\nimport \"../src/Counter.sol\";\r\n\r\ncontract Counter_Test is Test {\r\n    Counter public counter;\r\n\r\n    function setUp() public virtual {\r\n        counter = new Counter();\r\n    }\r\n}\r\n\r\ncontract SetNumber_Test is Counter_Test {\r\n  function setUp() public override {\r\n    Counter_Test.setup();\r\n  }\r\n\r\n  function test_SetNumber() public {\r\n    // write assertions\r\n  }\r\n}\r\n\r\ncontract Increment_Test is Counter_Test {\r\n  function setUp() public override {\r\n    Counter_Test.setup();\r\n  }\r\n\r\n  function test_Increment() public {\r\n    // write assertions\r\n  }\r\n}\r\n```\r\n\r\nSomething like that could then be generated using something like\r\n\r\n```\r\n$ forge create-test Counter --scaffold-type describe # or something else\r\n```\r\n\r\n### Consider introducing test type commands\r\n\r\nAs a matter of fact, given that there's different types of tests as well we might even want to introduce test type commands altogether:\r\n\r\n```\r\n$ forge create-unit-test Counter\r\n```\r\n\r\nor\r\n\r\n```\r\n$ forge create-fuzz-test Counter\r\n```\r\n\r\n### Make this part of an over all contract scaffold command\r\n\r\nAt this point, we might as well think about introducing a dedicated commands to scaffold entire contracts, including their test counterparts. So for example:\r\n\r\n```\r\n$ forge create-contract Counter\r\n```\r\n\r\nWould create `src/Counter.sol` with the contents:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\ncontract Counter {\r\n\r\n  constructor() {\r\n\r\n  }\r\n}\r\n\r\n```\r\n\r\nIt would also create `src/test/Counter.t.sol` and `script/Counter.s.sol` respectively. \r\nFoundry could then have some default test style config options in `foundry.toml` that are used when generating those source files.\n\n### Additional context\n\nMost of the above is something one can typically find in CLI tools for other platforms and frameworks as well.\r\nFor example `angular-cli` and `vue-cli` provide commands to easily spin up components including their tests.\r\n\r\nI think we can draw some inspiration from there.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5466/reactions",
-    "total_count": 2,
+    "total_count": 3,
     "+1": 0,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
     "confused": 0,
-    "heart": 2,
+    "heart": 3,
     "rocket": 0,
     "eyes": 0
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5466/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -100,7 +119,7 @@
     },
     "created_at": "2023-07-25T07:34:47Z",
     "updated_at": "2023-07-25T07:34:47Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "thanks @0x-r4bbit! I brought this up in the support chat. If this is not a super difficult task, I'd like to take this up and use this as an opportunity to get started with Rust.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1649287239/reactions",
@@ -155,6 +174,50 @@
       "hooray": 0,
       "confused": 0,
       "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1664933696",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5466#issuecomment-1664933696",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5466",
+    "id": 1664933696,
+    "node_id": "IC_kwDOGBlvNc5jPN9A",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-04T03:55:16Z",
+    "updated_at": "2023-08-04T03:55:16Z",
+    "author_association": "MEMBER",
+    "body": "Done with #5495",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1664933696/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
       "rocket": 0,
       "eyes": 0
     },
