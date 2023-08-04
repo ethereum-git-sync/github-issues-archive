@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/devp2p/issues/245",
+  "repository_url": "https://api.github.com/repos/ethereum/devp2p",
+  "labels_url": "https://api.github.com/repos/ethereum/devp2p/issues/245/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/devp2p/issues/245/comments",
+  "events_url": "https://api.github.com/repos/ethereum/devp2p/issues/245/events",
+  "html_url": "https://github.com/ethereum/devp2p/issues/245",
+  "id": 1837173965,
+  "node_id": "I_kwDOAcJRYs5tgQzN",
+  "number": 245,
+  "title": "Eth68 encoding of `txType` doesn't match client implementations for `NewPooledTransactionHashes`",
+  "user": {
+    "login": "acolytec3",
+    "id": 17355484,
+    "node_id": "MDQ6VXNlcjE3MzU1NDg0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17355484?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/acolytec3",
+    "html_url": "https://github.com/acolytec3",
+    "followers_url": "https://api.github.com/users/acolytec3/followers",
+    "following_url": "https://api.github.com/users/acolytec3/following{/other_user}",
+    "gists_url": "https://api.github.com/users/acolytec3/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/acolytec3/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/acolytec3/subscriptions",
+    "organizations_url": "https://api.github.com/users/acolytec3/orgs",
+    "repos_url": "https://api.github.com/users/acolytec3/repos",
+    "events_url": "https://api.github.com/users/acolytec3/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/acolytec3/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-04T18:27:36Z",
+  "updated_at": "2023-08-04T18:27:36Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "The current spec for the Eth68 message format for `NewPooledTransactionHashes` is this:\r\n`[[txtype₁: P, txtype₂: P, ...], [txsize₁: P, txsize₂: P, ...], [txhash₁: B_32, txhash₂: B_32, ...]]` \r\n\r\nGeth (followed by Nethermind, [Reth](https://github.com/paradigmxyz/reth/blob/689b9d635823022470b30e4112b722a48fce144d/crates/net/eth-wire/src/types/broadcast.rs#L244C7-L244C7), and EthereumJS) have implemented \r\n`[ txType1: P || txType2: P || txType3: P, [size1: P, size2: P, size3: P], [th1: B_32, th2: B_32, th3: B_32]]`, the key difference being that the transaction types array is flattened into one concatenated RLP string  where each individual byte represents a transaction type rather than an RLP list with elements of type `P` (assumed to be unpadded bytes though this is not documented anywhere that I could find).\r\n\r\nThis does make sense since `TransactionType` is borrowed from [EIP2718](https://eips.ethereum.org/EIPS/eip-2718) where `TransactionType` is not anticipated to be greater than 0x7f so will always fit in a single byte/uint8.\r\n\r\nAs such, we should either update the spec for Eth68 to match what has been implemented by the various clients or else have the client teams update code to match the current spec.  \r\n\r\nCurrent behavior can be tested using [this hive test \"Request Blob Pooled Transactions\" in the suite linked in this fork of Hive](https://github.com/marioevz/hive/tree/cancun-dn8-4844-4788/simulators/ethereum/engine/suites/blobs) ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/devp2p/issues/245/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/devp2p/issues/245/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
