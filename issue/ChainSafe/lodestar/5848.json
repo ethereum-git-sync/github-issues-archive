@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5848",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5848/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5848/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5848/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5848",
+  "id": 1836972227,
+  "node_id": "I_kwDOCD5_Gc5tffjD",
+  "number": 5848,
+  "title": "Non-checkpoint states are added into checkpoint cache",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-04T15:40:09Z",
+  "updated_at": "2023-08-04T17:11:32Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Currently it looks like we are adding non-checkpoint states into the checkpoint cache\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/5f7f9951f09c3e8ab0187fe05e47b9a4c7786f5b/packages/beacon-node/src/chain/stateCache/stateContextCheckpointsCache.ts#L55\r\n\r\nThis happens when importing a block once every epoch\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/903483107414fd64395c575b709f5158173bc607/packages/beacon-node/src/chain/blocks/importBlock.ts#L331-L335\r\n\r\nNon-checkpoint states can be determined by checking the state root in block header is a zero hash\r\n\r\n```ts\r\n// ...\r\nadd(cp: phase0.Checkpoint, item: CachedBeaconStateAllForks): void {\r\n    console.log(\"added checkpoint state\");\r\n    if (byteArrayEquals(item.latestBlockHeader.stateRoot, ZERO_HASH)) {\r\n      console.log(\"not a checkpoint state\");\r\n    }\r\n// ...\r\n```\r\n\r\nWe add 2 different states to checkpoint cache each epoch and one of them is not a checkpoint state\r\n```\r\nAug-04 16:01:52.999[]                 info: Synced - slot: 7027807 - head: 0x0300…1e75 - exec-block: valid(17842082 0xdacd…) - finalized: 0xdfe0…1817:219616 - peers: 32\r\nadded checkpoint state\r\nAug-04 16:02:05.051[]                 info: Synced - slot: 7027808 - head: (slot -1) 0x0300…1e75 - exec-block: valid(17842082 0xdacd…) - finalized: 0x9f2e…87f6:219617 - peers: 31\r\nadded checkpoint state\r\nnot a checkpoint state <-- this should never happen\r\nAug-04 16:02:17.000[]                 info: Synced - slot: 7027809 - head: 0xc202…3c70 - exec-block: valid(17842084 0x1b1f…) - finalized: 0x9f2e…87f6:219617 - peers: 33\r\n....\r\nAug-04 16:08:17.001[]                 info: Synced - slot: 7027839 - head: 0xe276…f61c - exec-block: valid(17842114 0x445d…) - finalized: 0x9f2e…87f6:219617 - peers: 41\r\nadded checkpoint state\r\nAug-04 16:08:29.024[]                 info: Synced - slot: 7027840 - head: (slot -1) 0xe276…f61c - exec-block: valid(17842114 0x445d…) - finalized: 0xadc1…d8a6:219618 - peers: 42\r\nadded checkpoint state\r\nnot a checkpoint state <-- this should never happen\r\nAug-04 16:08:41.246[]                 info: Synced - slot: 7027841 - head: 0xe6ee…4149 - exec-block: valid(17842116 0x8354…) - finalized: 0xadc1…d8a6:219618 - peers: 41\r\n```\r\n\r\ncc @dapplion @tuyennhv @wemeetagain ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5848/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5848/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
