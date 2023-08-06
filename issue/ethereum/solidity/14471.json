@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14471",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14471/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14471/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14471/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14471",
+  "id": 1838216834,
+  "node_id": "I_kwDOAm_5kc5tkPaC",
+  "number": 14471,
+  "title": "Function interferes with compilation optimization?",
+  "user": {
+    "login": "hpumengzhao",
+    "id": 36286293,
+    "node_id": "MDQ6VXNlcjM2Mjg2Mjkz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/36286293?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hpumengzhao",
+    "html_url": "https://github.com/hpumengzhao",
+    "followers_url": "https://api.github.com/users/hpumengzhao/followers",
+    "following_url": "https://api.github.com/users/hpumengzhao/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hpumengzhao/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hpumengzhao/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hpumengzhao/subscriptions",
+    "organizations_url": "https://api.github.com/users/hpumengzhao/orgs",
+    "repos_url": "https://api.github.com/users/hpumengzhao/repos",
+    "events_url": "https://api.github.com/users/hpumengzhao/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hpumengzhao/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-06T13:49:09Z",
+  "updated_at": "2023-08-06T13:49:09Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nFor the following contract\r\n```solidity\r\npragma solidity ^0.8.0;\r\n\r\ncontract RandomProgram {\r\n    \r\n    uint256 constant MAX_LOOP_COUNT = 10;\r\n    uint256 constant INITIAL_BALANCE = 100;\r\n    \r\n    struct Person {\r\n        string name;\r\n        uint256 age;\r\n        uint256 balance;\r\n    }\r\n\r\n    uint256 globalCount;\r\n    uint256 globalBalance = INITIAL_BALANCE;\r\n    \r\n    function loop() public {\r\n        for (uint256 i = 0; i < MAX_LOOP_COUNT; i++) {\r\n            require(i < MAX_LOOP_COUNT, \"This require statement is redundant\");\r\n            assert(i >= 0 && i < MAX_LOOP_COUNT); // failed to optimize???\r\n            globalCount++;\r\n            if (i % 2 == 0) {\r\n                globalBalance -= i;\r\n            } else {\r\n                globalBalance += i;\r\n            }\r\n        }\r\n    }\r\n    \r\n    function conditional(uint256 x, uint256 y) public pure returns (uint256) {\r\n        uint256 result;\r\n        if (x > y) {\r\n            result = x - y;\r\n            assert(result > 0);\r\n        } else if (x == y) {\r\n            result = x + y;\r\n            assert(result == 0);\r\n        } else {\r\n            result = y - x;\r\n            assert(result > 0);\r\n        }\r\n        return result;\r\n    }\r\n}\r\n```\r\nThe IR optimizer failed to remove `` assert(i >= 0 && i < MAX_LOOP_COUNT);``.\r\nIf i remove the function ``conditional``, the `` assert(i >= 0 && i < MAX_LOOP_COUNT);`` can be optimized.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.19\r\n- Framework/IDE (e.g. Truffle or Remix): Remix\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14471/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14471/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
