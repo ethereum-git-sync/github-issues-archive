@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-07-26T19:07:28Z",
-  "updated_at": "2023-07-27T14:25:30Z",
-  "closed_at": null,
+  "updated_at": "2023-08-06T06:34:41Z",
+  "closed_at": "2023-08-06T06:34:41Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "In the latest release ([v1.4.0-beta.0](https://github.com/ethereum/consensus-spec-tests/releases/tag/v1.4.0-beta.0)), there's a new test called [`include_attestation_from_previous_fork_with_new_range`](https://github.com/ethereum/consensus-specs/blob/dev/tests/core/pyspec/eth2spec/test/deneb/sanity/test_blocks.py#L120) meant to ensure the new attestation inclusion rules under [EIP-7045](https://eips.ethereum.org/EIPS/eip-7045) apply to attestations from the final `CAPELLA` epoch. This is the only generated test which [makes use of](https://github.com/ethereum/consensus-specs/blob/dev/tests/core/pyspec/eth2spec/test/deneb/sanity/test_blocks.py#L117C1-L119C3) the [`@spec_configured_state_test`](https://github.com/ethereum/consensus-specs/blob/dev/tests/core/pyspec/eth2spec/test/context.py#L290) override.\r\n\r\nThis override [emits a `config.yaml`](https://github.com/ethereum/consensus-specs/blob/dev/tests/core/pyspec/eth2spec/test/context.py#L625) file in the generated test directory. There are several problems with this:\r\n\r\n1) The [sanity test definition](https://github.com/ethereum/consensus-specs/blob/dev/tests/formats/sanity/blocks.md) does not say to expect a `config.yaml`\r\n2) The generated `config.yaml` is invalid:\r\n```yaml\r\n# this is the mainnet example\r\nALTAIR_FORK_EPOCH: 74240\r\n...\r\nBELLATRIX_FORK_EPOCH: 144896\r\n...\r\nCAPELLA_FORK_EPOCH: 194048\r\n...\r\nDENEB_FORK_EPOCH: 2\r\n```\r\n3) The generated `config.yaml` is missing the following fields which (without modification) prevent lighthouse from ingesting it:\r\n - `DEPOSIT_CHAIN_ID`\r\n - `DEPOSIT_NETWORK_ID`\r\n - `DEPOSIT_CONTRACT_ADDRESS`\r\n4) If clients silently ignore the `config.yaml` (which is likely), they will use the default testing config:\r\n```yaml\r\nALTAIR_FORK_EPOCH: 0\r\nBELLATRIX_FORK_EPOCH: 0\r\nCAPELLA_FORK_EPOCH: 0\r\nDENEB_FORK_EPOCH: 0\r\n```\r\nThis test generates the attestation in epoch `1`, which is meant to be a `CAPELLA` attestation. But with the default config, it ends up being within `DENEB`. This would mean we are only testing that the new rules apply to attestations within `DENEB` instead of ensuring they also apply to attestations from the final `CAPELLA` epoch.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-spec-tests/issues/35/reactions",
     "total_count": 1,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-spec-tests/issues/35/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "Hey @ethDreamer, thank you for reporting it!\r\n\r\nI opened a PR to fix this test case: https://github.com/ethereum/consensus-specs/pull/3464",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-spec-tests/issues/comments/1653466712/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/consensus-spec-tests/issues/comments/1666741593",
+    "html_url": "https://github.com/ethereum/consensus-spec-tests/issues/35#issuecomment-1666741593",
+    "issue_url": "https://api.github.com/repos/ethereum/consensus-spec-tests/issues/35",
+    "id": 1666741593,
+    "node_id": "IC_kwDOCu9hM85jWHVZ",
+    "user": {
+      "login": "hwwhww",
+      "id": 9263930,
+      "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hwwhww",
+      "html_url": "https://github.com/hwwhww",
+      "followers_url": "https://api.github.com/users/hwwhww/followers",
+      "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+      "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+      "repos_url": "https://api.github.com/users/hwwhww/repos",
+      "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-06T06:34:41Z",
+    "updated_at": "2023-08-06T06:34:41Z",
+    "author_association": "MEMBER",
+    "body": "closing via https://github.com/ethereum/consensus-specs/pull/3464",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/consensus-spec-tests/issues/comments/1666741593/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
