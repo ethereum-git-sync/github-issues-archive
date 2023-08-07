@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-06T10:20:08Z",
-  "updated_at": "2023-08-06T10:20:08Z",
-  "closed_at": null,
+  "updated_at": "2023-08-07T06:36:21Z",
+  "closed_at": "2023-08-07T06:36:21Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "I'm trying to run the cannon code, but `l2.outputroot ` value has to be specified. However, I have no idea how to find this value in the geroli explorer or local (using the devnet). Please help me, thanks!",
-  "closed_by": null,
+  "closed_by": {
+    "login": "dajuguan",
+    "id": 13568446,
+    "node_id": "MDQ6VXNlcjEzNTY4NDQ2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13568446?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dajuguan",
+    "html_url": "https://github.com/dajuguan",
+    "followers_url": "https://api.github.com/users/dajuguan/followers",
+    "following_url": "https://api.github.com/users/dajuguan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dajuguan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dajuguan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dajuguan/subscriptions",
+    "organizations_url": "https://api.github.com/users/dajuguan/orgs",
+    "repos_url": "https://api.github.com/users/dajuguan/repos",
+    "events_url": "https://api.github.com/users/dajuguan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dajuguan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6612/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6612/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1667242238",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/6612#issuecomment-1667242238",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6612",
+    "id": 1667242238,
+    "node_id": "IC_kwDODjvEJM5jYBj-",
+    "user": {
+      "login": "nitantchhajed",
+      "id": 96972634,
+      "node_id": "U_kgDOBcevWg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96972634?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nitantchhajed",
+      "html_url": "https://github.com/nitantchhajed",
+      "followers_url": "https://api.github.com/users/nitantchhajed/followers",
+      "following_url": "https://api.github.com/users/nitantchhajed/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nitantchhajed/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nitantchhajed/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nitantchhajed/subscriptions",
+      "organizations_url": "https://api.github.com/users/nitantchhajed/orgs",
+      "repos_url": "https://api.github.com/users/nitantchhajed/repos",
+      "events_url": "https://api.github.com/users/nitantchhajed/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nitantchhajed/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-07T06:08:48Z",
+    "updated_at": "2023-08-07T06:08:48Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "```shell\r\n#!/bin/bash\r\nset -euo pipefail\r\nSCRIPTS_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" > /dev/null && pwd )\"\r\ncd \"${SCRIPTS_DIR}\"\r\n\r\nOUTPUT_ORACLE=\"<L2 Oputut oracle proxy address>\"\r\nL1_API=<L1 RPC>\r\nL2_API=<L2 RPC>\r\nDATADIR=${3:-oracledata}\r\nL1_HEAD_NUM=${4:-latest}\r\n\r\n#L1 head block hash\r\nL1_HEAD=$(cast block --rpc-url \"$L1_API\" \"$L1_HEAD_NUM\" -f hash)\r\necho \"L1 head: $L1_HEAD\"\r\n\r\n# latest L2 output index \r\nL2_OUTPUT_INDEX=$(cast call --rpc-url \"$L1_API\" --block \"$L1_HEAD\" \"${OUTPUT_ORACLE}\" 'latestOutputIndex()')\r\necho \"L2 Output Index: $L2_OUTPUT_INDEX\"\r\n\r\n# outputRoot, timestamp and l2BlockNumber\r\nL2_OUTPUT=$(cast call --rpc-url \"$L1_API\" --block \"$L1_HEAD\" \"${OUTPUT_ORACLE}\" 'getL2Output(uint256) (bytes32,uint128,uint128)' \"$L2_OUTPUT_INDEX\")\r\necho \"L2 Output: $L2_OUTPUT\"\r\nIFS=$'\\n' OUTPUT_COMPONENTS=(${L2_OUTPUT})\r\n\r\n#  claimed outputRoot \r\nL2_CLAIM=${OUTPUT_COMPONENTS[0]}\r\necho \"L2 Claim: $L2_CLAIM\"\r\n\r\n#  L2 block number \r\nL2_BLOCK_NUM=\"${OUTPUT_COMPONENTS[2]}\"\r\necho \"L2 Block Number: $L2_BLOCK_NUM\"\r\n\r\n\r\nL2_HEAD_NUM=$(( L2_BLOCK_NUM - 100 ))\r\nL2_HEAD=$(cast block --rpc-url \"$L2_API\" \"$L2_HEAD_NUM\" -f hash)\r\necho \"L2 Head $L2_HEAD ($L2_HEAD_NUM)\"\r\n\r\n\r\n``` \r\ncreate a `canon.sh` file with above code and replace `<L2 Oputut oracle proxy address>`, `<L1 RPC>` & `<L2 RPC>` with your values and run the file by `./canon.sh` in your terminal. :)",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1667242238/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
