@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5856",
+  "id": 1839694704,
+  "node_id": "I_kwDOCD5_Gc5tp4Nw",
+  "number": 5856,
+  "title": "Zero downtime doppelganger protection",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4754137758,
+      "node_id": "LA_kwDOCD5_Gc8AAAABG15ing",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-feature-request",
+      "name": "meta-feature-request",
+      "color": "B5CF5F",
+      "default": false,
+      "description": "Issues to track feature requests."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-07T15:17:16Z",
+  "updated_at": "2023-08-07T15:17:16Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Problem description\n\nCurrent implementation of doppelganger protection does not differentiate between a simple restart and starting the validator on a new machine. This causes 2-3 missed attestations after every restart such as when upgrading Lodestar to a newer version but DP does not provide any protection in this case.\r\n\r\nFor some users (e.g. on dappnode), DP is enabled by default and every package upgrade causes unnecessary downtime which causes bad user experience.\n\n### Solution description\n\nWe should make our DP implementation a bit smarter and be able to differentiate between a restart and a new installation. Validator duties should only be skipped if it is really required.\r\n\r\nThis can be achieved by looking at the local slashing protection DB and if the validator produced an attestation in the previous epoch it means that the validator client was just restarted and DP can be skipped for this validator (https://github.com/ChainSafe/lodestar/compare/unstable...nflaig/zero-downtime-doppelganger).\r\n\r\nIt might even be safer in this case to start attestation right away because if two validator clients are started at the same time and one of them has an existing DB it would prevent slashing, whereas if both wait for 2-3 epochs no chain activity would be detected and both instances would start attesting at the same time causing validators to be slashed.\r\n\r\n\n\n### Additional context\n\nSimilar approach is described in https://github.com/prysmaticlabs/prysm/issues/7985#issuecomment-843209422 and https://github.com/status-im/nimbus-eth2/issues/3083.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

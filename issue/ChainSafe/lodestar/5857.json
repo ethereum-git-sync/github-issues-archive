@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5857",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5857/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5857/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5857/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5857",
+  "id": 1839771742,
+  "node_id": "I_kwDOCD5_Gc5tqLBe",
+  "number": 5857,
+  "title": "Reducing CachedBeaconState size",
+  "user": {
+    "login": "dapplion",
+    "id": 35266934,
+    "node_id": "MDQ6VXNlcjM1MjY2OTM0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/35266934?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dapplion",
+    "html_url": "https://github.com/dapplion",
+    "followers_url": "https://api.github.com/users/dapplion/followers",
+    "following_url": "https://api.github.com/users/dapplion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dapplion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dapplion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dapplion/subscriptions",
+    "organizations_url": "https://api.github.com/users/dapplion/orgs",
+    "repos_url": "https://api.github.com/users/dapplion/repos",
+    "events_url": "https://api.github.com/users/dapplion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dapplion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1478321239,
+      "node_id": "MDU6TGFiZWwxNDc4MzIxMjM5",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-discussion",
+      "name": "meta-discussion",
+      "color": "a6bddb",
+      "default": false,
+      "description": "Indicates a topic that requires input from various developers."
+    },
+    {
+      "id": 3172006584,
+      "node_id": "MDU6TGFiZWwzMTcyMDA2NTg0",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-memory",
+      "name": "scope-memory",
+      "color": "980043",
+      "default": false,
+      "description": "Issues to reduce and improve memory usage."
+    },
+    {
+      "id": 4754137758,
+      "node_id": "LA_kwDOCD5_Gc8AAAABG15ing",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-feature-request",
+      "name": "meta-feature-request",
+      "color": "B5CF5F",
+      "default": false,
+      "description": "Issues to track feature requests."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-07T15:53:45Z",
+  "updated_at": "2023-08-07T15:54:07Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Problem description\r\n\r\n- From https://github.com/ChainSafe/lodestar/issues/5855 Lodestar's big state memory footprint is an issue for large networks\r\n\r\nLodestar is relatively inefficient when representing sparse data, such a persistent merkle tree:\r\n\r\n| State           | VC len | SSZ    | TreeDU | CachedState |\r\n| --------------- | ------ | ------ | ------ | ----------- |\r\n| mainnet_1880255 | 216,541 | 32 MB  | 229 MB | 292 MB\r\n| mainnet_2620447 | 263,370 | 39 MB  | 271 MB | 356 MB\r\n| mainnet_6963647 | 852,585 | 121 MB | 837 MB | 1073 MB (x8.8 SSZ)\r\n| forecast        | 1,400,000  | 200 MB | -      | 1700 MB\r\n| forecast        | 1,700,000  | 240 MB | -      | 2100 MB\r\n| forecast        | 2,300,000  | 330 MB | -      | 2900 MB\r\n\r\n_Summary of state size by index count_\r\n\r\n## Why is the CachedState so heavy?\r\n\r\nThe memory cost of basic building blocks of CachedBeaconState using `@chainsafe/persistent-merkle-tree` is\r\n\r\n```\r\nValidator                   - 625.8 bytes / instance\r\nBranchNodeStruct(Validator) - 765.1 bytes / instance\r\nLeafNode                    - 103.1 bytes / instance\r\nBranchNode                  - 131.4 bytes / instance\r\nblst.PublicKey(affine)      - 82.4 bytes / instance\r\n```\r\n\r\n- A single validator record serialized is 121 bytes, while as Javascript objects 625 bytes (x5).\r\n- A branch node including hash is 131 bytes, where the min data required (left ptr, right ptr, hash) is 48 (x3).\r\n\r\n> While this numbers are not great, a lot of work had been done to reduce them from a naive initial design, like using a pseudo fixed size Uint8Array, the [HashObject](https://github.com/ChainSafe/ssz/blob/2929e8b6a0d787b9087d9438337a2486012401cb/packages/as-sha256/src/hashObject.ts#L5)\r\n\r\nAt large index count, those numbers add up fast. Using mainnet_6963647 with 852585 indexes (note that the branch nodes count of N leaves is N)\r\n\r\n```\r\nvalidators data:  765 * 852585     = 652 MB\r\nvalidators cache: 131 * 852585     = 111 MB\r\nbalances data:    103 * 852585 / 4 = 21  MB\r\nbalances cache:   131 * 852585 / 4 = 28  MB\r\ninactivity data:  103 * 852585 / 4 = 21  MB\r\ninactivity cache: 131 * 852585 / 4 = 28  MB\r\nTOTAL ------------------------------ 861 MB (837 MB measured)\r\n```\r\n_Breakdown of main contributors to BeaconState Tree memory_\r\n\r\n```\r\nblst.Pubkeys:      82 * 852585     = 70  MB\r\nPubkeyMap:        157 * 852585     = 133 MB\r\nTOTAL ------------------------------ 203 MB (236 MB measured, 1073 - 837)\r\n```\r\n_Breakdown of main contributors to BeaconStateCache memory_ \r\n\r\nNote that the BeaconStateCache memory cost is payed once per application, and most of the validators array is shared between all states in memory.\r\n\r\n## Can we do better?\r\n\r\nOur main problem is how to represent short binary data (hashes, pubkeys) efficiently in Javascript. The only option to have a ~1x (data represented / memory used) is by having multiple items in a large ArrayBuffer such that the overhead of each instance is amortized.\r\n\r\nThe BeaconState has the nice property where not much data is changed at once.\r\n\r\n**Properties**\r\n\r\n| Beacon state field       | Type                        | bytes/idx | Per-block changes | Per-epoch changes |\r\n| ------------------------ | --------------------------- | ----- | ----------------- | ----------------- |\r\n| block_roots, state_roots | Vector[Root, 8192]          | -     | W 1               | -\r\n| eth1_data_votes          | List[Eth1Data, 2048]        | -     | R all, W 1        | -\r\n| validators               | List[Validator, 1M]         | 121   | W (16:2000)       | W (0:1M)\r\n| balances                 | List[Gwei, 1M]              | 8     | W (512:~528)      | W 1M\r\n| randao_mixes             | Vector[Bytes32, 65536]      | -     | W 1               | W 1\r\n| slashings                | Vector[Gwei, 8192]          | -     | W (0:1)           | R 1M, W 1\r\n| epoch_participation      | List[uin8, 1M]              | 2     | W 31250           | R 1M, W 1M\r\n| inactivity_scores        | List[uint64, 1M]            | 8     | -                 | R 1M, W (0:1M)\r\n| historical_summaries     | List[HistoricalSummary, oo] | -     | -                 | W 1\r\n\r\n**Block processing**\r\n\r\n_With 1M indexes_\r\n\r\n```\r\nprocessWithdrawals           R (avg 16 max 16384) validators, W 16 balances\r\nprocessProposerSlashing      W (0:16) validators\r\nprocessAttesterSlashing      W (0:~500) validators\r\nprocessAttestations          W 31250 participation bytes\r\nprocessDeposit               W (0:~700) validators\r\nprocessVoluntaryExit         W (0:16) validators\r\nprocessBlsToExecutionChange  W (0:16) validators\r\nprocessSyncAggregate         W 512 balances\r\n+ hash\r\n```\r\nMin expected size diff: 35 KB\r\n\r\n**Epoch processing**\r\n```\r\nprocessJustificationAndFinalization  R 1M participation, active_balance\r\nprocessInactivityUpdates             R 1M participation + W (0:1M) inactivity \r\nprocessRewardsAndPenalties           R 1M participation, active_balance, inactivity + W 1M balances\r\nprocessRegistryUpdates               R 1M validators + W (0:20) validators\r\nprocessSlashings                     R 1M validators + W (0:1M) validators\r\nprocessEth1DataReset                 -\r\nprocessEffectiveBalanceUpdates       R 1M balances + W (0:1M) validators\r\nprocessSlashingsReset                -\r\nprocessRandaoMixesReset              -\r\nprocessHistoricalSummariesUpdate     -\r\nprocessParticipationFlagUpdates      -\r\nprocessSyncCommitteeUpdates          shuffling\r\n+ hash\r\n+ shufflings\r\n```\r\nMin expected size diff: 9 MB\r\n\r\n## State as flat memory\r\n\r\nBoth the state data and the hashing cache can be represented as flat memory. Prysm, and Lighthouse have been using this strategy since genesis. However, a naive implementation duplicates all content between forks, limiting the total amount of states that could be hold in memory at once.\r\n\r\nBut states can be represented as base layer + diff layers\r\n\r\n```\r\n                    /<------[d4] <------[d6]\r\n[b0] <-[d1] <-[d2] <-[d3] <-------[d5]    ^ state_b\r\n                                   ^ state_a\r\n```\r\nThen states can be represented as the sum of:\r\n```\r\nstate_a = compact([b0, d1, d2, d3, d5])\r\nstate_b = compact([b0, d1, d2, d4, d6])\r\n```\r\n\r\n**Advantages**\r\n- Happy case allows to represent state + cache in 2x SSZ size, instead of x8.8 like today\r\n- Allows to easily compute the size of diff layers, which unlocks more smart state cache designs\r\n\r\n**Drawbacks**\r\n- Each read potentially requires checking every single layer until reaching the base. Frequently read lists like participation, should not be represented in a diff format.\r\n- Compacting through forks may require to copy the entire base\r\n- Significant complexity\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5857/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5857/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
