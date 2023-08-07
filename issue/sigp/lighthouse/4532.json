@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-07-24T07:17:15Z",
-  "updated_at": "2023-08-07T04:18:21Z",
-  "closed_at": null,
+  "updated_at": "2023-08-07T18:28:22Z",
+  "closed_at": "2023-08-07T18:28:22Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nI noticed that after I checkpoint syncing on devnet-7, Lighthouse pretty much disconnect / ban most non lighthouse peers pretty quickly because peers aren't able to serve us `blob_sidecars_by_range` quick enough\r\n\r\n2 Teku & 4 Lodestar peers get disconnected due to `Negotiation timeout`\r\nPrysm peer rate limits us `RPC response was an error: The request was invalid with reason: rate limited`\r\nAnd I ended up with only 5 peers (4 Lighthouse & 1 Teku).\r\n\r\nI'm running with `--self-limiter=blob_sidecars_by_range:512/10`, slightly lower than our default `768/10`\r\nhttps://github.com/sigp/lighthouse/blob/f1f04bc68a5506c839693d25bc8c626c48ec8669/beacon_node/lighthouse_network/src/rpc/methods.rs#L38",
-  "closed_by": null,
+  "closed_by": {
+    "login": "realbigsean",
+    "id": 5160426,
+    "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/realbigsean",
+    "html_url": "https://github.com/realbigsean",
+    "followers_url": "https://api.github.com/users/realbigsean/followers",
+    "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+    "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+    "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+    "repos_url": "https://api.github.com/users/realbigsean/repos",
+    "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4532/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4532/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -148,6 +167,50 @@
     "body": "@realbigsean ^ I think we can probably close this given the comment above - it only happens on small testnets. \r\nDo you think it's worth applying some sort of self limiting at per-peer level? Probably not high priority but maybe something worth considering.",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1667160070/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1668388460",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4532#issuecomment-1668388460",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4532",
+    "id": 1668388460,
+    "node_id": "IC_kwDOCFeAzc5jcZZs",
+    "user": {
+      "login": "realbigsean",
+      "id": 5160426,
+      "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/realbigsean",
+      "html_url": "https://github.com/realbigsean",
+      "followers_url": "https://api.github.com/users/realbigsean/followers",
+      "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+      "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+      "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+      "repos_url": "https://api.github.com/users/realbigsean/repos",
+      "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-07T18:28:18Z",
+    "updated_at": "2023-08-07T18:28:18Z",
+    "author_association": "COLLABORATOR",
+    "body": "Yea I think we can close this in favor of this more general rate limiting issue: https://github.com/sigp/lighthouse/issues/4448\n\n> Do you think it's worth applying some sort of self limiting at per-peer level\n\ninteresting thought, but doing it based on connected peers might not be the best way, because we have changed this numebr pretty drastically in the past, it's gone from 50 to 100 for example at default and we wouldn't have wanted to change leniency in these cases. There might be something there with basing it off of \"peers seen\" or \"total network peers\" because this gives us an idea of how many options for peers we have, and the more options we have the less lenient we can be in scoring",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1668388460/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
