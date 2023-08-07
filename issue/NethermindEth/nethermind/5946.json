@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "OlegJakushkin",
@@ -105,14 +105,33 @@
     }
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-07-19T14:04:03Z",
-  "updated_at": "2023-08-05T07:09:47Z",
-  "closed_at": null,
+  "updated_at": "2023-08-07T13:11:03Z",
+  "closed_at": "2023-08-07T13:11:02Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**Description**\r\nWhen trying to estimate gas for sending ETH to fallback method, the estimate is too low. Here's the estimate gas RPC query:\r\n```json\r\n{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 1,\r\n    \"method\":\"eth_estimateGas\",\r\n    \"params\":[{\r\n        \"from\": \"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\",\r\n        \"to\": \"0x6978a05bbb01fcc27a41ff34f60472652bb04cfc\",\r\n        \"value\": \"0xde0b6b3a7640000\"\r\n    }]\r\n}\r\n```\r\n\r\nThis returns `0xbef9` which is 48889. For the same query Geth gives 54036. When executing the call itself, it consumes `41173` gas, which is less than the estimates, but the contract probably gets some discounts and might be doing some weird stuff with GAS opcode. Geths estimate is enough to make the call work, but Netherminds is not.\r\n\r\nNethermind version: 1.17.3 and <https://github.com/NethermindEth/nethermind/tree/feature/eth_multicall>\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "emlautarom1",
+    "id": 31224949,
+    "node_id": "MDQ6VXNlcjMxMjI0OTQ5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/31224949?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/emlautarom1",
+    "html_url": "https://github.com/emlautarom1",
+    "followers_url": "https://api.github.com/users/emlautarom1/followers",
+    "following_url": "https://api.github.com/users/emlautarom1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/emlautarom1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/emlautarom1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/emlautarom1/subscriptions",
+    "organizations_url": "https://api.github.com/users/emlautarom1/orgs",
+    "repos_url": "https://api.github.com/users/emlautarom1/repos",
+    "events_url": "https://api.github.com/users/emlautarom1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/emlautarom1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5946/reactions",
     "total_count": 0,
@@ -127,7 +146,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5946/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -294,6 +313,50 @@
     "body": "Very odd behavior.  The first time I tried with the `gas` property set to `0x1c9c380` I got back `0xbef9`, just like without it.  However, when I sent again with the `gas` property set (after submitting without) I got `0xd314`.  I now reliably get back the correct gas limit.  Perhaps this is some kind of caching issue in Nethermind that was causing me to get the cached result initially?\r\n\r\n```bash\r\ncurl https://ethereum.zoltu.io -H 'Accept: application/json' --data '{ \"jsonrpc\": \"2.0\", \"id\": 1, \"method\":\"eth_estimateGas\", \"params\":[{ \"from\": \"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\", \"to\": \"0x6978a05bbb01fcc27a41ff34f60472652bb04cfc\", \"value\": \"0xde0b6b3a7640000\" }] }'\r\n{\"jsonrpc\":\"2.0\",\"result\":\"0xbef9\",\"id\":1}\r\n```\r\n```bash\r\ncurl https://ethereum.zoltu.io -H 'Accept: application/json' --data '{ \"jsonrpc\": \"2.0\", \"id\": 1, \"method\":\"eth_estimateGas\", \"params\":[{ \"from\": \"0xd8dA\r\n6BF26964aF9D7eEd9e03E53415D37aA96045\", \"to\": \"0x6978a05bbb01fcc27a41ff34f60472652bb04cfc\", \"value\": \"0xde0b6b3a7640000\", \"gas\": \"0x1c9c380\" }] }'\r\n{\"jsonrpc\":\"2.0\",\"result\":\"0xd314\",\"id\":1}\r\n```\r\n\r\nIt does appear this works around the issue, I suspect that getting the wrong result the first time was some sort of caching issue (different bug).",
     "reactions": {
       "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1666420856/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1667832493",
+    "html_url": "https://github.com/NethermindEth/nethermind/issues/5946#issuecomment-1667832493",
+    "issue_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5946",
+    "id": 1667832493,
+    "node_id": "IC_kwDOBggaLc5jaRqt",
+    "user": {
+      "login": "emlautarom1",
+      "id": 31224949,
+      "node_id": "MDQ6VXNlcjMxMjI0OTQ5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31224949?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/emlautarom1",
+      "html_url": "https://github.com/emlautarom1",
+      "followers_url": "https://api.github.com/users/emlautarom1/followers",
+      "following_url": "https://api.github.com/users/emlautarom1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/emlautarom1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/emlautarom1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/emlautarom1/subscriptions",
+      "organizations_url": "https://api.github.com/users/emlautarom1/orgs",
+      "repos_url": "https://api.github.com/users/emlautarom1/repos",
+      "events_url": "https://api.github.com/users/emlautarom1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/emlautarom1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-07T13:11:02Z",
+    "updated_at": "2023-08-07T13:11:02Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "> Perhaps this is some kind of caching issue in Nethermind that was causing me to get the cached result initially?\r\n\r\nAs far as I know there is no form of caching for JSON-RPC calls on Nethermind. I see that you're making the requests to `https://ethereum.zoltu.io` so maybe the caching is done there?\r\n\r\nSince #5973 fixes this issue I'll be closing the ticket. Feel free to open a new one if you happen to have a new issue with gas estimation (or caching if that's the case).",
+    "reactions": {
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1667832493/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
