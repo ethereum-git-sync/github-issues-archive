@@ -31,13 +31,13 @@
   },
   "labels": [
     {
-      "id": 4937119027,
-      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
-      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
-      "name": "status:triaging",
+      "id": 2474207618,
+      "node_id": "MDU6TGFiZWwyNDc0MjA3NjE4",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:needs-more-info",
+      "name": "status:needs-more-info",
       "color": "0E8A16",
       "default": false,
-      "description": ""
+      "description": "There's not enough information to start working on this issue"
     }
   ],
   "state": "open",
@@ -85,9 +85,9 @@
     }
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 7,
   "created_at": "2023-07-04T05:48:44Z",
-  "updated_at": "2023-08-07T09:58:41Z",
+  "updated_at": "2023-08-08T15:47:10Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -362,6 +362,50 @@
     "body": "Thank you so much for your patience. I did isolate the bug. This contract and the corresponding test work on hardhat 2.10.2 but not on hardhat 2.11.0 and later, it throws \"SafeERC20: low-level call failed\".\r\n\r\ncontracts/TokenMover.js\r\n\r\n```\r\npragma solidity 0.8.2;\r\npragma abicoder v2;\r\n\r\nimport '@openzeppelin/contracts/token/ERC20/ERC20.sol';\r\nimport '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';\r\nimport '@openzeppelin/contracts/token/ERC20/IERC20.sol';\r\n\r\ncontract TokenMover is ERC20 {\r\n\tconstructor() ERC20(\"TokenMover\", \"TM\") {\r\n\t}\r\n\t\r\n\tfunction moveTokens(uint256 tokenAmount, address tokenContract) external {\r\n\t\tSafeERC20.safeTransferFrom(IERC20(tokenContract), msg.sender, address(this), tokenAmount);\r\n\t}\r\n}\r\n```\r\n\r\ntest/verify-contract.js\r\n\r\n```\r\nconst chai = require(\"chai\")\r\nconst { expect } = chai\r\nconst { ethers, waffle, } = require(\"hardhat\")\r\n\r\n// Enable and inject BN dependency\r\nchai.use(require(\"chai-bn\")(ethers.BigNumber))\r\n\r\n// These wallet addresses are real addresses on the Ethereum mainnet\r\nconst SENDING_WALLET = \"0xDBca354Aa9D55D9BB2D3588ceCb43A56eb2D0057\"\r\nconst WBTC_CONTRACT = \"0x2260fac5e5542a773aa44fbcfedf7c193bc2c599\"\r\n\r\n// Custom suite of unit tests follows\r\ndescribe(\"Verifying contract\", function () {\r\n    let tokenMoverContract\r\n    let deployAddress\r\n    let myAccount\r\n    let myAddress\r\n    let secondAddress\r\n   \r\n    describe(\"Test that fails on version 2.11.0 and later\", function () {\r\n        it(\"Should transfer some WBTC\", async function () {\r\n            // Test for correct block number\r\n            const blockNumber = await ethers.provider.getBlockNumber()\r\n            expect(blockNumber).to.equal(12548539)\r\n\r\n            // Deploy the contract\r\n            tokenMoverContract = await ethers.deployContract(\"TokenMover\", [], {\r\n                unsafeAllow: [\"delegatecall\"],\r\n            })\r\n\r\n            const deployed = await tokenMoverContract.deployed()\r\n            deployAddress = deployed.address\r\n            console.log(\"\\tContract deployed to\", deployAddress)\r\n            expect(deployAddress).to.exist\r\n\r\n            // Set up variables\r\n            const accounts = await ethers.getSigners()\r\n            myAccount = accounts[0]\r\n            myAddress = myAccount.address\r\n            const mySigner = await ethers.provider.getSigner(myAddress)\r\n            secondAddress = accounts[2].address\r\n            console.log(\"\\tDeployer's address is\", myAddress)\r\n           \r\n            // Check contract ETH balance\r\n            let contractWeiBefore = await ethers.provider.getBalance(myAddress)\r\n            let contractEthBefore = ethers.utils.formatEther(contractWeiBefore)\r\n            console.log(\"CONTRACT ITSELF HAS \", ethers.utils.commify(contractEthBefore.toString()), \"ETH\")\r\n           \r\n            // Make sure sending wallet has enough ETH to call the moveTokens function\r\n            let testWeiBefore = await ethers.provider.getBalance(SENDING_WALLET)\r\n            let testEthBefore = ethers.utils.formatEther(testWeiBefore)\r\n            console.log(\"SENDING_WALLET HAS \", ethers.utils.commify(testEthBefore.toString()), \"ETH\")\r\n\r\n            // Send gas money to SENDING_WALLET\r\n            await mySigner.sendTransaction({\r\n                to: SENDING_WALLET,\r\n                value: ethers.BigNumber.from(\"100000000000000000000\"),\r\n            })\r\n           \r\n            let testWei = await ethers.provider.getBalance(SENDING_WALLET)\r\n            let testEth = ethers.utils.formatEther(testWei)\r\n           \r\n            expect(testWei).to.be.a.bignumber.above(\r\n                ethers.BigNumber.from(\"100000000000000000000\")\r\n            )\r\n           \r\n            // Check ETH balance of SENDING_WALLET\r\n            await hre.network.provider.request({\r\n                method: \"hardhat_impersonateAccount\",\r\n                params: [SENDING_WALLET],\r\n            })\r\n            const sendingWalletSigner = await ethers.provider.getSigner(SENDING_WALLET)\r\n            expect(sendingWalletSigner._address).to.equal(SENDING_WALLET)\r\n            const abi = [\r\n                \"function balanceOf(address account) public view returns (uint256)\",\r\n                \"function approve(address _spender, uint256 _value) public returns (bool success)\",\r\n            ]\r\n           \r\n            let beforeWalletWei = await ethers.provider.getBalance(SENDING_WALLET)\r\n            let beforeWalletEth = ethers.utils.formatEther(beforeWalletWei)\r\n            console.log(\r\n                \"\\tETH balance of WBTC Test wallet before moveTokens is\",\r\n                ethers.utils.commify(beforeWalletEth.toString()),\r\n                \"ETH\"\r\n            )\r\n           \r\n            // Check WBTC balance of SENDING_WALLET\r\n            let wbtcSenderWallet = await ethers.getContractAt(abi, WBTC_CONTRACT, sendingWalletSigner)\r\n            const wbtcBefore = await wbtcSenderWallet.balanceOf(SENDING_WALLET)\r\n            const tokenBefore = await tokenMoverContract.balanceOf(\r\n                SENDING_WALLET\r\n            )\r\n\r\n            console.log(\r\n                \"\\tWBTC balance of SENDING_WALLET before moveTokens is\",\r\n                ethers.utils.commify(wbtcBefore.toString()),\r\n                \"WBTC\"\r\n            )\r\n           \r\n            let beforeReserveWei = await ethers.provider.getBalance(\r\n                secondAddress\r\n            )\r\n            let beforeReserveEth = ethers.utils.formatEther(beforeReserveWei)\r\n\r\n            // Approve from SEND_WALLET to our contract\r\n            const maxApprove = \"9999999999999999999\"\r\n            wbtcSenderWallet.approve(deployAddress, maxApprove)\r\n\r\n            // Get a contract object with the SENDING_WALLET signer\r\n           \r\n            let sendingWalletContract = await ethers.getContractAt(\r\n                \"TokenMover\",\r\n                deployAddress,\r\n                sendingWalletSigner\r\n            )\r\n           \r\n            console.log(\"Address of loaded deployed contract is \", sendingWalletContract.address)\r\n            await sendingWalletContract.moveTokens(\r\n                ethers.BigNumber.from(\"88778\"),\r\n                WBTC_CONTRACT\r\n            )\r\n           \r\n            let afterWalletWei = await ethers.provider.getBalance(SENDING_WALLET)\r\n            const diffWalletWei = beforeWalletWei.sub(afterWalletWei)\r\n            let diffWalletEth = ethers.utils.formatEther(diffWalletWei)\r\n\r\n            console.log(\r\n                \"\\tETH balance of WBTC Test wallet after moveTokens decreased by\",\r\n                ethers.utils.commify(diffWalletEth.toString()),\r\n                \"ETH\"\r\n            )\r\n\r\n            const wbtcAfter = await wbtcSenderWallet.balanceOf(SENDING_WALLET)\r\n            expect(wbtcAfter).to.be.bignumber.below(wbtcBefore)\r\n\r\n            await hre.network.provider.request({\r\n                method: \"hardhat_stopImpersonatingAccount\",\r\n                params: [SENDING_WALLET],\r\n            })\r\n        })\r\n    })\r\n})\r\n```\r\n\r\nLet me know if you can replicate the bug with this code!",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1667184475/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1669868784",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4103#issuecomment-1669868784",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4103",
+    "id": 1669868784,
+    "node_id": "IC_kwDOB7jojM5jiCzw",
+    "user": {
+      "login": "schaable",
+      "id": 1165424,
+      "node_id": "MDQ6VXNlcjExNjU0MjQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1165424?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/schaable",
+      "html_url": "https://github.com/schaable",
+      "followers_url": "https://api.github.com/users/schaable/followers",
+      "following_url": "https://api.github.com/users/schaable/following{/other_user}",
+      "gists_url": "https://api.github.com/users/schaable/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/schaable/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/schaable/subscriptions",
+      "organizations_url": "https://api.github.com/users/schaable/orgs",
+      "repos_url": "https://api.github.com/users/schaable/repos",
+      "events_url": "https://api.github.com/users/schaable/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/schaable/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-08T15:46:55Z",
+    "updated_at": "2023-08-08T15:46:55Z",
+    "author_association": "COLLABORATOR",
+    "body": "Hi @andersaamodt,\r\n\r\nI tried to reproduce the issue using the code you provided for both versions, but the test fails with an assertion error in both cases. Can you share the repo either as a zip file or by pushing it to GitHub to investigate it further?",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1669868784/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
