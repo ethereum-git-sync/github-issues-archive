@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5564",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5564/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5564/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5564/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5564",
+  "id": 1841654897,
+  "node_id": "I_kwDOGBlvNc5txWxx",
+  "number": 5564,
+  "title": "`vm.resumeGasMetering` can cause tests with expected reverts to fail with an `OutOfGas` error ",
+  "user": {
+    "login": "jameswenzel",
+    "id": 6371847,
+    "node_id": "MDQ6VXNlcjYzNzE4NDc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6371847?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jameswenzel",
+    "html_url": "https://github.com/jameswenzel",
+    "followers_url": "https://api.github.com/users/jameswenzel/followers",
+    "following_url": "https://api.github.com/users/jameswenzel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jameswenzel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jameswenzel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jameswenzel/subscriptions",
+    "organizations_url": "https://api.github.com/users/jameswenzel/orgs",
+    "repos_url": "https://api.github.com/users/jameswenzel/repos",
+    "events_url": "https://api.github.com/users/jameswenzel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jameswenzel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-08T16:41:27Z",
+  "updated_at": "2023-08-08T16:41:27Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (6672134 2023-08-08T00:21:59.824374000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nAfter calling `vm.pauseGasMetering`, calling `vm.resumeGasMetering` within a reverting external call causes tests to fail with an `OutOfGas` error. \r\n\r\nThere seem to broadly be inconsistencies and unexpected behavior with the `GasMetering` functions; see #5491 as possibly related.\r\n\r\nA reproduction, which eliminates self-external-calls as the issue.\r\n\r\n```solidity\r\n\r\nimport {Test, Vm} from \"forge-std/Test.sol\";\r\n\r\ncontract RevertingExternalContract {\r\n    error MyError();\r\n\r\n    Vm private constant vm = Vm(address(uint160(uint256(keccak256(\"hevm cheat code\")))));\r\n\r\n    function externalReverts() external {\r\n        vm.resumeGasMetering();\r\n        revert MyError();\r\n    }\r\n}\r\n\r\ncontract MeteringTest is Test {\r\n    error MyError();\r\n\r\n    RevertingExternalContract externalContract;\r\n\r\n    function setUp() public {\r\n        externalContract = new RevertingExternalContract();\r\n    }\r\n\r\n    function testSelfNormalRevert() public {\r\n        vm.expectRevert(MeteringTest.MyError.selector);\r\n        this.selfReverts();\r\n    }\r\n\r\n    function testSelfMeteringRevert() public {\r\n        vm.pauseGasMetering();\r\n        vm.expectRevert(MeteringTest.MyError.selector);\r\n        this.selfReverts();\r\n    }\r\n\r\n    function testExternalNormalRevert() public {\r\n        vm.expectRevert(RevertingExternalContract.MyError.selector);\r\n        externalContract.externalReverts();\r\n    }\r\n\r\n    function testExternalMeteringRevert() public {\r\n        vm.pauseGasMetering();\r\n        vm.expectRevert(RevertingExternalContract.MyError.selector);\r\n        externalContract.externalReverts();\r\n    }\r\n\r\n    function testExternalMeteringManualCheck() public {\r\n        vm.pauseGasMetering();\r\n        (bool success,) = address(this).call(abi.encodeWithSelector(this.selfReverts.selector));\r\n        assertEq(success, false);\r\n    }\r\n\r\n    function selfReverts() external {\r\n        vm.resumeGasMetering();\r\n        revert MyError();\r\n    }\r\n}\r\n```\r\n\r\nOutput of running these tests:\r\n\r\n```\r\n[PASS] testSelfNormalRevert() (gas: 3953)\r\nTest result: FAILED. 2 passed; 3 failed; 0 skipped; finished in 402.42µs\r\nRan 1 test suites: 2 tests passed, 3 failed, 0 skipped (5 total tests)\r\n\r\nFailing tests:\r\nEncountered 3 failing tests in test/Metering.t.sol:MeteringTest\r\n[FAIL. Reason: EvmError: OutOfGas] testExternalMeteringManualCheck() (gas: 9223372036854754743)\r\n[FAIL. Reason: EvmError: OutOfGas] testExternalMeteringRevert() (gas: 9223372036854754743)\r\n[FAIL. Reason: EvmError: OutOfGas] testSelfMeteringRevert() (gas: 9223372036854754743)\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5564/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5564/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
