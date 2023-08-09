@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-08T16:20:27Z",
-  "updated_at": "2023-08-08T16:20:27Z",
-  "closed_at": null,
+  "updated_at": "2023-08-08T18:26:40Z",
+  "closed_at": "2023-08-08T18:26:39Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Version 1.12.0 of types.Sender fails on some contract-creation transactions consistently.\r\n\r\n```go\r\nsender, err := types.Sender(types.LatestSignerForChainID(tx.ChainId()), tx)\r\nif err != nil {\r\n        log.Printf(\"sender of Ethereum block %d transaction hash %#x unavailable: %s\", blockNo, tx.Hash(), err)\r\n}\r\n```\r\n\r\nThe first failure happens on block 54092, the second on block 66886, and so on.\r\n\r\n```\r\n2023/08/08 18:00:21 sender of Ethereum block 54092 transaction hash 0x9c81f44c29ff0226f835cd0a8a2f2a7eca6db52a711f8211b566fd15d3e0e8d4 unavailable: invalid transaction v, r, s values\r\n2023/08/08 18:00:21 sender of Ethereum block 66886 transaction hash 0xf359761b1e9772116351369a1945d9a36efbd06862e2c280a8be0b1150f191d3 unavailable: invalid transaction v, r, s values\r\n2023/08/08 18:00:21 sender of Ethereum block 81655 transaction hash 0x277c52349a4ec5a372f91a78214ea778e352a071909108cd3b8e2d83a64b7a57 unavailable: invalid transaction v, r, s values\r\n2023/08/08 18:00:21 sender of Ethereum block 96252 transaction hash 0x8ac230db13feec03d0899c40d2b68485a19e2297d0b5eea08e4efec661ea21ec unavailable: invalid transaction v, r, s values\r\n2023/08/08 18:00:21 sender of Ethereum block 100689 transaction hash 0xbeafec04e9df5b0644bd9cd55b0a140e1b2542a8aa5609978ecd3d10eba11134 unavailable: invalid transaction v, r, s values\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "karalabe",
+    "id": 129561,
+    "node_id": "MDQ6VXNlcjEyOTU2MQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/129561?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/karalabe",
+    "html_url": "https://github.com/karalabe",
+    "followers_url": "https://api.github.com/users/karalabe/followers",
+    "following_url": "https://api.github.com/users/karalabe/following{/other_user}",
+    "gists_url": "https://api.github.com/users/karalabe/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/karalabe/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/karalabe/subscriptions",
+    "organizations_url": "https://api.github.com/users/karalabe/orgs",
+    "repos_url": "https://api.github.com/users/karalabe/repos",
+    "events_url": "https://api.github.com/users/karalabe/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/karalabe/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27883/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27883/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1670099094",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/27883#issuecomment-1670099094",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27883",
+    "id": 1670099094,
+    "node_id": "IC_kwDOAOvK985ji7CW",
+    "user": {
+      "login": "karalabe",
+      "id": 129561,
+      "node_id": "MDQ6VXNlcjEyOTU2MQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/129561?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/karalabe",
+      "html_url": "https://github.com/karalabe",
+      "followers_url": "https://api.github.com/users/karalabe/followers",
+      "following_url": "https://api.github.com/users/karalabe/following{/other_user}",
+      "gists_url": "https://api.github.com/users/karalabe/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/karalabe/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/karalabe/subscriptions",
+      "organizations_url": "https://api.github.com/users/karalabe/orgs",
+      "repos_url": "https://api.github.com/users/karalabe/repos",
+      "events_url": "https://api.github.com/users/karalabe/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/karalabe/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-08T18:26:39Z",
+    "updated_at": "2023-08-08T18:26:39Z",
+    "author_association": "MEMBER",
+    "body": "LatestSignerForChainID does not support decoding pre-Homestead transactions where 2 signatures are valid from the same tx. You'll need to construct a signer via types.MakeSigner and pass in the block number / timestamp too to have a signer that will run with Frontier rules (too) and correctly recover those transactions too.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1670099094/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
