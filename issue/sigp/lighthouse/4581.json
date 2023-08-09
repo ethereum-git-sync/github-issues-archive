@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4581",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4581/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4581/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4581/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4581",
+  "id": 1842296677,
+  "node_id": "I_kwDOCFeAzc5tzzdl",
+  "number": 4581,
+  "title": "\"too many subscriptions per request\" Error on Deneb local testnet",
+  "user": {
+    "login": "jimmygchen",
+    "id": 742762,
+    "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmygchen",
+    "html_url": "https://github.com/jimmygchen",
+    "followers_url": "https://api.github.com/users/jimmygchen/followers",
+    "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+    "repos_url": "https://api.github.com/users/jimmygchen/repos",
+    "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4615284981,
+      "node_id": "LA_kwDOCFeAzc8AAAABExeo9Q",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/deneb",
+      "name": "deneb",
+      "color": "B7BBEC",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-09T01:06:44Z",
+  "updated_at": "2023-08-09T01:19:30Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nA Discord user (Stefan) reported getting this error on a deneb-devnet-7 local testnet for lighthouse. The nodes on the network had `--subscribe-all-subnets` enabled:\r\n\r\n```\r\n[     964] [    36.090282] [service_lighthouse-nethermind-0--lighthouse-bn] [I] [2023-08-04T10:05:46Z ERROR libp2p_gossipsub::behaviour] Subscription filter error: too many subscriptions per request; ignoring RPC from peer 16Uiu2HAmDL3NPvDTYk6d3U59HeJ66aTJNpWUhr8R5pDWj13tHTcf\r\n```\r\n\r\nStefan also referenced the limit set here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/4ca101e085e2a88805cc4788e6f875ff65998b6c/beacon_node/lighthouse_network/src/service/mod.rs#L242-L244\r\n\r\nThe comment above is interesting, because a node, when subscribe to all attestation subnets, could go over the limit during fork transition, i.e. 2 epochs before  & after a fork, where lighthouse is subscribed to both the current fork topics and next fork topics (total of 162 topics as calculated above). I think the `max_subscriptions_per_request` may need to be bumped over 162 to prevent this error, otherwise the peer's subscription request could be ignored.\r\n\r\n@pawanjay176 @realbigsean could you please confirm my understanding above?\r\n\r\nCredits to @qu0b for reporting this! 🙏 ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4581/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4581/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
