@@ -40,21 +40,40 @@
       "description": "There's not enough information to start working on this issue"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-07-12T10:05:27Z",
-  "updated_at": "2023-07-17T09:56:54Z",
-  "closed_at": null,
+  "updated_at": "2023-08-09T07:10:53Z",
+  "closed_at": "2023-08-09T07:10:53Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\r\n\r\n2.16.1\r\n\r\n### What happened?\r\n\r\nhardhat makes calls like: `{\"jsonrpc\":\"2.0\",\"method\":\"eth_feeHistory\",\"params\":[\"0x1\",\"latest\",[50]],\"id\":9}`\r\nIf the fork environment called has a base fee set to `1` , or for any other reason, the response may be:\r\n`{\"jsonrpc\":\"2.0\",\"id\":9,\"result\":{\"baseFeePerGas\":[\"0x1\",\"0x0\"],\"gasUsedRatio\":[0.0],\"oldestBlock\":\"0x1efea03\",\"reward\":[[\"0x0\"]]}}`\r\n\r\nThe next eth_sendTransaction by hardhat contained: `\"maxFeePerGas\":\"0x0\",\"maxPriorityFeePerGas\":\"0x0\"}]`\r\n\r\nHardhat should probably not ever send transactions with 0 for these fields. The word \"probably\" may be debatable, but do we really expect any chain that is allowing free transactions?\r\n\r\n### Minimal reproduction steps\r\n\r\nSend multiple transactions of any kind to an `anvil --base-fee 1` node.\r\n\r\n### Search terms\r\n\r\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4136/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4136/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "> Just for my edification and so that we are on the same page, can you describe how this is useful in many testing scenarios -- assuming you mean in some way beyond the trivial \"I don't want to spend down my fee currency during tests\"?\r\n\r\nSending transactions from impersonated accounts without having to add funds to them is one. Some people also use this to assert how the balance of an account changed during a tx, although that's better done with the [balance change matchers](https://hardhat.org/hardhat-chai-matchers/docs/reference#balance-change).\r\n\r\n> I guess I'm just making the simple point that this is a bit of a weird value, and since hardhat is _calculating the fee_ by delegating that calculation to the chain provider via a percentile, if a production dapp gets back zero, that's very likely a misconfiguration (maybe DNS is not pointed correctly and ended up giving you the test chain, whatever).\r\n\r\nI agree in principle, but this is a design question: if I can possibly detect that there's a problem, even if it's in an external component, should I do it an report a proper message? In some cases the answer is undoubtedly yes (for example, I think we do this when people fork non-archive nodes). In other cases, the answer is no or not yet, mainly because any change like this takes time and adds complexity.\r\n\r\nIn this particular case I'm inclined to say no. If the remote node returns a wrong value, then the user should have enough information to figure out what's the problem. Hardhat would only be the middle man in this case.\r\n\r\nIf it was the case that providers often return a wrong value for some preventable reason, and a lot of users run into that problem, I would probably change my mind.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1637745991/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1670792038",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4136#issuecomment-1670792038",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4136",
+    "id": 1670792038,
+    "node_id": "IC_kwDOB7jojM5jlkNm",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-09T07:10:53Z",
+    "updated_at": "2023-08-09T07:10:53Z",
+    "author_association": "MEMBER",
+    "body": "Tentatively closing this.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1670792038/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
