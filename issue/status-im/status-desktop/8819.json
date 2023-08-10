@@ -75,9 +75,9 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-12-15T14:37:54Z",
-  "updated_at": "2023-07-27T17:46:16Z",
+  "updated_at": "2023-08-10T15:59:18Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -100,5 +100,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1673501654",
+    "html_url": "https://github.com/status-im/status-desktop/issues/8819#issuecomment-1673501654",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/8819",
+    "id": 1673501654,
+    "node_id": "IC_kwDOD5KrTM5jv5vW",
+    "user": {
+      "login": "shinnok",
+      "id": 544446,
+      "node_id": "MDQ6VXNlcjU0NDQ0Ng==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/544446?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shinnok",
+      "html_url": "https://github.com/shinnok",
+      "followers_url": "https://api.github.com/users/shinnok/followers",
+      "following_url": "https://api.github.com/users/shinnok/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shinnok/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shinnok/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shinnok/subscriptions",
+      "organizations_url": "https://api.github.com/users/shinnok/orgs",
+      "repos_url": "https://api.github.com/users/shinnok/repos",
+      "events_url": "https://api.github.com/users/shinnok/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shinnok/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-10T15:59:18Z",
+    "updated_at": "2023-08-10T15:59:18Z",
+    "author_association": "MEMBER",
+    "body": "Here's what I found out so far:\r\n\r\n# The problem\r\n\r\nThe culprit is that we can't do the word substitution (wrapping in **) in a single step, _atomically_. The current solution does:\r\nhttps://github.com/status-im/status-desktop/blob/7d0d321b35e60f2c70c70d36ee32efc070bf2f40/ui/imports/shared/status/StatusChatInput.qml#L526-L527\r\n\r\nWhich in turn does `messageInputField.insert()` twice, for the prefix ** and the postfix **. This is registered as two edits by the `QTextEdit` undo history, thus when undo-ing via the `⌘+Z`, the need to press twice to undo what we perceive as a single action (pressing `⌘+B`).\r\n\r\n# The solution?\r\n\r\nIn short, I couldn't find a workaround that behaves better than the current situation. Here's what I tried:\r\n\r\n## Disabling the Undo history for a moment\r\n\r\nThere's no API for this. Trying to _disable_ the Undo tree, for the duration of the two step edit, via alternative means like `Control.enabled = false` or setting `readOnly` to true, does nothing or results in text artifacts.\t \r\n\r\n```qml\r\n     messageInputField.readOnly = true\r\n     insertInTextInput(messageInputField.selectionStart, wrapWith);\r\n     insertInTextInput(messageInputField.selectionEnd, wrapWith);\r\n     messageInputField.readOnly = false\r\n```\r\n\r\n## Remove, then insert\r\n\r\nThis is the same behavior as the current implementation, only that instead of undoing each ** pair in turn, first `⌘+Z` press will undo the entire `**word**`, leaving _blank_ in instead and second press bring back `word` (without the wrapping **). I don't think it's better than the current implementation behavior (undoing each ** pair in turn).\r\n\r\n```qml\r\n       let selStart = messageInputField.selectionStart\r\n       let word = messageInputField.selectedText\r\n       messageInputField.remove(messageInputField.selectionStart, messageInputField.selectionEnd);\r\n       messageInputField.insert(selStart, wrapWith + word + wrapWith);\r\n       messageInputField.select(newSelectionStart, newSelectionEnd)\r\n```\r\n\r\n## Overwriting the entire text document\r\n\r\nThe last obvious thing to try, is to completely replace `TextEdit.text` with a version that has the substitution done outside the QML control interface.\r\n\r\n```qml\r\n        var unformattedText = messageInputField.getText(0, messageInputField.length)\r\n        let word = messageInputField.selectedText\r\n        var left = unformattedText.substring(0, messageInputField.selectionStart)\r\n        var right = unformattedText.substring(messageInputField.selectionEnd, messageInputField.text.length)\r\n        messageInputField.text = left + wrapWith + word +  wrapWith + right\r\n        messageInputField.select(newSelectionStart, newSelectionEnd)\r\n```\r\n\r\nUnfortunately, assigning to `TextEdit.text` clears the entire Undo tree thus far, so history is not available anymore, pressing `⌘+Z` results in nothing.\r\n\r\n# The conclusion\r\n\r\nAs I'm out of ideas to try around the limitation of the API (not being able to do this prefix/postfix substitution in a fell swoop), I'll put this on hold until I or somebody else comes with suggestions. Maybe @alexandraB99 can pitch in here or advertise this to extra 👀 .",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1673501654/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
