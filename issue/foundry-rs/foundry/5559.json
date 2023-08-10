@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-08-08T10:27:48Z",
-  "updated_at": "2023-08-10T01:57:57Z",
-  "closed_at": null,
+  "updated_at": "2023-08-10T15:29:48Z",
+  "closed_at": "2023-08-10T15:29:47Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [ ] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (394f217 2023-03-21T00:11:00.708322Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nNone\n\n### Describe the bug\n\nI'm developing contracts on a hardhat project, and I want to write test for it by foundry. The problem I'm facing is: In my contract, I will create a new child contract with the same salt + constructor params, but when running it on foundry and hardhat, it provides different addresses. After looking for the issue, I found that bytecode of child contract from foundry and hardhat is not the same, it means the bytecode which is compiled by foundry (in `out`) and hardhat (in `artifacts`) are different. My test in hardhat worked well, I can predict the child contract address by `ethers.utils.getCreate2Address` in js.\r\n\r\nI wonder if there is any difference between the hardhat config and foundry toml, but after many try with many kinds of config, the problem is still there. \r\nIs there any way to ensure that the config of hardhat and foundry execute the same.\r\n\r\nThis is my smart contract code:\r\n```\r\ncontract Parent {\r\n\r\n  function born(bytes32 id, string memory name, uint256 weight) external  returns(address) {\r\n      Child child = new Child{salt: id}(name, weight);\r\n      return address(child);\r\n  }\r\n}\r\n```\r\n\r\nhardhat config:\r\n```\r\nconfig = {\r\n  solidity: {\r\n    version: \"0.8.18\",\r\n    evmVersion: \"london\",\r\n    settings: {\r\n      optimizer: {\r\n        enabled: true,\r\n        runs: 200,\r\n      },\r\n    },\r\n  }\r\n...\r\n}\r\n```\r\n\r\nfoundry config\r\n```\r\n[profile.default]\r\nsrc = 'contracts'\r\nout = 'out'\r\nlibs = ['node_modules', 'lib']\r\ntest = 'test/foundry'\r\ncache_path  = 'forge-cache'\r\ngas_reports = [\"*\"]\r\noptimizer = true\r\noptimizer_runs = 200\r\nsolc = \"0.8.18\"\r\nevm_version = \"london\"\r\nauto_detect_solc = false\r\n```\r\n\r\nForge version: `0.2.0`\r\nHardhat version: `2.14.0`",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5559/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5559/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "I tried another simple contract which has shorter bytecode. This is contract code: \r\n```\r\npragma solidity 0.8.18;\r\ncontract Lock {\r\n    uint256 public unlockTime;\r\n    address payable public owner;\r\n    event Withdrawal(uint256 amount, uint256 when);\r\n\r\n    constructor(uint256 _unlockTime) payable {\r\n        require(block.timestamp < _unlockTime, \"Unlock time should be in the future\");\r\n        unlockTime = _unlockTime;\r\n        owner = payable(msg.sender);\r\n    }\r\n    function withdraw() public {\r\n        require(block.timestamp >= unlockTime, \"You can't withdraw yet\");\r\n        require(msg.sender == owner, \"You aren't the owner\");\r\n        emit Withdrawal(address(this).balance, block.timestamp);\r\n        owner.transfer(address(this).balance);\r\n    }\r\n}\r\n```\r\n\r\nHardhat compiled bytecode: \r\n```\r\n0x60806040526040516102a53803806102a58339810160408190526100229161009b565b8042106100815760405162461bcd60e51b815260206004820152602360248201527f556e6c6f636b2074696d652073686f756c6420626520696e207468652066757460448201526275726560e81b606482015260840160405180910390fd5b600055600180546001600160a01b031916331790556100b4565b6000602082840312156100ad57600080fd5b5051919050565b6101e2806100c36000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c8063251c1aa3146100465780633ccfd60b146100625780638da5cb5b1461006c575b600080fd5b61004f60005481565b6040519081526020015b60405180910390f35b61006a610097565b005b60015461007f906001600160a01b031681565b6040516001600160a01b039091168152602001610059565b6000544210156100e75760405162461bcd60e51b8152602060048201526016602482015275165bdd4818d85b89dd081dda5d1a191c985dc81e595d60521b60448201526064015b60405180910390fd5b6001546001600160a01b031633146101385760405162461bcd60e51b81526020600482015260146024820152732cb7ba9030b932b713ba103a34329037bbb732b960611b60448201526064016100de565b604080514781524260208201527fbf2ed60bd5b5965d685680c01195c9514e4382e28e3a5a2d2d5244bf59411b93910160405180910390a16001546040516001600160a01b03909116904780156108fc02916000818181858888f193505050501580156101a9573d6000803e3d6000fd5b5056fea264697066735822122076fbe7b8ebb7b119ae24cf4af4db6766738a27ad6a012e06535e6d12512b58ae64736f6c63430008120033\r\n```\r\n\r\nfoundry bytecode: \r\n```\r\n0x60806040526040516102a53803806102a58339810160408190526100229161009b565b8042106100815760405162461bcd60e51b815260206004820152602360248201527f556e6c6f636b2074696d652073686f756c6420626520696e207468652066757460448201526275726560e81b606482015260840160405180910390fd5b600055600180546001600160a01b031916331790556100b4565b6000602082840312156100ad57600080fd5b5051919050565b6101e2806100c36000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c8063251c1aa3146100465780633ccfd60b146100625780638da5cb5b1461006c575b600080fd5b61004f60005481565b6040519081526020015b60405180910390f35b61006a610097565b005b60015461007f906001600160a01b031681565b6040516001600160a01b039091168152602001610059565b6000544210156100e75760405162461bcd60e51b8152602060048201526016602482015275165bdd4818d85b89dd081dda5d1a191c985dc81e595d60521b60448201526064015b60405180910390fd5b6001546001600160a01b031633146101385760405162461bcd60e51b81526020600482015260146024820152732cb7ba9030b932b713ba103a34329037bbb732b960611b60448201526064016100de565b604080514781524260208201527fbf2ed60bd5b5965d685680c01195c9514e4382e28e3a5a2d2d5244bf59411b93910160405180910390a16001546040516001600160a01b03909116904780156108fc02916000818181858888f193505050501580156101a9573d6000803e3d6000fd5b5056fea26469706673582212209b8b2d501f0fe8324516d05e10e2dfc5f7400b4d4d69cc308f6a3a5a8779cf6164736f6c63430008120033\r\n```\r\n\r\nCompare:\r\n<img width=\"1471\" alt=\"image\" src=\"https://github.com/foundry-rs/foundry/assets/27964406/fa674e1d-4147-40e6-8a3f-fab5e764384b\">\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1672426318/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1673454231",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5559#issuecomment-1673454231",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5559",
+    "id": 1673454231,
+    "node_id": "IC_kwDOGBlvNc5jvuKX",
+    "user": {
+      "login": "mds1",
+      "id": 17163988,
+      "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mds1",
+      "html_url": "https://github.com/mds1",
+      "followers_url": "https://api.github.com/users/mds1/followers",
+      "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+      "organizations_url": "https://api.github.com/users/mds1/orgs",
+      "repos_url": "https://api.github.com/users/mds1/repos",
+      "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mds1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-10T15:29:47Z",
+    "updated_at": "2023-08-10T15:29:47Z",
+    "author_association": "COLLABORATOR",
+    "body": "These are different metadata hashes. The trailing `0033` is the length of the metadata hash (51 btyes) and it starts at the `a264` bytes (in the most recent screenshot, second row from the bottom, near the beginning of the row). See the solidity docs for more info.\r\n\r\nIf that's the only difference the actual executable code is identical and this difference is expected. The metadata hash is a function of various things, including filepaths, so if foundry and hardhat handle e.g. remappings differently you'll get a different hash. \r\n\r\nNote that both foundry and hardhat provide options to turns off this bytecode hash if you'd like to remove the discrepancy.\r\n\r\nGoing to close this since this is solved, but feel free to ask any more questions :) ",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1673454231/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
