@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "yakimant",
@@ -114,10 +114,10 @@
     }
   ],
   "milestone": null,
-  "comments": 12,
+  "comments": 14,
   "created_at": "2023-06-29T11:44:01Z",
-  "updated_at": "2023-08-09T09:41:51Z",
-  "closed_at": null,
+  "updated_at": "2023-08-10T09:55:00Z",
+  "closed_at": "2023-08-10T09:50:48Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Currently we have only 1 build session with 8 devices(which is silly slow), and this limit is enforced simply by Jenkins job config:\r\n\r\n![image](https://github.com/status-im/status-mobile/assets/2212681/a55fd181-1511-4783-b62d-aafbeb4bd635)\r\n\r\nhttps://ci.status.im/job/status-mobile/job/e2e/job/status-app-prs/configure\r\n\r\nThis works well enough for our development instance of Jenkins at https://ci.status.im/, but it does not take into account our separate release instance which runs [mobile nightly builds](https://ci.infra.status.im/job/status-mobile/job/nightly/) which also trigger end-to-end tests, except no limit is enforced due to it being a separate Jenkins instance.\r\n\r\nThis result is that the E2E job fails with:\r\n```\r\nERROR medium/test_activity_center.py::TestActivityMultipleDevicePR::test_navigation_jump_to@new_one_3\r\n  - AttributeError: '_asyncio.Future' object has no attribute 'session_id'\r\n```\r\nhttps://ci.status.im/job/status-mobile/job/e2e/job/status-app-prs-rerun/2750/console\r\n\r\nThere are at least two possible solutions:\r\n\r\n1. Run E2E for nightly on the devel CI by fetching nightly artifacts directly from DigitalOcean bucket.\r\n2. Run E2E for nightly on the release CI but implement some kind of global session locking mechanism.\r\n\r\nThe former is simpler, but does require extra logic to find the latest nightly build.\r\nThe latter is the more correct solution, but would require finding or developing some kind of locking API to use in both jobs.\r\nOne possibility would be to use [Consul API locking mechanism](https://developer.hashicorp.com/consul/docs/dynamic-app-config/sessions) in some kind of script.",
@@ -155,7 +155,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/16440/timeline",
   "performed_via_github_app": null,
-  "state_reason": "reopened"
+  "state_reason": "completed"
 }
 [
   {
@@ -674,6 +674,94 @@
     "body": "Removed:\r\n- ci.infra\r\n  - e2e\r\n  - platform/android-e2e\r\n- ci / e2e\r\n  - status-api-tests\r\n  - status-app-performance\r\n  - test-copy-apk-status-apps-prs\r\n\r\nBackup is in restic for 30 days just in case.",
     "reactions": {
       "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1671003134/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1672911680",
+    "html_url": "https://github.com/status-im/status-mobile/issues/16440#issuecomment-1672911680",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/16440",
+    "id": 1672911680,
+    "node_id": "IC_kwDOAx4p2c5jtptA",
+    "user": {
+      "login": "yakimant",
+      "id": 1529006,
+      "node_id": "MDQ6VXNlcjE1MjkwMDY=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1529006?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/yakimant",
+      "html_url": "https://github.com/yakimant",
+      "followers_url": "https://api.github.com/users/yakimant/followers",
+      "following_url": "https://api.github.com/users/yakimant/following{/other_user}",
+      "gists_url": "https://api.github.com/users/yakimant/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/yakimant/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/yakimant/subscriptions",
+      "organizations_url": "https://api.github.com/users/yakimant/orgs",
+      "repos_url": "https://api.github.com/users/yakimant/repos",
+      "events_url": "https://api.github.com/users/yakimant/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/yakimant/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-10T09:50:48Z",
+    "updated_at": "2023-08-10T09:50:48Z",
+    "author_association": "MEMBER",
+    "body": "Both ci.infra/nightly and ci/e2e-nightly work well.\r\ne2e-nightly and regular e2e will queue for saucelabs resources now.",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1672911680/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1672917360",
+    "html_url": "https://github.com/status-im/status-mobile/issues/16440#issuecomment-1672917360",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/16440",
+    "id": 1672917360,
+    "node_id": "IC_kwDOAx4p2c5jtrFw",
+    "user": {
+      "login": "yakimant",
+      "id": 1529006,
+      "node_id": "MDQ6VXNlcjE1MjkwMDY=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1529006?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/yakimant",
+      "html_url": "https://github.com/yakimant",
+      "followers_url": "https://api.github.com/users/yakimant/followers",
+      "following_url": "https://api.github.com/users/yakimant/following{/other_user}",
+      "gists_url": "https://api.github.com/users/yakimant/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/yakimant/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/yakimant/subscriptions",
+      "organizations_url": "https://api.github.com/users/yakimant/orgs",
+      "repos_url": "https://api.github.com/users/yakimant/repos",
+      "events_url": "https://api.github.com/users/yakimant/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/yakimant/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-10T09:55:00Z",
+    "updated_at": "2023-08-10T09:55:00Z",
+    "author_association": "MEMBER",
+    "body": "Another issue appeared while discussing the nightlies, I created a ticket for it:\r\nhttps://github.com/status-im/status-mobile/issues/16966",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1672917360/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
