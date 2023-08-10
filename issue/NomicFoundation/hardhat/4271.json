@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4271",
+  "repository_url": "https://api.github.com/repos/NomicFoundation/hardhat",
+  "labels_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4271/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4271/comments",
+  "events_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4271/events",
+  "html_url": "https://github.com/NomicFoundation/hardhat/issues/4271",
+  "id": 1844178605,
+  "node_id": "I_kwDOB7jojM5t6-6t",
+  "number": 4271,
+  "title": "RpcTransactionReceipt response validation issue with Alchemy",
+  "user": {
+    "login": "fredwes",
+    "id": 6827305,
+    "node_id": "MDQ6VXNlcjY4MjczMDU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6827305?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fredwes",
+    "html_url": "https://github.com/fredwes",
+    "followers_url": "https://api.github.com/users/fredwes/followers",
+    "following_url": "https://api.github.com/users/fredwes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fredwes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fredwes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fredwes/subscriptions",
+    "organizations_url": "https://api.github.com/users/fredwes/orgs",
+    "repos_url": "https://api.github.com/users/fredwes/repos",
+    "events_url": "https://api.github.com/users/fredwes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fredwes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4937119027,
+      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
+      "name": "status:triaging",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-09T23:30:12Z",
+  "updated_at": "2023-08-10T01:59:50Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version of Hardhat\r\n\r\n2.12.7\r\n\r\n### What happened?\r\n\r\nWhen running hardhat network forked from Arbitrum One, using Alchemy provider. Calling `getTransactionReceipt` fails due to the response from Alchemy failing the validation done by Hardhat. This issue appears to be limited to querying a transaction hash that is a contract deployment, in this case it appears that Alchemy omits the `to` property from the response rather than setting the property to null as the validation function expects.\r\n\r\nI was able to solve the issue for myself locally by making a modification to the validation logic [here](https://github.com/NomicFoundation/hardhat/blob/7197a6c141068e240c316f7de8486777e78c05c4/packages/hardhat-core/src/internal/core/jsonrpc/types/output/receipt.ts#L22)\r\n\r\ncurrent: `to: nullable(rpcAddress),`\r\nchanged (and working): `to: optional(nullable(rpcAddress)),`\r\n\r\n### Minimal reproduction steps\r\n\r\n1. Hardhat config\r\n```\r\nmodule.exports = {\r\n  solidity: \"0.8.4\",\r\n  networks: {\r\n    hardhat: {\r\n      forking: {\r\n        url: \"https://arb-mainnet.g.alchemy.com/v2/<YOUR_ALCHEMY_API_KEY>\",\r\n        blockNumber: 1250000,\r\n        enabled: true,\r\n      },\r\n      accounts: {\r\n        count: 0,\r\n      },\r\n    },\r\n  },\r\n};\r\n```\r\n\r\n2. Prepare a simple script:\r\n```\r\nimport { ethers } from \"hardhat\";\r\n\r\nconst main = async () => {\r\n     console.log(await ethers.provider.getTransactionReceipt(\"0x44a7f70cf843d696d1254ef8d359ca60fececfa2b8f5278f932735409c19c377\"));\r\n};\r\n\r\nmain().catch(error => {\r\n    console.error(error);\r\n    process.exitCode = 1;\r\n});\r\n```\r\n\r\n3. Run local node and script:\r\n```\r\nnpx hardhat node --network hardhat\r\n...\r\nnpx hardhat run --network localhost <script.js>\r\n```\r\n4. Result:\r\n```\r\nProviderError: Invalid JSON-RPC response's result.\r\n\r\nErrors: Invalid value undefined supplied to : RpcTransactionReceipt | null/to: ADDRESS | null\r\n    at HttpProvider.request (/Users/wesleyfrederickson/repos/rnglabs/gmx-vault-contracts/node_modules/hardhat/src/internal/core/providers/http.ts:88:21)\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at async EthersProviderWrapper.send (/Users/wesleyfrederickson/repos/rnglabs/gmx-vault-contracts/node_modules/@nomiclabs/hardhat-ethers/src/internal/ethers-provider-wrapper.ts:13:20)\r\n```\r\n\r\n### Search terms\r\n\r\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4271/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4271/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
