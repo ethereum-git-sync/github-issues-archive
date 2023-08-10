@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2023-03-29T15:18:29Z",
-  "updated_at": "2023-05-10T12:28:46Z",
-  "closed_at": null,
+  "updated_at": "2023-08-10T14:35:21Z",
+  "closed_at": "2023-08-10T14:35:20Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "# Context\r\n\r\nThe transaction manager `op-service/txmgr` is shared between the `op-batcher` and `op-proposer`. So adding metrics to the txmgr automatically benefits both services.\r\n\r\n# Description\r\n\r\n## Architecture\r\n\r\n- [x] Create new package `op-service/txmgr/metrics` with a reusable metrics struct, so it can be embedded into the `op-batcher/metrics.Metrics` and `op-proposer/metrics.Metrics` structs.\r\n  - In this sense, the tx mgr metrics component is more similar to the reusable `op-service/metrics.RefMetrics` struct. It should have a ctor similar to `MakeRefMetrics` so it can be embedded into both batcher and proposer metrics.\r\n  - All individual metrics should also set the `GaugeOpts.Subsystem` field to `\"txmgr\"`. So effectively, individual metrics should result in having names like `op_batcher_default_txmgr_nonce`.\r\n  - [x]  `op-service/txmgr/metrics` package should have an interface `Metricer` and the two implementations `Metrics` and `NoopMetrics` (similar to `RefMetrics`). The txmgr ctor should receive a `Metricer` .\r\n- [x] Embed and initialize `Metrics` and `NoopMetrics` in the respective batcher and proposer metrics\r\n- [x] Move balance metrics from batcher & proposer into the tx-manager metrics\r\n\r\n## List of Metrics\r\n\r\n- [x] Gauge & Histogram of confirmation latency (likely seconds, from when tx was first sent to when it was included on chain).\r\n  - Can also have from when the final bumped price one was submitted to when that one got included.\r\n- [x] Counter/Histogram of the number of times it bumped a tx after it sent the one that got included.\r\n- [x] Gauge of send state errors (pre-populated list of errors + bucket for unknown)\r\n- [x] Gauge/Histogram of how many times it had to bump the TX price\r\n- [x] Gauge for current nonce\r\n- [ ] Counter of gas / fees spent on L1\r\n- [ ] Histogram of gas / fees spent on L1 (maybe more interesting in the batcher)\r\n- [ ] Gauge/Histogram of basefee/tip for submitting transactions\r\n\r\n**These metrics can be added incrementally with multiple PRs.**\r\n\r\n# Testing\r\n\r\nYou can test your new metrics locally by spinning up a devnet with `make devnet-up` and then watching `http://localhost:7300/`. Check that all the new txmgr metrics are there and show sensible values.\r\n\r\nFixes CLI-3319",
-  "closed_by": null,
+  "closed_by": {
+    "login": "sebastianst",
+    "id": 2607372,
+    "node_id": "MDQ6VXNlcjI2MDczNzI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2607372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sebastianst",
+    "html_url": "https://github.com/sebastianst",
+    "followers_url": "https://api.github.com/users/sebastianst/followers",
+    "following_url": "https://api.github.com/users/sebastianst/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sebastianst/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sebastianst/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sebastianst/subscriptions",
+    "organizations_url": "https://api.github.com/users/sebastianst/orgs",
+    "repos_url": "https://api.github.com/users/sebastianst/repos",
+    "events_url": "https://api.github.com/users/sebastianst/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sebastianst/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5291/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5291/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -280,6 +299,50 @@
     "body": "thanks @sebastianst for clarifying\r\nPlease let me know, if there is any issue I can help you with!!!\r\nI have good knowledge in javascript and solidity.\r\nI am still trying to understand the op stack project throughly, however if there is any issue, please let me know :)\r\nAll the good first open issues are already completed, I guess.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1542122975/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1673342617",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/5291#issuecomment-1673342617",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/5291",
+    "id": 1673342617,
+    "node_id": "IC_kwDODjvEJM5jvS6Z",
+    "user": {
+      "login": "sebastianst",
+      "id": 2607372,
+      "node_id": "MDQ6VXNlcjI2MDczNzI=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2607372?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sebastianst",
+      "html_url": "https://github.com/sebastianst",
+      "followers_url": "https://api.github.com/users/sebastianst/followers",
+      "following_url": "https://api.github.com/users/sebastianst/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sebastianst/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sebastianst/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sebastianst/subscriptions",
+      "organizations_url": "https://api.github.com/users/sebastianst/orgs",
+      "repos_url": "https://api.github.com/users/sebastianst/repos",
+      "events_url": "https://api.github.com/users/sebastianst/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sebastianst/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-10T14:35:20Z",
+    "updated_at": "2023-08-10T14:35:20Z",
+    "author_association": "MEMBER",
+    "body": "Closing for now as most of this has been implemented already and remaining metrics are being investigated. CC @trianglesphere ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1673342617/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
