@@ -40,7 +40,7 @@
       "description": "Indicates a topic that requires input from various developers."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-08-02T19:37:36Z",
-  "updated_at": "2023-08-03T14:25:00Z",
-  "closed_at": null,
+  "updated_at": "2023-08-11T20:04:05Z",
+  "closed_at": "2023-08-11T20:04:05Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "After thinking about changes done in https://github.com/ChainSafe/lodestar/pull/5834 a bit more I am not sure it is correct to pin the genesis and bootnode file URLs by commit hash. If we pin the files we might as well just copy and paste the enr and not rely on github at all, by pinning the URLs we get the worst of both worlds\r\n- we have to update source code to update bootnodes and\r\n- we rely on files provided by github\r\n\r\nLooking at the static `bootEnrs` for mainnet it seems like the last update was 3 years ago (https://github.com/ChainSafe/lodestar/pull/1806)\r\nhttps://github.com/ChainSafe/lodestar/blob/549aa03a40e4090d752e7275d3e29046e6214b4b/packages/cli/src/networks/mainnet.ts#L9\r\n\r\n@dapplion I noticed most of the updates to network configration in past PRs was done by you. For example for goerli/prater in PR https://github.com/ChainSafe/lodestar/pull/2188 you specified a unpinned URL to fetch from github and empty `bootEnrs = []` but in case of gnosis we have both unpinned URLs and hard coded `bootEnrs` (https://github.com/ChainSafe/lodestar/pull/4979). Would be great to quickly explain the rationale for this\r\n- when do we specify hard coded enrs in `bootEnrs`?\r\n- when should hard coded `bootEnrs` be updated in the code?\r\n- do we want to always fetch the latest list from github?\r\n\r\nIn my opinion, we should either not fetch data from github at all to prevent issues like https://github.com/ChainSafe/lodestar/issues/5833 (or risk of github outages) or we should unpin the files again to not have to update the source code to fetch updated list of ENRs.\r\n\r\n**Note:** In case of github outage we just log an error but if github provides us with invalid ENRs and users have `--network.connectToDiscv5Bootnodes` set then their beacon node will fail on startup (https://github.com/ChainSafe/lodestar/issues/5833)\r\nhttps://github.com/ChainSafe/lodestar/blob/549aa03a40e4090d752e7275d3e29046e6214b4b/packages/cli/src/networks/index.ts#L106-L109\r\n\r\nDiscv5 just ignores invalid ENRs when adding the enr [addEnr](https://github.com/ChainSafe/discv5/blob/75304d5a067f0ec2af839a280265b3d489bd4829/src/service/service.ts#L282-L288).\r\n\r\nRegarding both those cases, I think we might be fine if we just pull latest files from github as connectToDiscv5Bootnodes is mostly meant for advanced use cases like devnets and a hidden flag. But I would like some discussion on when the hard coded values should be updated as it case of github outage we solely rely on those.\r\n\r\nI also noticed that Lighthouse is planning to deprecate their two old bootnodes (see https://github.com/eth-clients/eth2-networks/pull/88), maybe it make sense to update hard coded `bootEnrs` at least once before every hard fork.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "wemeetagain",
+    "id": 1348242,
+    "node_id": "MDQ6VXNlcjEzNDgyNDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1348242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wemeetagain",
+    "html_url": "https://github.com/wemeetagain",
+    "followers_url": "https://api.github.com/users/wemeetagain/followers",
+    "following_url": "https://api.github.com/users/wemeetagain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wemeetagain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wemeetagain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wemeetagain/subscriptions",
+    "organizations_url": "https://api.github.com/users/wemeetagain/orgs",
+    "repos_url": "https://api.github.com/users/wemeetagain/repos",
+    "events_url": "https://api.github.com/users/wemeetagain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wemeetagain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5838/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5838/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -148,8 +167,8 @@
     "body": "I would suggest we do the following then\r\n- always pull unpinned / latest version of files from github\r\n- more frequent updates to hard coded values (once per hard fork)\r\n- if a set of bootnodes is likely to change frequently then only pull from github (only for non-critical testnets)",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1664084484/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 2,
+      "+1": 2,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
