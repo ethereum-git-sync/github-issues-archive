@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-08-11T11:42:34Z",
-  "updated_at": "2023-08-11T11:44:29Z",
-  "closed_at": null,
+  "updated_at": "2023-08-13T15:55:52Z",
+  "closed_at": "2023-08-13T15:55:30Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [x] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (3fec8c1 2023-08-11T00:53:21.210226000Z)\n\n### What command(s) is the bug in?\n\nforget test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nWith the recent nightly releases our invariant test suite is broken for maple-core-v2 (https://github.com/maple-labs/maple-core-v2)\r\n\r\nI've been debugging and found that this nightly release works: https://github.com/foundry-rs/foundry/releases/tag/nightly-ca67d15f4abd46394b324c50e21e66f306a1162d\r\n\r\nBut the release right after causing the test suite to fail: https://github.com/foundry-rs/foundry/releases/tag/nightly-16208aa91fc65e7a99ef68ba1bc8d4b4f9ac8f62\r\n\r\nI started debugging and noticed that the targetContract behavior doesn't seem to be working as expected. We have one target contract that we define which then handles and distributes all the calls for us. But I noticed that other contracts (such as non targeted handlers) are now being called directly (not via the target contract we defined).\r\n\r\nHere is an example of how we define our target contract https://github.com/maple-labs/maple-core-v2/blob/3a49435209614ded4c34c4bbd57e2ceb59a1d3e0/tests/invariants/BasicInvariants.t.sol#L81\r\n\r\nHere is an example trace below:\r\n\r\n```bash\r\nTraces:\r\n  [0] DistributionHandler::distributorEntryPoint(115792089237316195423570985008687907853269984665640564039457584007913129639935 [1.157e77])\r\n    ├─ [0] console::log(DH:ENTRY_POINT) [staticcall]\r\n    │   └─ ← ()\r\n    ├─ [0] 0xe54a55121A47451c5727ADBAF9b9FC1643477e25::a6c4cff2(ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)\r\n    │   ├─ [2498] BasicInvariants::currentTimestamp() [staticcall]\r\n    │   │   └─ ← 1685721539 [1.685e9]\r\n    │   ├─ [0] VM::warp(1685721539 [1.685e9])\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] console::log(handlerBase.entryPoint(%s), 115792089237316195423570985008687907853269984665640564039457584007913129639935 [1.157e77]) [staticcall]\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] console::log(handlerBase.entryPoint() totalWeight, 100) [staticcall]\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] 0xe54a55121A47451c5727ADBAF9b9FC1643477e25::deposit(115792089237316195423570985008687907853269984665640564039457584007913129639935 [1.157e77])\r\n    │   │   ├─ [498] BasicInvariants::currentTimestamp() [staticcall]\r\n    │   │   │   └─ ← 1685721539 [1.685e9]\r\n    │   │   ├─ [476672] VM::warp(1685721539 [1.685e9])\r\n    │   │   │   └─ ← ()\r\n    │   │   ├─ [414811] VM::startPrank(@\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB])\r\n    │   │   │   └─ ← ()\r\n    │   │   ├─ [0] console::log(lpHandler.deposit(%s), 115792089237316195423570985008687907853269984665640564039457584007913129639935 [1.157e77]) [staticcall]\r\n    │   │   │   └─ ← ()\r\n    │   │   ├─ [47276] MockERC20::mint(@\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], 39675502443893022040240438 [3.967e25])\r\n    │   │   │   ├─ emit Transfer(owner_: 0x0000000000000000000000000000000000000000, recipient_: @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], amount_: 39675502443893022040240438 [3.967e25])\r\n    │   │   │   └─ ← ()\r\n    │   │   ├─ [27377] MockERC20::approve(MaplePool: [0xDfC10BC83D8D74F493F894bC003BE0c4D91c52c2], 39675502443893022040240438 [3.967e25])\r\n    │   │   │   ├─ emit Approval(owner_: @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], spender_: MaplePool: [0xDfC10BC83D8D74F493F894bC003BE0c4D91c52c2], amount_: 39675502443893022040240438 [3.967e25])\r\n    │   │   │   └─ ← true\r\n    │   │   ├─ [139120] MaplePool::deposit(39675502443893022040240438 [3.967e25], @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB])\r\n    │   │   │   ├─ [80550] Proxy::canCall(0x503a6465706f7369740000000000000000000000000000000000000000000000, @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], 0x00000000000000000000000000000000000000000020d19d4c15b391cdf3b1360000000000000000000000004cca5a3bb90ed438e9e5e4ccd2fda4767f8716ab) [staticcall]\r\n    │   │   │   │   ├─ [75524] PoolManager::canCall(0x503a6465706f7369740000000000000000000000000000000000000000000000, @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], 0x00000000000000000000000000000000000000000020d19d4c15b391cdf3b1360000000000000000000000004cca5a3bb90ed438e9e5e4ccd2fda4767f8716ab) [delegatecall]\r\n    │   │   │   │   │   ├─ [2537] PoolManagerFactory::mapleGlobals() [staticcall]\r\n    │   │   │   │   │   │   └─ ← NonTransparentProxy: [0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9]\r\n    │   │   │   │   │   ├─ [10490] NonTransparentProxy::isFunctionPaused(0x7bd243de) [staticcall]\r\n    │   │   │   │   │   │   ├─ [5183] Globals::isFunctionPaused(0x7bd243de) [delegatecall]\r\n    │   │   │   │   │   │   │   └─ ← false\r\n    │   │   │   │   │   │   └─ ← false\r\n    │   │   │   │   │   ├─ [2859] MockERC20::balanceOf(MaplePool: [0xDfC10BC83D8D74F493F894bC003BE0c4D91c52c2]) [staticcall]\r\n    │   │   │   │   │   │   └─ ← 0\r\n    │   │   │   │   │   ├─ [12356] Proxy::assetsUnderManagement() [staticcall]\r\n    │   │   │   │   │   │   ├─ [7366] FixedTermLoanManager::assetsUnderManagement() [delegatecall]\r\n    │   │   │   │   │   │   │   └─ ← 0\r\n    │   │   │   │   │   │   └─ ← 0\r\n    │   │   │   │   │   ├─ [12321] Proxy::assetsUnderManagement() [staticcall]\r\n    │   │   │   │   │   │   ├─ [7331] OpenTermLoanManager::assetsUnderManagement() [delegatecall]\r\n    │   │   │   │   │   │   │   └─ ← 0\r\n    │   │   │   │   │   │   └─ ← 0\r\n    │   │   │   │   │   └─ ← true,\r\n    │   │   │   │   └─ ← true,\r\n    │   │   │   ├─ emit Transfer(owner_: 0x0000000000000000000000000000000000000000, recipient_: @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], amount_: 39675502443893022040240438 [3.967e25])\r\n    │   │   │   ├─ emit Deposit(caller_: @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], owner_: @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], assets_: 39675502443893022040240438 [3.967e25], shares_: 39675502443893022040240438 [3.967e25])\r\n    │   │   │   ├─ [21527] MockERC20::transferFrom(@\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], MaplePool: [0xDfC10BC83D8D74F493F894bC003BE0c4D91c52c2], 39675502443893022040240438 [3.967e25])\r\n    │   │   │   │   ├─ emit Approval(owner_: @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], spender_: MaplePool: [0xDfC10BC83D8D74F493F894bC003BE0c4D91c52c2], amount_: 0)\r\n    │   │   │   │   ├─ emit Transfer(owner_: @\tlp: [0x4CCA5A3bB90ed438E9e5E4cCd2Fda4767F8716aB], recipient_: MaplePool: [0xDfC10BC83D8D74F493F894bC003BE0c4D91c52c2], amount_: 39675502443893022040240438 [3.967e25])\r\n    │   │   │   │   └─ ← true\r\n    │   │   │   └─ ← 39675502443893022040240438 [3.967e25]\r\n    │   │   ├─ [343678] VM::stopPrank()\r\n    │   │   │   └─ ← 0x00000000000000000000000000000000000000000020d19d4c15b391cdf3b136\r\n    │   │   ├─ [67237] BasicInvariants::setCurrentTimestamp(1685721539 [1.685e9])\r\n    │   │   │   └─ ← ()\r\n    │   │   └─ ← ()\r\n    │   ├─ [23437] BasicInvariants::setCurrentTimestamp(1685721539 [1.685e9])\r\n    │   │   └─ ← ()\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n\r\n  [0] DistributionHandler::distributorEntryPoint(1783337552764758011541237039385682083260693588267778546324578154709 [1.783e66])\r\n    ├─ [0] console::log(DH:ENTRY_POINT) [staticcall]\r\n    │   └─ ← ()\r\n    ├─ [0] 0x89CA9F4f77B267778EB2eA0Ba1bEAdEe8523af36::a6c4cff2(0000000010ef0daf0348b01a57b8a7d45a23c47b227a653702c9e4e3ff76b8d5)\r\n    │   ├─ [2498] BasicInvariants::currentTimestamp() [staticcall]\r\n    │   │   └─ ← 1685721539 [1.685e9]\r\n    │   ├─ [183384] VM::warp(1685721539 [1.685e9])\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] console::log(handlerBase.entryPoint(%s), 1783337552764758011541237039385682083260693588267778546324578154709 [1.783e66]) [staticcall]\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] console::log(handlerBase.entryPoint() totalWeight, 100) [staticcall]\r\n    │   │   └─ ← ()\r\n    │   ├─ [135805] 0x89CA9F4f77B267778EB2eA0Ba1bEAdEe8523af36::makePayment(1783337552764758011541237039385682083260693588267778546324578154709 [1.783e66])\r\n    │   │   ├─ [498] BasicInvariants::currentTimestamp() [staticcall]\r\n    │   │   │   └─ ← 1685721539 [1.685e9]\r\n    │   │   ├─ [61546] VM::warp(1685721539 [1.685e9])\r\n    │   │   │   └─ ← ()\r\n    │   │   ├─ [0] console::log(ftlHandler.makePayment(%s), 1783337552764758011541237039385682083260693588267778546324578154709 [1.783e66]) [staticcall]\r\n    │   │   │   └─ ← ()\r\n    │   │   ├─ [33037] BasicInvariants::setCurrentTimestamp(1685721539 [1.685e9])\r\n    │   │   │   └─ ← ()\r\n    │   │   └─ ← ()\r\n    │   ├─ [23437] BasicInvariants::setCurrentTimestamp(1685721539 [1.685e9])\r\n    │   │   └─ ← ()\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n\r\n  [42622] 0x89CA9F4f77B267778EB2eA0Ba1bEAdEe8523af36::040eb909(00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000003f1f00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000006b56)\r\n    ├─ [0] console::log(handlerBase.setSelectorWeight() Called with weight:, 16159 [1.615e4]) [staticcall]\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n\r\n  [0] DistributionHandler::distributorEntryPoint(7934)\r\n    ├─ [0] console::log(DH:ENTRY_POINT) [staticcall]\r\n    │   └─ ← ()\r\n    ├─ [46487] 0x89CA9F4f77B267778EB2eA0Ba1bEAdEe8523af36::a6c4cff2(0000000000000000000000000000000000000000000000000000000000001efe)\r\n    │   ├─ [2498] BasicInvariants::currentTimestamp() [staticcall]\r\n    │   │   └─ ← 1685721539 [1.685e9]\r\n    │   ├─ [16018] VM::warp(1685721539 [1.685e9])\r\n    │   │   └─ ← \"HB:INVALID_WEIGHTS\"\r\n    │   ├─ [0] console::log(handlerBase.entryPoint(%s), 7934) [staticcall]\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] console::log(handlerBase.entryPoint() totalWeight, 16259 [1.625e4]) [staticcall]\r\n    │   │   └─ ← ()\r\n    │   └─ ← 0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001248423a494e56414c49445f574549474854530000000000000000000000000000\r\n    └─ ← ()\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 272.79ms\r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in tests/invariants/BasicInvariants.t.sol:BasicInvariants\r\n[FAIL. Reason: HB:INVALID_WEIGHTS] statefulFuzz_fixedTermLoanManager_A_basic() (runs: 1, calls: 7, reverts: 1)\r\n```\r\n\r\nThe contract `0x89CA9F4f77B267778EB2eA0Ba1bEAdEe8523af36` and function `handlerBase.setSelectorWeight()` should not be directly called but you can see from the trace that it is. ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5606/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5606/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "@Evalir perhaps this is revm related?\r\n\r\nlets also add maple to integration tests if possible",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1674613217/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1676398407",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5606#issuecomment-1676398407",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5606",
+    "id": 1676398407,
+    "node_id": "IC_kwDOGBlvNc5j689H",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-13T15:55:30Z",
+    "updated_at": "2023-08-13T15:55:52Z",
+    "author_association": "MEMBER",
+    "body": "Closed with #5610 — albeit we still need to find the offender bugs in revm.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1676398407/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
