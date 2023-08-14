@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5625",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5625/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5625/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5625/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5625",
+  "id": 1850025876,
+  "node_id": "I_kwDOGBlvNc5uRSeU",
+  "number": 5625,
+  "title": "targeted_contracts in invariant test is getting updated unexpectedly partway through an invariant test run",
+  "user": {
+    "login": "Melvillian",
+    "id": 1884338,
+    "node_id": "MDQ6VXNlcjE4ODQzMzg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1884338?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Melvillian",
+    "html_url": "https://github.com/Melvillian",
+    "followers_url": "https://api.github.com/users/Melvillian/followers",
+    "following_url": "https://api.github.com/users/Melvillian/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Melvillian/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Melvillian/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Melvillian/subscriptions",
+    "organizations_url": "https://api.github.com/users/Melvillian/orgs",
+    "repos_url": "https://api.github.com/users/Melvillian/repos",
+    "events_url": "https://api.github.com/users/Melvillian/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Melvillian/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-14T15:31:50Z",
+  "updated_at": "2023-08-14T15:31:50Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (a0a31c3 2023-08-11T18:45:55.249069000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nBackground:\r\n\r\nI am running a invariant test contract using a forked version of the blockchain pointing at Mainnet, with a single Handler, and I only want the Handler and its functions to be called throughout the entire invariant test run. Any calls to non-handler functions is undesired and results in me needing to set `fail_on_revert = false` in order to prevent my invariant test run from failing every time.\r\n\r\nExpected Behavior:\r\n\r\nI use `targetContract` and `targetSelector` to select my Handler's address and various Handler functions, respectively, in the `setUp` function of my InvariantTest contract. This will mean that the only function I ever see being fuzzed should be the Handler. I should run `forge test -vvvv` and not see any calls to other contracts\r\n\r\nActual Behavior:\r\n\r\nWhen I run `forge test -vvvv`, I see that there are many calls being made to a contract that was deployed during the `setUp` of my InvariantTest contract. Specifically, the only other contract besides the Handler being fuzzed is the one that was setup with the code below. The purpose of the code below is to take an already-deployed (i.e. already existing contract on the mainnet fork) and overwrite its bytecode with my own supplied code in order to mock it and make testing simpler:\r\n\r\n```solidity\r\nfunction _deployMockBridge() internal {\r\n        vm.selectFork(_l1Fork);\r\n        MockBridge mb1 = new MockBridge();\r\n        bytes memory mb1Code = address(mb1).code;\r\n        vm.etch(_bridge, mb1Code);\r\n\r\n        vm.selectFork(_l2Fork);\r\n        MockBridge mb2 = new MockBridge();\r\n        bytes memory mb2Code = address(mb2).code;\r\n        vm.etch(_bridge, mb2Code);\r\n    }\r\n```\r\n\r\nHypothesis:\r\n\r\nI cloned `foundry` and added some debugging logs to a locally running version of `forge` in order to try to understand what is going on. From running that, I was able to that in [this executor.rs function](https://github.com/foundry-rs/foundry/blob/master/crates/evm/src/fuzz/strategies/state.rs#L251) the list of targeted_contracts is being updated with the MockBridge code's address. Whys is that happening, even though we never deployed the MockBridge in our InvariantTeest? My guess is that because of [this check in collect_data](https://github.com/foundry-rs/foundry/blob/master/crates/evm/src/fuzz/invariant/executor.rs#L556C13-L556C21), because of the call to `vm.etch`, there is a bug where Forge thinks that we actually did deploy the contract with a sender that didn't have any code (whatever addresses is used by `vm`) and so it ends up adding the MockBridge contract to the listed of `created_contracts`, which ultimately gets sampled from to decide on the next fuzz run, and thus will probabilistically end up choosing the MockBridge code and its selectors to be fuzzed.\r\n\r\n\r\nSolution:\r\nwhen calculated `created_contracts`, exclude any that were touched by Cheatcode addresses, as those are not really created, as we can see here with `etch`. Though to be clear, I'm not sure this is the problem because I'm not super familiar with Forge's codebase; that is just what I've been able to uncover by manually debugging.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5625/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5625/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
