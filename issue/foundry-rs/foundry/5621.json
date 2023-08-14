@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5621",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5621/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5621/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5621/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5621",
+  "id": 1849141085,
+  "node_id": "I_kwDOGBlvNc5uN6dd",
+  "number": 5621,
+  "title": "`gasleft()` returns incorrect value within calback",
+  "user": {
+    "login": "zaqk",
+    "id": 10659278,
+    "node_id": "MDQ6VXNlcjEwNjU5Mjc4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10659278?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zaqk",
+    "html_url": "https://github.com/zaqk",
+    "followers_url": "https://api.github.com/users/zaqk/followers",
+    "following_url": "https://api.github.com/users/zaqk/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zaqk/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zaqk/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zaqk/subscriptions",
+    "organizations_url": "https://api.github.com/users/zaqk/orgs",
+    "repos_url": "https://api.github.com/users/zaqk/repos",
+    "events_url": "https://api.github.com/users/zaqk/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zaqk/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-14T07:08:10Z",
+  "updated_at": "2023-08-14T07:08:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (dffdfde 2023-08-14T00:22:15.788827000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nIt seems that `gasleft()` is returning an extremely high gas usage amount within a function callback. I ran into this issue when trying to measure gas usage in a UniswapV3Pool callback.\r\n\r\nHeres an example that you can test with forge test:\r\n```solidity\r\ncontract Callback {\r\n    function execute(uint256 startGas) external returns (uint256, uint256) {\r\n        uint256 g1 = GasTester(msg.sender).callbackResponse(startGas);\r\n        uint256 g2 = startGas - gasleft();\r\n        return (g1, g2);\r\n    }\r\n}\r\n\r\ncontract GasTester {\r\n\r\n    Callback callback;\r\n\r\n    constructor() {\r\n        callback = new Callback();\r\n    }\r\n\r\n    function run() public returns (uint256, uint256, uint256, uint256, uint256) {\r\n        uint256 startGas = gasleft();\r\n\r\n        require(msg.sender == msg.sender && msg.sender != address(0)); // use some gas\r\n\r\n        uint256 g0 = startGas - gasleft();\r\n\r\n\r\n        (uint256 g1, uint256 g2) = callback.execute(startGas);\r\n\r\n        uint256 g3 = startGas - gasleft();\r\n\r\n\r\n        return (startGas, g0, g1, g2, g3);\r\n    }\r\n\r\n    function callbackResponse(uint256 startGas) external returns (uint256) {\r\n        return startGas - gasleft();\r\n    }\r\n\r\n}\r\n```\r\n\r\nthe test case:\r\n```solidity\r\n    function test_gas() public {\r\n        GasTester gasTester = new GasTester();\r\n        (uint256 startGas, uint256 g0, uint256 g1, uint256 g2, uint256 g3) = gasTester.run();\r\n        console2.log(\"startGas\", startGas);\r\n        console2.log(\"g0\", g0);\r\n        console2.log(\"g1\", g1);\r\n        console2.log(\"g2\", g2);\r\n        console2.log(\"g3\", g3);\r\n    }\r\n```\r\n\r\nand finally the log output:\r\n```\r\n[PASS] test_gas() (gas: 291458)\r\nLogs:\r\n  startGas 9079256848778620484\r\n  g0 26\r\n  g1 281510161082736559\r\n  g2 141863388262167292\r\n  g3 1732\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 2.64ms\r\nRan 1 test suites: 1 tests passed, 0 failed, 0 skipped (1 total tests)\r\n```\r\n\r\nIt seems that any gas usage calculated using `gasleft()` is accurate but if execution context changes `gasleft()` becomes extremely large. `g0` ad `g3` are accurate while `g1` and `g2` which are calculated in a callback or a separate contract are inaccurate.\r\n\r\nI also ran into this previously closed issue which may be related (not 100% sure):\r\nhttps://github.com/foundry-rs/foundry/issues/3863",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5621/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5621/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
