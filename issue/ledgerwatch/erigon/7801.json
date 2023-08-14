@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-06-26T09:16:42Z",
-  "updated_at": "2023-08-06T02:06:58Z",
-  "closed_at": null,
+  "updated_at": "2023-08-14T02:01:51Z",
+  "closed_at": "2023-08-14T02:01:51Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nErigon version: \r\n\r\n- build from [origin/devel] Remove the Rinkeby testnet (#7677 ) \r\n\r\nOS & Version:\r\n\r\n- Ubuntu 22.04.2 LTS\r\n\r\nCommit hash: \r\n\r\n- fa0cfcbec7d5aecd44f4254b6b2dc9b03486f2f5\r\n\r\nConcensus Layer: \r\n\r\n- just Erigon used as an Execution Layer for Consensus Layer clients with default configuration\r\n\r\nChain/Network: \r\n\r\n- ETH main\r\n\r\n#### Expected behaviour\r\n\r\n- I would like to use `eth_callMany` to simulate a trade. Obviously [0x380d096daec90a2d255574df70a89f65efc773a627adc924fba5f5869570e642](https://etherscan.io/tx/0x380d096daec90a2d255574df70a89f65efc773a627adc924fba5f5869570e642) on ethereum is a successfully executed transaction and its position in the block is 10. So when I build the correct raw transaction and use `eth_callMany` at any position in block, I should be able to call this transaction successfully.\r\n\r\n#### Actual behaviour\r\n\r\n- In fact, when I use `eth_callMany` at any position greater than 10, it occurs this:\r\n```\r\ninsufficient funds for gas * price + value: address ...\r\n```\r\n\r\n- Any position less than or equal to 10 can be executed normally, which means that the original transaction at position 10 was not executed normally. \r\n- To be able to execute `eth_callMany`, I had to set `gasBailout` in `core.ApplyMessage` to **True** in `erigon/cmd/rpcdaemon/commands/eth_callMany.go`\r\n- Noticing that the transaction at position 9 has the same `tx.from` as the transaction at position 10, it leads me to believe that this issue is related to #6569 . @ArielTM\r\n\r\n\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n``` python\r\nfrom web3 import Web3, HTTPProvider\r\nfrom config import *\r\n\r\nimport requests\r\n\r\n\r\nw3 = Web3(HTTPProvider(Erigon_path))\r\ns = requests.session()\r\n\r\n\r\ndef get_amount_from_raw_tx(raw_tx, height, index):\r\n    for k in raw_tx:\r\n        if isinstance(raw_tx[k], int):\r\n            raw_tx[k] = hex(raw_tx[k])\r\n    raw_tx = dict(\r\n        [\r\n            (k, raw_tx[k])\r\n            for k in raw_tx\r\n            if k in [\"to\", \"gas\", \"maxFeePerGas\", \"maxPriorityFeePerGas\", \"data\"]\r\n        ]\r\n    )\r\n\r\n    params = [\r\n        [{\"transactions\": [raw_tx]}],\r\n        {\"blockNumber\": hex(height), \"transactionIndex\": index},\r\n    ]\r\n    print(\r\n        s.post(\r\n            erigon_path,\r\n            json={\r\n                \"jsonrpc\": \"2.0\",\r\n                \"method\": \"eth_callMany\",\r\n                \"params\": params,\r\n                \"id\": 67,\r\n            },\r\n        ).json()\r\n    )\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    raw_tx = {\r\n        \"value\": 0,\r\n        \"chainId\": 1,\r\n        \"gas\": 2000000,\r\n        \"maxFeePerGas\": 1029546770420,\r\n        \"maxPriorityFeePerGas\": 1192368570,\r\n        \"to\": \"0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6\",\r\n        \"data\": \"0xf7729d43000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000001f4000000000000000000000000000000000000000000000000000000012a05f2000000000000000000000000000000000000000000000000000000000000000000\",\r\n    }\r\n    height = 16957059\r\n    index = 11\r\n    get_amount_from_raw_tx(raw_tx, height, index)\r\n\r\n```\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7801/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7801/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "This issue is stale because it has been open for 40 days with no activity. Remove stale label or comment, or this will be closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1666678469/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1676566573",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/7801#issuecomment-1676566573",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7801",
+    "id": 1676566573,
+    "node_id": "IC_kwDOC0FsAM5j7mAt",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-08-14T02:01:51Z",
+    "updated_at": "2023-08-14T02:01:51Z",
+    "author_association": "NONE",
+    "body": "This issue was closed because it has been stalled for 7 days with no activity.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1676566573/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
