@@ -67,7 +67,7 @@
       "description": "Implementation of the needed improvements for the Admin events to be stable."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -121,22 +121,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 85,
-    "closed_issues": 246,
+    "open_issues": 62,
+    "closed_issues": 296,
     "state": "open",
     "created_at": "2022-09-28T20:32:56Z",
-    "updated_at": "2023-08-03T18:53:24Z",
+    "updated_at": "2023-08-15T17:44:15Z",
     "due_on": "2023-08-18T07:00:00Z",
     "closed_at": null
   },
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-07-31T09:19:32Z",
-  "updated_at": "2023-08-03T18:38:29Z",
-  "closed_at": null,
+  "updated_at": "2023-08-15T17:43:43Z",
+  "closed_at": "2023-08-15T17:43:43Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "In a network of Status nodes (desktop clients) that participate in the same community, we have a bunch of different nodes:\r\n\r\n- A single control node, this one owns the private key of the community\r\n- Multiple owners nodes (nodes that used to be control nodes, until they've removed the private key)\r\n- Multiple token master nodes (accounts with admin privileges + token distribution)\r\n- Multiple admin nodes (accounts with admin privileges)\r\n\r\nControl nodes, owners and token master can deploy, mint and airdrop tokens.\r\nTokens that have been created through community user interface will be added to 2 places:\r\n\r\n1. In the `CommunityDescription` which has a `communityTokensMetadata` field (this data is publicly available to everyone)\r\n2. In the accounts local database - here we store everything that goes into `communityTokensMetadata` + some additional information that is only interesting for owners/admins (this data is not publicly available and only lives in the account's database)\r\n\r\nBecause of the nature of 2) we need a way to distribute that additional information to other admins as well, so they'll see the same community token information in the community settings interface as the owner that deployed the token.\r\n\r\nUnfortunately, we can't simply derive it from the community tokens metadata in the community description, because it's incomplete.\r\n\r\n### What we probably want to do\r\n\r\nIn order to share such information across privileged users, we probably need to introduce a new message type that is then encrypted using every privileged user's public key and send to those users accordingly.\r\n\r\nThere are various ways to go about this, however since I think there'll be more such data that we want to be shared across those users, it probably makes sense to introduce a generic message that can hold different kinds of payloads.\r\n\r\nFor example something like:\r\n\r\n```protobuf\r\nmessage CommunitySuperUserSyncMessage {\r\n  uint64 clock = 1;\r\n  EventType type = 2;\r\n  repeated CommunityCompleteTokenMetadata complete_token_metadata = 3;\r\n  // other types of payloads that need to be synced across admins\r\n  \r\n  enum EventType {\r\n    UNKNOWN = 0;\r\n    COMMUNITY_TOKEN_DEPLOYED =1;\r\n    COMMUNITY_TOKEN_REMOVED = 2;\r\n    ... // other types of data that need to be synced across admins\r\n  }\r\n}\r\n```\r\n\r\nAs mentioned above, this message needs to be send to all privileged users via private message (so they can be encrypted accordingly). Receiving nodes then need to:\r\n\r\n1. Verify that the message was sent by a legitimate privileged user (and not some random account)\r\n2. Apply the changes provided in the payload and sync the local database\r\n\r\n^ This should keep admins in sync. \r\n\r\nIn addition, we might want to consider adding this shared data to the nodes Sync/Backup mechanism, so that when a privileged user recovers their account, they can reconstruct the known data.\r\n\r\nFeel free to discuss the exact details further on this issue.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mprakhov",
+    "id": 117639195,
+    "node_id": "U_kgDOBwMIGw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/117639195?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mprakhov",
+    "html_url": "https://github.com/mprakhov",
+    "followers_url": "https://api.github.com/users/mprakhov/followers",
+    "following_url": "https://api.github.com/users/mprakhov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mprakhov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mprakhov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mprakhov/subscriptions",
+    "organizations_url": "https://api.github.com/users/mprakhov/orgs",
+    "repos_url": "https://api.github.com/users/mprakhov/repos",
+    "events_url": "https://api.github.com/users/mprakhov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mprakhov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/11715/reactions",
     "total_count": 0,
@@ -151,7 +170,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11715/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -230,6 +249,50 @@
     "body": "Another type of message that could go in there is requestToJoinState decisions, which is needed in [#3843](https://github.com/status-im/status-go/pull/3843)\r\n\r\nHere's what this is about:\r\n1. Control node receive request to join request from user, hasn't made a decision yet\r\n2. Some admin node signals a request to join decision to the control node\r\n3. Control node now makes decision using admins decision and needs to signal final decision to admins\r\n\r\nFor now we might be able to piggy back on RequestToJoinResponse message type and send them to admins, but ultimately this should probably be done via this generic share-among-admins message",
     "reactions": {
       "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1663454256/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1679349695",
+    "html_url": "https://github.com/status-im/status-desktop/issues/11715#issuecomment-1679349695",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/11715",
+    "id": 1679349695,
+    "node_id": "IC_kwDOD5KrTM5kGNe_",
+    "user": {
+      "login": "mprakhov",
+      "id": 117639195,
+      "node_id": "U_kgDOBwMIGw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117639195?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mprakhov",
+      "html_url": "https://github.com/mprakhov",
+      "followers_url": "https://api.github.com/users/mprakhov/followers",
+      "following_url": "https://api.github.com/users/mprakhov/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mprakhov/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mprakhov/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mprakhov/subscriptions",
+      "organizations_url": "https://api.github.com/users/mprakhov/orgs",
+      "repos_url": "https://api.github.com/users/mprakhov/repos",
+      "events_url": "https://api.github.com/users/mprakhov/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mprakhov/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-15T17:43:43Z",
+    "updated_at": "2023-08-15T17:43:43Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "All PR's were merged, closing as done",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1679349695/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
