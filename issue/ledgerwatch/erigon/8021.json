@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8021",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8021/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8021/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8021/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8021",
+  "id": 1851130222,
+  "node_id": "I_kwDOC0FsAM5uVgFu",
+  "number": 8021,
+  "title": "Duplicate static peer connection attempts",
+  "user": {
+    "login": "battlmonstr",
+    "id": 11477595,
+    "node_id": "MDQ6VXNlcjExNDc3NTk1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11477595?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/battlmonstr",
+    "html_url": "https://github.com/battlmonstr",
+    "followers_url": "https://api.github.com/users/battlmonstr/followers",
+    "following_url": "https://api.github.com/users/battlmonstr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/battlmonstr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/battlmonstr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/battlmonstr/subscriptions",
+    "organizations_url": "https://api.github.com/users/battlmonstr/orgs",
+    "repos_url": "https://api.github.com/users/battlmonstr/repos",
+    "events_url": "https://api.github.com/users/battlmonstr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/battlmonstr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-15T09:12:07Z",
+  "updated_at": "2023-08-15T09:12:07Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nCommit hash: \r\n\r\na25f22a06cc1a62e57b30595b580ce057efa8c45\r\n\r\nErigon Command (with flags/config):\r\n\r\n    erigon ... --staticpeers <url>\r\n\r\n#### Actual behaviour\r\n\r\nEach peer connects twice simultaneously, and gets 1 or 2 failures.\r\n\r\n#### Expected behaviour\r\n\r\nEach peer is connected once.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nEnable trace logging and look for \"Adding static node\" messages.\r\nThose produce `staticPool` tasks, which then are taken by `startStaticDials` and it calls `dial` on them.\r\n\r\n#### Details\r\n\r\nIt happens because by default erigon starts with 67 and 68 protocols each of which is served with a separate sentry, which makes a separate `makeP2PServer`. When `Server.Start()` is called it will call `setupDialScheduler()` which calls `addStatic()`. Those 2 operate in parallel with each other.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8021/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8021/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
