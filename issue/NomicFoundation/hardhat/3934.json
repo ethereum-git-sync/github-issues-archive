@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-05-16T08:02:36Z",
-  "updated_at": "2023-05-16T17:20:53Z",
+  "updated_at": "2023-08-15T00:12:19Z",
   "closed_at": "2023-05-16T17:20:53Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Describe the feature\r\n\r\n[EIP 2930](https://eips.ethereum.org/EIPS/eip-2930) adds a transaction type which contains a list of addresses and storage keys that the transaction plans to access, AKA *Access List*.\r\n\r\nAll slots in the list are paid in advance, at a discount relative to the cost of accessing those not in the list.\r\nOf course, any slot specified in the list but not accessed during the transaction, will be \"paid for nothing\".\r\n\r\nAn example of a transaction which specifies an access list:\r\n```\r\nconst tx = {\r\n    from: walletAddress,\r\n    to: contractAddress,\r\n    data: transactionData,\r\n    value: 0,\r\n    type: 1,\r\n    accessList: [\r\n        {\r\n            address: contractAddress,\r\n            storageKeys: [\r\n                \"0x0000000000000000000000000000000000000000000000000000000000000042\",\r\n                \"0x0000000000000000000000000000000000000000000000000000000000000053\",\r\n            ],\r\n        },\r\n        {\r\n            address: usdcTokenAddress,\r\n            storageKeys: [\r\n                \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n                \"0x0000000000000000000000000000000000000000000000000000000000000001\",\r\n                \"0x0000000000000000000000000000000000000000000000000000000000000002\",\r\n            ],\r\n        },\r\n    ],\r\n};\r\n```\r\n\r\nThe primary difficulty is of course computing the access-list for a specific transaction in advance, as there may be several different contracts involved in the transaction, and in each one of them, different storage slots may be accessed depending on the specific details of the transaction.\r\n\r\nLuckily, the Go-Ethereum (GETH) client supports the `eth_createAccessList` RPC method for conveniently determining the list of all storage slots expected to be accessed during a given transaction.\r\n\r\nYou can find an example of this in [web3.js](https://web3js.readthedocs.io/en/v1.7.0/web3-eth.html#createaccesslist).\r\nI'm not sure whether or not ethers.js (which HardHat relies on as its Web3 backbone) supports this method as well.\r\n\r\nHardHat already supports [various JSON RPC methods](https://hardhat.org/hardhat-network/docs/reference#json-rpc-methods-support).\r\n\r\nI would like to request adding support also for the `eth_createAccessList` RPC method.\r\n\r\nThanks\r\n\r\n### Search terms\r\n\r\nEIP-2930, Access List, eth_createAccessList",
   "closed_by": {
     "login": "fvictorio",
