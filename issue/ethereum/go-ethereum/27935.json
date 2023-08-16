@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27935",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27935/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27935/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27935/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/27935",
+  "id": 1851970661,
+  "node_id": "I_kwDOAOvK985uYtRl",
+  "number": 27935,
+  "title": "Allow replay of transactions that are designed to be replayable",
+  "user": {
+    "login": "SKYBITDev3",
+    "id": 141273631,
+    "node_id": "U_kgDOCGuqHw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/141273631?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/SKYBITDev3",
+    "html_url": "https://github.com/SKYBITDev3",
+    "followers_url": "https://api.github.com/users/SKYBITDev3/followers",
+    "following_url": "https://api.github.com/users/SKYBITDev3/following{/other_user}",
+    "gists_url": "https://api.github.com/users/SKYBITDev3/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/SKYBITDev3/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/SKYBITDev3/subscriptions",
+    "organizations_url": "https://api.github.com/users/SKYBITDev3/orgs",
+    "repos_url": "https://api.github.com/users/SKYBITDev3/repos",
+    "events_url": "https://api.github.com/users/SKYBITDev3/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/SKYBITDev3/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-15T19:05:22Z",
+  "updated_at": "2023-08-15T19:09:00Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "# Rationale\r\nInnovative and useful blockchains have been increasingly appearing, resulting in a growing field of cross-chain platforms and tools, and the need to deploy contracts to the same addresses across many blockchains.\r\n\r\nThe CREATE2 opcode and CREATE3 method make it easier to deploy contracts to the same address on multiple blockchains (because nonce is not used in address calculation). But first CREATE2 and CREATE3 *factory* contracts need to be deployed before CREATE2 and CREATE3 can be used.\r\n\r\nSuch factory contracts need to be deployed to the same address on multiple blockchains in order for the contracts that are deployed from them to have the same address.\r\n\r\nOne example is [Deterministic Deployment Proxy](https://github.com/Zoltu/deterministic-deployment-proxy) by [MicahZoltu](https://github.com/MicahZoltu), whom we know is an Ethereum core developer and EIP author. It offers a CREATE2 factory packaged as a replayable serialized signed raw deployment transaction:\r\n```\r\n0xf87e8085174876e800830186a08080ad601f80600e600039806000f350fe60003681823780368234f58015156014578182fd5b80825250506014600cf31ba02222222222222222222222222222222222222222222222222222222222222222a02222222222222222222222222222222222222222222222222222222222222222\r\n```\r\nTransaction type and chain ID are `0`, with hardcoded gas limit and price.\r\n\r\nAs long as this deployment transaction is broadcast as-is, the transaction hash will always be [0x8ee59123fee2379c81c6fed5fa4310d24b0e40027b3bb04684bde87f0e3caaf1](https://basescan.org/tx/0x8ee59123fee2379c81c6fed5fa4310d24b0e40027b3bb04684bde87f0e3caaf1) and the created contract will always have address [0x7a0d94f55792c434d74a40883c6ed8545e406d12](https://basescan.org/address/0x7a0d94f55792c434d74a40883c6ed8545e406d12). See the raw transaction processed on Base: https://basescan.org/getRawTx?tx=0x8ee59123fee2379c81c6fed5fa4310d24b0e40027b3bb04684bde87f0e3caaf1, which matches with the `0xf87e80...` above.\r\n\r\nThis CREATE2 factory has actually been successfully deployed to the same address on over 20 blockchains, just by pushing the raw transaction `0xf87e80...` to each: https://blockscan.com/address/0x7A0D94F55792C434d74a40883C6ed8545E406D12\r\n\r\nNow with increased enforcement of chain ID as first described in the [Geth v1.10.0 announcement](https://blog.ethereum.org/2021/03/03/geth-v1-10-0#chainid-enforcement), rejections of such deployment transactions with chain ID `0` are becoming more common with node services.\r\n\r\nIf we respond to the rejections by setting chain ID to match the blockchain that we want to deploy the factory contract onto, then the raw transaction will be different for each blockchain (as changing other values like gas price would too), hence the address will be different on each blockchain, which is the opposite of what is needed.\r\n\r\n`--rpc.allow-unprotected-txs` is only relevant for those running nodes. Not everyone runs nodes due to the high hardware requirements, and there are many shared node services. But node services may not enable `--rpc.allow-unprotected-txs`, and you also said in the Geth v1.10.0 announcement \"that this is a temporary mechanism that will be removed long term\". Such a heavy-handed banning of transaction replay would be the wrong approach. Such intolerance would stifle innovation in the cross-chain field.\r\n\r\nFactory contracts are a valid use case for replayable transactions. I'm aware that there are security risks when there's no replay protection. So then let's come up with a way to maintain secuirty whilst allowing transactions that are meant to be replayed.\r\n\r\n\r\n# Implementation\r\nOne idea is to agree on a value for chain ID that would indicate that the transaction was designed to be replayable. e.g. if `chainId === -1` then let it through. No wallet app would set a negative chain ID (and none would've done so in the past so there's no risk of replay of past transactions), so normal crypto users remain safe.\r\n\r\nAlso consider whether there should be other checks e.g. allow if the transaction is only for contract deployment.\r\n ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27935/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27935/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
