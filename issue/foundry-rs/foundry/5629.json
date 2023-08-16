@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-15T10:44:57Z",
-  "updated_at": "2023-08-15T10:44:57Z",
+  "updated_at": "2023-08-16T09:53:55Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1680304613",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5629#issuecomment-1680304613",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5629",
+    "id": 1680304613,
+    "node_id": "IC_kwDOGBlvNc5kJ2nl",
+    "user": {
+      "login": "pcaversaccio",
+      "id": 25297591,
+      "node_id": "MDQ6VXNlcjI1Mjk3NTkx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25297591?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/pcaversaccio",
+      "html_url": "https://github.com/pcaversaccio",
+      "followers_url": "https://api.github.com/users/pcaversaccio/followers",
+      "following_url": "https://api.github.com/users/pcaversaccio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/pcaversaccio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/pcaversaccio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/pcaversaccio/subscriptions",
+      "organizations_url": "https://api.github.com/users/pcaversaccio/orgs",
+      "repos_url": "https://api.github.com/users/pcaversaccio/repos",
+      "events_url": "https://api.github.com/users/pcaversaccio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/pcaversaccio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-16T09:52:19Z",
+    "updated_at": "2023-08-16T09:53:55Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Alright, two observations after some debugging: It only happens using the `ci` profile, even if I use the same configurations as in the `default` profile (the default profile always runs successfully). My `foundry.toml` is:\r\n\r\n```\r\n## defaults for all profiles\r\n[profile.default]\r\nsrc = 'src'                                                 # the source directory\r\ntest = 'test'                                               # the test directory\r\nout = 'out'                                                 # the output directory (for artifacts)\r\nlibs = ['lib']                                              # a list of library directories\r\ncache = true                                                # cache the builds\r\ncache_path = 'cache'                                        # where the cache is stored\r\nsolc_version = '0.8.21'                                     # override for the solc version\r\nevm_version = 'paris'                                       # set the EVM target version (prevent using the `PUSH0` opcode)\r\noptimizer = true                                            # enable the solc optimiser\r\noptimizer_runs = 999999                                     # the number of optimiser runs\r\nverbosity = 3                                               # the verbosity of tests\r\nfs_permissions = [{ access = \"read-write\", path = \"./\"}]    # set read-write access to project root\r\n\r\n## default overrides for the CI runs\r\n[profile.ci]\r\nforce = true                                                # always perform a clean build\r\nfuzz = { runs = 10_000 }                                    # increase the number of fuzz runs\r\nverbosity = 4                                               # increase the verbosity of tests\r\n```\r\n\r\nFurthermore, I found that the error is triggered by the following test:\r\n\r\n```solidity\r\nfunction testDeployCreateRevertNonPayable() public {\r\n    vm.expectRevert({revertData: abi.encodeWithSelector(CreateX.FailedContractCreation.selector, createXAddr)});\r\n    createX.deployCreate({initCode: hex\"01\"});\r\n}\r\n```\r\n\r\nIf I replace `hex\"01\"` with `abi.encode(hex\"01\")` it will run successfully (if I use `abi.encodePacked` instead it will revert; the function `deployCreate` uses `bytes` as input for the argument, which is the init code). So two questions @Evalir: why is this throwing only if I use the `ci` profile and why is there an issue with the `hex`/`abi.encodePacked` instruction?",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1680304613/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
