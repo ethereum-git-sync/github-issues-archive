@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4633",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4633/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4633/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4633/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4633",
+  "id": 1854379664,
+  "node_id": "I_kwDOCFeAzc5uh5aQ",
+  "number": 4633,
+  "title": "Fork choice attestation checks ignore gossip clock disparity",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1071554809,
+      "node_id": "MDU6TGFiZWwxMDcxNTU0ODA5",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/spec_change",
+      "name": "spec_change",
+      "color": "0bedad",
+      "default": false,
+      "description": "A change related to the Eth2 spec"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-17T06:56:38Z",
+  "updated_at": "2023-08-17T06:56:51Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\n[Found using Hydra, impact is very low]\r\n\r\nFork choice checks that the attestations it is processing are not prior to the previous epoch here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/fork_choice/src/fork_choice.rs#L975-L986\r\n\r\nHowever the gossip clock disparity allows attestations in epoch N - 2 through to fork choice, during the first 500ms of epoch N. Due to this check:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/beacon_node/beacon_chain/src/attestation_verification.rs#L1054-L1063\r\n\r\nThis breaks the property that an attestation which passes `attestation_verification` should be capable of being applied to `fork_choice`. On a live network this would manifest as an ugly log message like:\r\n\r\n> BeaconChainError(ForkChoiceError(InvalidAttestation(PastEpoch { attestation_epoch: Epoch(0), current_epoch: Epoch(2) })))\r\n\r\nFunnily, the comment on fork choice's `PastEpoch` error mentions the allowable clock disparity, even though it doesn't take it into account:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/fork_choice/src/fork_choice.rs#L169-L173\r\n\r\n## Steps to resolve\r\n\r\nThis is arguably a spec bug, as the spec also doesn't take the gossip clock disparity into account here: https://github.com/ethereum/consensus-specs/blob/v1.3.0/specs/phase0/fork-choice.md#validate_target_epoch_against_current_time\r\n\r\nOne way fix would be to amend the fork choice spec to also allow clock disparity. Another option would be to just modify Lighthouse to allow an extra slot's worth of attestations. This also applies to Deneb where the conditions are changed slightly but the same problem exists:\r\n\r\nhttps://github.com/ethereum/consensus-specs/blob/dev/specs/deneb/p2p-interface.md#beacon_aggregate_and_proof\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4633/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4633/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
