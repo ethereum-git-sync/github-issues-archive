@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-08-16T12:36:08Z",
-  "updated_at": "2023-08-16T16:33:56Z",
-  "closed_at": null,
+  "updated_at": "2023-08-18T15:06:53Z",
+  "closed_at": "2023-08-18T15:06:52Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (9477764 2023-08-16T10:20:52.021727Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\n_No response_\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nWe have a contracts project I've been using without any issues for months. I just cloned a version of the project from Github. Now, I'm getting an error from `vm.parseJson` in our `Utils.sol` script. This `Utils` script is responsible for creating a json file which includes the address of all of our contracts and the block they were deploy in.\r\n\r\n### Utils.sol\r\n```\r\npragma solidity ^0.8.16;\r\n\r\nimport \"forge-std/Script.sol\";\r\nimport \"forge-std/console.sol\";\r\n\r\ncontract Utils is Script {\r\n    error Utils_contractAddressNotFound(string contractName);\r\n\r\n    string constant namesKey = \"doNotRemoveUsedToParseFile\";\r\n\r\n    string[] contractNames;\r\n    string tempContractJson;\r\n\r\n    function getContractDeploymentAddress(string memory contractName) internal returns (address) {\r\n        string memory deploymentFile = _readDeploymentFile();\r\n        bytes memory contractAddress = vm.parseJson(deploymentFile, string.concat(\".\", contractName, \".address\"));\r\n        if (contractAddress.length == 0) {\r\n            revert Utils_contractAddressNotFound(contractName);\r\n        }\r\n        return abi.decode(contractAddress, (address));\r\n    }\r\n\r\n    function exportContractDeployment(string memory _contractName, address _contractAddress, uint256 _startBlock)\r\n        internal\r\n    {\r\n        string memory path = _getDeployedFilePath();\r\n\r\n        // serialize json\r\n        string memory contractJson;\r\n        contractJson = vm.serializeAddress(_contractName, \"address\", _contractAddress);\r\n        contractJson = vm.serializeUint(_contractName, \"startBlock\", _startBlock);\r\n\r\n        string memory deploymentFile = _readDeploymentFile();\r\n        bool fileExists = bytes(deploymentFile).length > 0;\r\n        bool isInJsonFile = fileExists ? (vm.parseJson(deploymentFile, _contractName)).length > 0 : false;\r\n\r\n        if (isInJsonFile) {\r\n            // just update existing deployment address\r\n            vm.writeJson(contractJson, path, string.concat(\".\", _contractName));\r\n            return;\r\n        }\r\n\r\n        // wrap the address and startBlock with contract name\r\n        contractJson = vm.serializeString(\"json\", _contractName, contractJson);\r\n\r\n        if (fileExists) {\r\n            // get all contract names from that file\r\n            contractNames = abi.decode(vm.parseJson(deploymentFile, namesKey), (string[]));\r\n            // parse and reconstruct entire file\r\n            for (uint256 i = 0; i < contractNames.length; i++) {\r\n                (address contractAddress, uint256 startBlock) =\r\n                    abi.decode(vm.parseJson(deploymentFile, contractNames[i]), (address, uint256));\r\n                tempContractJson = \"\";\r\n                tempContractJson = vm.serializeAddress(contractNames[i], \"address\", contractAddress);\r\n                tempContractJson = vm.serializeUint(contractNames[i], \"startBlock\", startBlock);\r\n\r\n                contractJson = vm.serializeString(\"json\", contractNames[i], tempContractJson);\r\n            }\r\n        } else {\r\n            // no deployments exist so ensure array is empty\r\n            delete contractNames;\r\n        }\r\n\r\n        // add the contractNames array with new contract name\r\n        contractNames.push(_contractName);\r\n        contractJson = vm.serializeString(\"json\", namesKey, contractNames);\r\n\r\n        // overwrite json file\r\n        vm.writeJson(contractJson, path);\r\n    }\r\n\r\n    function _getDeployedFilePath() internal view returns (string memory) {\r\n        string memory inputDir = string.concat(vm.projectRoot(), \"/deployed/\");\r\n        string memory file = string.concat(vm.toString(block.chainid), \".json\");\r\n\r\n        return string.concat(inputDir, file);\r\n    }\r\n\r\n    function _readDeploymentFile() internal returns (string memory) {\r\n        try vm.readFile(_getDeployedFilePath()) returns (string memory result) {\r\n            return result;\r\n        } catch {\r\n            return \"\";\r\n        }\r\n    }\r\n}\r\n```\r\n\r\nThe error:\r\n```\r\nforge script scripts/core/Globals.s.sol:Deploy --rpc-url anvil --broadcast -vvvv --legacy --slow\r\n[⠔] Compiling...\r\nNo files changed, compilation skipped\r\nTraces:\r\n  [1510279] → new Deploy@0x5b73C5498c1E3b4dbA84de0F1833c4a029d90519\r\n    └─ ← 7433 bytes of code\r\n\r\n  [464352] Deploy::run() \r\n    ├─ [0] VM::envUint(PRIVATE_KEY) [staticcall]\r\n    │   └─ ← <env var value>\r\n    ├─ [0] VM::startBroadcast(<pk>) \r\n    │   └─ ← ()\r\n    ├─ [394925] → new Globals@0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512\r\n    │   ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266)\r\n    │   └─ ← 1853 bytes of code\r\n    ├─ [0] VM::stopBroadcast() \r\n    │   └─ ← ()\r\n    ├─ [0] VM::projectRoot() [staticcall]\r\n    │   └─ ← /Users/andy/Projects/Open Format/core/contracts\r\n    ├─ [0] VM::toString(31337) [staticcall]\r\n    │   └─ ← 0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000053331333337000000000000000000000000000000000000000000000000000000\r\n    ├─ [0] VM::serializeAddress(Globals, address, Globals: [0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512]) \r\n    │   └─ ← {\"address\":\"0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512\"}\r\n    ├─ [0] VM::serializeUint(Globals, startBlock, 1) \r\n    │   └─ ← {\"address\":\"0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512\",\"startBlock\":1}\r\n    ├─ [0] VM::projectRoot() [staticcall]\r\n    │   └─ ← /Users/andy/Projects/Open Format/core/contracts\r\n    ├─ [0] VM::toString(31337) [staticcall]\r\n    │   └─ ← 0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000053331333337000000000000000000000000000000000000000000000000000000\r\n    ├─ [0] VM::readFile(/Users/andy/Projects/Open Format/core/contracts/deployed/31337.json) [staticcall]\r\n    │   └─ ← <file>\r\n    ├─ [0] VM::parseJson(<JSON file>, Globals) [staticcall]\r\n    │   └─ ← \"path error: \r\n$Globals\r\n^^^^^^^^\r\n\"\r\n    └─ ← \"path error: \r\n$Globals\r\n^^^^^^^^\r\n\"\r\n\r\n\r\nError: \r\npath error: \r\n$Globals\r\n^^^^^^^^\r\n\r\n\r\nmake[1]: *** [deploy-Globals] Error 1\r\nmake: *** [deploy] Error 2\r\n```\r\n\r\nIt works with this release - https://github.com/foundry-rs/foundry/releases/tag/nightly-8bbde620ab39246f3c89700a19dfe6f347e99f4f\r\nBreaks with next release - https://github.com/foundry-rs/foundry/releases/tag/nightly-94777647f6ea5d34572a1b15c9b57e35b8c77b41\r\n\r\nProject - https://github.com/open-format/contracts\r\nDiscussion - https://github.com/foundry-rs/foundry/discussions/4846",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5645/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5645/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -236,6 +255,50 @@
     "body": "Ig the problem is here:\r\n`bool isInJsonFile = fileExists ? (vm.parseJson(deploymentFile, _contractName)).length > 0 : false;`\r\nyou should change it to\r\n`bool isInJsonFile = fileExists ? (vm.parseJson(deploymentFile, string.concat(\".\", _contractName))).length > 0 : false;`",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1680927669/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1684055874",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5645#issuecomment-1684055874",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5645",
+    "id": 1684055874,
+    "node_id": "IC_kwDOGBlvNc5kYKdC",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-18T15:06:52Z",
+    "updated_at": "2023-08-18T15:06:52Z",
+    "author_association": "MEMBER",
+    "body": "closing— @klkvr gave a great answer",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1684055874/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
