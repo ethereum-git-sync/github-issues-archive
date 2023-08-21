@@ -1,14 +1,14 @@
 {
-  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11954",
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11969",
   "repository_url": "https://api.github.com/repos/status-im/status-desktop",
-  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11954/labels{/name}",
-  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11954/comments",
-  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11954/events",
-  "html_url": "https://github.com/status-im/status-desktop/issues/11954",
-  "id": 1858788669,
-  "node_id": "I_kwDOD5KrTM5uyt09",
-  "number": 11954,
-  "title": "[Community Ownership] deploy Owner Token through community address",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11969/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11969/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11969/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/11969",
+  "id": 1859725040,
+  "node_id": "I_kwDOD5KrTM5u2Sbw",
+  "number": 11969,
+  "title": "[Community Ownership] new Owner should ask members for addresses",
   "user": {
     "login": "osmaczko",
     "id": 33099791,
@@ -62,26 +62,7 @@
   "locked": false,
   "assignee": null,
   "assignees": [
-    {
-      "login": "endulab",
-      "id": 61889657,
-      "node_id": "MDQ6VXNlcjYxODg5NjU3",
-      "avatar_url": "https://avatars.githubusercontent.com/u/61889657?v=4",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/endulab",
-      "html_url": "https://github.com/endulab",
-      "followers_url": "https://api.github.com/users/endulab/followers",
-      "following_url": "https://api.github.com/users/endulab/following{/other_user}",
-      "gists_url": "https://api.github.com/users/endulab/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/endulab/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/endulab/subscriptions",
-      "organizations_url": "https://api.github.com/users/endulab/orgs",
-      "repos_url": "https://api.github.com/users/endulab/repos",
-      "events_url": "https://api.github.com/users/endulab/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/endulab/received_events",
-      "type": "User",
-      "site_admin": false
-    }
+
   ],
   "milestone": {
     "url": "https://api.github.com/repos/status-im/status-desktop/milestones/65",
@@ -120,16 +101,16 @@
     "due_on": "2023-09-29T07:00:00Z",
     "closed_at": null
   },
-  "comments": 1,
-  "created_at": "2023-08-21T07:38:20Z",
-  "updated_at": "2023-08-21T18:47:04Z",
+  "comments": 0,
+  "created_at": "2023-08-21T16:23:05Z",
+  "updated_at": "2023-08-21T18:16:16Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "The Owner Token must be deployed by the community address. This is to prevent malicious owners from deploying multiple Owner Tokens with potentially harmful intentions in the future.\r\n\r\nThis will effectively bind the contract to the community. Clients will verify the owner token contract address by reviewing the transaction history of the community address; only the first deployment is valid.\r\n\r\nEdit: It should be possible to sign the transaction \"offline\" using the community key, then send the transaction using the user's wallet. That would mean the transaction would still count as performed by the community, but the gas would be paid by the user's wallet.\r\n\r\nCheck out Iuri's old presentation on Ethereum for an example of that. TLDW: he started a transaction in his wallet, took the data, signed it using the first wallet's private key, then took that signed transaction data and pasted it in another wallet. He could then send it using that second wallet, but it still did the transfer from the first wallet.\r\n\r\nIf we do it like that, we do not need all those steps below.\r\n\r\n---\r\n\r\nIgnore this if the way above works\r\n\r\nTo facilitate the deployment by the community address, it needs sufficient funds to cover the gas fees. Therefore, the procedure should be:\r\n1. The owner transfers ETH to the community address to cover gas fees.\r\n2. The community address deploys the Owner Token contract.\r\n3. The community address refunds any remaining ETH to the owner.\r\n4. The owner [sets signerPublicKey](https://github.com/status-im/communities-contracts/blob/8d3f185bf4d382d522815cff7cb2b70902cfffa8/contracts/mvp/OwnerToken.sol#L42) with its chat PublicKey.\r\n\r\n---\r\n\r\n### Acceptance criteria:\r\n- [ ] Owner Token contract is deployed by community address\r\n- [ ] Owner Token's [signerPublicKey](https://github.com/status-im/communities-contracts/blob/8d3f185bf4d382d522815cff7cb2b70902cfffa8/contracts/mvp/OwnerToken.sol#L10) property points to Owner's chat PublicKey\r\n\r\n#### Implementation:\r\nIdeally, these four steps should be executed in a single atomic transaction. This ensures that either all operations succeed, or none are executed, preventing any intermediate and undesirable state. If executing all in one transaction is not feasible, a robust recovery/retry mechanism should be implemented in the event that any of the transactions fail.\r\n\r\n#### Considerations:\r\nExtend Owner Token's constructor with `signerPublicKey` parameter to avoid step 4.",
+  "body": "Dependent on https://github.com/status-im/status-desktop/issues/11972\r\n\r\nAt present, only the control node stores the revealed addresses of members. When ownership is transferred to a new owner, this new owner doesn't have access to these revealed addresses. To perform permissions checks, the new owner must request members to reveal their addresses again. Maybe we could introduce a cool-down period, potentially 24 hours, during which members are not kicked for not having revealed their addresses immediately after an ownership transfer.\r\n\r\nNOTE: _Although the new owner can approach the previous owner to obtain the revealed addresses, this method poses a security risk. The former owner could send malicious addresses or may no longer be trusted._\r\n\r\n### Acceptance criteria:\r\n- [ ] new control node should ask members for revealed addresses\r\n- [ ] permissions check should be done after cool-down period, so that members have time to send addresses",
   "closed_by": null,
   "reactions": {
-    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11954/reactions",
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11969/reactions",
     "total_count": 0,
     "+1": 0,
     "-1": 0,
@@ -140,53 +121,10 @@
     "rocket": 0,
     "eyes": 0
   },
-  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11954/timeline",
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11969/timeline",
   "performed_via_github_app": null,
   "state_reason": null
 }
 [
-  {
-    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1686536195",
-    "html_url": "https://github.com/status-im/status-desktop/issues/11954#issuecomment-1686536195",
-    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/11954",
-    "id": 1686536195,
-    "node_id": "IC_kwDOD5KrTM5khoAD",
-    "user": {
-      "login": "jrainville",
-      "id": 11926403,
-      "node_id": "MDQ6VXNlcjExOTI2NDAz",
-      "avatar_url": "https://avatars.githubusercontent.com/u/11926403?v=4",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/jrainville",
-      "html_url": "https://github.com/jrainville",
-      "followers_url": "https://api.github.com/users/jrainville/followers",
-      "following_url": "https://api.github.com/users/jrainville/following{/other_user}",
-      "gists_url": "https://api.github.com/users/jrainville/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/jrainville/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/jrainville/subscriptions",
-      "organizations_url": "https://api.github.com/users/jrainville/orgs",
-      "repos_url": "https://api.github.com/users/jrainville/repos",
-      "events_url": "https://api.github.com/users/jrainville/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/jrainville/received_events",
-      "type": "User",
-      "site_admin": false
-    },
-    "created_at": "2023-08-21T15:21:22Z",
-    "updated_at": "2023-08-21T15:21:22Z",
-    "author_association": "MEMBER",
-    "body": "Lookup signing a transaction by the community and then send the transaction with the user wallet (to pay the gas)",
-    "reactions": {
-      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1686536195/reactions",
-      "total_count": 1,
-      "+1": 1,
-      "-1": 0,
-      "laugh": 0,
-      "hooray": 0,
-      "confused": 0,
-      "heart": 0,
-      "rocket": 0,
-      "eyes": 0
-    },
-    "performed_via_github_app": null
-  }
+
 ]

@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/11968",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/11968/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/11968/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/11968/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/11968",
+  "id": 1859719943,
+  "node_id": "I_kwDOD5KrTM5u2RMH",
+  "number": 11968,
+  "title": "Wallet Settings: Tweaked import keypair flows to work around current inability to know which keypairs are fully imported on which synced device",
+  "user": {
+    "login": "benjthayer",
+    "id": 110033914,
+    "node_id": "U_kgDOBo77-g",
+    "avatar_url": "https://avatars.githubusercontent.com/u/110033914?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjthayer",
+    "html_url": "https://github.com/benjthayer",
+    "followers_url": "https://api.github.com/users/benjthayer/followers",
+    "following_url": "https://api.github.com/users/benjthayer/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjthayer/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjthayer/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjthayer/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjthayer/orgs",
+    "repos_url": "https://api.github.com/users/benjthayer/repos",
+    "events_url": "https://api.github.com/users/benjthayer/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjthayer/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-21T16:20:15Z",
+  "updated_at": "2023-08-21T16:20:15Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Modifications have been made to the keypair import flows (in the `Wallet` page of the `Settings | Desktop` file). \r\n\r\n**Why?**\r\nThe previous iteration of the keypair import flows relied on us being able to know and communicate to the user which devices have which keypairs imported. This presumption in the previous design iteration allowed us to direct the user to a specific device depending on what keypair they wanted to import. If a keypair the user wanted to import was currently imported and fully functional on device B, instructions could be provided on device A to head to device B in order to generate the encrypted keypair QR. Given this information isn't currently known, the flows have been updated and generalised in various ways to avoid reliance on this information.\r\n\r\n\r\nThe previously designed flows can be found in the `Archive` pages of the `Settings | Desktop` file for comparison:\r\nhttps://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=18442-606636&mode=design&t=kDsJy0gwUXRt62bH-4\r\n\r\nThe new designs can be found in their place in the `Wallet` page of the `Settings | Desktop` file:\r\nhttps://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=18442-535102&mode=design&t=x4R2VWW5FQXxodXP-4\r\n\r\n\r\n**Detailed list of changes:**\r\n\r\n**1) Notification centre item relating to import of keypair to another of the user's synced devices:**\r\n\r\nNew copy: `Rainbow keypair was added to one of your synced devices`\r\nOld copy: `Rainbow keypair was added to: [device name]`\r\n\r\n<img width=\"1081\" alt=\"Screenshot 2023-08-21 at 16 23 23\" src=\"https://github.com/status-im/status-desktop/assets/110033914/d3ce3d1e-3716-471d-9230-492f539c0bab\">\r\n\r\n\r\n--\r\n\r\n\r\n**2) Orange alert message on non-imported keypair** \r\n\r\nNew copy: `Import keypair to use derived accounts`\r\nOld copy: `Added to [device name] - [date imported DD MMM YYYY]`\r\n\r\n<img width=\"1404\" alt=\"Screenshot 2023-08-21 at 16 26 06\" src=\"https://github.com/status-im/status-desktop/assets/110033914/3a602d68-430d-4160-8c75-a8da06cbbf51\">\r\n\r\n\r\n--\r\n\r\n**3) Import missing keypairs dialog**\r\n\r\nPreviously, this dialog would group missing keypairs by the device they can be imported from. The dialog has been reformatted to avoid referencing devices. Instead of device groupings, the user is presented with 2 groups of options. \r\n- First, they can 'Import via scanning encrypted QR` - this brings up the QR scanner dialog and the user can scan whichever device they wish (the user is relied on to determine which device they scan based on their knowledge of where the required keypairs are fully imported).\r\n- Secondly, they can select individual keypairs to import via seed phrase / private key (depending on how the keypair was originally imported) or QR\r\n\r\n- Additionally, we've removed any of the sub-flows that showed differences in the user's flow depending on if keypair they wanted to import was on just one or multiple devices (we no longer need the ability for the user to select which device to import from in the event the keypair they want to import is imported on multiple of their synced devices).\r\n\r\n<img width=\"809\" alt=\"Screenshot 2023-08-21 at 16 30 19\" src=\"https://github.com/status-im/status-desktop/assets/110033914/2502fd12-326c-4ef5-a2a7-891b94066106\">\r\n\r\n\r\n--\r\n\r\n\r\n**4) QR dialog**\r\n\r\nGiven we no longer know which device to direct the user to in order to import specific keypairs, the QR dialog title now omits the device name:\r\n\r\nNew copy: `Scan encrypted keypair QR code`\r\nOld copy: `Scan encrypted QR from [device name]`\r\n\r\nIn addition, we've taken the opportunity to make the CTA on how to generate the QR on the other device more descriptive:\r\n\r\nNew copy: `How to display the QR code on your other device`\r\nOld copy: `How to generate the QR`\r\n\r\n(This may also need to be rolled out to other sync/QR flows for consistency)\r\n\r\n<img width=\"812\" alt=\"Screenshot 2023-08-21 at 16 34 46\" src=\"https://github.com/status-im/status-desktop/assets/110033914/ba218d3c-66f2-493c-b14c-34cc53228d4c\">\r\n\r\n\r\n--\r\n\r\n\r\n\r\n**5) QR dialog - how to generate the QR on the other synced device instructions**\r\n\r\nGiven we no longer know which device to direct the user to in order to import specific keypairs, the QR dialog instructions on how to generate the QR on the other device now avoids directing the user to specific devices:\r\n\r\nNew copy: `1. Open Status on the device you want to import from`\r\nOld copy: `Open Status on [mobile/desktop device name]`\r\n\r\nTabs have also been added to allow the user to select whether they want to import via QR from a desktop or a mobile device\r\n\r\n<img width=\"810\" alt=\"Screenshot 2023-08-21 at 16 39 32\" src=\"https://github.com/status-im/status-desktop/assets/110033914/8f8931d5-13fd-4958-bd9b-7e61e7f8461f\">\r\n\r\n\r\n--\r\n\r\n\r\n**6) Keypair import confirmation toasts **\r\n\r\nThese have been amended to avoid specifying the device name (which is largely redundant anyway considering the user will be mindful of which device they have just imported from via the QR route as they will have that device to hand to generate the QR on and scan from).\r\n\r\n<img width=\"814\" alt=\"Screenshot 2023-08-21 at 16 46 49\" src=\"https://github.com/status-im/status-desktop/assets/110033914/80368309-354b-408b-bae7-02cfc4187d7c\">\r\n\r\n\r\n--\r\n\r\n\r\n**7) Importing keypairs via the keypair context menu**\r\n\r\nRelated to point 3, the previous flows enabled the user to select which device they wanted to scan the QR from if the keypair they want to import was imported on more than one of their synced devices. Again, this option and associated dialog states have been removed.\r\n\r\n<img width=\"843\" alt=\"Screenshot 2023-08-21 at 16 53 11\" src=\"https://github.com/status-im/status-desktop/assets/110033914/5b29ef03-273c-4da6-97ce-af640379c1a3\">\r\n\r\n\r\n--\r\n\r\n\r\n**8) Importing keypairs at the account level (Navigating into an account page in Wallet settings)** \r\n\r\n'Import keypair to use account' : The description directly beneath this title has been modified to remove reference to a specific device:\r\n\r\nNew copy: `This account was added to one of your synced devices. To begin using this account you will first need import the associated keypair to this device. Click “Import missing keypair” above.`\r\n\r\nOld copy: `This account was added to [device name]. To begin using this account you will first need import the associated keypair to this device. Click “Import missing keypair” above.`\r\n\r\nhttps://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=18442-539781&mode=design&t=x4R2VWW5FQXxodXP-4\r\n\r\n<img width=\"1022\" alt=\"Screenshot 2023-08-21 at 17 01 27\" src=\"https://github.com/status-im/status-desktop/assets/110033914/16caaee9-a9e6-48f5-9804-c73a51d1e29f\">\r\n\r\n\r\n--\r\n\r\n\r\n**9) Importing keypairs at the account level (Navigating into an account page in Wallet)**\r\n\r\nSimilar to 8, reference to the device name has been removed in the `Import keypair to use this account` panel at the top of the page:\r\n\r\nNew copy: `This account was added to one of your synced devices. To begin using this account you will first need import the associated keypair to this device.`\r\n\r\nOld copy: `This account was added to [device name]. To begin using this account you will first need import the associated keypair to this device.`\r\n\r\n<img width=\"1256\" alt=\"Screenshot 2023-08-21 at 17 05 13\" src=\"https://github.com/status-im/status-desktop/assets/110033914/550c661c-8568-499a-b6b9-4e578c500ae7\">\r\n\r\nhttps://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=18442-539713&mode=design&t=x4R2VWW5FQXxodXP-4\r\n\r\n- The flows here align with those discussed earlier in removing the device name from the dialog copy and removing the option to select which device to import from. The copy has been shortened slightly in addition:\r\n\r\n<img width=\"826\" alt=\"Screenshot 2023-08-21 at 17 10 02\" src=\"https://github.com/status-im/status-desktop/assets/110033914/b86f2708-64a3-4a0b-a294-d6f1b6bda933\">\r\n\r\n\r\n--\r\n\r\n\r\n**9) Importing keypairs after Waku backup**\r\n\r\nA couple of amends to align with above copy/logic and fixes:\r\n\r\nAmber warning copy:\r\nNew copy: `Restored from backup. Import keypair to use derived accounts.`\r\nOld copy: `Restored from backup. Re-enter private key to use.`\r\n\r\nMenu items: removal of `Import keypair from device via encrypted QR`\r\n\r\nhttps://www.figma.com/file/idUoxN7OIW2Jpp3PMJ1Rl8/%E2%9A%99%EF%B8%8F-Settings-%7C-Desktop?type=design&node-id=18442-538750&mode=design&t=x4R2VWW5FQXxodXP-4\r\n\r\n<img width=\"1289\" alt=\"Screenshot 2023-08-21 at 17 12 31\" src=\"https://github.com/status-im/status-desktop/assets/110033914/84b86b14-8bcc-4fc5-87f2-919feccc0f81\">\r\n\r\n\r\n--\r\n\r\n\r\nAs a final point, when talking about `associated accounts` in relation to accounts that are derived from a keypair, we are now changing this language to `derived accounts` as this is more accurate and allows us to familiarise users with this language which is used elsewhere in the app (eg choosing a derivation path when creating an account). We should use `derived accounts` anywhere we previously used `associated accounts` eg in the keypair context menu: `Remove keypair and associated accounts` becomes `Remove keypair and derived accounts`. I can create a separate issue for which screens/components this impacts if needed.\r\n\r\n\r\n@saledjenic @John-44 @xAlisher @mariocnovoa ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/11968/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/11968/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
