@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14508",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14508/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14508/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14508/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14508",
+  "id": 1859774044,
+  "node_id": "I_kwDOAm_5kc5u2eZc",
+  "number": 14508,
+  "title": "Optimize external calls gas cost.",
+  "user": {
+    "login": "drortirosh",
+    "id": 40341007,
+    "node_id": "MDQ6VXNlcjQwMzQxMDA3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/40341007?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/drortirosh",
+    "html_url": "https://github.com/drortirosh",
+    "followers_url": "https://api.github.com/users/drortirosh/followers",
+    "following_url": "https://api.github.com/users/drortirosh/following{/other_user}",
+    "gists_url": "https://api.github.com/users/drortirosh/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/drortirosh/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/drortirosh/subscriptions",
+    "organizations_url": "https://api.github.com/users/drortirosh/orgs",
+    "repos_url": "https://api.github.com/users/drortirosh/repos",
+    "events_url": "https://api.github.com/users/drortirosh/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/drortirosh/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-21T16:56:03Z",
+  "updated_at": "2023-08-21T16:56:03Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "The solidity compiler creates a \"jump table\" to all external calls.\r\nIt attempts to optimize the gas used to access all external methods.\r\nHowever, the compiler has no knowledge on the call frequency of these methods.\r\n\r\ne.g.\r\nWith ERC4337, we have a central \"EntryPoint\" contract.\r\nIt exposes ~20 methods, but most of them are view or \"admin\" functions.\r\nIn production, only 2-3 methods are \"critical\", and are used by >99.9%  of the calls\r\n\r\n(These numbers are not an exaggeration: out of over 1M transactions, only few 100s are NOT calls to `handleOps()` method (and internally, calling  also `internalHandleOp` and `depositTo`)\r\n\r\nObviously, we could like to optimize the gas usage of those methods, even at the cost of making the other methods slightly more expensive.\r\n\r\nCurrently, there is no way to \"prioritize\" such methods, except by mutilating the `methodSig` using trial-and-error, which is obviously unadvisable way to create a public API.\r\n\r\n### Suggestion\r\nAdd a `#pragma` value to hint the the compiler a specific method should get a higher priority when creating the jump-table, even at the cost of making other methods less efficient\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14508/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14508/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

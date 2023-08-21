@@ -67,6 +67,15 @@
       "description": "We like the idea but it’s not important enough to be a part of the roadmap."
     },
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -76,21 +85,40 @@
       "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 10,
+  "comments": 11,
   "created_at": "2020-08-07T13:52:31Z",
-  "updated_at": "2023-08-13T12:03:41Z",
-  "closed_at": null,
+  "updated_at": "2023-08-21T12:04:06Z",
+  "closed_at": "2023-08-21T12:04:06Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!--## Prerequisites\r\n\r\n- First, many thanks for taking part in the community. We really appreciate that.\r\n- We realize there is a lot of information requested here. We ask only that you do your best to provide as much information as possible so we can better help you.\r\n- Support questions are better asked in one of the following locations:\r\n\t- [Solidity chat](https://gitter.im/ethereum/solidity)\r\n\t- [Stack Overflow](https://ethereum.stackexchange.com/)\r\n- Ensure the issue isn't already reported.\r\n- The issue should be reproducible with the latest solidity version; however, this isn't a hard requirement and being reproducible with an older version is sufficient.\r\n-->\r\n\r\n## Description\r\n\r\n<!--Please shortly describe the bug you have found, and what you expect instead.-->\r\nI'm trying to use the new try / catch feature but it seems that it doesn't recognise address.call to be an external call\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.7.0\r\n- Target EVM version (as per compiler settings): default\r\n- Framework/IDE (e.g. Truffle or Remix): Truffle and Remix\r\n- EVM execution environment / backend / blockchain client: it's a compilation issue so not relevant\r\n- Operating system: OSX\r\n\r\n## Steps to Reproduce\r\n\r\ntry to compile : \r\n```\r\npragma solidity ^0.7.0;\r\n\r\n\r\ncontract TryCatchIssue {\r\n    address payable externalAddress;\r\n    constructor(address payable addr) {\r\n        externalAddress = addr;\r\n    }\r\n    \r\n    \r\n    function callme(bytes calldata data) external {\r\n        try externalAddress.call{value: 100}(data) {\r\n            \r\n        } catch (string memory reason) {\r\n            revert(reason);\r\n        } catch (bytes memory reason) {\r\n            revert();\r\n        }\r\n    }\r\n}\r\n```\r\n\r\nI'm expecting to use try / catch but instead I get the error message:\r\n`Try can only be used with external function calls and contract creation calls.`\r\n\r\n<!--\r\nPlease provide a *minimal* source code example to trigger the bug you have found.\r\nPlease also mention any command line flags that are necessary for triggering the bug.\r\nProvide as much information as necessary to reproduce the bug.\r\n\r\n```solidity\r\n// Some *minimal* Solidity source code to reproduce the bug.\r\n// ...\r\n```\r\n-->\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/9592/reactions",
     "total_count": 0,
@@ -105,7 +133,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/9592/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -228,8 +256,8 @@
     "body": "Low-level calls return a tuple ``(bool, bytes memory)`` - the ``bool`` indicating, if the call failed, the ``bytes memory`` containing the error message as an ABI-encoded call to a function with signature ``Error(string)``. So with low-level calls you are supposed to manually decode the message.\r\nThe ``bytes memory`` part will consist of the 4-byte signature of ``Error(string)`` followed by a pointer to the string, which in turn consists of a length and the padded string data.\r\nSo for ``revert(\"abc\");`` you can expect the ``bytes memory`` to contain the following:\r\n```\r\n0x08c379a0 -- first 4 bytes of the keccak256 hash of \"Error(String)\"\r\n0x0000000000000000000000000000000000000000000000000000000000000020 -- relative offset of the string argument\r\n0x0000000000000000000000000000000000000000000000000000000000000003 -- length of the string\r\n0x6162630000000000000000000000000000000000000000000000000000000000 -- padded string \"abc\"\r\n```\r\n\r\nPossibly, we will have a ``try...catch``-like mechanism for low-level calls in the future - or will at least make it easier to decode the error message using ``abi.decode`` with memory array slices. But currently decoding this will involve some manual effort.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/671374867/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 3,
+      "+1": 3,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -536,6 +564,50 @@
     "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1676338563/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1686202650",
+    "html_url": "https://github.com/ethereum/solidity/issues/9592#issuecomment-1686202650",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/9592",
+    "id": 1686202650,
+    "node_id": "IC_kwDOAm_5kc5kgWka",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-08-21T12:04:05Z",
+    "updated_at": "2023-08-21T12:04:05Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1686202650/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
