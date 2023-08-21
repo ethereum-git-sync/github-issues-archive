@@ -33,7 +33,7 @@
 
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -41,10 +41,10 @@
   "milestone": null,
   "comments": 5,
   "created_at": "2022-09-06T10:32:28Z",
-  "updated_at": "2023-05-22T04:09:50Z",
+  "updated_at": "2023-08-21T00:12:25Z",
   "closed_at": "2022-12-27T18:23:08Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "<!--\r\n\r\nThank you for using Hardhat and taking the time to open an issue!\r\n\r\n**Note that this issue tracker is not a support channel.**\r\n\r\n- For help with Hardhat and Hardhat network, please use our [Discord server](https://hardhat.org/discord).\r\n- For help with ethers.js, please go to [its Github Discussions](https://github.com/ethers-io/ethers.js/discussions).\r\n\r\nIf you are reporting a bug, please include reproduction steps. The best way to do this is to include a [Minimal Reproducible Example](https://stackoverflow.com/help/minimal-reproducible-example). If you can't do that, then include a link to your repo, and the steps to reproduce the problem. The easiest it is to reproduce your problem, the faster we are going to be able to fix it.\r\n\r\nIf you are submitting a feature request, please take the time to clearly describe your use case, and not only your proposed solution.\r\n\r\nThis issue will be automatically assigned to a Hardhat team member. This person will act as the point of contact between you and the team, but won't necessarily fix it nor address it in any way. An issue being assigned does not mean that it's being worked on.\r\n\r\n-->\r\n\r\n# What is the current issue?\r\n\r\nThe `@nomiclabs/hardhat-etherscan` works great to verify contracts via the CLI.\r\n\r\nThere is an edge case with an issue when contracts deployed with constructor arguments that contain a `bool` parameter.\r\n\r\nThere was an issue open in the past, but it was closed: #2635. I have tried the different combinations suggested for the boolean parameter. But it only works only when passing the arguments as a separate file.\r\n\r\n## My example script.\r\n\r\nThis does not work ❌ \r\n\r\n```bash\r\nnpx hardhat verify 0x5012ed48e48e31C3382E2b7F8dF9C83844925A06 \"LSP7 Mintable\" \"LSP7M\" \"0x7ae30dfc63eAD54eb2E2B7ea300120f58a82E4b1\" false --network luksoL16\r\n```\r\n\r\nThis works ✅ \r\n\r\n```bash\r\nnpx hardhat verify 0x5012ed48e48e31C3382E2b7F8dF9C83844925A06 --constructor-args arguments.js --network luksoL16\r\n```\r\n\r\nfile `arguments.js`\r\n\r\n```js title=\"arguments.js\"\r\nmodule.exports = [\r\n  \"LSP7 Mintable\",\r\n  \"LSP7M\",\r\n  \"<owner-address>\",\r\n  false // isNonDivisible (true or false)\r\n];\r\n```\r\n\r\nThe contract deployed can be found here: https://github.com/lukso-network/lsp-smart-contracts/blob/develop/contracts/LSP7DigitalAsset/presets/LSP7Mintable.sol\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\n\r\npragma solidity ^0.8.0;\r\n\r\n// interfaces\r\nimport {ILSP7Mintable} from \"./ILSP7Mintable.sol\";\r\n\r\n// modules\r\nimport {LSP7DigitalAsset} from \"../LSP7DigitalAsset.sol\";\r\n\r\n/**\r\n * @title LSP7Mintable\r\n * @author Jean Cavallera, Yamen Merhi\r\n * @dev LSP7 extension, mintable.\r\n */\r\ncontract LSP7Mintable is LSP7DigitalAsset, ILSP7Mintable {\r\n    // solhint-disable no-empty-blocks\r\n\r\n    /**\r\n     * @notice Sets the token-Metadata and register LSP7InterfaceId\r\n     * @param name_ The name of the token\r\n     * @param symbol_ The symbol of the token\r\n     * @param newOwner_ The owner of the the token-Metadata\r\n     * @param isNonDivisible_ Specify if the LSP7 token is a fungible or non-fungible token\r\n     */\r\n    constructor(\r\n        string memory name_,\r\n        string memory symbol_,\r\n        address newOwner_,\r\n        bool isNonDivisible_\r\n    ) LSP7DigitalAsset(name_, symbol_, newOwner_, isNonDivisible_) {}\r\n\r\n    /**\r\n     * @inheritdoc ILSP7Mintable\r\n     */\r\n    function mint(\r\n        address to,\r\n        uint256 amount,\r\n        bool force,\r\n        bytes memory data\r\n    ) public override onlyOwner {\r\n        _mint(to, amount, force, data);\r\n    }\r\n}\r\n```",
   "closed_by": {
     "login": "fvictorio",
