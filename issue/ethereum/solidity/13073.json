@@ -31,6 +31,15 @@
   },
   "labels": [
     {
+      "id": 4699440809,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
+      "name": "closed due inactivity",
+      "color": "91535E",
+      "default": false,
+      "description": "The issue/PR was automatically closed due to inactivity."
+    },
+    {
       "id": 4699444681,
       "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
@@ -49,21 +58,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 15,
+  "comments": 17,
   "created_at": "2022-05-27T10:54:31Z",
-  "updated_at": "2023-08-14T12:04:19Z",
-  "closed_at": null,
+  "updated_at": "2023-08-22T15:50:42Z",
+  "closed_at": "2023-08-22T12:04:14Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Page\r\n\r\nhttps://docs.soliditylang.org/en/v0.8.14/smtchecker.html#assert\r\n\r\n## Abstract\r\n\r\nI cannot replicate the SMTChecker assertion violation output in this example. I can replicate the SMTChecker output in all other examples so I know SMTChecker is working.\r\n\r\nContract code\r\n```\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity >=0.8.0;\r\n\r\ncontract Max {\r\n    function max(uint[] memory a) public pure returns (uint) {\r\n        require(a.length >= 5);\r\n        uint m = 0;\r\n        for (uint i = 0; i < a.length; ++i)\r\n            if (a[i] > m)\r\n                m = a[i];\r\n\r\n        for (uint i = 0; i < a.length; ++i)\r\n            assert(m > a[i]);\r\n\r\n        return m;\r\n    }\r\n}\r\n```\r\n\r\nCommand I am using to run SMTChecker: `solc Max.sol --model-checker-engine chc --model-checker-show-unproved --model-checker-timeout 0 --model-checker-targets \"assert\"`\r\n\r\nsolc Version: 0.8.14+commit.80d49f37.Linux.g++ (with z3 dynamic library)\r\n\r\nMy output:\r\n```\r\nWarning: CHC: Error trying to invoke SMT solver.\r\n  --> Max.sol:13:13:\r\n   |\r\n13 |             assert(m > a[i]);\r\n   |             ^^^^^^^^^^^^^^^^\r\n\r\nWarning: CHC: Assertion violation might happen here.\r\n  --> Max.sol:13:13:\r\n   |\r\n13 |             assert(m > a[i]);\r\n   |             ^^^^^^^^^^^^^^^^\r\n```\r\n\r\nOutput shown in documentation:\r\n```\r\nWarning: CHC: Assertion violation happens here.\r\nCounterexample:\r\n\r\na = [0, 0, 0, 0, 0]\r\n = 0\r\n\r\nTransaction trace:\r\nTest.constructor()\r\nTest.max([0, 0, 0, 0, 0])\r\n  --> max.sol:14:4:\r\n   |\r\n14 |            assert(m > a[i]);\r\n```\r\n\r\n## Pull request\r\n\r\nI have not identified the exact issue yet. If I change the `--model-checker-engine` argument to `all`, the BMC checker properly identifies the assertion violation with a counterexample, but the documentation shows the CHC checker should identify the assertion violation. If I change the assert comparison to less than or equals (`assert(m >= a[i]);` instead of `assert(m > a[i]);`), the contract compiles without issue and there are no warnings from SMTChecker.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13073/reactions",
     "total_count": 0,
@@ -78,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13073/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -729,6 +757,94 @@
     "body": "This issue has been marked as stale due to inactivity for the last 90 days.\nIt will be automatically closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1677196029/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1688054815",
+    "html_url": "https://github.com/ethereum/solidity/issues/13073#issuecomment-1688054815",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13073",
+    "id": 1688054815,
+    "node_id": "IC_kwDOAm_5kc5knawf",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-08-22T12:04:13Z",
+    "updated_at": "2023-08-22T12:04:13Z",
+    "author_association": "NONE",
+    "body": "Hi everyone! This issue has been automatically closed due to inactivity.\nIf you think this issue is still relevant in the latest Solidity version and you have something to [contribute](https://docs.soliditylang.org/en/latest/contributing.html), feel free to reopen.\nHowever, unless the issue is a concrete proposal that can be implemented, we recommend starting a language discussion on the [forum](https://forum.soliditylang.org) instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1688054815/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1688473817",
+    "html_url": "https://github.com/ethereum/solidity/issues/13073#issuecomment-1688473817",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13073",
+    "id": 1688473817,
+    "node_id": "IC_kwDOAm_5kc5kpBDZ",
+    "user": {
+      "login": "engn33r",
+      "id": 6261182,
+      "node_id": "MDQ6VXNlcjYyNjExODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6261182?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/engn33r",
+      "html_url": "https://github.com/engn33r",
+      "followers_url": "https://api.github.com/users/engn33r/followers",
+      "following_url": "https://api.github.com/users/engn33r/following{/other_user}",
+      "gists_url": "https://api.github.com/users/engn33r/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/engn33r/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/engn33r/subscriptions",
+      "organizations_url": "https://api.github.com/users/engn33r/orgs",
+      "repos_url": "https://api.github.com/users/engn33r/repos",
+      "events_url": "https://api.github.com/users/engn33r/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/engn33r/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-22T15:50:42Z",
+    "updated_at": "2023-08-22T15:50:42Z",
+    "author_association": "NONE",
+    "body": "I tested the original issue I reported. I'm now getting the expected output as described in the docs. The z3 version I have installed is still 4.8.12-1. The only obvious differences I can think of since my original attempt are:\r\n- Installing solc from ppa instead of downloading a binary\r\n- Using solc 0.8.21 instead of an older version\r\n\r\nNo modifying of z3 files were needed to make it work this time. Something must have changed but I'm unsure what.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1688473817/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
