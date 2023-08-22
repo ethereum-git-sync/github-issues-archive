@@ -58,7 +58,7 @@
       "description": "Low priority item"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,12 +67,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2022-02-08T02:23:32Z",
-  "updated_at": "2022-02-08T02:23:32Z",
-  "closed_at": null,
+  "updated_at": "2023-08-22T15:19:35Z",
+  "closed_at": "2023-08-22T15:19:35Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "Thanks to @kasey for the fruitful discussion on this and original idea.\r\n\r\n## Background\r\n\r\nPrysm's current architecture when it comes to receiving blocks and processing is complex, as it is a pipeline connecting several packages as part of the Prysm runtime. This makes it hard to test and arguably error prone. At a high-level, the architecture is as follows:\r\n\r\n**Chain Synchronization and Block Retrieval**\r\n1. The `p2p` service starts, which connects to bootnodes, other peers, and manages network connections\r\n2. Prysm's `initial sync` service starts, which creates a state machine determining the sync status of the node by interacting with peers over p2p. This service determines if a node is synced to the canonical chain head, is **syncing** or if it has yet to begin the sync process\r\n3. If a node needs to sync, the initial sync services interacts with the p2p service to send requests for blocks to peers in **batches**\r\n4. Upon receiving a batch of blocks, the initial sync service then submits them to the `blockchain` service, which exposes a function named `ReceiveBlockBatch`. This function runs core state transition logic and advances the actual state of a beacon node\r\n5. Once a node is synced, the initial sync service then closes, and a new service, known as `regular sync` starts\r\n6. The regular sync service waits to receive blocks from peers via pubsub subscriptions, maintained via the p2p service, and upon receiving a block, it forwards it to the `ReceiveBlock` function for `blockchain service`\r\n\r\nOverall, this follows more of a traditional, _push_ architecture where there is a logical flow to a block from p2p all the way to being processed in a state transition. Unfortunately, the sequence above involves many inter-related components that add complexity to testing. An alternative approach to this pipeline is to consider more of an isolated architecture where the `blockchain` service can subscribe to data it need, rather than exposing a method to the sync service. This improves **separation of concerns**.\r\n\r\nThe general idea, in pseudocode, is\r\n```\r\nfunc syncService() {\r\n  for block <- p2pReceivedBlocks {\r\n    validate(block)\r\n    buffer <- block\r\n  }\r\n}\r\n```\r\nand\r\n```\r\nfunc blockchainService() {\r\n  for block <- syncService.Buffer() {\r\n     stateTransition(block)\r\n  }\r\n}\r\n```\r\n\r\nThis way, the sync service does not need to know about the blockchain service. It only needs to be in charge of maintaining its state machine internally and thats it. This issue is to explore this revamp along with limitations and potential problems. This needs a thorough design to evaluate if the refactor is worthwhile, but is a step in making Prysm follow more idiomatic Go design patterns.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "rauljordan",
+    "id": 5572669,
+    "node_id": "MDQ6VXNlcjU1NzI2Njk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5572669?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rauljordan",
+    "html_url": "https://github.com/rauljordan",
+    "followers_url": "https://api.github.com/users/rauljordan/followers",
+    "following_url": "https://api.github.com/users/rauljordan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rauljordan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rauljordan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rauljordan/subscriptions",
+    "organizations_url": "https://api.github.com/users/rauljordan/orgs",
+    "repos_url": "https://api.github.com/users/rauljordan/repos",
+    "events_url": "https://api.github.com/users/rauljordan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rauljordan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10198/reactions",
     "total_count": 1,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/10198/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
