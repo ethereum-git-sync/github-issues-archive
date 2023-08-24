@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12799",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12799/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12799/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12799/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12799",
+  "id": 1865648504,
+  "node_id": "I_kwDOBvuov85vM4l4",
+  "number": 12799,
+  "title": "Add `/eth/v1/beacon/light_client/*` to BeaconAPI",
+  "user": {
+    "login": "DragonDev1906",
+    "id": 8270201,
+    "node_id": "MDQ6VXNlcjgyNzAyMDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8270201?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/DragonDev1906",
+    "html_url": "https://github.com/DragonDev1906",
+    "followers_url": "https://api.github.com/users/DragonDev1906/followers",
+    "following_url": "https://api.github.com/users/DragonDev1906/following{/other_user}",
+    "gists_url": "https://api.github.com/users/DragonDev1906/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/DragonDev1906/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/DragonDev1906/subscriptions",
+    "organizations_url": "https://api.github.com/users/DragonDev1906/orgs",
+    "repos_url": "https://api.github.com/users/DragonDev1906/repos",
+    "events_url": "https://api.github.com/users/DragonDev1906/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/DragonDev1906/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-24T18:08:49Z",
+  "updated_at": "2023-08-24T19:17:49Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!--💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎\r\n\r\nHellooo! 😄 \r\n\r\nTo help us tend to your issue faster, please search our currently open issues before submitting a new one.\r\nExisting issues often contain information about workarounds, resolution, or progress updates.\r\n\r\n💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎-->\r\n\r\n# 🚀 Feature Request\r\n\r\n### Description\r\n\r\n<!-- ✍️ A clear and concise description of the problem or missing capability... --> \r\n\r\nSince Beacon-API version [v2.4.0](https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.4.0#/), the Beacon-API specs contain 4 endpoints that are extremely useful for light clients or anything else that does not want to or cannot fully trust the full node (consensus + execution).\r\n\r\nSince I've stumbled onto the fact that Prysm doesn't have these api methods, yet, need them for a project and would prefer not to have to use the p2p networking protocol for that, I'd like to propose adding these to the Beacon-API. This has the extra benefit of helping the light client ecosystem, which would be useful for more decentralized wallet applications.\r\n\r\nMetaMask, for example, could use the standardized Beacon-API to update its light client (taking only a few seconds if really outdated) and then can verify everything it needs by asking the execution-layer node for merkle proofs. A powerfull ability but not really useful of they're not supported by the most commonly used beacon-chain nodes.\r\n\r\nGetting the data for these endpoints shouldn't be too difficult, as it is used for other things, too. The biggest difficulty could be adding `/eth/v1/beacon/light_client/updates` if infromation about the sync committees and their signatures are pruned (though they might still be necessary for the p2p protocol, I don't know if Prysm has support for light clients on the p2p network.\r\n\r\n### Describe the solution you'd like\r\n\r\n<!-- ✍️ If you have a solution in mind, please describe it. --> \r\n\r\nAddition of the following Beacon-API endpoints:\r\n- [ ] [/eth/v1/beacon/light_client/bootstrap/{block_root}](https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.4.0#/Beacon/getLightClientBootstrap) for bootstrapping\r\n- [ ] [/eth/v1/beacon/light_client/updates](https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.4.0#/Beacon/getLightClientUpdatesByRange) for getting historic sync committee changes (I assume prism doesn't prune these)\r\n- [ ] [/eth/v1/beacon/light_client/finality_update](https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.4.0#/Beacon/getLightClientFinalityUpdate) for getting necessary information to stay at the head of the (finalized) chain\r\n\r\nAllowing SSZ encoding for those endpoints, as whoever wants to use the data likely wants it to be compact and requires knowledge about forks, the consensus and the relevant types anyways. The JSON encoding is far less compact, but it could be useful to provide both encodings.\r\n\r\nOptionally:\r\n- [ ] [/eth/v1/beacon/light_client/optimistic_update](https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.4.0#/Beacon/getLightClientOptimisticUpdate) for getting more up-to-date information that may not be finalized, yet\r\n- [ ] Events for light_client_finality_update and light_client_optimistic_update for easy access to the newest data\r\n\r\n### Describe alternatives you've considered\r\n\r\n<!-- ✍️ Have you considered any alternative solutions or workarounds? --> \r\n\r\nAs of now I see the following workarounds:\r\n- Use a different Beacon-Chain node implementation (and re-sync that one, at the moment the only node that supports light clients over the API, that I know of, is Nimbus)\r\n- Hack together a list of calls to get the data in multiple calls (far from ideal, especially because they're standardized methods, not sure if possible without getting all blocks)\r\n- Maybe use the p2p networking (if supported), but that's not as easy to use as the REST API.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12799/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12799/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
