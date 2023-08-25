@@ -30,31 +30,42 @@
     "site_admin": false
   },
   "labels": [
-    {
-      "id": 249074435,
-      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
-      "name": "bug :bug:",
-      "color": "fc1313",
-      "default": false,
-      "description": ""
-    }
+
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 8,
   "created_at": "2023-08-19T00:41:58Z",
-  "updated_at": "2023-08-19T11:32:42Z",
-  "closed_at": null,
+  "updated_at": "2023-08-24T20:53:36Z",
+  "closed_at": "2023-08-24T20:49:13Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nwhen using external linked libraries, the compiler doesn't generate abi for external library functions, preventing external tooling from decoding delegatecalls to them.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.21\r\n- Target EVM version (as per compiler settings): shanghai\r\n- Framework/IDE (e.g. Truffle or Remix): foundry\r\n- EVM execution environment / backend / blockchain client: anvil\r\n- Operating system: macos\r\n\r\n## Steps to Reproduce\r\n\r\nCounter.sol\r\n```solidity\r\npragma solidity ^0.8.21;\r\n\r\nimport 'src/CounterCommon.sol';\r\n\r\ncontract Counter {\r\n    using CounterCommon for uint256;\r\n\r\n    uint256 public number;\r\n\r\n    function increment() public {\r\n        number = number.incr();\r\n    }\r\n}\r\n```\r\n\r\nCounterCommon.sol\r\n```solidity\r\npragma solidity ^0.8.21;\r\n\r\nlibrary CounterCommon {\r\n    function incr(uint256 n) external returns (uint256) {\r\n        return n + 1;\r\n    }\r\n}\r\n```\r\n\r\n```js\r\n$ foundry test -vvvv\r\n[⠢] Compiling...\r\nNo files changed, compilation skipped\r\n\r\nRunning 1 test for test/Counter.t.sol:CounterTest\r\n[PASS] test_Increment() (gas: 31486)\r\nTraces:\r\n  [31486] CounterTest::test_Increment()\r\n    ├─ [25447] Counter::increment()\r\n    │   ├─ [341] CounterCommon::incr(0) [delegatecall]\r\n    │   │   └─ ← 0x0000000000000000000000000000000000000000000000000000000000000001\r\n    │   └─ ← ()\r\n    ├─ [261] Counter::number() [staticcall]\r\n    │   └─ ← 1\r\n    └─ ← ()\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 6.48ms\r\nRan 1 test suites: 1 tests passed, 0 failed, 0 skipped (1 total tests)\r\n```\r\n\r\n```js\r\n$ jq '.abi' out/Counter.sol/Counter.json\r\n[\r\n  {\r\n    \"inputs\": [],\r\n    \"name\": \"increment\",\r\n    \"outputs\": [],\r\n    \"stateMutability\": \"nonpayable\",\r\n    \"type\": \"function\"\r\n  },\r\n  {\r\n    \"inputs\": [],\r\n    \"name\": \"number\",\r\n    \"outputs\": [\r\n      {\r\n        \"internalType\": \"uint256\",\r\n        \"name\": \"\",\r\n        \"type\": \"uint256\"\r\n      }\r\n    ],\r\n    \"stateMutability\": \"view\",\r\n    \"type\": \"function\"\r\n  }\r\n]\r\n```\r\n\r\n```js\r\n$ jq '.abi' out/Counter.sol/CounterCommon.json\r\n[]\r\n```\r\n\r\nas you can see, there is no entry for `incr`, thus no easy way for external tooling to decode the delegatecall to the library.\r\n\r\noriginally observed in this codebase with PoolCommons.sol library https://github.com/ajna-finance/ajna-core/tree/main/src",
-  "closed_by": null,
+  "closed_by": {
+    "login": "matheusaaguiar",
+    "id": 95899911,
+    "node_id": "U_kgDOBbdRBw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/95899911?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/matheusaaguiar",
+    "html_url": "https://github.com/matheusaaguiar",
+    "followers_url": "https://api.github.com/users/matheusaaguiar/followers",
+    "following_url": "https://api.github.com/users/matheusaaguiar/following{/other_user}",
+    "gists_url": "https://api.github.com/users/matheusaaguiar/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/matheusaaguiar/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/matheusaaguiar/subscriptions",
+    "organizations_url": "https://api.github.com/users/matheusaaguiar/orgs",
+    "repos_url": "https://api.github.com/users/matheusaaguiar/repos",
+    "events_url": "https://api.github.com/users/matheusaaguiar/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/matheusaaguiar/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14501/reactions",
     "total_count": 0,
@@ -69,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14501/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -324,6 +335,94 @@
     "body": "https://github.com/ethereum/solidity/pull/6187 seems it was introduced here",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1684923596/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1692387178",
+    "html_url": "https://github.com/ethereum/solidity/issues/14501#issuecomment-1692387178",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14501",
+    "id": 1692387178,
+    "node_id": "IC_kwDOAm_5kc5k38dq",
+    "user": {
+      "login": "matheusaaguiar",
+      "id": 95899911,
+      "node_id": "U_kgDOBbdRBw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95899911?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/matheusaaguiar",
+      "html_url": "https://github.com/matheusaaguiar",
+      "followers_url": "https://api.github.com/users/matheusaaguiar/followers",
+      "following_url": "https://api.github.com/users/matheusaaguiar/following{/other_user}",
+      "gists_url": "https://api.github.com/users/matheusaaguiar/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/matheusaaguiar/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/matheusaaguiar/subscriptions",
+      "organizations_url": "https://api.github.com/users/matheusaaguiar/orgs",
+      "repos_url": "https://api.github.com/users/matheusaaguiar/repos",
+      "events_url": "https://api.github.com/users/matheusaaguiar/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/matheusaaguiar/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-24T20:49:13Z",
+    "updated_at": "2023-08-24T20:49:13Z",
+    "author_association": "MEMBER",
+    "body": "Hi @banteg and @ultrasecreth. Thanks for the report but this is not a bug.\r\nNon view/pure functions and storage pointers are intentionally excluded from the ABI, as stated in https://github.com/ethereum/solidity/issues/3409#issuecomment-360750870, which is the PR that solves the issue you linked.\r\n\r\nFunctions taking storage pointers are excluded because such types are not well defined in the ABI. We consider them an internal detail and they are not supposed to be called in ways other than from Solidity contracts (which does not require the ABI JSON, and knows how to encode those types).\r\n\r\nNon view/pure functions are excluded because the only way to call them is delegatecall. As [the comment above says](https://github.com/ethereum/solidity/issues/3409#issuecomment-360750870), this was done after we implemented [#3203](https://github.com/ethereum/solidity/pull/3203), which makes library functions check if they're being delegatecalled and revert if that's not the case. These function are technically there but are not really usable and there's no point including them. People would not be able to make external calls based on that ABI definition.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1692387178/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1692392002",
+    "html_url": "https://github.com/ethereum/solidity/issues/14501#issuecomment-1692392002",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14501",
+    "id": 1692392002,
+    "node_id": "IC_kwDOAm_5kc5k39pC",
+    "user": {
+      "login": "ultrasecreth",
+      "id": 241804,
+      "node_id": "MDQ6VXNlcjI0MTgwNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/241804?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ultrasecreth",
+      "html_url": "https://github.com/ultrasecreth",
+      "followers_url": "https://api.github.com/users/ultrasecreth/followers",
+      "following_url": "https://api.github.com/users/ultrasecreth/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ultrasecreth/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ultrasecreth/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ultrasecreth/subscriptions",
+      "organizations_url": "https://api.github.com/users/ultrasecreth/orgs",
+      "repos_url": "https://api.github.com/users/ultrasecreth/repos",
+      "events_url": "https://api.github.com/users/ultrasecreth/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ultrasecreth/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-24T20:53:06Z",
+    "updated_at": "2023-08-24T20:53:06Z",
+    "author_association": "NONE",
+    "body": "But then it means that external tooling won't understand them, like the tenderly folks can't decode the call to show in the stacktrace. \r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1692392002/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
