@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-08-03T09:21:49Z",
-  "updated_at": "2023-08-03T20:57:27Z",
-  "closed_at": null,
+  "updated_at": "2023-08-26T03:37:16Z",
+  "closed_at": "2023-08-26T03:37:16Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Hi! I've fully synced node running:\r\n * `op-node` image: `us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:v1.1.0`\r\n * `op-geth` image: `us-docker.pkg.dev/oplabs-tools-artifacts/images/op-geth:v1.101105.3`\r\n * `dtl` image: `ethereumoptimism/data-transport-layer:0.5.56`\r\nWhile trying to get transaction receipt for transaction [`0xe1ce5ae7203c5f2ad9abcc3aafb430530e39a9f9ab6d9107d179ad92ca1c9105`](https://optimistic.etherscan.io/tx/0xe1ce5ae7203c5f2ad9abcc3aafb430530e39a9f9ab6d9107d179ad92ca1c9105) I am getting the `null` result:\r\n<details><summary>eth_getTransactionReceipt</summary>\r\n\r\n```sh\r\n$ curl -X POST http://mynode --header 'content-type: application/json'      --data '{\"id\":7704110,\"jsonrpc\":\"2.0\", \"method\":\"eth_getTransactionReceipt\", \"params\":[\"0xe1ce5ae7203c5f2ad9abcc3aafb430530e39a9f9ab6d9107d179ad92ca1c9105\"]}'\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":7704110,\"result\":null}\r\n```\r\n</details>\r\n\r\nBut querying the node for raw receipt returns some information.\r\n\r\n<details><summary>debug_getRawReceipts</summary>\r\n\r\n```sh\r\n$ curl -X POST http://mynode --header 'content-type: application/json'      --data '{\"id\":7704110,\"jsonrpc\":\"2.0\", \"method\":\"debug_getRawReceipts\", \"params\":[\"0x395735e4cb8383717415a46be12f05f233394d5bc4d744b5933168610e305ba3\"]}'|jq\r\n  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\r\n                                 Dload  Upload   Total   Spent    Left  Speed\r\n100  3217    0  3073  100   144   1151     53  0:00:02  0:00:02 --:--:--  1204\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 7704110,\r\n  \"result\": [\r\n    \"0xf905e60183024676b9010000000000000000000000000000000000000002000000000400000000000000000080000000000000000080000000000000000000000400000000000000002000008040000000000400000000400000000080000000000000000004800000000000001000020001000000000000000801000000000000000000000002000001000000000400000000000008000000000000000000000000000000000080000000000000000000000000000040000000000000000000010000000000080000000000008000000000000000000000000000000000000008000000008000040020000000000000000000000000800000000000000000000000000000080000000000f904dbf8dd94ead311112b1057f4850d6b67603a6b40c6677198f884a0c3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62a000000000000000000000000045930713ef39950a53333c9c478603c4811178bfa00000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000045930713ef39950a53333c9c478603c4811178bfb84000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000001f9011c94ead311112b1057f4850d6b67603a6b40c6677198f863a004133ee4cb027e1c5fce5e3481289278a93bd16a65a3b65b428a6d239e706bfba000000000000000000000000045930713ef39950a53333c9c478603c4811178bfa00000000000000000000000000000000000000000000000000000000000000006b8a0000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000035697066733a2f2f516d5a4e38623843756758526e667076726236436373686844324c7236456556366e633445424a576b6a4a4346780000000000000000000000f87a94ae6fdda940155d090e3a3de9b090ad6a392f761af842a03d0ce9bfc3ed7d6862dbb28b2dea94561fe714a1b4d019aa8af39730d1ad7c3da0000000000000000000000000ead311112b1057f4850d6b67603a6b40c6677198a00000000000000000000000000000000000000000000000000002738d24e52000f9025e94ead311112b1057f4850d6b67603a6b40c6677198f884a00b35afaf155daeef41cc46df86f058df2855c57d30ab134647a6b587e7cc8c39a00000000000000000000000005be12d4b22eaa4354b3d6f636df047ab7a2a0af8a000000000000000000000000045930713ef39950a53333c9c478603c4811178bfa00000000000000000000000000000000000000000000000000000000000000006b901c0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000045930713ef39950a53333c9c478603c4811178bf0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000002738d24e52000000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000077420eb7743a248973fb62dd037a65d54d1ce3b1e9ca47efdb2d98793fca8d9a71fdb2fa0000000000000000000000000000000000000000000000000000000000000000\"\r\n  ]\r\n}\r\n```\r\n</details> \r\n\r\nMy `l1 node` is a fully synced in `archive` mode `geth v1.12`.\r\nThe same happens with the nodes of some NaaS providers, for example chainstack.com.\r\nI believe the issue is somewhere in [receipt preparation logic](\r\nhttps://github.com/ethereum-optimism/op-geth/blob/39d121af21bc4cb45c46edf2dc1bf33daa28c54d/internal/ethapi/api.go#L1815)\r\n\r\nCan anybody help to debug the issue?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "alexqrid",
+    "id": 30272185,
+    "node_id": "MDQ6VXNlcjMwMjcyMTg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/30272185?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/alexqrid",
+    "html_url": "https://github.com/alexqrid",
+    "followers_url": "https://api.github.com/users/alexqrid/followers",
+    "following_url": "https://api.github.com/users/alexqrid/following{/other_user}",
+    "gists_url": "https://api.github.com/users/alexqrid/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/alexqrid/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/alexqrid/subscriptions",
+    "organizations_url": "https://api.github.com/users/alexqrid/orgs",
+    "repos_url": "https://api.github.com/users/alexqrid/repos",
+    "events_url": "https://api.github.com/users/alexqrid/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/alexqrid/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6582/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6582/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -228,6 +247,50 @@
     "body": "Thank you, I'll try. If there would be any problem affected by the configuration I can't get any other transaction receipts, the problem is with the single transaction [`0xe1ce5ae7203c5f2ad9abcc3aafb430530e39a9f9ab6d9107d179ad92ca1c9105`](https://optimistic.etherscan.io/tx/0xe1ce5ae7203c5f2ad9abcc3aafb430530e39a9f9ab6d9107d179ad92ca1c9105). Getting other transaction receipts works well",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1664639172/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1694142848",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/6582#issuecomment-1694142848",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6582",
+    "id": 1694142848,
+    "node_id": "IC_kwDODjvEJM5k-pGA",
+    "user": {
+      "login": "alexqrid",
+      "id": 30272185,
+      "node_id": "MDQ6VXNlcjMwMjcyMTg1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30272185?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/alexqrid",
+      "html_url": "https://github.com/alexqrid",
+      "followers_url": "https://api.github.com/users/alexqrid/followers",
+      "following_url": "https://api.github.com/users/alexqrid/following{/other_user}",
+      "gists_url": "https://api.github.com/users/alexqrid/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/alexqrid/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/alexqrid/subscriptions",
+      "organizations_url": "https://api.github.com/users/alexqrid/orgs",
+      "repos_url": "https://api.github.com/users/alexqrid/repos",
+      "events_url": "https://api.github.com/users/alexqrid/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/alexqrid/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-26T03:37:16Z",
+    "updated_at": "2023-08-26T03:37:16Z",
+    "author_association": "NONE",
+    "body": "After running l2geth to get data before bedrock, everything seems to work correctly.\r\nIf someone finds this useful my setup is: `dtl`, `l2geth`, `op-geth`, `op-node`, for more information refer to https://github.com/smartcontracts/simple-optimism-node",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1694142848/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
