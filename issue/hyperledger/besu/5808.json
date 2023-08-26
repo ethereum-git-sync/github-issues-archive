@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5808",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5808/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5808/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5808/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5808",
+  "id": 1867752550,
+  "node_id": "I_kwDODE2jmc5vU6Rm",
+  "number": 5808,
+  "title": "Rocksdb Error when Downgrading from Besu 23.7.1 to 22.10.2",
+  "user": {
+    "login": "sheharyar12",
+    "id": 17731586,
+    "node_id": "MDQ6VXNlcjE3NzMxNTg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17731586?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sheharyar12",
+    "html_url": "https://github.com/sheharyar12",
+    "followers_url": "https://api.github.com/users/sheharyar12/followers",
+    "following_url": "https://api.github.com/users/sheharyar12/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sheharyar12/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sheharyar12/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sheharyar12/subscriptions",
+    "organizations_url": "https://api.github.com/users/sheharyar12/orgs",
+    "repos_url": "https://api.github.com/users/sheharyar12/repos",
+    "events_url": "https://api.github.com/users/sheharyar12/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sheharyar12/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-25T22:34:17Z",
+  "updated_at": "2023-08-25T22:44:00Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "# Rocksdb Error when Downgrading from Besu 23.7.1 to 22.10.2\r\n\r\n- [ x] Have you read the Code of Conduct? By filing an Issue, I agree to comply with it, including treating everyone with respect: [Code of Conduct]()\r\n- [ x] Reproduced the issue in the latest version of the software\r\n- [ x] Read the debugging docs: [Besu Debugging Docs]()\r\n- [ x] Checked for duplicate issues: [Besu Issues]()\r\n\r\n## Description\r\nI want to seamlessly revert from version 23.7.1 to 22.10.2 without any database errors after having successfully upgraded to 23.7.1 and executed the recommended database revert command, and finally downgrading back to 22.10.2.\r\n\r\n## Acceptance Criteria\r\nBesu should revert back to version 22.10.2 without any startup errors after previously upgrading to 23.7.1 and executing the recommended database revert commands. See [here](https://github.com/hyperledger/besu/pull/5471) as recommended.\r\n\r\n## Steps to Reproduce (Bug)\r\n1. Deploy Besu 22.10.2 (with 4 min validators) as a private network.\r\n2. Allow blocks to be imported.\r\n3. Stop Besu 22.10.2 and run besu with version 23.7.1.\r\n4. Allow it to import blocks on 23.7.1.\r\n5. Stop the 23.7.1 version and execute the command: `besu revert storage-variables`\r\n6. Redeploy using version 22.10.2. An error should be encountered during startup.\r\n\r\n**Expected behavior:** Besu 22.10.2 should start without errors after reverting from 23.7.1.\r\n\r\n**Actual behavior:** Encountered an error during the startup of Besu 22.10.2 after reverting.\r\n\r\n**Frequency:** This issue occurs consistently upon reverting.\r\n\r\n### Logs when reverting db via executing subcommand `storage revert-variables`\r\n```\r\n2023-08-18 14:29:43.219+00:00 | main | INFO | DatabaseMetadata | Lookup database metadata file in data directory: /besu/data\r\n2023-08-18 14:29:43.835+00:00 | main | INFO | RocksDBKeyValueStorageFactory | Existing database detected at /besu/data. Version 1. Compacting database..\r\n2023-08-18 14:29:52.733+00:00 | main | INFO | StorageSubCommand$Revert VariablesStorage | Reverted variable storage for key chainHeadHash\r\n2023-08-18 14:29:52.821+00:00 | main | INFO | StorageSubCommand$RevertVariablesStorage | Reverted variable storage for key local-enr-seqno\r\n```\r\n\r\n\r\n### Logs (if a bug)\r\n```\r\n2023-08-22 00:11:15.041+00:00 I main I INFO I RocksDBKeyValueStorageFactory | Existing database detected at /besu/data. Version 1\r\npicocli.CommandLine$ParameterException: org.rocksdb.RocksDBException: Column families not opened: O\r\nat org.hyperledger.besu.cli.BesuCommand.run(BesuCommand.java:1443)\r\nat picocli.CommandLine.executeUserObject(CommandLine.java:1939)\r\nat picocli.CommandLine.access$1300(CommandLine.java:145)\r\nat picocli.CommandLine$RunLast.executeUserObjectOfLastSubcommandWithSameParent(CommandLine.java:2358)\r\nat picocli.CommandLine$RunLast.handle(CommandLine.java:2352)\r\nat picocli.CommandLine$RunLast.handle(CommandLine.java:2314)\r\nat picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2179)\r\nat picocli.CommandLine$RunLast.execute(CommandLine.java:2316)\r\nat picocli.CommandLine.execute(CommandLine.java:2078)\r\nat org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler.handle(ConfigOptionSearchAndRunHandler.java:54)\r\nat org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler.handle(ConfigOptionSearchAndRunHandler.java:32)\r\nat picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2179)\r\nat picocli.CommandLine$RunLast.execute(CommandLine.java:2316)\r\nat picocli.CommandLine.execute(CommandLine.java:2078)\r\nat org.hyperledger.besu.cli.BesuCommand.parse(BesuCommand.java:1614)\r\nat org.hyperledger.besu.cli.BesuCommand.parse(BesuCommand.java:1391)\r\nat org.hyperledger.besu.Besu.main(Besu.java:48)\r\nCaused by: picocli.CommandLine$ExecutionException: org.rocksdb.RocksDBException: Column families not opened: O\r\nat org.hyperledger.besu.cli.BesuCommand.buildController(BesuCommand.java:2122)\r\nat org.hyperledger.besu.cli.BesuCommand.initController(BesuCommand.java:2115)\r\nat org.hyperledger.besu.cli.BesuCommand.run(BesuCommand.java:1427)\r\n... 16 more\r\nCaused by: org.hyperledger.besu.plugin.services.exception.StorageException: org.rocksdb.RocksDBException: Column families not opened: D\r\nat org.hyperledger.besu.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage.<init>(RocksDBColumnarKeyValueStorage.java:166)\r\nat org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBKeyValueStorageFactory.create(RocksDBKeyValueStorageFactory.java:124)\r\nat org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder.build(KeyValueStorageProviderBuilder.java:71)\r\nat org.hyperledger.besu.cli.BesuCommand.keyValueStorageProvider(BesuCommand.java:2803)\r\nat org.hyperledger.besu.cli.BesuCommand.getControllerBuilder(BesuCommand.java:2127)\r\nat org.hyperledger.besu.cli.BesuCommand.buildController(BesuCommand.java:2120)\r\nCaused by: org.rocksdb.RocksDBException: Column families not opened: [\r\nat org.rocksdb.OptimisticTransactionDB.open(Native Method)\r\nat org.rocksdb.OptimisticTransactionDB.open(OptimisticTransactionDB.java:80)\r\nat org.hyperledger.besu.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage.<init>(RocksDBColumnarKeyValueStorage.java:146)\r\n... 23 more\r\nTo display full help: besu [COMMAND] --help\r\n\r\n```\r\n\r\n#### Software version: Initially besu 22.10.2 & 23.7.1. \r\n#### Additional Information\r\n#### Database storage format : FOREST",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5808/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5808/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
