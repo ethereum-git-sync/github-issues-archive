@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5732",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5732/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5732/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5732/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5732",
+  "id": 1868283151,
+  "node_id": "I_kwDOGBlvNc5vW70P",
+  "number": 5732,
+  "title": "impersonated accounts do not get returned by eth_accounts",
+  "user": {
+    "login": "MartinquaXD",
+    "id": 19190235,
+    "node_id": "MDQ6VXNlcjE5MTkwMjM1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19190235?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MartinquaXD",
+    "html_url": "https://github.com/MartinquaXD",
+    "followers_url": "https://api.github.com/users/MartinquaXD/followers",
+    "following_url": "https://api.github.com/users/MartinquaXD/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MartinquaXD/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MartinquaXD/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MartinquaXD/subscriptions",
+    "organizations_url": "https://api.github.com/users/MartinquaXD/orgs",
+    "repos_url": "https://api.github.com/users/MartinquaXD/repos",
+    "events_url": "https://api.github.com/users/MartinquaXD/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MartinquaXD/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-26T22:17:59Z",
+  "updated_at": "2023-08-26T22:19:11Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nAnvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (ae3ec74 2023-08-26T00:18:16.173100000Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nI'm trying to use an impersonated account via `ethers.js` with this function:\r\n```ts\r\nexport const impersonate = async (address: string, provider: ethers.JsonRpcProvider) => {\r\n  // Impersonate the account\r\n  await provider.send(\"anvil_impersonateAccount\", [address]);\r\n\r\n  // Create a signer for the impersonated account\r\n  return await provider.getSigner(address);\r\n}\r\n```\r\nWhich fails with following error (anvil output included as it gives a bit more context):\r\n```\r\nListening on 127.0.0.1:8545\r\neth_chainId\r\nanvil_impersonateAccount\r\neth_accounts\r\neth_chainId\r\nerror: Uncaught (in promise) Error: invalid account\r\n    at JsonRpcProvider.getSigner (file:///Users/martin/work/ethers/node_modules/.deno/ethers@6.7.1/node_modules/ethers/lib.esm/providers/provider-jsonrpc.js:717:15)\r\n    at Object.runMicrotasks (ext:core/01_core.js:838:30)\r\n    at processTicksAndRejections (ext:deno_node/_next_tick.ts:53:14)\r\n    at runNextTicks (ext:deno_node/_next_tick.ts:71:5)\r\n    at eventLoopTick (ext:core/01_core.js:189:21)\r\n    at async impersonate (file:///Users/martin/work/ethers/src/utils.ts:61:10)\r\n    at async file:///Users/martin/work/ethers/src/test.ts:10:16\r\n```\r\n\r\nAfter digging a bit I think `ethers.js` expects all accounts the node can sign transactions as to be returned by `eth_accounts` which conforms with the [spec](https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_accounts). However, when using `anvil_impersonateAccount` the list of addresses returned by `eth_account` does not change which leads to this incompatibility with `ethers.js`. Although this seems to work when using anvil from rust as it's shown in the [`can_impersonate_account`](https://github.com/foundry-rs/foundry/blob/ae3ec74234fe30a88279b3850c99ff191f373781/crates/anvil/tests/it/anvil_api.rs#L65-L98) test.\r\n\r\nI adjusted the test with the provided diff to show that `anvil_impersonateAccount` indeed does not change the list reported by `eth_account`. It looks in the code that impersonated accounts and the accounts managed by the node from the beginning are stored in 2 places (`CheatsState::impersonated_accounts` vs. `EthApi::signers`) which would both have to be queried for a fix.\r\n\r\n<details>\r\n<summary>test setup</summary>\r\n\r\nRun test with: `cargo test -- can_impersonate_account --nocapture`\r\n\r\nDiff:\r\n```\r\ndiff --git a/crates/anvil/tests/it/anvil_api.rs b/crates/anvil/tests/it/anvil_api.rs\r\nindex a4213dc4..b4b1a93f 100644\r\n--- a/crates/anvil/tests/it/anvil_api.rs\r\n+++ b/crates/anvil/tests/it/anvil_api.rs\r\n@@ -81,7 +81,10 @@ async fn can_impersonate_account() {\r\n     let res = provider.send_transaction(tx.clone(), None).await;\r\n     res.unwrap_err();\r\n \r\n+    let before_impersonation = api.accounts().unwrap();\r\n     api.anvil_impersonate_account(impersonate).await.unwrap();\r\n+    let after_impersonation = api.accounts().unwrap();\r\n+    assert_ne!(before_impersonation, after_impersonation);\r\n \r\n     let res = provider.send_transaction(tx.clone(), None).await.unwrap().await.unwrap().unwrap();\r\n     assert_eq!(res.from, impersonate);\r\n```\r\n\r\n</details>",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5732/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5732/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
