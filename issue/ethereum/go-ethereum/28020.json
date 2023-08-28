@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28020",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28020/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28020/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28020/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28020",
+  "id": 1869340407,
+  "node_id": "I_kwDOAOvK985va973",
+  "number": 28020,
+  "title": "Question about rewinding blockchain head block",
+  "user": {
+    "login": "nothingmin",
+    "id": 67548026,
+    "node_id": "MDQ6VXNlcjY3NTQ4MDI2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/67548026?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nothingmin",
+    "html_url": "https://github.com/nothingmin",
+    "followers_url": "https://api.github.com/users/nothingmin/followers",
+    "following_url": "https://api.github.com/users/nothingmin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nothingmin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nothingmin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nothingmin/subscriptions",
+    "organizations_url": "https://api.github.com/users/nothingmin/orgs",
+    "repos_url": "https://api.github.com/users/nothingmin/repos",
+    "events_url": "https://api.github.com/users/nothingmin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nothingmin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-28T09:07:51Z",
+  "updated_at": "2023-08-28T09:15:05Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "On geth startup, geth rewind the blockchain until geth finds t**he head block that has corresponding state**.\r\n\r\n```\r\n// Rewind the fast block in a simpleton way to the target head\r\nif currentSnapBlock := bc.CurrentSnapBlock(); currentSnapBlock != nil && header.Number.Uint64() < currentSnapBlock.Number.Uint64() {\r\n\tnewHeadSnapBlock := bc.GetBlock(header.Hash(), header.Number.Uint64())\r\n\t// If either blocks reached nil, reset to the genesis state\r\n\tif newHeadSnapBlock == nil {\r\n\t\tnewHeadSnapBlock = bc.genesisBlock\r\n\t}\r\n\trawdb.WriteHeadFastBlockHash(db, newHeadSnapBlock.Hash())\r\n\r\n\t// Degrade the chain markers if they are explicitly reverted.\r\n\t// In theory we should update all in-memory markers in the\r\n\t// last step, however the direction of SetHead is from high\r\n\t// to low, so it's safe the update in-memory markers directly.\r\n\tbc.currentSnapBlock.Store(newHeadSnapBlock.Header())\r\n\theadFastBlockGauge.Update(int64(newHeadSnapBlock.NumberU64()))\r\n}\r\n```\r\n\r\nSo I thought that currentSnapBlock (which used in snapshot-sync) should be rewound too like head block does.\r\nHowever, geth **does not rewind currentSnapBlock**.\r\nI'm wondering why geth does not rewound the currentSnapBlock.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28020/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28020/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
