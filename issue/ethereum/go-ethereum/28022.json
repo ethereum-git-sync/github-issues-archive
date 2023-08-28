@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28022",
+  "id": 1869920899,
+  "node_id": "I_kwDOAOvK985vdLqD",
+  "number": 28022,
+  "title": "Unintended change in behavior for state copy/commit between v1.12.0 and v1.12.1",
+  "user": {
+    "login": "wuestholz",
+    "id": 51156,
+    "node_id": "MDQ6VXNlcjUxMTU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/51156?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wuestholz",
+    "html_url": "https://github.com/wuestholz",
+    "followers_url": "https://api.github.com/users/wuestholz/followers",
+    "following_url": "https://api.github.com/users/wuestholz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wuestholz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wuestholz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wuestholz/subscriptions",
+    "organizations_url": "https://api.github.com/users/wuestholz/orgs",
+    "repos_url": "https://api.github.com/users/wuestholz/repos",
+    "events_url": "https://api.github.com/users/wuestholz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wuestholz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-28T14:51:11Z",
+  "updated_at": "2023-08-28T16:08:11Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version:  v1.12.1 and v1.12.2\r\n\r\n#### Expected behaviour\r\n\r\nWhen I run the following code snippet, I expect both printed balances (that is, `b1` and `b2`) to be 42:\r\n\r\n```golang\r\ndb := rawdb.NewMemoryDatabase()\r\nst1, _ := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)\r\naddr := common.HexToAddress(\"0xaaaa\")\r\nbal := big.NewInt(42)\r\nst1.SetBalance(addr, bal)\r\nuseCommit := true\r\nif useCommit {\r\n\tblock := uint64(0)\r\n\tdeleteEmptyObjects := false\r\n\t_, commitErr := st1.Commit(block, deleteEmptyObjects)\r\n\tif commitErr != nil {\r\n\t\treturn\r\n\t}\r\n}\r\nb1 := st1.GetBalance(addr)\r\nfmt.Printf(\"b1: %v\\n\", b1)\r\nst2 := st1.Copy()\r\nb2 := st2.GetBalance(addr)\r\nfmt.Printf(\"b2: %v\\n\", b2)\r\n```\r\n\r\nThis used to be the behavior for version v1.12.0. Specifically, for version v1.12.0, the following code snippet prints 42 twice:\r\n\r\n```golang\r\ndb := rawdb.NewMemoryDatabase()\r\nst1, _ := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)\r\naddr := common.HexToAddress(\"0xaaaa\")\r\nbal := big.NewInt(42)\r\nst1.SetBalance(addr, bal)\r\nuseCommit := true\r\nif useCommit {\r\n\tdeleteEmptyObjects := false\r\n\t_, commitErr := st1.Commit(deleteEmptyObjects)\r\n\tif commitErr != nil {\r\n\t\treturn\r\n\t}\r\n}\r\nb1 := st1.GetBalance(addr)\r\nfmt.Printf(\"b1: %v\\n\", b1)\r\nst2 := st1.Copy()\r\nb2 := st2.GetBalance(addr)\r\nfmt.Printf(\"b2: %v\\n\", b2)\r\n```\r\n\r\n#### Actual behaviour\r\n\r\nIn version v1.12.1 (and v1.12.2), the first code snippet prints the following:\r\n\r\n```golang\r\nb1: 42\r\nb2: 0\r\n```\r\n\r\nIs this an intended change in behavior? Or is this a regression due to changes related to the new storage scheme?\r\n\r\nNote that the output does not change between the two versions if I set `useCommit` to false.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nRun the above code snippet for v1.12.0 (second snippet) and v1.12.1 (first snippet) and compare the output.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
