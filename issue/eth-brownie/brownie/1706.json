@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1706",
+  "repository_url": "https://api.github.com/repos/eth-brownie/brownie",
+  "labels_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1706/labels{/name}",
+  "comments_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1706/comments",
+  "events_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1706/events",
+  "html_url": "https://github.com/eth-brownie/brownie/issues/1706",
+  "id": 1869843228,
+  "node_id": "I_kwDOCUsNcc5vc4sc",
+  "number": 1706,
+  "title": "Decrease in Transaction Creation Speed Over Time in Fork",
+  "user": {
+    "login": "Akbar30Bill",
+    "id": 9596993,
+    "node_id": "MDQ6VXNlcjk1OTY5OTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9596993?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Akbar30Bill",
+    "html_url": "https://github.com/Akbar30Bill",
+    "followers_url": "https://api.github.com/users/Akbar30Bill/followers",
+    "following_url": "https://api.github.com/users/Akbar30Bill/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Akbar30Bill/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Akbar30Bill/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Akbar30Bill/subscriptions",
+    "organizations_url": "https://api.github.com/users/Akbar30Bill/orgs",
+    "repos_url": "https://api.github.com/users/Akbar30Bill/repos",
+    "events_url": "https://api.github.com/users/Akbar30Bill/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Akbar30Bill/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-28T14:08:45Z",
+  "updated_at": "2023-08-28T14:09:23Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Environment information\r\n\r\n* `brownie` Version: 1.19.3\r\n* `ganache-cli` Version: not using\r\n* Python Version: 3.8.16\r\n* OS: Tried on OSX, Ubuntu 22.04\r\n\r\n### What was wrong?\r\n\r\nI use Brownie to create and execute transactions on a custom Anvil fork. Note that I am not using Brownie's development network cmd to run this fork; instead, I have forked the network separately and added the network using `brownie networks add` but generally, this case is also valid for other forking methods that I have tried such as ganache.\r\n\r\nAs I create more transactions, I've observed that the speed of transaction creation gradually decreases. After running my script for a while, hardware resource usage (CPU, RAM, Disk) significantly increases, and the CPU hits 100% usage (one entire core). This leads me to suspect that Brownie might have a bottleneck.\r\n\r\n#### To Reproduce:\r\n\r\n1. Fork the network (`anvil --base-fee 0 --fork-url <YOUR_FORK_URL> --port 42069 --auto-impersonate --compute-units-per-second 8000 --no-rate-limit`)\r\n2. Add the network to brownie (`brownie networks add Polygon anvil_polygon_mainnet_fork host='http://127.0.0.1:42069' chainid=137`)\r\n3. Run the Brownie script to create transactions (`brownie run scripts/bulktx.py --network anvil_polygon_mainnet_fork`)\r\n4. Observe the decrease in transaction creation speed and increase in hardware resource usage over time.\r\n\r\n#### Expected Behavior:\r\nThe transaction creation speed should remain consistent regardless of the number of transactions created without significant hardware resource increase.\r\n\r\n#### Actual Behavior:\r\nThe transaction creation speed decreases over time, and hardware usage significantly increases, eventually hitting 100% CPU usage.\r\n\r\n\r\n\r\nBulkTx script:\r\n```python3\r\nfrom brownie import accounts, web3\r\nfrom web3.middleware import construct_simple_cache_middleware\r\nfrom time import time\r\n\r\ndef main():\r\n    web3.middleware_onion.add(construct_simple_cache_middleware(cache_class=dict))\r\n\r\n    acc = accounts.at('<some public address that has balance in the forked network>', force=True)\r\n    print(acc: {acc}')\r\n\r\n    start_time, idx = time(), 0\r\n    while idx := idx+1:\r\n        tx = acc.transfer(acc.address, 1000000000000000)\r\n        print(f'{idx}: {(time() - start_time)/idx}')\r\n```\r\nHow it started:\r\n![Screenshot 2023-08-28 at 16 55 18](https://github.com/eth-brownie/brownie/assets/9596993/544ddd5b-00f5-47f4-b7b8-80810e87cbe7)\r\n![Screenshot 2023-08-28 at 16 58 08](https://github.com/eth-brownie/brownie/assets/9596993/b69cd91e-0c8c-465a-aba0-09526ab7fbd9)\r\nHow it's going:\r\n![Screenshot 2023-08-28 at 17 27 04](https://github.com/eth-brownie/brownie/assets/9596993/2d701ee5-48c2-4921-b281-a8927aa573f1)\r\n![Screenshot 2023-08-28 at 17 26 07](https://github.com/eth-brownie/brownie/assets/9596993/6e11b230-8c5e-4686-8c93-c34266d8578a)\r\n\r\nNote: the speed in the screen shots shows the AVG time it takes to make a transaction and does not mean actual TPS speed\r\n\r\nI am genuinely curious about why transaction creation slows down over time and would greatly appreciate any insights or solutions.\r\n\r\nI appreciate your help!\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/eth-brownie/brownie/issues/1706/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/eth-brownie/brownie/issues/1706/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
