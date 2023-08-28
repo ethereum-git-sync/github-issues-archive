@@ -58,7 +58,7 @@
       "description": "ETA August 2023"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "michaelsproul",
@@ -103,14 +103,33 @@
     }
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2023-07-06T00:37:23Z",
-  "updated_at": "2023-08-21T07:21:35Z",
-  "closed_at": null,
+  "updated_at": "2023-08-28T02:17:56Z",
+  "closed_at": "2023-08-28T02:17:56Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nThe Lighthouse v4.3.0 validator client will sometimes log an error message when publishing a block that came from an MEV relay:\r\n\r\n> Jul 06 00:18:23.968 ERRO Error whilst producing block            info: this error may or may not result in a missed block, block_slot: XXX, error: \\\"Some endpoints failed, num_failed: 4 https://node1 => RequestFailed(Irrecoverable(\\\\\\\"Error from beacon node when publishing block: ServerMessage(ErrorMessage { code: 400, message: \\\\\\\\\\\\\\\"BAD_REQUEST: Unsupported endpoint version: v1\\\\\\\\\\\\\\\", stacktraces: [] })\\\\\\\")) ...\r\n\r\nThis strange error is the result of several subtleties:\r\n\r\n1. In Lighthouse v4.3.0 we changed the block publishing API to properly check gossip validity before publishing (#4264). This includes ruling out _duplicate blocks_. When publishing a builder block, the relay publishes it to the network _before_ returning it back to the proposer, so many blocks are detected as duplicates and rejected.\r\n2. Due to another bug in our HTTP route handlers (#3404) the true error message is lost when conveying it to the validator client. We know how to fix this class of error now, and just need to roll out the fix over the whole HTTP API (this might interact with #4462).\r\n\r\n## Version\r\n\r\nLighthouse v4.3.0\r\n\r\n## Present Behaviour\r\n\r\nThe aforementioned error will be logged by the VC. The block _should still be integrated into the chain_ (assuming the builder does their job and there's no re-org).\r\n\r\nThe beacon node will log this warning, which can be used to quickly check that a block proposal didn't fail for another reason:\r\n\r\n> WARN Not publishing block, not gossip verified     slot => xxx, error => BlockIsAlreadyKnown\r\n\r\n## Expected Behaviour\r\n\r\nWe are still discussing the best way to handle this, but our hope is that we'll be able to distinguish valid duplicate blocks, blocks that are still in the process of being imported, and invalid duplicate blocks. The HTTP return codes in each case might end up being 200, 202 and 400 respectively. The `DuplicateCache` will be helpful in identifying the \"in progress\" blocks.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4473/reactions",
     "total_count": 1,
@@ -125,7 +144,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4473/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -343,6 +362,50 @@
       "hooray": 0,
       "confused": 0,
       "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1694900273",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4473#issuecomment-1694900273",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4473",
+    "id": 1694900273,
+    "node_id": "IC_kwDOCFeAzc5lBiAx",
+    "user": {
+      "login": "paulhauner",
+      "id": 6660660,
+      "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/paulhauner",
+      "html_url": "https://github.com/paulhauner",
+      "followers_url": "https://api.github.com/users/paulhauner/followers",
+      "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+      "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+      "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+      "repos_url": "https://api.github.com/users/paulhauner/repos",
+      "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-28T02:17:56Z",
+    "updated_at": "2023-08-28T02:17:56Z",
+    "author_association": "MEMBER",
+    "body": "Resolved by #4655",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1694900273/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
       "rocket": 0,
       "eyes": 0
     },
