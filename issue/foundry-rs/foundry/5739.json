@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5739",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5739/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5739/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5739/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5739",
+  "id": 1870167259,
+  "node_id": "I_kwDOGBlvNc5veHzb",
+  "number": 5739,
+  "title": "`rollFork` fails to clean up \"hot\" storage variables",
+  "user": {
+    "login": "amusingaxl",
+    "id": 112016538,
+    "node_id": "U_kgDOBq08mg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/112016538?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/amusingaxl",
+    "html_url": "https://github.com/amusingaxl",
+    "followers_url": "https://api.github.com/users/amusingaxl/followers",
+    "following_url": "https://api.github.com/users/amusingaxl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/amusingaxl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/amusingaxl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/amusingaxl/subscriptions",
+    "organizations_url": "https://api.github.com/users/amusingaxl/orgs",
+    "repos_url": "https://api.github.com/users/amusingaxl/repos",
+    "events_url": "https://api.github.com/users/amusingaxl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/amusingaxl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-28T17:32:41Z",
+  "updated_at": "2023-08-28T17:34:14Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (bff4ed9 2023-08-28T00:24:09.226668296Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test --fork-url <RPC_ENDPOINT>\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nI just spotted this bug in the wild while running MakerDAO's [Spell Test suite](https://github.com/makerdao/spells-goerli/blob/0bc45005e3afe60bfda47121c4337fbb85b40653/src/DssSpell.t.base.sol#L283-L302).\r\n\r\nRelevant part of the code:\r\n\r\n```solidity\r\n    function setUp() public {\r\n        setValues(address(chief));\r\n\r\n        spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;\r\n        _castPreviousSpell();\r\n\r\n        // ------------- From here ----------------------\r\n        spell = spellValues.deployed_spell != address(0) ?\r\n            DssSpell(spellValues.deployed_spell) : new DssSpell();\r\n\r\n        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {\r\n            // if we have a deployed spell in the config\r\n            // we want to roll our fork to the block where it was deployed\r\n            // this means the test suite will continue to accurately pass/fail\r\n            // even if mainnet has already scheduled/cast the spell\r\n            vm.makePersistent(address(this));\r\n            vm.makePersistent(address(rates));\r\n            vm.makePersistent(address(addr));\r\n            vm.makePersistent(address(deployers));\r\n            vm.rollFork(spellValues.deployed_spell_block);\r\n        }\r\n    }\r\n```\r\n\r\nSpells have an `eta` and a `done` storage variables.\r\n\r\nApparently, any \"hot\" storage variable is not reset after `rollFork`, like if we had called `vm.makePersistent()` on it.\r\n\r\nIf I log both variables _before_ and _after_ `rollFork`, they have the same value:\r\n\r\n```solidity\r\n        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {\r\n            console2.log(\"Before `rollFork`: eta = %d, done = %b\", spell.eta(), spell.done());\r\n\r\n            // if we have a deployed spell in the config\r\n            // we want to roll our fork to the block where it was deployed\r\n            // this means the test suite will continue to accurately pass/fail\r\n            // even if mainnet has already scheduled/cast the spell\r\n            vm.makePersistent(address(this));\r\n            vm.makePersistent(address(rates));\r\n            vm.makePersistent(address(addr));\r\n            vm.makePersistent(address(deployers));\r\n            vm.rollFork(spellValues.deployed_spell_block);\r\n\r\n            console2.log(\"After `rollFork`: eta = %d, done = %b\", spell.eta(), spell.done());\r\n        }\r\n```\r\n\r\nResult shows both wrong:\r\n\r\n```\r\nLogs:\r\n  Before `rollFork`: eta = 1693238220, done = b true\r\n  After `rollFork`: eta = 1693238220, done = b true\r\n```\r\n\r\nIf I remove the log from _before_, `done` is now correct (it has not been accessed), however `eta` is still incorrect, because it was accessed in the conditional:\r\n\r\n```solidity\r\n        //                                                  +---- `eta` accessed here:\r\n        //                                                  v\r\n        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {\r\n            // if we have a deployed spell in the config\r\n            // we want to roll our fork to the block where it was deployed\r\n            // this means the test suite will continue to accurately pass/fail\r\n            // even if mainnet has already scheduled/cast the spell\r\n            vm.makePersistent(address(this));\r\n            vm.makePersistent(address(rates));\r\n            vm.makePersistent(address(addr));\r\n            vm.makePersistent(address(deployers));\r\n            vm.rollFork(spellValues.deployed_spell_block);\r\n\r\n            console2.log(\"After `rollFork`: eta = %d, done = %b\", spell.eta(), spell.done());\r\n        }\r\n```\r\n\r\nResult shows `done` correct and `eta` wrong:\r\n\r\n```\r\nLogs:\r\n  eta = 1693238220, done = b false\r\n```\r\n\r\nIf I remove `eta` from the conditional and log it only after `rollFork`, it works as expected:\r\n\r\n```\r\n        if (spellValues.deployed_spell_block != 0) {\r\n            // if we have a deployed spell in the config\r\n            // we want to roll our fork to the block where it was deployed\r\n            // this means the test suite will continue to accurately pass/fail\r\n            // even if mainnet has already scheduled/cast the spell\r\n            vm.makePersistent(address(this));\r\n            vm.makePersistent(address(rates));\r\n            vm.makePersistent(address(addr));\r\n            vm.makePersistent(address(deployers));\r\n            vm.rollFork(spellValues.deployed_spell_block);\r\n\r\n            console2.log(\"After `rollFork`: eta = %d, done = %b\", spell.eta(), spell.done());\r\n        }\r\n```\r\n\r\nResult with both correct:\r\n```\r\nLogs:\r\n  eta = 0, done = b false\r\n```\r\n\r\nThis looks like an unexpected behavior.\r\n\r\nPlease reach out to me if you need help running that test suite, but after setting `ETH_RPC_URL`, you can just call `make test match=\"testOnTime\"`.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5739/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5739/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
