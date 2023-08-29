@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-28T17:32:41Z",
-  "updated_at": "2023-08-28T17:34:14Z",
+  "updated_at": "2023-08-29T01:13:26Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1696627907",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5739#issuecomment-1696627907",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5739",
+    "id": 1696627907,
+    "node_id": "IC_kwDOGBlvNc5lIHzD",
+    "user": {
+      "login": "nhtyy",
+      "id": 15225385,
+      "node_id": "MDQ6VXNlcjE1MjI1Mzg1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15225385?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nhtyy",
+      "html_url": "https://github.com/nhtyy",
+      "followers_url": "https://api.github.com/users/nhtyy/followers",
+      "following_url": "https://api.github.com/users/nhtyy/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nhtyy/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nhtyy/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nhtyy/subscriptions",
+      "organizations_url": "https://api.github.com/users/nhtyy/orgs",
+      "repos_url": "https://api.github.com/users/nhtyy/repos",
+      "events_url": "https://api.github.com/users/nhtyy/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nhtyy/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-29T01:13:26Z",
+    "updated_at": "2023-08-29T01:13:26Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "hi you can see the behavior arise in the code snippet below, at first i also thought this was bug but\r\n\r\nhttps://github.com/foundry-rs/foundry/blob/bff4ed912bb023d7bf9b20eda581aa4867a1cf70/crates/evm/src/executor/backend/mod.rs#L1098-L1111\r\n \r\nI think this is more of a semantics issue; when you run the command `forge test --fork-url <RPC_ENDPOINT>` yore not specifying the block number, therefore using the current, if you load some state while the fork is at the block number it is essentially cached to memory\r\n\r\nNow imagine you instantiate a fork at some `block=T`, and you explicitly override some value (storing it in memory), i think it makes sense that rolling the block number to `block=T+n` forward wouldn't dump all the storage and try to get the new storage at the current block (assuming its lower than the actual chains block height).\r\n\r\nHowever I see where you're coming from when rolling the chain **back**. You could definitely make an argument that the state should be dumped in favor of the older state, since in practice the chain can never go backwards.\r\n\r\non the other hand this could be breaking change, So you should probably just use a different pattern to achieve this. But maybe the core team will have other thoughts.\r\n\r\nA fix could be checking that if `new_block_number < current_block` dont copy over the state like in the snippet above.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1696627907/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
