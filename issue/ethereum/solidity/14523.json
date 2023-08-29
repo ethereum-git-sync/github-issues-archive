@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14523",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14523/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14523/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14523/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14523",
+  "id": 1870292081,
+  "node_id": "I_kwDOAm_5kc5vemRx",
+  "number": 14523,
+  "title": "Issue with source map offset (\"s\")",
+  "user": {
+    "login": "AntoineMrtl",
+    "id": 74369980,
+    "node_id": "MDQ6VXNlcjc0MzY5OTgw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/74369980?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AntoineMrtl",
+    "html_url": "https://github.com/AntoineMrtl",
+    "followers_url": "https://api.github.com/users/AntoineMrtl/followers",
+    "following_url": "https://api.github.com/users/AntoineMrtl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AntoineMrtl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AntoineMrtl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AntoineMrtl/subscriptions",
+    "organizations_url": "https://api.github.com/users/AntoineMrtl/orgs",
+    "repos_url": "https://api.github.com/users/AntoineMrtl/repos",
+    "events_url": "https://api.github.com/users/AntoineMrtl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AntoineMrtl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-28T18:52:12Z",
+  "updated_at": "2023-08-28T18:54:20Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nThere might be an issue concerning source map with solc compiler : at some point, the source map no longer point to valid instruction, at the beginning it's correct but then It's cutted in half, I tried also with remix and it's the same. The source map length it's the same as the opcodes length so I don't think I'm misinterpreting and the weirdest is that at the end, the first element of the source map (\"s\"), the offset is outside my file total number of character, like I have not even 700 characters in my files and it tell me an instruction start from 2120 ...\r\n\r\n## Environment\r\n\r\n- Compiler version: solc@0.8.21\r\n- Target EVM version (as per compiler settings): default \r\n- Framework/IDE (e.g. Truffle or Remix): Remix\r\n- Operating system: Windows\r\n\r\n## Steps to Reproduce\r\n\r\nCopy this code in remix :\r\n\r\n```solidity\r\npragma solidity ^0.8.0;\r\n\r\ncontract TestContract {\r\n    address public constant deadAddress = address(0xdead);\r\n\r\n    mapping(address => bool) private _isExcludedFromFees;\r\n    mapping(address => bool) public _isExcludedMaxTradingAmount;\r\n\r\n    uint256 public maxTradingAmount;\r\n    uint256 public swapTokensAtAmount;\r\n    uint256 public maxWallet;\r\n\r\n    constructor() {\r\n        uint256 totalSupply = 10_000_000 * 1e18;\r\n\r\n        swapTokensAtAmount = (totalSupply * 100) / 10000;\r\n        maxTradingAmount = (totalSupply * 100) / 10000;\r\n        maxWallet = (totalSupply * 100) / 10000;\r\n    }\r\n\r\n    receive() external payable {}\r\n\r\n    function test() external {\r\n        uint aaaa = 543646;\r\n        uint bbbb = 11324;\r\n    }\r\n}\r\n\r\n```\r\n\r\nCompile, see compilation detail, go to runtime Bytecode, and then see \"sourceMap\".\r\n\r\nThe source map (\"25:683:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;53:53;;;;;;;;;;;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;237:31;;;;;;;;;;;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;171:59;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;274:33;;;;;;;;;;;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;619:87;;;;;;;;;;;;;:::i;:::-;;313:24;;;;;;;;;;;;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;53:53;99:6;53:53;:::o;237:31::-;;;;:::o;171:59::-;;;;;;;;;;;;;;;;;;;;;;:::o;274:33::-;;;;:::o;619:87::-;654:9;666:6;654:18;;682:9;694:5;682:17;;644:62;;619:87::o;313:24::-;;;;:::o;7:126:1:-;44:7;84:42;77:5;73:54;62:65;;7:126;;;:::o;139:96::-;176:7;205:24;223:5;205:24;:::i;:::-;194:35;;139:96;;;:::o;241:118::-;328:24;346:5;328:24;:::i;:::-;323:3;316:37;241:118;;:::o;365:222::-;458:4;496:2;485:9;481:18;473:26;;509:71;577:1;566:9;562:17;553:6;509:71;:::i;:::-;365:222;;;;:::o;593:77::-;630:7;659:5;648:16;;593:77;;;:::o;676:118::-;763:24;781:5;763:24;:::i;:::-;758:3;751:37;676:118;;:::o;800:222::-;893:4;931:2;920:9;916:18;908:26;;944:71;1012:1;1001:9;997:17;988:6;944:71;:::i;:::-;800:222;;;;:::o;1109:117::-;1218:1;1215;1208:12;1355:122;1428:24;1446:5;1428:24;:::i;:::-;1421:5;1418:35;1408:63;;1467:1;1464;1457:12;1408:63;1355:122;:::o;1483:139::-;1529:5;1567:6;1554:20;1545:29;;1583:33;1610:5;1583:33;:::i;:::-;1483:139;;;;:::o;1628:329::-;1687:6;1736:2;1724:9;1715:7;1711:23;1707:32;1704:119;;;1742:79;;:::i;:::-;1704:119;1862:1;1887:53;1932:7;1923:6;1912:9;1908:22;1887:53;:::i;:::-;1877:63;;1833:117;1628:329;;;;:::o;1963:90::-;1997:7;2040:5;2033:13;2026:21;2015:32;;1963:90;;;:::o;2059:109::-;2140:21;2155:5;2140:21;:::i;:::-;2135:3;2128:34;2059:109;;:::o;2174:210::-;2261:4;2299:2;2288:9;2284:18;2276:26;;2312:65;2374:1;2363:9;2359:17;2350:6;2312:65;:::i;:::-;2174:210;;;;:::o\") end with offset more than 2k (i.e. 2174), but the file doesn't even have this length. (709 characters length).\r\n\r\n```[tasklist]\r\n### Tasks\r\n```\r\n\r\n```[tasklist]\r\n### Tasks\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14523/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14523/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
