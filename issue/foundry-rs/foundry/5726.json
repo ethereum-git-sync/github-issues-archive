@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-25T12:18:13Z",
-  "updated_at": "2023-08-25T12:18:13Z",
+  "updated_at": "2023-08-29T08:23:02Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1696989677",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5726#issuecomment-1696989677",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5726",
+    "id": 1696989677,
+    "node_id": "IC_kwDOGBlvNc5lJgHt",
+    "user": {
+      "login": "0xfarhaan",
+      "id": 59924029,
+      "node_id": "MDQ6VXNlcjU5OTI0MDI5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/59924029?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/0xfarhaan",
+      "html_url": "https://github.com/0xfarhaan",
+      "followers_url": "https://api.github.com/users/0xfarhaan/followers",
+      "following_url": "https://api.github.com/users/0xfarhaan/following{/other_user}",
+      "gists_url": "https://api.github.com/users/0xfarhaan/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/0xfarhaan/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/0xfarhaan/subscriptions",
+      "organizations_url": "https://api.github.com/users/0xfarhaan/orgs",
+      "repos_url": "https://api.github.com/users/0xfarhaan/repos",
+      "events_url": "https://api.github.com/users/0xfarhaan/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/0xfarhaan/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-29T08:23:02Z",
+    "updated_at": "2023-08-29T08:23:02Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Same would have expected this to fail with `fail_on_revert` set true. Updated the example @Rubilmax posted to use the assertion helper which does post in the logs an assertion failure but the test suite passes. \r\n\r\n### Code:\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.0;\r\n\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract Handler is Test {\r\n\r\n    function doSomething() public {\r\n        assertTrue(false);\r\n    }\r\n\r\n}\r\n\r\ncontract BrokenInvariantTest is Test {\r\n    \r\n    bytes4[] internal selectors;\r\n\r\n    Handler handler;\r\n\r\n    function setUp() public {\r\n        handler = new Handler();\r\n\r\n        selectors.push(Handler.doSomething.selector);\r\n\r\n        targetSelector(FuzzSelector({addr: address(handler), selectors: selectors}));\r\n    }\r\n\r\n    function statefulFuzz_BrokenInvariant() public {}\r\n\r\n}\r\n```\r\n\r\n```bash\r\n~/rep/personal/forge-playground main ?1 ❯ forge t --mt statefulFuzz_Broken                           \r\n[⠒] Compiling...\r\nNo files changed, compilation skipped\r\n\r\nRunning 1 test for tests/unit/5.t.sol:BrokenInvariantTest\r\n[PASS] statefulFuzz_BrokenInvariant() (runs: 1, calls: 1, reverts: 1)\r\nLogs:\r\n  Error: Assertion Failed\r\n  \r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 2.20ms\r\nRan 1 test suites: 1 tests passed, 0 failed, 0 skipped (1 total tests\r\n```\r\n\r\nWe did ask for this behaviour in https://github.com/foundry-rs/foundry/issues/4718 with the solution implemented in https://github.com/foundry-rs/foundry/pull/5445. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1696989677/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
