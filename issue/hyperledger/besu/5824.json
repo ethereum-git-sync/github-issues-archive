@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5824",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5824/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5824/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5824/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5824",
+  "id": 1872343709,
+  "node_id": "I_kwDODE2jmc5vmbKd",
+  "number": 5824,
+  "title": "Duplicate key errors in EthScheduler-Transactions",
+  "user": {
+    "login": "benjaminion",
+    "id": 20796281,
+    "node_id": "MDQ6VXNlcjIwNzk2Mjgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20796281?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjaminion",
+    "html_url": "https://github.com/benjaminion",
+    "followers_url": "https://api.github.com/users/benjaminion/followers",
+    "following_url": "https://api.github.com/users/benjaminion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjaminion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjaminion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjaminion/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjaminion/orgs",
+    "repos_url": "https://api.github.com/users/benjaminion/repos",
+    "events_url": "https://api.github.com/users/benjaminion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjaminion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-29T20:05:57Z",
+  "updated_at": "2023-08-29T20:05:57Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nAs a node operator, I want `ERROR` level messages in the logs only to apply to important or actionable situations.\r\n\r\nThe below errors and stack traces don't seem to be useful, and as a node operator there doesn't seem to be anything I can do in response to them. Since Besu apparently keeps running fine, they should probably be demoted to `DEBUG`.\r\n\r\n### Acceptance Criteria\r\n\r\n* `ERROR` level messages that are not useful are suppressed.\r\n\r\n### Steps to Reproduce (Bug)\r\n\r\nRun Besu for a while.\r\n\r\n**Expected behavior:**\r\n\r\nLogs don't contain unhelpful `ERROR` level stack traces.\r\n\r\n**Actual behavior:** [What actually happens]\r\n\r\n```\r\n2023-08-29 19:31:22.624+00:00 | EthScheduler-Transactions-0 | ERROR | Besu | Uncaught exception in thread \"EthScheduler-Transactions-0\"\r\njava.lang.IllegalStateException: Duplicate key 0xf526c3350c599fa381f0a9fd4412105d6e3b84cef407973520a4a536a602806d (attempted merging values ValidationResult{invalidReason=Optional.empty, errorMessage=Optional.empty} and ValidationResult{invalidReason=Optional[TRANSACTION_ALREADY_KNOWN], errorMessage=Optional.empty})\r\n        at java.base/java.util.stream.Collectors.duplicateKeyException(Collectors.java:135)\r\n        at java.base/java.util.stream.Collectors.lambda$uniqKeysMapAccumulator$1(Collectors.java:182)\r\n        at java.base/java.util.stream.ReduceOps$3ReducingSink.accept(ReduceOps.java:169)\r\n        at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)\r\n        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)\r\n        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)\r\n        at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)\r\n        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)\r\n        at java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:682)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionPool.addRemoteTransactions(TransactionPool.java:212)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionsMessageProcessor.processTransactionsMessage(TransactionsMessageProcessor.java:87)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionsMessageProcessor.processTransactionsMessage(TransactionsMessageProcessor.java:60)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionsMessageHandler.lambda$exec$0(TransactionsMessageHandler.java:51)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\r\n        at java.base/java.lang.Thread.run(Thread.java:833)\r\n```\r\n\r\n```\r\n2023-08-29 19:49:07.440+00:00 | EthScheduler-Transactions-1 | ERROR | Besu | Uncaught exception in thread \"EthScheduler-Transactions-1\"\r\njava.lang.IllegalStateException: Duplicate key 0x73ea91e496f6015d18c20478bdd2bcd0afa41766b0c0946eac723a7ddf39c073 (attempted merging values ValidationResult{invalidReason=Optional[TRANSACTION_REPLACEMENT_UNDERPRICED], errorMessage=Optional.empty} and ValidationResult{invalidReason=Optional[TRANSACTION_REPLACEMENT_UNDERPRICED], errorMessage=Optional.empty})\r\n        at java.base/java.util.stream.Collectors.duplicateKeyException(Collectors.java:135)\r\n        at java.base/java.util.stream.Collectors.lambda$uniqKeysMapAccumulator$1(Collectors.java:182)\r\n        at java.base/java.util.stream.ReduceOps$3ReducingSink.accept(ReduceOps.java:169)\r\n        at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)\r\n        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)\r\n        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)\r\n        at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)\r\n        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)\r\n        at java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:682)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionPool.addRemoteTransactions(TransactionPool.java:212)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionsMessageProcessor.processTransactionsMessage(TransactionsMessageProcessor.java:87)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionsMessageProcessor.processTransactionsMessage(TransactionsMessageProcessor.java:60)\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionsMessageHandler.lambda$exec$0(TransactionsMessageHandler.java:51)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\r\n        at java.base/java.lang.Thread.run(Thread.java:833)\r\n```\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\n\r\nA couple of times per hour.\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.7.1\r\n* Java version: openjdk 17.0.8 2023-07-18\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n\r\nI am running with the `Xlayered-tx-pool=true` flag.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5824/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5824/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
