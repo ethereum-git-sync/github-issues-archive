@@ -49,7 +49,7 @@
       "description": "This issue is ready to be worked on"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "schaable",
@@ -96,12 +96,31 @@
   "milestone": null,
   "comments": 11,
   "created_at": "2023-08-02T20:04:44Z",
-  "updated_at": "2023-08-23T14:07:44Z",
-  "closed_at": null,
+  "updated_at": "2023-08-30T17:03:38Z",
+  "closed_at": "2023-08-30T17:03:37Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "Edit by @fvictorio, original issue below.\r\n\r\nWe should:\r\n- [ ] Use paris as the evmVersion targeted by solc unless the user explicitly set one. This should work for all possible solc configurations: the version shortcut, an explicit version, multiple versions, and overrides.\r\n- [ ] Tests for all those scenarios.\r\n- [ ] Update the docs to explain the situation, what Hardhat does, and how to change it.\r\n- [ ] We should manually test this. It's easy to do: we just compile a contract with the default version, and check that no PUSH0 opcodes are included. Pasting the bytecode in the [EVM Codes Playground](https://www.evm.codes/playground) and changing the view to mnemonic is the easiest way to do this.\r\n- [ ] Add a test which does the same that the previous step does. It's probably enough to have a fixture project where we just assert the resulting bytecode is a previously manually validated one. This will use a fixed solc version, but that's fine since this is mainly a smoke test.\r\n- [ ] We should at least check that there are no surprises around the cache. The way to do this is to compile a project with the current version of Hardhat, then install the version with these changes, and compile again. This should trigger a re-compilation because the solc config changed.\r\n\r\n---\r\n\r\n### Describe the feature\r\n\r\nSolc defaults the `evmVersion` parameter to shanghai since version 0.8.20. The main issue caused by this is that the compiler emits PUSH0 as an opcode. This opcode is supported on Ethereum L1 but as far as I know it hasn't been adopted on any other chain so far (except perhaps Gnosis Chain?). Most notably, it hasn't been adopted by L2s. On all these other chains, the PUSH0 opcode will be seen as an invalid opcode and cause the code to revert.\r\n\r\nHardhat relies on the solc default for `evmVersion`. Foundry, for reference, [defaults to paris](https://github.com/foundry-rs/foundry/blob/e05b9c75b4501d5880764948b61db787f3dd7fe0/config/src/lib.rs#L1732).\r\n\r\nThere is some knowledge about the potential issues caused by using shanghai, but I wouldn't count on it being widely known. At some point we will need to face EVM differences across chains and layers, and setting the default to paris simply delays this. However, setting the default to shanghai at this moment seems premature and is just asking for someone to deploy a broken contract to production.\r\n\r\nI suggest to set the default evmVersion to paris if the compiler version is >=0.8.20 and the user hasn't configured it themselves.\r\n\r\n### Search terms\r\n\r\nevmVersion paris shanghai push0",
-  "closed_by": null,
+  "closed_by": {
+    "login": "schaable",
+    "id": 1165424,
+    "node_id": "MDQ6VXNlcjExNjU0MjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1165424?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/schaable",
+    "html_url": "https://github.com/schaable",
+    "followers_url": "https://api.github.com/users/schaable/followers",
+    "following_url": "https://api.github.com/users/schaable/following{/other_user}",
+    "gists_url": "https://api.github.com/users/schaable/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/schaable/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/schaable/subscriptions",
+    "organizations_url": "https://api.github.com/users/schaable/orgs",
+    "repos_url": "https://api.github.com/users/schaable/repos",
+    "events_url": "https://api.github.com/users/schaable/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/schaable/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4232/reactions",
     "total_count": 3,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4232/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
