@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5763",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5763/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5763/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5763/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5763",
+  "id": 1875846313,
+  "node_id": "I_kwDOGBlvNc5vzySp",
+  "number": 5763,
+  "title": "Flashloan test wrong: all runs well, but EVM revert in the end",
+  "user": {
+    "login": "chen4903",
+    "id": 108803001,
+    "node_id": "U_kgDOBnwzuQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/108803001?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chen4903",
+    "html_url": "https://github.com/chen4903",
+    "followers_url": "https://api.github.com/users/chen4903/followers",
+    "following_url": "https://api.github.com/users/chen4903/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chen4903/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chen4903/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chen4903/subscriptions",
+    "organizations_url": "https://api.github.com/users/chen4903/orgs",
+    "repos_url": "https://api.github.com/users/chen4903/repos",
+    "events_url": "https://api.github.com/users/chen4903/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chen4903/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-08-31T16:13:04Z",
+  "updated_at": "2023-08-31T16:14:42Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (56adbe4 2023-07-16T07:03:29.896803000Z)\n\n### What command(s) is the bug in?\n\nforge test --match-path test/09.NewFreeDAO/a.sol -vvv --offline\n\n### Operating System\n\nWindows\n\n### Describe the bug\n\nI try a simple flashloan. All runs well, the flashloan() and DVMFlashLoanCall() return true, but the result is an EVM revert. I never meet this situation before, I think maybe there is somthing I doesn't notice...\r\n\r\nThis is the code.\r\n\r\n    // SPDX-License-Identifier: UNLICENSED\r\n    pragma solidity ^0.8.10;\r\n\r\n    import \"forge-std/Test.sol\";\r\n\r\n    contract Attacker is Test {\r\n        address constant wbnb = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;\r\n        address constant dodo = 0xD534fAE679f7F02364D177E9D44F1D15963c0Dd7;\r\n\r\n        function setUp() public {\r\n            vm.createSelectFork(\"bsc\", 21_140_434);\r\n        }\r\n\r\n        function test_flashloan() public {\r\n            bytes memory data = abi.encode(dodo, wbnb, 250 * 1e18);\r\n            IDVM(dodo).flashLoan(0, 250 * 1e18, address(this), data);\r\n        }\r\n\r\n        function DVMFlashLoanCall(address sender, uint256 baseAmount, uint256 quoteAmount, bytes calldata data) external {\r\n            IERC20(wbnb).transfer(msg.sender, 250 * 1e18);\r\n        }\r\n    }\r\n    interface IDVM{\r\n      function flashLoan(uint256,uint256,address,bytes memory) external returns(bool);\r\n    }\r\n    interface IERC20 {\r\n      function transfer(address to, uint256 value) external returns (bool);\r\n    }\r\n\r\nI run this command: forge test --match-path test/09.NewFreeDAO/a.sol -vvv --offline. And the output is that: \r\n\r\n> Running 1 test for test/09.NewFreeDAO/a.sol:Attacker\r\n[FAIL. Reason: EvmError: Revert] test_flashloan() (gas: 69569)\r\nTraces:\r\n  [55656] Attacker::test_flashloan()\r\n    ├─ [52674] 0xD534fAE679f7F02364D177E9D44F1D15963c0Dd7::d0a494e4(000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d8d726b7177a800000000000000000000000000007fa9385be102ac3eac297483dd6233d62b3e149600000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000060000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd7000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000000000000000000000000000d8d726b7177a80000)\r\n    │   ├─ [50505] 0x409E377A7AfFB1FD3369cfc24880aD58895D1dD9::d0a494e4(000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d8d726b7177a800000000000000000000000000007fa9385be102ac3eac297483dd6233d62b3e149600000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000060000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd7000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000000000000000000000000000d8d726b7177a80000) [delegatecall]\r\n    │   │   ├─ [29962] 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c::a9059cbb(0000000000000000000000007fa9385be102ac3eac297483dd6233d62b3e149600000000000000000000000000000000000000000000000d8d726b7177a80000)\r\n    │   │   │   ├─ emit Transfer(from: 0xD534fAE679f7F02364D177E9D44F1D15963c0Dd7, to: Attacker: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], value: 250000000000000000000 [2.5e20])\r\n    │   │   │   └─ ← 0x0000000000000000000000000000000000000000000000000000000000000001\r\n    │   │   ├─ [3398] Attacker::DVMFlashLoanCall(Attacker: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], 0, 250000000000000000000 [2.5e20], 0x000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd7000000000000000000000000bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c00000000000000000000000000000000000000000000000d8d726b7177a80000)\r\n    │   │   │   ├─ [2610] 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c::a9059cbb(000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd700000000000000000000000000000000000000000000000d8d726b7177a80000)\r\n    │   │   │   │   ├─ emit Transfer(from: Attacker: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], to: 0xD534fAE679f7F02364D177E9D44F1D15963c0Dd7, value: 250000000000000000000 [2.5e20])\r\n    │   │   │   │   └─ ← 0x0000000000000000000000000000000000000000000000000000000000000001\r\n    │   │   │   └─ ← ()\r\n    │   │   ├─ [2487] 0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2::70a08231(000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd7) [staticcall]\r\n    │   │   │   └─ ← 0x000000000000000000000000000000000000000000008acc9a6bb5189c407f6f\r\n    │   │   ├─ [534] 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c::70a08231(000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd7) [staticcall]\r\n    │   │   │   └─ ← 0x00000000000000000000000000000000000000000000000f6f6d2fb1d1c839e3\r\n    │   │   ├─ [487] 0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2::70a08231(000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd7) [staticcall]\r\n    │   │   │   └─ ← 0x000000000000000000000000000000000000000000008acc9a6bb5189c407f6f\r\n    │   │   ├─ [534] 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c::70a08231(000000000000000000000000d534fae679f7f02364d177e9d44f1d15963c0dd7) [staticcall]\r\n    │   │   │   └─ ← 0x00000000000000000000000000000000000000000000000f6f6d2fb1d1c839e3\r\n    │   │   ├─  emit topic 0: 0x0b82e93068db15abd9fbb2682c65462ea8a0a10582dce93a5664818e296f54eb\r\n    │   │   │           data: 0x0000000000000000000000007fa9385be102ac3eac297483dd6233d62b3e14960000000000000000000000007fa9385be102ac3eac297483dd6233d62b3e1496000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d8d726b7177a80000\r\n    │   │   └─ ← ()\r\n    │   └─ ← ()\r\n    └─ ← \"EvmError: Revert\"\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 1.10s\r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\nFailing tests:\r\nEncountered 1 failing test in test/09.NewFreeDAO/a.sol:Attacker\r\n[FAIL. Reason: EvmError: Revert] test_flashloan() (gas: 69569)\r\nEncountered a total of 1 failing tests, 0 tests succeeded",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5763/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5763/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
