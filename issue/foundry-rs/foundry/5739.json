@@ -49,7 +49,7 @@
   "milestone": null,
   "comments": 10,
   "created_at": "2023-08-28T17:32:41Z",
-  "updated_at": "2023-08-30T21:40:46Z",
+  "updated_at": "2023-08-30T22:04:13Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -451,9 +451,9 @@
       "site_admin": false
     },
     "created_at": "2023-08-30T20:33:23Z",
-    "updated_at": "2023-08-30T21:01:26Z",
+    "updated_at": "2023-08-30T22:04:13Z",
     "author_association": "CONTRIBUTOR",
-    "body": "@mattsse \r\n\r\nhi at first I thought it made sense to roll the state back just to some block the user chose, but I dont think users will intend that their state that they explicitly sets gets dumped aswell.\r\n\r\nimo a bigger issue is that if you read `address(n).value()` at `block=t` in the **`setup`** function, and then roll **forward** to `block=t+x < current_block` in a subsequent calls it will still be the old value within the setup (because its cached in the journaled state throughout the rest of the tx)\r\n\r\nnot sure if this actually gets persisted in the cacheDB at the moment (is it marked touched from an sload?)",
+    "body": "@mattsse \r\n\r\nhi at first I thought it made sense to roll the state back just to some block the user chose, but I dont think users will intend that their state that they explicitly sets gets dumped aswell.\r\n\r\nimo a bigger issue is that if you do an sload on `address(n)` at `block=t` in the **`setup`** function, and then roll **forward** to `block=t+x < current_block` in subsequent calls it will still be the old value within the setup (because its cached in the journaled state throughout the rest of the tx)\r\n\r\nnot sure if this actually gets persisted in the cacheDB at the moment (is it marked touched from an sload?)",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1699799953/reactions",
       "total_count": 0,
@@ -495,9 +495,9 @@
       "site_admin": false
     },
     "created_at": "2023-08-30T21:40:45Z",
-    "updated_at": "2023-08-30T21:40:45Z",
+    "updated_at": "2023-08-30T21:44:11Z",
     "author_association": "CONTRIBUTOR",
-    "body": "maybe we can purge the journal of all entries that are not marked as touched?\r\n\r\ndont think this hits the edge case where a contract has an sload and a sstore (making it touched) if the goal is to do a \"future\" sload\r\n\r\ni think im on the side of making it forward only and just clearing the semantics in the docs as revert/snapshot is probably the functionality people are thinking of when wanting to a do a \"roll back\"",
+    "body": "maybe we can purge the journal of all entries that are not marked as touched? or something like that\r\n\r\n^ dont think this hits the edge case where an account has an sload and a sstore (making it touched) if the goal is to do a \"future\" sload\r\n\r\ni think im on the side of making it forward only and just clearing the semantics (no reads before a roll of things you dont want cached?) in the docs \r\n\r\nas I think revert/snapshot is probably the functionality people are thinking of when wanting to a do a \"roll back\"",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1699886682/reactions",
       "total_count": 0,
