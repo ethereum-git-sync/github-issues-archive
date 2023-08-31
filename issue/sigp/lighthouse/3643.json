@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2022-10-15T16:37:37Z",
-  "updated_at": "2022-11-15T09:25:40Z",
-  "closed_at": null,
+  "updated_at": "2023-08-31T00:29:01Z",
+  "closed_at": "2023-08-31T00:29:01Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nMaking the [validator monitor](https://github.com/sigp/lighthouse/blob/stable/beacon_node/beacon_chain/src/validator_monitor.rs) track block proposals would help us raise alerts if there has been a missed proposal by a local/monitored validator. This has been requested several times and makes a lot of sense, especially now we have builders as an additional failure point.\r\n\r\n## Implementation\r\n\r\nConsidering this briefly, I think we could track missed proposals in two ways:\r\n\r\n1. Use [ValidatorMonitor::process_valid_state](https://github.com/sigp/lighthouse/blob/01e84b71f524968f5b940fbd2fa31d29408b6581/beacon_node/beacon_chain/src/validator_monitor.rs#L294-L296) to reading the proposers for the current epoch and then look at `latest_block_roots` for skip slots.\r\n2. Add a new `ValidatorMonitor::process_head_state` method which works similar to the previous method, but only takes states which were elected as the head (rather than *all* states).\r\n\r\nThe issue with (1) would be that relatively weight-less, obscure heads may trigger a rather alarming \"missed block\" alert.\r\n\r\nA downside both approaches is that it would only register a missed block once a subsequent block has been imported. I'm not hugely concerned with this since we should already be raising CRIT logs whenever a block production fails. The edge-case here would be a failure in block *propagation*, which presently raises no logs. All this considered, we'd likely be registering the proposal failure within 12-24s and given the relatively infrequent nature of block proposal I'm comfortable with this slight delay. \r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "paulhauner",
+    "id": 6660660,
+    "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/paulhauner",
+    "html_url": "https://github.com/paulhauner",
+    "followers_url": "https://api.github.com/users/paulhauner/followers",
+    "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+    "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+    "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+    "repos_url": "https://api.github.com/users/paulhauner/repos",
+    "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/3643/reactions",
     "total_count": 1,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/3643/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -140,6 +159,50 @@
     "body": "#3727 and #3728 are some small changes to the validator monitor that I want to get included before we start on this one.",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1314869078/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1700076578",
+    "html_url": "https://github.com/sigp/lighthouse/issues/3643#issuecomment-1700076578",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/3643",
+    "id": 1700076578,
+    "node_id": "IC_kwDOCFeAzc5lVRwi",
+    "user": {
+      "login": "paulhauner",
+      "id": 6660660,
+      "node_id": "MDQ6VXNlcjY2NjA2NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6660660?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/paulhauner",
+      "html_url": "https://github.com/paulhauner",
+      "followers_url": "https://api.github.com/users/paulhauner/followers",
+      "following_url": "https://api.github.com/users/paulhauner/following{/other_user}",
+      "gists_url": "https://api.github.com/users/paulhauner/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/paulhauner/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/paulhauner/subscriptions",
+      "organizations_url": "https://api.github.com/users/paulhauner/orgs",
+      "repos_url": "https://api.github.com/users/paulhauner/repos",
+      "events_url": "https://api.github.com/users/paulhauner/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/paulhauner/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-08-31T00:28:47Z",
+    "updated_at": "2023-08-31T00:28:47Z",
+    "author_association": "MEMBER",
+    "body": "Closing as a duplicate with #3414",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1700076578/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
