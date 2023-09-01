@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 8,
+  "comments": 9,
   "created_at": "2023-08-28T14:51:11Z",
-  "updated_at": "2023-08-31T13:31:56Z",
-  "closed_at": null,
+  "updated_at": "2023-09-01T12:18:08Z",
+  "closed_at": "2023-09-01T12:18:07Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version:  v1.12.1 and v1.12.2\r\n\r\n#### Expected behaviour\r\n\r\nWhen I run the following code snippet, I expect both printed balances (that is, `b1` and `b2`) to be 42:\r\n\r\n```golang\r\ndb := rawdb.NewMemoryDatabase()\r\nst1, _ := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)\r\naddr := common.HexToAddress(\"0xaaaa\")\r\nbal := big.NewInt(42)\r\nst1.SetBalance(addr, bal)\r\nuseCommit := true\r\nif useCommit {\r\n\tblock := uint64(0)\r\n\tdeleteEmptyObjects := false\r\n\t_, commitErr := st1.Commit(block, deleteEmptyObjects)\r\n\tif commitErr != nil {\r\n\t\treturn\r\n\t}\r\n}\r\nb1 := st1.GetBalance(addr)\r\nfmt.Printf(\"b1: %v\\n\", b1)\r\nst2 := st1.Copy()\r\nb2 := st2.GetBalance(addr)\r\nfmt.Printf(\"b2: %v\\n\", b2)\r\n```\r\n\r\nThis used to be the behavior for version v1.12.0. Specifically, for version v1.12.0, the following code snippet prints 42 twice:\r\n\r\n```golang\r\ndb := rawdb.NewMemoryDatabase()\r\nst1, _ := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)\r\naddr := common.HexToAddress(\"0xaaaa\")\r\nbal := big.NewInt(42)\r\nst1.SetBalance(addr, bal)\r\nuseCommit := true\r\nif useCommit {\r\n\tdeleteEmptyObjects := false\r\n\t_, commitErr := st1.Commit(deleteEmptyObjects)\r\n\tif commitErr != nil {\r\n\t\treturn\r\n\t}\r\n}\r\nb1 := st1.GetBalance(addr)\r\nfmt.Printf(\"b1: %v\\n\", b1)\r\nst2 := st1.Copy()\r\nb2 := st2.GetBalance(addr)\r\nfmt.Printf(\"b2: %v\\n\", b2)\r\n```\r\n\r\n#### Actual behaviour\r\n\r\nIn version v1.12.1 (and v1.12.2), the first code snippet prints the following:\r\n\r\n```golang\r\nb1: 42\r\nb2: 0\r\n```\r\n\r\nIs this an intended change in behavior? Or is this a regression due to changes related to the new storage scheme?\r\n\r\nNote that the output does not change between the two versions if I set `useCommit` to false.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nRun the above code snippet for v1.12.0 (second snippet) and v1.12.1 (first snippet) and compare the output.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "rjl493456442",
+    "id": 5959481,
+    "node_id": "MDQ6VXNlcjU5NTk0ODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5959481?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rjl493456442",
+    "html_url": "https://github.com/rjl493456442",
+    "followers_url": "https://api.github.com/users/rjl493456442/followers",
+    "following_url": "https://api.github.com/users/rjl493456442/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rjl493456442/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rjl493456442/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rjl493456442/subscriptions",
+    "organizations_url": "https://api.github.com/users/rjl493456442/orgs",
+    "repos_url": "https://api.github.com/users/rjl493456442/repos",
+    "events_url": "https://api.github.com/users/rjl493456442/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rjl493456442/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -412,6 +431,50 @@
     "body": "Thanks! I'll probably need to run some experiments first, but I'll let you know if more questions pop up.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1701047166/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1702657122",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28022#issuecomment-1702657122",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28022",
+    "id": 1702657122,
+    "node_id": "IC_kwDOAOvK985lfHxi",
+    "user": {
+      "login": "rjl493456442",
+      "id": 5959481,
+      "node_id": "MDQ6VXNlcjU5NTk0ODE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5959481?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rjl493456442",
+      "html_url": "https://github.com/rjl493456442",
+      "followers_url": "https://api.github.com/users/rjl493456442/followers",
+      "following_url": "https://api.github.com/users/rjl493456442/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rjl493456442/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rjl493456442/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rjl493456442/subscriptions",
+      "organizations_url": "https://api.github.com/users/rjl493456442/orgs",
+      "repos_url": "https://api.github.com/users/rjl493456442/repos",
+      "events_url": "https://api.github.com/users/rjl493456442/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rjl493456442/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-01T12:18:07Z",
+    "updated_at": "2023-09-01T12:18:07Z",
+    "author_association": "MEMBER",
+    "body": "I will just close this ticket. Feel free to reopen a new one!",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1702657122/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
