@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5837",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5837/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5837/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5837/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5837",
+  "id": 1877108778,
+  "node_id": "I_kwDODE2jmc5v4mgq",
+  "number": 5837,
+  "title": "Besu v23.7.1 does not synchronize with goerli",
+  "user": {
+    "login": "chichi13",
+    "id": 25102234,
+    "node_id": "MDQ6VXNlcjI1MTAyMjM0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25102234?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chichi13",
+    "html_url": "https://github.com/chichi13",
+    "followers_url": "https://api.github.com/users/chichi13/followers",
+    "following_url": "https://api.github.com/users/chichi13/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chichi13/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chichi13/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chichi13/subscriptions",
+    "organizations_url": "https://api.github.com/users/chichi13/orgs",
+    "repos_url": "https://api.github.com/users/chichi13/repos",
+    "events_url": "https://api.github.com/users/chichi13/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chichi13/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-01T09:48:28Z",
+  "updated_at": "2023-09-01T09:48:28Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nI wanted to sync Goerli network with Besu `v23.7.1`, unfortunately the sync blocked 3 times on the block `0x928201` (9601537).\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Use `v23.7.1`\r\n2. Configuration used: \r\n\r\n```ini\r\nExecStart=/home/ethereum/bin/besu/bin/besu \\\r\n  --network=goerli \\\r\n  --logging=INFO \\\r\n  --host-allowlist=* \\\r\n  --metrics-enabled=true \\\r\n  --metrics-port=6061 \\\r\n  --metrics-host=0.0.0.0 \\\r\n  --rpc-http-enabled=true \\\r\n  --rpc-http-port=8545 \\\r\n  --rpc-ws-enabled=True \\\r\n  --rpc-ws-host=localhost \\\r\n  --rpc-ws-port=8554 \\\r\n  --max-peers=10 \\\r\n  --sync-mode=X_CHECKPOINT \\\r\n  --data-storage-format=BONSAI \\\r\n  --data-path=/home/ethereum/var/lib/besu \\\r\n  --Xplugin-rocksdb-high-spec-enabled \\\r\n  --engine-jwt-secret=/home/ethereum/secrets/jwtsecret \\\r\n  --api-gas-price-blocks=100 \\\r\n  --api-gas-price-percentile=99 \\\r\n  --min-gas-price=1\r\n```\r\n\r\n3. Sync the node\r\n\r\n**Expected behavior:** Node syncing well\r\n\r\n**Actual behavior:** Sync blocked at height 9601537 without any error.\r\n\r\n**Frequency:** Everytime with `v23.7.1`, tried with, `X_CHECKPOINT` and `X_SNAP`.\r\n\r\n### Logs (if a bug)\r\n\r\n- At the begining, no error:\r\n\r\n![image](https://github.com/hyperledger/besu/assets/25102234/1fd2e9eb-7da9-47d6-9214-db16f53cbc2e)\r\n\r\nWe can see, Besu will download the pivot block 9601537 (`Downloading world state from peers for pivot block 9601537`).\r\n\r\n- After a few minutes, we have a lot of DNS Errors:\r\n\r\n![image](https://github.com/hyperledger/besu/assets/25102234/7084f565-71e8-4a2c-8109-ae73b36d4caf)\r\n\r\n- After ~6h of syncing, we have no more info in the logs:\r\n\r\n![image](https://github.com/hyperledger/besu/assets/25102234/a158438a-fe7d-48c8-8b91-268c0049b8a0)\r\n\r\nAnd the RPC is not synced, the RPC return the same block height:\r\n\r\n```bash\r\n❯ curl -sX POST -H \"Content-Type: application/json\" https://***** --data '{\"jsonrpc\": \"2.0\", \"id\": 42, \"method\": \"eth_blockNumber\", \"params\": []}'\r\n{\"jsonrpc\":\"2.0\",\"id\":42,\"result\":\"0x928201\"}%\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Software version: `v23.7.1`\r\n* Java version: `17.0.7`\r\n* OS Name & Version:\r\n\r\n```\r\nDISTRIB_ID=Ubuntu\r\nDISTRIB_RELEASE=20.04\r\nDISTRIB_CODENAME=focal\r\nDISTRIB_DESCRIPTION=\"Ubuntu 20.04.6 LTS\"\r\nNAME=\"Ubuntu\"\r\nVERSION=\"20.04.6 LTS (Focal Fossa)\"\r\nID=ubuntu\r\nID_LIKE=debian\r\nPRETTY_NAME=\"Ubuntu 20.04.6 LTS\"\r\nVERSION_ID=\"20.04\"\r\nHOME_URL=\"https://www.ubuntu.com/\"\r\nSUPPORT_URL=\"https://help.ubuntu.com/\"\r\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\r\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\r\nVERSION_CODENAME=focal\r\nUBUNTU_CODENAME=focal\r\n```\r\n\r\n* Kernel Version:\r\n\r\n```\r\nLinux devhub-rpc-server-02 5.4.0-153-generic #170-Ubuntu SMP Fri Jun 16 13:43:31 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux\r\n```\r\n\r\n* Cloud VM, type, size: Hetzner Bare Metal\r\n* Consensus Client & Version if using Proof of Stake: Teku `v23.6.1`\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n\r\n* System info - 6 CPU / 64 Go RAM / 2 To SSD NVMe\r\n\r\n\r\n----------------------\r\n\r\n**I'd also like to point out that version `23.7.1` is marked as a release on Github. However in the Besu version `23.7.1-dev-2bced4eb`. What is the truth?**",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5837/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5837/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
