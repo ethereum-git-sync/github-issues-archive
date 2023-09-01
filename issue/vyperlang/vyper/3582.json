@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3582",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3582/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3582/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3582/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3582",
+  "id": 1877945354,
+  "node_id": "I_kwDOBGDvrM5v7ywK",
+  "number": 3582,
+  "title": "calls and references to state variables should not be represented as `Attribute` nodes",
+  "user": {
+    "login": "0xalpharush",
+    "id": 87383155,
+    "node_id": "MDQ6VXNlcjg3MzgzMTU1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/87383155?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xalpharush",
+    "html_url": "https://github.com/0xalpharush",
+    "followers_url": "https://api.github.com/users/0xalpharush/followers",
+    "following_url": "https://api.github.com/users/0xalpharush/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xalpharush/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xalpharush/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xalpharush/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xalpharush/orgs",
+    "repos_url": "https://api.github.com/users/0xalpharush/repos",
+    "events_url": "https://api.github.com/users/0xalpharush/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xalpharush/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-01T19:21:54Z",
+  "updated_at": "2023-09-01T19:21:54Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.3.7\r\n* OS: osx\r\n* Python Version (output of `python --version`): 3.11\r\n\r\n### What's your issue about?\r\nAnother improvement to the Vyper AST would be disambiguating calls and references to state variables from accesses to field of structure types. This is something that Solidity has done poorly and it creates a lot of complexity in the AST especially as the language has evolved and expressions like `X.Y` can represent a whole host of constructs. Below is an example of several instances of this in Vyper. In order to resolve shadowing like `self.caller = caller`, it requires keeping track of context like the namespace is `self` rather than just explicitly distinguishing that this is a reference to a state variable. Accessing attributes of `self` like `balance` and `address` could also be made distinct from variables or fields by creating a unique representation in the AST. This eliminates a lot of special casing, branching, and other complexities required in consumers of the AST by representing precisely info the Vyper has already gathered during compilation.\r\n\r\n```vyper\r\ninterface X:\r\n    pass\r\n\r\ncaller: address\r\n@external\r\ndef __default__():\r\n     caller: addres = msg.sender\r\n     self.caller = caller\r\n     amt: uint256 = self.balance\r\n     where: address = X(self).address\r\n```\r\n\r\n\r\n### How can it be fixed?\r\n\r\nMake field access distinct from referring to state variables or calls like `SELFBALANCE` and `ADDRESS`\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3582/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3582/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
