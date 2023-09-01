@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 11,
+  "comments": 12,
   "created_at": "2023-06-23T09:00:16Z",
-  "updated_at": "2023-08-25T02:03:21Z",
-  "closed_at": null,
+  "updated_at": "2023-09-01T02:07:37Z",
+  "closed_at": "2023-09-01T02:07:37Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nErigon version：erigon version 2.43.0-stable\r\n\r\nOS & Version：Linux - Ubuntu 22.10\r\n\r\nCommit hash: \r\n\r\nErigon Command (with flags/config)：\r\n--datadir=/node2/data-erigon\r\n--torrent.download.rate=20mb \r\n--http --http.addr 0.0.0.0 \r\n--authrpc.jwtsecret /node2/data-erigon/jwt.hex\r\n\r\n\r\nConcensus Layer：Prysm v4.0.5\r\n\r\nConcensus Layer Command (with flags/config):\r\n--datadir=/node2/data-prysm \r\n--jwt-secret=/node2/data-erigon/jwt.hex \r\n--rpc-host=0.0.0.0 \r\n--grpc-gateway-host=0.0.0.0 \r\n--monitoring-host=0.0.0.0 -\r\n-execution-endpoint=http://127.0.0.1:8551 \r\n--accept-terms-of-use=true\r\n\r\n\r\nChain/Network: \r\n\r\nExpected behaviour\r\nErigon data is continuously synchronized, and the mdbx.data file in the chaindata directory should continue to grow.\r\n\r\nActual behaviour\r\nErigon currently stops syncing, but no errors are reported.The capacity of the mdbx.data file in chaindata is 1486058684416 bytes, which has not changed for two days.\r\n\r\nSteps to reproduce the behaviour\r\nerigon does not currently have continuous sync data，but no errors are reported.\r\n\r\ndiagnostic info 1：logs info\r\n[INFO] [06-23|16:25:30.126] [txpool] stat                            pending=0 baseFee=0 queued=30000 alloc=2.6GB sys=3.1GB\r\n[INFO] [06-23|16:26:30.121] [txpool] stat                            pending=0 baseFee=0 queued=30000 alloc=2.3GB sys=3.1GB\r\n[INFO] [06-23|16:27:30.118] [p2p] GoodPeers                          eth67=29 eth68=21\r\n[INFO] [06-23|16:27:30.126] [txpool] stat                            pending=0 baseFee=0 queued=30000 alloc=2.6GB sys=3.1GB\r\n[INFO] [06-23|16:28:30.121] [txpool] stat                            pending=0 baseFee=0 queued=30000 alloc=2.4GB sys=3.1GB\r\n[INFO] [06-23|16:29:30.118] [p2p] GoodPeers                          eth67=29 eth68=21\r\n[INFO] [06-23|16:29:30.125] [txpool] stat                            pending=0 baseFee=0 queued=30000 alloc=2.6GB sys=3.1GB\r\n[INFO] [06-23|16:30:30.121] [txpool] stat                            pending=0 baseFee=0 queued=30000 alloc=2.5GB sys=3.1GB\r\n[INFO] [06-23|16:31:30.117] [p2p] GoodPeers                          eth68=23 eth67=28\r\n[INFO] [06-23|16:31:30.126] [txpool] stat                            pending=0 baseFee=0 queued=30000 alloc=2.8GB sys=3.1GB\r\n\r\ndiagnostic info 1：stack trace\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0xd9f315        github.com/anacrolix/torrent.(*Client).initiateProtocolHandshakes+0x195        /root/go/pkg/mod/github.com/anacrolix/torrent@v1.48.1-0.20230219022425-e8971ea0f1bf/cli>\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0xd9f72f        github.com/anacrolix/torrent.(*Client).establishOutgoingConnEx+0x30f        /root/go/pkg/mod/github.com/anacrolix/torrent@v1.48.1-0.20230219022425-e8971ea0f1bf/client>\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0xd9fbd7        github.com/anacrolix/torrent.(*Client).establishOutgoingConn+0x77        /root/go/pkg/mod/github.com/anacrolix/torrent@v1.48.1-0.20230219022425-e8971ea0f1bf/client.go>\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0xd9fdc4        github.com/anacrolix/torrent.(*Client).outgoingConnection+0xc4                /root/go/pkg/mod/github.com/anacrolix/torrent@v1.48.1-0.20230219022425-e8971ea0f1bf/clie>\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: 1 @ 0x459e16 0x48ae95 0x13f03ed 0x48e0a1\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0x48ae94        time.Sleep+0x134                                                                /usr/local/go/src/runtime/time.go:195\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0x13f03ec        github.com/ledgerwatch/erigon-lib/downloader.(*Downloader).mainLoop.func1+0x4c        /root/go/pkg/mod/github.com/ledgerwatch/erigon-lib@v0.0.0-20230423044930-fc9dd7>\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: 1 @ 0x459e16 0x48ae95 0x8b3436 0x48e0a1\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0x48ae94        time.Sleep+0x134                                                /usr/local/go/src/runtime/time.go:195\r\n6月 23 16:34:10 zlaxdata erigon[1873737]: #        0x8b3435        github.com/VictoriaMetrics/metrics.summariesSwapCron+0x35        /root/go/pkg/mod/github.com/!victoria!metrics/metrics@v1.23.1/summary.go:237\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7793/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7793/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -544,6 +563,50 @@
     "body": "This issue is stale because it has been open for 40 days with no activity. Remove stale label or comment, or this will be closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1692649445/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1702012662",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/7793#issuecomment-1702012662",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7793",
+    "id": 1702012662,
+    "node_id": "IC_kwDOC0FsAM5lcqb2",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-09-01T02:07:36Z",
+    "updated_at": "2023-09-01T02:07:36Z",
+    "author_association": "NONE",
+    "body": "This issue was closed because it has been stalled for 7 days with no activity.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1702012662/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
