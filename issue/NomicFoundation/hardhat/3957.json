@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-05-26T10:02:13Z",
-  "updated_at": "2023-06-06T16:16:05Z",
+  "updated_at": "2023-09-05T00:12:28Z",
   "closed_at": "2023-05-26T10:07:23Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\r\n\r\n2.10.1\r\n\r\n### What happened?\r\n\r\nI'm trying to verify a contract on Arbitrum Goerli (https://chainlist.org/chain/421613) and Optimism Goerli (https://chainlist.org/chain/420), but keep getting this error: `Unexpected token < in JSON at position 4`. I've tried the programmatic verification task (\"verify:verify\") as well as verifying via the CLI, and get the same error each time. \r\n\r\nOptimism Goerli API endpoint docs: https://docs.optimism.etherscan.io/v/optimistic-goerli-etherscan\r\nArbitrum Goerli API endpoint docs: https://docs.arbiscan.io/getting-started/endpoint-urls\r\n\r\n### Minimal reproduction steps\r\n\r\nIn your hardhat config, you need something along the lines of:\r\n\r\n```\r\netherscan: {\r\n    apiKey: {\r\n      goerliOptimism: process.env.OPTIMISMSCAN_API_KEY || \"\",\r\n      goerliArbitrum: process.env.ARBITRUMSCAN_API_KEY || \"\",\r\n    },\r\n    customChains: [\r\n      {\r\n        network: \"goerliOptimism\",\r\n        chainId: 420,\r\n        urls: {\r\n          apiURL: \"https://api-goerli-optimistic.etherscan.io/\",\r\n          browserURL: \"https://goerli-optimism.etherscan.io/\",\r\n        },\r\n      },\r\n      {\r\n        network: \"goerliArbitrum\",\r\n        chainId: 421613,\r\n        urls: {\r\n          apiURL: \"https://api-goerli.arbiscan.io/\",\r\n          browserURL: \"https://goerli.arbiscan.io/\",\r\n        },\r\n      },\r\n    ],\r\n  }\r\n```\r\n\r\nand you can attempt to verify:\r\n\r\nArbitrum Goerli: `0xAA45a6e4e1E6e43c14B366Dd0228874fb1DC0eF9` (no constructor args)\r\nCLI: `npx hardhat verify --network goerliArbitrum 0xAA45a6e4e1E6e43c14B366Dd0228874fb1DC0eF9`\r\n\r\nOptimism Goerli: `0x4e0AfBa59894060369881f4Bc9ba05731A4119f1` (no constructor args)\r\nCLI: `npx hardhat verify --network goerliOptimism 0x4e0AfBa59894060369881f4Bc9ba05731A4119f1`\r\n\r\n### Search terms\r\n\r\nverification arbitrum goerli optimism goerli",
   "closed_by": {
     "login": "beshup",
