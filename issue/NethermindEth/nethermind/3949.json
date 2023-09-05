@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "kamilchodola",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 12,
+  "comments": 13,
   "created_at": "2022-04-09T12:42:53Z",
-  "updated_at": "2023-09-04T12:44:19Z",
-  "closed_at": null,
+  "updated_at": "2023-09-04T22:50:17Z",
+  "closed_at": "2023-09-04T22:50:17Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "After running nethermind successfully for a couple months with no issues, I did a graceful restart for maintenance last week and upon starting again, have seen this logged every second for the past week straight:\r\n\r\n`Syncing previously downloaded blocks from DB (partial offline mode until it finishes)`\r\n\r\nI've restarted nethermind multiple times, same behavior. Some errors are logged suggesting DB corruption -- how can I best resolve this? I've run with `--Sync.FixReceipts true` which did not resolve.\r\n\r\nWhen stopping the process, this error is logged:\r\n\r\n```\r\n2022-04-09 07:19:58.9715|ERROR|624|Closing DBs shutdown error. RocksDbSharp.RocksDbException: IO error: ReadFile failed: D:\\Nethermind\\nethermind_db/mainnet\\receipts/038928.sst: Data error (cyclic redundancy check).\r\n\r\n   at RocksDbSharp.Native.rocksdb_flush(IntPtr db, IntPtr options)\r\n   at Nethermind.Db.Rocks.DbOnTheRocks.Flush()\r\n   at Nethermind.Db.Rocks.DbOnTheRocks.Dispose(Boolean disposing)\r\n   at Nethermind.Db.Rocks.DbOnTheRocks.Dispose()\r\n   at Nethermind.Db.DbProvider.Dispose()\r\n   at Nethermind.Runner.Ethereum.EthereumRunner.<StopAsync>b__5_8()\r\n   at Nethermind.Runner.Ethereum.EthereumRunner.Stop(Action stopAction, String description)\r\n\r\n```\r\n\r\nWhen starting the process, this error is logged:\r\n\r\n```\r\n2022-04-09 07:21:20.6166|ERROR|110|BlockchainProcessor encountered an exception. RocksDbSharp.RocksDbException: IO error: ReadFile failed: D:\\Nethermind\\nethermind_db/mainnet\\receipts/038928.sst: Data error (cyclic redundancy check).\r\n\r\n   at RocksDbSharp.Native.rocksdb_put(IntPtr db, IntPtr writeOptions, Byte[] key, Int64 keyLength, Byte[] value, Int64 valueLength, ColumnFamilyHandle cf)\r\n   at Nethermind.Db.Rocks.ColumnDb.set_Item(Byte[] key, Byte[] value)\r\n   at Nethermind.Blockchain.Receipts.PersistentReceiptStorage.Insert(Block block, TxReceipt[] txReceipts)\r\n   at Nethermind.Blockchain.Processing.BlockProcessor.StoreTxReceipts(Block block, TxReceipt[] txReceipts)\r\n   at Nethermind.Blockchain.Processing.BlockProcessor.ProcessOne(Block suggestedBlock, ProcessingOptions options, IBlockTracer blockTracer)\r\n   at Nethermind.Blockchain.Processing.BlockProcessor.Process(Keccak newBranchStateRoot, List`1 suggestedBlocks, ProcessingOptions options, IBlockTracer blockTracer)\r\n   at Nethermind.Blockchain.Processing.BlockchainProcessor.ProcessBranch(ProcessingBranch processingBranch, ProcessingOptions options, IBlockTracer tracer)\r\n   at Nethermind.Blockchain.Processing.BlockchainProcessor.Process(Block suggestedBlock, ProcessingOptions options, IBlockTracer tracer)\r\n   at Nethermind.Blockchain.Processing.BlockchainProcessor.RunProcessingLoop()\r\n   at System.Threading.Tasks.Task.InnerInvoke()\r\n   at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(Object obj)\r\n   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)\r\n--- End of stack trace from previous location ---\r\n   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)\r\n   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)\r\n```\r\n\r\n**To Reproduce**\r\nGenerally, not sure. I suspect the database error means I have corruption.\r\n\r\n**Expected behavior**\r\nNo errors, expected normal mode.\r\n\r\n**Desktop (please complete the following information):**\r\n - OS: Windows 10\r\n - Version 1.12.4\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "NoahStahl",
+    "id": 7528994,
+    "node_id": "MDQ6VXNlcjc1Mjg5OTQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7528994?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/NoahStahl",
+    "html_url": "https://github.com/NoahStahl",
+    "followers_url": "https://api.github.com/users/NoahStahl/followers",
+    "following_url": "https://api.github.com/users/NoahStahl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/NoahStahl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/NoahStahl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/NoahStahl/subscriptions",
+    "organizations_url": "https://api.github.com/users/NoahStahl/orgs",
+    "repos_url": "https://api.github.com/users/NoahStahl/repos",
+    "events_url": "https://api.github.com/users/NoahStahl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/NoahStahl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3949/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3949/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -626,6 +645,50 @@
     "body": "Hello @kamilchodola ! \r\n\r\nNo I did not face this problem recently :) ",
     "reactions": {
       "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1705209210/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1705748969",
+    "html_url": "https://github.com/NethermindEth/nethermind/issues/3949#issuecomment-1705748969",
+    "issue_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/3949",
+    "id": 1705748969,
+    "node_id": "IC_kwDOBggaLc5lq6np",
+    "user": {
+      "login": "NoahStahl",
+      "id": 7528994,
+      "node_id": "MDQ6VXNlcjc1Mjg5OTQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7528994?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/NoahStahl",
+      "html_url": "https://github.com/NoahStahl",
+      "followers_url": "https://api.github.com/users/NoahStahl/followers",
+      "following_url": "https://api.github.com/users/NoahStahl/following{/other_user}",
+      "gists_url": "https://api.github.com/users/NoahStahl/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/NoahStahl/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/NoahStahl/subscriptions",
+      "organizations_url": "https://api.github.com/users/NoahStahl/orgs",
+      "repos_url": "https://api.github.com/users/NoahStahl/repos",
+      "events_url": "https://api.github.com/users/NoahStahl/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/NoahStahl/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-04T22:50:17Z",
+    "updated_at": "2023-09-04T22:50:17Z",
+    "author_association": "NONE",
+    "body": "@kamilchodola Thanks for checking -- I have not seen this happen again since the original reports. I will mark as closed 👍🏽",
+    "reactions": {
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/comments/1705748969/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
