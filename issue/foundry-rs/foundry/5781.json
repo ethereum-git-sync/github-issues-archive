@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5781",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5781/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5781/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5781/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5781",
+  "id": 1882189976,
+  "node_id": "I_kwDOGBlvNc5wL_CY",
+  "number": 5781,
+  "title": "`extcodesize` reports value greater than zero after `selfdestruct`",
+  "user": {
+    "login": "Bobface",
+    "id": 10945014,
+    "node_id": "MDQ6VXNlcjEwOTQ1MDE0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10945014?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Bobface",
+    "html_url": "https://github.com/Bobface",
+    "followers_url": "https://api.github.com/users/Bobface/followers",
+    "following_url": "https://api.github.com/users/Bobface/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Bobface/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Bobface/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Bobface/subscriptions",
+    "organizations_url": "https://api.github.com/users/Bobface/orgs",
+    "repos_url": "https://api.github.com/users/Bobface/repos",
+    "events_url": "https://api.github.com/users/Bobface/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Bobface/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-05T15:18:19Z",
+  "updated_at": "2023-09-05T15:18:19Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge, Anvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (dea5405 2023-08-17T00:25:19.368594453Z)\n\n### What command(s) is the bug in?\n\nscript\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nCalling `extcodesize` on a `selfdestruct`ed contract after the transaction is confirmed returns a value greater than zero.\r\n\r\nExample script:\r\n```\r\npragma solidity ^0.8.20;\r\n\r\nimport {Script} from \"forge-std/Script.sol\";\r\nimport {console} from \"forge-std/console.sol\";\r\n\r\ncontract Example is Script {\r\n    function run() external {\r\n        // Create a contract that selfdestructs\r\n        Destruct destruct = new Destruct();\r\n\r\n        // Call the selfdestruct function\r\n        destruct.destruct();\r\n\r\n        // This is only here to absolutely make sure that the line\r\n        // below it is executed after the selfdestruct tx is confirmed\r\n        payable(address(0)).transfer(0);\r\n\r\n        // This does not output 0, but 107\r\n        console.log(\"codesize\", address(destruct).code.length);\r\n    }\r\n}\r\n\r\ncontract Destruct {\r\n    function destruct() external {\r\n        selfdestruct(payable(0));\r\n    }\r\n}\r\n```\r\n\r\nExecuting it with\r\n```\r\nforge script \\\r\n    --broadcast \\\r\n    --slow \\\r\n    --rpc-url http://localhost:3000 \\\r\n    --with-gas-price 0 \\\r\n    -vvvv \\\r\n    Example\r\n```\r\n\r\nagainst a local `anvil` node running on `localhost:3000` results in\r\n```\r\nTraces:\r\n  [86293] Example::run() \r\n    ├─ [21475] → new Destruct@0xC7f2Cf4845C6db0e1a1e91ED41Bcd0FcC1b0E141\r\n    │   └─ ← 107 bytes of code\r\n    ├─ [7704] Destruct::destruct() \r\n    │   └─ ← ()\r\n    ├─ [0] 0x0000000000000000000000000000000000000000::fallback() \r\n    │   └─ ← ()\r\n    ├─ [0] console::9710a9d0(0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006b0000000000000000000000000000000000000000000000000000000000000008636f646573697a65000000000000000000000000000000000000000000000000) [staticcall]\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n\r\n\r\nScript ran successfully.\r\n\r\n== Logs ==\r\n  codesize 107\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5781/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5781/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
