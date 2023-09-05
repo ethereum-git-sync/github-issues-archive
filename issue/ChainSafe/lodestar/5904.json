@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-23T07:16:08Z",
-  "updated_at": "2023-08-24T05:57:57Z",
+  "updated_at": "2023-09-05T16:45:56Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1706963703",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/5904#issuecomment-1706963703",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5904",
+    "id": 1706963703,
+    "node_id": "IC_kwDOCD5_Gc5lvjL3",
+    "user": {
+      "login": "nflaig",
+      "id": 38436224,
+      "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nflaig",
+      "html_url": "https://github.com/nflaig",
+      "followers_url": "https://api.github.com/users/nflaig/followers",
+      "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+      "organizations_url": "https://api.github.com/users/nflaig/orgs",
+      "repos_url": "https://api.github.com/users/nflaig/repos",
+      "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nflaig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-05T16:45:56Z",
+    "updated_at": "2023-09-05T16:45:56Z",
+    "author_association": "MEMBER",
+    "body": "The issue seems to be related to how the `beacon_finalized_epoch` metric is updated\r\n- metric is updated when importing a new block https://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/beacon-node/src/chain/blocks/importBlock.ts#L370\r\n- whereas finalized epoch value in log is retrieved from chain head state https://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/beacon-node/src/node/notifier.ts#L56-L57\r\n\r\nThe problem is that the metric value is only updated when the block slot is the first slot of the epoch\r\nhttps://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/beacon-node/src/chain/blocks/importBlock.ts#L334\r\n\r\nbut if that block is missed, the metric will not be updated at all, causing the value to deviate from other clients and to what the log reports\r\n\r\nThis can also be seen in the following logs, there are multiple skipped epochs (slot 0 block in epoch _N+2_ was missed)\r\n```\r\nSep-05 15:04:06.483[chain]         verbose: Checkpoint finalized epoch=201608, rootHex=0x1e8946a93214282ca8f7fc308f67f1fb5b6f763ca55a52e0d46a374c4bf15418\r\nSep-05 15:23:13.284[chain]         verbose: Checkpoint finalized epoch=201610, rootHex=0xe0a251f29be4f4227969152f1c298315a46adf52c75b8b7b26abadccb92d7156\r\nSep-05 15:42:25.704[chain]         verbose: Checkpoint finalized epoch=201613, rootHex=0x8266693af6053374f4bd144f797c477e4a317c5297629094210044726e98e2c5\r\nSep-05 15:55:14.114[chain]         verbose: Checkpoint finalized epoch=201616, rootHex=0x5047823040b759272717c1ed1db731e99bf41f7951621b2b6c6b054facc03ed6\r\n```\r\n\r\nAnother issue, we are also not emitting finalized checkpoint events for those epochs\r\nhttps://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/beacon-node/src/chain/blocks/importBlock.ts#L363\r\n\r\nAs it works right now, the metric is unreliable, especially on goerli where a lot of blocks are missed. Alternatively, you could fetch the beacon API `/eth/v1/beacon/states/head/finality_checkpoints` ([getStateFinalityCheckpoints](https://ethereum.github.io/beacon-APIs/#/Beacon/getStateFinalityCheckpoints)) to get the finalized epoch. The API will provide accurate and consistent values.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1706963703/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
