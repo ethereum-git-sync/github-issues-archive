@@ -105,11 +105,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-09-04T17:35:59Z",
-  "updated_at": "2023-09-04T17:36:55Z",
+  "updated_at": "2023-09-05T11:27:03Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "### Description\r\n\r\nI sent some ETH tokens and figured out that after the transaction is confirmed, it doesn't show in all or any of the account's activity filter.\r\n\r\n### Findings\r\n\r\nIt seems the multi-transaction is missing \"to\" and \"from\" network IDs, which are `0` in DB. This, in combination with the filter not using \"all networks\" API, filters out the multi-transaction entry.\r\n\r\n`SELECT HEX(from_address), HEX(to_address), HEX(from_amount), from_network_id, to_network_id, timestamp, ROWID FROM multi_transactions ORDER BY timestamp DESC LIMIT 5;\r\nE2D622C817878DA5143BBE06866CA8E35273BA8A|5D7905390B77A937AE8C444AA8BF7FA9A6A7DBA0|307865386434613531303030|0|0|1693839242|1149`\r\n\r\nThe latest changes to `CreateMultiTransactionFromCommand` are missing forwarding the NetworkID.\r\n\r\n### TODO\r\n\r\n- [ ] Send empty chain IDs instead of all entries when we don't want to filter for specific chain IDs\r\n- [ ] Propagate chain IDs to multi-transaction when available",
+  "body": "### Description\r\n\r\nI sent some ETH tokens and figured out that after the transaction is confirmed, it doesn't show in all or any of the account's activity filter.\r\n\r\n### Findings\r\n\r\nIt seems the multi-transaction is missing \"to\" and \"from\" network IDs, which are `0` in DB. This, in combination with the filter not using \"all networks\" API, filters out the multi-transaction entry.\r\n\r\n`SELECT HEX(from_address), HEX(to_address), HEX(from_amount), from_network_id, to_network_id, timestamp, ROWID FROM multi_transactions ORDER BY timestamp DESC LIMIT 5;\r\nE2D622C817878DA5143BBE06866CA8E35273BA8A|5D7905390B77A937AE8C444AA8BF7FA9A6A7DBA0|307865386434613531303030|0|0|1693839242|1149`\r\n\r\nThe latest changes to `CreateMultiTransactionFromCommand` are missing forwarding the NetworkID.\r\n\r\n### TODO\r\n\r\n- [x] Send empty chain IDs instead of all entries when we don't want to filter for specific chain IDs [#12078](https://github.com/status-im/status-desktop/pull/12078)\r\n- [ ] Fix showing multi_transactions as pending, found after implementing all chains fix\r\n- [ ] Propagate chain IDs to multi-transaction when available",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/12077/reactions",
