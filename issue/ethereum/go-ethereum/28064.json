@@ -40,17 +40,17 @@
       "description": ""
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-09-05T16:44:07Z",
-  "updated_at": "2023-09-06T09:42:45Z",
-  "closed_at": "2023-09-05T17:00:14Z",
+  "updated_at": "2023-09-06T12:40:02Z",
+  "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "While running performance benchmarks of ethereum code, I have discovered a significant amount of time is consumed by trace logging, even **when the trace logging is not enabled.**\r\n\r\nBy cpuprofile, 2% of my runtime is consumed by:\r\n```\r\nlog.Trace\r\nlog.write\r\nstack.Caller\r\n```\r\nIn the source:\r\nhttps://github.com/ethereum/go-ethereum/blob/v1.12.2/log/logger.go#L185\r\n\r\n#### Actual behaviour\r\nThe ethereum logging generates expensive stacktraces on every log.Trace() call, even when the trace logging is disabled.\r\n\r\n#### Expected behaviour\r\nThe stacktrace should be generated only when the log is not going to be dropped.\r\n\r\n#### System information\r\nCommit hash : 25733a4aadba3b60a9766f1e6ac9c787588ba678\r\n",
@@ -88,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28064/timeline",
   "performed_via_github_app": null,
-  "state_reason": "completed"
+  "state_reason": "reopened"
 }
 [
   {
@@ -167,6 +167,50 @@
     "body": "On Sep 5, 2023, at 11:10 AM, Martin Holst Swende ***@***.***> wrote:﻿\r\nWhy did you close this? Seems like you have a point, no?\r\n\r\n—Reply to this email directly, view it on GitHub, or unsubscribe.You are receiving this because you are subscribed to this thread.Message ID: ***@***.***>",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1707525310/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1708275509",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28064#issuecomment-1708275509",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28064",
+    "id": 1708275509,
+    "node_id": "IC_kwDOAOvK985l0jc1",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-06T12:40:02Z",
+    "updated_at": "2023-09-06T12:40:02Z",
+    "author_association": "MEMBER",
+    "body": "A benchmark:\r\n```golang\r\nfunc BenchmarkTraceLogging(b *testing.B) {\r\n\tRoot().SetHandler(LvlFilterHandler(LvlInfo, StreamHandler(os.Stderr, TerminalFormat(true))))\r\n\tb.ResetTimer()\r\n\tfor i := 0; i < b.N; i++ {\r\n\t\tTrace(\"a message\", \"v\", i)\r\n\t}\r\n}\r\n```\r\nResults, for commenting out the line `Call: stack.Caller(skip),`:  \r\n```\r\n[user@work go-ethereum]$ benchstat before.txt after.txt \r\nname            old time/op    new time/op    delta\r\nTraceLogging-8    2.84µs ± 8%    0.97µs ±11%  -65.80%  (p=0.008 n=5+5)\r\n\r\nname            old alloc/op   new alloc/op   delta\r\nTraceLogging-8      511B ± 0%      263B ± 0%  -48.53%  (p=0.000 n=5+4)\r\n\r\nname            old allocs/op  new allocs/op  delta\r\nTraceLogging-8      4.00 ± 0%      2.00 ± 0%  -50.00%  (p=0.008 n=5+5)\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1708275509/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
