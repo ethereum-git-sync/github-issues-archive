@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4706",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4706/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4706/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4706/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4706",
+  "id": 1883349996,
+  "node_id": "I_kwDOCFeAzc5wQaPs",
+  "number": 4706,
+  "title": "Shared global ENR",
+  "user": {
+    "login": "AgeManning",
+    "id": 7454587,
+    "node_id": "MDQ6VXNlcjc0NTQ1ODc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7454587?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AgeManning",
+    "html_url": "https://github.com/AgeManning",
+    "followers_url": "https://api.github.com/users/AgeManning/followers",
+    "following_url": "https://api.github.com/users/AgeManning/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AgeManning/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AgeManning/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AgeManning/subscriptions",
+    "organizations_url": "https://api.github.com/users/AgeManning/orgs",
+    "repos_url": "https://api.github.com/users/AgeManning/repos",
+    "events_url": "https://api.github.com/users/AgeManning/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AgeManning/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2336800125,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMTI1",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/t%20Networking",
+      "name": "t Networking",
+      "color": "40E0D0",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-06T06:43:27Z",
+  "updated_at": "2023-09-06T06:43:27Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nDiscv5 has a number of services. It maintains an Arc<RwLock<ENR>> which passes it around the different services. \r\n\r\nLighthouse also has a global network variable list. Inside it, holds a RwLock<ENR> and the global variable list is usually Arc'd around between different threads. \r\n\r\nWe currently have the situation where we are storing two kinds of Enr in memory. One (that actual source of truth) lies inside of discv5. The second, the one Lighthouse knows about, lies in the NetworkGlobals. \r\n\r\nWe try and keep these in sync by updating our view based on messages we receive from discovery. However, I think a better design is to just keep the one record and share mutable access across Lighthouse and discovery. \r\n\r\nThe benefits I think are:\r\n- Simpler code, because we can just mutate the Enr from within Lighthouse. \r\n- Enr's will always be in sync, no error from missing messages and keeping track of two records\r\n\r\nDownsides are:\r\n- We need to expose the ENR is discovery. This gives users access to modify the local ENR in discovery. In principle, doing bad mutations can cause issues with discovery (i.e modifying sequence numbers etc).\r\n- We need to be mindful of deadlocks. I can't think of any, but it's worth mentioning here.\r\n\r\nImplementation:\r\n\r\nI think to implement this we need to expose the local ENR in the discv5 struct (in the discv5 repo). Once exposed, we need to build it for discovery and then store the resulting reference in the NetworkGlobals. \r\n\r\nThere are some immediate simplifications we can make once doing this. I'd start with removing functions like this: https://github.com/sigp/lighthouse/blob/stable/beacon_node/lighthouse_network/src/discovery/mod.rs#L405 and probably the calling code. \r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4706/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4706/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
