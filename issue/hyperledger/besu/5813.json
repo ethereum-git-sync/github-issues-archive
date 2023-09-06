@@ -30,7 +30,24 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 1921587647,
+      "node_id": "MDU6TGFiZWwxOTIxNTg3NjQ3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamGroot",
+      "name": "TeamGroot",
+      "color": "1d76db",
+      "default": false,
+      "description": "GH issues worked on by Groot Team"
+    },
+    {
+      "id": 5290172097,
+      "node_id": "LA_kwDODE2jmc8AAAABO1GewQ",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/non%20mainnet%20(private%20networks)",
+      "name": "non mainnet (private networks)",
+      "color": "0052cc",
+      "default": false,
+      "description": "not related to mainnet features - covers privacy, permissioning, IBFT2, QBFT"
+    }
   ],
   "state": "open",
   "locked": false,
@@ -79,7 +96,7 @@
   "milestone": null,
   "comments": 10,
   "created_at": "2023-08-28T12:37:54Z",
-  "updated_at": "2023-09-04T05:19:02Z",
+  "updated_at": "2023-09-05T22:08:59Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -530,8 +547,8 @@
     "body": "> Anyway, I've recreated and uploaded the sample Truffle project for your convenience [here](https://github.com/gomezgoiri/metacoin_deployment_error).\r\n\r\n@gomezgoiri Thanks for this, very helpful! I was able to recreate, think I know what's going on...\r\n\r\nAttaching a couple of logs showing the RPC requests that are sent to besu by truffle and hardhat respectively.\r\n\r\n[besu-with-truffle.log](https://github.com/hyperledger/besu/files/12509504/besu-with-truffle.log)\r\n[besu-with-hardhat.log](https://github.com/hyperledger/besu/files/12509501/besu-with-hardhat.log)\r\n\r\nBoth call `eth_estimateGas` which I would expect to be non-zero since free gas networks still use gas, it's just the price is 0.\r\n\r\nHardhat calls `eth_feeHistory` before calling `eth_sendRawTransaction` with 0 set in the max/priority gas price params (I decoded the raw RLP using https://toolkit.abdk.consulting/ethereum#transaction)\r\n\r\nwhereas Truffle calls `eth_gasPrice` before `eth_sendRawTransaction` with non-zero set in the gas price params.\r\n\r\nBesu _allows_ zero-priced transactions through but will still attempt to spend ETH is the incoming transaction tells it to, hence the truffle error.\r\n\r\nNow what's interesting is that for my quickstart network, both `eth_gasPrice` and  `eth_feeHistory`  return 0 for the price...\r\n\r\n```\r\n➜  quorum-test-network curl -X POST --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_gasPrice\",\"params\":[],\"id\":53}' http://127.0.0.1:8545\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : 53,\r\n  \"result\" : \"0x0\"\r\n}\r\n\r\n➜  quorum-test-network curl -X POST --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_feeHistory\",\"params\": [\"0x5\", \"latest\", [20,30]],\"id\":1}' http://127.0.0.1:8545\r\n{\r\n  \"jsonrpc\" : \"2.0\",\r\n  \"id\" : 1,\r\n  \"result\" : {\r\n    \"oldestBlock\" : \"0x3\",\r\n    \"baseFeePerGas\" : [ \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\", \"0x0\" ],\r\n    \"gasUsedRatio\" : [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]\r\n  }\r\n}\r\n```\r\n\r\nAssuming that truffle is using `eth_gasPrice` to inform the transaction's price params, then it suggests to me that there's a bug in truffle because it's not respecting the \"0x0\" price response to `eth_gasPrice` and setting the gas price params to non-zero anyway.",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1704620983/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
