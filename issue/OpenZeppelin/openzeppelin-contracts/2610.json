@@ -40,21 +40,40 @@
       "description": "Put on hold for some reason that must be specified in a comment."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 13,
+  "comments": 14,
   "created_at": "2021-03-25T07:44:14Z",
-  "updated_at": "2023-05-05T18:46:31Z",
-  "closed_at": null,
+  "updated_at": "2023-09-05T21:29:49Z",
+  "closed_at": "2023-09-05T21:29:49Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/378531b70906c906461fa14e5631f0569b938257/contracts/token/ERC721/IERC721.sol#L70\r\n\r\nHello,\r\n\r\nI'm trying to implement royalty in ERC721 token. The idea is to have a `wantToSell` method to set a price for a token, if you want to allow someone to buy it, and a `transferFrom payable` method to allow buyer to call it providing enough value ETH.\r\nThe royalty is distributed to the token contract owner and token ID author in all subsequent re-sells.\r\n\r\nThe problem is that the `transferFrom` function declared without the `payable` modifier and the solidity compiler complains if I try to override the `transferFrom` function adding the `payable` modifier myself.\r\n\r\nThe standard declares the `transferFrom` method as a `payable` https://eips.ethereum.org/EIPS/eip-721\r\n\r\n```solidity\r\nfunction transferFrom(address _from, address _to, uint256 _tokenId) external payable;\r\n``` \r\n\r\n1. Is there some reason why openzeppelin implementation deviate from the standard in this regard?\r\n2. Is there some workaround I can use to implement the royalty functionality in the current openzeppelin implementation?\r\n3. Is there a better way to implement the royalty functionality that would not suffer from this issue?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "frangio",
+    "id": 481465,
+    "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/frangio",
+    "html_url": "https://github.com/frangio",
+    "followers_url": "https://api.github.com/users/frangio/followers",
+    "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+    "organizations_url": "https://api.github.com/users/frangio/orgs",
+    "repos_url": "https://api.github.com/users/frangio/repos",
+    "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/frangio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2610/reactions",
     "total_count": 3,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2610/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -632,6 +651,50 @@
     "body": "I had to make my own `IERC721Payable.sol`. Sharing here so others can use it:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\n// OpenZeppelin Contracts (last updated v4.8.0) (token/ERC721/IERC721.sol)\r\n\r\npragma solidity ^0.8.0;\r\n\r\nimport '@openzeppelin/contracts/utils/introspection/IERC165.sol';\r\n\r\n/**\r\n * @dev Required interface of an ERC721 compliant contract.\r\n */\r\ninterface IERC721Payable is IERC165 {\r\n\t/**\r\n\t * @dev Emitted when `tokenId` token is transferred from `from` to `to`.\r\n\t */\r\n\tevent Transfer(\r\n\t\taddress indexed from,\r\n\t\taddress indexed to,\r\n\t\tuint256 indexed tokenId\r\n\t);\r\n\r\n\t/**\r\n\t * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.\r\n\t */\r\n\tevent Approval(\r\n\t\taddress indexed owner,\r\n\t\taddress indexed approved,\r\n\t\tuint256 indexed tokenId\r\n\t);\r\n\r\n\t/**\r\n\t * @dev Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.\r\n\t */\r\n\tevent ApprovalForAll(\r\n\t\taddress indexed owner,\r\n\t\taddress indexed operator,\r\n\t\tbool approved\r\n\t);\r\n\r\n\t/**\r\n\t * @dev Returns the number of tokens in ``owner``'s account.\r\n\t */\r\n\tfunction balanceOf(address owner) external view returns (uint256 balance);\r\n\r\n\t/**\r\n\t * @dev Returns the owner of the `tokenId` token.\r\n\t *\r\n\t * Requirements:\r\n\t *\r\n\t * - `tokenId` must exist.\r\n\t */\r\n\tfunction ownerOf(uint256 tokenId) external view returns (address owner);\r\n\r\n\t/**\r\n\t * @dev Safely transfers `tokenId` token from `from` to `to`.\r\n\t *\r\n\t * Requirements:\r\n\t *\r\n\t * - `from` cannot be the zero address.\r\n\t * - `to` cannot be the zero address.\r\n\t * - `tokenId` token must exist and be owned by `from`.\r\n\t * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.\r\n\t * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.\r\n\t *\r\n\t * Emits a {Transfer} event.\r\n\t */\r\n\tfunction safeTransferFrom(\r\n\t\taddress from,\r\n\t\taddress to,\r\n\t\tuint256 tokenId,\r\n\t\tbytes calldata data\r\n\t) external payable;\r\n\r\n\t/**\r\n\t * @dev Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients\r\n\t * are aware of the ERC721 protocol to prevent tokens from being forever locked.\r\n\t *\r\n\t * Requirements:\r\n\t *\r\n\t * - `from` cannot be the zero address.\r\n\t * - `to` cannot be the zero address.\r\n\t * - `tokenId` token must exist and be owned by `from`.\r\n\t * - If the caller is not `from`, it must have been allowed to move this token by either {approve} or {setApprovalForAll}.\r\n\t * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.\r\n\t *\r\n\t * Emits a {Transfer} event.\r\n\t */\r\n\tfunction safeTransferFrom(\r\n\t\taddress from,\r\n\t\taddress to,\r\n\t\tuint256 tokenId\r\n\t) external payable;\r\n\r\n\t/**\r\n\t * @dev Transfers `tokenId` token from `from` to `to`.\r\n\t *\r\n\t * WARNING: Note that the caller is responsible to confirm that the recipient is capable of receiving ERC721\r\n\t * or else they may be permanently lost. Usage of {safeTransferFrom} prevents loss, though the caller must\r\n\t * understand this adds an external call which potentially creates a reentrancy vulnerability.\r\n\t *\r\n\t * Requirements:\r\n\t *\r\n\t * - `from` cannot be the zero address.\r\n\t * - `to` cannot be the zero address.\r\n\t * - `tokenId` token must be owned by `from`.\r\n\t * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.\r\n\t *\r\n\t * Emits a {Transfer} event.\r\n\t */\r\n\tfunction transferFrom(\r\n\t\taddress from,\r\n\t\taddress to,\r\n\t\tuint256 tokenId\r\n\t) external payable;\r\n\r\n\t/**\r\n\t * @dev Gives permission to `to` to transfer `tokenId` token to another account.\r\n\t * The approval is cleared when the token is transferred.\r\n\t *\r\n\t * Only a single account can be approved at a time, so approving the zero address clears previous approvals.\r\n\t *\r\n\t * Requirements:\r\n\t *\r\n\t * - The caller must own the token or be an approved operator.\r\n\t * - `tokenId` must exist.\r\n\t *\r\n\t * Emits an {Approval} event.\r\n\t */\r\n\tfunction approve(address to, uint256 tokenId) external;\r\n\r\n\t/**\r\n\t * @dev Approve or remove `operator` as an operator for the caller.\r\n\t * Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller.\r\n\t *\r\n\t * Requirements:\r\n\t *\r\n\t * - The `operator` cannot be the caller.\r\n\t *\r\n\t * Emits an {ApprovalForAll} event.\r\n\t */\r\n\tfunction setApprovalForAll(address operator, bool _approved) external;\r\n\r\n\t/**\r\n\t * @dev Returns the account approved for `tokenId` token.\r\n\t *\r\n\t * Requirements:\r\n\t *\r\n\t * - `tokenId` must exist.\r\n\t */\r\n\tfunction getApproved(\r\n\t\tuint256 tokenId\r\n\t) external view returns (address operator);\r\n\r\n\t/**\r\n\t * @dev Returns if the `operator` is allowed to manage all of the assets of `owner`.\r\n\t *\r\n\t * See {setApprovalForAll}\r\n\t */\r\n\tfunction isApprovedForAll(\r\n\t\taddress owner,\r\n\t\taddress operator\r\n\t) external view returns (bool);\r\n}\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1536639696/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1707335156",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/2610#issuecomment-1707335156",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/2610",
+    "id": 1707335156,
+    "node_id": "IC_kwDOA9tCBs5lw930",
+    "user": {
+      "login": "frangio",
+      "id": 481465,
+      "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/frangio",
+      "html_url": "https://github.com/frangio",
+      "followers_url": "https://api.github.com/users/frangio/followers",
+      "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+      "organizations_url": "https://api.github.com/users/frangio/orgs",
+      "repos_url": "https://api.github.com/users/frangio/repos",
+      "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/frangio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-05T21:29:49Z",
+    "updated_at": "2023-09-05T21:29:49Z",
+    "author_association": "MEMBER",
+    "body": "Duplicate of https://github.com/OpenZeppelin/openzeppelin-contracts/issues/1015",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1707335156/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
