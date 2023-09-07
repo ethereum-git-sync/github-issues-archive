@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/remix-project/issues/4054",
+  "repository_url": "https://api.github.com/repos/ethereum/remix-project",
+  "labels_url": "https://api.github.com/repos/ethereum/remix-project/issues/4054/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/remix-project/issues/4054/comments",
+  "events_url": "https://api.github.com/repos/ethereum/remix-project/issues/4054/events",
+  "html_url": "https://github.com/ethereum/remix-project/issues/4054",
+  "id": 1885077365,
+  "node_id": "I_kwDODtLRw85wW_91",
+  "number": 4054,
+  "title": "Debugger memory value update issue",
+  "user": {
+    "login": "RayHuang880301",
+    "id": 84802160,
+    "node_id": "MDQ6VXNlcjg0ODAyMTYw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/84802160?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/RayHuang880301",
+    "html_url": "https://github.com/RayHuang880301",
+    "followers_url": "https://api.github.com/users/RayHuang880301/followers",
+    "following_url": "https://api.github.com/users/RayHuang880301/following{/other_user}",
+    "gists_url": "https://api.github.com/users/RayHuang880301/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/RayHuang880301/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/RayHuang880301/subscriptions",
+    "organizations_url": "https://api.github.com/users/RayHuang880301/orgs",
+    "repos_url": "https://api.github.com/users/RayHuang880301/repos",
+    "events_url": "https://api.github.com/users/RayHuang880301/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/RayHuang880301/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-07T04:05:13Z",
+  "updated_at": "2023-09-07T04:05:13Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "When using the `CALL` opcode, the memory is not updated as expected, the example code is as follows\r\n```\r\n// SPDX-License-Identifier: MIT\r\n\r\npragma solidity >=0.6.0;\r\n\r\ncontract Main {\r\n    function calldataload() external {\r\n        assembly {\r\n            mstore8(0, 0x66)\r\n            let result := call(gas(), address(), 0, 0, 1, 32, 32)\r\n            mstore(0, result)\r\n            return(0, add(returndatasize(), 32))\r\n        }\r\n    }\r\n\r\n    fallback() external {\r\n        assembly {\r\n            mstore(0, calldataload(0))\r\n            return(0, 32)\r\n        }\r\n    }\r\n}\r\n```\r\n\r\nBefore and after this line of code, the return data should be updated in memory 0x20\r\n`let result := call(gas(), address(), 0, 0, 1, 32, 32)`\r\n\r\nbut the memory before and after `CALL` are the same and the return value (in this case, should be 0x66) haven't be update in memory 0x20\r\n<img width=\"223\" alt=\"image\" src=\"https://github.com/ethereum/remix-project/assets/84802160/f8198048-3896-4834-ad68-8ce179c9958b\">\r\n\r\nIt is not updated until after passing the `mstore(0, result)` in the next line.\r\n<img width=\"223\" alt=\"image\" src=\"https://github.com/ethereum/remix-project/assets/84802160/007d28e0-302b-4f67-be55-bcbb088ae1fa\">\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/remix-project/issues/4054/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/remix-project/issues/4054/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
