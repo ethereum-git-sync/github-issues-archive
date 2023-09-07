@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5796",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5796/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5796/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5796/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5796",
+  "id": 1885384675,
+  "node_id": "I_kwDOGBlvNc5wYK_j",
+  "number": 5796,
+  "title": "Limit for contacts cloning",
+  "user": {
+    "login": "0xmikko",
+    "id": 26343374,
+    "node_id": "MDQ6VXNlcjI2MzQzMzc0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26343374?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xmikko",
+    "html_url": "https://github.com/0xmikko",
+    "followers_url": "https://api.github.com/users/0xmikko/followers",
+    "following_url": "https://api.github.com/users/0xmikko/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xmikko/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xmikko/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xmikko/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xmikko/orgs",
+    "repos_url": "https://api.github.com/users/0xmikko/repos",
+    "events_url": "https://api.github.com/users/0xmikko/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xmikko/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-07T08:35:37Z",
+  "updated_at": "2023-09-07T08:55:47Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [ ] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (dbfd8d9 2023-09-06T12:58:39.679860620Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge t \r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nIn testing contracts, we have a function, which clones contracts:\r\n```\r\n function takeCreditAccount(uint256, uint256) external override returns (address creditAccount) {\r\n        FactoryParams storage fp = _factoryParams[msg.sender];\r\n\r\n        address masterCreditAccount = fp.masterCreditAccount;\r\n        if (masterCreditAccount == address(0)) {\r\n            revert CallerNotCreditManagerException(); // U:[AF-1]\r\n        }\r\n\r\n        uint256 head = fp.head;\r\n        if (head == fp.tail || block.timestamp < _queuedAccounts[msg.sender][head].reusableAfter) {\r\n            creditAccount = Clones.clone(masterCreditAccount); // U:[AF-2A]\r\n            emit DeployCreditAccount({creditAccount: creditAccount, creditManager: msg.sender}); // U:[AF-2A]\r\n        } else {\r\n            creditAccount = _queuedAccounts[msg.sender][head].creditAccount; // U:[AF-2B]\r\n            delete _queuedAccounts[msg.sender][head]; // U:[AF-2B]\r\n            unchecked {\r\n                ++fp.head; // U:[AF-2B]\r\n            }\r\n        }\r\n\r\n        emit TakeCreditAccount({creditAccount: creditAccount, creditManager: msg.sender}); // U:[AF-2A,2B]\r\n    }\r\n```\r\n\r\nAs you can see, it calls ```Clones.clone``` method for cloning a contract. It works perfect, until the depth < ~25 (for testing purposes, I have only one function which creates accounts). Then, it provides the following error:\r\n\r\n```new <Unknown>@0xA14a1b426bdA7ca0F83450dBd2DF61dA907D7ee7\r\n    │   │   │   │   └─ ← 0 bytes of code\r\n    │   │   │   └─ ← \"ERC1167: create failed\"\r\n    │   │   └─ ← \"ERC1167: create failed\"\r\n    │   └─ ← \"ERC1167: create failed\"\r\n    └─ ← \"ERC1167: create failed\"\r\n ```\r\n \r\nIt seems that the problem related to `factory contract nonce`, when it's not updated on time",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5796/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5796/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
