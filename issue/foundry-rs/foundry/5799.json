@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5799",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5799/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5799/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5799/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5799",
+  "id": 1886910466,
+  "node_id": "I_kwDOGBlvNc5wd_gC",
+  "number": 5799,
+  "title": "Inconsistent invariant test behavior when logging using FFI",
+  "user": {
+    "login": "77abe77",
+    "id": 16051956,
+    "node_id": "MDQ6VXNlcjE2MDUxOTU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16051956?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/77abe77",
+    "html_url": "https://github.com/77abe77",
+    "followers_url": "https://api.github.com/users/77abe77/followers",
+    "following_url": "https://api.github.com/users/77abe77/following{/other_user}",
+    "gists_url": "https://api.github.com/users/77abe77/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/77abe77/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/77abe77/subscriptions",
+    "organizations_url": "https://api.github.com/users/77abe77/orgs",
+    "repos_url": "https://api.github.com/users/77abe77/repos",
+    "events_url": "https://api.github.com/users/77abe77/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/77abe77/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-08T04:24:01Z",
+  "updated_at": "2023-09-08T04:24:15Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [x] Foundry\n- [x] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (dbfd8d9 2023-09-06T13:15:10.101858000Z)\n\n### What command(s) is the bug in?\n\nforge test \n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nIn attempt to figure out a bug in a more complex project in which I observed state inconsistencies between a handler function's context and an invariant function's context,[ I made this a simpler repo to try to reproduce this issue that I will reference in this issue:](https://github.com/77abe77/ForgeInvariantBehavior/tree/master)\r\n\r\nNote that this is potentially related to #5795\r\n\r\nOkay so the I made a external logger using ffi using a simple python cli script that has two features\r\n1. python3 test/log.py --new (creates or clears a reports.txt in the top-level directory\r\n2. python3 test/log.py --append \"<string>\" (appends string to newline of reports.txt\r\n\r\n### Feature Request?\r\nThe reason I opted for making an external logger is because its quite annoying that I have to force the tests to fail to see `console.log` or I have to put up with long traces just to see the logs\r\n\r\nSide note (not in scope of this issue): I end up making a python script bc I could not figure out how to get something like\r\n`echo \"<string>\" > reports.txt` to work using the ffi string array api. I believe it has to do with the `>` since when I was trying it was treating the `> reports' as part of the echo string.\r\n\r\n## Repo Structure\r\nOkay the structure of my test is as simple as I could make it. It consists of\r\n1. Test Contract (the top level invariant contract)\r\n2. Handler Contract\r\n4. Target Contract (the contract the hander wraps around)\r\n\r\n### Forge config (inlined in code)\r\n```\r\n    /// forge-config: default.invariant.runs = 1\r\n    /// forge-config: default.invariant.depth = 10\r\n    /// forge-config: default.invariant.fail-on-revert = true\r\n    /// forge-config: default.invariant.call-override = false\r\n```\r\n\r\nIn every function I am logging the name of the function and all the state of all the contracts including `block.timestamp`\r\nTo save space in this issue I will simply write `ffiLog` in place of the multiline function\r\n\r\n```\r\ncontract TargetContract {\r\n    uint public counter;\r\n    uint public a;\r\n    uint public b;\r\n\r\n    function incrementA() public {\r\n        a++;\r\n        counter++;\r\n    }\r\n\r\n    function incrementB() public {\r\n        b++;\r\n        counter++;\r\n    }\r\n}\r\n\r\ncontract Handler is TestBase, StdCheats {\r\n    using StringHelper for string;\r\n    using FFILog for Vm;\r\n\r\n    TargetContract public t;\r\n\r\n    uint public counter;\r\n    uint public a;\r\n    uint public b;\r\n\r\n    function incrementA() public {\r\n        a += 1;\r\n        counter++;\r\n        t.incrementA();\r\n        vm.ffiLog(string(\"incrementA()\")\r\n   \r\n    }\r\n\r\n    function incrementB() public {\r\n        b += 1;\r\n        counter++;\r\n        t.incrementB();\r\n        ffiLog(string(\"incrementB()\")\r\n    }\r\n\r\n    constructor() {\r\n        vm.ffiLog(\"Handler()\");\r\n        t = new TargetContract();\r\n    }\r\n\r\n    modifier useActor() {\r\n        vm.ffiLog(\"[modifier] useActor\");\r\n\r\n        startHoax(msg.sender);\r\n        _;\r\n        vm.stopPrank();\r\n    }\r\n\r\n    function f1(uint seed) external {\r\n        if (seed <= type(uint).max / 100 * 20) {\r\n            vm.ffiLog(\"[handler] skip by 1 day\");\r\n            skip(1 days);\r\n        }\r\n        ffiLog(string(\"f1( \").add(vm.toString(seed)).add(string(\" )\"))\r\n    }\r\n\r\n    function f2(uint seed) external useActor() {\r\n        if (seed <= type(uint).max / 100 * 20) {\r\n            vm.ffiLog(\"[handler] skip by 1 day\");\r\n            skip(1 days);\r\n        }\r\n        ffiLog(\"f2\")\r\n    }\r\n}\r\n\r\ncontract TestContract is Test {\r\n    using StringHelper for string;\r\n    using FFILog for Vm;\r\n    Handler handler;\r\n\r\n    uint counter;\r\n\r\n    constructor() {\r\n        string[] memory cmds = new string[](3);\r\n        cmds[0] = \"python3\";\r\n        cmds[1] = \"test/log.py\";\r\n        cmds[2] = \"--new\";\r\n        vm.ffi(cmds);\r\n    }\r\n\r\n    function setUp() public {\r\n        vm.ffiLog(\"Test::setUp()\");\r\n        handler = new Handler();\r\n        bytes4[] memory selectors = new bytes4[](4);\r\n        selectors[0] = bytes4(keccak256(\"f1(uint256)\"));\r\n        selectors[1] = bytes4(keccak256(\"f2(uint256)\"));\r\n        selectors[2] = bytes4(keccak256(\"incrementA()\"));\r\n        selectors[3] = bytes4(keccak256(\"incrementB()\"));\r\n        targetSelector(FuzzSelector({\r\n            addr: address(handler),\r\n            selectors: selectors\r\n        }));\r\n        targetContract(address(this));\r\n    }\r\n\r\n    /// forge-config: default.invariant.runs = 1\r\n    /// forge-config: default.invariant.depth = 10\r\n    /// forge-config: default.invariant.fail-on-revert = true\r\n    /// forge-config: default.invariant.call-override = false\r\n    function invariant_A() external {\r\n        ffiLog\r\n    }\r\n}\r\n\r\n```\r\n\r\n## The Inconsistencies\r\n\r\nIll list some behaviors that confused me but the last point here is where I think there's a bug.\r\n\r\n1. Invariant function gets called after every handler function. This is a bit confusing is bc im not sure what the distinction between a run and depth are. The fact that there are runs and each run has a depth makes me think that the invariant would be called after each run. Its actually good that its getting called after each call, but then I dont see the distinction b/w runs. Why not just specify how many times you want the thing to run? Now if the mental model was that each run was simulating a eth block, where the depth is the transactions inside that block that would be nice. But Ive come to find out that anything you call inside the invariant function context does not persist evm state.\r\n2. If you count the # of functions inside my sample log you'll see that it adds to 20, instead of the 10 expected due to the configuration. why is this?\r\n3. Moreover you realize that the first 10 and the last 10 logged calls are identical in order and arguments. The kicker is that the only thing that is different between them is that last set of logs show different values for `block.timestamp`. The second set shows what I would assume to be the correct or expected values. The first set does not seem to persist the `block.timestamp` when `skip` is called, yet the second set does. Ill attach a snippet of the aligned logs below:\r\n```\r\n[handler] skip by 1 day                                                                 [handler] skip by 1 day\r\nf1( 265 )                                                                               f1( 265 )\r\n             :           handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f                          :           handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f\r\n             :   block.timestamp:86401                                                               :   block.timestamp:86401\r\n             :      block.number:1                                                                   :      block.number:1\r\n             : handler.t.counter:0                                                                   : handler.t.counter:0\r\n             :       handler.t.a:0                                                                   :       handler.t.a:0\r\n             :       handler.t.b:0                                                                   :       handler.t.b:0\r\n             :   handler.counter:0                                                                   :   handler.counter:0\r\n             :         handler.a:0                                                                   :         handler.a:0\r\n             :         handler.b:0                                                                   :         handler.b:0\r\ninvariant_A():                                                                          invariant_A():\r\n             :             handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f                        :             handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72\r\n             :     block.timestamp:1                                                                 :     block.timestamp:86401\r\n             :        block.number:1                                                                 :        block.number:1\r\n             :             counter:0                                                                 :             counter:0\r\n             : handler.t().counter:0                                                                 : handler.t().counter:0\r\n             :       handler.t().a:0                                                                 :       handler.t().a:0\r\n             :       handler.t().b:0                                                                 :       handler.t().b:0\r\n             :     handler.counter:0                                                                 :     handler.counter:0\r\n             :           handler.a:0                                                                 :           handler.a:0\r\n             :           handler.b:0                                                                 :           handler.b:0\r\nincrementA()                                                                            incrementA()\r\n             :           handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f                          :           handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f\r\n             :   block.timestamp:1                                                                   :   block.timestamp:86401\r\n             :      block.number:1                                                                   :      block.number:1\r\n             : handler.t.counter:1                                                                   : handler.t.counter:1\r\n             :       handler.t.a:1                                                                   :       handler.t.a:1\r\n             :       handler.t.b:0                                                                   :       handler.t.b:0\r\n             :         handler.a:1                                                                   :         handler.a:1\r\n             :   handler.counter:1                                                                   :   handler.counter:1\r\n             :         handler.a:1                                                                   :         handler.a:1\r\n             :         handler.b:0                                                                   :         handler.b:0\r\ninvariant_A():                                                                          invariant_A():\r\n             :             handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f                        :             handler:0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f\r\n             :     block.timestamp:1                                                                 :     block.timestamp:86401\r\n             :        block.number:1                                                                 :        block.number:1\r\n             :             counter:0                                                                 :             counter:0\r\n             : handler.t().counter:1                                                                 : handler.t().counter:1\r\n             :       handler.t().a:1                                                                 :       handler.t().a:1\r\n             :       handler.t().b:0                                                                 :       handler.t().b:0\r\n             :     handler.counter:1                                                                 :     handler.counter:1\r\n             :           handler.a:1                                                                 :           handler.a:1\r\n             :           handler.b:0                                                                 :           handler.b:0\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5799/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5799/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
