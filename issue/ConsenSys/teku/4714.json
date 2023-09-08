@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2021-11-29T10:20:12Z",
-  "updated_at": "2023-08-16T12:14:36Z",
-  "closed_at": null,
+  "updated_at": "2023-09-08T14:15:28Z",
+  "closed_at": "2023-09-08T14:15:28Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "Just noting this as a possible optimisation to come back to some time. Stick it on the backlog.\r\n\r\nIn [`ProcessSyncAggregate()`](https://github.com/ConsenSys/teku/blob/be023253c2b04d4ebd3a4d5628be876c7ef30b49/ethereum/spec/src/main/java/tech/pegasys/teku/spec/logic/versions/altair/block/BlockProcessorAltair.java#L184) we can make use of the same optimisation intended for light clients.\r\n\r\nThe idea is as follows.\r\n\r\nIf `idlePubkeys.size() < participantPubkeys.size()` (which it usually should be), then we call `eth2FastAggregateVerify()` not with `participantPubkeys` but with `state.current_sync_committee.aggregate_pubkey` and the list of *negated* `idlePubkeys`.\r\n\r\nWe'd need a method to negate public keys, but this is simple.\r\n\r\nTo illustrate the saving:\r\n  - Committee participation 100%: we have no work to do aggregating public keys: 100% time saving.\r\n  - Committee participation 80%: we do one-quarter of the work aggregating public keys (plus a tiny overhead for the negations)\r\n  - Committee participation 66%: we do half of the work aggregating public keys (plus a tiny overhead for the negations)\r\n  - Committee participation 50% or less: We do the same work as now.\r\n \r\nI don't know if aggregating the public keys is a noticeable computational burden, but this is a simple enough optimisation in any case.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "benjaminion",
+    "id": 20796281,
+    "node_id": "MDQ6VXNlcjIwNzk2Mjgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20796281?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjaminion",
+    "html_url": "https://github.com/benjaminion",
+    "followers_url": "https://api.github.com/users/benjaminion/followers",
+    "following_url": "https://api.github.com/users/benjaminion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjaminion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjaminion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjaminion/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjaminion/orgs",
+    "repos_url": "https://api.github.com/users/benjaminion/repos",
+    "events_url": "https://api.github.com/users/benjaminion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjaminion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/4714/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/4714/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "NB. Need to make sure we don't re-do the group membership test for the negated public keys. They are automatically G1 group members.",
     "reactions": {
       "url": "https://api.github.com/repos/Consensys/teku/issues/comments/981497752/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1711743952",
+    "html_url": "https://github.com/Consensys/teku/issues/4714#issuecomment-1711743952",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/4714",
+    "id": 1711743952,
+    "node_id": "IC_kwDOCM9I9M5mByPQ",
+    "user": {
+      "login": "benjaminion",
+      "id": 20796281,
+      "node_id": "MDQ6VXNlcjIwNzk2Mjgx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20796281?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/benjaminion",
+      "html_url": "https://github.com/benjaminion",
+      "followers_url": "https://api.github.com/users/benjaminion/followers",
+      "following_url": "https://api.github.com/users/benjaminion/following{/other_user}",
+      "gists_url": "https://api.github.com/users/benjaminion/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/benjaminion/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/benjaminion/subscriptions",
+      "organizations_url": "https://api.github.com/users/benjaminion/orgs",
+      "repos_url": "https://api.github.com/users/benjaminion/repos",
+      "events_url": "https://api.github.com/users/benjaminion/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/benjaminion/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-08T14:15:28Z",
+    "updated_at": "2023-09-08T14:15:28Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "While investigating #5182, it seems that public key aggregation overhead is very small among all the things to be done for block validation. While this approach would be more efficient, the gain is not worth it for the added complexity.\r\n\r\nClosing.",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1711743952/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
