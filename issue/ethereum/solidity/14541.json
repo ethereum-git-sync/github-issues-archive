@@ -123,7 +123,7 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-09-06T14:29:20Z",
-  "updated_at": "2023-09-07T15:48:44Z",
+  "updated_at": "2023-09-08T09:29:30Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -217,9 +217,9 @@
       "site_admin": false
     },
     "created_at": "2023-09-07T15:38:34Z",
-    "updated_at": "2023-09-07T15:48:44Z",
+    "updated_at": "2023-09-08T09:29:30Z",
     "author_association": "MEMBER",
-    "body": "I play a bit with the example and could simplified it a bit more, i.e. `zb` and the `try / catch` in `c` are unnecessary:\r\n\r\n```bash\r\ncompiler=${1:-solc}\r\n\r\nmkdir -p @\r\n\r\ncat <<=== > a.sol\r\n    import \"@/za.sol\";\r\n    import \"b.sol\";\r\n\r\n    contract A is B {\r\n        function a() public pure {\r\n            zc();\r\n        }\r\n    }\r\n===\r\n\r\ncat <<=== > b.sol\r\n    import \"c.sol\";\r\n\r\n    abstract contract B is C {}\r\n===\r\n\r\ncat <<=== > c.sol\r\n    abstract contract C\r\n    {\r\n        function c() public view returns (uint) {\r\n            return 0;\r\n        }\r\n    }\r\n===\r\n\r\ncat <<=== > @/za.sol\r\n    import \"@/zc.sol\";\r\n===\r\n\r\ncat <<=== > @/zc.sol\r\n    function zc() pure returns (bytes memory returndata) {\r\n        if (returndata.length == 0) {\r\n            return \"\";\r\n        }\r\n    }\r\n===\r\n\r\ndiff --color --unified \\\r\n    <(solc a.sol b.sol --bin --via-ir | grep '======= a.sol:A =======' --after-context=2 | fold --width 100) \\\r\n    <(solc a.sol       --bin --via-ir | grep '======= a.sol:A =======' --after-context=2 | fold --width 100)\r\n\r\ndiff --color --unified \\\r\n    <(solc a.sol b.sol --ir) \\\r\n    <(solc a.sol       --ir)\r\n```\r\n\r\nSo the new import pattern is:\r\n```\r\na──►za──►zc\r\n│         \r\n▼         \r\nb\r\n│\r\n▼\r\nc\r\n```",
+    "body": "I played a bit with the example and could simplify it a bit more, i.e. `zb` and the `try / catch` in `c` are unnecessary:\r\n\r\n```bash\r\ncompiler=${1:-solc}\r\n\r\nmkdir -p @\r\n\r\ncat <<=== > a.sol\r\n    import \"@/za.sol\";\r\n    import \"b.sol\";\r\n\r\n    contract A is B {\r\n        function a() public pure {\r\n            zc();\r\n        }\r\n    }\r\n===\r\n\r\ncat <<=== > b.sol\r\n    import \"c.sol\";\r\n\r\n    abstract contract B is C {}\r\n===\r\n\r\ncat <<=== > c.sol\r\n    abstract contract C\r\n    {\r\n        function c() public view returns (uint) {\r\n            return 0;\r\n        }\r\n    }\r\n===\r\n\r\ncat <<=== > @/za.sol\r\n    import \"@/zc.sol\";\r\n===\r\n\r\ncat <<=== > @/zc.sol\r\n    function zc() pure returns (bytes memory returndata) {\r\n        if (returndata.length == 0) {\r\n            return \"\";\r\n        }\r\n    }\r\n===\r\n\r\ndiff --color --unified \\\r\n    <(solc a.sol b.sol --bin --via-ir | grep '======= a.sol:A =======' --after-context=2 | fold --width 100) \\\r\n    <(solc a.sol       --bin --via-ir | grep '======= a.sol:A =======' --after-context=2 | fold --width 100)\r\n\r\ndiff --color --unified \\\r\n    <(solc a.sol b.sol --ir) \\\r\n    <(solc a.sol       --ir)\r\n```\r\n\r\nSo the new import pattern is:\r\n```\r\na──►za──►zc\r\n│         \r\n▼         \r\nb\r\n│\r\n▼\r\nc\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1710377695/reactions",
       "total_count": 0,
