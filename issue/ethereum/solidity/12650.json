@@ -31,34 +31,16 @@
   },
   "labels": [
     {
-      "id": 1282209978,
-      "node_id": "MDU6TGFiZWwxMjgyMjA5OTc4",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/optimizer",
-      "name": "optimizer",
-      "color": "d4c5f9",
+      "id": 4438481746,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3bUg",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/must%20have%20eventually",
+      "name": "must have eventually",
+      "color": "ffb04d",
       "default": false,
-      "description": ""
-    },
-    {
-      "id": 4699440809,
-      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
-      "name": "closed due inactivity",
-      "color": "91535E",
-      "default": false,
-      "description": "The issue/PR was automatically closed due to inactivity."
-    },
-    {
-      "id": 4699444681,
-      "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
-      "name": "stale",
-      "color": "BF4801",
-      "default": false,
-      "description": "The issue/PR was marked as stale because it has been open for too long."
+      "description": "Something we consider essential but not enough to prevent us from releasing Solidity 1.0 without it."
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,8 +49,8 @@
   "milestone": null,
   "comments": 48,
   "created_at": "2022-02-08T23:54:17Z",
-  "updated_at": "2023-09-08T09:18:13Z",
-  "closed_at": "2023-03-31T12:04:26Z",
+  "updated_at": "2023-09-08T15:39:55Z",
+  "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Today I spent some time on prototyping and was managed to achieve O(1)-complexity dispatcher. Check out few my messages here: https://github.com/vyperlang/vyper/issues/2386#issuecomment-1033117651\r\n\r\nAnd find code prototype here: https://gist.github.com/k06a/737fd1f389bb6f2e66f0ef76ea73729b\r\n\r\n## Abstract\r\n\r\nI believe dispatcher implementation initially was O(N), but now it may be tree-like O(log(n)). I assume having an O(1) dispatcher when some contract has 5+ methods is a cool achievement.\r\n\r\n## Motivation\r\n\r\nContracts with tens of methods could have really slow dispatcher for most of the methods. Computing keccak256 and 2 jumps is a relatively cheap way to dispatch.\r\n\r\n## Specification\r\n\r\nWe just need to brute-force `magic` values at compile time to achieve all selectors being mapped into 0..N-1 values. The complexity of such brute force should be `N^N/N!`. If the number of selectors is really huge we could, for example, find the first function for splitting into a few groups by 8, and then use different magic for each group. Having 1 magic number you could split 32 selectors into 4 groups by 8 and then find magic for each group. Finding magic for a group of 8 would take `8^8/8! = 416` iterations in average. Seems possible to do this in compile-time.\r\n\r\nPseudocode:\r\n```solidity\r\nconst index = keccak256(abi.encodePacked(selector + (magic << 32))) % selectors.length;\r\nJUMP(READ(table_start + index));\r\n```\r\n\r\n## Backwards Compatibility\r\n\r\nThe resulting dispatcher code should be fully compatible for external calls with any other versions of the dispatcher.\r\n",
@@ -106,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/12650/timeline",
   "performed_via_github_app": null,
-  "state_reason": "not_planned"
+  "state_reason": "reopened"
 }
 [
   {
