@@ -40,7 +40,7 @@
       "description": "Issues that identify a bug and require a fix."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "nazarhussain",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-07-18T18:34:05Z",
-  "updated_at": "2023-09-08T09:39:00Z",
-  "closed_at": null,
+  "updated_at": "2023-09-08T15:32:30Z",
+  "closed_at": "2023-09-08T15:32:30Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "### Describe the bug\r\n\r\nThe network worker thread is not shutting down in some cases.\r\n\r\nForce closing (`kill`) does not help either because worker does receive signal.\r\n```\r\nJul-17 17:08:54.000[]                 info: Synced - slot: 6092144 - head: 0xe00e…5e94 - exec-block: valid(9361504 0x8772…) - finalized: 0x7710…765c:190377 - peers: 51\r\n^CJul-17 17:09:01.307[]                 info: Stopping gracefully, use Ctrl+C again to force process exit\r\nJul-17 17:09:06.176[]                 info: Synced - slot: 6092145 - head: (slot -1) 0xe00e…5e94 - exec-block: valid(9361504 0x8772…) - finalized: 0x7710…765c:190377 - peers: 50\r\n^CJul-17 17:09:10.028[]                 info: Forcing process exit\r\n^C^C^C^C^C./lodestar: line 7: 2357120 Killed                  node --trace-deprecation --max-old-space-size=4096 ./packages/cli/bin/lodestar.js \"$@\r\n```\r\n\r\nIt is pretty clear based on observed logs that the issue is the network worker.\r\n\r\n\"terminating network worker\" is logged\r\nhttps://github.com/ChainSafe/lodestar/blob/5116493e87a9fe2102ebc7a3ff77677c90da3ddf/packages/beacon-node/src/network/core/networkCoreWorkerHandler.ts#L129\r\n\r\nbut \"terminated network worker\" is not\r\nhttps://github.com/ChainSafe/lodestar/blob/5116493e87a9fe2102ebc7a3ff77677c90da3ddf/packages/beacon-node/src/network/core/networkCoreWorkerHandler.ts#L131\r\n\r\nI checked the log files, there is nothing that peaks out, likely just the same issue we see on the main thread with libp2p\r\n- https://github.com/ChainSafe/lodestar/issues/5642\r\n\r\nCan likely be resolved by calling `process.exit` on worker explicitly or force closing it using another approach.\r\n\r\n### Expected behavior\r\n\r\nNetwork worker should shut down cleanly and not hang the main process.\r\n\r\n### Steps to reproduce\r\n\r\nRun Lodestar beacon node with `--network.useWorker true` flag.\r\n\r\n### Additional context\r\n\r\nThe problem seems to be with [libp2p](https://github.com/libp2p/js-libp2p) which in the end must take care of closing all connections / removing tcp listeners. There are several closed but also open issues regarding connections not being closed properly.\r\n- https://github.com/libp2p/js-libp2p/issues/433\r\n- https://github.com/libp2p/js-libp2p/issues/436\r\n\r\nThis comment https://github.com/libp2p/js-libp2p/issues/436#issuecomment-432624680 summarizes open tasks but there was no progress in a while.\r\n\r\n### Operating system\r\n\r\nLinux\r\n\r\n### Lodestar version or commit hash\r\n\r\nec8153153c83d082cb89fca682d502e709e3f415",
-  "closed_by": null,
+  "closed_by": {
+    "login": "wemeetagain",
+    "id": 1348242,
+    "node_id": "MDQ6VXNlcjEzNDgyNDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1348242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wemeetagain",
+    "html_url": "https://github.com/wemeetagain",
+    "followers_url": "https://api.github.com/users/wemeetagain/followers",
+    "following_url": "https://api.github.com/users/wemeetagain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wemeetagain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wemeetagain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wemeetagain/subscriptions",
+    "organizations_url": "https://api.github.com/users/wemeetagain/orgs",
+    "repos_url": "https://api.github.com/users/wemeetagain/repos",
+    "events_url": "https://api.github.com/users/wemeetagain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wemeetagain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5775/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5775/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
