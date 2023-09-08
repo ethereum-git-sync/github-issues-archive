@@ -40,21 +40,40 @@
       "description": "VIP is not scheduled to move forward at this time"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 14,
+  "comments": 15,
   "created_at": "2021-07-14T19:57:36Z",
-  "updated_at": "2022-02-10T00:22:16Z",
-  "closed_at": null,
+  "updated_at": "2023-09-08T20:44:43Z",
+  "closed_at": "2023-09-08T20:44:43Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "## Simple Summary\r\nReduce code size and gas usage for jump tables. Introduce a JUMPTABLE macro in LLL which can be optimized for any backend. This is a non-user facing optimization.\r\n\r\n## Motivation\r\nVyper currently uses a jump table at the contract entry point to determine which function to call into. The format of the jump table looks something like\r\n```lisp\r\n(if caller_supplied_method_id == method_identifier(A())\r\n  (... A() body...)\r\n)\r\n(if caller_supplied_method_id == method_identifier(B())\r\n  (... B() body...)\r\n)\r\n; and so on\r\n```\r\nIn assembly this translates to\r\n```assembly\r\n# \"jump table fragment\"\r\n# pretend caller_supplied_method_id is already on the stack\r\nPUSH4 0x12345678 # method_identifier(A())\r\nEQ # == x\r\nISZERO # not\r\nPUSH2 __next__\r\nJUMPI # skip\r\n# ... A() body...\r\n__next__ JUMPDEST\r\n# repeat for B and so on\r\n```\r\n\r\nThere are a couple issues with this. First of all the search is linear. If a contract has 80 methods and the most commonly called method happens to be the last method compiled into the contract code, that \"jump table fragment\" needs to be executed 80 times. On average, it would need to be executed 40 times, for an average overhead of 23 gas per fragment, which would translate into 920 gas overhead *just to find the correct entry point* for a function.\r\n\r\nSecond of all, there is some code size overhead. The assembly costs 12 bytes per signature, and while it looks fairly efficient, I'll show below that the code size can be reduced to overhead of 3 bytes per signature - only the jumptable locations need to be stored in the code.\r\n\r\n## Specification\r\n\r\nOur basic goal is to minimize the lookup cost and space for determining the entry point of a function.\r\n\r\nOn x86, jump tables are a common optimization strategy for switch/case statements. When the variable being \"switched\" has relatively dense values, the jumptable will have a layout like the following:\r\n```c\r\nswitch(x) {\r\n  case '1': ...; break;\r\n  case '2': ...; break;\r\n  case '4': ...; break;\r\n  ...\r\n}\r\n```\r\nThe code would first jump into a lookup table of jump destinations, and then jumps from there into the correct code, something like\r\n```c\r\n__jumptable = {\r\n  0x1234, // case 1\r\n  0x5678, // case 2\r\n  0x0000, // fail/invalid\r\n  0xabcd, // case 4\r\n}\r\ngoto __jumptable[x - '1'] // glossing over the detail of handling the \"fail/invalid\" case\r\n```\r\n\r\nThis gives us a constant lookup time for the code location of any given method. The problem with using this approach directly for our use case is that a) code size is at a high premium on the EVM so\r\nwe would like to avoid as much wasted space as possible, b) we can't use the dense lookup table representation anyways because our method identifiers are 4 bytes; we would need contracts that are 2**32 bytes long mostly filled with zeros to implement a jump table.\r\n\r\nIf we use a so-called \"perfect\" hash function, we can have our cake and eat it. We need to construct a hash function which is dense and has unique location in the lookup table for every input. The simplest hash function we could use would be `mulmod(method_id, MAGIC_NUMBER, num_methods)`, where `MAGIC_NUMBER` is computed at compile time (yes, this could be very expensive unless we find a good algorithm). Then, our entry point computation would look like this:\r\n\r\n```python\r\n# Copy jump table into memory\r\ncodecopy(0, __jumptable, 2 * NUM_METHODS)\r\n\r\n# Grab the method id from calldata\r\nmethod_id = shr(calldataload(0), 28)\r\n\r\n# Index into our jumptable\r\nidx = mulmod(method_id, MAGIC_NUMBER, NUM_METHODS)\r\n\r\n# Get the 2-byte jumpdest\r\n_dst = mload(idx) & 0xFFFF\r\njump(_dst)\r\n\r\n__jumptable\r\n0x1234\r\n0x5678\r\n0xabcd\r\n\r\n... # rest of contract\r\n```\r\n\r\nThis reduces the per-method overhead to 3 bytes (2 bytes for each entry in the jump table and 1 byte to mark the entry points as valid with `JUMPDEST`s) / 0.1875 gas (`CODECOPY` requires 3 gas per word, and we can load 16 jump locations per word), while introducing global overhead of roughly 24 bytes / 40 gas.\r\n\r\n## Drawbacks\r\n\r\n- It's difficult to detect invalid method identifiers since the identifiers are no longer stored in the code. The fallback function would have to be a special case. For the same reason, it wouldn't work well for common switch/case statements which have a `default` clause.\r\n\r\n- It's hard to disassemble code since identifiers are no longer in the code. All that's left of them is the MAGIC_NUMBER that is calculated at compile-time.\r\n\r\n- Code may take arbitrarily long time to compile unless we have a good algorithm for calculating MAGIC_NUMBER, however there is a lot of literature on perfect hash functions and we should be able to find an algorithm to calculate a perfect hash function in polynomial time (even if it is not quite as efficient as mulmod/magic number).\r\n\r\n## Alternatives\r\n\r\nIf the drawbacks are too great, we can look into alternative strategies which would still return most of the benefits (i.e. O(1) or O(log(n)) entry point calculation but maybe less space / gas efficient)\r\n\r\n- Cuckoo hash for the lookup table\r\n- Binary search for the lookup table\r\n\r\n## Helpful Links\r\nhttps://en.wikipedia.org/wiki/Branch_table#Jump_table_example_in_C\r\nhttps://en.wikipedia.org/wiki/Perfect_hash_function\r\nhttps://en.wikipedia.org/wiki/Cuckoo_hashing\r\n\r\n## Copyright\r\nCopyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/vyperlang/vyper/issues/2386/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2386/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -676,6 +695,50 @@
     "body": "Using mulmod directly is not possible, if `selectorA % selectors.length == selectorB % selectors.length` then using mulmod will give a collision.",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1034348177/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1712202640",
+    "html_url": "https://github.com/vyperlang/vyper/issues/2386#issuecomment-1712202640",
+    "issue_url": "https://api.github.com/repos/vyperlang/vyper/issues/2386",
+    "id": 1712202640,
+    "node_id": "IC_kwDOBGDvrM5mDiOQ",
+    "user": {
+      "login": "charles-cooper",
+      "id": 3867501,
+      "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/charles-cooper",
+      "html_url": "https://github.com/charles-cooper",
+      "followers_url": "https://api.github.com/users/charles-cooper/followers",
+      "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+      "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+      "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+      "repos_url": "https://api.github.com/users/charles-cooper/repos",
+      "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-08T20:44:43Z",
+    "updated_at": "2023-09-08T20:44:43Z",
+    "author_association": "COLLABORATOR",
+    "body": "closing as completed as of https://github.com/vyperlang/vyper/pull/3496",
+    "reactions": {
+      "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1712202640/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
