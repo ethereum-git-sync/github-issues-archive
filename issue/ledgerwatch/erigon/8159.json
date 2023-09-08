@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8159",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8159/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8159/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8159/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8159",
+  "id": 1887595589,
+  "node_id": "I_kwDOC0FsAM5wgmxF",
+  "number": 8159,
+  "title": "`eth_getTransactionReceipt` for pre-Byzantium transactions misses `root`",
+  "user": {
+    "login": "etan-status",
+    "id": 89844309,
+    "node_id": "MDQ6VXNlcjg5ODQ0MzA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/89844309?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/etan-status",
+    "html_url": "https://github.com/etan-status",
+    "followers_url": "https://api.github.com/users/etan-status/followers",
+    "following_url": "https://api.github.com/users/etan-status/following{/other_user}",
+    "gists_url": "https://api.github.com/users/etan-status/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/etan-status/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/etan-status/subscriptions",
+    "organizations_url": "https://api.github.com/users/etan-status/orgs",
+    "repos_url": "https://api.github.com/users/etan-status/repos",
+    "events_url": "https://api.github.com/users/etan-status/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/etan-status/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-08T12:31:30Z",
+  "updated_at": "2023-09-08T12:31:30Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "When using `eth_getTransactionReceipt` on very old transactions (pre EIP-658 / pre Byzantium), Erigon incorrectly omits the `root` field in the response, and makes up an unexpected `status` field. \r\n\r\nThe Ethereum JSON-RPC specification requires `root` to be present for pre-Byzantium transactions:\r\n\r\n- https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt\r\n\r\n> It also returns either :\r\n> \r\n> - root : DATA 32 bytes of post-transaction stateroot (pre Byzantium)\r\n> - status: QUANTITY either 1 (success) or 0 (failure)\r\n\r\nErigon seems to _always_ reply with a `status` and without a `root`, irrespective of the corresponding original spec fork. This seems to be a regression since #2211, but it may have also been broken before.\r\n\r\nIt is important that the intermediate post-state `root` is provided for pre-Byzantium transactions; otherwise it is impossible to cryptographically verify that the JSON-RPC API response was not tampered with. The verification compares the provided receipt data against the block header's `receipts_root`. The technical background for the transition from `root` to `status` with Byzantium can be found here: https://eips.ethereum.org/EIPS/eip-658\r\n\r\n#### System information\r\n\r\nCloudflare Ethereum Gateway\r\nCloudflare technical support referred to Erigon for support with this issue.\r\n\r\nChain/Network: Mainnet\r\n\r\n#### Expected behaviour\r\n\r\nInfura response is correct and includes `root`:\r\n\r\n```\r\n{\r\n  \"blockHash\": \"0x4e3a3754410177e6937ef1f84bba68ea139e8d1a2258c5f85db9f1cd715a1bdd\",\r\n  \"blockNumber\": \"0xb443\",\r\n  \"contractAddress\": null,\r\n  \"cumulativeGasUsed\": \"0x5208\",\r\n  \"effectiveGasPrice\": \"0x2d79883d2000\",\r\n  \"from\": \"0xa1e4380a3b1f749673e270229993ee55f35663b4\",\r\n  \"gasUsed\": \"0x5208\",\r\n  \"logs\": [],\r\n  \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n  \"root\": \"0x96a8e009d2b88b1483e6941e6812e32263b05683fac202abc622a3e31aed1957\",\r\n  \"to\": \"0x5df9b87991262f6ba471f09758cde1c0fc1de734\",\r\n  \"transactionHash\": \"0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060\",\r\n  \"transactionIndex\": \"0x0\",\r\n  \"type\": \"0x0\"\r\n}\r\n```\r\n\r\n#### Actual behaviour\r\n\r\nCloudflare response lacks `root` and includes `status`:\r\n\r\n```\r\n{\r\n  \"blockHash\": \"0x4e3a3754410177e6937ef1f84bba68ea139e8d1a2258c5f85db9f1cd715a1bdd\",\r\n  \"blockNumber\": \"0xb443\",\r\n  \"contractAddress\": null,\r\n  \"cumulativeGasUsed\": \"0x5208\",\r\n  \"effectiveGasPrice\": \"0x2d79883d2000\",\r\n  \"from\": \"0xa1e4380a3b1f749673e270229993ee55f35663b4\",\r\n  \"gasUsed\": \"0x5208\",\r\n  \"logs\": [],\r\n  \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n  \"status\": \"0x1\",\r\n  \"to\": \"0x5df9b87991262f6ba471f09758cde1c0fc1de734\",\r\n  \"transactionHash\": \"0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060\",\r\n  \"transactionIndex\": \"0x0\",\r\n  \"type\": \"0x0\"\r\n}\r\n```\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n```\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"eth_getTransactionReceipt\",\"params\":[\"0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060\"]}\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8159/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8159/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
