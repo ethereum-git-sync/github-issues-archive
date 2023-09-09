@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-09-07T08:29:54Z",
-  "updated_at": "2023-09-07T08:29:54Z",
-  "closed_at": null,
+  "updated_at": "2023-09-08T23:55:24Z",
+  "closed_at": "2023-09-08T23:55:24Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [ ] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (dbfd8d9 2023-09-06T12:58:39.679860620Z)\n\n### What command(s) is the bug in?\n\nforge t\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nI have a function which behavior depends on `block.number`. It could not be called twice for one block. For invariant test, I added a handler with function:\r\n\r\n```\r\nvm.roll(block.number+1);\r\ntestFunction();\r\n```\r\nAnd it reverts! Furthermore, it's impossible to get stacktrace when it happened.\r\n\r\nThen, I add a storage variable to handler contract `blockNum` and change the code into:\r\n\r\n```\r\nvm.roll(++blockNum);\r\ntestFunction();\r\n```\r\nThis code doesn't revert.\r\n\r\nSo, it seems there is race condition or incorrect mutex for block.number which allow to change it during the parrallel execution",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5795/reactions",
     "total_count": 0,
@@ -69,8 +88,95 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5795/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1712335347",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5795#issuecomment-1712335347",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5795",
+    "id": 1712335347,
+    "node_id": "IC_kwDOGBlvNc5mECnz",
+    "user": {
+      "login": "simplyoptimistic",
+      "id": 111120814,
+      "node_id": "U_kgDOBp-Rrg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/111120814?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/simplyoptimistic",
+      "html_url": "https://github.com/simplyoptimistic",
+      "followers_url": "https://api.github.com/users/simplyoptimistic/followers",
+      "following_url": "https://api.github.com/users/simplyoptimistic/following{/other_user}",
+      "gists_url": "https://api.github.com/users/simplyoptimistic/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/simplyoptimistic/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/simplyoptimistic/subscriptions",
+      "organizations_url": "https://api.github.com/users/simplyoptimistic/orgs",
+      "repos_url": "https://api.github.com/users/simplyoptimistic/repos",
+      "events_url": "https://api.github.com/users/simplyoptimistic/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/simplyoptimistic/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-08T23:34:38Z",
+    "updated_at": "2023-09-08T23:34:38Z",
+    "author_association": "NONE",
+    "body": "I believe this is a duplicate of this [issue](https://github.com/foundry-rs/foundry/issues/3005). At the moment, state changes are not persisted between tests, which means changes to `block.timestamp` or `block.number` won't persist. You have already figured out the workaround for now which is to persist the state and warp/roll to it. See this [comment](https://github.com/foundry-rs/foundry/issues/4994#issuecomment-1618329347) for a more complete solution.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1712335347/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1712345299",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5795#issuecomment-1712345299",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5795",
+    "id": 1712345299,
+    "node_id": "IC_kwDOGBlvNc5mEFDT",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-08T23:55:24Z",
+    "updated_at": "2023-09-08T23:55:24Z",
+    "author_association": "MEMBER",
+    "body": "Indeed @simplyoptimistic — this is a duplicate of #3005 and a feature that adds persisting of block-related values will soon be added. Thanks!",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1712345299/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
