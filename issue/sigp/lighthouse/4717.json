@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4717",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4717/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4717/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4717/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4717",
+  "id": 1888507783,
+  "node_id": "I_kwDOCFeAzc5wkFeH",
+  "number": 4717,
+  "title": "Historic sync duties queries fail for recently-activated validators",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 2336800343,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMzQz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/HTTP-API",
+      "name": "HTTP-API",
+      "color": "5A63A2",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 5676702110,
+      "node_id": "LA_kwDOCFeAzc8AAAABUluZng",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/v4.5.0",
+      "name": "v4.5.0",
+      "color": "574414",
+      "default": false,
+      "description": "ETA Q4 2023"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-09T00:26:25Z",
+  "updated_at": "2023-09-09T00:26:25Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nThere's a bug in the calculation of historic sync committee duties, where by this error will be returned:\r\n\r\n```\r\ncurl -X POST -H \"Content-Type: application/json\" --data '[\"155654\"]' \"http://localhost:5052/eth/v1/validator/duties/sync/688802\"\r\n```\r\n\r\n```json\r\n{\"code\":500,\"message\":\"UNHANDLED_ERROR: SyncDutiesError(UnknownValidator(155654))\",\"stacktraces\":[]}\r\n```\r\n\r\n(This example is from Gnosis chain, reported by one of our users)\r\n\r\nIt occurs because there's an optimisation in the endpoint that tries to avoid expensive state loads:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/beacon_node/http_api/src/sync_committees.rs#L99-L109\r\n\r\nAlthough the validator 155654 exists on-chain at epoch 688802, the state loaded is from epoch `(688802 // 512 - 1) * 512 = 688128` where it does not exist. Using the state from the start of the current period also isn't sufficient because that would yield the state at epoch 688640, where the validator also doesn't exist.\r\n\r\nIn some sense this optimisation is still sound, because the validator _cannot_ actually be part of sync committee at this point, because sync committees are determined 512 epochs in advance. One way to fix it would be to just avoid erroring out here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/consensus/types/src/beacon_state.rs#L935\r\n\r\nI need to think more about the best way to fix it.\r\n\r\n## Version\r\n\r\nLighthouse v4.4.1\r\n\r\n## Additional Info\r\n\r\nThere may also be another bug lurking in the duties-from-head codepath, as the user reports the error occurring \"live\" while trying to request duties for the current epoch. I haven't spotted the bug there (yet), but will link it here if I find one.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4717/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4717/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
