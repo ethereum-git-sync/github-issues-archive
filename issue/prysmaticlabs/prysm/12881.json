@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12881",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12881/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12881/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12881/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12881",
+  "id": 1888831857,
+  "node_id": "I_kwDOBvuov85wlUlx",
+  "number": 12881,
+  "title": "rpc/validator: Not connected to ETH1. Cannot determine validator ETH1 deposit block number",
+  "user": {
+    "login": "ppppppppppppppppppppl",
+    "id": 56196499,
+    "node_id": "MDQ6VXNlcjU2MTk2NDk5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/56196499?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ppppppppppppppppppppl",
+    "html_url": "https://github.com/ppppppppppppppppppppl",
+    "followers_url": "https://api.github.com/users/ppppppppppppppppppppl/followers",
+    "following_url": "https://api.github.com/users/ppppppppppppppppppppl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ppppppppppppppppppppl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ppppppppppppppppppppl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ppppppppppppppppppppl/subscriptions",
+    "organizations_url": "https://api.github.com/users/ppppppppppppppppppppl/orgs",
+    "repos_url": "https://api.github.com/users/ppppppppppppppppppppl/repos",
+    "events_url": "https://api.github.com/users/ppppppppppppppppppppl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ppppppppppppppppppppl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-09T18:09:29Z",
+  "updated_at": "2023-09-09T19:42:21Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\nI'm running PoS Geth and Prysm on Windows following setup instructions from prylabs: https://docs.prylabs.network/docs/install/install-with-scriptand \r\n\r\nMy validator was just activated today, but I keep getting an error message in Beacon: \r\n`WARN rpc/validator: Not connected to ETH1. Cannot determine validator ETH1 deposit block number. I can't figure out what went wrong. `\r\n\r\nMy validation layer doesn't seem to be working. This is the message from validation: \r\n`[2023-09-09 13:48:39]  INFO validator: Waiting for deposit to be observed by beacon node pubKey=0x88dc8960e9a0 status=UNKNOWN_STATUS `\r\n\r\nHere is the beacon node connectivity status: \r\n```\r\ncurl http://localhost:8080/healthz\r\n*blockchain.Service: ERROR, service is optimistic, and only limited service functionality is provided please check if execution layer is fully synced\r\n*prometheus.Service: OK\r\n\r\n\r\n*initialsync.Service: OK\r\n*sync.Service: OK\r\n*builder.Service: OK\r\n*rpc.Service: ERROR, service is optimistic, validators can't perform duties please check if execution layer is fully synced\r\n*gateway.Gateway: OK\r\n*p2p.Service: OK\r\n*execution.Service: ERROR, retryExecutionClientConnection: cacheHeadersForEth1DataVote: determineEarliestVotingBlock=18088881: (1694208087 > 1694170703): provided time is later than the current eth1 head\r\n*attestations.Service: OK\r\n```\r\n\r\nHere is beacon node - execution node connectivity status: \r\n```\r\ncurl http://localhost:3500/eth/v1alpha1/node/eth1/connections\r\n{\"currentAddress\":\"http://localhost:8551\",\"currentConnectionError\":\"retryExecutionClientConnection: cacheHeadersForEth1DataVote: determineEarliestVotingBlock=18091936: (1694208087 > 1694207663): provided time is later than the current eth1 head\",\"addresses\":[\"http://localhost:8551\"],\"connectionErrors\":[]}\r\n```\r\n\r\nHere is EL syncing status:\r\n```\r\n eth.syncing\r\n{\r\n  currentBlock: 18100876,\r\n  healedBytecodeBytes: 39627117,\r\n  healedBytecodes: 4803,\r\n  healedTrienodeBytes: 11282746102,\r\n  healedTrienodes: 35121471,\r\n  healingBytecode: 0,\r\n  healingTrienodes: 1108,\r\n  highestBlock: 18100984,\r\n  startingBlock: 18100779,\r\n  syncedAccountBytes: 54344580337,\r\n  syncedAccounts: 228182669,\r\n  syncedBytecodeBytes: 6977533855,\r\n  syncedBytecodes: 1012529,\r\n  syncedStorage: 1030397964,\r\n  syncedStorageBytes: 221823608029\r\n}\r\n```\r\n\r\nCan anyone help? I've attached a full troubleshooting report and logs from EL, CL and validation. \r\n\r\n\r\n[Validation Log.txt](https://github.com/prysmaticlabs/prysm/files/12566451/Validation.Log.txt)\r\n[Execution Log.txt](https://github.com/prysmaticlabs/prysm/files/12566482/Execution.Log.txt)\r\n[Beacon Log.txt](https://github.com/prysmaticlabs/prysm/files/12566483/Beacon.Log.txt)\r\n[debugging report.txt](https://github.com/prysmaticlabs/prysm/files/12566408/debugging.report.txt)\r\n\r\n## Environment\r\n\r\n### Operating System:\r\n`Windows 11`\r\n\r\n### Prysm Version\r\n```\r\nLatest prysm release is v4.0.8.\r\nUsing prysm version v4.0.8.\r\nBeacon chain is up to date.\r\nWARN GPG verification is not natively available on Windows.\r\nWARN Skipping integrity verification of downloaded binary\r\nVerifying binary authenticity with SHA256 Hash.\r\nSHA256 Hash Match\r\nStarting Prysm beacon-chain --version\r\nbeacon-chain version Prysm/v4.0.8/0ca3644057e27966a446051fe3bc3389a1add54e. Built at: 2023-08-22 18:30:36+00:00\r\n```\r\n\r\n### Geth Version\r\n```\r\nVersion: 1.12.2-stable\r\nGit Commit: bed84606583893fdb698cc1b5058cc47b4dbd837\r\nGit Commit Date: 20230812\r\nArchitecture: amd64\r\nGo Version: go1.20.7\r\nOperating System: windows\r\nGOPATH=\r\nGOROOT=\r\n```\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12881/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12881/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

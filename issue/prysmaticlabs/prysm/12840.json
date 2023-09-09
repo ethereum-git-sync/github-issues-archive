@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "james-prysm",
@@ -79,12 +79,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-09-01T13:28:59Z",
-  "updated_at": "2023-09-04T10:15:12Z",
-  "closed_at": null,
+  "updated_at": "2023-09-09T18:53:04Z",
+  "closed_at": "2023-09-09T18:53:03Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "Prysm caches SignedValidatorRegistration objects as shown here before sending it to the MEV relay https://github.com/prysmaticlabs/prysm/blob/0a5c322f2211bee538c9f8279711ef94d6f13c28/validator/client/registration.go#L79 , I believe we register SignedValidatorRegistration with the relayers every epoch. Epoch 0 runs before the genesis timestamp. Sending SignedValidatorRegistration object to relayers before genesis fails because of https://github.com/flashbots/mev-boost-relay/blob/main/services/api/service.go#L1019 . The request to send fails, but the object is still cached. Whenever we resend it post-genesis, we pick the cached object with a stale timestamp, making it such that the validators can never be registered on the relay.\r\n\r\nThe solution I feel should be we shouldn't cache pre-genesis ValidatorRegistration objects in prysm. We should add a check if the timestamp is before genesis and avoid caching such an object.\r\n\r\nThis is not an issue in the current status quo, as relayers were introduced post genesis. This mainly fails in custom devnet setups where we setup relays from genesis. \r\n\r\nThis issue can be reproduced using kurtosis(https://github.com/kurtosis-tech/eth2-package), by setting up with prysm as the consensus client.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12840/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12840/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -222,8 +241,8 @@
     "body": "Discussed with james offline, raised a PR to fix this  https://github.com/prysmaticlabs/prysm/pull/12847 ",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1704996221/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
