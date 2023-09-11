@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12884",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12884/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12884/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12884/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12884",
+  "id": 1889544756,
+  "node_id": "I_kwDOBvuov85woCo0",
+  "number": 12884,
+  "title": "Time moves during fork choice spec test",
+  "user": {
+    "login": "hcnam",
+    "id": 43805697,
+    "node_id": "MDQ6VXNlcjQzODA1Njk3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43805697?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hcnam",
+    "html_url": "https://github.com/hcnam",
+    "followers_url": "https://api.github.com/users/hcnam/followers",
+    "following_url": "https://api.github.com/users/hcnam/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hcnam/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hcnam/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hcnam/subscriptions",
+    "organizations_url": "https://api.github.com/users/hcnam/orgs",
+    "repos_url": "https://api.github.com/users/hcnam/repos",
+    "events_url": "https://api.github.com/users/hcnam/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hcnam/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-11T02:48:59Z",
+  "updated_at": "2023-09-11T02:48:59Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "In the fork choice spec test, it uses *tick* to set the internal time of Prysm. However, Pyrsm’s Tick function resets the genesis time to now()-tick and adjusts the slot to the appropriate value. Therefore, now() is taken as time.Now(), which represents the real time and changes with the program’s flow. This results in a potential unintended slot change during a test (e.g., when tick=(ticks_in_new_slot - 1)), which may or may not affect the forkchoice decision and non-deterministically lead to a different result (PASS/FAIL), which does not happen in other clients like Lighthouse, Teku, or Nimbus.\r\n\r\nFor example, when ```steps.yaml``` defined as below, and attestations were \r\n\r\n```\r\n- {tick: 0}\r\n- {tick: 12}\r\n   # block_0xAAA was proposed\r\n- {tick: 24}\r\n   # block_0xBBB was proposed\r\n- {tick: 36}\r\n   # block_0xCCC was proposed\r\n- {tick: 48}\r\n   # block_0xDDD was proposed\r\n- {tick: 59}\r\n- {block: block_0xAAA}   # Receive all blocks right before next slot\r\n- {block: block_0xBBB}\r\n- {block: block_0xCCC}\r\n- {block: block_0xDDD}\r\n- {attestation: attestation_0x000}   # Assume attestations are from future (from right next slot)\r\n- {attestation: attestation_0x111}   \r\n- {attestation: attestation_0x222}\r\n- {attestation: attestation_0x333}\r\n- {attestation: attestation_0x444}\r\n- {attestation: attestation_0x555}\r\n- {tick: 60}\r\n…\r\n```\r\n**Expect:** All attestations from 0x000 to 0x555 will be rejected (due to ```onAttestation``` itself is stateless in spec test)\r\n**Result**: Sometimes, some of attestations are accepted and affect to weight (due to time passed, became next slot)\r\n\r\n\r\nReference:\r\nIn [here](https://github.com/prysmaticlabs/prysm/blob/develop/testing/spectest/shared/common/forkchoice/builder.go#L40) and [here](https://github.com/prysmaticlabs/prysm/blob/develop/time/utils.go#L19) ```onTick``` is technically implemented according to the specs, but in fact when ```prysmTime.Now()``` is called it shows the real current time, which will change as time goes. This doesn’t happen in Teku, Nimbus or Lighthouse\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12884/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12884/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
