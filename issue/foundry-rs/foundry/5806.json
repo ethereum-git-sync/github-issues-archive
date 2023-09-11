@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-09-10T06:04:32Z",
-  "updated_at": "2023-09-10T06:04:32Z",
-  "closed_at": null,
+  "updated_at": "2023-09-11T13:08:04Z",
+  "closed_at": "2023-09-11T13:08:04Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\n_No response_\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nWindows\n\n### Describe the bug\n\nBigIntsEx - library with internal methods (not linkable).\r\nTest case fails with message.\r\n```[FAIL. Reason: Overflow()] test_toUint_overflow():(uint256) (gas: 6947)```\r\nSo vm.expectRevert not works correctly.\r\nWhen I test same at contract or library with public method it works as expected.\r\n\r\nCurrently, to pass this tests I've renamed test function to ```testFail_toUint_overflow()``` \r\n\r\n```\r\n    function test_toUint_overflow() public returns (uint) {\r\n        CommonTypes.BigInt memory big = CommonTypes.BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', false);\r\n        vm.expectRevert(BigIntsEx.Overflow.selector);\r\n        return BigIntsEx.toUint(big);\r\n    }\r\n```\r\n\r\n```\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.17;\r\n\r\nimport \"@zondax/filecoin-solidity/contracts/v0.8/utils/BigInts.sol\";\r\n\r\nlibrary BigIntsEx {\r\n    error Overflow();\r\n\r\n    function toUint(CommonTypes.BigInt memory bi) internal view returns (uint) {\r\n        (uint result, bool overflow) = BigInts.toUint256(bi);\r\n        if (overflow) revert Overflow();\r\n        return result;\r\n    }\r\n. . .\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5806/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5806/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1713846184",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5806#issuecomment-1713846184",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5806",
+    "id": 1713846184,
+    "node_id": "IC_kwDOGBlvNc5mJzeo",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-11T13:08:01Z",
+    "updated_at": "2023-09-11T13:08:01Z",
+    "author_association": "MEMBER",
+    "body": "`expectRevert` works for the _next call_. However, here you're calling a library with an internal method, which means you're performing a `JUMP`, so `expectRevert` won't work as intended. See the book: https://book.getfoundry.sh/cheatcodes/expect-revert?highlight=revert#description",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1713846184/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
