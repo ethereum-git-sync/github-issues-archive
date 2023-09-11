@@ -67,34 +67,16 @@
       "description": "Changes are not very noticeable or potential benefits are limited."
     },
     {
-      "id": 4438490842,
-      "node_id": "LA_kwDOAm_5kc8AAAABCI3-2g",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/should%20have",
-      "name": "should have",
-      "color": "ffbe6c",
+      "id": 4438481746,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3bUg",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/must%20have%20eventually",
+      "name": "must have eventually",
+      "color": "ffb04d",
       "default": false,
-      "description": "We like the idea but it’s not important enough to be a part of the roadmap."
-    },
-    {
-      "id": 4699440809,
-      "node_id": "LA_kwDOAm_5kc8AAAABGBvGqQ",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/closed%20due%20inactivity",
-      "name": "closed due inactivity",
-      "color": "91535E",
-      "default": false,
-      "description": "The issue/PR was automatically closed due to inactivity."
-    },
-    {
-      "id": 4699444681,
-      "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
-      "name": "stale",
-      "color": "BF4801",
-      "default": false,
-      "description": "The issue/PR was marked as stale because it has been open for too long."
+      "description": "Something we consider essential but not enough to prevent us from releasing Solidity 1.0 without it."
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -103,8 +85,8 @@
   "milestone": null,
   "comments": 13,
   "created_at": "2020-07-01T04:30:26Z",
-  "updated_at": "2023-03-14T12:05:01Z",
-  "closed_at": "2023-03-14T12:05:01Z",
+  "updated_at": "2023-09-11T11:04:54Z",
+  "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nWhile most library functions don't go in the ABI, `pure` and `view` functions do.  Of course, actually using these is [infamously](https://github.com/ethereum/solidity/issues/6420) [difficult](https://github.com/ethereum/solidity/issues/7530), due to the fact that library selectors are computed differently from other selectors, but they're there.  The specific types that differ are structs, enums, and contracts, which in the signature use the internal name of the type, rather than the usual conversion to an ABI type.\r\n\r\nThe problem is this: In nearly every version of Solidity, including 0.6.10, the ABI parameter entries for enums and contracts put this internal name of the type in the `type` field, rather than the name of the corresponding ABI type.\r\n\r\nNow, this does have the advantage that it allows the selector to be computed correctly by the naive method, without specifically knowing that you're dealing with a library!  (As the ABI still lacks anything to indicate the contract/library distinction.)  But it has the disadvantage that it screws up any more sophisticated attempt to process the ABI, that is expecting something that conforms to the spec.  (Like: You can't actually *encode* with these types!  Without other information, there's nothing to tell us whether a `Blank` is the name of a contract type or the name of a globally-declared enum type.  Web3 and Ethers sure can't handle it, and I'm not about to make Truffle try.)\r\n\r\nI suspect this is simply a bug.  Further evidence for this is that this only seems to happen to enums and contracts -- structs are unaffected.  Even if it's deliberate... well, it should be changed, and the library problem should be handled a different way.  (Having `internalType` goes a long way here, even if we still need something in the ABI to distinguish contracts from libraries.)\r\n\r\nNow, on noticing this, I had to check which versions are affected... it turns out that this behavior goes all the way back to **0.1.5**, a mere two versions after libraries were introduced in 0.1.3.  Given how long this has been around, one might be tempted to say, this isn't a bug, this is just how it works, at least for now.  But I'm still calling it a bug: it breaks the spec; it breaks any processing more sophisticated than computing the selector, such as encoding or decoding; and structs don't work this way and have never worked this way, not since 0.4.17 when it first became possible to pass a struct externally.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.1.5 -- 0.6.10\r\n- Target EVM version (as per compiler settings): default\r\n- Framework/IDE (e.g. Truffle or Remix): Truffle (for 0.4.12 and later); Remix (for 0.4.11 and earlier)\r\n\r\n## Steps to Reproduce\r\n\r\nTry compiling the following:\r\n\r\n```solidity\r\npragma experimental ABIEncoderV2;\r\n\r\nlibrary ABITest {\r\n\r\n  struct Pair {\r\n    uint x;\r\n    uint y;\r\n  }\r\n\r\n  function structy(Pair calldata) external view { //works fine\r\n  }\r\n\r\n  enum Ternary {\r\n    Yes, No, MaybeSo\r\n  }\r\n\r\n  function enumy(Ternary) external view { //problem!\r\n  }\r\n\r\n  function contracty(Blank) external view { //problem!\r\n  }\r\n}\r\n\r\ncontract Blank {\r\n}\r\n```\r\n\r\n(comment things out as appropriate to get it to compile with earlier versions; changing `calldata` to `memory` and `external` to `public` may also be necessary; also changing `view` to `constant` (or just omitting that, since everything went in the ABI prior to 0.5.6))",
@@ -142,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/9278/timeline",
   "performed_via_github_app": null,
-  "state_reason": "not_planned"
+  "state_reason": "reopened"
 }
 [
   {
