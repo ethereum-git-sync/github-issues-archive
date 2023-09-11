@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3498",
+  "repository_url": "https://api.github.com/repos/ethereum/consensus-specs",
+  "labels_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3498/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3498/comments",
+  "events_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3498/events",
+  "html_url": "https://github.com/ethereum/consensus-specs/issues/3498",
+  "id": 1889549249,
+  "node_id": "I_kwDOCOoGbc5woDvB",
+  "number": 3498,
+  "title": "Consider adding attestation deferring test vectors in the fork-choice spec test",
+  "user": {
+    "login": "hcnam",
+    "id": 43805697,
+    "node_id": "MDQ6VXNlcjQzODA1Njk3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43805697?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hcnam",
+    "html_url": "https://github.com/hcnam",
+    "followers_url": "https://api.github.com/users/hcnam/followers",
+    "following_url": "https://api.github.com/users/hcnam/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hcnam/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hcnam/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hcnam/subscriptions",
+    "organizations_url": "https://api.github.com/users/hcnam/orgs",
+    "repos_url": "https://api.github.com/users/hcnam/repos",
+    "events_url": "https://api.github.com/users/hcnam/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hcnam/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-11T02:54:55Z",
+  "updated_at": "2023-09-11T02:54:55Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "In consensus-spec, ```validate_on_attestation``` asks to delay consideration for future attestations until their slot is in the past. However, it seems that the current spec test on fork choice does not handle it.  \r\n\r\n```\r\n# Attestations can only affect the fork choice of subsequent slots.\r\n# Delay consideration in the fork choice until their slot is in the past.\r\n    assert get_current_slot(store) >= attestation.data.slot + 1\r\n```\r\nHowever, there are problems to make this test impossible in current spec test implementations.\r\n* Stateless ```onAttestation``` on Prysm\r\n* Insufficient future attestation handling in Teku spec test\r\n* Different data structure for deferred attestation\r\n\r\n\r\n### Stateless ```onAttestation``` on Prysm\r\nFirst problem is that  ```onAttestation``` from Prysm is stateless. That is, Prysm handles future attestation scheduling outside of the ```onAttestation``` function. This is acknowledged by the Prysm developers team in the sense that “[As a stateless function (onAttestation), this does not hold nor delay attestation based on the spec descriptions.](https://github.com/prysmaticlabs/prysm/blob/develop/beacon-chain/blockchain/process_attestation.go#L17)” Therefore, current testing tools on Prysm can not handle future attestations; They just reject it on current fork choice spec test tool. See scenario A below.\r\n\r\n**Scenario A**\r\n**Assumption:** No attestation except Attestation X and Y, or B and C has same vote.\r\n**Steps:**\r\n```\r\n N      N+1     N+2\r\n[A]  –  [B]  –  [ ] \r\n     \\  [ ]  –  [C] \r\n \r\nSlot N   : Block A\r\nSlot N+1 : Block B (parent: A)\r\nSlot N+2 : Block C (parent also A)\r\n           Receive Attestation_0 from validator X of slot N+3 (attesting block B)\r\nSlot N+3 : Check head\r\n```\r\n**Expect:** head is B due to votes\r\n**Result**: Prysm decide with tie-break rule\r\n\r\n### Insufficient future attestation handling in Teku spec test\r\nThe issue stems from incomplete future attestation handling in Teku spec test. In Teku, it has an attestation scheduling so the future slot attestations can be deferred until their slot in the past. However, Teku's spec test environment does not fully support future attestations, i.e., it *cannot defer attestations more than one slot*. Teku assigns one of the two states for incoming future slot attestation. The first state is ```DEFER_FOR_FORK_CHOICE```, indicating that the attestation should be handled in the next slot. The other state is ```SAVED_FOR_FUTURE```, which is used to save attestations that should be handled after several slots in the future. Teku's fork-choice testing environment supports ```DEFER_FOR_FORK_CHOICE``` state attestations *but not* ```SAVED_FOR_FUTURE``` state attestations. This results in test cases with attestations attesting the future after the one slot failing in Teku tester. See scenario B below.\r\n\r\n\r\n**Scenario B** \r\n**Assumption:** No attestation except Attestation X and Y, or B and C has same vote. \r\n**Steps:**\r\n```\r\n N      N+1     N+2     N+3  \r\n[A]  –  [B]  –  [ ]  –  [ ] \r\n     \\  [ ]  –  [C]  –  [ ] \r\n \r\nSlot N   : Block A\r\nSlot N+1 : Block B (parent: A)\r\nSlot N+2 : Block C (parent also A)\r\n           Receive Attestation_0 from validator X of slot N+4 (attesting block B)\r\nSlot N+4 : Check head\r\n```\r\n**Expect:** head is B due to Teku can handle deferred attestation (later ignored)\r\n**Result**: Teku decide with tie-break rule\r\n \r\n\r\n### Different data structure for deferred attestation\r\nThis problem is **data structure discrepancy** between multiple clients. We’ve checked the several  implementations, but they adopt different data structure for deferring future attestations: Lighthouse and Nimbus are using *queue*, and Prysm and Teku are using *map* to save early received attestations. \r\nMoreover, implementation of map data structure also has discrepancy; Prysm uses *non-deterministic map*, but Teku uses *deterministic map* structure. \r\nDue to the above discrepancy, if a slashable pair of attestation (like double voting two different block that shares the same parent block) enter ```onAttestation```, Prysm makes a non-deterministic fork choice result.  See scenario C below.\r\n\r\n**Scenario C** \r\n**Assumption:** No attestation except Attestation X and Y, or B and C has same vote. attester_slashing was not received yet.\r\n**Steps:**\r\n```\r\n N      N+1     N+2  \r\n[A]  –  [B]  –  [ ] \r\n     \\  [ ]  –  [C] \r\n \r\nSlot N   : Block A\r\nSlot N+1 : Block B (parent: A)\r\nSlot N+2 : Block C (parent also A)\r\n           Receive Attestation_0 from validator X of slot N+3 (attesting block B)\r\n           Receive Attestation_1 from validator X of slot N+3 (attesting block C)\r\nSlot N+3 : Check head\r\n```\r\n**Expect:** head is B due to other use queue for deferred attestation (later ignored)\r\n**Result**: Teku deterministically makes the same decisions while Prysm nondeterministically makes different decisions (Note that the results from Teku and Prysm may be different from Lighthouse and Nimbus).\r\n\r\n\r\n\r\nReferences:\r\nLighthouse: [queued_attestations]( https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/fork_choice/src/fork_choice.rs#L1135C13-L1135C17)\r\nTeku: [deferredAttestations](https://github.com/Consensys/teku/blob/8b618b03842ffe866769d9a5192746018290ed18/ethereum/statetransition/src/main/java/tech/pegasys/teku/statetransition/forkchoice/ForkChoice.java#L211C21-L211C21), [futureAttestations](https://github.com/Consensys/teku/blob/e89031eca692b4a4b4df84fa4ae32bae07b491d8/ethereum/statetransition/src/main/java/tech/pegasys/teku/statetransition/attestation/AttestationManager.java#L247C19-L247C37)\r\nPrysm: [processAttestations](https://github.com/prysmaticlabs/prysm/blob/7bc44d9cfe6260964c5c03ae05111cb36088efd1/beacon-chain/blockchain/receive_attestation.go#L163), [AttCaches](https://github.com/prysmaticlabs/prysm/blob/develop/beacon-chain/operations/attestations/kv/kv.go#L27)\r\nNimbus: [queuedAttestations](https://github.com/status-im/nimbus-eth2/blob/d014d0a51cca1dda13d34e3de860aa4287afdb36/beacon_chain/fork_choice/fork_choice.nim#L232)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3498/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3498/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
