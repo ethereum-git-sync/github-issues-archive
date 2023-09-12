@@ -49,7 +49,7 @@
       "description": "not related to mainnet features - covers privacy, permissioning, IBFT2, QBFT"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "joshuafernandes",
@@ -96,12 +96,31 @@
   "milestone": null,
   "comments": 12,
   "created_at": "2023-08-28T12:37:54Z",
-  "updated_at": "2023-09-11T06:36:04Z",
-  "closed_at": null,
+  "updated_at": "2023-09-11T22:29:32Z",
+  "closed_at": "2023-09-11T22:29:31Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nI want to deploy a smart contract in a [free gas private network](https://besu.hyperledger.org/stable/private-networks/how-to/configure/free-gas) with Besu's latest stable version (23.7.1). Besu answers `Upfront cost exceeds account balance` error.\r\n\r\n### Acceptance Criteria\r\n* The private network uses London fork or later (I can deploy it if I modify the genesis file to use a previous fork)\r\n* The balance of the account used to deploy a contract has a balance of zero\r\n* The smart contract is successfully deployed\r\n\r\n### Steps to Reproduce (Bug)\r\nI've found this error with many configurations (IBFT2, QBFT, different Besu versions), but here I'll describe the simplest way to reproduce it:\r\n\r\n1. Create a free gas network using [Quorum-dev-quickstart](https://github.com/Consensys/quorum-dev-quickstart): `npx quorum-dev-quickstart@latest --clientType besu --orchestrate false --quorumKeyManager false --privacy false --monitoring none --blockscout false`\r\n2. Edit `.env` file to use `BESU_VERSION=23.7.1`.\r\n3. (Optional, doesn't make a difference) Adjust the [block size](https://besu.hyperledger.org/stable/private-networks/how-to/configure/free-gas#1-set-the-block-size) and [contract size](https://besu.hyperledger.org/stable/private-networks/how-to/configure/free-gas#2-set-the-contract-size) in the genesis file.\r\n4. Run the network: `docker compose up -d`\r\n5. Deploy a smart contract. To test it, you can use a sample Truffle project as suggested in the _SC info_ section.\r\n\r\n**Expected behavior:** Get information about the deployed contracts and their addresses.\r\n\r\n**Actual behavior:** Truffle returns the following error: `Upfront cost exceeds account balance`.\r\n\r\n**Frequency:** Always\r\n\r\n### Logs (if a bug)\r\n\r\nI haven't identify any relevant logs in Besu.\r\n\r\nIn the current _quorum-dev-quickstart_ Besu version (23.4.1) I saw [this error](https://github.com/hyperledger/besu/issues/5528), but it is apparently fixed.\r\n\r\n### Versions\r\n* Software version: 23.7.1\r\n\r\n### Smart contract information\r\n\r\nI've seen the error deploying many different smart contracts, but you could use this one to test it:\r\n\r\n* Solidity version: ^0.8.13\r\n* Repo with minimal set of deployable/reproducible contract code: [Metacoin](https://trufflesuite.com/boxes/metacoin/).\r\n\r\nConfiguration:\r\n\r\n1. Install [dotenv](https://www.npmjs.com/package/dotenv) and [HDWalletProvider](https://www.npmjs.com/package/@truffle/hdwallet-provider).\r\n2. Uncomment the two related lines in `truffle-config.js`\r\n3. Create a _.env_ file with a property called `DEPLOYER_MNEMONIC` and a random mnemonic.\r\n4. Add the following network to  `truffle-config.js` (with the recommended [configuration guidelines](https://besu.hyperledger.org/stable/private-networks/how-to/configure/free-gas#configure-free-gas-in-truffle) or not, it doesn't make a difference).\r\n5. Run  `npx truffle migrate --network local`\r\n\r\n```javascript\r\n    local: {\r\n      provider: () =>\r\n        new HDWalletProvider({\r\n          mnemonic: process.env.DEPLOYER_MNEMONIC,\r\n          providerOrUrl: \"http://localhost:8545\", // \"https://node1.ethereum.bclab.dev\"\r\n        }),\r\n      network_id: \"*\",\r\n    },\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "siladu",
+    "id": 2893793,
+    "node_id": "MDQ6VXNlcjI4OTM3OTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2893793?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/siladu",
+    "html_url": "https://github.com/siladu",
+    "followers_url": "https://api.github.com/users/siladu/followers",
+    "following_url": "https://api.github.com/users/siladu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/siladu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/siladu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/siladu/subscriptions",
+    "organizations_url": "https://api.github.com/users/siladu/orgs",
+    "repos_url": "https://api.github.com/users/siladu/repos",
+    "events_url": "https://api.github.com/users/siladu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/siladu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5813/reactions",
     "total_count": 0,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5813/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -635,8 +654,8 @@
     "body": "Yes, @joshuafernandes I was able to deploy the project with Hardhat.\r\n\r\nThanks @siladu, I'll assume that it is a bug in Truffle (and possibly in polygon-edge) then. I'll check their issues and open a new one there if nobody has raised the flag yet. It is ok for me if you close this one.",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1713254611/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
