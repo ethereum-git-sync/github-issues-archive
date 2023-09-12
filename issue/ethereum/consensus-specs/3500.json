@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3500",
+  "repository_url": "https://api.github.com/repos/ethereum/consensus-specs",
+  "labels_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3500/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3500/comments",
+  "events_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3500/events",
+  "html_url": "https://github.com/ethereum/consensus-specs/issues/3500",
+  "id": 1892647192,
+  "node_id": "I_kwDOCOoGbc5wz4EY",
+  "number": 3500,
+  "title": "Disable Peer Exchange (PX) in Gossipsub",
+  "user": {
+    "login": "diegomrsantos",
+    "id": 7316595,
+    "node_id": "MDQ6VXNlcjczMTY1OTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7316595?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/diegomrsantos",
+    "html_url": "https://github.com/diegomrsantos",
+    "followers_url": "https://api.github.com/users/diegomrsantos/followers",
+    "following_url": "https://api.github.com/users/diegomrsantos/following{/other_user}",
+    "gists_url": "https://api.github.com/users/diegomrsantos/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/diegomrsantos/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/diegomrsantos/subscriptions",
+    "organizations_url": "https://api.github.com/users/diegomrsantos/orgs",
+    "repos_url": "https://api.github.com/users/diegomrsantos/repos",
+    "events_url": "https://api.github.com/users/diegomrsantos/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/diegomrsantos/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-12T14:28:22Z",
+  "updated_at": "2023-09-12T15:14:17Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "After reviewing the Gossipsub v1.1 specification in the context of the Eth consensus network, we'd like to propose explicitly disabling the Peer Exchange (PX) feature.\r\n\r\nPX was introduced in the Gossipsub v1.1 specification as a potential solution to a couple of issues [#215](https://github.com/libp2p/specs/issues/215) and [#233](https://github.com/libp2p/go-libp2p-pubsub/issues/233). The primary motivation was to address the challenge posed by a \"star\" mesh topology where a central node might continuously attempt to prune, while peripheral nodes continually attempt to graft. Although PX does offer a way to potentially alleviate this problem by suggesting alternate peers to the pruned nodes, we aren't sure this is an actual issue for the network, and enabling this feature can increase network traffic and broaden the attack vector surface.\r\n\r\nWe elaborate more on this below: \r\n\r\n### Concerns:\r\n\r\n- Unverifiable Data: PX introduces data that can't be validated within the protocol. This allows a malicious entity to create and inject fake or malicious identities without any means of verification.\r\n\r\n- Message Size Concerns: We've observed prune messages with sizes reaching up to 9KB and encompassing 210 peerIDs. Should signed records be populated, the sizes could escalate significantly, leading to both efficiency and potential DoS concerns.\r\n \r\n- Privacy and Security Risks: PX publicizes all connected peers in a global topic, inadvertently marking them as potential targets for malicious attacks.\r\n\r\n### Ethereum's Bootstrap Mechanism: \r\nEthereum's consensus network has its established bootstrap and discovery mechanisms, using a combination of hardcoded [bootnodes](https://ethereum.org/en/developers/docs/nodes-and-clients/bootnodes/) and [discv5](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/p2p-interface.md#the-discovery-domain-discv5). These mechanisms are designed to ensure robust peer discovery without needing to lean on Gossipsub's PX feature. Given the inherent robustness of Ethereum's own discovery methods, PX might not be relevant, as mentioned here https://github.com/libp2p/specs/issues/570#issuecomment-1706452354.\r\n\r\nAdditionally, it appears that PX is currently enabled on [Teku](https://github.com/libp2p/jvm-libp2p/blob/086952dc97a5ea1436d11ca2477b030fadc8f56b/libp2p/src/main/kotlin/io/libp2p/pubsub/gossip/GossipRouter.kt#L571), and it might be worth reviewing its utility and potential implications on that client.\r\n\r\nWe welcome feedback and insights and am open to further elaboration and discussion.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3500/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/3500/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
