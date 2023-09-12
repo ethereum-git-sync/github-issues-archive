@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,27 +41,46 @@
   "milestone": null,
   "comments": 5,
   "created_at": "2023-09-07T11:04:00Z",
-  "updated_at": "2023-09-07T20:18:37Z",
-  "closed_at": null,
+  "updated_at": "2023-09-12T14:59:50Z",
+  "closed_at": "2023-09-12T14:59:50Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "> If there is another issue that discusses the same topic, feel free to close this one.\r\n\r\nI wanted to quickly get your opinion on whether it would make sense to remove the functions `increaseAllowance` and `decreaseAllowance` from the [`ERC20`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol) contract and move it to an extension contract instead. My arguments are the following:\r\n\r\n- These functions are _not_ part of the [EIP-20](https://eips.ethereum.org/EIPS/eip-20) specs.\r\n- These functions may allow for further phishing possibilities (instead of the common `approve` or `permit` ones; see e.g. just 12 hours ago someone lost $24m since he got tricked into signing a malicious `increaseAllowance` payload  https://etherscan.io/tx/0xcbe7b32e62c7d931a28f747bba3a0afa7da95169fcf380ac2f7d54f3a2f77913).\r\n- The security concerns that fix `increaseAllowance` and `decreaseAllowance` are not critical nor high in the wild (and `decreaseAllowance` can be frontrunned also) and thus I think the responsibility can be delegated to the devs to decide whether to include it or not.\r\n- If such a change is implemented, the upcoming breaking version `5.0.0` would be suitable.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "frangio",
+    "id": 481465,
+    "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/frangio",
+    "html_url": "https://github.com/frangio",
+    "followers_url": "https://api.github.com/users/frangio/followers",
+    "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+    "organizations_url": "https://api.github.com/users/frangio/orgs",
+    "repos_url": "https://api.github.com/users/frangio/repos",
+    "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/frangio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4583/reactions",
-    "total_count": 13,
-    "+1": 13,
-    "-1": 0,
+    "total_count": 17,
+    "+1": 15,
+    "-1": 1,
     "laugh": 0,
     "hooray": 0,
     "confused": 0,
     "heart": 0,
     "rocket": 0,
-    "eyes": 0
+    "eyes": 1
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4583/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,9 +115,9 @@
     "body": "would like to add that there is an open bounty of 1500+ dai (collectable from [these people](https://twitter.com/bantg/status/1699774038418346108)) for demonstrating the allowance frontrun has ever happened in the wild.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1710133352/reactions",
-      "total_count": 13,
-      "+1": 13,
-      "-1": 0,
+      "total_count": 17,
+      "+1": 16,
+      "-1": 1,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
@@ -228,8 +247,8 @@
     "body": "An additional argument for removing the functions is the following.\r\n\r\nSome smart wallets (Argent in particulat) enforce some restriction on token movement, in the form of daily spending limits. This is likelly to be more widespread with AA adoption.\r\n\r\nAFAIK, this is done (or used to be done) by a module that filters the data of outgoing calls, to \"detect\" calls to `transfer` or `approve`. If such a function is detected, then the value is decoded and the limits are verified/updated.\r\n\r\nThis would have been affected if Permit had supported ERC-1271, because the wallets would have had a hard time detecting weither they are verifying a permit message or not. This is one of the reason we did not include ERC-1271 support in ERC-2612 permit!\r\n\r\nNon standard functions, such as `increasseAllowance` can be used to buypass there speding restrictions. While we can't prevent any dev including such a function in their ERC20 instance, we should probably not include it by default.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1710297819/reactions",
-      "total_count": 4,
-      "+1": 4,
+      "total_count": 6,
+      "+1": 6,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -272,9 +291,9 @@
     "body": "In fact, it is meaningless to completely kill `increaseAllowance()`, but it has a lot of room for optimization\n\nMy suggestion is to add a check to the pre-existing `allowance` in `increaseAllowance`. This not only meets the purpose of not being able to directly use the func to initiate phishing, but also conforms to the semantics of the function itself: \"increasse\".\n\nThis is the most elegant solution😏",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1710676655/reactions",
-      "total_count": 0,
+      "total_count": 2,
       "+1": 0,
-      "-1": 0,
+      "-1": 2,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
