@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7503",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7503/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7503/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7503/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7503",
+  "id": 1892446583,
+  "node_id": "I_kwDOCM9I9M5wzHF3",
+  "number": 7503,
+  "title": "web3signer remote registration, unable to delete keys",
+  "user": {
+    "login": "yorickdowne",
+    "id": 71337066,
+    "node_id": "MDQ6VXNlcjcxMzM3MDY2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/71337066?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yorickdowne",
+    "html_url": "https://github.com/yorickdowne",
+    "followers_url": "https://api.github.com/users/yorickdowne/followers",
+    "following_url": "https://api.github.com/users/yorickdowne/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yorickdowne/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yorickdowne/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yorickdowne/subscriptions",
+    "organizations_url": "https://api.github.com/users/yorickdowne/orgs",
+    "repos_url": "https://api.github.com/users/yorickdowne/repos",
+    "events_url": "https://api.github.com/users/yorickdowne/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yorickdowne/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-12T12:46:00Z",
+  "updated_at": "2023-09-12T12:46:00Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\n\r\nI am starting Teku with `--validators-external-signer-url http://web3signer:9000 --validators-external-signer-public-keys external-signer` so that keys loaded into web3signer come in on startup, and users do not need to manually register these keys if they switched consensus layer clients.\r\n\r\nI also register the keys with Teku when loading them into web3signer, so that they are immediately live.\r\n\r\nThis creates an issue when trying to delete the remote registration.\r\n\r\n- Load keys into web3signer and register as remote key with Teku, via keymanager API\r\n- Restart Teku, it loads keys from the web3signer URL\r\n- Attempt to delete keys and delete remote registration, this fails. Likely because the remote registration was created upon startup from the web3signer URL:\r\n\r\n```\r\nRemote registration for validator 0x8fe5b2c0ce05093e3c6bbe1db0363b542709dfb4b8433e13ce23f1e7a7d840cc09a2ad97c5fd03980988df48bbe840f2 was found but an error was encountered trying to delete it:\r\nCannot remove read-only validator\r\n```\r\n\r\n- Restart Teku again. It would now not get a key list from web3signer, but it still sees the remote registration that was created on key import:\r\n\r\n```\r\nNo keys loaded into web3signer\r\nRemote keys registered with consensus\r\n0x9642bbe4853617cb603863e4c90398304724ad192c4d6337fded814a6ab0c04ede5dafd9d9148ae4c0d1a51354a17687 http://web3signer:9000\r\n0x8fe5b2c0ce05093e3c6bbe1db0363b542709dfb4b8433e13ce23f1e7a7d840cc09a2ad97c5fd03980988df48bbe840f2 http://web3signer:9000\r\n```\r\n\r\nThis is worrisome for users: They deleted keys but still see the registration. One user came to me with slashing fears.\r\n\r\n**Expected behavior:**\r\n\r\nI'd like to be able to remove registrations that I created, or that were created from web3signer when Teku starts, so key deletion also removes the remote registration from Teku.\r\n\r\nI'd like to keep the behavior where keys are immediately live on import, which is why they are imported into web3signer and then registered with Teku, both via keymanager API.\r\n\r\n**Frequency:**\r\n\r\nReproducible\r\n\r\n### Versions (Add all that apply)\r\n* Software version: `teku/v23.9.0/linux-x86_64/-eclipseadoptium-openjdk64bitservervm-java-17`\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7503/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7503/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
