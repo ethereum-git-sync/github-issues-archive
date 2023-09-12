@@ -40,7 +40,7 @@
       "description": "PRs or issues for the Deneb upgrade"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "kasey",
@@ -107,12 +107,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-09-07T16:07:34Z",
-  "updated_at": "2023-09-07T16:08:18Z",
-  "closed_at": null,
+  "updated_at": "2023-09-12T15:32:23Z",
+  "closed_at": "2023-09-12T15:32:23Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "The following errors were observed in the interop while spamming blobs. There were discrepancies in the number of blobs received and processed before data availability check in block chain pkg. Special mention the slot time is 6s\r\n```\r\ntime=\"2023-09-06 18:40:48\" level=debug msg=\"Received blob sidecar\" blockRoot=0xea157798e542fe6ca6dc413753c3da2b89e99ce3050050bbe0042b1b4fe30e5d index=0 prefix=sync proposerIndex=70 slot=19\r\ntime=\"2023-09-06 18:40:48\" level=debug msg=\"Received blob sidecar\" blockRoot=0xea157798e542fe6ca6dc413753c3da2b89e99ce3050050bbe0042b1b4fe30e5d index=3 prefix=sync proposerIndex=70 slot=19\r\ntime=\"2023-09-06 18:40:48\" level=debug msg=\"Received blob sidecar\" blockRoot=0xea157798e542fe6ca6dc413753c3da2b89e99ce3050050bbe0042b1b4fe30e5d index=2 prefix=sync proposerIndex=70 slot=19\r\ntime=\"2023-09-06 18:40:48\" level=debug msg=\"Received blob sidecar\" blockRoot=0xea157798e542fe6ca6dc413753c3da2b89e99ce3050050bbe0042b1b4fe30e5d index=1 prefix=sync proposerIndex=70 slot=19\r\ntime=\"2023-09-06 18:40:48\" level=debug msg=\"Received blob sidecar\" blockRoot=0xea157798e542fe6ca6dc413753c3da2b89e99ce3050050bbe0042b1b4fe30e5d index=5 prefix=sync proposerIndex=70 slot=19\r\ntime=\"2023-09-06 18:40:48\" level=debug msg=\"Received blob sidecar\" blockRoot=0xea157798e542fe6ca6dc413753c3da2b89e99ce3050050bbe0042b1b4fe30e5d index=4 prefix=sync proposerIndex=70 slot=19\r\ntime=\"2023-09-06 18:40:48\" level=error msg=\"Could not handle p2p pubsub\" error=\"could not validate blob data availability: could not check data availability, expected 6 commitments, obtained 5\r\n```\r\n\r\nWe added additional log here\r\n```\r\ncase <-nc.channel:\r\n\t\t\tchannelWrites++\r\n\t\t\tif channelWrites == existingBlobs {\r\n\t\t\t\ts.blobNotifier.Lock()\r\n\t\t\t\tdelete(s.blobNotifier.chanForRoot, root)\r\n\t\t\t\ts.blobNotifier.Unlock()\r\n\t\t\t\tsidecars, err := s.cfg.BeaconDB.BlobSidecarsByRoot(ctx, root)\r\n\t\t\t\tif err != nil {\r\n\t\t\t\t\treturn errors.Wrap(err, \"could not get blob sidecars\")\r\n\t\t\t\t}\r\n\t\t\t\tlog.Info(\"All blobs are available in database but arrived late \", channelWrites, existingBlobs, len(sidecars))\r\n\t\t\t\treturn kzg.IsDataAvailable(kzgCommitments, sidecars)\r\n```\r\n\r\nAnd confirmed `BlobSidecarsByRoot` returned one less sidecar\r\n```\r\ntime=\"2023-09-06 18:56:52\" level=info msg=\"All blobs are available in database but arrived late 5 5 4\" prefix=blockchain\r\n```\r\n**Temporary Workaround:**\r\nWe introduced a 500ms delay before invoking BlobSidecarsByRoot as a temporary measure. This is intriguing because all the DB methods are presumed to be blocking calls, but this issue suggests otherwise.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12867/reactions",
     "total_count": 0,
@@ -127,7 +146,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12867/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
