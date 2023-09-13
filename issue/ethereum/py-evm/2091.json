@@ -32,25 +32,44 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-01-04T06:57:22Z",
-  "updated_at": "2023-01-04T17:56:46Z",
-  "closed_at": null,
+  "updated_at": "2023-09-13T16:24:38Z",
+  "closed_at": "2023-09-13T16:24:37Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "* py-evm Version: 0.6.1a2\r\n* OS: linux/ubuntu\r\n* Python Version 3.8.10:\r\n* Environment (at end):\r\n\r\n### What is wrong?\r\n\r\nI am attempting to replicate the mainnet transaction `0x96e0415a617ff9018593333ed759063e99bbe77005251e5d7023ca3e6ee409ac`.\r\nI have stubbed the chaindb to load state directly from a geth instance, as needed.\r\nUnfortunately, I do not have a convenient minimal replication.\r\n\r\nThis invokes the blake2b precompile, which throws an exception:\r\n\r\n```\r\n...\r\n  File \"/project/env/lib/python3.8/site-packages/py_evm-0.6.1a2-py3.8.egg/eth/vm/logic/call.py\", line 162, in __call__                                                                                                 \r\n    child_computation = computation.apply_child_computation(child_msg)                                                                                                                                                                        \r\n  File \"/project/env/lib/python3.8/site-packages/py_evm-0.6.1a2-py3.8.egg/eth/vm/computation.py\", line 364, in apply_child_computation                                                                                 \r\n    child_computation = self.generate_child_computation(child_msg)                                                                                                                                                                            \r\n  File \"/project/env/lib/python3.8/site-packages/py_evm-0.6.1a2-py3.8.egg/eth/vm/computation.py\", line 376, in generate_child_computation                                                                              \r\n    child_computation = self.apply_message(                                                                                                                                                                                                   \r\n  File \"/project/env/lib/python3.8/site-packages/py_evm-0.6.1a2-py3.8.egg/eth/vm/forks/frontier/computation.py\", line 83, in apply_message                                                                             \r\n    computation = cls.apply_computation(                                                                                                                                                                                                      \r\n  File \"/project/env/lib/python3.8/site-packages/py_evm-0.6.1a2-py3.8.egg/eth/vm/computation.py\", line 527, in apply_computation                                                                                       \r\n    precompile(computation)                                                                                                                                                                                                                   \r\n  File \"/project/env/lib/python3.8/site-packages/py_evm-0.6.1a2-py3.8.egg/eth/precompiles/blake2.py\", line 32, in blake2b_fcompress                                                                                    \r\n    computation.output = blake2b_compress(*parameters)                                                                                                                                                                                        \r\n  File \"/project/env/lib/python3.8/site-packages/py_evm-0.6.1a2-py3.8.egg/eth/_utils/blake2/compression.py\", line 102, in blake2b_compress                                                                             \r\n    m = struct.unpack_from('<16%s' % Blake2b.WORDFMT, bytes(block))                                                                                                                                                                           \r\nValueError: bytes must be in range(0, 256)                                                                                                                                                                                                                                                                                                                                                                                                    \r\n```\r\n\r\n\r\n### How can it be fixed\r\n\r\ndelete [`eth/_utils/blake2/compression.py` line 101](https://github.com/ethereum/py-evm/blob/2e44b8a7c71d1ed67cd3a95320f0612dfb76307d/eth/_utils/blake2/compression.py#L101):\r\n\r\n```python\r\n    m = struct.unpack_from('<16%s' % Blake2b.WORDFMT, bytes(block))\r\n```\r\n\r\nExplanation: at the above line, `block` is not actually type `bytes` -- it is already parsed into a tuple of `int`s at [`eth/_utils/blake2/coders.py` line 32](https://github.com/ethereum/py-evm/blob/2e44b8a7c71d1ed67cd3a95320f0612dfb76307d/eth/_utils/blake2/coders.py#L32):\r\n\r\n```python\r\n    message = cast(TMessage, _get_64_bit_little_endian_words(input_bytes[68:196]))\r\n```\r\n\r\nWhich is called at [`eth/precompiles/blake2.py:23`](https://github.com/ethereum/py-evm/blob/2e44b8a7c71d1ed67cd3a95320f0612dfb76307d/eth/precompiles/blake2.py#L23)\r\n\r\n### Environment\r\n\r\n```\r\naiohttp==3.8.3\r\naiosignal==1.3.1\r\nasync-timeout==4.0.2\r\nattrs==22.2.0\r\nbase58==2.1.1\r\nbitarray==2.6.2\r\ncached-property==1.5.2\r\ncachetools==5.2.0\r\ncertifi==2022.12.7\r\ncharset-normalizer==2.1.1\r\ncytoolz==0.12.1\r\neth-abi==2.2.0\r\neth-account==0.5.9\r\neth-bloom==2.0.0\r\neth-hash==0.5.1\r\neth-keyfile==0.5.1\r\neth-keys==0.3.4\r\neth-rlp==0.2.1\r\neth-typing==2.3.0\r\neth-utils==1.10.0\r\nfrozenlist==1.3.3\r\nhexbytes==0.3.0\r\nidna==3.4\r\nimportlib-resources==5.10.2\r\nipfshttpclient==0.8.0a2\r\njsonschema==4.17.3\r\nlru-dict==1.1.8\r\nmultiaddr==0.0.9\r\nmultidict==6.0.4\r\nmypy-extensions==0.4.3\r\nnetaddr==0.8.0\r\nnumpy==1.24.1\r\nparsimonious==0.8.1\r\npkgutil-resolve-name==1.3.10\r\nprotobuf==3.19.5\r\npy-ecc==6.0.0\r\npy-evm==0.6.1a2\r\npycryptodome==3.16.0\r\npyethash==0.1.27\r\npyrsistent==0.19.3\r\nrequests==2.28.1\r\nrlp==2.0.1\r\nsix==1.16.0\r\nsortedcontainers==2.4.0\r\ntoolz==0.12.0\r\ntrie==2.1.0\r\nurllib3==1.26.13\r\nvarint==1.0.2\r\nweb3==5.31.3\r\nwebsockets==9.1\r\nyarl==1.8.2\r\nzipp==3.11.0\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fselmo",
+    "id": 3532824,
+    "node_id": "MDQ6VXNlcjM1MzI4MjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3532824?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fselmo",
+    "html_url": "https://github.com/fselmo",
+    "followers_url": "https://api.github.com/users/fselmo/followers",
+    "following_url": "https://api.github.com/users/fselmo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fselmo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fselmo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fselmo/subscriptions",
+    "organizations_url": "https://api.github.com/users/fselmo/orgs",
+    "repos_url": "https://api.github.com/users/fselmo/repos",
+    "events_url": "https://api.github.com/users/fselmo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fselmo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/py-evm/issues/2091/reactions",
-    "total_count": 0,
-    "+1": 0,
+    "total_count": 1,
+    "+1": 1,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/2091/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/py-evm/issues/comments/1717948249",
+    "html_url": "https://github.com/ethereum/py-evm/issues/2091#issuecomment-1717948249",
+    "issue_url": "https://api.github.com/repos/ethereum/py-evm/issues/2091",
+    "id": 1717948249,
+    "node_id": "IC_kwDOBJ456s5mZc9Z",
+    "user": {
+      "login": "fselmo",
+      "id": 3532824,
+      "node_id": "MDQ6VXNlcjM1MzI4MjQ=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3532824?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fselmo",
+      "html_url": "https://github.com/fselmo",
+      "followers_url": "https://api.github.com/users/fselmo/followers",
+      "following_url": "https://api.github.com/users/fselmo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fselmo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fselmo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fselmo/subscriptions",
+      "organizations_url": "https://api.github.com/users/fselmo/orgs",
+      "repos_url": "https://api.github.com/users/fselmo/repos",
+      "events_url": "https://api.github.com/users/fselmo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fselmo/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-13T16:24:37Z",
+    "updated_at": "2023-09-13T16:24:37Z",
+    "author_association": "MEMBER",
+    "body": "closed by 0f820b8",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/py-evm/issues/comments/1717948249/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
