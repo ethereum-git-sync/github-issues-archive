@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/remix-project/issues/4065",
+  "repository_url": "https://api.github.com/repos/ethereum/remix-project",
+  "labels_url": "https://api.github.com/repos/ethereum/remix-project/issues/4065/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/remix-project/issues/4065/comments",
+  "events_url": "https://api.github.com/repos/ethereum/remix-project/issues/4065/events",
+  "html_url": "https://github.com/ethereum/remix-project/issues/4065",
+  "id": 1893510741,
+  "node_id": "I_kwDODtLRw85w3K5V",
+  "number": 4065,
+  "title": "MyFirstDAO.Sol",
+  "user": {
+    "login": "Gitobse",
+    "id": 143973550,
+    "node_id": "U_kgDOCJTcrg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/143973550?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Gitobse",
+    "html_url": "https://github.com/Gitobse",
+    "followers_url": "https://api.github.com/users/Gitobse/followers",
+    "following_url": "https://api.github.com/users/Gitobse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Gitobse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Gitobse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Gitobse/subscriptions",
+    "organizations_url": "https://api.github.com/users/Gitobse/orgs",
+    "repos_url": "https://api.github.com/users/Gitobse/repos",
+    "events_url": "https://api.github.com/users/Gitobse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Gitobse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-13T00:08:36Z",
+  "updated_at": "2023-09-13T00:18:08Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract DAO {\n        // Rest of the code here\n                                 }\n\t\t// Struct to represent a proposal in the DAO\t\n\t\tstruct Proposal {\n\t\t    string description;\n\t\t    uint voteCount;\n\t\t    bool executed;\n\t\t}\n\t\t\n\t\t// Struct to represent a member of the DAO\n\t\tstruct Member {\n\t\t    address memberAddress;\n\t\t    uint memberSince;\n\t\t    uint tokenBalance;\n\t\t} \n\t\t\n\t\taddress[] public members; // Array to store member addresses\n\t\tmapping(address => Member) public memberInfo; // Mapping to store member information\n\t\tmapping(address => mapping(uint => bool)) public votes; // Mapping to track member votes for proposals\n\t\tProposal[] public proposals; // Array to store proposals\n\t\t\n\t\tuint public totalSupply; // Total token supply\n\t\tmapping(address => uint) public balances; // Mapping to store token balances of members\n\t\t\n\t\tevent ProposalCreated(uint indexed proposalId, string description); // Event emitted when a proposal is created\n\t\tevent VoteCast(address indexed voter, uint indexed proposalId, uint tokenAmount); // Event emitted when a vote is cast\n\t\tevent ProposalAccepted(string message); // Event emitted when a proposal is accepted\n\t\tevent ProposalRejected(string rejected); // Event emitted when a proposal is rejected\n\t\t\n\t\t// Function to add a member to the DAO\n\t\tfunction addMember(address _member) public {\n\t\t    require(memberInfo[_member].memberAddress == address(0), \"Member already exists\");\n\t\t    memberInfo[_member] = Member({\n\t\t        memberAddress: _member,\n\t\t        memberSince: block.timestamp,\n\t\t        tokenBalance: 100\n\t\t    });\n\t\t    members.push(_member);\n\t\t    balances[_member] = 100;\n\t\t    totalSupply += 100;\n\t\t} \n\t\t\n\t\t// Function to remove a member from the DAO\n\t\tfunction removeMember(address _member) public {\n\t\t    require(memberInfo[_member].memberAddress != address(0), \"Member does not exist\");\n\t\t    memberInfo[_member] = Member({\n\t\t        memberAddress: address(0),\n\t\t        memberSince: 0,\n\t\t        tokenBalance: 0\n\t\t    });\n\t\t    for (uint i = 0; i < members.length; i++) {\n\t\t        if (members[i] == _member) {\n\t\t            members[i] = members[members.length - 1];\n\t\t            members.pop();\n\t\t            break;\n\t\t        }\n\t\t    }\n\t\t    balances[_member] = 0;\n\t\t    totalSupply -= 100;\n\t\t} \n\t\t\n\t\t// Function to create a proposal in the DAO\n\t\tfunction createProposal(string memory _description) public {\n\t\t    proposals.push(Proposal({\n\t\t        description: _description,\n\t\t        voteCount: 0,\n\t\t        executed: false\n\t\t    }));\n\t\t    emit ProposalCreated(proposals.length - 1, _description);\n\t\t} \n\t\t\n\t\t// Function for a member to vote on a proposal\n\t\tfunction vote(uint _proposalId, uint _tokenAmount) public {\n\t\t    require(memberInfo[msg.sender].memberAddress != address(0), \"Only members can vote\");\n\t\t    require(balances[msg.sender] >= _tokenAmount, \"Not enough tokens to vote\");\n\t\t    require(votes[msg.sender][_proposalId] == false, \"You have already voted for this proposal\");\n\t\t    votes[msg.sender][_proposalId] = true;\n\t\t    memberInfo[msg.sender].tokenBalance -= _tokenAmount;\n\t\t    proposals[_proposalId].voteCount += _tokenAmount;\n\t\t    emit VoteCast(msg.sender, _proposalId, _tokenAmount);\n\t\t} \n\t\t\n\t\t// Function to execute a proposal in the DAO\n\t\tfunction executeProposal(uint _proposalId) public {\n\t\t    require(proposals[_proposalId].executed == false, \"Proposal has already been executed\");\n\t\t    if(((proposals[_proposalId].voteCount / totalSupply)*100) > 50){\n\t\t        proposals[_proposalId].executed = true;\n\t\t        emit ProposalAccepted(\"Proposal has been approved\");\n\t\t    }\n\t\t    emit ProposalRejected(\"Proposal has not been approved by majority vote\");\n\t\t} \n}\n\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/remix-project/issues/4065/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/remix-project/issues/4065/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
