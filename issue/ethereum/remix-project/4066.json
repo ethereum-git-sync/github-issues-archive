@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/remix-project/issues/4066",
+  "repository_url": "https://api.github.com/repos/ethereum/remix-project",
+  "labels_url": "https://api.github.com/repos/ethereum/remix-project/issues/4066/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/remix-project/issues/4066/comments",
+  "events_url": "https://api.github.com/repos/ethereum/remix-project/issues/4066/events",
+  "html_url": "https://github.com/ethereum/remix-project/issues/4066",
+  "id": 1894941834,
+  "node_id": "I_kwDODtLRw85w8oSK",
+  "number": 4066,
+  "title": "bug in remix.ethereum.org - you cannot test payable methods",
+  "user": {
+    "login": "mtumilowicz",
+    "id": 26941332,
+    "node_id": "MDQ6VXNlcjI2OTQxMzMy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26941332?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mtumilowicz",
+    "html_url": "https://github.com/mtumilowicz",
+    "followers_url": "https://api.github.com/users/mtumilowicz/followers",
+    "following_url": "https://api.github.com/users/mtumilowicz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mtumilowicz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mtumilowicz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mtumilowicz/subscriptions",
+    "organizations_url": "https://api.github.com/users/mtumilowicz/orgs",
+    "repos_url": "https://api.github.com/users/mtumilowicz/repos",
+    "events_url": "https://api.github.com/users/mtumilowicz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mtumilowicz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-13T17:16:28Z",
+  "updated_at": "2023-09-13T17:17:06Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "contract:\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract Receiver {\r\n\r\n    receive() external payable {}\r\n\r\n    function getMoney() public payable {}\r\n\r\n}\r\n```\r\n\r\ntests:\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\nimport \"../contracts/Receiver.sol\"; // Import the EventTicketing contract\r\nimport \"remix_tests.sol\"; \r\n\r\ncontract TestReceiveEtherExample {\r\n    Receiver public instance;\r\n\r\n    function beforeEach() public {\r\n        instance = new Receiver();\r\n    }\r\n\r\n    function checkBalance() public {\r\n        uint256 balance = address(instance).balance;\r\n        Assert.equal(balance, 0, \"Initial balance should be 0\");\r\n    }\r\n\r\n    function testReceiveEther() public payable {\r\n        // Send 1 ether to the contract\r\n        payable(address(instance)).transfer(1 ether);\r\n\r\n        // Check if balance is updated correctly\r\n        uint256 balance = address(instance).balance;\r\n        Assert.equal(balance, 1 ether, \"Balance should be 1 ether after receiving\");\r\n    }\r\n\r\n    function testGetMoney() public payable {\r\n        uint256 initialBalance = address(instance).balance;\r\n\r\n        // Call the getMoney function\r\n        instance.getMoney{value: 1 ether}();\r\n\r\n        uint256 finalBalance = address(instance).balance;\r\n\r\n        // Check if the balance has increased by 1 ether\r\n        Assert.equal(finalBalance, initialBalance + 1 ether, \"Balance should be increased by 1 ether after calling getMoney\");\r\n    }\r\n}\r\n```\r\n\r\noutput:\r\n<img width=\"667\" alt=\"image\" src=\"https://github.com/ethereum/remix-project/assets/26941332/59adbd3f-dfeb-4630-807c-3818fdc80737\">\r\n\r\ninvoking method of the contract directly works as expected:\r\n<img width=\"667\" alt=\"image\" src=\"https://github.com/ethereum/remix-project/assets/26941332/a1b54b07-039f-4ac3-a0f6-4b4abc340d2b\">\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/remix-project/issues/4066/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/remix-project/issues/4066/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
