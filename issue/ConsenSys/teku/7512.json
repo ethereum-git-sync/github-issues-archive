@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-09-14T06:52:45Z",
-  "updated_at": "2023-09-14T06:53:12Z",
-  "closed_at": null,
+  "updated_at": "2023-09-14T13:39:19Z",
+  "closed_at": "2023-09-14T13:39:18Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Description\r\n\r\nI'm trying to use an HTTP URL containing basic auth parameters with Teku BN, like this:\r\n\r\n```\r\n--ee-endpoint \"https://username:pass@site.com\"\r\n```\r\n\r\nTeku is parsing the URL and making the request, but it leaves off the `Authorization` header, so the request fails.\r\n\r\nSupport for basic auth usernames and passwords in URLs is quite standard, and an old issue https://github.com/Consensys/teku/issues/3609 suggests that it was supported at some point for Teku VC <> BN connections. With HTTPS, transmission of the username & password is safe.\r\n\r\n### Steps to Reproduce (Bug)\r\n\r\nRun Teku BN with `--ee-endpoint` and a URL guarded by basic auth. It throws this exception:\r\n\r\n```\r\n2023-09-14 06:47:01.481 WARN  - Endpoint https://username:password@site.com encountered an issue | Invalid response received: 401; {\"error\": \"401 Unauthorized\"}\r\n2023-09-14 06:47:02.597 ERROR - Execution Client request failed. Check the same JWT secret is configured for Teku and the Execution Client.\r\norg.web3j.protocol.exceptions.ClientConnectionException: Invalid response received: 401; {\"error\": \"401 Unauthorized\"}\r\nat org.web3j.protocol.http.HttpService.performIO(HttpService.java:172) ~[core-4.10.1.jar:?]\r\nat org.web3j.protocol.Service.send(Service.java:48) ~[core-4.10.1.jar:?]\r\nat org.web3j.protocol.Service.lambda$sendAsync$0(Service.java:60) ~[core-4.10.1.jar:?]\r\nat org.web3j.utils.Async.lambda$run$1(Async.java:38) ~[core-4.10.1.jar:?]\r\nat java.util.concurrent.CompletableFuture$AsyncRun.run(Unknown Source) [?:?]\r\nat java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) [?:?]\r\nat java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) [?:?]\r\nat java.lang.Thread.run(Unknown Source) [?:?]\r\n2023-09-14 06:47:02.822 WARN  - Unable to import blocks because execution client is offline.\r\n```\r\n\r\nLogs from the server (Caddy) show the lack of `Authorization` header:\r\n\r\n```\r\nSep 14 06:32:23 site.com caddy[770]: 2023/09/14 06:32:23.449        ERROR        http.log.access.log0        handled request        {\"request\": {\"remote_ip\": \"X.X.X.X\", \"remote_port\": \"38612\", \"proto\": \"HTTP/2.0\", \"method\": \"POST\", \"host\": \"site.com\", \"uri\": \"/\", \"headers\": {\"Authorization\": [], \"Content-Type\": [\"application/json; charset=utf-8\"], \"Content-Length\": [\"84\"], \"Accept-Encoding\": [\"gzip\"], \"User-Agent\": [\"okhttp/4.11.0\"]}, \"tls\": {\"resumed\": false, \"version\": 772, \"cipher_suite\": 4865, \"proto\": \"h2\", \"server_name\": \"site.com\"}}, \"user_id\": \"\", \"duration\": 0.00002376, \"size\": 29, \"status\": 401, \"resp_headers\": {\"Server\": [\"Caddy\"], \"Alt-Svc\": [\"h3=\\\":443\\\"; ma=2592000\"], \"Www-Authenticate\": [\"Basic realm=\\\"restricted\\\"\"], \"Content-Type\": [\"application/json\"]}}\r\n```\r\n\r\n### Versions\r\n\r\n* Software version: `teku/v23.9.0/linux-x86_64/-eclipseadoptium-openjdk64bitservervm-java-17` (and v23.8.0).\r\n* Java version:\r\n\r\n```\r\nopenjdk version \"17.0.8.1\" 2023-08-24\r\nOpenJDK Runtime Environment Temurin-17.0.8.1+1 (build 17.0.8.1+1)\r\nOpenJDK 64-Bit Server VM Temurin-17.0.8.1+1 (build 17.0.8.1+1, mixed mode)\r\n```\r\n* OS Name & Version: `Ubuntu 22.04.3 LTS`\r\n* Docker Version:\r\n\r\n```\r\nClient: Docker Engine - Community\r\n Version:           24.0.5\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/7512/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7512/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1719473838",
+    "html_url": "https://github.com/Consensys/teku/issues/7512#issuecomment-1719473838",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7512",
+    "id": 1719473838,
+    "node_id": "IC_kwDOCM9I9M5mfRau",
+    "user": {
+      "login": "michaelsproul",
+      "id": 4452260,
+      "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/michaelsproul",
+      "html_url": "https://github.com/michaelsproul",
+      "followers_url": "https://api.github.com/users/michaelsproul/followers",
+      "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+      "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+      "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+      "repos_url": "https://api.github.com/users/michaelsproul/repos",
+      "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-14T13:39:08Z",
+    "updated_at": "2023-09-14T13:39:08Z",
+    "author_association": "NONE",
+    "body": "Having thought about it, this is insane because the JWT needs to go in the Authorization header. I'm not sure _why_ it was working with Lighthouse but I should probably stop it from working!",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1719473838/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
