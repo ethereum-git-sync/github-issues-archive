@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4602",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4602/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4602/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4602/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4602",
+  "id": 1895985090,
+  "node_id": "I_kwDOA9tCBs5xAm_C",
+  "number": 4602,
+  "title": "Multiple inheritance with upgradeable contracts",
+  "user": {
+    "login": "R-Santev",
+    "id": 77731162,
+    "node_id": "MDQ6VXNlcjc3NzMxMTYy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/77731162?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/R-Santev",
+    "html_url": "https://github.com/R-Santev",
+    "followers_url": "https://api.github.com/users/R-Santev/followers",
+    "following_url": "https://api.github.com/users/R-Santev/following{/other_user}",
+    "gists_url": "https://api.github.com/users/R-Santev/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/R-Santev/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/R-Santev/subscriptions",
+    "organizations_url": "https://api.github.com/users/R-Santev/orgs",
+    "repos_url": "https://api.github.com/users/R-Santev/repos",
+    "events_url": "https://api.github.com/users/R-Santev/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/R-Santev/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-14T08:06:07Z",
+  "updated_at": "2023-09-14T08:06:07Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**🧐 Motivation**\r\nHello OpenZeppelin team,\r\n\r\nNavigating the world of multiple inheritance with upgradeable contracts can be a tad complex, especially for those who are newer to the ecosystem. I've noticed there isn't a clear guideline on this in the documentation, which led me to develop a potential approach. My intention is to foster a discussion here to refine it and maybe consider incorporating some variant of it into the OpenZeppelin documentation, if deemed useful.\r\n\r\n**📝 Details**\r\nHere is a question I found on StackOverflow:\r\n\r\n> I'm trying to convert an existing non-upgradeable contract that has multiple inheritance into an upgradeable one. I'm following the tutorial at https://docs.openzeppelin.com/contracts/4.x/upgradeable and the only thing I've found in docs is the following:\r\n\r\n> Initializer functions are not linearized by the compiler like constructors. Because of this, each __{ContractName}_init function embeds the linearized calls to all parent initializers. As a consequence, calling two of these init functions can potentially initialize the same contract twice.\r\n\r\n> The function __{ContractName}_init_unchained found in every contract is the initializer function minus the calls to parent initializers, and can be used to avoid the double initialization problem, but doing this manually is not recommended. We hope to be able to implement safety checks for this in future versions of the Upgrades Plugins.\r\n\r\n> I don't know what to do from here. It talks about a problem, tells a workaround, but also telling that manually isn't recommended, and also telling that it will have the safety checks in the future upgrades plugins.\r\n\r\n> So what should I do? It says what I shouldn't do but doesn't mention what I should do. Am I missing something?\r\n\r\n> How can I have multiple inheritance and upgradeability at the same time with OpenZeppelin contracts? (I'm extending ERC20BurnableUpgradeable and [draft-]ERC20PermitUpgradeable, and using Solidity 0.8.9, Hardhat, OpenZeppelin 4.7.3 if it helps)\r\n\r\n[Here is a link to the question.](https://stackoverflow.com/questions/73539831/how-to-implement-multiple-inheritance-with-openzeppelin-upgradeable-contracts)\r\n\r\n**And here is my recommended approach:**\r\n\r\n 1. If a parent contract is inherited by only one child, use the child's init() to invoke the parent's init().\r\n 2. If a parent contract is inherited by multiple child contracts, use the init() of the closest child that inherits from (wraps) the other child contracts inheriting the parent.\r\n\r\nConsider it as bundling sections of contracts into modules. These modules are then grouped into larger modules, and this hierarchical grouping continues until you reach the most derived contract.\r\n\r\n**It sounds a bit complicated, but the following example makes it clear.**\r\n\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\nimport \"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\";\r\n\r\ncontract Animal is Initializable {\r\n    function __Animal_init() internal onlyInitializing {\r\n        // Most base contract\r\n        __Animal_init_unchained();\r\n    }\r\n\r\n    function __Animal_init_unchained() internal onlyInitializing {\r\n        // Initialization logic for Animal\r\n    }\r\n}\r\n\r\ncontract ThinkingExtension is Initializable {\r\n    function __ThinkingExtension_init() internal onlyInitializing {\r\n        __ThinkingExtension_init_unchained();\r\n    }\r\n\r\n    function __ThinkingExtension_init_unchained() internal onlyInitializing {\r\n        // Initialization logic for ThinkingExtension\r\n    }\r\n}\r\n\r\ncontract Human is Animal, ThinkingExtension {\r\n    function __Human_init() internal onlyInitializing {\r\n        // Human is the only child that inherits ThinkingExtension\r\n        __ThinkingExtension_init();\r\n        __Human_init_unchained();\r\n    }\r\n\r\n    function __Human_init_unchained() internal onlyInitializing {\r\n        // Initialization logic for Human\r\n    }\r\n}\r\n\r\ncontract HorseExtension is Initializable {\r\n    function __HorseExtension_init() internal onlyInitializing {\r\n        // Most base contract\r\n        __HorseExtension_init_unchained();\r\n    }\r\n\r\n    function __HorseExtension_init_unchained() internal onlyInitializing {\r\n        // Initialization logic for HorseExtension\r\n    }\r\n}\r\n\r\ncontract FastRunnerExtension is HorseExtension {\r\n    function __FastRunnerExtension_init() internal onlyInitializing {\r\n        // We don't initialize HorseExtension here, because there is another child that inherits from it on the same level\r\n        __FastRunnerExtension_init_unchained();\r\n    }\r\n\r\n    function __FastRunnerExtension_init_unchained() internal onlyInitializing {\r\n        // Initialization logic for FastRunnerExtension\r\n    }\r\n}\r\n\r\ncontract SaddleExtension is HorseExtension {\r\n    function __SaddleExtension_init() internal onlyInitializing {\r\n        // We don't initialize HorseExtension here, because there is another child that inherits from it on the same level\r\n        __SaddleExtension_init_unchained();\r\n    }\r\n\r\n    function __SaddleExtension_init_unchained() internal onlyInitializing {\r\n        // Initialization logic for SaddleExtension\r\n    }\r\n}\r\n\r\ncontract Horse is Animal, HorseExtension, FastRunnerExtension, SaddleExtension {\r\n    function __Horse_init() internal onlyInitializing {\r\n        // The Horse contract wraps all contracts that inherit from HorseExtension.\r\n        // Therefore, we initialize HorseExtension here.\r\n        __HorseExtension_init();\r\n        __FastRunnerExtension_init();\r\n        __SaddleExtension_init();\r\n        __Horse_init_unchained();\r\n    }\r\n\r\n    function __Horse_init_unchained() internal onlyInitializing {\r\n        // Initialization logic for Horse\r\n    }\r\n}\r\n\r\ncontract Centaur is Animal, Human, Horse {\r\n    function initialize() public initializer {\r\n        // The Centaur contract wraps all contracts that inherit from Animal.\r\n        // Therefore, we initialize Animal here.\r\n        __Animal_init();\r\n        __Human_init();\r\n        __Horse_init();\r\n        // Initialization logic for Centaur\r\n    }\r\n}\r\n\r\n```\r\n\r\n[Here is a visual representation of the `Centaur` contract's architecture that can help you understand how the approach works.][1]\r\n\r\nI'm keen to hear your thoughts on this and collaborate to refine the approach.\r\nThanks in advance!\r\n\r\n  [1]: https://i.stack.imgur.com/xbIr8.png\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4602/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4602/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
