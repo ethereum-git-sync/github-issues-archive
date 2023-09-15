@@ -49,7 +49,7 @@
       "description": "not related to mainnet features - covers privacy, permissioning, IBFT2, QBFT"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "matthew1001",
@@ -96,12 +96,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-09-06T08:53:59Z",
-  "updated_at": "2023-09-11T22:08:47Z",
-  "closed_at": null,
+  "updated_at": "2023-09-15T04:47:17Z",
+  "closed_at": "2023-09-15T04:47:17Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Description\r\n```\r\n2023-09-06 09:09:07.295+01:00 | BftProcessorExecutor-QBFT-0 | ERROR | EventMultiplexer | State machine threw exception while processing event \\{BlockTimerExpiry{Round Identifier=ConsensusRoundIdentifier{Sequence=378, Round=0}}\\}\r\njava.lang.IllegalStateException: Block creation failed unexpectedly. Will restart on next block added to chain.\r\n        at org.hyperledger.besu.ethereum.blockcreation.AbstractBlockCreator.createBlock(AbstractBlockCreator.java:292)\r\n        at org.hyperledger.besu.ethereum.blockcreation.AbstractBlockCreator.createBlock(AbstractBlockCreator.java:156)\r\n        at org.hyperledger.besu.ethereum.blockcreation.AbstractBlockCreator.createBlock(AbstractBlockCreator.java:142)\r\n        at org.hyperledger.besu.consensus.qbft.statemachine.QbftRound.createAndSendProposalMessage(QbftRound.java:130)\r\n        at org.hyperledger.besu.consensus.qbft.statemachine.QbftBlockHeightManager.handleBlockTimerExpiry(QbftBlockHeightManager.java:136)\r\n        at org.hyperledger.besu.consensus.common.bft.statemachine.BaseBftController.handleBlockTimerExpiry(BaseBftController.java:167)\r\n        at org.hyperledger.besu.consensus.common.bft.EventMultiplexer.handleBftEvent(EventMultiplexer.java:65)\r\n        at java.base/java.util.Optional.ifPresent(Optional.java:178)\r\n        at org.hyperledger.besu.consensus.common.bft.BftProcessor.run(BftProcessor.java:65)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\r\n        at java.base/java.lang.Thread.run(Thread.java:833)\r\nCaused by: java.lang.NullPointerException: Cannot invoke \"org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions.selectTransactions(org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions$TransactionSelector)\" because \"this.pendingTransactions\" is null\r\n        at org.hyperledger.besu.ethereum.eth.transactions.TransactionPool.selectTransactions(TransactionPool.java:526)\r\n        at org.hyperledger.besu.ethereum.blockcreation.BlockTransactionSelector.buildTransactionListForBlock(BlockTransactionSelector.java:274)\r\n        at org.hyperledger.besu.ethereum.blockcreation.AbstractBlockCreator.selectTransactions(AbstractBlockCreator.java:362)\r\n        at org.hyperledger.besu.ethereum.blockcreation.AbstractBlockCreator.createBlock(AbstractBlockCreator.java:200)\r\n        ... 11 more\r\n```\r\n\r\n### Steps to Reproduce (Bug)\r\n\r\n1. Start a 5 node QBFT chain\r\n2. Stop one of the nodes and delete its database\r\n3. Restart the node with `--sync-mode=FAST --fast-sync-min-peers=4` (the min peers is needed to avoid the min number of 5 before syncing starts)\r\n\r\n**Expected behavior:** The node syncs with the chain and then resumes proposing & validating blocks (since it was before it was stopped and its data deleted)\r\n\r\n**Actual behavior:** NPE ^^",
-  "closed_by": null,
+  "closed_by": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5856/reactions",
     "total_count": 0,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5856/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -239,8 +258,8 @@
     "body": "Need any assistance let us know ",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1714652112/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
