@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4738",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4738/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4738/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4738/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4738",
+  "id": 1897886466,
+  "node_id": "I_kwDOCFeAzc5xH3MC",
+  "number": 4738,
+  "title": "Genesis state download sometimes panics",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 5676702110,
+      "node_id": "LA_kwDOCFeAzc8AAAABUluZng",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/v4.5.0",
+      "name": "v4.5.0",
+      "color": "574414",
+      "default": false,
+      "description": "ETA Q4 2023"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-09-15T07:40:46Z",
+  "updated_at": "2023-09-15T07:42:43Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWe've identified a bug in the downloading of genesis states that is used on Holesky and Chiado (introduced in #4653).\r\n\r\nThe problem is that we use the `reqwest::blocking::Client` to download the state, [which can panic if called from an async context](https://github.com/seanmonstar/reqwest/blob/a4e8ab694c639f889a110831041fdc93d924e504/src/blocking/client.rs#L845-L859):\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/common/eth2_network_config/src/lib.rs#L17\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/common/eth2_network_config/src/lib.rs#L378-L386\r\n\r\nWe call it from an async context via `genesis_state` here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/beacon_node/client/src/builder.rs#L259\r\n\r\nand here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/beacon_node/client/src/builder.rs#L279\r\n\r\nand here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/beacon_node/client/src/builder.rs#L380\r\n\r\ni.e. in all the cases where we are starting the client for the first time: genesis sync, and checkpoint sync from state on-disk or a URL\r\n\r\n## Version\r\n\r\nLighthouse v4.4.1\r\n\r\n## Impact\r\n\r\n- Has so far only been observed in debug mode (not `--release`).\r\n- Only occurs on first start-up. Once the state is downloaded it is subsequently read from the DB.\r\n- Can be worked around.\r\n\r\n## Workaround\r\n\r\nInstead of `--network holesky`, use `--testnet-dir` pointed to the [custom_config_data](https://github.com/eth-clients/holesky/tree/main/custom_config_data) for Holesky.\r\n\r\n## Steps to resolve\r\n\r\n- Option 1: wrap the calls in `spawn_blocking` or similar.\r\n- Option 2: use the async reqwest client in `Eth2NetworkConfig` and propagate the async-ness (this might be painful).\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4738/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4738/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1720824903",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4738#issuecomment-1720824903",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4738",
+    "id": 1720824903,
+    "node_id": "IC_kwDOCFeAzc5mkbRH",
+    "user": {
+      "login": "michaelsproul",
+      "id": 4452260,
+      "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/michaelsproul",
+      "html_url": "https://github.com/michaelsproul",
+      "followers_url": "https://api.github.com/users/michaelsproul/followers",
+      "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+      "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+      "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+      "repos_url": "https://api.github.com/users/michaelsproul/repos",
+      "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-15T07:42:43Z",
+    "updated_at": "2023-09-15T07:42:43Z",
+    "author_association": "MEMBER",
+    "body": "For reference the panic includes this message:\r\n\r\n> panicked at 'Cannot drop a runtime in a context where blocking is not allowed. This happens when a runtime is dropped from within an asynchronous context.'\r\n\r\nThanks @jmcph4 for reporting, and assisting debug alongside @jimmygchen ",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1720824903/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]
