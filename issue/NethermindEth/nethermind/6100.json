@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6100",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6100/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6100/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6100/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/6100",
+  "id": 1899267767,
+  "node_id": "I_kwDOBggaLc5xNIa3",
+  "number": 6100,
+  "title": "change in block gas limit causes loss of consensus",
+  "user": {
+    "login": "svanegmond",
+    "id": 837744,
+    "node_id": "MDQ6VXNlcjgzNzc0NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/837744?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/svanegmond",
+    "html_url": "https://github.com/svanegmond",
+    "followers_url": "https://api.github.com/users/svanegmond/followers",
+    "following_url": "https://api.github.com/users/svanegmond/following{/other_user}",
+    "gists_url": "https://api.github.com/users/svanegmond/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/svanegmond/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/svanegmond/subscriptions",
+    "organizations_url": "https://api.github.com/users/svanegmond/orgs",
+    "repos_url": "https://api.github.com/users/svanegmond/repos",
+    "events_url": "https://api.github.com/users/svanegmond/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/svanegmond/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-16T02:52:35Z",
+  "updated_at": "2023-09-16T02:53:24Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Description**\r\nWhile processing shyft mainnet chain from the beginning, nethermind 1.20.3, block processor loses consensus as soon as the block gas limit changed.\r\n\r\n**Steps to Reproduce**\r\n\r\nSync Shyft chain from beginning. Any archive mode.   Nethermind [config template](https://github.com/shyftfederation/ansible-playbooks/blob/main/assets/nethermind.cfg.j2), [chainspec](https://spec.shyft.network/ShyftMainnet-current.json), [static nodes](https://spec.shyft.network/static-nodes-ipv4.json).\r\n\r\nAt block 4431021 per our chainspec there is a change to the block gas limit, identifying a contract that returns a constant.\r\n\r\nBug occurs in linux-arm64-1.20.3 official build from releases page.\r\n\r\nDowngrading to 1.19.3 - no problem at this block. Processing continues normally.\r\n\r\n\r\n**Actual behavior**\r\n\r\n```\r\nProcessed     4430410...  4430777 |    705.72 ms  | slot   1,014 ms     | Gas gwei: 0.00 .. 0.00 (0.00) .. 0.00\r\n- Blocks              1.37 MGas   |     65    txs | calls    368 (  0)  | sload  13,055 | sstore  1,840 | create   0\r\n- Block throughput    1.93 MGas/s |     92.10 t/s |          521.45 b/s | recv        0 | proc        1\r\nBlock gas limit was changed from 10000000 to 40000000.\r\nProcessed     4430778...  4431022 |    694.12 ms  | slot   1,003 ms     | Gas gwei: 0.00 .. 0.00 (0.00) .. 0.00\r\n- Blocks              0.99 MGas   |     47    txs | calls    245 (  0)  | sload   8,714 | sstore  1,234 | create   0\r\n- Block throughput    1.42 MGas/s |     67.71 t/s |          352.96 b/s | recv        0 | proc       10\r\nProcessed block 4431025 (0x36b538...cb2871) is invalid:\r\n- hash: expected 0xca517716bf5ea33db1af7a3a5cb667d62aa78a4b6bec3a09a2e04371b6a73145, got 0x36b5387aae28ede9eed2b6e688d8b0edb52628453b05ddeecd6bee80d0cb2871\r\n- gas used: expected 50388, got 49344 (diff: -1044)\r\n- receipts root: expected 0xc07bef762118c70cb5eb4800a3eaf3f370e0e700cec691be181475f2c503beef, got 0x5cac4c16400e8ebb88bb84cc65fed87d20b0d24a2ee04dd8d7333f476aa75142\r\n- state root: expected 0x7bd01fdc0cb6b366fba26d896a3616997c2711bab70856bf6c34af47c3cc3ed2, got 0x7fe05cdef5fdc676a9b29b54215df5242ec8771feba3297f692183bcabc699e4\r\nProcessed block is not valid 4431025 (0xca517716bf5ea33db1af7a3a5cb667d62aa78a4b6bec3a09a2e04371b6a73145)\r\nSuggested block TD: 1507799674885851355067799469895350738832750640, Suggested block IsPostMerge False, Block TD: 1507799674885851355067799469895350738832750640, Block >\r\nCurrent contract validators (19): [0x61e952deeedd57e54a057fd5c612e7baf2dd5d09, 0x9435ca62d3b1341631fbe3d545e5e41ef9975c6f, 0xadd60cac91853ff3393e79af171027e38d03e9dc, >\r\nProcessed block 4431025 (0x36b538...cb2871) is invalid:\r\n- hash: expected 0xca517716bf5ea33db1af7a3a5cb667d62aa78a4b6bec3a09a2e04371b6a73145, got 0x36b5387aae28ede9eed2b6e688d8b0edb52628453b05ddeecd6bee80d0cb2871\r\n- gas used: expected 50388, got 49344 (diff: -1044)\r\n- receipts root: expected 0xc07bef762118c70cb5eb4800a3eaf3f370e0e700cec691be181475f2c503beef, got 0x5cac4c16400e8ebb88bb84cc65fed87d20b0d24a2ee04dd8d7333f476aa75142\r\n- state root: expected 0x7bd01fdc0cb6b366fba26d896a3616997c2711bab70856bf6c34af47c3cc3ed2, got 0x7fe05cdef5fdc676a9b29b54215df5242ec8771feba3297f692183bcabc699e4\r\nProcessed block is not valid 4431025 (0xca517716bf5ea33db1af7a3a5cb667d62aa78a4b6bec3a09a2e04371b6a73145)\r\nSuggested block TD: 1507799674885851355067799469895350738832750640, Suggested block IsPostMerge False, Block TD: 1507799674885851355067799469895350738832750640, Block >\r\nCreated a Receipts trace of block 0xca517716bf5ea33db1af7a3a5cb667d62aa78a4b6bec3a09a2e04371b6a73145 in file /tmp/receipts_0xca517716bf5ea33db1af7a3a5cb667d62aa78a4b6b>\r\nDeleting an invalid block or its descendant 0xb4949293aa18427d17a8d8a73a1f635b44699d2fb06c83a216668bcd67327b70\r\n\r\n... etc, etc\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6100/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6100/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
