@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7285",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7285/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7285/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7285/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/7285",
+  "id": 1900552837,
+  "node_id": "I_kwDODjvEJM5xSCKF",
+  "number": 7285,
+  "title": "op-node: SyncClient may incorrectly remove peers.",
+  "user": {
+    "login": "welkin22",
+    "id": 136572398,
+    "node_id": "U_kgDOCCPt7g",
+    "avatar_url": "https://avatars.githubusercontent.com/u/136572398?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/welkin22",
+    "html_url": "https://github.com/welkin22",
+    "followers_url": "https://api.github.com/users/welkin22/followers",
+    "following_url": "https://api.github.com/users/welkin22/following{/other_user}",
+    "gists_url": "https://api.github.com/users/welkin22/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/welkin22/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/welkin22/subscriptions",
+    "organizations_url": "https://api.github.com/users/welkin22/orgs",
+    "repos_url": "https://api.github.com/users/welkin22/repos",
+    "events_url": "https://api.github.com/users/welkin22/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/welkin22/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-18T09:43:16Z",
+  "updated_at": "2023-09-18T09:50:25Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Describe the bug**\r\nI noticed the following code\r\n```\r\nn.syncCl = NewSyncClient(log, rollupCfg, n.host.NewStream, gossipIn.OnUnsafeL2Payload, metrics, n.appScorer)\r\n\t\t\tn.host.Network().Notify(&network.NotifyBundle{\r\n\t\t\t\tConnectedF: func(nw network.Network, conn network.Conn) {\r\n\t\t\t\t\tn.syncCl.AddPeer(conn.RemotePeer())\r\n\t\t\t\t},\r\n\t\t\t\tDisconnectedF: func(nw network.Network, conn network.Conn) {\r\n\t\t\t\t\tn.syncCl.RemovePeer(conn.RemotePeer())\r\n\t\t\t\t},\r\n\t\t\t})\r\n```\r\nWhen the staticPeer is configured with a DNS address (such as /dns/xxx.com/tcp/xxx/p2p/xxx), a peer can obtain multiple IP addresses through domain name resolution. However, in Libp2p, dialing concurrently can result in one peer corresponding to multiple connections, which is exacerbated by multiple IP addresses. If one of the connections is disconnected due to an unstable network or other reasons, the Notifiee.Disconnected event is triggered. At this time, the peer is removed from the syncClient, and the processing flow of the peerLoop exits. The log displays the message `stopped syncing loop of peer`. However, the peer still has other connections that can be used for p2p synchronization. Therefore, we should not remove this peer unless we determine that all of its connections are disconnected and there are no available connections, just like the check performed by the `monitorStaticPeers` function.\r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\n1. Configuration --p2p.static=/dns/xxx.com/tcp/xxx/p2p/xxx\r\n2. Run op-node\r\n3. Sometimes it can be observed that the same peers establish multiple connections.There are multiple `connected to peer` records for the same peer in the log.\r\n4. After a while, one of the connections was disconnected, causing a `stopped syncing loop of peer`\r\n\r\n\r\n**Expected behavior**\r\nwe should not remove this peer unless we determine that all of its connections are disconnected and there are no available connections\r\nSuggested changes:\r\n```\r\nDisconnectedF: func(nw network.Network, conn network.Conn) {\r\n\t\t\t\t\t// only when no connection is available, we can remove the peer\r\n\t\t\t\t\tif nw.Connectedness(conn.RemotePeer()) == network.NotConnected {\r\n\t\t\t\t\t\tn.syncCl.RemovePeer(conn.RemotePeer())\r\n\t\t\t\t\t}\r\n\t\t\t\t},\r\n```\r\n\r\n**Screenshots**\r\n![截屏2023-09-18 17 29 39](https://github.com/ethereum-optimism/optimism/assets/136572398/6a131e55-a289-493e-8a9f-5e7405c1dfd7)\r\n\r\n\r\n**System Specs:**\r\n - OS: linux\r\n - Package Version (or commit hash): release/bedrock-mainnet but I believe the latest code also has this issue\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7285/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7285/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
