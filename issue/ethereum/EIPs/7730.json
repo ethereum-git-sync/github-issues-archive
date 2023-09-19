@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-09-18T18:30:40Z",
-  "updated_at": "2023-09-18T19:18:36Z",
-  "closed_at": null,
+  "updated_at": "2023-09-19T14:43:34Z",
+  "closed_at": "2023-09-19T14:43:34Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Specification (v1)\r\nThe below is only usable between blocks FORK_BLKNUM and FORK_BLKNUM + EFFECTIVE_DURATION (both TBA).\r\n\r\nIf the v value of a signature is (strictly) greater than 1024, then calculate the sender as follows:\r\n\r\nLet s be the sender computed according to the normal algorithm, using 27 as the v value if the provided v is odd, and 28 if the provided v is even.\r\nLet the actual sender be the address that a contract would be created at if its sender is s and the contract creation nonce is floor((v - 1025) / 2).\r\nTransactions with v values strictly greater than 1024 are only valid if the sender account is nonexistent or its code is empty.\r\n\r\nIf the v value of a signature is 1023 or 1024, then calculate the sender as follows:\r\n\r\nLet P be the public key computed according to the normal algorithm, in the 64-byte packed form that is normally hashed to determine the sender address, using 27 as the v value if the provided v is odd, and 28 if the provided v is even.\r\nLet the actual sender be the last 20 bytes of the sha3 of the lowercase non-prefixed hex encoded form of P instead of the binary raw P itself.\r\nSpecification (v2)\r\nCreate a solidity contract with the following functions:\r\n\r\ndeclareEmptyContract(index): computes rlp.encode([msg.sender, index]); if there is a contract at this address with ether and no code, then the contract saves a record that this contract has been checked, and sends an equal amount of \"future ether\" (an ERC20 token) at that account.\r\ndeclareLowercaseHexAddress(pubkey): checks sha3(pubkey) % 2**160 == msg.sender; then checks that sha3(pubkey.encode('hex')) % 2**160 has ether; if it does, then the contract saves a record that this contract has been checked, and sends an equal amount of \"future ether\" (an ERC20 token) at that account\r\nwithdraw(): deletes the msg.sender's future ether, and sends it an equivalent amount of ether.\r\nThe hard fork would increase the future ether contract's balance by an amount equal to the total quantity of extant future ether.\r\n\r\nSpecification (v3)\r\nFollow v2, but distribute the future ether on a Casper testnet. Then, later have a single step that converts both Casper ether and ethereum 1.0 ether into ether as part of the Serenity hardfork.\r\n\r\nRationale\r\nThis allows for users with ether or other assets in common classes of \"stuck\" accounts to withdraw their assets. The first case covers contracts that are accidentally created with no code, as well as some losses due to replay attacks where a contract was created on ETC, funds sent on ETH but the contract not created on ETH; the second case covers losses due to an old ethereum javascript library that incorrectly computed ethereum addresses. Note that in all cases, the \"rightful owner\" of the assets is obvious and mathematically provable, and no user is being deprived of any assets, and this proposal provides no explicit favor to any single account, user or application.\r\n\r\nIt is understood that there may be a risk that this proposal will be viewed controversially as it is in some sense a \"rescue\" rather than a \"technical improvement\", even though it is arguably much less intrusive than previous such proposals for the reasons outlined above; the proposal is created in order to allow community discussion and debate and does not signify full endorsement.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Pandapip1",
+    "id": 45835846,
+    "node_id": "MDQ6VXNlcjQ1ODM1ODQ2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/45835846?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Pandapip1",
+    "html_url": "https://github.com/Pandapip1",
+    "followers_url": "https://api.github.com/users/Pandapip1/followers",
+    "following_url": "https://api.github.com/users/Pandapip1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Pandapip1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Pandapip1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Pandapip1/subscriptions",
+    "organizations_url": "https://api.github.com/users/Pandapip1/orgs",
+    "repos_url": "https://api.github.com/users/Pandapip1/repos",
+    "events_url": "https://api.github.com/users/Pandapip1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Pandapip1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/EIPs/issues/7730/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/EIPs/issues/7730/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "I created what I thought was a complete contract and funded it with some eth, only to find out later the contract had no functions or code, how do I get my eth out of this now (now classed as an EOW) Thanks.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/1724167705/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/1725786737",
+    "html_url": "https://github.com/ethereum/EIPs/issues/7730#issuecomment-1725786737",
+    "issue_url": "https://api.github.com/repos/ethereum/EIPs/issues/7730",
+    "id": 1725786737,
+    "node_id": "IC_kwDOAq426M5m3Wpx",
+    "user": {
+      "login": "Pandapip1",
+      "id": 45835846,
+      "node_id": "MDQ6VXNlcjQ1ODM1ODQ2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45835846?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Pandapip1",
+      "html_url": "https://github.com/Pandapip1",
+      "followers_url": "https://api.github.com/users/Pandapip1/followers",
+      "following_url": "https://api.github.com/users/Pandapip1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Pandapip1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Pandapip1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Pandapip1/subscriptions",
+      "organizations_url": "https://api.github.com/users/Pandapip1/orgs",
+      "repos_url": "https://api.github.com/users/Pandapip1/repos",
+      "events_url": "https://api.github.com/users/Pandapip1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Pandapip1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-19T14:43:34Z",
+    "updated_at": "2023-09-19T14:43:34Z",
+    "author_association": "MEMBER",
+    "body": "This is not the right place to discuss potential EIPs. Please use [FEM](https://ethereum-magicians.org).\r\n\r\nThere is currently no way to \"reclaim\" stuck ether. Anyone who tells you otherwise is probably a scammer.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/EIPs/issues/comments/1725786737/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
