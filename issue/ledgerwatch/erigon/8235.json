@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8235",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8235/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8235/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8235/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8235",
+  "id": 1902533200,
+  "node_id": "I_kwDOC0FsAM5xZlpQ",
+  "number": 8235,
+  "title": "Unhandled Exception - panic: runtime error: index out of range [32] with length 32",
+  "user": {
+    "login": "mbwmbw1337",
+    "id": 6092663,
+    "node_id": "MDQ6VXNlcjYwOTI2NjM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6092663?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mbwmbw1337",
+    "html_url": "https://github.com/mbwmbw1337",
+    "followers_url": "https://api.github.com/users/mbwmbw1337/followers",
+    "following_url": "https://api.github.com/users/mbwmbw1337/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mbwmbw1337/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mbwmbw1337/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mbwmbw1337/subscriptions",
+    "organizations_url": "https://api.github.com/users/mbwmbw1337/orgs",
+    "repos_url": "https://api.github.com/users/mbwmbw1337/repos",
+    "events_url": "https://api.github.com/users/mbwmbw1337/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mbwmbw1337/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-19T09:05:17Z",
+  "updated_at": "2023-09-19T09:06:41Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I run a cluster of over 30 Erigon full archive nodes. About 30-50% have been having this unhandled panic causing the application to completely exit. I restarted the Application, and it seems to progress.\r\n\r\nMay be related to:\r\n- https://github.com/golang/go/issues/60860\r\n- https://github.com/hajimehoshi/ebiten/issues/1173\r\n\r\n**Version**\r\n```\r\n/home/erigon/erigon/build/bin/erigon -v\r\nerigon version 2.49.0-dev-8983128d\r\n```\r\n\r\n**Command**\r\n#bin/bash\r\n```\r\n/home/erigon/erigon/build/bin/erigon \\\r\n--chain=mainnet \\\r\n--torrent.upload.rate=\"1024mb\" \\\r\n--torrent.download.rate=\"1024mb\" \\\r\n--datadir=\"$(eval echo ~$USER)/erigon-eth\" \\\r\n--internalcl \\\r\n--chain=mainnet \\\r\n--port=30501 \\\r\n--http.port=9201 \\\r\n--authrpc.port=9101 \\\r\n--authrpc.addr=0.0.0.0 \\\r\n--authrpc.vhosts=* \\\r\n--torrent.port=42501 \\\r\n--private.api.addr=127.0.0.1:9090 \\\r\n--nat=\"extip:$(curl -s ifconfig.me)\" \\\r\n--http \\\r\n--http.api=eth,erigon,web3,net,debug,trace,txpool \\\r\n--ws \\\r\n--ws.compression\r\n```\r\n\r\n```\r\nINFO[09-19|02:04:08.874] head updated                             hash=0x6c1b7d9718a6a3ca96697f0d9d491b4dbfc7bf9bfa0a5c271b9d81253bfd84ec number=18165895\r\nINFO[09-19|02:04:08.952] [5/7 Execution] Completed on             block=18165896\r\nINFO[09-19|02:04:09.050] [Caplin] Downloading epochs from reqresp app=caplin stage=CatchUpEpochs from=229826 to=229837\r\nINFO[09-19|02:04:09.885] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229826\r\nINFO[09-19|02:04:11.283] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229827\r\nINFO[09-19|02:04:13.362] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229828\r\nINFO[09-19|02:04:17.599] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229829\r\nINFO[09-19|02:04:19.601] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229830\r\nINFO[09-19|02:04:24.058] [txpool] stat                            pending=10000 baseFee=30000 queued=30000 alloc=8.9GB sys=22.3GB\r\nINFO[09-19|02:04:26.528] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229831\r\nINFO[09-19|02:04:28.791] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229832\r\nINFO[09-19|02:04:32.869] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229833\r\nINFO[09-19|02:04:34.886] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229834\r\nINFO[09-19|02:04:39.550] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229835\r\nINFO[09-19|02:04:42.288] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229836\r\nINFO[09-19|02:04:47.409] [Caplin] Epoch downloaded                app=caplin stage=CatchUpEpochs epoch=229837\r\nINFO[09-19|02:04:57.524] [3/12 Senders] Started                   from=18165895 to=18166277\r\nINFO[09-19|02:04:57.945] [4/12 Execution] Blocks execution        from=18165895 to=18166277\r\npanic: runtime error: index out of range [32] with length 32\r\n\r\ngoroutine 102629835 [running]:\r\ngithub.com/tidwall/btree.(*Map[...]).nodeAscend(0x2ddd7a0?, 0xc02ea62960, 0x1?, 0xc0c1685e78, 0x60)\r\n        github.com/tidwall/btree@v1.6.0/map.go:530 +0x225\r\ngithub.com/tidwall/btree.(*Map[...]).nodeAscend(0x2ddd7a0?, 0xc03447ddc8, 0x1?, 0xc0c1685e78, 0xe0)\r\n        github.com/tidwall/btree@v1.6.0/map.go:516 +0x12d\r\ngithub.com/tidwall/btree.(*Map[...]).ascend(...)\r\n        github.com/tidwall/btree@v1.6.0/map.go:504\r\ngithub.com/tidwall/btree.(*Map[...]).AscendMut(0x43c6aa?, 0xc18b0ac4a0?, 0x10?)\r\n        github.com/tidwall/btree@v1.6.0/map.go:497 +0x45\r\ngithub.com/ledgerwatch/erigon/cl/persistence.(*GossipSource).PurgeRange(0xc17e0e36d8?, {0x5707d6?, 0x2d925a0?}, 0xc07fa10500?, 0xc21e90aeb0?)\r\n        github.com/ledgerwatch/erigon/cl/persistence/block_store.go:112 +0xf5\r\ngithub.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func16({0x2d925a0, 0xc21e90aeb0}, {0x2da4870?, 0xc0a89a7b60?}, 0xc032c18780, {0x18, 0x381cd, 0x381ce, 0x7039c6, 0x7039c6})\r\n        github.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:492 +0x5b\r\ngithub.com/ledgerwatch/erigon/cl/clstages.(*StageGraph[...]).StartWithStage.func1()\r\n        github.com/ledgerwatch/erigon/cl/clstages/clstages.go:39 +0xe4\r\ncreated by github.com/ledgerwatch/erigon/cl/clstages.(*StageGraph[...]).StartWithStage\r\n        github.com/ledgerwatch/erigon/cl/clstages/clstages.go:33 +0x3e5\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8235/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8235/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
