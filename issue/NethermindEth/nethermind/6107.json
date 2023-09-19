@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6107",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6107/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6107/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6107/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/6107",
+  "id": 1902519513,
+  "node_id": "I_kwDOBggaLc5xZiTZ",
+  "number": 6107,
+  "title": "Use Jemalloc for significant memory reduction",
+  "user": {
+    "login": "asdacap",
+    "id": 1841324,
+    "node_id": "MDQ6VXNlcjE4NDEzMjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1841324?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/asdacap",
+    "html_url": "https://github.com/asdacap",
+    "followers_url": "https://api.github.com/users/asdacap/followers",
+    "following_url": "https://api.github.com/users/asdacap/following{/other_user}",
+    "gists_url": "https://api.github.com/users/asdacap/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/asdacap/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/asdacap/subscriptions",
+    "organizations_url": "https://api.github.com/users/asdacap/orgs",
+    "repos_url": "https://api.github.com/users/asdacap/repos",
+    "events_url": "https://api.github.com/users/asdacap/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/asdacap/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-19T08:57:54Z",
+  "updated_at": "2023-09-19T10:36:02Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "- When looking at memory allocation it turns out that a large proportion of the memory allocation is due to glibc malloc fragmentation.\r\n- I call this \"magic overhead\" which can be measured via .net gc info, Load-(Committed + DB memory).\r\n- This is surprisingly common for application utilizing rocksdb:\r\n  - https://blog.cloudflare.com/the-effect-of-switching-to-tcmalloc-on-rocksdb-memory-use/\r\n  - https://engineering.linkedin.com/blog/2021/taming-memory-fragmentation-in-venice-with-jemalloc\r\n- This can be validated by limiting the number of heap via env variable `MALLOC_ARENA_MAX` to something like 4. The default is core count * 8 on 64 bit system.\r\n- Here are the overhead size on various configuration. Tested on a Ryzen 9 7950X, memory limited to 32GB via systemd-run:\r\n\r\n| Configuration | Overhead (GB) |\r\n| ----------------- | -------------------- |\r\n| Default           | 13.5 |\r\n| Call `malloc_trim` every 5 minute | 7.5 |\r\n| MALLOC_ARENA_MAX=32 | 4.5 |\r\n| MALLOC_MMAP_THRESHOLD=64000 | 5.5 |\r\n| Jemalloc via LD_PRELOAD | 1.5 |\r\n\r\n- Which basically mean, jemalloc is the end goal. However, I've no idea how to deploy this in a cross platform manner.\r\n- Adjusting malloc parameters comes with tradeoff of either lock contention (reduced arena count) or higher system CPU usage (MMAP_THRESHOLD and friends).\r\n- It is possible to change the malloc config via `mallopts` call at runtime, however it does not work for limiting num of arena as the arena would have already been created by .net runtime by the time managed code start running.\r\n- Using `mallopts` for limiting `MALLOC_MMAP_THRESHOLD` seems promising, but it does not work as well as just limiting arena count to 32.\r\n\r\n- Graph is (jemalloc, default, max arena 32, jemalloc, default, call trim every 5 minute)\r\n![Screenshot_2023-09-19_16-34-21](https://github.com/NethermindEth/nethermind/assets/1841324/971679b6-e581-4cc6-88e4-da179ddb512d)\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6107/reactions",
+    "total_count": 2,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 2,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6107/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
