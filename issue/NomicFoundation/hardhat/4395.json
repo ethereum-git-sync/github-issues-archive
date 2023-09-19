@@ -40,7 +40,7 @@
       "description": "There's not enough information to start working on this issue"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "ChristopherDedominici",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-09-18T16:28:23Z",
-  "updated_at": "2023-09-19T09:35:43Z",
-  "closed_at": null,
+  "updated_at": "2023-09-19T15:56:38Z",
+  "closed_at": "2023-09-19T15:56:38Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\n\n2.13.0\n\n### What happened?\n\nthis is a part of my smart contract.\r\n````\r\nimport \"@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol\";\r\n...\r\ncontract Test {\r\n...\r\n  function createVault(uint256 vaultId) {\r\n    ...\r\n    address vault = ClonesUpgradeable.clone(vaultImplementation);\r\n    console.log(vault);\r\n    emit VaultCreated(msg.sender, vault);\r\n  }\r\n}\r\n````\r\nAnd I called `createVault()` function several times using scripts(javascript) in one test file.\r\nit should've generated different address of vaults each time but all addresses are the same so i can't do further test on behavior of those vaults.\r\n````\r\nTest.connect(alice).createVault(1);\r\nTest.connect(bob).createVault(2);\r\n````\n\n### Minimal reproduction steps\n\nrun `npx hardhat test` to check the generated addresses in the console.\r\nThey are always the same.\n\n### Search terms\n\nclone same address",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hawkofsky",
+    "id": 53114416,
+    "node_id": "MDQ6VXNlcjUzMTE0NDE2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/53114416?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hawkofsky",
+    "html_url": "https://github.com/hawkofsky",
+    "followers_url": "https://api.github.com/users/hawkofsky/followers",
+    "following_url": "https://api.github.com/users/hawkofsky/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hawkofsky/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hawkofsky/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hawkofsky/subscriptions",
+    "organizations_url": "https://api.github.com/users/hawkofsky/orgs",
+    "repos_url": "https://api.github.com/users/hawkofsky/repos",
+    "events_url": "https://api.github.com/users/hawkofsky/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hawkofsky/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4395/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4395/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -142,6 +161,50 @@
     "body": "Hey @hawkofsky, I tried to reproduce this but I couldn't. Here's what I tried.\r\n\r\nI have this solidity code:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\nimport \"@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol\";\r\n\r\nimport \"hardhat/console.sol\";\r\n\r\ncontract Foo {}\r\n\r\ncontract Test {\r\n  function createClone(address implementation) public {\r\n    address clone = ClonesUpgradeable.clone(implementation);\r\n    console.log(clone);\r\n  }\r\n}\r\n```\r\n\r\nand this test:\r\n\r\n```js\r\nconst { expect } = require(\"chai\");\r\n\r\ndescribe(\"clones\", function () {\r\n  it(\"test\", async function () {\r\n    const foo = await ethers.deployContract(\"Foo\");\r\n    const test = await ethers.deployContract(\"Test\");\r\n\r\n    await test.createClone(foo.target);\r\n  });\r\n\r\n  it(\"test 2\", async function () {\r\n    const foo = await ethers.deployContract(\"Foo\");\r\n    const test = await ethers.deployContract(\"Test\");\r\n\r\n    await test.createClone(foo.target);\r\n  });\r\n});\r\n```\r\n\r\nAnd two different addresses are logged.\r\n\r\nOne reason why this could be happening to you is if you are resetting the network, for example doing something like:\r\n\r\n```js\r\n  // reset the network before each test\r\n  beforeEach(async function () {\r\n    await network.provider.send(\"hardhat_reset\", [])\r\n  });\r\n```\r\n\r\nThe other reason this could be happening is if you are using [fixtures](https://hardhat.org/hardhat-runner/docs/guides/test-contracts#using-fixtures), which use snapshots under the hood.\r\n\r\nIf neither of those is the case, then we'll need a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example) to be able to look into this.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1725158973/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1725942238",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4395#issuecomment-1725942238",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4395",
+    "id": 1725942238,
+    "node_id": "IC_kwDOB7jojM5m38ne",
+    "user": {
+      "login": "hawkofsky",
+      "id": 53114416,
+      "node_id": "MDQ6VXNlcjUzMTE0NDE2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/53114416?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hawkofsky",
+      "html_url": "https://github.com/hawkofsky",
+      "followers_url": "https://api.github.com/users/hawkofsky/followers",
+      "following_url": "https://api.github.com/users/hawkofsky/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hawkofsky/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hawkofsky/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hawkofsky/subscriptions",
+      "organizations_url": "https://api.github.com/users/hawkofsky/orgs",
+      "repos_url": "https://api.github.com/users/hawkofsky/repos",
+      "events_url": "https://api.github.com/users/hawkofsky/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hawkofsky/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-19T15:56:38Z",
+    "updated_at": "2023-09-19T15:56:38Z",
+    "author_association": "NONE",
+    "body": "Oh, you're right. It works now. Thank you.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1725942238/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
