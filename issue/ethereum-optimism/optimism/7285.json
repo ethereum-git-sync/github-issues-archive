@@ -41,7 +41,7 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-09-18T09:43:16Z",
-  "updated_at": "2023-09-19T09:38:51Z",
+  "updated_at": "2023-09-20T06:21:03Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -91,9 +91,9 @@
       "site_admin": false
     },
     "created_at": "2023-09-19T07:55:49Z",
-    "updated_at": "2023-09-19T09:38:51Z",
+    "updated_at": "2023-09-20T06:21:03Z",
     "author_association": "NONE",
-    "body": "Maybe we should use the `peerConnectWatcher` struct from github.com/libp2p/go-libp2p@v0.25.1/p2p/host/basic/peer_connectedness.go, it already does all the work we need\r\n\r\nexample:\r\n```\r\nsubscribe, err := n.host.EventBus().Subscribe(&event.EvtPeerConnectednessChanged{})\r\n\tgo func() {\r\n\t\tfor evt := range subscribe.Out() {\r\n\t\t\tevto := evt.(event.EvtPeerConnectednessChanged)\r\n\t\t\tif evto.Connectedness == network.Connected {\r\n\t\t\t\tlog.Info(\"event: connect peer\", \"peer\", evto.Peer)\r\n\t\t\t\tn.syncCl.AddPeer(evto.Peer)\r\n\t\t\t} else if evto.Connectedness == network.NotConnected {\r\n\t\t\t\tlog.Info(\"event: disconnect peer\", \"peer\", evto.Peer)\r\n\t\t\t\tn.syncCl.RemovePeer(evto.Peer)\r\n\t\t\t}\r\n\t\t}\r\n\t}()\r\n```",
+    "body": "Maybe we should use the `peerConnectWatcher` struct from github.com/libp2p/go-libp2p@v0.25.1/p2p/host/basic/peer_connectedness.go, it already does all the work we need\r\n\r\nexample:\r\n```\r\nsubscribe, err := n.host.EventBus().Subscribe(&event.EvtPeerConnectednessChanged{})\r\nif err != nil {\r\n    return fmt.Errorf(\"failed to subscribe peer connectedness changed event: %w\", err)\r\n}\r\ngo func() {\r\n    for evt := range subscribe.Out() {\r\n\t    evto := evt.(event.EvtPeerConnectednessChanged)\r\n\t    if evto.Connectedness == network.Connected {\r\n\t\t    log.Info(\"event: connect peer\", \"peer\", evto.Peer)\r\n\t\t    n.syncCl.AddPeer(evto.Peer)\r\n\t    } else if evto.Connectedness == network.NotConnected {\r\n\t\t    log.Info(\"event: disconnect peer\", \"peer\", evto.Peer)\r\n\t\t    n.syncCl.RemovePeer(evto.Peer)\r\n\t    }\r\n    }\r\n}()\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1725008298/reactions",
       "total_count": 0,
