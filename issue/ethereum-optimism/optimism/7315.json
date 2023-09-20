@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7315",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7315/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7315/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7315/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/7315",
+  "id": 1905193336,
+  "node_id": "I_kwDODjvEJM5xjvF4",
+  "number": 7315,
+  "title": "Cannon fraud proofs have debug_dbGet dependency",
+  "user": {
+    "login": "jyellick",
+    "id": 7431583,
+    "node_id": "MDQ6VXNlcjc0MzE1ODM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7431583?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jyellick",
+    "html_url": "https://github.com/jyellick",
+    "followers_url": "https://api.github.com/users/jyellick/followers",
+    "following_url": "https://api.github.com/users/jyellick/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jyellick/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jyellick/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jyellick/subscriptions",
+    "organizations_url": "https://api.github.com/users/jyellick/orgs",
+    "repos_url": "https://api.github.com/users/jyellick/repos",
+    "events_url": "https://api.github.com/users/jyellick/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jyellick/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-20T15:03:03Z",
+  "updated_at": "2023-09-20T15:03:03Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "I was a little unsure whether to classify this issue as a bug or a feature, so please feel free to convert.\r\n\r\nThere are a number of client diversity projects underway to bring Optimism support to Ethereum clients other than Geth.  The community seems to recognize the importance of having multiple client implementations for the health of the overall Optimism ecosystem.\r\n\r\nHowever, it seems that the Cannon fraud proofs are being built with a strong dependency on Geth specific APIs.  In particular, the `fraudproof_test.go` e2e tests seem to ultimately be using the `debug_dbGet` API.  Based on my reading of these tests, this API is not simply being used by the test, but is actually relied on by the implementation.  This feels like a serious problem because this API is not part of the formal Ethereum JSON RPC spec, so its behavior is not defined.  Additionally because there is no real versioning guarantees over the layout of the Geth database, it is also inherently not stable.\r\n\r\nI've not had a chance to really dig into exactly how this API is being used in Cannon, but based on other usage seen in the e2e tests, I suspect that its usage might be related to retrieving nodes of the Merkle Trie.  Could we instead use the `eth_getProof` API instead?  Do we need to put an EIP together for a new well specified API that other clients can implement?  Is the `debug_dbGet` usage simply intended to be transient and replaced with something else ultimately?  Is the coupling of the on-chain executing mini-Geth so tight that Cannon will never be able to be used with other Ethereum clients?\r\n\r\nIt would be great to hear some clarification on the above questions and to learn whether changes to eliminate this dependency would be welcomed.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7315/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7315/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
