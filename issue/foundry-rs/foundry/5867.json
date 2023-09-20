@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5867",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5867/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5867/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5867/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5867",
+  "id": 1905271691,
+  "node_id": "I_kwDOGBlvNc5xkCOL",
+  "number": 5867,
+  "title": "`forge script --json` swallows errors",
+  "user": {
+    "login": "amusingaxl",
+    "id": 112016538,
+    "node_id": "U_kgDOBq08mg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/112016538?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/amusingaxl",
+    "html_url": "https://github.com/amusingaxl",
+    "followers_url": "https://api.github.com/users/amusingaxl/followers",
+    "following_url": "https://api.github.com/users/amusingaxl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/amusingaxl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/amusingaxl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/amusingaxl/subscriptions",
+    "organizations_url": "https://api.github.com/users/amusingaxl/orgs",
+    "repos_url": "https://api.github.com/users/amusingaxl/repos",
+    "events_url": "https://api.github.com/users/amusingaxl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/amusingaxl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-20T15:42:58Z",
+  "updated_at": "2023-09-20T15:43:12Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [x] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (ec3f9bd 2023-09-19T13:44:30.009787069Z)\n\n### What command(s) is the bug in?\n\nforge script\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nErrors thrown in scripts when parsing JSON config are swallowed:\r\n\r\n```solidity\r\nimport {console2} from \"forge-std/console2.sol\";\r\nimport {Script} from \"forge-std/Script.sol\";\r\nimport {stdJson} from \"forge-std/StdJson.sol\";\r\n\r\ncontract MyScript is Script {\r\n    function run() {\r\n        string memory config = \"{\\\"nst\\\":\\\"0x7Fc85446b851eBD2ED047978E8A46fEb9b87e67f\\\",\\\"vestTot\\\":2000000000000000000000000,\\\"vestBgn\\\":1688158800,\\\"vestTau\\\":31536000,\\\"vestEta\\\":0}\";\r\n\r\n        ConfigReader reader = new ConfigReader(config);\r\n\r\n        console2.log(\"config:\", config);\r\n        try reader.readAddress(\".ngt\") returns (address) {\r\n\r\n        } catch (bytes memory e) {\r\n            console2.logBytes(e); // Displays the error\r\n        }\r\n        console2.log(\"ngt:\", config.readAddress(\".ngt\")); // Error is swallowed\r\n}\r\n```\r\n\r\n`ConfigReader` above is just a wrapper on top of `stdJson` so it can work with `try...catch` blocks:\r\n\r\n```solidity\r\ncontract ConfigReader {\r\n    string internal config;\r\n\r\n    constructor(string memory _config) {\r\n        config = _config;\r\n    }\r\n\r\n    function readAddress(string memory key) external returns (address) {\r\n        return stdJson.readAddress(config, key);\r\n    }\r\n\r\n    function readUint(string memory key) external returns (uint256) {\r\n        return stdJson.readUint(config, key);\r\n    }\r\n}\r\n```\r\n\r\nIf I run the script above:\r\n\r\n```bash\r\nforge script --json MyScript -vvvvv\r\n```\r\n\r\nI get:\r\n```\r\n{\r\n  \"logs\": [\r\n    \"config: {\\\"nst\\\":\\\"0x7Fc85446b851eBD2ED047978E8A46fEb9b87e67f\\\",\\\"vestTot\\\":2000000000000000000000000,\\\"vestBgn\\\":1688158800,\\\"vestTau\\\":31536000,\\\"vestEta\\\":0}\",\r\n    \"0x0bc445030000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002d4e6f206d61746368696e672076616c7565206f7220617272617920666f756e6420666f72206b6579202e6e677400000000000000000000000000000000000000\"\r\n  ],\r\n  \"gas_used\": 885313,\r\n  \"returns\": {}\r\n}\r\n```\r\n\r\nOnly the error caught is shown.\r\n\r\nWhen running the same script without `--json`, I get a proper error message:\r\n\r\n```\r\nError: \r\nNo matching value or array found for key .ngt\r\n```\r\n\r\nIf there is logging whatsoever (i.e.: simply try to read the missing JSON key), I simply get a pretty much empty response:\r\n\r\n```json\r\n{\r\n  \"logs\": [],\r\n  \"gas_used\": 874524,\r\n  \"returns\": {}\r\n}\r\n```\r\n\r\nwhich is not very useful.\r\n\r\nI understand that `--json` is supposed to output a valid JSON, but I can see 2 possible ways of doing this:\r\n1. Encode the error into a JSON string and add it to the payload.\r\n2. Use `stderr` to display the error in a non-JSON format.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5867/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5867/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
