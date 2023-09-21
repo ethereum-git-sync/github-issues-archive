@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28176",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28176/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28176/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28176/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28176",
+  "id": 1907267069,
+  "node_id": "I_kwDOAOvK985xrpX9",
+  "number": 28176,
+  "title": "Unexpected behavior for `StateDB.IntermediateRoot` and `StateDB.Copy`",
+  "user": {
+    "login": "wuestholz",
+    "id": 51156,
+    "node_id": "MDQ6VXNlcjUxMTU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/51156?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wuestholz",
+    "html_url": "https://github.com/wuestholz",
+    "followers_url": "https://api.github.com/users/wuestholz/followers",
+    "following_url": "https://api.github.com/users/wuestholz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wuestholz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wuestholz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wuestholz/subscriptions",
+    "organizations_url": "https://api.github.com/users/wuestholz/orgs",
+    "repos_url": "https://api.github.com/users/wuestholz/repos",
+    "events_url": "https://api.github.com/users/wuestholz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wuestholz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-21T15:38:02Z",
+  "updated_at": "2023-09-21T15:39:29Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version:  v1.13.1\r\n\r\n#### Expected behaviour\r\n\r\nWhen I run the following code snippet, I don't expect a panic:\r\n\r\n```golang\r\ndb := rawdb.NewMemoryDatabase()\r\nst1, _ := state.New(types.EmptyRootHash, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)\r\n\r\naddrA := common.HexToAddress(\"0xaaaaaaaa\")\r\nbal, _ := math.ParseBig256(\"0xfffffffffffffffffffffff\")\r\nst1.SetBalance(addrA, bal)\r\nvar nonceA uint64 = 0\r\nst1.SetNonce(addrA, nonceA)\r\nst1.SetCode(addrA, []byte{})\r\naddrB := common.HexToAddress(\"0xbbbbbbbb\")\r\nvar nonceB uint64 = 1\r\n\r\nst1Root, comErr1 := st1.Commit(0, false)\r\nif comErr1 != nil {\r\n\tpanic(comErr1)\r\n}\r\nst2, newErr1 := state.New(st1Root, st1.Database(), nil)\r\nif newErr1 != nil {\r\n\tpanic(newErr1)\r\n}\r\n\r\nst3 := st2\r\n\r\nst3.SetNonce(addrB, nonceB)\r\n\r\nskipIntermediateRoot := false // Setting this to true \"fixes it\".\r\nif !skipIntermediateRoot {\r\n\tst3.IntermediateRoot(false)\r\n}\r\n\r\nvar st4 *state.StateDB\r\nskipCopy := false // Setting this to true \"fixes it\".\r\nif skipCopy {\r\n\tst4 = st3\r\n} else {\r\n\tst4 = st3.Copy()\r\n}\r\n\r\nst4Root, comErr2 := st4.Commit(0, false)\r\nif comErr2 != nil {\r\n\tpanic(comErr2)\r\n}\r\nst5, newErr2 := state.New(st4Root, st4.Database(), nil)\r\nif newErr2 != nil {\r\n\tpanic(newErr2)\r\n}\r\n\r\nif st5.GetNonce(addrB) != nonceB {\r\n\tpanic(\"nonce of account B does not match\")\r\n}\r\n\r\nopenTr, openErr := st5.Database().OpenTrie(st4Root)\r\nif openErr != nil {\r\n\tpanic(openErr)\r\n}\r\nnodeIt, nodeItErr := openTr.NodeIterator(nil)\r\nif nodeItErr != nil {\r\n\tpanic(nodeItErr)\r\n}\r\nit := trie.NewIterator(nodeIt)\r\nfoundB := false\r\nfor it.Next() {\r\n\tkey := openTr.GetKey(it.Key)\r\n\tif key == nil {\r\n\t\tcontinue\r\n\t}\r\n\taddr := common.BytesToAddress(key)\r\n\tif addr == addrB {\r\n\t\tfoundB = true\r\n\t}\r\n}\r\nif !foundB {\r\n\tpanic(\"account B was not found\")\r\n}\r\n```\r\n\r\n#### Actual behaviour\r\n\r\nThe code produces a panic (\"account B was not found\").\r\n\r\nI don't understand why `addrB` is not found when iterating over the accounts of the final state (`st5`).\r\n\r\nI found two \"fixes\", but I don't understand why they work: (1) setting `skipCopy` to true or alternatively (2) setting `skipIntermediateRoot` to true.\r\n\r\nIs this the intended behavior?\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nRun the above code snippet with v1.13.1.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28176/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28176/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
