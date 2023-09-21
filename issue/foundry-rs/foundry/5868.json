@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5868",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5868/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5868/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5868/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5868",
+  "id": 1905788837,
+  "node_id": "I_kwDOGBlvNc5xmAel",
+  "number": 5868,
+  "title": "Invariant violation not found on simple 2 step owner transfer test",
+  "user": {
+    "login": "karmacoma-eth",
+    "id": 85039585,
+    "node_id": "MDQ6VXNlcjg1MDM5NTg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85039585?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/karmacoma-eth",
+    "html_url": "https://github.com/karmacoma-eth",
+    "followers_url": "https://api.github.com/users/karmacoma-eth/followers",
+    "following_url": "https://api.github.com/users/karmacoma-eth/following{/other_user}",
+    "gists_url": "https://api.github.com/users/karmacoma-eth/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/karmacoma-eth/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/karmacoma-eth/subscriptions",
+    "organizations_url": "https://api.github.com/users/karmacoma-eth/orgs",
+    "repos_url": "https://api.github.com/users/karmacoma-eth/repos",
+    "events_url": "https://api.github.com/users/karmacoma-eth/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/karmacoma-eth/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-20T22:15:36Z",
+  "updated_at": "2023-09-20T22:15:36Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (ec3f9bd 2023-09-19T13:48:52.205431000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\ntake the following src contract:\r\n\r\n```\r\ncontract Owned {\r\n    address public owner;\r\n    address private ownerCandidate;\r\n\r\n    constructor() {\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner);\r\n        _;\r\n    }\r\n\r\n    modifier onlyOwnerCandidate() {\r\n        require(msg.sender == ownerCandidate);\r\n        _;\r\n    }\r\n\r\n   function transferOwnership(address candidate) external onlyOwner {\r\n        ownerCandidate = candidate;\r\n    }\r\n\r\n    function acceptOwnership() external onlyOwnerCandidate {\r\n        owner = ownerCandidate;\r\n    }\r\n}\r\n```\r\n\r\nand the following test:\r\n\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.15;\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract Handler is Test {\r\n    Owned owned;\r\n\r\n    constructor(Owned _owned) {\r\n        owned = _owned;\r\n    }\r\n\r\n    function transferOwnership(address sender, address candidate) external {\r\n        vm.assume(sender != address(0));\r\n        vm.prank(sender);\r\n        owned.transferOwnership(candidate);\r\n    }\r\n\r\n    function acceptOwnership(address sender) external {\r\n        vm.assume(sender != address(0));\r\n        vm.prank(sender);\r\n        owned.acceptOwnership();\r\n    }\r\n}\r\n\r\ncontract TwoStepOwnershipTestFoundry is Test {\r\n    address owner;\r\n    Owned owned;\r\n    Handler handler;\r\n\r\n    function setUp() public {\r\n        owner = address(this);\r\n        owned = new Owned();\r\n\r\n        handler = new Handler(owned);\r\n        targetContract(address(handler));\r\n\r\n        bytes4[] memory selectors = new bytes4[](2);\r\n        selectors[0] = Handler.transferOwnership.selector;\r\n        selectors[1] = Handler.acceptOwnership.selector;\r\n        targetSelector(FuzzSelector(address(handler), selectors));\r\n    }\r\n\r\n    function test_successful_transfer(address newOwner) public {\r\n        handler.transferOwnership(owner, newOwner);\r\n        handler.acceptOwnership(newOwner);\r\n\r\n        assertEq(owned.owner(), newOwner);\r\n    }\r\n\r\n    function invariant_owner_never_changes_this_is_bad_lol() public returns(bool cond) {\r\n        cond = (owned.owner() == owner);\r\n        assertEq(owned.owner(), owner);\r\n    }\r\n}\r\n```\r\n\r\nThere is no trick here, this is a kind of sanity check for invariant testing. Note the `test_successful_transfer` test, all that is needed to violate the invariant is to chain these two call:\r\n\r\n```\r\n        // must pass the current owner as the first arg\r\n        handler.transferOwnership(owner, newOwner);\r\n\r\n        // must pass the same newOwner as in the previous call\r\n        handler.acceptOwnership(newOwner);\r\n```\r\n \r\nHowever:\r\n- running `forge test --mc TwoStepOwnershipTest` yields no violation\r\n- same thing with 10k fuzz runs\r\n- tried with 100k fuzz runs but I ended up killing forge after 20 min\r\n\r\ncc @horsefacts who helped investigate (https://twitter.com/eth_call/status/1704304001292914782)\r\ncc @mds1 who asked for the issue",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5868/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 1
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5868/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
