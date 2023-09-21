@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5926",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5926/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5926/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5926/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5926",
+  "id": 1907535518,
+  "node_id": "I_kwDODE2jmc5xsq6e",
+  "number": 5926,
+  "title": "Besu does not correctly detect DB type on Startup and Gracefully Exit  ",
+  "user": {
+    "login": "non-fungible-nelson",
+    "id": 85905982,
+    "node_id": "MDQ6VXNlcjg1OTA1OTgy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85905982?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/non-fungible-nelson",
+    "html_url": "https://github.com/non-fungible-nelson",
+    "followers_url": "https://api.github.com/users/non-fungible-nelson/followers",
+    "following_url": "https://api.github.com/users/non-fungible-nelson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/non-fungible-nelson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/non-fungible-nelson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/non-fungible-nelson/subscriptions",
+    "organizations_url": "https://api.github.com/users/non-fungible-nelson/orgs",
+    "repos_url": "https://api.github.com/users/non-fungible-nelson/repos",
+    "events_url": "https://api.github.com/users/non-fungible-nelson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/non-fungible-nelson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4328706977,
+      "node_id": "LA_kwDODE2jmc8AAAABAgLToQ",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamChupa",
+      "name": "TeamChupa",
+      "color": "fbca04",
+      "default": false,
+      "description": "GH issues worked on by Chupacabara Team"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-21T18:27:26Z",
+  "updated_at": "2023-09-21T20:06:48Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Description\nAs a node operator, I want my Besu instance to be able to gracefully detect a change in the configured storage format, and if a switch occurs from Forest <> Bonsai, to gracefully exit and log a complaint in my console. I do not want my node to start up and cause issues with the existing state trie. \n\nToday, the node can be switched from BONSAI to FOREST and will startup with JSON RPC errors and not fail gracefully. You can switch back to BONSAI from FOREST and recover without issue. \n\n### Existing Process \n\nBesu detects the Version 2 DB, even when FOREST is specified in the Config. Logs below running FOREST:\n```\n# Data storage: Forest                                                                             #\n2023-09-21 16:01:16.740-04:00 | main | INFO  | DatabaseMetadata | Lookup database metadata file in data directory: /Volumes/External DB 1/besu\n2023-09-21 16:01:16.767-04:00 | main | INFO  | RocksDBKeyValueStorageFactory | Existing database detected at /Volumes/External DB 1/besu. Version 2. Compacting database...\n```\nThis is followed immediately by normal startup logs and immediate JSON RPC errors...\n```\n 2023-09-21 16:01:39.632-04:00 | vert.x-worker-thread-14 | ERROR | BaseJsonRpcProcessor | Error processing method: eth_getBlockByNumber [\"latest\",false]\njava.lang.NullPointerException: Cannot invoke \"org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDbSegmentIdentifier.get()\" because \"segment\" is null\n\tat org.hyperledger.besu.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage.get(RocksDBColumnarKeyValueStorage.java:253)\n\tat org.hyperledger.besu.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage.get(RocksDBColumnarKeyValueStorage.java:69)\n\tat org.hyperledger.besu.services.kvstore.SegmentedKeyValueStorageAdapter.get(SegmentedKeyValueStorageAdapter.java:70)\n\tat org.hyperledger.besu.ethereum.storage.keyvalue.WorldStateKeyValueStorage.getTrieNode(WorldStateKeyValueStorage.java:77)\n\tat org.hyperledger.besu.ethereum.storage.keyvalue.WorldStateKeyValueStorage.getAccountStateTrieNode(WorldStateKeyValueStorage.java:64)\n\tat org.hyperledger.besu.ethereum.storage.keyvalue.WorldStateKeyValueStorage.isWorldStateAvailable(WorldStateKeyValueStorage.java:99)\n\tat org.hyperledger.besu.ethereum.worldstate.DefaultWorldStateArchive.isWorldStateAvailable(DefaultWorldStateArchive.java:54)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.EthGetBlockByNumber.latestResult(EthGetBlockByNumber.java:90)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.AbstractBlockParameterMethod.findResultByParamType(AbstractBlockParameterMethod.java:90)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.AbstractBlockParameterMethod.response(AbstractBlockParameterMethod.java:102)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.BaseJsonRpcProcessor.process(BaseJsonRpcProcessor.java:44)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.TracedJsonRpcProcessor.process(TracedJsonRpcProcessor.java:41)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.TimedJsonRpcProcessor.process(TimedJsonRpcProcessor.java:45)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.AuthenticatedJsonRpcProcessor.process(AuthenticatedJsonRpcProcessor.java:51)\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.JsonRpcExecutor.execute(JsonRpcExecutor.java:92)\n\tat org.hyperledger.besu.ethereum.api.handlers.AbstractJsonRpcExecutor.executeRequest(AbstractJsonRpcExecutor.java:87)\n\tat org.hyperledger.besu.ethereum.api.handlers.JsonRpcObjectExecutor.execute(JsonRpcObjectExecutor.java:57)\n\tat org.hyperledger.besu.ethereum.api.handlers.JsonRpcExecutorHandler.lambda$handler$0(JsonRpcExecutorHandler.java:57)\n\tat java.base/java.util.Optional.ifPresentOrElse(Optional.java:196)\n\tat org.hyperledger.besu.ethereum.api.handlers.JsonRpcExecutorHandler.lambda$handler$2(JsonRpcExecutorHandler.java:54)\n\tat io.vertx.ext.web.impl.BlockingHandlerDecorator.lambda$handle$0(BlockingHandlerDecorator.java:48)\n\tat io.vertx.core.impl.ContextBase.lambda$null$0(ContextBase.java:137)\n\tat io.vertx.core.impl.ContextInternal.dispatch(ContextInternal.java:264)\n\tat io.vertx.core.impl.ContextBase.lambda$executeBlocking$1(ContextBase.java:135)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\n\tat java.base/java.lang.Thread.run(Thread.java:833)\n```\n\n### Acceptance Criteria\n* Besu understands the existing storage format on disk\n* Besu gracefully exit sand prints a reason, the node does not attempt to catch up to the chain head ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5926/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5926/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
