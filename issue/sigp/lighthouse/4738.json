@@ -49,7 +49,7 @@
       "description": "ETA Q4 2023"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "jimmygchen",
@@ -94,14 +94,33 @@
     }
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-09-15T07:40:46Z",
-  "updated_at": "2023-09-19T05:08:17Z",
-  "closed_at": null,
+  "updated_at": "2023-09-21T06:16:10Z",
+  "closed_at": "2023-09-21T06:16:10Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nWe've identified a bug in the downloading of genesis states that is used on Holesky and Chiado (introduced in #4653).\r\n\r\nThe problem is that we use the `reqwest::blocking::Client` to download the state, [which can panic if called from an async context](https://github.com/seanmonstar/reqwest/blob/a4e8ab694c639f889a110831041fdc93d924e504/src/blocking/client.rs#L845-L859):\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/common/eth2_network_config/src/lib.rs#L17\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/common/eth2_network_config/src/lib.rs#L378-L386\r\n\r\nWe call it from an async context via `genesis_state` here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/beacon_node/client/src/builder.rs#L259\r\n\r\nand here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/beacon_node/client/src/builder.rs#L279\r\n\r\nand here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/beacon_node/client/src/builder.rs#L380\r\n\r\ni.e. in all the cases where we are starting the client for the first time: genesis sync, and checkpoint sync from state on-disk or a URL\r\n\r\n## Version\r\n\r\nLighthouse v4.4.1\r\n\r\n## Impact\r\n\r\n- Has so far only been observed in debug mode (not `--release`).\r\n- Only occurs on first start-up. Once the state is downloaded it is subsequently read from the DB.\r\n- Can be worked around.\r\n\r\n## Workaround\r\n\r\nInstead of `--network holesky`, use `--testnet-dir` pointed to the [custom_config_data](https://github.com/eth-clients/holesky/tree/main/custom_config_data) for Holesky.\r\n\r\n## Steps to resolve\r\n\r\n- Option 1: wrap the calls in `spawn_blocking` or similar.\r\n- Option 2: use the async reqwest client in `Eth2NetworkConfig` and propagate the async-ness (this might be painful).\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "jimmygchen",
+    "id": 742762,
+    "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmygchen",
+    "html_url": "https://github.com/jimmygchen",
+    "followers_url": "https://api.github.com/users/jimmygchen/followers",
+    "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+    "repos_url": "https://api.github.com/users/jimmygchen/repos",
+    "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4738/reactions",
     "total_count": 3,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4738/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -195,6 +214,50 @@
     "body": "I'd like to work on this one - be good to have this fixed before holesky relaunch.",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1724838442/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1728919062",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4738#issuecomment-1728919062",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4738",
+    "id": 1728919062,
+    "node_id": "IC_kwDOCFeAzc5nDTYW",
+    "user": {
+      "login": "jimmygchen",
+      "id": 742762,
+      "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jimmygchen",
+      "html_url": "https://github.com/jimmygchen",
+      "followers_url": "https://api.github.com/users/jimmygchen/followers",
+      "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+      "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+      "repos_url": "https://api.github.com/users/jimmygchen/repos",
+      "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-21T06:16:10Z",
+    "updated_at": "2023-09-21T06:16:10Z",
+    "author_association": "MEMBER",
+    "body": "Fixed in #4753 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1728919062/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
