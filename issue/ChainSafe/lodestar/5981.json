@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5981",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5981/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5981/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5981/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/5981",
+  "id": 1908481063,
+  "node_id": "I_kwDOCD5_Gc5xwRwn",
+  "number": 5981,
+  "title": "Network worker thread vs child process",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2963898184,
+      "node_id": "MDU6TGFiZWwyOTYzODk4MTg0",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-performance",
+      "name": "scope-performance",
+      "color": "980043",
+      "default": false,
+      "description": "Performance issue and ideas to improve performance."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-22T08:56:00Z",
+  "updated_at": "2023-09-22T09:06:22Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Metrics when running the network in a child process (**feat1**) vs a worker thread (**stable**). Beacon nodes have `--subscribeAllSubnets` flag set and `--network.useWorker` is enabled now by default as well. Both instances are on **v1.11.1**, the branch for running the network in a child process can be found here https://github.com/ChainSafe/lodestar/compare/unstable...nflaig/network-worker-process2.\r\n\r\n### Event loop lag NETWORK WORKER\r\n\r\nSignificant reduction in event loop lag when using a child process\r\n\r\n#### Child process (feat1-mainnet-hzax41)\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/099e63c1-73d6-46b5-bb5c-bcff9044d80e)\r\n\r\n#### Worker thread (stable-mainnet-hzax41)\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/6d49a871-fbe9-4560-970e-ce70797a67c8)\r\n\r\n### Event loop lag BEACON\r\n\r\nMain thread event loop lag is down as well if child process is used\r\n\r\n#### Child process (feat1-mainnet-hzax41)\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/db79b3eb-0916-4d33-8392-a8b323faa692)\r\n\r\n#### Worker thread (stable-mainnet-hzax41)\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/728fadce-856e-4a3f-b09d-f902830ec856)\r\n\r\n### Prometheus scrape duration\r\n\r\nThe scrape duration is a lot higher when using a child process, likely releated to increased IPC latency and serialization / deserialization as currently the raw txt payload is serialized to base64 which is not ideal.\r\n\r\n#### Child process (feat1-mainnet-hzax41)\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/f2963f2e-136a-4262-8ed4-dfa820f66a46)\r\n\r\n#### Worker thread (stable-mainnet-hzax41)\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/29180be3-1fdb-4ef0-b943-fa784ceadb4c)\r\n\r\n### Attnet mesh peers per subnet\r\n\r\nMesh peers seems to be much lower (possible related to higher gossib validator job wait time?)\r\n\r\n#### Child process (feat1-mainnet-hzax41)\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/4c2c7f8d-a278-43d8-990c-6f459a88062a)\r\n\r\n#### Worker thread (stable-mainnet-hzax41)\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/1e237394-d049-41c4-aa01-fc21c3c25b65)\r\n\r\n### Peer connection length\r\n\r\nPeer connection length looks pretty good ob both sides, maybe slighly better when using a child process\r\n\r\n#### Child process (feat1-mainnet-hzax41)\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/3688023a-ae3f-469a-9f5c-8a96ca3460ea)\r\n\r\n#### Worker thread (stable-mainnet-hzax41)\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/b8f46da9-9325-4cc6-9a16-480b46d78387)\r\n\r\n### Gossip validation queue\r\n\r\nJob wait time and queue length looks much better when using a worker thread. This might be related to IPC and serdes latency added when using a child process. Latency metrics are required to further investigate this.\r\n\r\n#### Child process (feat1-mainnet-hzax41)\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/b3f68832-8252-491b-ac67-abe50b0fea6b)\r\n\r\n#### Worker thread (stable-mainnet-hzax41)\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/2401e237-4cc4-4f8f-b296-e6ef49f14397)\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5981/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5981/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
