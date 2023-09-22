@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5928",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5928/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5928/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5928/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5928",
+  "id": 1908010924,
+  "node_id": "I_kwDODE2jmc5xue-s",
+  "number": 5928,
+  "title": "besu-lighthouse validators missing block proposals",
+  "user": {
+    "login": "siladu",
+    "id": 2893793,
+    "node_id": "MDQ6VXNlcjI4OTM3OTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2893793?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/siladu",
+    "html_url": "https://github.com/siladu",
+    "followers_url": "https://api.github.com/users/siladu/followers",
+    "following_url": "https://api.github.com/users/siladu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/siladu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/siladu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/siladu/subscriptions",
+    "organizations_url": "https://api.github.com/users/siladu/orgs",
+    "repos_url": "https://api.github.com/users/siladu/repos",
+    "events_url": "https://api.github.com/users/siladu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/siladu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1537362490,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDkw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-22T01:16:45Z",
+  "updated_at": "2023-09-22T01:33:26Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Getting this on sepolia and goerli, using:\r\nBesu `23.7.2` through `23.7.3-RC`\r\nLighthouse version `Lighthouse/v4.3.0-dfcb336/x86_64-linux` through `\"Lighthouse/v4.4.1-2841f60/x86_64-linux`\r\n\r\ne.g. https://sepolia.beaconcha.in/validator/237#blocks\r\n\r\nLogs during missed proposal\r\n\r\nlighthouse validator log...\r\n\r\n`{\"msg\":\"Error whilst producing block\",\"level\":\"CRIT\",\"ts\":\"2023-09-19T05:57:48.009264719Z\",\"service\":\"block\",\"info\":\"proposal did not use a builder\",\"block_slot\":\"Slot(3280789)\",\"message\":\"Recoverable(\\\"Some endpoints failed, num_failed: 1 http://127.0.0.1:5052/ => RequestFailed(Recoverable(\\\\\\\"Error from beacon node when producing block: ServerMessage(ErrorMessage { code: 500, message: \\\\\\\\\\\\\\\"UNHANDLED_ERROR: NoEth1ChainConnection\\\\\\\\\\\\\\\", stacktraces: [] })\\\\\\\"))\\\")\"}`\r\n`{\"msg\":\"Error whilst producing block\",\"level\":\"CRIT\",\"ts\":\"2023-09-19T05:57:48.009270042Z\",\"service\":\"block\",\"module\":\"validator_client::block_service:390\",\"info\":\"proposal did not use a builder\",\"block_slot\":\"Slot(3280789)\",\"message\":\"Recoverable(\\\"Some endpoints failed, num_failed: 1 http://127.0.0.1:5052/ => RequestFailed(Recoverable(\\\\\\\"Error from beacon node when producing block: ServerMessage(ErrorMessage { code: 500, message: \\\\\\\\\\\\\\\"UNHANDLED_ERROR: NoEth1ChainConnection\\\\\\\\\\\\\\\", stacktraces: [] })\\\\\\\"))\\\")\"}`\r\n\r\nbeacon.log...\r\n`{\"msg\":\"Error processing HTTP API request\",\"level\":\"WARN\",\"ts\":\"2023-09-19T05:57:48.009233154Z\",\"module\":\"http_api:185\",\"method\":\"GET\",\"path\":\"/eth/v2/validator/blocks/3280789\",\"status\":\"500 Internal Server Error\",\"elapsed\":\"5.648487ms\"}`\r\n\r\nbesu.log...\r\n`{\"@timestamp\":\"2023-09-19T05:57:44,003\",\"level\":\"WARN\",\"thread\":\"vert.x-worker-thread-0\",\"class\":\"AbstractEngineForkchoiceUpdated\",\"message\":\"Payload attributes are present before cancun hardfork\",\"throwable\":\"\"}`\r\n`{\"@timestamp\":\"2023-09-19T05:57:44,004\",\"level\":\"INFO\",\"thread\":\"vert.x-worker-thread-0\",\"class\":\"MergeCoordinator\",\"message\":\"Start building proposals for block 4318421 identified by 0x0068b57fe96f24e5\",\"throwable\":\"\"}`\r\n`{\"@timestamp\":\"2023-09-19T05:57:47,504\",\"level\":\"WARN\",\"thread\":\"vert.x-worker-thread-0\",\"class\":\"AbstractEngineForkchoiceUpdated\",\"message\":\"Payload attributes are present before cancun hardfork\",\"throwable\":\"\"}`\r\n\r\nConfirmed that the besu cancun warnings are a false positive and shouldn't affect block production. \r\n\r\nLighthouse beacon config:\r\n`/opt/lighthouse/current/lighthouse bn  --network=sepolia --datadir=/data/lighthouse --debug-level=info --logfile-debug-level=info --logfile=/var/log/lighthouse/beacon.log --log-format=JSON --execution-jwt=/etc/jwt-secret.hex --execution-endpoint=http://127.0.0.1:8551 --port=9000 --validator-monitor-auto --metrics --metrics-address='0.0.0.0' --metrics-port=8008 --http --http-address='127.0.0.1' --http-port=5052 --http-allow-origin='*' --suggested-fee-recipient=... --checkpoint-sync-url=https://beaconstate-sepolia.chainsafe.io --disable-deposit-contract-sync`\r\n\r\nLighthouse validator config:\r\n`/opt/lighthouse/current/lighthouse vc --network=sepolia --debug-level=info --logfile-debug-level=info --logfile=/var/log/lighthouse/validator.log --log-format=JSON --beacon-nodes=http://127.0.0.1:5052 --validators-dir=/etc/lighthouse/keys --secrets-dir=/etc/lighthouse/secrets --suggested-fee-recipient=... --init-slashing-protection --enable-doppelganger-protection`",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5928/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5928/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
