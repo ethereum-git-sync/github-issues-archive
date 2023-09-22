@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14573",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14573/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14573/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14573/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14573",
+  "id": 1908848677,
+  "node_id": "I_kwDOAm_5kc5xxrgl",
+  "number": 14573,
+  "title": "Unable to invoke the Eldarica solver (SMTChecker)",
+  "user": {
+    "login": "acmLL",
+    "id": 109368825,
+    "node_id": "U_kgDOBoTV-Q",
+    "avatar_url": "https://avatars.githubusercontent.com/u/109368825?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/acmLL",
+    "html_url": "https://github.com/acmLL",
+    "followers_url": "https://api.github.com/users/acmLL/followers",
+    "following_url": "https://api.github.com/users/acmLL/following{/other_user}",
+    "gists_url": "https://api.github.com/users/acmLL/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/acmLL/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/acmLL/subscriptions",
+    "organizations_url": "https://api.github.com/users/acmLL/orgs",
+    "repos_url": "https://api.github.com/users/acmLL/repos",
+    "events_url": "https://api.github.com/users/acmLL/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/acmLL/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-22T12:49:35Z",
+  "updated_at": "2023-09-22T12:49:35Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nBy using solvers = [ 'eld' ] in the foundry.toml file, I get 'Warning (1218): CHC: Error trying to invoke SMT solver.' message. But eldarica is installed in my mac and accessible via the command eld in any folder.\r\n\r\n## Environment\r\n\r\n- Compiler version: solc 0.8.21\r\n- Framework/IDE (e.g. Truffle or Remix): Foundry (forge 0.2.0)\r\n- Operating system: macOS Monterey (12.6.8)\r\n\r\n## Steps to Reproduce\r\n\r\nUsing this content in foundry.toml:\r\n\r\n[profile.default]\r\nsrc = \"src\"\r\nout = \"out\"\r\nlibs = [\"lib\"]\r\n\r\n# See more config options https://github.com/foundry-rs/foundry/tree/master/config\r\n[profile.default.model_checker]\r\nengine = 'chc'\r\nsolvers = [ 'eld' ]\r\ntimeout = 0\r\ntargets = [\r\n\t\"assert\",\r\n\t\"constantCondition\",\r\n\t\"divByZero\",\r\n\t\"outOfBounds\",\r\n\t\"overflow\",\r\n\t\"underflow\"\r\n]\r\ninvariants = [ 'contract' ]\r\nshowProved = true\r\nshowProvedSafe = true\r\n\r\n[profile.default.model_checker.contracts]\r\n'src/Monotonic.sol' = [ 'Monotonic' ]\r\n\r\nAfter running this command line 'forge build --force', I get:\r\n\r\n[⠢] Compiling...\r\n[⠒] Compiling 16 files with 0.8.21\r\n[⠆] Solc 0.8.21 finished in 8.49s\r\nCompiler run successful with warnings:\r\nWarning (1218): CHC: Error trying to invoke SMT solver.\r\n --> src/Monotonic.sol:7:16:\r\n  |\r\n7 |         return x * 42;\r\n  |                ^^^^^^\r\n\r\nWarning (1218): CHC: Error trying to invoke SMT solver.\r\n  --> src/Monotonic.sol:12:9:\r\n   |\r\n12 |         assert(f(b) > f(a));\r\n   |         ^^^^^^^^^^^^^^^^^^^\r\n\r\nWarning (5840): CHC: 2 verification condition(s) could not be proved. Enable the model checker option \"show unproved\" to see all of them. Consider choosing a specific contract to be verified in order to reduce the solving problems. Consider increasing the timeout per query.\r\n\r\nFor this example (found in SMTchecker documentation from https://docs.soliditylang.org/en/latest/smtchecker.html:\r\n\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity =0.8.21;\r\n\r\ncontract Monotonic {\r\n    function f(uint x) internal pure returns (uint) {\r\n        require(x < type(uint128).max);\r\n        return x * 42;\r\n    }\r\n\r\n    function inv(uint a, uint b) public pure {\r\n        require(b > a);\r\n        assert(f(b) > f(a));\r\n    }\r\n}\r\n\r\nThanks!",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14573/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14573/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
