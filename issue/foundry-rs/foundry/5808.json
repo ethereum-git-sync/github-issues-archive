@@ -49,7 +49,7 @@
       "description": "Good for newcomers"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "ruvaag",
@@ -96,12 +96,31 @@
   "milestone": null,
   "comments": 7,
   "created_at": "2023-09-10T07:15:55Z",
-  "updated_at": "2023-09-21T20:13:17Z",
-  "closed_at": null,
+  "updated_at": "2023-09-23T11:13:46Z",
+  "closed_at": "2023-09-23T11:13:46Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (75836a7 2023-09-09T00:31:54.458033000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nJSON reading functions `readInt`/`readUint`/`readIntArray` etc automatically detect the base of the string.\r\n\r\nThis leads to unpleasant surprises... in our case we had a P256 verifier working on all but four of ~300 Wycheproof test vectors, and the last four were due to `readUint` switching to decimal.\r\n\r\n## Minimal reproducible example\r\n\r\n```solidity\r\nimport {stdJson} from \"forge-std/StdJson.sol\";\r\nimport {Test, console2} from \"forge-std/Test.sol\";\r\n\r\nusing stdJson for string;\r\n\r\ncontract ReadIntTest is Test {\r\n    function testReadInt() public {\r\n        string memory json = '[\"ffffffff\",\"00000010\"]';\r\n        int256[] memory ints = json.readIntArray(\"\");\r\n        console2.log(ints[0]);\r\n        console2.log(ints[1]);\r\n    }\r\n}\r\n```\r\n\r\n<img width=\"610\" alt=\"image\" src=\"https://github.com/foundry-rs/foundry/assets/169280/93d3db1e-1865-4c2f-a8b9-c0f5af2bdf63\">\r\n\r\n## Proposed fix\r\n\r\n- Parse decimal only\r\n- (If there's demand for it, you could parse hex when there is an `0x` prefix)\r\n\r\nLess is more. If people pass a bare hex string to readInt, better to error right away (then they can easily `uint256(json.readBytes32(...))`) than sneakily, later, once some input lacks letters.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5808/reactions",
     "total_count": 0,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5808/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -415,14 +434,14 @@
     "body": "happy to assign it to you @ruvaag !\r\n\r\nindeed, this is bubbling up from the parity types crate. What you propose is what I'd do—only accept decimal characters before parsing as `uint`/`int`. Eventually we'll switch to alloy types and this will be a tad easier to do.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1730233457/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
       "heart": 0,
-      "rocket": 0,
+      "rocket": 1,
       "eyes": 0
     },
     "performed_via_github_app": null
