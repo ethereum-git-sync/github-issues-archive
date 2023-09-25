@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5891",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5891/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5891/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5891/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5891",
+  "id": 1911486442,
+  "node_id": "I_kwDOGBlvNc5x7vfq",
+  "number": 5891,
+  "title": "Fail to reproduce invariant error",
+  "user": {
+    "login": "PavelCore",
+    "id": 10712731,
+    "node_id": "MDQ6VXNlcjEwNzEyNzMx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10712731?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/PavelCore",
+    "html_url": "https://github.com/PavelCore",
+    "followers_url": "https://api.github.com/users/PavelCore/followers",
+    "following_url": "https://api.github.com/users/PavelCore/following{/other_user}",
+    "gists_url": "https://api.github.com/users/PavelCore/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/PavelCore/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/PavelCore/subscriptions",
+    "organizations_url": "https://api.github.com/users/PavelCore/orgs",
+    "repos_url": "https://api.github.com/users/PavelCore/repos",
+    "events_url": "https://api.github.com/users/PavelCore/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/PavelCore/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-25T13:13:07Z",
+  "updated_at": "2023-09-25T13:14:22Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (ec3f9bd 2023-09-19T13:48:52.205431000Z)\n\n### What command(s) is the bug in?\n\nFOUNDRY_INVARIANT_RUNS=1 FOUNDRY_INVARIANT_DEPTH=15 forge test -v --mc=\"CallStorageTest\"\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\nWhile making an invariant testing, Forge successfully identifies failing scenario but cannot reproduce it when the targeted contract does not implement targeted interface, despite having a fallback function and artifacts provided.\r\n\r\nExample handler without the actual implementation of the functions in the code:\r\n```\r\ncontract CallStorageHandler {\r\n\r\n    bytes private _storedCall;\r\n    uint256 public storedCalls = 0; \r\n\r\n    modifier storeCall() {\r\n        console2.log(\"storing call\");\r\n        console2.logBytes(msg.data[:4]);\r\n        storedCalls += 1;\r\n        _storedCall = msg.data;\r\n        _;\r\n    }\r\n\r\n    function getStoredCall() external view returns(bytes memory) {\r\n        return _storedCall;\r\n    }\r\n\r\n    fallback() external storeCall {}\r\n    receive() external payable storeCall {}\r\n\r\n    // These functions are present in IReentrant interface\r\n    // function deposit() external payable storeCall {\r\n    // }\r\n\r\n    // function withdraw() external storeCall {\r\n    // }\r\n}\r\n```\r\n\r\nThe contract has a callback, hence it should not fail with any called function.\r\n\r\nThe contract with the invariants. It calls the `CallStorageHandler` contract with the fuzzed functions from `IReentrant` interface.\r\n```\r\ncontract CallStorageTest is Test {\r\n    Reentrant public reentrant;\r\n    CallStorageHandler public callStorage;\r\n\r\n    function setUp() public {\r\n        reentrant = new Reentrant();\r\n        excludeContract(address(reentrant));\r\n\r\n        callStorage = new CallStorageHandler();\r\n        string[] memory artifacts = new string[](1);\r\n        artifacts[0] = \"src/interfaces/IReentrant.sol:IReentrant\";\r\n        targetInterface(FuzzInterface(\r\n            payable(address(callStorage)), artifacts\r\n        ));\r\n    }\r\n\r\n    function invariant_storedCallsCounter() public {\r\n        assertLe(callStorage.storedCalls(), 10);\r\n    }\r\n}\r\n```\r\n\r\nHere is the output of the forge:\r\n```\r\n$ FOUNDRY_INVARIANT_RUNS=1 FOUNDRY_INVARIANT_DEPTH=15 forge test -v --mc=\"CallStorageTest\"\r\n[⠰] Compiling...\r\nNo files changed, compilation skipped\r\n2023-09-25T13:11:21.423554Z ERROR forge::runner: Failed to replay invariant error err=\r\nFailed to create counter example\r\n\r\nContext:\r\n- Couldn't find function\r\n\r\nRunning 1 test for test/TestProxy.t.sol:CallStorageTest\r\n[FAIL. Reason: Assertion failed.] invariant_storedCallsCounter() (runs: 1, calls: 11, reverts: 0)\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 31.69ms\r\n \r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/TestProxy.t.sol:CallStorageTest\r\n[FAIL. Reason: Assertion failed.] invariant_storedCallsCounter() (runs: 1, calls: 11, reverts: 0)\r\n\r\nEncountered a total of 1 failing tests, 0 tests succeeded\r\n```\r\n\r\nThe basic idea is that I want to fuzz the calls to the Reentrant contract without actually calling it and without implementing the whole interface of it in another contract.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5891/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5891/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
