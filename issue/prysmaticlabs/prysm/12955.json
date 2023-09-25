@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12955",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12955/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12955/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12955/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/12955",
+  "id": 1912016637,
+  "node_id": "I_kwDOBvuov85x9w79",
+  "number": 12955,
+  "title": "Missed blocks because of high GetBeaconBlock duration",
+  "user": {
+    "login": "0xalex88",
+    "id": 113263502,
+    "node_id": "U_kgDOBsBDjg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/113263502?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xalex88",
+    "html_url": "https://github.com/0xalex88",
+    "followers_url": "https://api.github.com/users/0xalex88/followers",
+    "following_url": "https://api.github.com/users/0xalex88/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xalex88/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xalex88/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xalex88/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xalex88/orgs",
+    "repos_url": "https://api.github.com/users/0xalex88/repos",
+    "events_url": "https://api.github.com/users/0xalex88/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xalex88/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-25T17:56:58Z",
+  "updated_at": "2023-09-25T18:03:47Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!--💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎\r\n\r\nHellooo! 😄 \r\n\r\nTo help us tend to your issue faster, please search our currently open issues before submitting a new one.\r\nExisting issues often contain information about workarounds, resolution, or progress updates.\r\n\r\n💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎-->\r\n\r\n# 💎 Issue\r\n\r\nWe've missed two blocks in the last day (on different bn/vc nodes pairs) because GetBeaconBlock took 3.5 and 5 seconds.\r\nWe're running prysm 4.0.8 on dedicated servers (8c/16t 32GB ram, nvme ssds) and there are plenty of resources (cpu <20% used, disk I/O < 5%) however in these two occasions the GetBeaconBlock function took enough time to miss/orphan the block. Btw I'm using the parallel build flag.\r\nI've checked the different metrics (process_attestations_milliseconds, new_att_head_milliseconds...) that are observed within that function but couldn't find any strange value. I've also checked go metrics (goroutines, gc, etc...) and are all normal.\r\n\r\nBN logs are:\r\n```\r\n{\"level\":\"info\",\"msg\":\"Begin building block\",\"prefix\":\"rpc/validator\",\"sinceSlotStartTime\":23264605,\"slot\":7400522,\"time\":\"2023-09-25T08:24:47Z\"}\r\n{\"blockHash\":\"0x713a10a1b235362465494c4c8eda28b329c8d84b3546e551cad7e8a25b647370\",\"builderPubKey\":\"0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62\",\"level\":\"info\",\"msg\":\"Received header with bid\",\"prefix\":\"rpc/validator\",\"sinceSlotStartTime\":174809064,\"slot\":7400522,\"time\":\"2023-09-25T08:24:47Z\",\"validator\":661052,\"value\":\"25338793725767838\"}\r\n{\"beaconStateRoot\":\"0x005609579a052e8f1fdb041c263a3dcbe88990d69d10320c3589a441b1f71e16\",\"level\":\"debug\",\"msg\":\"Computed state root\",\"prefix\":\"rpc/validator\",\"time\":\"2023-09-25T08:24:52Z\"}\r\n{\"level\":\"info\",\"msg\":\"Finished building block\",\"prefix\":\"rpc/validator\",\"sinceSlotStartTime\":5004925564,\"slot\":7400522,\"time\":\"2023-09-25T08:24:52Z\",\"validator\":661052}\r\n```\r\n\r\ngeth logs are:\r\n```\r\n{\"blocks\":1,\"dirty\":\"1022.94 MiB\",\"elapsed\":\"112.429ms\",\"hash\":\"0xafd3d4ea6ceccafcba56e3ac46a54fb90fe97094db8cc986f17caf9ec3e4f9a3\",\"lvl\":\"info\",\"mgas\":28.221194,\"mgasps\":251.01185205226017,\"msg\":\"Imported new potential chain segment\",\"number\":\"18211590\",\"t\":\"2023-09-25T08:24:25.002894466Z\",\"txs\":241}\r\n{\"elapsed\":\"3.311802ms\",\"hash\":\"0xafd3d4ea6ceccafcba56e3ac46a54fb90fe97094db8cc986f17caf9ec3e4f9a3\",\"lvl\":\"info\",\"msg\":\"Chain head was updated\",\"number\":\"18211590\",\"root\":\"0xc704b9b9b6ae2d260b80a4d51c0f659bc73bbc438ba4b5b945f78cc9381fe6db\",\"t\":\"2023-09-25T08:24:25.031236791Z\"}\r\n{\"blocks\":1,\"dirty\":\"1022.49 MiB\",\"elapsed\":\"69.414ms\",\"hash\":\"0xdcb7025f7638e7929d96532599a6675ed0f7a028cec1489809398be98a474901\",\"lvl\":\"info\",\"mgas\":14.661053,\"mgasps\":211.20877959208198,\"msg\":\"Imported new potential chain segment\",\"number\":\"18211591\",\"t\":\"2023-09-25T08:24:36.673863746Z\",\"txs\":141}\r\n{\"elapsed\":\"2.259717ms\",\"hash\":\"0xdcb7025f7638e7929d96532599a6675ed0f7a028cec1489809398be98a474901\",\"lvl\":\"info\",\"msg\":\"Chain head was updated\",\"number\":\"18211591\",\"root\":\"0x8f1f69b56eb737b179dbb712c4a30d1f03ea8b4a4e99e3527d60689d0db10fbd\",\"t\":\"2023-09-25T08:24:36.700386784Z\"}\r\n{\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Starting work on payload\",\"t\":\"2023-09-25T08:24:36.751402268Z\"}\r\n{\"elapsed\":\"8.280ms\",\"fees\":\"6.027619509e-05\",\"gas\":757036,\"hash\":\"0x2ab98bb026d1b4a9d2ede0df112451c6edb7a0d72d086de21db196147ad4a5e1\",\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Updated payload\",\"number\":18211592,\"root\":\"0x29cfe8b776886cfc70efb3f177f64bbff54debfe61d923253b84ade58b33c1bc\",\"t\":\"2023-09-25T08:24:36.759786866Z\",\"txs\":11,\"withdrawals\":16}\r\n{\"elapsed\":\"16.422ms\",\"fees\":\"0.003544467236\",\"gas\":3823120,\"hash\":\"0x27b7e1b5683f01b1b7de58cd41874b50331c286d1211eaa01b1b5f9a6a3e531e\",\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Updated payload\",\"number\":18211592,\"root\":\"0x5af7edeb29c3737c7ca996705a22e4674cd646b17a6280c54a601123f1214931\",\"t\":\"2023-09-25T08:24:38.777111719Z\",\"txs\":56,\"withdrawals\":16}\r\n{\"elapsed\":\"19.295ms\",\"fees\":\"0.004608539878\",\"gas\":5024442,\"hash\":\"0x7e6d8b4fe29248d675e779cbdbfce3b7ae7d4b32f60fcc3462d38c69cec28791\",\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Updated payload\",\"number\":18211592,\"root\":\"0xecd9fca378981786ff594513e5b65164e4f6413b5d36c920f98e0e8b656b0867\",\"t\":\"2023-09-25T08:24:40.796895842Z\",\"txs\":73,\"withdrawals\":16}\r\n{\"elapsed\":\"22.459ms\",\"fees\":\"0.005772333872\",\"gas\":6759580,\"hash\":\"0xb75684f12f57afd5513685d720ddcc5d9d6b53e143798b7426ba0d61dd2383e4\",\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Updated payload\",\"number\":18211592,\"root\":\"0x7a686d1414fc81e4791cf8ea861292e99ee328bfbfd9a63cbeda680c640d543a\",\"t\":\"2023-09-25T08:24:42.820003122Z\",\"txs\":99,\"withdrawals\":16}\r\n{\"elapsed\":\"28.051ms\",\"fees\":\"0.009040343848\",\"gas\":9227070,\"hash\":\"0xd712726398d3520d11c3a4365cc7e3993a5bb1385a6f3299b461b05234222d6d\",\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Updated payload\",\"number\":18211592,\"root\":\"0x448d0046c3802b6030c9a08701b01131666f06c65bf3d355f648eeb971e368b4\",\"t\":\"2023-09-25T08:24:44.848312064Z\",\"txs\":127,\"withdrawals\":16}\r\n{\"elapsed\":\"33.652ms\",\"fees\":\"0.009948055336\",\"gas\":10291152,\"hash\":\"0x68660e32b020f510ea9f02e2fe026946c42c5ea80c75e3bc1041020c1b84459c\",\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Updated payload\",\"number\":18211592,\"root\":\"0xbd6d00ad130a9d60c8d639e8afd4d54c1b86d877a4785e4c50b1e16d85c108e3\",\"t\":\"2023-09-25T08:24:46.882389919Z\",\"txs\":139,\"withdrawals\":16}\r\n{\"id\":\"0xe7563bc3cd8d68c1\",\"lvl\":\"info\",\"msg\":\"Stopping work on payload\",\"reason\":\"delivery\",\"t\":\"2023-09-25T08:24:47.032083089Z\"}\r\n```\r\n\r\nAre there any metrics that can help find out what took the most? It usually takes a couple hundred ms so it's weird it took so much this time (on multiple servers too).",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12955/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12955/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
