@@ -58,7 +58,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "jflo",
@@ -125,12 +125,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-09-13T10:55:45Z",
-  "updated_at": "2023-09-18T22:15:49Z",
-  "closed_at": null,
+  "updated_at": "2023-09-24T23:25:32Z",
+  "closed_at": "2023-09-24T23:25:32Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Steps to Reproduce (Bug)\r\n1. Sync Mainnet Besu (Bonsai / not an archive node)\r\n2. Try this curl:\r\n\r\n```bash\r\ncurl -sX POST -H \"Content-Type: application/json\" https://rpc-mainnet-eth.nodeguardians.io --data '{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"method\": \"eth_getProof\",\r\n  \"params\": [\r\n    \"0x3971EB866AA9b2b8aFEa8a7C816F3b7e8b195a35\",\r\n    [\"0x65a7ed542fb37fe237fdfbdd70b31598523fe5b32879e307bae27a0bd9581c08\"],\r\n    \"latest\"\r\n  ],\r\n  \"id\": 1\r\n}'\r\n```\r\n\r\n4. The `curl` return this error:\r\n\r\n```json\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"Account not found\"}}\r\n```\r\n\r\n**Expected behavior:** Return the `eth_getProof`, working well with public nodes (for example: https://ethereum.publicnode.com) / premium RPC / our `Nethermind` node\r\n\r\n**Actual behavior:** `{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"Account not found\"}}`\r\n\r\n**Frequency:** 100%\r\n\r\n### Logs (if a bug)\r\n\r\n- No errors in the logs, the EL is well synced:\r\n\r\n```\r\nSep 13 12:47:37 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:47:37.178+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineNewPayload | Imported #18,126,888 / 111 tx / 16 ws / base fee 23.94 gwei / 16,412,028 (54.7%) gas / (0x6772ef8e4c38707df5e96cad49f423f806814e11114e3e4f8527579e25529a48) in 0.226s. Peers: 10\r\nSep 13 12:47:37 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:47:37.262+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineForkchoiceUpdated | VALID for fork-choice-update: head: 0x6772ef8e4c38707df5e96cad49f423f806814e11114e3e4f8527579e25529a48, finalized: 0x0161d9a7faecfcb6cb2ecf6c8c4f2f10b8e298528c805e595394c937989cbd5d, safeBlockHash: 0x908fc95b4b634f3061989c5d2982409aee7f1c99c26bc359c5a25703ce57cba1\r\nSep 13 12:47:48 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:47:48.118+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineNewPayload | Imported #18,126,889 / 78 tx / 16 ws / base fee 24.23 gwei / 11,132,470 (37.1%) gas / (0x1f0e841b3753b1864871686b5df7a743e05081cce85a75879525cb8caec1bd0b) in 0.140s. Peers: 10\r\nSep 13 12:48:00 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:48:00.622+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineNewPayload | Imported #18,126,890 / 94 tx / 16 ws / base fee 23.44 gwei / 12,975,967 (43.3%) gas / (0x710a30fbef95ac204d259a1b82177cb463ef8c9d68470b4af6b1ca75ce12c19f) in 0.239s. Peers: 10\r\nSep 13 12:48:12 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:48:12.539+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineNewPayload | Imported #18,126,891 / 109 tx / 16 ws / base fee 23.05 gwei / 9,677,929 (32.3%) gas / (0x7ded47d33bae0820dc6bbee7098b5218d0698b4c01760250f4438883cd8aad80) in 0.196s. Peers: 10\r\nSep 13 12:48:24 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:48:24.911+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineNewPayload | Imported #18,126,892 / 118 tx / 16 ws / base fee 22.03 gwei / 13,875,639 (46.3%) gas / (0xcef38eae13fe42fca2c9c9a14b99c2a09b169dd31e61678db1fa7400f0e858ad) in 0.218s. Peers: 10\r\nSep 13 12:48:37 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:48:37.235+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineNewPayload | Imported #18,126,893 / 99 tx / 16 ws / base fee 21.82 gwei / 9,403,589 (31.3%) gas / (0xed025f8f6d0069023aef9ffdd3ce003f35d3fe0c0bdac4b6ff10363414e9cbb6) in 0.201s. Peers: 10\r\nSep 13 12:48:37 rpc-ethereum-mainnet-01 besu[58685]: 2023-09-13 12:48:37.299+02:00 | vert.x-worker-thread-0 | INFO  | AbstractEngineForkchoiceUpdated | VALID for fork-choice-update: head: 0xed025f8f6d0069023aef9ffdd3ce003f35d3fe0c0bdac4b6ff10363414e9cbb6, finalized: 0x0161d9a7faecfcb6cb2ecf6c8c4f2f10b8e298528c805e595394c937989cbd5d, safeBlockHash: 0x908fc95b4b634f3061989c5d2982409aee7f1c99c26bc359c5a25703ce57cba1\r\n```\r\n\r\n- And the CL, no error as well:\r\n\r\n```\r\nSep 13 12:48:15 rpc-ethereum-mainnet-01 teku[19836]: 12:48:15.079 INFO  - Slot Event  *** Slot: 7314839, Block: ea754734d506c5ab1ad4501d3e290e6312f085698e8d9525ad58ce02e29f35e2, Justified: 228587, Finalized: 228586, Peers: 100\r\nSep 13 12:48:27 rpc-ethereum-mainnet-01 teku[19836]: 12:48:27.081 INFO  - Slot Event  *** Slot: 7314840, Block: 11eb51077feb9dec7085d9fbc949a14d9702dfcde299e1ea083ea87854684925, Justified: 228587, Finalized: 228586, Peers: 100\r\nSep 13 12:48:39 rpc-ethereum-mainnet-01 teku[19836]: 12:48:39.083 INFO  - Slot Event  *** Slot: 7314841, Block: b076f06e275738e2005cde089ef2e659676c8bbabdfeb600ba9108e40f86d4ba, Justified: 228587, Finalized: 228586, Peers: 100\r\nSep 13 12:48:51 rpc-ethereum-mainnet-01 teku[19836]: 12:48:51.074 INFO  - Slot Event  *** Slot: 7314842, Block: ee704a76ceda00fa23484241547d067d819e8e53238c0f0387170adf74506db0, Justified: 228587, Finalized: 228586, Peers: 100\r\nSep 13 12:49:03 rpc-ethereum-mainnet-01 teku[19836]: 12:49:03.077 INFO  - Slot Event  *** Slot: 7314843, Block: 9fcd5cee30974eacfc72b09372741b048bcfce81e79f249af8a06db227175fd3, Justified: 228587, Finalized: 228586, Peers: 100\r\nSep 13 12:49:15 rpc-ethereum-mainnet-01 teku[19836]: 12:49:15.079 INFO  - Slot Event  *** Slot: 7314844, Block: 99294fe82109f04e3681b62aebde1d136b85acf7712e2a78dbe74f991e942b6a, Justified: 228587, Finalized: 228586, Peers: 100\r\nSep 13 12:49:27 rpc-ethereum-mainnet-01 teku[19836]: 12:49:27.081 INFO  - Slot Event  *** Slot: 7314845, Block: ae2f2bb1b97b0de965404248c75709e0206c1d3809fc7d1e9102810f899a4326, Justified: 228587, Finalized: 228586, Peers: 100\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.7.2\r\n* Java version: 17.0.8.1\r\n* OS Name & Version:\r\n\r\n```env\r\nDISTRIB_ID=Ubuntu\r\nDISTRIB_RELEASE=20.04\r\nDISTRIB_CODENAME=focal\r\nDISTRIB_DESCRIPTION=\"Ubuntu 20.04.6 LTS\"\r\nNAME=\"Ubuntu\"\r\nVERSION=\"20.04.6 LTS (Focal Fossa)\"\r\nID=ubuntu\r\nID_LIKE=debian\r\nPRETTY_NAME=\"Ubuntu 20.04.6 LTS\"\r\nVERSION_ID=\"20.04\"\r\nHOME_URL=\"https://www.ubuntu.com/\"\r\nSUPPORT_URL=\"https://help.ubuntu.com/\"\r\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\r\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\r\nVERSION_CODENAME=focal\r\nUBUNTU_CODENAME=focal\r\n```\r\n\r\n* Kernel Version: `Linux rpc-ethereum-mainnet-01 5.4.0-162-generic #179-Ubuntu SMP Mon Aug 14 08:51:31 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux`\r\n* Cloud VM, type, size: Bare Metal\r\n* Consensus Client & Version if using Proof of Stake: Teku / v23.9.0\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n* Besu setup info - config options:\r\n\r\n```env\r\nExecStart=/home/ethereum/bin/besu/bin/besu \\\r\n  --network=mainnet \\\r\n  --logging=INFO \\\r\n  --host-allowlist=* \\\r\n  --metrics-enabled=true \\\r\n  --metrics-port=6061 \\\r\n  --metrics-host=0.0.0.0 \\\r\n  --rpc-http-enabled=true \\\r\n  --rpc-http-port=8545 \\\r\n  --rpc-ws-enabled=True \\\r\n  --rpc-ws-host=localhost \\\r\n  --rpc-ws-port=8554 \\\r\n  --max-peers=10 \\\r\n  --sync-mode=X_CHECKPOINT \\\r\n  --data-storage-format=BONSAI \\\r\n  --data-path=/home/ethereum/var/lib/besu \\\r\n  --Xplugin-rocksdb-high-spec-enabled \\\r\n  --engine-jwt-secret=/home/ethereum/secrets/jwtsecret\r\n```\r\n\r\n* System info - memory, CPU: 64Go RAM / Ryzen 5, 6 core\r\n\r\n\r\nThe same curl is working for `Nethermind` client, but not with `Besu`. Did I miss a configuration ? Did I find an unexpected behaviour ?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5874/reactions",
     "total_count": 0,
@@ -145,7 +164,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5874/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -180,14 +199,14 @@
     "body": "Thanks for pointing this out, @chichi13.  That function is currently unimplemented for the bonsai storage format, but it shouldn't be difficult to add.  We will try to get that added for bonsai in time to be in the next release.\r\n\r\n\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1724533833/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
       "heart": 0,
-      "rocket": 0,
+      "rocket": 1,
       "eyes": 0
     },
     "performed_via_github_app": null
