@@ -67,11 +67,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-09-21T17:29:35Z",
-  "updated_at": "2023-09-21T18:35:42Z",
+  "updated_at": "2023-09-25T18:19:56Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "To reproduce, run latest hive:\r\n- like so `./hive -sim ethereum/engine -client-file ./<YOURCONFIG>l --sim.limit \"engine-cancun\"`\r\n\r\nReplace Blob Transactions (Cancun) is the failing test, and it is expecting only 1 blob transaction in the produced block, assuming that the second one sent would replace the prior one, instead of being sent with it.  The two that are included in the produced block are from the same sender, and they have the same nonce, so this is likely a bug, not a pricing issue.\r\n\r\n",
+  "body": "To reproduce, i use the following setup to debug hive tests:\n\ni hacked a thing: https://github.com/ethereum/hive/compare/master...jflo:hive:local_debug_hacks\n\nwhich uses this snooper as a fake client\n\nhttps://github.com/parithosh/json_rpc_snoop/compare/master...jflo:json_rpc_snoop:dualSnoopers\n\nwhich you'll have to build and tag, so the hive test will use it.\n\nthen ran hive like:\n\n` ./hive -sim ethereum/engine -client-file ./configs/local-client.yaml --sim.limit \"engine-cancun/Replace Blob Transactions\" --docker.output`  to isolate a single test, and step through in my debugger.\n\n\nReplace Blob Transactions (Cancun) is the failing test, and it is expecting only 1 blob transaction in the produced block, assuming that the second one sent would replace the prior one, instead of being sent with it.  The two that are included in the produced block are from the same sender, and they have the same nonce, so this is likely a bug, not a pricing issue.\n\n",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5922/reactions",
