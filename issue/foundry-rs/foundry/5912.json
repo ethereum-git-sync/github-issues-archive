@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5912",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5912/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5912/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5912/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5912",
+  "id": 1912933464,
+  "node_id": "I_kwDOGBlvNc5yBQxY",
+  "number": 5912,
+  "title": "\"salt\" is not accepted in the typed data file for \"cast wallet sign\"",
+  "user": {
+    "login": "akolotov",
+    "id": 20793260,
+    "node_id": "MDQ6VXNlcjIwNzkzMjYw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20793260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/akolotov",
+    "html_url": "https://github.com/akolotov",
+    "followers_url": "https://api.github.com/users/akolotov/followers",
+    "following_url": "https://api.github.com/users/akolotov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/akolotov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/akolotov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/akolotov/subscriptions",
+    "organizations_url": "https://api.github.com/users/akolotov/orgs",
+    "repos_url": "https://api.github.com/users/akolotov/repos",
+    "events_url": "https://api.github.com/users/akolotov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/akolotov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-26T08:01:23Z",
+  "updated_at": "2023-09-26T08:01:23Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nCast\n\n### Have you ensured that all of these are up to date?\n\n- [ ] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (2885b0d 2023-09-13T00:28:05.459976172Z)\n\n### What command(s) is the bug in?\n\ncast wallet sign\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nTry to sign the typed data with the following command `cast wallet sign --interactive --data --from-file ./out/MetaTransaction1.json`. It will out put the following error:\r\n```\r\nError: \r\nfailed to parse json file: \"./out/MetaTransaction1.json\": data did not match any variant of untagged enum Type\r\n\r\nContext:\r\n- data did not match any variant of untagged enum Type\r\n```\r\n`./out/MetaTransaction1.json`:\r\n```\r\n{\r\n  \"domain\": {\r\n    \"name\": \"RootChainManager\",\r\n    \"salt\": \"0x0000000000000000000000000000000000000000000000000000000000000001\",\r\n    \"verifyingContract\": \"0xA0c68C638235ee32657e8f720a23ceC1bFc77C77\",\r\n    \"version\": \"1\"\r\n  },\r\n  \"message\": {\r\n    \"from\": \"0x95Ba4cF87D6723ad9C0Db21737D862bE80e93911\",\r\n    \"functionSignature\": \"0xe3dec8fb00000000000000000000000095ba4cf87d6723ad9c0db21737d862be80e93911000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000002dc6c0\",\r\n    \"nonce\": 0\r\n  },\r\n  \"primaryType\": \"MetaTransaction\",\r\n  \"types\": {\r\n    \"EIP712Domain\": [\r\n      {\r\n        \"name\": \"name\",\r\n        \"type\": \"string\"\r\n      },\r\n      {\r\n        \"name\": \"version\",\r\n        \"type\": \"string\"\r\n      },\r\n      {\r\n        \"name\": \"verifyingContract\",\r\n        \"type\": \"address\"\r\n      },\r\n      {\r\n        \"name\": \"salt\",\r\n        \"type\": \"bytes32\"\r\n      }\r\n    ],\r\n    \"MetaTransaction\": [\r\n      {\r\n        \"name\": \"nonce\",\r\n        \"type\": \"uint256\"\r\n      },\r\n      {\r\n        \"name\": \"from\",\r\n        \"type\": \"address\"\r\n      },\r\n      {\r\n        \"name\": \"functionSignature\",\r\n        \"type\": \"bytes\"\r\n      }\r\n    ]\r\n  }\r\n}\r\n```\r\n\r\nAt the same time if `salt` is replaced by any other sequence everything works as expected:\r\n`./out/MetaTransaction2.json`:\r\n```\r\n{\r\n  \"domain\": {\r\n    \"name\": \"RootChainManager\",\r\n    \"z\": \"0x0000000000000000000000000000000000000000000000000000000000000001\",\r\n    \"verifyingContract\": \"0xA0c68C638235ee32657e8f720a23ceC1bFc77C77\",\r\n    \"version\": \"1\"\r\n  },\r\n  \"message\": {\r\n    \"from\": \"0x95Ba4cF87D6723ad9C0Db21737D862bE80e93911\",\r\n    \"functionSignature\": \"0xe3dec8fb00000000000000000000000095ba4cf87d6723ad9c0db21737d862be80e93911000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000002dc6c0\",\r\n    \"nonce\": 0\r\n  },\r\n  \"primaryType\": \"MetaTransaction\",\r\n  \"types\": {\r\n    \"EIP712Domain\": [\r\n      {\r\n        \"name\": \"name\",\r\n        \"type\": \"string\"\r\n      },\r\n      {\r\n        \"name\": \"version\",\r\n        \"type\": \"string\"\r\n      },\r\n      {\r\n        \"name\": \"verifyingContract\",\r\n        \"type\": \"address\"\r\n      },\r\n      {\r\n        \"name\": \"z\",\r\n        \"type\": \"bytes32\"\r\n      }\r\n    ],\r\n    \"MetaTransaction\": [\r\n      {\r\n        \"name\": \"nonce\",\r\n        \"type\": \"uint256\"\r\n      },\r\n      {\r\n        \"name\": \"from\",\r\n        \"type\": \"address\"\r\n      },\r\n      {\r\n        \"name\": \"functionSignature\",\r\n        \"type\": \"bytes\"\r\n      }\r\n    ]\r\n  }\r\n}\r\n```\r\n\r\n```\r\ncast wallet sign --interactive --data --from-file ./out/MetaTransaction2.json\r\nEnter private key: \r\n0x2e7452c91f55802475bc4cd921f8f12d016d026e89f5444940004f7ccd73fc407b8fce966d2c683532c222cde2b388d60222e1bdcb9ee5beeffb8a790de1218c1b\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5912/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5912/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
