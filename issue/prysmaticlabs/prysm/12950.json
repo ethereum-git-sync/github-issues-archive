@@ -40,21 +40,40 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-09-24T08:42:29Z",
-  "updated_at": "2023-09-25T16:44:09Z",
-  "closed_at": null,
+  "updated_at": "2023-09-26T16:45:51Z",
+  "closed_at": "2023-09-26T16:45:51Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Describe the bug\n\nWe (Lighthouse) received a report on Discord of a failed proposal due this error being returned from the `/eth/v2/beacon/blocks` endpoint:\r\n\r\n> CRIT Error whilst producing block            info: proposal did not use a builder, block_slot: Slot(X), message: Recoverable(\"Some endpoints failed, num_failed: 1 http://192.168.1.2:5052/ => RequestFailed(Recoverable(\\\"Error from beacon node when producing block: ServerMessage(ErrorMessage { code: 500, message: \\\\\\\"Prepared Capella beacon block is blinded\\\\\\\", stacktraces: [] })\\\"))\"), service: block\r\n\r\nThis is a Lighthouse VC connected to a Prysm BN, and the inner error `Prepared Capella beacon block is blinded` comes from the Prysm BN. I don't understand what this means, because on this code path the Lighthouse VC is definitely hitting the `/eth/v2/beacon/blocks` endpoint. Is this the result of a misconfiguration where the Prysm BN wants to use a builder, and therefore can't build local blocks? Or is this likely related to the recent Geth block-building bug?\n\n### Has this worked before in a previous version?\n\n_No response_\n\n### 🔬 Minimal Reproduction\n\n_No response_\n\n### Error\n\n_No response_\n\n### Platform(s)\n\n_No response_\n\n### What version of Prysm are you running? (Which release)\n\n_No response_\n\n### Anything else relevant (validator index / public key)?\n\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "james-prysm",
+    "id": 90280386,
+    "node_id": "MDQ6VXNlcjkwMjgwMzg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/90280386?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/james-prysm",
+    "html_url": "https://github.com/james-prysm",
+    "followers_url": "https://api.github.com/users/james-prysm/followers",
+    "following_url": "https://api.github.com/users/james-prysm/following{/other_user}",
+    "gists_url": "https://api.github.com/users/james-prysm/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/james-prysm/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/james-prysm/subscriptions",
+    "organizations_url": "https://api.github.com/users/james-prysm/orgs",
+    "repos_url": "https://api.github.com/users/james-prysm/repos",
+    "events_url": "https://api.github.com/users/james-prysm/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/james-prysm/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12950/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12950/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "It's a misconfiguration \r\nwhat's happening is internally prysm has another endpoint that it's using a grpc endpoint that can return all kind of block types. because the endpoint mentioned that it's a blinded block ( despite wanting a non blinded block) what happened is it called the internal gRPC endpoint and got a blinded block. blinded blocks are returned when  \r\n1. the mev builder is turned on through the `--http-mev-relay` flag\r\n2. the validator is registered ( either through the proposer settings or by having the `--enable-builder` flag)\r\n3. circuit breaker is not triggered.\r\nif those are triggered only the blinded block endpoint will work and the regular one won't we may be able to change this in the future as we are changing the internal endpoints to all be rest. there is no clean way for us to unblind a blinded block in this endpoint currently.\r\n\r\n\r\nalso tangentially related :https://github.com/prysmaticlabs/prysm/issues/12103",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1734115120/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1735919316",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/12950#issuecomment-1735919316",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12950",
+    "id": 1735919316,
+    "node_id": "IC_kwDOBvuov85neAbU",
+    "user": {
+      "login": "james-prysm",
+      "id": 90280386,
+      "node_id": "MDQ6VXNlcjkwMjgwMzg2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/90280386?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/james-prysm",
+      "html_url": "https://github.com/james-prysm",
+      "followers_url": "https://api.github.com/users/james-prysm/followers",
+      "following_url": "https://api.github.com/users/james-prysm/following{/other_user}",
+      "gists_url": "https://api.github.com/users/james-prysm/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/james-prysm/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/james-prysm/subscriptions",
+      "organizations_url": "https://api.github.com/users/james-prysm/orgs",
+      "repos_url": "https://api.github.com/users/james-prysm/repos",
+      "events_url": "https://api.github.com/users/james-prysm/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/james-prysm/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-26T16:45:51Z",
+    "updated_at": "2023-09-26T16:45:51Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "aware of the issue, will address as we clean up the api. closing for now",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1735919316/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
