@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "ChristopherDedominici",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-09-19T16:15:29Z",
-  "updated_at": "2023-09-21T10:21:53Z",
-  "closed_at": null,
+  "updated_at": "2023-09-26T14:08:21Z",
+  "closed_at": "2023-09-26T14:08:21Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\n\n2.17.3\n\n### What happened?\n\nIn delegatecall, target contract state variables are incorrect when doing unit test.\r\nHere is a simplified version of smart contract for reproduction.\r\n````\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\nimport \"hardhat/console.sol\";\r\n\r\ncontract Foo {\r\n  address public masterChef;\r\n  \r\n  constructor() {\r\n    masterChef = address(0x9BA666165867E916Ee7Ed3a3aE6C19415C2fBDDD);\r\n  }\r\n  \r\n  function stake() external view {\r\n    console.log(masterChef);\r\n  }\r\n}\r\n\r\ncontract Test {\r\n  address strategy;\r\n\r\n  function setStrategy(address _strategy) external {\r\n    strategy = _strategy;\r\n  }\r\n\r\n  function callStrategy() public {\r\n    bytes memory performData = abi.encodeWithSignature(\"stake()\");\r\n    (bool success, ) = strategy.delegatecall(performData);\r\n    require(success == true, \"delegatecall failed\");\r\n  }\r\n}\r\n\r\n````\r\nAnd this is a test file in javascript.\r\n````\r\n\r\ndescribe(\"test\", function () {\r\n  it(\"test\", async function () {\r\n    const foo = await ethers.deployContract(\"Foo\");\r\n    const test = await ethers.deployContract(\"Test\");\r\n    \r\n    await test.setStrategy(foo.target);\r\n\r\n    await test.callStrategy();\r\n  });\r\n});\r\n````\r\nIt should print the masterchef address i hardcoded but see different address(it seems the deployed address of foo contract).\n\n### Minimal reproduction steps\n\nJust run `npx hardhat test` with the above the code.\n\n### Search terms\n\ndelegatecall",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4402/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4402/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -142,6 +161,50 @@
     "body": "@fvictorio @ChristopherDedominici any comments on this issue?",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1729285144/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1735618852",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4402#issuecomment-1735618852",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4402",
+    "id": 1735618852,
+    "node_id": "IC_kwDOB7jojM5nc3Ek",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-26T14:08:21Z",
+    "updated_at": "2023-09-26T14:08:21Z",
+    "author_association": "MEMBER",
+    "body": "That behavior is correct, unless I'm missing something.\r\n\r\nThe way delegate call works is that the storage of the *calling* contract will be used with the logic of the *called* contract. In this case, the logic says \"log the first address in the storage\", but since the storage of `Test` is being used for that, you get a log with the `strategy` address.\r\n\r\nTentatively closing because I think this is working as expected.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1735618852/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
