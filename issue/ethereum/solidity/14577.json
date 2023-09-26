@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14577",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14577/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14577/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14577/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14577",
+  "id": 1912640915,
+  "node_id": "I_kwDOAm_5kc5yAJWT",
+  "number": 14577,
+  "title": "Using delegatecall within view functions, to implement proxies",
+  "user": {
+    "login": "hoytech",
+    "id": 144548,
+    "node_id": "MDQ6VXNlcjE0NDU0OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/144548?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hoytech",
+    "html_url": "https://github.com/hoytech",
+    "followers_url": "https://api.github.com/users/hoytech/followers",
+    "following_url": "https://api.github.com/users/hoytech/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hoytech/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hoytech/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hoytech/subscriptions",
+    "organizations_url": "https://api.github.com/users/hoytech/orgs",
+    "repos_url": "https://api.github.com/users/hoytech/repos",
+    "events_url": "https://api.github.com/users/hoytech/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hoytech/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-26T04:10:02Z",
+  "updated_at": "2023-09-26T04:10:02Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n\r\nWith some types of proxy contracts, functions invoke `delegatecall` to execute the code stored in a separate implementation contract. However, these functions cannot be declared as `view`s because `delegatecall` cannot be used within view functions. This means that the exported ABIs for these functions will be (ie) `nonpayable`, resulting in contracts invoking these functions with `call` instead of `staticcall`, and causing these functions to be incorrectly categorised by smart contract wallets, block explorers, etc.\r\n\r\n## Motivation\r\n\r\nThere are several work-arounds to this issue, most of which are discussed in these StackOverflow answers by @k06a : [thread 1](https://ethereum.stackexchange.com/questions/82342/how-to-perform-delegate-call-inside-of-view-call-staticall) and [thread 2](https://ethereum.stackexchange.com/questions/142490/preserving-visibility-view-of-a-method-using-delegate-call-to-a-view-method/). Another hack involves [post-processing](https://github.com/euler-xyz/euler-contracts/blob/master/tasks/compileoverride.js) the compiled ABI. Unfortunately, these work-arounds all involve a run-time cost, and/or don't actually mark the functions as views in the ABI output by the compiler itself.\r\n\r\nThe \"best\" work-around I have found is described in the first StackOverflow thread above. In this approach, the view function `staticcall`s to `address(this)`, which is then handled by a special non-view function that `delegatecall`s the implementation. This results in the functions having `view` state mutability in the output ABI, at the expense of some extra run-time gas usage. (Note that `msg.sender` is lost, but this typically does not matter for view functions.)\r\n\r\nThis approach works because if a caller `staticcall`s a contract that invokes `delegatecall`, it will succeed as long as the called contract, and all contracts it invokes, do not actually attempt any state modifications. This demonstrates that in principle we could address this issue purely by making a change to the solidity compiler (and no EVM changes are needed).\r\n\r\n## Specification\r\n\r\nI did a few small experiments to feel out the possibilities for how this could be addressed.\r\n\r\n### Option A\r\n\r\n[Patch](https://github.com/hoytech/solidity/commit/8686390a589da986de4dcfb9fc42ac2a321b27c4) / [test](https://gist.github.com/hoytech/76da2263ab526151ea705160596c87ec)\r\n\r\nThis trivial patch adds a `delegatecallToView` function to `address`. This works exactly the same as `delegatecall` except that it is considered to have `view` state mutability instead of `nonpayable`:\r\n\r\n    function myView() external view returns (uint) {\r\n        (bool success, bytes memory ret) = module.delegatecallToView(msg.data);\r\n        require(success);\r\n        return abi.decode(ret, (uint));\r\n    }\r\n\r\nThis solves all the issues mentioned above, but has the down-side of preventing the compiler from statically verifying that no state modifications will be attempted when invoking `view` functions. In the broad sense, I don't see this as a problem because the actual decision about whether to interpret the function as a view is done by the *caller* by choosing to invoke it with `staticcall` or not.\r\n\r\nThat said, there may very well be scenarios where the static verification is important, and I would like to learn more about these if so. The only case I can really think of is if you are interacting with a contract that has been verified on etherscan and its ABI says `view`, you can be sure that state modifications will not happen even if you use `call` instead of `staticcall` for some reason.\r\n\r\n### Option B\r\n\r\n[Patch](https://github.com/hoytech/solidity/commit/16742f8d8f76f671ffcd5566a797e14b3d82a602) / [test](https://gist.github.com/hoytech/c349ff2edc243935107720765fcbf88a)\r\n\r\nThis patch is slightly more complicated but still pretty minimal. It adds support for a special `viewable` modifier. This is *not* a state mutability specifier. All it does is override the function's `stateMutability` field to be `view` in the ABI output:\r\n\r\n    function myView() external viewable returns (uint) {\r\n        (bool success, bytes memory ret) = module.delegatecall(msg.data);\r\n        require(success);\r\n        return abi.decode(ret, (uint));\r\n    }\r\n\r\nThe above function is compiled with default state mutability (ie nonpayable), which means that `delegatecall` is allowed. However, at ABI export-time its `stateMutability` is overridden to be `view`. The modifier is called `viewable` to indicate that these functions are intended to be invoked with `staticcall`, even though the compiler has not been able to statically verify that it won't attempt state modifications.\r\n\r\nTypically you would use this function with no state mutability specifier and then perform a `delegatecall` within the function. If you do not do a `delegatecall` (or some state changing operation) then you will receive a warning that this function can be made a view instead.\r\n\r\nOne drawback of the patch in its current form is that when importing full contracts into a compilation unit, the external ABI is not used, so `viewable` functions will be invoked with `call` instead of `staticcall`. This can be worked around by instead using an `interface` where the functions are labeled as views.\r\n\r\nThis patch needs a bit more polish before I'd consider it ready. Testing, obviously, but also things like throwing errors when combining `viewable` with `view`/`pure`, specifying `viewable` multiple times, etc.\r\n\r\n### Option C\r\n\r\nI did not try implementing this, but `viewable` could itself become a state modification specifier, somewhere \"in-between\" `nonpayable` and `view`.\r\n\r\nThis would probably solve the \"compilation unit\" issue mentioned in the previous section, but I think if we went this route then we may as well make function capabilities more general/granular, for example as described [here](https://github.com/ethereum/solidity/issues/9248#issuecomment-713884387). Personally I would selfishly prefer a focused solution for this specific issue.\r\n\r\n\r\n## Backwards Compatibility\r\n\r\nOption A would change the static-verification guarantee implied by `view`, which may or may not cause problems (I'd like to learn more about this!).\r\n\r\nOption B could break contracts that define their own modifiers named `viewable`.\r\n\r\nI haven't thought enough about Option C to say one way or the other.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14577/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14577/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
