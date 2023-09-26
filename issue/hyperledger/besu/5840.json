@@ -85,7 +85,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -94,12 +94,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-09-01T16:28:23Z",
-  "updated_at": "2023-09-21T18:28:08Z",
-  "closed_at": null,
+  "updated_at": "2023-09-26T15:23:45Z",
+  "closed_at": "2023-09-26T15:23:45Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Bonsai Fleetnodes \r\nWe are now able to ship trie logs from full nodes to other Besu components thanks to recent feature work. This proposal outlines a light fleet node that is controlled by a parent/captain that can serve near-hear RPC traffic. The design goals of this lightnode are:\r\n\r\n- Light on machine resources → These are not full nodes, and therefore need much less resources (and less cost) than a full Besu/Linea node \r\n- Lightning fast to stand up → These nodes don't need a full state DB nor chain data and can be spun up very fast to enable on-demand horizontal scale for certain RPC calls like eth_call\r\n\r\nBelow we outline a POC.\r\n\r\n### Proof of Concept\r\nFor building a proof of concept (POC) with a lightweight Besu node capable of maintaining a significantly small state size. These nodes are intended to serve near head RPC traffic. The following steps can be taken to modify Besu for this use-case:\r\n- Add Parent/Child Mode Flag: Introduce a new flag to Besu, such as --child-mode, which would trigger the lightweight child node functionality.\r\n- Initial SnapSync and Trie Removal: When the --child-mode flag is activated, the node would perform an initial snap sync with a heal process for the flat DB during the first startup. After the snap sync, the trie data can be safely removed.\r\n- Trie Log Reception and Query Mechanism: Implement a mechanism for the child node to receive and query trielogs from a parent Besu node. Essentially, the parent Besu node would send trielogs to the child, which would listen and store them. The child node could also request missing trielogs if it detects any gaps (check [Shomei](https://github.com/ConsenSys/besu-shomei-plugin) for some dev ideas).\r\n\r\nIt might be necessary to adapt or create new besu plugins.\r\n\r\n### POC Workflow:\r\n1. Parent initiates a snap sync. \r\n2. First child will do a snapsync. Next child mode will be setup from AWS snapshot database (without the trie and with only the flat DB)\r\n3. After snap sync, the parent provides necessary trielogs to the child.\r\n4. The child node listens for incoming trielogs and saves them.\r\n4a. If any missing trielogs are detected during synchronization or subsequent operations, the child can request them from the parent.\r\n\r\nThere are multiple considerations to weigh when deciding on the plugin's design.\r\n\r\n#### Parent Mode:\r\nSending trielogs to registered child nodes.\r\n\r\n#### Child Mode:\r\n- Receiving trielogs and triggering state changes (fork choice update ?).\r\n- Requesting missing trielogs if needed (e.g., receiving block 5 but the local state is at block 3).\r\n- Deleting the trie after the initial synchronization (only for the first child mode)\r\n- Pruning old blockchain data (this feature is already implemented)\r\n\r\nWe are also considering whether to implement a simple list in the parent for managing childs or to introduce an event-based system to enhance efficiency. Both options have their advantages and challenges:\r\n\r\n#### Simple List Approach:\r\nAdvantages: Simplicity and straightforward implementation for the POC.\r\nChallenges: Might not be as scalable or efficient if the number of childs increases significantly.\r\n \r\n#### Event-Based Approach:\r\nAdvantages: More efficient communication between parent and childs, scalability as the network grows, cleaner code separation between different actions.\r\nChallenges: More complex to implement, may require additional effort for the POC.\r\n\r\nThe decision between these approaches depends on our priorities for the POC. If we prioritize a rapid POC implementation, the simple list approach might be more suitable. However, if we want to model a more scalable and efficient system, investing in the event-based approach could provide valuable insights for future development.\r\n\r\n### RPC Compatibility\r\n [Besu Lightnode - RPC API w/o Trie branch](https://docs.google.com/document/d/1iI55bZX5RJuFdSK38opf_bV-6Y7LxDOVH5Dmychjgpw/edit)\r\nThe above doc outlines the RPC we have tested for usage. \r\n\r\n### Plugin approach\r\n\r\nI think we can have everything in the plugin and this one could introduce functionalities automatically based on a flag choice, either --child-mode or --parent-mode.\r\nBy adding this plugin, the following features would be integrated:\r\nFor `--parent-mode`, the plugin would enable sending and managing trielogs to registered childs.\r\nFor `--child-mode`, the plugin would handle receiving trielogs, triggering state changes, requesting missing trielogs if necessary, and removing trie after snapsync.\r\n\r\nOne question: Can we remove the trie after the initial sync from the plugin? It might be necessary to modify the plugin's interface to access synchronization status information and determine whether the trie can be removed.\r\nThis approach would effectively abstract the complexity from the Besu codebase, allowing Besu to function without being directly aware of the specific operations being conducted.\r\n\r\n## Open Questions \r\n~~Self Destruct - Can we just ignore this as this is a near-head RPC node, not a full node needing to manage a \"correct\" state trie. Can we leave it in the trie and presume users will not query it later on? Or mark it as \"deleted\" and make it inaccessible~~\r\nApparently this is not an issue - tested on Goerli\r\n\r\nHow many historical states will the light node maintain? Can we instantiate the node with n-500 or some number of trie logs to prepopulate \"near head\" state ?\r\n- I think if we have a snapshot of the DB at the block 500. And we have huge traffic, the head is currently 1000. We will start a new node that will start at block 500 and import all of the block until 1000. So all the block between 1000 and 500 will be in memory and it will be fine. I think it can be ok for a lot of use-case.\r\n\r\nClone/snapshot strategy - how do we implement a strategy for standing up new nodes?\r\n- This PoC mostly covers functionality for enabling light RPC nodes, we need to make sure we incorporate a snapshot strategy",
-  "closed_by": null,
+  "closed_by": {
+    "login": "non-fungible-nelson",
+    "id": 85905982,
+    "node_id": "MDQ6VXNlcjg1OTA1OTgy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85905982?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/non-fungible-nelson",
+    "html_url": "https://github.com/non-fungible-nelson",
+    "followers_url": "https://api.github.com/users/non-fungible-nelson/followers",
+    "following_url": "https://api.github.com/users/non-fungible-nelson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/non-fungible-nelson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/non-fungible-nelson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/non-fungible-nelson/subscriptions",
+    "organizations_url": "https://api.github.com/users/non-fungible-nelson/orgs",
+    "repos_url": "https://api.github.com/users/non-fungible-nelson/repos",
+    "events_url": "https://api.github.com/users/non-fungible-nelson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/non-fungible-nelson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5840/reactions",
     "total_count": 0,
@@ -114,7 +133,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5840/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
