@@ -30,7 +30,33 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 6008515308,
+      "node_id": "LA_kwDOIQGLK88AAAABZiKq7A",
+      "url": "https://api.github.com/repos/ethereum/execution-spec-tests/labels/scope:evm",
+      "name": "scope:evm",
+      "color": "3D41B2",
+      "default": false,
+      "description": "Scope: evm_transition_tool package"
+    },
+    {
+      "id": 6008623232,
+      "node_id": "LA_kwDOIQGLK88AAAABZiRQgA",
+      "url": "https://api.github.com/repos/ethereum/execution-spec-tests/labels/type:feat",
+      "name": "type:feat",
+      "color": "0e8a16",
+      "default": false,
+      "description": "type: Feature"
+    },
+    {
+      "id": 6008698715,
+      "node_id": "LA_kwDOIQGLK88AAAABZiV3Ww",
+      "url": "https://api.github.com/repos/ethereum/execution-spec-tests/labels/scope:fw",
+      "name": "scope:fw",
+      "color": "30EAF1",
+      "default": false,
+      "description": "Scope: Framework (evm|tools|forks|pytest)"
+    }
   ],
   "state": "open",
   "locked": false,
@@ -41,9 +67,9 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-08-03T15:58:12Z",
-  "updated_at": "2023-08-03T15:58:12Z",
+  "updated_at": "2023-09-26T07:54:58Z",
   "closed_at": null,
-  "author_association": "COLLABORATOR",
+  "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Feature Description\r\nFor our current t8n tools inluding geth, besu & evmone, we cannot reliably create tests with invalid fields. \r\n\r\n**Possible invalid cases could include the following:**\r\n- Address fields > 20 bytes,\r\n- Hash fields > 32 bytes,\r\n- Unsigned 64-bit integer fields (timestamp, excessBlobGas) > 64-bits,\r\n- Fields with null values that are required to exist.\r\n\r\n## Existing Issues\r\n`test_blob_txs.py::test_invalid_blob_tx_contract_creation` is not fill-able using our most up to date cancun geth t8n tool:\r\n[marioevz/go-ethereum@4844-devnet-6-t8n/4c0559f55](https://github.com/marioevz/go-ethereum/commit/4c0559f55fe32dfc1ee34e86f07952e30b02283c)\r\n\r\nIt returns the following error when filled:\r\n```\r\nException: failed to evaluate: ERROR(10): failed unmarshaling stdin: missing required field 'to' in transaction\r\n```\r\n\r\nWithin this test case we want to generate the fixture where a type 3 blob transaction has no `to` address: `to=None`. The EIP-4844 spec describes this situation as invalid, and hence we want to assert that execution clients acknowledge the invalidity upon fixture consumption. Similarly, to test that they should return an expected error via the EngineAPI when consuming the fixture within the hive pyspec simulator. \r\n\r\n## Possible Solution\r\n\r\nTo allow the t8n to generate a valid fixture, we first check the validity of every field for the test case before passing alloc, txs & env to be processed by the t8n tool. \r\n\r\nThis can be a separate function `validity_checker()` that checks the validity of every field, flagging the field names that are invalid, alongside there invalid values. It will also overwrite the invalid fields with an appropriate default valid field. \r\n\r\nNow we pass the \"valid\" txs & env to the t8n tool, bypassing any error, and use the valid output result to only partially create the fixture. We would then use the invalid fields returned from `validity_checker()` within `types.py` when creating the block rlp. \r\n\r\n\r\n",
   "closed_by": null,
