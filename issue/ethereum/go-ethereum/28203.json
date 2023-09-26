@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28203",
+  "id": 1913205381,
+  "node_id": "I_kwDOAOvK985yCTKF",
+  "number": 28203,
+  "title": "Some possible optimizations for geth",
+  "user": {
+    "login": "hzysvilla",
+    "id": 13715006,
+    "node_id": "MDQ6VXNlcjEzNzE1MDA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13715006?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hzysvilla",
+    "html_url": "https://github.com/hzysvilla",
+    "followers_url": "https://api.github.com/users/hzysvilla/followers",
+    "following_url": "https://api.github.com/users/hzysvilla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hzysvilla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hzysvilla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hzysvilla/subscriptions",
+    "organizations_url": "https://api.github.com/users/hzysvilla/orgs",
+    "repos_url": "https://api.github.com/users/hzysvilla/repos",
+    "events_url": "https://api.github.com/users/hzysvilla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hzysvilla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-26T10:30:57Z",
+  "updated_at": "2023-09-26T10:31:14Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Dear Geth Team,\r\nI am currently researching some optimisations to Geth related to cache, state and underlying storage as part of my work on the downstream **chainlancet**.\r\nWith **chainlancet**，I have observed some optimizations that may improve geth's efficiency, as follows:\r\n\r\n1.Duplicate contract bytecode writing. \r\nThe bytecode of the contract newly created by the user will always be written to the underlying database. However, the underlying data uses bytecode hashes as keys and according to research [1] more than 90% of bytecodes are duplicates. This means that a considerable amount of bytecode is being written repeatedly.\r\nGeth can prevent repeated bytecode from being written to reduce write load. In addition, it is thought that corresponding EIP can be proposed for the _Create_ opcode to optimize the gas amount and improve the user experience. For example, deploying duplicate bytecode consumes less gas (similar to _Sstore_ [2]).\r\n\r\n2.Duplicate keccak256 calculation\r\nThe current implementation of the _keccak256_ instruction does not have any cache, which causes calculations for the same preimage even within a transaction to be executed repeatedly, wasting CPU resources. According to our observation, this kind of repeated calculation of _keccak256_ instructions is very common. For example, in the ERC20 token transfer, the _msg.sender_ and _to_ parameters will be calculated twice by _keccak256_ instruction.\r\nWe believe that cache can be added to the implementation of _keccak256_ instructions in geth's implementation, so that repeated hash calculations can be avoided. In addition, we can also propose EIP to reduce gas consumption when the contract repeats _keccak256_ calculations.\r\n\r\nWe hope that our findings can further optimize geth operation and improve user experience.\r\n\r\nCheers,\r\nThe team of  **chainlancet**",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

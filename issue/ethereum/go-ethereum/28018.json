@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-08-28T01:13:33Z",
-  "updated_at": "2023-09-12T12:23:21Z",
-  "closed_at": null,
+  "updated_at": "2023-09-26T11:12:45Z",
+  "closed_at": "2023-09-26T11:12:45Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\nGeth version: v1.101200.0\r\nOS & Version: Linux\r\n\r\n#### Background:\r\nWe built a private network, in which we deployed a set of geth nodes as p2p layer( which we called p2p nodes ) before miner nodes for high availability. All transactions go to the p2p nodes first, then broadcasted to the miner nodes later.\r\n\r\n#### Expected behavior\r\nAll transactions with enough price and correct nonce should be mined when the miner's pool is empty and gas price goes down.\r\n\r\n#### Actual behavior\r\nSome transactions are stuck in the p2p node's pool forever after a traffic jam.\r\n\r\n#### Steps to reproduce the behavior\r\n1. Prepare some addresses (let's say 100k+)\r\n2. Send transactions between them, in a high throughput(say 4k+/s tps), and keep it for a while (say 30mins)\r\n3. Make sure to trigger the traffic jam. (By watching meter indicated whether the miner's pool size has reach the limit or not)\r\n4. After the load testing finished, there might be some transactions stuck in the p2p nodes forever.\r\n\r\nWe found the root cause here :\r\nthey are caught in this [underpriced buffer](https://github.com/ethereum/go-ethereum/blob/master/eth/fetcher/tx_fetcher.go#L306). After adding a frequent cleaner to this buffer, the blocking issue disappeared.\r\n\r\nWhen the traffic is jamming, some transactions may be rejected as 'underpriced', and might be rejected forever even the chain's gas price has went down, unless other 'underpriced' transaction replace it. it's seems unfair.\r\n\r\nSo, i am wondering that, maybe we should make this buffer cleared frequently?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fjl",
+    "id": 6915,
+    "node_id": "MDQ6VXNlcjY5MTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6915?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fjl",
+    "html_url": "https://github.com/fjl",
+    "followers_url": "https://api.github.com/users/fjl/followers",
+    "following_url": "https://api.github.com/users/fjl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fjl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fjl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fjl/subscriptions",
+    "organizations_url": "https://api.github.com/users/fjl/orgs",
+    "repos_url": "https://api.github.com/users/fjl/repos",
+    "events_url": "https://api.github.com/users/fjl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fjl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28018/reactions",
     "total_count": 1,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28018/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
