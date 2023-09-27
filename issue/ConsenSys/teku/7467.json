@@ -40,7 +40,7 @@
       "description": "Issues required to implement Deneb upgrade"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "zilm13",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-28T22:21:10Z",
-  "updated_at": "2023-08-29T12:01:58Z",
-  "closed_at": null,
+  "updated_at": "2023-09-27T18:00:57Z",
+  "closed_at": "2023-09-27T18:00:56Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Description\r\nTeku is hitting the following exception on a valid Deneb builder bid:\r\n```\r\n2023-08-28 19:04:59.237 ERROR - Unable to obtain a valid bid from builder. Falling back to local execution engine.\r\n java.util.concurrent.CompletionException: tech.pegasys.teku.infrastructure.json.exceptions.MissingRequiredFieldException: required fields: (withdrawals_root, blob_gas_used, excess_blob_gas) were not set\r\n at java.util.concurrent.CompletableFuture.encodeThrowable(Unknown Source) ~[?:?] \r\n at java.util.concurrent.CompletableFuture.completeThrowable(Unknown Source) ~[?:?] \r\n at java.util.concurrent.CompletableFuture$UniApply.tryFire(Unknown Source) ~[?:?] \r\n at java.util.concurrent.CompletableFuture.postComplete(Unknown Source) [?:?]\r\n at java.util.concurrent.CompletableFuture.completeExceptionally(Unknown Source) [?:?]\r\n at tech.pegasys.teku.ethereum.executionclient.rest.OkHttpRestClient$2.onResponse(OkHttpRestClient.java:163) [teku-ethereum-executionclient-develop.jar:23.8.0+34-g46321bcd4e]\r\n at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519) [okhttp-4.11.0.jar:?]\r\n at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) [?:?]\r\n at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) [?:?]\r\n at java.lang.Thread.run(Unknown Source) [?:?]\r\n Caused by: tech.pegasys.teku.infrastructure.json.exceptions.MissingRequiredFieldException: required fields: (withdrawals_root, blob_gas_used, excess_blob_gas) were not set\r\n at tech.pegasys.teku.infrastructure.json.types.DeserializableObjectTypeDefinition.deserialize(DeserializableObjectTypeDefinition.java:101) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.types.RequiredDeserializableFieldDefinition.readField(RequiredDeserializableFieldDefinition.java:42) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.types.DeserializableObjectTypeDefinition.deserialize(DeserializableObjectTypeDefinition.java:74) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.types.RequiredDeserializableFieldDefinition.readField(RequiredDeserializableFieldDefinition.java:42) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.types.DeserializableObjectTypeDefinition.deserialize(DeserializableObjectTypeDefinition.java:74) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.types.RequiredDeserializableFieldDefinition.readField(RequiredDeserializableFieldDefinition.java:42) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.types.DeserializableObjectTypeDefinition.deserialize(DeserializableObjectTypeDefinition.java:74) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.JsonUtil.parse(JsonUtil.java:118) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.infrastructure.json.JsonUtil.parse(JsonUtil.java:110) ~[teku-infrastructure-json-develop.jar:23.8.0+34-g46321bcd4e]\r\n at tech.pegasys.teku.ethereum.executionclient.rest.OkHttpRestClient$2.onResponse(OkHttpRestClient.java:160) ~[teku-ethereum-executionclient-develop.jar:23.8.0+34-g46321bcd4e]\r\n ... 4 more\r\n```\r\nThe builder bid is as follows:\r\n```json\r\n{\r\n    \"version\": \"deneb\",\r\n    \"data\": {\r\n        \"message\": {\r\n            \"header\": {\r\n                \"parent_hash\": \"0xa9507f61bc2f06d7bc4ebe7bf9d6bd54b1172796b92b90e346bd3acc7d91dbd8\",\r\n                \"fee_recipient\": \"0x878705ba3f8bc32fcf7f4caa1a35e72af65cf766\",\r\n                \"state_root\": \"0xeb6cece5c5e9d29fce1c47138d0059c7ec70f569a9da1addcba4410cbf1c0c88\",\r\n                \"receipts_root\": \"0xc538d36ed1acf6c28187110a2de3e5df707d6d38982f436eb0db7a623f9dc2cd\",\r\n                \"logs_bloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 000000000000000000000000000000000000000000\",\r\n                \"prev_randao\": \"0x30fe4a3c5aea79d1862b78ac0b38b3bbcfc6c20ab0b402e2db435e82574fcbdc\",\r\n                \"block_number\": \"66\",\r\n                \"gas_limit\": \"26663452\",\r\n                \"gas_used\": \"210000\",\r\n                \"timestamp\": \"1693249499\",\r\n                \"extra_data\": \"0x6275696c646572207061796c6f6164\",\r\n                \"base_fee_per_gas\": \"598964\",\r\n                \"block_hash\": \"0x13047edbab52cf4421a61bfcfc2485b8af48da0f5f1e25439b946680b3bb0154\",\r\n                \"transactions_root\": \"0x2f5e224d7af16526048efa4dfcdbe7fc841d7fc3aee99d947b6c46ebd2a82c99\",\r\n                \"withdrawals_root\": \"0x792930bbd5baac43bcc798ee49aa8185ef76bb3b44ba62b91d86ae569e4bb535\",\r\n                \"blob_gas_used\": \"0\",\r\n                \"excess_blob_gas\": \"0\"\r\n            },\r\n            \"blinded_blobs_bundle\": {\r\n                \"commitments\": [],\r\n                \"proofs\": [],\r\n                \"blob_roots\": []\r\n            },\r\n            \"value\": \"1076580166200000\",\r\n            \"pubkey\": \"0x95fde78acd5f6886ddaf5d0056610167c513d09c1c0efabbc7cdcc69beea113779c4a81e2d24daafc5387dbf6ac5fe48\"\r\n        },\r\n        \"signature\": \"0x9071a79170de126252e8f694c5c3f19390a869a233f4103b93c293f099be83aa632ab6e79dd2fcb9d3bf8f812b6e4e960886810cf8298d0855867e195fc935d91d32e4fd8909520c7e8ce20b631a9007dbe6b3a68c5c6562f9ba3f460e6e3f55\"\r\n    }\r\n}\r\n```\r\nWhich seems to match what the builder spec describes, and does contain the `withdrawals_root, blob_gas_used, excess_blob_gas` fields in the `message` portion of the response.\r\n\r\n### Steps to Reproduce (Bug)\r\nUsing the following kurtosis eth2-package branch: https://github.com/marioevz/eth2-package/tree/mock-builder-updates-deneb\r\n\r\nRun the following command:\r\n```bash\r\nkurtosis run --enclave eth2 . \"$(cat mock_mev_test_teku.json)\"\r\n```\r\nWhere the json file has the following contents:\r\n```json\r\n {\r\n   \"participants\": [\r\n     {   \r\n       \"el_client_type\": \"geth\",\r\n       \"el_client_image\": \"ethpandaops/geth:lightclient-devnet-8-edf4ab3\",\r\n       \"cl_client_type\": \"teku\",\r\n       \"cl_client_image\": \"consensys/teku:develop\",\r\n       \"count\": 2\r\n     }   \r\n   ],  \r\n   \"network_params\": {\r\n     \"capella_fork_epoch\": 1,\r\n     \"deneb_fork_epoch\": 2\r\n   },  \r\n   \"launch_additional_services\": true,\r\n   \"global_client_log_level\": \"debug\",\r\n   \"snooper_enabled\": true,\r\n   \"mev_type\": \"mock\"\r\n }\r\n```\r\n\r\n**Expected behavior:**\r\nAfter Deneb epoch, Teku should parse the bid and then request the unblinded payload and blob bundle by signing the beacon block and blob sidecars.\r\n\r\n**Actual behavior:**\r\nTeku falls-back to local payload building.\r\n\r\n**Frequency:**\r\nAlways happens.\r\n\r\n### Versions\r\n`consensys/teku:develop` docker image, `Digest:sha256:a90150de8269d51382e8df186bc77c0b29854aba90979c902c7f0e85599af4e0`\r\n`teku/v23.8.0+34-g46321bcd4e/linux-x86_64/-eclipseadoptium-openjdk64bitservervm-java-17`",
-  "closed_by": null,
+  "closed_by": {
+    "login": "marioevz",
+    "id": 11726710,
+    "node_id": "MDQ6VXNlcjExNzI2NzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marioevz",
+    "html_url": "https://github.com/marioevz",
+    "followers_url": "https://api.github.com/users/marioevz/followers",
+    "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+    "organizations_url": "https://api.github.com/users/marioevz/orgs",
+    "repos_url": "https://api.github.com/users/marioevz/repos",
+    "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marioevz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/7467/reactions",
     "total_count": 0,
@@ -107,8 +126,51 @@
   },
   "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7467/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1737849011",
+    "html_url": "https://github.com/Consensys/teku/issues/7467#issuecomment-1737849011",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7467",
+    "id": 1737849011,
+    "node_id": "IC_kwDOCM9I9M5nlXiz",
+    "user": {
+      "login": "marioevz",
+      "id": 11726710,
+      "node_id": "MDQ6VXNlcjExNzI2NzEw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/marioevz",
+      "html_url": "https://github.com/marioevz",
+      "followers_url": "https://api.github.com/users/marioevz/followers",
+      "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+      "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+      "organizations_url": "https://api.github.com/users/marioevz/orgs",
+      "repos_url": "https://api.github.com/users/marioevz/repos",
+      "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/marioevz/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-27T18:00:56Z",
+    "updated_at": "2023-09-27T18:00:56Z",
+    "author_association": "NONE",
+    "body": "Builder is now fully working on Teku's latest develop and latest commit of this hive's PR: https://github.com/ethereum/hive/pull/838\r\n\r\nClosing issue.",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1737849011/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
