@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5933",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5933/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5933/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5933/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/5933",
+  "id": 1916206532,
+  "node_id": "I_kwDOGBlvNc5yNv3E",
+  "number": 5933,
+  "title": "forge test error",
+  "user": {
+    "login": "Ortiz2525",
+    "id": 135733065,
+    "node_id": "U_kgDOCBcfSQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/135733065?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Ortiz2525",
+    "html_url": "https://github.com/Ortiz2525",
+    "followers_url": "https://api.github.com/users/Ortiz2525/followers",
+    "following_url": "https://api.github.com/users/Ortiz2525/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Ortiz2525/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Ortiz2525/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Ortiz2525/subscriptions",
+    "organizations_url": "https://api.github.com/users/Ortiz2525/orgs",
+    "repos_url": "https://api.github.com/users/Ortiz2525/repos",
+    "events_url": "https://api.github.com/users/Ortiz2525/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Ortiz2525/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-26T08:44:14Z",
+  "updated_at": "2023-09-27T19:43:49Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\nimport \"forge-std/Test.sol\";\r\nimport {PoolSwapBaseTest} from \"../../shared/Swap.t.sol\";\r\n\r\nimport {Pool} from \"src/Pool.sol\";\r\nimport {PoolMath} from \"src/libs/PoolMath.sol\";\r\nimport {Errors} from \"src/libs/Errors.sol\";\r\nimport {MockCallbackReceiver} from \"../../mocks/MockCallbackReceiver.sol\";\r\nimport {SafeCast} from \"@openzeppelin/contracts/utils/math/SafeCast.sol\";\r\nimport {SignedMath} from \"@openzeppelin/contracts/utils/math/SignedMath.sol\";\r\n\r\nusing SignedMath for int256;\r\nusing SafeCast for uint256;\r\n\r\nabstract contract PoolSwapFuzzTest is PoolSwapBaseTest {\r\n    /// @dev add liquidity to BasePool\r\n    modifier setUpDepositToBasePool(uint256[3] memory amounts) {\r\n        address lp1 = makeAddr(\"lp1\");\r\n        _approvePts(lp1, address(baseLpt), type(uint256).max);\r\n        for (uint256 i = 0; i < amounts.length; i++) {\r\n            deal(address(pts[i]), lp1, amounts[i], true);\r\n        }\r\n        _basePoolAddLiquidity(lp1, amounts, 0, lp1);\r\n        _;\r\n    }\r\n\r\n    /// @param index index of the pt to swap\r\n    /// @param ptsToBasePool amount of pts to deposit to base pool before swap\r\n    /// @param ptDesired amount of pt to swap (in/out)\r\n    /// @param timestamp timestamp when swap is executed\r\n    struct SwapFuzzInput {\r\n        uint256 index;\r\n        uint256[3] ptsToBasePool;\r\n        uint256 ptDesired;\r\n        uint256 timestamp;\r\n    }\r\n\r\n    modifier boundSwapFuzzInput(SwapFuzzInput memory input) {\r\n        input.index = bound(input.index, 0, N_COINS - 1); // 0 <= index < N_COINS\r\n        input.ptsToBasePool = bound(input.ptsToBasePool, 1_000, 100 * ONE_UNDERLYING);\r\n        // if reserve on pool is less than ptIn, revert with ProportionTooHigh\r\n        input.ptDesired = bound(input.ptDesired, 100, input.ptsToBasePool[input.index]);\r\n        // timestamp [block.timestamp, maturity - 1]\r\n        input.timestamp = bound(input.timestamp, block.timestamp, maturity - 1);\r\n        _;\r\n    }\r\n}\r\n\r\ncontract PoolSwapPtForUnderlyingFuzzTest is PoolSwapFuzzTest {\r\n    /// @notice test swap when callback data is given\r\n    function testFuzz_WhenCallData(SwapFuzzInput memory swapInput)\r\n        public\r\n        boundSwapFuzzInput(swapInput)\r\n        whenMaturityNotPassed\r\n        setUpDepositToBasePool(swapInput.ptsToBasePool)\r\n    {\r\n        _deployMockCallbackReceiverTo(receiver);\r\n        deal(address(underlying), receiver, 1e6 * ONE_UNDERLYING, false);\r\n        vm.warp(swapInput.timestamp);\r\n\r\n        _testFuzz_swapUnderlyingForPt(swapInput);\r\n    }\r\n\r\n    /// @notice test swap when callback data is not given\r\n    function testFuzz_WhenNoCallData(SwapFuzzInput memory swapInput)\r\n        public\r\n        boundSwapFuzzInput(swapInput)\r\n        whenMaturityNotPassed\r\n        setUpDepositToBasePool(swapInput.ptsToBasePool)\r\n    {\r\n        // give enough underlying to pool\r\n        fund(address(underlying), address(pool), 1e6 * ONE_UNDERLYING, false);\r\n        vm.warp(swapInput.timestamp);\r\n\r\n        _testFuzz_swapUnderlyingForPt(swapInput);\r\n    }\r\n\r\n    /// @dev\r\n    /// Pre-condition: liquidity is added to the pool\r\n    /// Test case: swap underlying for pt\r\n    /// Post-condition:\r\n    ///   1. underlying balance of receiver should increase by the return value from swapPtForUnderlying\r\n    ///   2. underlying reserve should be decreased by the amount of underlying sent to receiver and fee\r\n    ///   3. Solvenvy check\r\n    ///   4. baseLpt minted should be approximately equal to the expected amount\r\n    function _testFuzz_swapUnderlyingForPt(SwapFuzzInput memory swapInput) public {\r\n        uint256 index = swapInput.index;\r\n        uint256 ptOutDesired = swapInput.ptDesired;\r\n\r\n        // pre-condition\r\n        uint256 preBaseLptSupply = baseLpt.totalSupply();\r\n        bytes memory callbackData =\r\n            receiver.code.length == 0 ? bytes(\"\") : abi.encode(Pool.swapUnderlyingForPt.selector, underlying);\r\n        // execute\r\n        uint256 underlyingIn = pool.swapUnderlyingForPt(index, ptOutDesired, receiver, callbackData);\r\n        // assert 1\r\n        assertApproxEqRel(\r\n            pts[index].balanceOf(receiver),\r\n            ptOutDesired,\r\n            0.01 * 1e18, // This error is due to the approximation error between the actual and expected baseLpt minted\r\n            // See CurveV2Pool.calc_token_amount and CurveV2Pool.remove_liquidity_one_coin\r\n            \"receiver should receive appropriately amount of pt [rel 1%]\"\r\n        );\r\n        // assert 2\r\n        assertUnderlyingReserveAfterSwap({\r\n            underlyingToAccount: -underlyingIn.toInt256(),\r\n            protocolFeeIn: pool.accumulatedFee(),\r\n            preTotalUnderlying: preTotalUnderlying\r\n        });\r\n        // assert 3\r\n        assertEq(\r\n            pool.totalBaseLpt(),\r\n            preTotalBaseLpt - (preBaseLptSupply - baseLpt.totalSupply()),\r\n            \"reserve should be decreased by baseLpt burned\"\r\n        );\r\n        // assert 4\r\n        assertSolvencyReserve();\r\n    }\r\n}\r\n```\r\nMy operating system is windows 10.\r\nI typed \"forge test\" but error occurs.\r\n```\r\nFailing tests:\r\nEncountered 1 failing test in test/fuzz/pool/Swap.t.sol:PoolSwapPtForUnderlyingFuzzTest\r\n[FAIL. Reason: Setup failed: Failed to execute command: %1 is not a valid Win32 application. (os error 193)] setUp() (gas: 0) ```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5933/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5933/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
