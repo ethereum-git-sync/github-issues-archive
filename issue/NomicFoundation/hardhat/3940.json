@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-05-18T07:32:48Z",
-  "updated_at": "2023-06-28T14:14:12Z",
+  "updated_at": "2023-09-27T00:12:59Z",
   "closed_at": "2023-06-28T14:14:11Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "## Version of Hardhat\r\n\r\n2.12.7 and 2.14.0\r\n\r\n## What happened?\r\n\r\nCalling a function which takes no input arguments, under a scenario in which the function should revert with a message:\r\n- When `viaIR = false`, the function reverts with the expected message\r\n- When `viaIR = true`, the function reverts with a different message\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.19\r\n- Framework/IDE: hardhat-truffle5\r\n- Operating system: MacOS\r\n\r\nI have tested this problem separately with hardhat versions 2.12.7 and 2.14.0.\r\nThe reproduction below uses the 'truffle5' plugin, but it also works without it.\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\npragma solidity 0.8.19;\r\n\r\ncontract MyContract {\r\n    bool private alreadyCalled;\r\n\r\n    function initialize() external {\r\n        require(!alreadyCalled, \"already called\");\r\n        alreadyCalled = true;\r\n    }\r\n}\r\n```\r\n\r\n```javascript\r\nconst MyContract = artifacts.require(\"MyContract\");\r\n\r\ncontract(\"MyContract\", () => {\r\n    it(\"Test\", async () => {\r\n        const myContract = await MyContract.new();\r\n\r\n        await myContract.initialize();\r\n        try {\r\n            await myContract.initialize();\r\n        } catch (error) {\r\n            console.log(error.message);\r\n        }\r\n    });\r\n});\r\n```\r\n\r\nOutcome:\r\n```\r\n+---------+-------+-----------------------------------------------------------------------------------------+\r\n| HardHat | viaIR | Printout                                                                                |\r\n+---------+-------+-----------------------------------------------------------------------------------------+\r\n| 2.12.7  | false | VM Exception while processing transaction: reverted with reason string 'already called' |\r\n+---------+-------+-----------------------------------------------------------------------------------------+\r\n| 2.12.7  | true  | Transaction reverted: function was called with incorrect parameters                     |\r\n+---------+-------+-----------------------------------------------------------------------------------------+\r\n| 2.14.0  | false | VM Exception while processing transaction: reverted with reason string 'already called' |\r\n+---------+-------+-----------------------------------------------------------------------------------------+\r\n| 2.14.0  | true  | Transaction reverted and Hardhat couldn't infer the reason                              |\r\n+---------+-------+-----------------------------------------------------------------------------------------+\r\n```\r\n\r\nStrangely enough, adding a `console.log` inside the contract function solves the problem.\r\n\r\nThis is possibly a Solc issue, so I have posted it [there](https://github.com/ethereum/solidity/issues/14244) too.\r\n\r\nPlease find the project configuration below.\r\n\r\nFile package.json:\r\n```json\r\n{\r\n    \"scripts\": {\r\n        \"build\": \"hardhat compile\",\r\n        \"test\": \"hardhat test --bail\"\r\n    },\r\n    \"devDependencies\": {\r\n        \"@nomiclabs/hardhat-truffle5\": \"2.0.7\",\r\n        \"@nomiclabs/hardhat-web3\": \"2.0.0\",\r\n        \"hardhat\": \"2.12.7\"\r\n    }\r\n}\r\n```\r\n\r\nFile hardhat.config.js:\r\n```javascript\r\nrequire(\"@nomiclabs/hardhat-truffle5\");\r\n\r\nmodule.exports = {\r\n    solidity: {\r\n        version: \"0.8.19\",\r\n        settings: {\r\n            viaIR: true,\r\n            optimizer: {\r\n                enabled: true,\r\n                runs: 200\r\n            }\r\n        }\r\n    },\r\n    paths: {\r\n        sources: \"./project/contracts\",\r\n        tests: \"./project/tests\",\r\n        cache: \"./project/cache\",\r\n        artifacts: \"./project/artifacts\"\r\n    }\r\n};\r\n```\r\n\r\nThanks :)\r\n\r\n## Search terms\r\n\r\nsolc, viaIR, revert",
   "closed_by": {
     "login": "fvictorio",

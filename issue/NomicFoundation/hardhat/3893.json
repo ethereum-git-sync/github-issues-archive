@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-05-02T22:25:36Z",
-  "updated_at": "2023-06-28T13:22:38Z",
+  "updated_at": "2023-09-27T00:13:02Z",
   "closed_at": "2023-06-28T13:22:38Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\n\n2.12.6\n\n### What happened?\n\nNot receiving `eth_subscribe` message after 5mins on inactivity. It is working with ganache. \r\nhttps://github.com/NomicFoundation/hardhat/issues/588\r\nThis thread was resolved so I created a new one\r\n\r\n\r\nI've further describe the issue here https://stackoverflow.com/questions/76158051/cannot-listen-to-contract-events-with-ethers-js\n\n### Minimal reproduction steps\n\nThis is the code I've used.\r\n```\r\nconst ERC721Abi = require(\"../solidity/abi/CampaignERC721Abi.json\");\r\nconst { ethers } = require(\"ethers\");\r\nconst wsHelper = require(\"../helpers/wsHelper\");\r\nconst Web3WsProvider = require(\"web3-providers-ws\");\r\n\r\nconst tokenAddress = \"0x464A8eB115BB4f9A95281391ff91FbebAc112e97\";\r\nconst chainId = 1337;\r\n\r\nconst sturdyWs = async () => {\r\n  const options = {\r\n    timeout: 30000, // ms\r\n\r\n    // // Useful for credentialed urls, e.g: ws://username:password@localhost:8546\r\n    // headers: {\r\n    //   authorization: 'Basic username:password'\r\n    // },\r\n\r\n    clientConfig: {\r\n      // Useful if requests are large\r\n      maxReceivedFrameSize: 100000000, // bytes - default: 1MiB\r\n      maxReceivedMessageSize: 100000000, // bytes - default: 8MiB\r\n\r\n      // Useful to keep a connection alive\r\n      keepalive: true,\r\n      keepaliveInterval: 60000, // ms\r\n    },\r\n\r\n    // Enable auto reconnection\r\n    reconnect: {\r\n      auto: true,\r\n      delay: 5000, // ms\r\n      maxAttempts: 5,\r\n      onTimeout: false,\r\n    },\r\n  };\r\n  const ws = new Web3WsProvider(\"ws://127.0.0.1:8545\", options);\r\n  ws.connect();\r\n\r\n  const promise = new Promise((resolve, reject) => {\r\n    ws.on(\"connect\", (m) => {\r\n      console.log(\"open\");\r\n      resolve();\r\n    });\r\n    ws.on(\"error\", (err) => {\r\n      console.log(\"error\", err);\r\n      reject(err);\r\n    });\r\n  });\r\n  ws.on(\"data\", (d) => {\r\n    console.log(d.method, d.params?.subscription, d?.params?.result?.topics);\r\n  });\r\n  await promise;\r\n\r\n  const contract = new ethers.Contract(tokenAddress, ERC721Abi, provider[chainId]);\r\n  const topic = contract.filters.Transfer();\r\n  console.log(\"topic\", topic);\r\n  ws.send(\r\n    {\r\n      jsonrpc: \"2.0\",\r\n      id: 1,\r\n      method: \"eth_subscribe\",\r\n      params: [\"logs\", topic],\r\n    },\r\n    (error, result) => {\r\n      if (error) {\r\n        console.error(error);\r\n      } else {\r\n        console.log(\"result:\", result.result); // subscription id\r\n      }\r\n    }\r\n  );\r\n\r\n  await new Promise((resolve, reject) => {});\r\n};\r\n\r\nrouter.get(\"/test\", async (req, res, next) => {\r\n  try {\r\n    sturdyWs();\r\n    return res.send({});\r\n  } catch (e) {\r\n    console.error(e);\r\n    return res.send({ e });\r\n  }\r\n});\r\n\r\nmodule.exports = router;\r\n\r\n```\n\n### Search terms\n\nwebsocket",
   "closed_by": {
     "login": "fvictorio",

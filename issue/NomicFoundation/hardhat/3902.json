@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-05-06T14:59:52Z",
-  "updated_at": "2023-06-28T13:41:35Z",
+  "updated_at": "2023-09-27T00:13:02Z",
   "closed_at": "2023-06-28T13:41:34Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Describe the feature\r\n\r\n## My goal:\r\n\r\nrun tests on blockchain-fork (e.g. BSC-mainnet fork)\r\ninteract with already deployed contracts on blockchain (e.g. MasterChefV3 - https://bscscan.com/address/0x556b9306565093c855aea9ae92a594704c2cd59e#code )\r\n\r\nin case if during a test some error appeared inside deployed 0x556b9306565093c855aea9ae92a594704c2cd59e I want to see this error location inside sources\r\n\r\n## What do I have now:\r\n\r\n> npx hardhat test\r\n\r\n```\r\n  1) SpotV2MasterchefV3\r\n       With deposit\r\n         Should withdraw liquidity:\r\n     Error: VM Exception while processing transaction: reverted with an unrecognized custom error\r\n      at <UnrecognizedContract>.<unknown> (0x556b9306565093c855aea9ae92a594704c2cd59e)\r\n      at SpotV2MasterchefV3._decreaseLiquidityNFT (src/DeFi/Spot/SpotV2MasterchefV3.sol:698)\r\n      at SpotV2MasterchefV3.withdrawEntireDeposit (src/DeFi/Spot/SpotV2MasterchefV3.sol:534)\r\n      at HardhatNode._mineBlockWithPendingTxs (node_modules/hardhat/src/internal/hardhat-network/provider/node.ts:1815:23)\r\n      at HardhatNode.mineBlock (node_modules/hardhat/src/internal/hardhat-network/provider/node.ts:504:16)\r\n```\r\n\r\nI don't like this\r\n\r\n```\r\n      at <UnrecognizedContract>.<unknown> (0x556b9306565093c855aea9ae92a594704c2cd59e)\r\n```\r\n\r\nit's impossible to debug\r\n\r\nI would like to have error message and pointer to source line with a failing code\r\n\r\n## What did I try:\r\n\r\nI tried to download sources from bscscan and compile it by myself\r\n\r\nI got theses artifacts\r\n\r\nMasterChefV3.json:\r\n```\r\n{'_format': 'hh-sol-artifact-1',\r\n 'abi': [...],\r\n 'bytecode': '...',\r\n 'contractName': 'MasterChefV3',\r\n 'deployedBytecode': '...',\r\n 'deployedLinkReferences': {},\r\n 'linkReferences': {},\r\n 'sourceName': 'src/external/downloads/MasterChefV3/MasterChefV3.sol'\r\n}\r\n```\r\n\r\nMasterChefV3.dbg.json:\r\n```\r\n{\r\n  \"_format\": \"hh-sol-dbg-1\",\r\n  \"buildInfo\": \"../../../../../build-info/b2a005c7913e2c839de483c0b16d6d24.json\"\r\n}\r\n```\r\n\r\n\r\ninside my test I do this\r\n\r\n```\r\n  const masterchefAddress = \"0x556b9306565093c855aea9ae92a594704c2cd59e\";\r\n  before(async function () {\r\n    ...\r\n    const MasterChefV3 = await ethers.getContractFactory('MasterChefV3');\r\n    const masterchef = MasterChefV3.attach(masterchefAddress);\r\n  }\r\n```\r\n\r\nso I expected hardhat to fetch all info about the contract from Artifact including SourceMap and give me detailed transaction error message and solidity traceback, but it did not help\r\n\r\n\r\n\r\n\r\n## Question\r\n\r\nHow can I get detailed transaction error message and solidity traceback in my test for external contract for which I have all sources?",
   "closed_by": {
     "login": "fvictorio",
