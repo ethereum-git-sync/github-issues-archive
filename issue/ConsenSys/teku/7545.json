@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7545",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7545/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7545/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7545/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7545",
+  "id": 1914302959,
+  "node_id": "I_kwDOCM9I9M5yGfHv",
+  "number": 7545,
+  "title": "Late block production - due to validator registrations?",
+  "user": {
+    "login": "benjaminion",
+    "id": 20796281,
+    "node_id": "MDQ6VXNlcjIwNzk2Mjgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20796281?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benjaminion",
+    "html_url": "https://github.com/benjaminion",
+    "followers_url": "https://api.github.com/users/benjaminion/followers",
+    "following_url": "https://api.github.com/users/benjaminion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benjaminion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benjaminion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benjaminion/subscriptions",
+    "organizations_url": "https://api.github.com/users/benjaminion/orgs",
+    "repos_url": "https://api.github.com/users/benjaminion/repos",
+    "events_url": "https://api.github.com/users/benjaminion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benjaminion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-26T21:04:11Z",
+  "updated_at": "2023-09-26T21:04:11Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "From `@mksh1991` on [discord](https://discord.com/channels/697535391594446898/697539289042649190/1156281718114885802):\r\n\r\n> We missed a block recently with Teku on Ethereum mainnet. From the logs it looks like client was busy sending validator registration to beacon node, at the moment when block needed to be produced. The logs of Teku client are [here](https://gist.github.com/mksh/7cd256305e251b41584244550df82813), missed slot is [here](https://beaconcha.in/slot/7410306). Is this expected behavior, or it's possible to tune Teku somehow to avoid this?\r\n\r\nFrom the logs, the block was published at 3.8s into the slot, which is really too late to be useful. The timing of the validator registrations looks suspicious.\r\n\r\n1. Could the validator registrations have delayed block publication?\r\n2. If so, what can we do to avoid this?\r\n\r\n```\r\n2023-09-26 17:00:43.092 INFO  - Validator   *** Published aggregate          Count: 1, Slot: 7410301, Root: a98f081d66718d9d614c9c1576aeff5bc93155f0b84d620f6d7396de176db4e7\r\n2023-09-26 17:00:47.007 DEBUG - Performing block duties for slot 7410302, last production slot 7410301\r\n2023-09-26 17:00:51.004 DEBUG - Performing attestation duties for slot 7410302, last production slot 7410301\r\n2023-09-26 17:00:51.174 INFO  - Validator   *** Published attestation        Count: 4, Slot: 7410302, Root: a0ff0182ccfd4d0a8f9891ea511312fe7770814b73b54a5c358863c11f7b562b\r\n2023-09-26 17:00:59.009 DEBUG - Performing block duties for slot 7410303, last production slot 7410302\r\n2023-09-26 17:01:03.002 DEBUG - Performing attestation duties for slot 7410303, last production slot 7410302\r\n2023-09-26 17:01:03.179 INFO  - Validator   *** Published attestation        Count: 2, Slot: 7410303, Root: ae8b4f16ebc69af67d75a35f42f98f9e7acbadd174d5688c0b3f7ba11368e746\r\n2023-09-26 17:01:11.012 DEBUG - Performing block duties for slot 7410304, last production slot 7410303\r\n2023-09-26 17:01:15.001 DEBUG - Performing attestation duties for slot 7410304, last production slot 7410303\r\n2023-09-26 17:01:23.012 DEBUG - Performing block duties for slot 7410305, last production slot 7410304\r\n2023-09-26 17:01:27.002 DEBUG - Performing attestation duties for slot 7410305, last production slot 7410304\r\n2023-09-26 17:01:27.162 INFO  - Validator   *** Published attestation        Count: 1, Slot: 7410305, Root: cc12e354e5c0e5e8a411de624c9716e39eac4b8a0822f73b37e645754f3d29d2\r\n2023-09-26 17:01:35.053 DEBUG - Going to send 400 validator registration(s) to the Beacon Node in 4 batch(es)\r\n2023-09-26 17:01:35.054 DEBUG - Starting to send batch 1/4\r\n2023-09-26 17:01:35.054 DEBUG - Performing block duties for slot 7410306, last production slot 7410305\r\n2023-09-26 17:01:35.087 DEBUG - Information about 50 proposers has been processed successfully by the Beacon Node.\r\n2023-09-26 17:01:35.187 DEBUG - Batch 1/4: 100 validator(s) registrations were sent to the Beacon Node.\r\n2023-09-26 17:01:35.187 DEBUG - Starting to send batch 2/4\r\n2023-09-26 17:01:35.315 DEBUG - Batch 2/4: 100 validator(s) registrations were sent to the Beacon Node.\r\n2023-09-26 17:01:35.315 DEBUG - Starting to send batch 3/4\r\n2023-09-26 17:01:35.369 DEBUG - Batch 3/4: 100 validator(s) registrations were sent to the Beacon Node.\r\n2023-09-26 17:01:35.369 DEBUG - Starting to send batch 4/4\r\n2023-09-26 17:01:35.428 DEBUG - Batch 4/4: 100 validator(s) registrations were sent to the Beacon Node.\r\n2023-09-26 17:01:35.429 INFO  - Validator   *** 400 out of 400 validator registration(s) were successfully sent to the builder network via the Beacon Node.\r\n2023-09-26 17:01:38.810 INFO  - Validator   *** Published block              Count: 1, Slot: 7410306, Root: b4b0655e0edc73a08b7a9c2d44c9858b3fde19355db620109b0885d78b1d401c, 11168409 (37%) gas, EL block:  0712f0571b1133f176c92ae8911656aa384bab4e7b027066aeaba8cd93a98eaa (18221306)\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7545/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7545/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
