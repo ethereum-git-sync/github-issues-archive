@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-09-26T10:30:57Z",
-  "updated_at": "2023-09-26T10:31:14Z",
-  "closed_at": null,
+  "updated_at": "2023-09-28T09:23:55Z",
+  "closed_at": "2023-09-28T09:23:55Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "Dear Geth Team,\r\nI am currently researching some optimisations to Geth related to cache, state and underlying storage as part of my work on the downstream **chainlancet**.\r\nWith **chainlancet**，I have observed some optimizations that may improve geth's efficiency, as follows:\r\n\r\n1.Duplicate contract bytecode writing. \r\nThe bytecode of the contract newly created by the user will always be written to the underlying database. However, the underlying data uses bytecode hashes as keys and according to research [1] more than 90% of bytecodes are duplicates. This means that a considerable amount of bytecode is being written repeatedly.\r\nGeth can prevent repeated bytecode from being written to reduce write load. In addition, it is thought that corresponding EIP can be proposed for the _Create_ opcode to optimize the gas amount and improve the user experience. For example, deploying duplicate bytecode consumes less gas (similar to _Sstore_ [2]).\r\n\r\n2.Duplicate keccak256 calculation\r\nThe current implementation of the _keccak256_ instruction does not have any cache, which causes calculations for the same preimage even within a transaction to be executed repeatedly, wasting CPU resources. According to our observation, this kind of repeated calculation of _keccak256_ instructions is very common. For example, in the ERC20 token transfer, the _msg.sender_ and _to_ parameters will be calculated twice by _keccak256_ instruction.\r\nWe believe that cache can be added to the implementation of _keccak256_ instructions in geth's implementation, so that repeated hash calculations can be avoided. In addition, we can also propose EIP to reduce gas consumption when the contract repeats _keccak256_ calculations.\r\n\r\nWe hope that our findings can further optimize geth operation and improve user experience.\r\n\r\nCheers,\r\nThe team of  **chainlancet**",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203/reactions",
     "total_count": 0,
@@ -69,8 +88,95 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1738696499",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28203#issuecomment-1738696499",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203",
+    "id": 1738696499,
+    "node_id": "IC_kwDOAOvK985nomcz",
+    "user": {
+      "login": "itherunder",
+      "id": 61953384,
+      "node_id": "MDQ6VXNlcjYxOTUzMzg0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61953384?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/itherunder",
+      "html_url": "https://github.com/itherunder",
+      "followers_url": "https://api.github.com/users/itherunder/followers",
+      "following_url": "https://api.github.com/users/itherunder/following{/other_user}",
+      "gists_url": "https://api.github.com/users/itherunder/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/itherunder/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/itherunder/subscriptions",
+      "organizations_url": "https://api.github.com/users/itherunder/orgs",
+      "repos_url": "https://api.github.com/users/itherunder/repos",
+      "events_url": "https://api.github.com/users/itherunder/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/itherunder/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-28T08:22:37Z",
+    "updated_at": "2023-09-28T08:22:37Z",
+    "author_association": "NONE",
+    "body": "Brilliant ideas, significant issue, hope Ethereum official can pay more attention on this.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1738696499/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1738794227",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28203#issuecomment-1738794227",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28203",
+    "id": 1738794227,
+    "node_id": "IC_kwDOAOvK985no-Tz",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-28T09:23:55Z",
+    "updated_at": "2023-09-28T09:23:55Z",
+    "author_association": "MEMBER",
+    "body": "> 1.Duplicate contract bytecode writing.\r\n\r\nThe ethereum state trie allows for deduplicating code, since it's referenced by hash. Originally, go-ethereum had a hash-based trie implementation, making it so that we _by necessity_ had each contract only once, keyed by hash. \r\nWhile this does save space, it also costs space, since it means an implementation can never delete code, unless there's also an active reference counting going on. \r\n\r\n> 2.Duplicate keccak256 calculation\r\n\r\nThe actual `keccak256` operation might or might not be optimizable via a cache. Personally I don't quite believe it would make noticeable change, but it would increase execution complexity somewhat. \r\n\r\n\r\nNeat ideas, but we don't really need to keep an open ticket for them. We welcome contributions if anyone wants to try out an idea for an optimization, please file a PR.  ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1738794227/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
