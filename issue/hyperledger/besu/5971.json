@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5971",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5971/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5971/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5971/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5971",
+  "id": 1918099812,
+  "node_id": "I_kwDODE2jmc5yU-Fk",
+  "number": 5971,
+  "title": "The JSON-RPC trace_filter method can cause a Thread block",
+  "user": {
+    "login": "vitor-fernandes",
+    "id": 23244625,
+    "node_id": "MDQ6VXNlcjIzMjQ0NjI1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/23244625?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vitor-fernandes",
+    "html_url": "https://github.com/vitor-fernandes",
+    "followers_url": "https://api.github.com/users/vitor-fernandes/followers",
+    "following_url": "https://api.github.com/users/vitor-fernandes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vitor-fernandes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vitor-fernandes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vitor-fernandes/subscriptions",
+    "organizations_url": "https://api.github.com/users/vitor-fernandes/orgs",
+    "repos_url": "https://api.github.com/users/vitor-fernandes/repos",
+    "events_url": "https://api.github.com/users/vitor-fernandes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vitor-fernandes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-28T18:59:55Z",
+  "updated_at": "2023-09-28T18:59:55Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nHi, while I was testing the JSON-RPC API I noticed that the _filter_ method of _TRACE_ API accepts a large block range which can cause a Thread block exception and possible leads to DoS the node.\r\n\r\nI'm receiving the exception when sending a block range like 0 - 100000000\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Enable the JSON-RPC and TRACE API on the Node\r\n2. Call the trace_filter method with a large block range\r\n3. curl -X POST --data '{\"jsonrpc\":\"2.0\",\"method\":\"trace_filter\",\"params\":[{\"fromBlock\":\"1\",\"toBlock\":\"1000000000\",\"after\":2,\"count\":2,\"fromAddress\":[\"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\"]}],\"id\":415}' http://127.0.0.1:8548\r\n4. Checking the logs, there will be a lot of Thread blocked exceptions, which will need to reboot the node to stop it from spawn\r\n\r\n**Expected behavior:** An error message when the supplied block range is too large\r\n\r\n**Actual behavior:** The node will fetch the traces between the entire block range causing a Thread exception, and keeping the client waiting until timeout the request\r\n\r\n**Frequency:** Every time when a large block range is supplied.\r\n\r\n#### Short Fix\r\n\r\nA limit for the block range can be applied as occurred on the [eth_getLogs](https://besu.hyperledger.org/23.4.0/public-networks/reference/api#eth_getlogs)\r\n\r\n### Logs (if a bug)\r\n```\r\n2023-09-28 15:49:54.013-03:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #16,997 / 0 tx / 0 pending / 0 (0.0%) gas / (0xf4749789dab086b9701de03979fab0bb79809b3fdebf7300b78e67d07298a01c)\r\n2023-09-28 15:49:54.013-03:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Produced #16,997 / 0 tx / 0 pending / 0 (0.0%) gas / (0xf4749789dab086b9701de03979fab0bb79809b3fdebf7300b78e67d07298a01c)\r\n2023-09-28 15:49:54.013-03:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #16,997 / 0 tx / 0 pending / 0 (0.0%) gas / (0xf4749789dab086b9701de03979fab0bb79809b3fdebf7300b78e67d07298a01c)\r\n2023-09-28 15:49:54.015-03:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #16,997 / 0 tx / 0 pending / 0 (0.0%) gas / (0xf4749789dab086b9701de03979fab0bb79809b3fdebf7300b78e67d07298a01c)\r\n2023-09-28 15:49:54.037-03:00 | vertx-blocked-thread-checker | WARN  | BlockedThreadChecker | Thread Thread[#67,vert.x-worker-thread-17,5,main] has been blocked for 62529 ms, time limit is 60000 ms\r\nio.vertx.core.VertxException: Thread blocked\r\n\tat org.rocksdb.RocksDB.get(Native Method)\r\n\tat org.rocksdb.RocksDB.get(RocksDB.java:2096)\r\n\tat org.hyperledger.besu.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage.get(RocksDBColumnarKeyValueStorage.java:253)\r\n\tat org.hyperledger.besu.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage.get(RocksDBColumnarKeyValueStorage.java:69)\r\n\tat org.hyperledger.besu.services.kvstore.SegmentedKeyValueStorageAdapter.get(SegmentedKeyValueStorageAdapter.java:70)\r\n\tat org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage.get(KeyValueStoragePrefixedKeyBlockchainStorage.java:140)\r\n\tat org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage.getBlockHash(KeyValueStoragePrefixedKeyBlockchainStorage.java:112)\r\n\tat org.hyperledger.besu.ethereum.chain.DefaultBlockchain.getBlockHashByNumber(DefaultBlockchain.java:250)\r\n\tat org.hyperledger.besu.ethereum.chain.Blockchain.getBlockByNumber(Blockchain.java:108)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TraceFilter.getBlockList(TraceFilter.java:207)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TraceFilter.traceFilterWithPipeline(TraceFilter.java:124)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TraceFilter.response(TraceFilter.java:99)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.BaseJsonRpcProcessor.process(BaseJsonRpcProcessor.java:44)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.TracedJsonRpcProcessor.process(TracedJsonRpcProcessor.java:41)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.TimedJsonRpcProcessor.process(TimedJsonRpcProcessor.java:45)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.execution.JsonRpcExecutor.execute(JsonRpcExecutor.java:92)\r\n\tat org.hyperledger.besu.ethereum.api.handlers.AbstractJsonRpcExecutor.executeRequest(AbstractJsonRpcExecutor.java:87)\r\n\tat org.hyperledger.besu.ethereum.api.handlers.JsonRpcObjectExecutor.execute(JsonRpcObjectExecutor.java:57)\r\n\tat org.hyperledger.besu.ethereum.api.handlers.JsonRpcExecutorHandler.lambda$handler$0(JsonRpcExecutorHandler.java:57)\r\n\tat java.base/java.util.Optional.ifPresentOrElse(Optional.java:196)\r\n\tat org.hyperledger.besu.ethereum.api.handlers.JsonRpcExecutorHandler.lambda$handler$2(JsonRpcExecutorHandler.java:54)\r\n\tat io.vertx.ext.web.impl.BlockingHandlerDecorator.lambda$handle$0(BlockingHandlerDecorator.java:48)\r\n\tat io.vertx.core.impl.ContextBase.lambda$null$0(ContextBase.java:137)\r\n\tat io.vertx.core.impl.ContextInternal.dispatch(ContextInternal.java:264)\r\n\tat io.vertx.core.impl.ContextBase.lambda$executeBlocking$1(ContextBase.java:135)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)\r\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.base/java.lang.Thread.run(Thread.java:1623)\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Software version: besu/v23.4.4/osx-aarch_64/openjdk-java-20\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5971/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5971/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
