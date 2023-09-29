@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": {
     "login": "alwx",
@@ -122,18 +122,18 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 63,
-    "closed_issues": 36,
+    "open_issues": 1,
+    "closed_issues": 100,
     "state": "open",
     "created_at": "2023-04-17T16:09:18Z",
-    "updated_at": "2023-08-11T11:48:19Z",
+    "updated_at": "2023-09-29T10:57:56Z",
     "due_on": "2023-08-30T07:00:00Z",
     "closed_at": null
   },
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-07-14T19:29:15Z",
-  "updated_at": "2023-08-11T10:15:59Z",
-  "closed_at": "2023-08-11T10:15:58Z",
+  "updated_at": "2023-09-29T11:00:35Z",
+  "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "See the original feature description provided by @John-44 in this conversation (see point B) https://discord.com/channels/624634427930312714/928646594314784859/1129407293256122429\r\n\r\nCurrently, in a 1-1 chat, each message sent increments the counter, regardless of the proximity of the messages in time. To enhance the user experience we should implement an optimized logic for the counter incrementation.\r\n\r\nThe suggested behavior is as follows: When a 1-1 chat message is sent, the counter will be incremented by 1. However, if another message is sent within 2 minutes of the previous message, the counter will not be incremented, and the 2-minute window will reset. Only when no further messages are received within the subsequent 2 minutes after the most recent message, the counter will increment again upon sending a subsequent message.\r\n\r\nBy implementing this logic, the counter will accurately reflect the number of distinct messaging events rather than incrementing for each individual message sent within a short time frame. This optimization will provide a more meaningful representation of chat activity while avoiding unnecessary counter increments and reducing visual clutter.\r\n",
@@ -171,8 +171,95 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-mobile/issues/16696/timeline",
   "performed_via_github_app": null,
-  "state_reason": "completed"
+  "state_reason": "reopened"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1740705191",
+    "html_url": "https://github.com/status-im/status-mobile/issues/16696#issuecomment-1740705191",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/16696",
+    "id": 1740705191,
+    "node_id": "IC_kwDOAx4p2c5nwQ2n",
+    "user": {
+      "login": "pavloburykh",
+      "id": 97245802,
+      "node_id": "U_kgDOBcvaag",
+      "avatar_url": "https://avatars.githubusercontent.com/u/97245802?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/pavloburykh",
+      "html_url": "https://github.com/pavloburykh",
+      "followers_url": "https://api.github.com/users/pavloburykh/followers",
+      "following_url": "https://api.github.com/users/pavloburykh/following{/other_user}",
+      "gists_url": "https://api.github.com/users/pavloburykh/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/pavloburykh/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/pavloburykh/subscriptions",
+      "organizations_url": "https://api.github.com/users/pavloburykh/orgs",
+      "repos_url": "https://api.github.com/users/pavloburykh/repos",
+      "events_url": "https://api.github.com/users/pavloburykh/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/pavloburykh/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-29T10:57:50Z",
+    "updated_at": "2023-09-29T10:57:50Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "@alwx hello. I am re-opening the issue as counters are not working as expected. \r\n\r\n\r\n**Little bit of context:** \r\n\r\nWe have tested new counters logic in this PR https://github.com/status-im/status-mobile/pull/17442 that includes correspondent go changes (https://github.com/status-im/status-go/pull/3889 and https://github.com/status-im/status-go/pull/4035) which have been recently merged into develop without any testing. \r\n\r\nStatus mobile PR https://github.com/status-im/status-mobile/pull/16850 was closed for some reason. So I guess we still need some changes to be made on mobile side in order feature works properly. \r\n\r\nPlease, see the issues below\r\n\r\n\r\n### ISSUE 1 New increment logic has been applied to communities and groups\r\n\r\nAccording to the feature [description](https://github.com/status-im/status-mobile/issues/16696#issue-1805432840) new logic needs to be applied only for 1-1 chats. \r\n\r\nCurrently it is applied to communities and groups as well\r\n\r\n**Preconditions:** User A and User B are members of the same group/community\r\n\r\n**Steps:** \r\n\r\n1. User A sends couple of messages in a row containing mentions/replies to User B in common community/group\r\n2. By User B see if community/group unread counters = quantity of messages with replies/counters send by User A\r\n\r\n**Actual result:** 1 unread counter will be displayed for mentions/replies send in 2 minute window\r\n\r\n[Android_message_receiver.zip](https://github.com/status-im/status-mobile/files/12764400/Android_message_receiver.zip)\r\n\r\n[IOS_message_sender.zip](https://github.com/status-im/status-mobile/files/12764404/IOS_message_sender.zip)\r\n\r\nhttps://github.com/status-im/status-mobile/assets/97245802/fe11c02a-f803-4db8-a411-fbd80ae09a2a\r\n\r\n\r\n**Expected result:** we should use old counters logic for communities/groups: display counter for each direct message containing reply/mention\r\n\r\n\r\n### ISSUE 2 Unread dot is not replaced by unread counter when new reply/mention is received in  communities/groups\r\n\r\n**Preconditions:** User A and User B are members of the same group/community\r\n\r\n**Steps:** \r\n\r\n1. User A sends regular message in group/community (as a result unread notification dot should appear for User B in group/community)\r\n2. User A mentions/sends reply to User B in group/community\r\n3. See if unread dot is replaced by the unread counter for User B\r\n\r\n**Actual result:** unread dot is not replaced by unread counter\r\n\r\n**Expected result:** unread dot should be replaced by unread counter\r\n\r\n\r\nhttps://github.com/status-im/status-mobile/assets/97245802/88f684cd-0c16-4193-972d-5c5f40f3fca4\r\n\r\n\r\n\r\n\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1740705191/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1740709200",
+    "html_url": "https://github.com/status-im/status-mobile/issues/16696#issuecomment-1740709200",
+    "issue_url": "https://api.github.com/repos/status-im/status-mobile/issues/16696",
+    "id": 1740709200,
+    "node_id": "IC_kwDOAx4p2c5nwR1Q",
+    "user": {
+      "login": "pavloburykh",
+      "id": 97245802,
+      "node_id": "U_kgDOBcvaag",
+      "avatar_url": "https://avatars.githubusercontent.com/u/97245802?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/pavloburykh",
+      "html_url": "https://github.com/pavloburykh",
+      "followers_url": "https://api.github.com/users/pavloburykh/followers",
+      "following_url": "https://api.github.com/users/pavloburykh/following{/other_user}",
+      "gists_url": "https://api.github.com/users/pavloburykh/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/pavloburykh/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/pavloburykh/subscriptions",
+      "organizations_url": "https://api.github.com/users/pavloburykh/orgs",
+      "repos_url": "https://api.github.com/users/pavloburykh/repos",
+      "events_url": "https://api.github.com/users/pavloburykh/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/pavloburykh/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-09-29T11:00:35Z",
+    "updated_at": "2023-09-29T11:00:35Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "@alwx you are currently assigned to this issue. In case you do not have capacity to take it into work now please unassign yourself in order other devs can take this ticket. Thank you.  ",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-mobile/issues/comments/1740709200/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
