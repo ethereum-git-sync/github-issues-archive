@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -84,22 +84,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 31,
-    "closed_issues": 45,
+    "open_issues": 26,
+    "closed_issues": 59,
     "state": "open",
     "created_at": "2022-05-17T19:52:44Z",
-    "updated_at": "2023-06-29T16:00:39Z",
+    "updated_at": "2023-09-28T21:31:51Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 4,
   "created_at": "2021-11-09T21:17:13Z",
-  "updated_at": "2023-01-04T20:22:49Z",
-  "closed_at": null,
+  "updated_at": "2023-09-28T21:31:51Z",
+  "closed_at": "2023-09-28T21:31:51Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Also reported some time ago in https://forum.openzeppelin.com/t/why-contracts-upgradeable-has-ierc721upgradeable-and-i-whatever-upgradeable/14793 \r\n\r\n\r\n**💻 Environment**\r\n\r\nopenzeppelin-contracts == 4.3.2\r\nopenzeppelin-contracts-upgradeable == 4.3.2\r\n\r\n**📝 Details**\r\n\r\n<!-- Describe the problem you have been experiencing in more detail. Include as much information as you think is relevant. Keep in mind that transactions can fail for many reasons; context is key here. -->\r\n\r\nThe package openzeppelin-contracts-upgradeable renames the interfaces when they are exactly the same as non-upgradeable (vanilla) versions. This isn't necessary and brings a lot of issues like this one\r\n\r\n**🔢 Code to reproduce bug**\r\n\r\n<!-- We will be able to better help if you provide a minimal example that triggers the bug. -->\r\n```solidity\r\ninterface IMyContract is IERC721 {\r\n...\r\n}\r\n\r\ncontract MyContract is IMyContract, ERC721Upgradeable {\r\n...\r\n}\r\n```\r\n\r\n\r\nThen when I compile I get errors like these:\r\n\r\n```\r\n11 | contract PolicyNFT is IERC721,\r\n   | ^ (Relevant source part starts here and spans across multiple lines).\r\nNote: Definition in \"ERC721Upgradeable\": \r\n   --> @openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:184:5:\r\n    |\r\n184 |     function safeTransferFrom(\r\n    |     ^ (Relevant source part starts here and spans across multiple lines).\r\nNote: Definition in \"IERC721\": \r\n   --> @openzeppelin/contracts/token/ERC721/IERC721.sol:136:5:\r\n    |\r\n136 |     function safeTransferFrom(\r\n    |     ^ (Relevant source part starts here and spans across multiple lines).\r\n\r\nTypeError: Derived contract must override function \"safeTransferFrom\". Two or more base classes define function with same name and parameter types.\r\n```\r\n\r\nI think XXXUpgradeable contracts shouldn't define new interfaces but instead implement the standard ones. Interfaces are the same between upgradeable and non-upgradeable contracts.\r\n\r\nIf name clashes are an issue when importing files from `contracts` and `contracts-upgradeable`, those can be easily avoided using explicit imports\r\n\r\n```solidity\r\nimport {IERC20Metadata} from \"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol\";\r\nimport {ERC20Upgradeable} from \"@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol\";\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "frangio",
+    "id": 481465,
+    "node_id": "MDQ6VXNlcjQ4MTQ2NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/481465?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/frangio",
+    "html_url": "https://github.com/frangio",
+    "followers_url": "https://api.github.com/users/frangio/followers",
+    "following_url": "https://api.github.com/users/frangio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/frangio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/frangio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/frangio/subscriptions",
+    "organizations_url": "https://api.github.com/users/frangio/orgs",
+    "repos_url": "https://api.github.com/users/frangio/repos",
+    "events_url": "https://api.github.com/users/frangio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/frangio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3928/reactions",
     "total_count": 5,
@@ -114,7 +133,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3928/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
