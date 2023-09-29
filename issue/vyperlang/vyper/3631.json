@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3631",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3631/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3631/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3631/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3631",
+  "id": 1918883235,
+  "node_id": "I_kwDOBGDvrM5yX9Wj",
+  "number": 3631,
+  "title": "Compiler Panics When Overflowing the Memory",
+  "user": {
+    "login": "trocher",
+    "id": 43437004,
+    "node_id": "MDQ6VXNlcjQzNDM3MDA0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43437004?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/trocher",
+    "html_url": "https://github.com/trocher",
+    "followers_url": "https://api.github.com/users/trocher/followers",
+    "following_url": "https://api.github.com/users/trocher/following{/other_user}",
+    "gists_url": "https://api.github.com/users/trocher/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/trocher/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/trocher/subscriptions",
+    "organizations_url": "https://api.github.com/users/trocher/orgs",
+    "repos_url": "https://api.github.com/users/trocher/repos",
+    "events_url": "https://api.github.com/users/trocher/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/trocher/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-09-29T09:01:47Z",
+  "updated_at": "2023-09-29T09:01:47Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.3.10rc3\r\n* OS: osx\r\n* Python Version (output of `python --version`): 3.11.4\r\n\r\n### What's your issue about?\r\n\r\nGiven some expression that overflows the memory, the compiler panics instead of exiting with some custom error.\r\nFor example, compiling the following contract results in `vyper.exceptions.CompilerPanic: out of range`.\r\n\r\n```Vyper\r\n@external\r\ndef bar():\r\n    s: String[max_value(uint256)] = \"a\"\r\n```\r\n\r\n```bash\r\nError compiling: tests/customs/code.vy\r\nTraceback (most recent call last):\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 338, in <module>\r\n    _parse_args(sys.argv[1:])\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 185, in _parse_args\r\n    compiled = compile_files(\r\n               ^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 321, in compile_files\r\n    compiler_data = vyper.compile_codes(\r\n                    ^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 143, in compile_codes\r\n    exc_handler(contract_name, exc)\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/cli/vyper_compile.py\", line 219, in exc_handler\r\n    raise exception\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/__init__.py\", line 140, in compile_codes\r\n    out[contract_name][output_format] = formatter(compiler_data)\r\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/output.py\", line 82, in build_ir_output\r\n    return compiler_data.ir_nodes\r\n           ^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 160, in ir_nodes\r\n    ir, ir_runtime = self._ir_output\r\n                     ^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/.pyenv/versions/3.11.4/lib/python3.11/functools.py\", line 1001, in __get__\r\n    val = self.func(instance)\r\n          ^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 156, in _ir_output\r\n    return generate_ir_nodes(self.global_ctx, self.settings.optimize)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/compiler/phases.py\", line 294, in generate_ir_nodes\r\n    ir_nodes, ir_runtime = module.generate_ir_for_module(global_ctx)\r\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/module.py\", line 427, in generate_ir_for_module\r\n    selector_section = _selector_section_sparse(external_functions, global_ctx)\r\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/module.py\", line 266, in _selector_section_sparse\r\n    entry_points, sig_of = _generate_external_entry_points(external_functions, global_ctx)\r\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/module.py\", line 94, in _generate_external_entry_points\r\n    func_ir = generate_ir_for_function(code, global_ctx)\r\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/function_definitions/common.py\", line 133, in generate_ir_for_function\r\n    kwarg_handlers, common = generate_ir_for_external_function(code, func_t, context)\r\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/function_definitions/external_function.py\", line 168, in generate_ir_for_external_function\r\n    body += [parse_body(code.body, context, ensure_terminated=True)]\r\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 444, in parse_body\r\n    ir = parse_stmt(stmt, context)\r\n         ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 418, in parse_stmt\r\n    return Stmt(stmt, context).ir_node\r\n           ^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 41, in __init__\r\n    self.ir_node = fn()\r\n                   ^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/stmt.py\", line 68, in parse_AnnAssign\r\n    rhs = Expr(self.stmt.value, self.context).ir_node\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/expr.py\", line 80, in __init__\r\n    self.ir_node = fn()\r\n                   ^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/expr.py\", line 129, in parse_Str\r\n    return self._make_bytelike(typ, bytez, bytez_length)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/expr.py\", line 150, in _make_bytelike\r\n    return IRnode.from_list(\r\n           ^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/ir_node.py\", line 562, in from_list\r\n    [cls.from_list(o, source_pos=source_pos) for o in obj[1:]],\r\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/ir_node.py\", line 562, in <listcomp>\r\n    [cls.from_list(o, source_pos=source_pos) for o in obj[1:]],\r\n     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/ir_node.py\", line 562, in from_list\r\n    [cls.from_list(o, source_pos=source_pos) for o in obj[1:]],\r\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/ir_node.py\", line 562, in <listcomp>\r\n    [cls.from_list(o, source_pos=source_pos) for o in obj[1:]],\r\n     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/ir_node.py\", line 547, in from_list\r\n    return cls(\r\n           ^^^^\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/ir_node.py\", line 147, in __init__\r\n    _check(-(2**255) <= self.value < 2**256, \"out of range\")\r\n  File \"/Users/trocher/Documents/thesis/vyper/vyper/codegen/ir_node.py\", line 135, in _check\r\n    raise CompilerPanic(str(err))\r\nvyper.exceptions.CompilerPanic: out of range\r\n\r\nThis is an unhandled internal compiler error. Please create an issue on Github to notify the developers.\r\nhttps://github.com/vyperlang/vyper/issues/new?template=bug.md\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3631/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3631/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
