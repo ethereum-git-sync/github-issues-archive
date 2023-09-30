@@ -76,7 +76,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "r0qs",
@@ -123,12 +123,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-09-06T14:29:20Z",
-  "updated_at": "2023-09-11T14:22:53Z",
-  "closed_at": null,
+  "updated_at": "2023-09-29T21:01:39Z",
+  "closed_at": "2023-09-29T21:01:39Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Originally reported in https://github.com/ethereum/solidity/issues/14494#issuecomment-1692358415.\r\n\r\n## Description\r\nExplicitly requesting compilation of a file that is already included via imports may in certain situations affect the order in which Yul functions are placed in the IR output, which causes bytecode differences. This is apparently due to different AST IDs assigned to those functions.\r\n\r\nThe problem manifests both with and without optimizer. Only the IR pipeline is affected.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.21\r\n\r\n## Steps to Reproduce\r\n```bash\r\nmkdir @\r\n\r\ncat <<=== > a.sol\r\n    import \"@/za.sol\";\r\n    import \"b.sol\";\r\n\r\n    contract A is B {\r\n        function a() public pure {\r\n            zb();\r\n        }\r\n    }\r\n===\r\n\r\ncat <<=== > b.sol\r\n    import \"@/zb.sol\";\r\n    import \"c.sol\";\r\n\r\n    abstract contract B is C {}\r\n===\r\n\r\ncat <<=== > c.sol\r\n    abstract contract C\r\n    {\r\n        function f() public pure {}\r\n\r\n        function c() public view returns (uint) {\r\n            try this.f() { return 0; }\r\n            catch {}\r\n        }\r\n    }\r\n===\r\n\r\ncat <<=== > @/za.sol\r\n    import \"@/zc.sol\";\r\n===\r\n\r\ncat <<=== > @/zb.sol\r\n    import \"@/zc.sol\";\r\n\r\n    function zb() pure {\r\n        zc();\r\n    }\r\n===\r\n\r\ncat <<=== > @/zc.sol\r\n    function zc() pure returns (bytes memory returndata) {\r\n        if (returndata.length == 0) {\r\n            return \"\";\r\n        }\r\n    }\r\n===\r\n\r\ndiff --color --unified \\\r\n    <(solc a.sol b.sol --bin --via-ir | grep '======= a.sol:A =======' --after-context=2 | fold --width 100) \\\r\n    <(solc a.sol       --bin --via-ir | grep '======= a.sol:A =======' --after-context=2 | fold --width 100)\r\n\r\ndiff --color --unified \\\r\n    <(solc a.sol b.sol --ir) \\\r\n    <(solc a.sol       --ir)\r\n```\r\n\r\nI could not go below 6 files or get rid of a subdirectory, though I suspect this is needed only due to the way it affects the import/compilation order and examples without it should be possible as well.\r\n\r\nThe import pattern goes like this:\r\n\r\n```\r\na──►za──►zc\r\n│         ▲\r\n▼         │\r\nb──►zb────┘\r\n│\r\n▼\r\nc\r\n```\r\n\r\nBut the pattern itself is not enough. The `try`/`catch` and all the other calls are necessary and must also be placed in specific files.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14541/reactions",
     "total_count": 0,
@@ -143,7 +162,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14541/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
