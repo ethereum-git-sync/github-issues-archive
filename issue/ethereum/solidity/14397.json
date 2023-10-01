@@ -8,7 +8,7 @@
   "id": 1796823742,
   "node_id": "I_kwDOAm_5kc5rGVq-",
   "number": 14397,
-  "title": "[Bug] Compiler error with `@inheritdoc` tag in functions depending on its position.",
+  "title": "`@inheritdoc` tag in Natspec does not stop at the end of the line",
   "user": {
     "login": "CJ42",
     "id": 31145285,
@@ -38,6 +38,42 @@
       "color": "fc1313",
       "default": false,
       "description": ""
+    },
+    {
+      "id": 838064207,
+      "node_id": "MDU6TGFiZWw4MzgwNjQyMDc=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/annoys%20users%20:cry:",
+      "name": "annoys users :cry:",
+      "color": "ea2cab",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4438006499,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaa4w",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20effort",
+      "name": "low effort",
+      "color": "ffb1fa",
+      "default": false,
+      "description": "There is not much implementation work to be done. The task is very easy or tiny."
+    },
+    {
+      "id": 4438157609,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
+      "name": "low impact",
+      "color": "5d71ff",
+      "default": false,
+      "description": "Changes are not very noticeable or potential benefits are limited."
+    },
+    {
+      "id": 4438481746,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3bUg",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/must%20have%20eventually",
+      "name": "must have eventually",
+      "color": "ffb04d",
+      "default": false,
+      "description": "Something we consider essential but not enough to prevent us from releasing Solidity 1.0 without it."
     }
   ],
   "state": "open",
@@ -47,9 +83,9 @@
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-07-10T13:45:50Z",
-  "updated_at": "2023-09-30T01:02:53Z",
+  "updated_at": "2023-10-01T10:03:26Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -104,6 +140,50 @@
     "body": "Any update on this issue, this greatly effects compiling and testing. ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1741612304/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1742028403",
+    "html_url": "https://github.com/ethereum/solidity/issues/14397#issuecomment-1742028403",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14397",
+    "id": 1742028403,
+    "node_id": "IC_kwDOAm_5kc5n1T5z",
+    "user": {
+      "login": "cameel",
+      "id": 137030,
+      "node_id": "MDQ6VXNlcjEzNzAzMA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cameel",
+      "html_url": "https://github.com/cameel",
+      "followers_url": "https://api.github.com/users/cameel/followers",
+      "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+      "organizations_url": "https://api.github.com/users/cameel/orgs",
+      "repos_url": "https://api.github.com/users/cameel/repos",
+      "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cameel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-01T10:02:07Z",
+    "updated_at": "2023-10-01T10:02:07Z",
+    "author_association": "MEMBER",
+    "body": "I can confirm it's a bug. It's not so much the position of @inheritdoc as the fact that the compiler does not seem to stop at the newline when reading the name of the thing that's being inherited. This example shows it better:\r\n\r\n```solidity\r\n    /**\r\n     * @inheritdoc ITest\r\n     *  a\r\n     *   b\r\n     *    c @dev some extra details\r\n     */\r\n```\r\n```\r\nError: Documentation tag @inheritdoc references inexistent contract \"ITest  a   b\".\r\n```\r\n\r\nIn the error message you can see which part the compiler considers to be the interface name. It only stops at `b`.\r\n\r\nIn your repro it fails because you have a trailing space after (i.e. `* ` instead of just `*`). If you remove it, the contract will compile:\r\n```solidity\r\n    /**\r\n     * @inheritdoc ITest\r\n     *\r\n     * @dev some extra details\r\n     */\r\n```\r\nSo the short-term workaround for you is to enable trimming of trailing whitespace in your editor to avoid situations like this (which is a good practice in general). But this of course will need to be fixed in the compiler too.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1742028403/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
