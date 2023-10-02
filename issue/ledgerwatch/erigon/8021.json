@@ -30,17 +30,9 @@
     "site_admin": false
   },
   "labels": [
-    {
-      "id": 4566396003,
-      "node_id": "LA_kwDOC0FsAM8AAAABEC2sYw",
-      "url": "https://api.github.com/repos/ledgerwatch/erigon/labels/Stale",
-      "name": "Stale",
-      "color": "ededed",
-      "default": false,
-      "description": null
-    }
+
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,8 +41,8 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-08-15T09:12:07Z",
-  "updated_at": "2023-10-02T02:04:45Z",
-  "closed_at": "2023-10-02T02:04:45Z",
+  "updated_at": "2023-10-02T10:16:05Z",
+  "closed_at": null,
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nCommit hash: \r\n\r\na25f22a06cc1a62e57b30595b580ce057efa8c45\r\n\r\nErigon Command (with flags/config):\r\n\r\n    erigon ... --staticpeers <url>\r\n\r\n#### Actual behaviour\r\n\r\nEach peer connects twice simultaneously, and gets 1 or 2 failures.\r\n\r\n#### Expected behaviour\r\n\r\nEach peer is connected once.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nEnable trace logging and look for \"Adding static node\" messages.\r\nThose produce `staticPool` tasks, which then are taken by `startStaticDials` and it calls `dial` on them.\r\n\r\n#### Details\r\n\r\nIt happens because by default erigon starts with 67 and 68 protocols each of which is served with a separate sentry, which makes a separate `makeP2PServer`. When `Server.Start()` is called it will call `setupDialScheduler()` which calls `addStatic()`. Those 2 operate in parallel with each other.\r\n",
@@ -88,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8021/timeline",
   "performed_via_github_app": null,
-  "state_reason": "not_planned"
+  "state_reason": "reopened"
 }
 [
   {
