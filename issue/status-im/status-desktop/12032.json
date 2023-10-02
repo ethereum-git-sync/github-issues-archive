@@ -67,7 +67,7 @@
       "description": "Tasks to improve performance and memory usage for MVP"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -121,22 +121,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 55,
-    "closed_issues": 112,
+    "open_issues": 54,
+    "closed_issues": 126,
     "state": "open",
     "created_at": "2023-02-13T19:08:52Z",
-    "updated_at": "2023-09-25T17:15:21Z",
+    "updated_at": "2023-10-02T17:41:29Z",
     "due_on": "2023-10-19T07:00:00Z",
     "closed_at": null
   },
   "comments": 0,
   "created_at": "2023-08-29T19:28:16Z",
-  "updated_at": "2023-09-25T17:53:45Z",
-  "closed_at": null,
+  "updated_at": "2023-10-02T14:01:35Z",
+  "closed_at": "2023-10-02T14:01:34Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "# Bug Report\r\n\r\n## Description\r\n\r\nThe function `buildTokensAndCollectibles` from the communities module is called a lot when you start the app and it is sync, so it can freeze the app a little.\r\n\r\nThe reason why it is called so much is that we trigger it each time the wallet tokens are rebuilt (that's just once), and also when `eventCollectiblesOwnershipUpdateFinished` is received. It should also be done once, but somehow it is received multiple times.\r\n\r\nThere are multiple solutions that are not mutually exclusive:\r\n- make `getCommunityTokens` async. This is not easy, because `buildTokensAndCollectibles` expects it to be sync at the moment\r\n- Split the community part from the normal tokens\r\n  - Call the communityToken part only when the communities are loaded and when we receive a specific call that a new community token was added\r\n  - We then need to update the model smartly, probably by having a `clean` function that removes only the tokens of a certain type.\r\n- Check if the update on collectible actually makes sense\r\n  - I don't think we even add the collectibles from our wallet in the list (but maybe we should and it's a bug)\r\n\r\n## Steps to reproduce\r\n\r\nJust open the app and see how much `wakuext_getCommunityTokens` is called\r\nI also had two wallet accounts and one community with permissions (no special tokens)\r\n\r\n#### Expected behavior\r\n\r\n`buildTokensAndCollectibles` is only called once at the start\r\n\r\n#### Actual behavior\r\n\r\n`buildTokensAndCollectibles` is called multiple times\r\n\r\n### Additional Information\r\n\r\n- Status desktop version: master `0405ea0b892a13aab02d9a58a8830abe8210a5f5`\r\n- Operating System: Ubuntu 20\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "jrainville",
+    "id": 11926403,
+    "node_id": "MDQ6VXNlcjExOTI2NDAz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11926403?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jrainville",
+    "html_url": "https://github.com/jrainville",
+    "followers_url": "https://api.github.com/users/jrainville/followers",
+    "following_url": "https://api.github.com/users/jrainville/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jrainville/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jrainville/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jrainville/subscriptions",
+    "organizations_url": "https://api.github.com/users/jrainville/orgs",
+    "repos_url": "https://api.github.com/users/jrainville/repos",
+    "events_url": "https://api.github.com/users/jrainville/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jrainville/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/12032/reactions",
     "total_count": 0,
@@ -151,7 +170,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/12032/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
