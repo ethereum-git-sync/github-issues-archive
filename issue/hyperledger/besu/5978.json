@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/5978",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/5978/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/5978/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/5978/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/5978",
+  "id": 1923488657,
+  "node_id": "I_kwDODE2jmc5yphuR",
+  "number": 5978,
+  "title": "Private transaction issues on contract deployement",
+  "user": {
+    "login": "Alexsilva43",
+    "id": 125788559,
+    "node_id": "U_kgDOB39hjw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/125788559?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Alexsilva43",
+    "html_url": "https://github.com/Alexsilva43",
+    "followers_url": "https://api.github.com/users/Alexsilva43/followers",
+    "following_url": "https://api.github.com/users/Alexsilva43/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Alexsilva43/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Alexsilva43/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Alexsilva43/subscriptions",
+    "organizations_url": "https://api.github.com/users/Alexsilva43/orgs",
+    "repos_url": "https://api.github.com/users/Alexsilva43/repos",
+    "events_url": "https://api.github.com/users/Alexsilva43/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Alexsilva43/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-03T07:25:34Z",
+  "updated_at": "2023-10-03T07:34:37Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "In the same vein of https://github.com/hyperledger/besu/issues/5972, I've tried to deploy the same smart contract (Simple Storage) in a privacy group but the blockchain LOG throws the following message:\r\n\r\n2023-10-03 07:07:53.141+00:00 | BftProcessorExecutor-QBFT-0 | ERROR | PrivacyPrecompiledContract | Failed to process private transaction 0x6ffaf02f8d6f27c398f9790d218456a3e2331f03d6c68b18f0a9851f77a30e0c: PRIVATE_TRANSACTION_FAILED\r\n2023-10-03 07:07:53.526+00:00 | BftProcessorExecutor-QBFT-0 | ERROR | PrivacyPrecompiledContract | Failed to process private transaction 0x6ffaf02f8d6f27c398f9790d218456a3e2331f03d6c68b18f0a9851f77a30e0c: PRIVATE_TRANSACTION_FAILED\r\n2023-10-03 07:07:53.529+00:00 | EthScheduler-Workers-0 | INFO  | PersistBlockTask | Block 9281 (0xd6cb6d9f33423b6f75628c50de8ee68d1169290717b154d3838a7caa4b753fdd) is already imported\r\n2023-10-03 07:07:53.531+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #9,281 / 1 tx / 0 pending / 21,512 (0.1%) gas / (0xd6cb6d9f33423b6f75628c50de8ee68d1169290717b154d3838a7caa4b753fdd)\r\n\r\nAs we can see, even though the transaction is failed, it is still successfully registered in the blockchain.  \r\n\r\nOn Tessera node side, it seems that there were no issues:\r\n2023-10-03 07:07:49.773 [qtp1396895429-45] INFO  c.q.t.q2t.BesuTransactionResource - Enter Request : POST : /send\r\n2023-10-03 07:07:49.913 [pool-1-thread-1] INFO  c.q.t.q.i.RestPayloadPublisher - Publishing message to http://40.83.121.219:9203/\r\n2023-10-03 07:07:49.913 [pool-1-thread-2] INFO  c.q.t.q.i.RestPayloadPublisher - Publishing message to http://40.83.121.219:9303/\r\n2023-10-03 07:07:50.006 [pool-1-thread-2] INFO  c.q.t.q.i.RestPayloadPublisher - Published to http://40.83.121.219:9303/\r\n2023-10-03 07:07:50.030 [pool-1-thread-1] INFO  c.q.t.q.i.RestPayloadPublisher - Published to http://40.83.121.219:9203/\r\n2023-10-03 07:07:50.033 [qtp1396895429-45] INFO  c.q.t.q2t.BesuTransactionResource - Exit Request : POST : /send\r\n2023-10-03 07:07:50.033 [qtp1396895429-45] INFO  c.q.t.q2t.BesuTransactionResource - Response for send : 200 OK\r\n2023-10-03 07:07:50.789 [pool-3-thread-1] INFO  c.q.t.p.p.PartyInfoBroadcaster - Started PartyInfo polling round\r\n2023-10-03 07:07:50.798 [pool-3-thread-1] INFO  c.q.t.p.p.PartyInfoBroadcaster - Finished PartyInfo polling round\r\n2023-10-03 07:07:53.056 [qtp1396895429-42] INFO  c.q.t.q2t.BesuTransactionResource - Enter Request : POST : /receive\r\n2023-10-03 07:07:53.073 [qtp1396895429-42] INFO  c.q.t.t.i.TransactionManagerImpl - Lookup transaction 07AMkxe1E4PtCHwf5KXHMmgRFbAhRobEIQ4K3HSjdHE=\r\n2023-10-03 07:07:53.115 [qtp1396895429-42] INFO  c.q.t.q2t.BesuTransactionResource - Exit Request : POST : /receive\r\n2023-10-03 07:07:53.115 [qtp1396895429-42] INFO  c.q.t.q2t.BesuTransactionResource - Response for receive : 200 OK\r\n2023-10-03 07:07:53.436 [qtp1396895429-49] INFO  c.q.t.q2t.BesuTransactionResource - Enter Request : POST : /receive\r\n2023-10-03 07:07:53.437 [qtp1396895429-49] INFO  c.q.t.t.i.TransactionManagerImpl - Lookup transaction 07AMkxe1E4PtCHwf5KXHMmgRFbAhRobEIQ4K3HSjdHE=\r\n2023-10-03 07:07:53.516 [qtp1396895429-49] INFO  c.q.t.q2t.BesuTransactionResource - Exit Request : POST : /receive\r\n2023-10-03 07:07:53.516 [qtp1396895429-49] INFO  c.q.t.q2t.BesuTransactionResource - Response for receive : 200 OK\r\n2023-10-03 07:07:54.293 [qtp1396895429-47] INFO  c.q.t.q2t.BesuTransactionResource - Enter Request : POST : /receive\r\n2023-10-03 07:07:54.294 [qtp1396895429-47] INFO  c.q.t.t.i.TransactionManagerImpl - Lookup transaction 07AMkxe1E4PtCHwf5KXHMmgRFbAhRobEIQ4K3HSjdHE=\r\n2023-10-03 07:07:54.305 [qtp1396895429-47] INFO  c.q.t.q2t.BesuTransactionResource - Exit Request : POST : /receive\r\n2023-10-03 07:07:54.305 [qtp1396895429-47] INFO  c.q.t.q2t.BesuTransactionResource - Response for receive : 200 OK\r\n\r\nAs a matter of factor, it's not clear why this error comes up. The deployment script is attached. I don't understand where this problem comes from.\r\n\r\n\r\n\r\n\r\n \r\n[SimpleStorage_contract.txt](https://github.com/hyperledger/besu/files/12789658/SimpleStorage_contract.txt)\r\n[deploy_file.txt](https://github.com/hyperledger/besu/files/12789686/deploy_file.txt)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/5978/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5978/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
