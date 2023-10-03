@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28242",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28242/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28242/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28242/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28242",
+  "id": 1924115492,
+  "node_id": "I_kwDOAOvK985yr6wk",
+  "number": 28242,
+  "title": "Block-building Latency issues and improvements",
+  "user": {
+    "login": "protolambda",
+    "id": 19571989,
+    "node_id": "MDQ6VXNlcjE5NTcxOTg5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19571989?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/protolambda",
+    "html_url": "https://github.com/protolambda",
+    "followers_url": "https://api.github.com/users/protolambda/followers",
+    "following_url": "https://api.github.com/users/protolambda/following{/other_user}",
+    "gists_url": "https://api.github.com/users/protolambda/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/protolambda/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/protolambda/subscriptions",
+    "organizations_url": "https://api.github.com/users/protolambda/orgs",
+    "repos_url": "https://api.github.com/users/protolambda/repos",
+    "events_url": "https://api.github.com/users/protolambda/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/protolambda/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-03T13:06:59Z",
+  "updated_at": "2023-10-03T13:06:59Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "So I've been looking closer into the engine-API block building code path, as part of optimizing the sequencing work with a 2-second block time in OP Mainnet and other [op-geth](https://github.com/ethereum-optimism/op-geth) based forks, and found several issues that I believe are worth improving in upstream geth.\r\n\r\nThe issues generally affect latency:\r\n- How long it takes for block building to complete when you ask it to via engine API.\r\n- How long it takes for a submitted tx to be included in a block.\r\n- How long it takes for a completed block to become canonical\r\n\r\n## Issues\r\n\r\n### Unused empty blocks\r\n\r\nGeth builds an \"empty\" block to fall back to when block-building is stopped prematurely. But the actual engine-API always calls `ResolveFull`, which contains a `payload.cond.Wait()` ([here](https://github.com/ethereum/go-ethereum/blob/614804b33c340cd60cbb6087d898b2968b0da320/miner/payload_building.go#L166)) that waits for a payload building iteration to complete (first call to `payload.update`).\r\n\r\nWaiting for the full payload means that the \"empty\" payload essentially becomes useless: it's not the default ready-to-go block that reduces the engine API latency, but rather a thing that's only considered in tests (with the regular `Resolve` call that does not wait for a full payload), and not useful in the real code-path. There may be an argument that a beacon proposer wants to be greedy, and give up on a block if it cannot include EL fees, but that should never happen if the block-building time is accurate.\r\n\r\nOp-geth uses the \"empty\" feature to reproduce blocks (i.e. no-tx-pool, only pure inputs), and partially solves the above ([here](https://github.com/ethereum-optimism/op-geth/blob/78643d85cf0e9c1363ab335f5d2938c3a9584654/miner/payload_building.go#L221)) by marking the initial empty payload as a valid full payload. Yet, the sequencer still ends up building the empty payload, and then having to rebuild another thing. This might be somewhat fast, but is unused processing work.\r\n\r\nNote that while the \"empty\" block was \"cheap\" to build originally, it now will now include withdrawals, and soon also a beacon-blcok-root EVM call. It's not \"instant\" anymore. And then has to calculate the state-root of the withdrawal and beacon-block-root storage changes.\r\n\r\n### Unused placeholder is synchronous\r\n\r\nSo even though the above empty block is unused, it is still synchronous processing (`forkchoiceUpdated` calls `api.eth.Miner().BuildPayload(args)` whichs builds the empty block before creating any go routine), that blocks the forkchoice update method call before completing. Even though a payload ID for the response could have been constructed already.\r\n\r\nThis makes the method more likely to time out, and adds latency to the actual block-building work, which gets delayed by this (as the empty payload is ignored).\r\n\r\n### Fill or timeout, no control\r\n\r\nThe Engine API lends little control to block-building timing, especially when building large blocks at fast interval: to complete a block, it has to either:\r\n- Use up all the gas in the block\r\n- Empty the tx-pool\r\n- Timeout\r\n\r\nA `engine_getPayload` call to stop the block building is not respected immediately: it signals the go-routine that is iterating to stop (no next iteration), but does not stop it right there and then (no interrupt), and waits for the block-building to time out (or fill with all gas).\r\n\r\nAnd only when it's *not* the first full payload does it serve something immediately to the user. Otherwise the \"stopped\" payload building is still awaited to complete \"fully\". This means that a block response can be up to ~2 seconds late, since a full block can take that long to build: if the block-building started late into the slot, then it's still the first block building iteration, and then it is very unlikely to complete on time for the actual block proposal.\r\n\r\nBeing able to build blocks repeatedly and consistently at fast block-building time interval requires the building to stop when the request comes in, and not drag on.\r\n\r\nBlock-building delays are more likely to cascade into repeated block latency when a block finishes late, causes the next block to start late, which then finishes late, etc.\r\n\r\n### Slow block re-insertion\r\n\r\nAfter a `engine_forkchoiceUpdatedV` call completes, the payload is retrieved with `engine_getPayload` (fill/timeout latency), and then has to be re-inserted into geth with `engine_newPayload` (adding more latency), which then does not appear to be using a common cache with the block-building, causing latency on the import. We can try to publish the payload before reinserting it, but ideally this last step is mostly cached and does not take nearly as long as it seems to do.\r\n\r\n## Proposed solution\r\n\r\n- Do not put the unused empty block in the critical synchronous path\r\n- Fetch the pre-state, create the EVM environment, and build the empty block \"template\": the snapshot and rollback functionality allows for some work to be reused. Unfortunately the withdrawals processing is at the end of the block, not the top. But at least it covers most of the setup work. The `generateWork` function already sets this up, but currently still redoes all this work for each new block building iteration.\r\n- The `payload.stop` channel that the `payload_building.go` handles should be passed on as interrupt to the existing block-building work. The payload-builder can set the maximum timeout then, and handle when it is requested to stop building early.\r\n- The `generateWork` in `worker.go` should handle above signal, instead of setting up a timeout.\r\n- See if we can cache more of the completed block-building work, so re-insertion of the block with `engine_newPayload` does not take as long (we are seeing some speed differences between fresh blocks and previously seen blocks, but it's still surprisingly slow at reinserting blocks, 1+ seconds more often than we like to see).\r\n\r\nI'm interested in implementing the above changes, and plan to open a draft PR for these. Feedback/corrections welcome!\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28242/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28242/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
