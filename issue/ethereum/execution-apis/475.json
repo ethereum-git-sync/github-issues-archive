@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/execution-apis/issues/475",
+  "repository_url": "https://api.github.com/repos/ethereum/execution-apis",
+  "labels_url": "https://api.github.com/repos/ethereum/execution-apis/issues/475/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/execution-apis/issues/475/comments",
+  "events_url": "https://api.github.com/repos/ethereum/execution-apis/issues/475/events",
+  "html_url": "https://github.com/ethereum/execution-apis/issues/475",
+  "id": 1924175298,
+  "node_id": "I_kwDOFoG9Gs5ysJXC",
+  "number": 475,
+  "title": "graphql: standardize test outputs",
+  "user": {
+    "login": "s1na",
+    "id": 1591639,
+    "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/s1na",
+    "html_url": "https://github.com/s1na",
+    "followers_url": "https://api.github.com/users/s1na/followers",
+    "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+    "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+    "organizations_url": "https://api.github.com/users/s1na/orgs",
+    "repos_url": "https://api.github.com/users/s1na/repos",
+    "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/s1na/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-03T13:38:05Z",
+  "updated_at": "2023-10-03T13:38:05Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "There are multiple GraphQL hive tests where due to historical reasons 2 responses are accepted. This is unfortunate. The aim of this issue to discuss and agree on one output. The following tests have 2 acceptable responses:\r\n\r\n- `17_eth_getBlock_byNumberInvalid.json` tries to get a block by a number that doesn't exist in the chain (88888888)\r\n- `07_eth_gasPrice.json` accepts both `0x10` and `0x1` as valid responses\r\n- `30_eth_getTransaction_byHash.json` this returns a transaction object. it accepts 2 responses. As far as I can tell these are the differences:\r\n  - `index` being `0` vs `0x0`. We should use `0x0` here now that all integer values are hex-encoded\r\n  - `log.index` being `0` vs `0x0`. Same as above.\r\n  - `status` being `null` vs `0x0`. I'm not sure why status should be null here. IMO we should return `0x0`.\r\n- `33_eth_getTransactionReceipt.json` as far as I can tell only difference is `index` being `0` vs `0x0`. Should use `0x0`.\r\n\r\n\r\nThe following testcase also accepts 2 responses. Either an error, or simply a nil value. It gets the balance of an account against a block which shouldnt exist. However since we've added new block the query has now actually a correct response. It needs to be updated with another block number.\r\n\r\n- `12_eth_getBalance_toobig_bn.json`\r\n\r\nWe need to agree what to do for 12 and 17. It boils down to this: when a resource does not exist, return null or error. IMO to stay consistent with JSON-RPC we should return null. Also this is not really an exception.\r\n\r\nNot sure what to do for `07_eth_gasPrice`.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/execution-apis/issues/475/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/execution-apis/issues/475/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
