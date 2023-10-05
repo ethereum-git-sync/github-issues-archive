@@ -60,7 +60,7 @@
   "created_at": "2021-08-10T17:59:39Z",
   "updated_at": "2021-08-19T16:15:33Z",
   "closed_at": null,
-  "author_association": "MEMBER",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### What's your issue about?\r\n\r\nCurrently `msg.data` is only allowed with the `len` and `slice` functions, it would be nice to allow `extract32` usage.\r\n\r\nA very oversimplified example would be:\r\n\r\n```python\r\ndef foo(_value: uint256) -> uint256:\r\n    bar: bytes32 = extract32(msg.data, 4)\r\n    return convert(bar, uint256)\r\n```\r\n\r\nA more useful scenario, particularly with [relayers](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/9fbc1d71c0ed4c68a0bc160c69df1f85e94d2d8e/contracts/metatx/MinimalForwarder.sol#L49-L51), is extracting information (like an address) that was appended to the calldata:\r\n\r\n```python\r\ndef pretend_to_be_someone(_value: uint256) -> uint256:\r\n    msg_sender: address = msg.sender\r\n    if msg.sender == MAGIC_CALLER:\r\n        msg_sender = extract32(msg.data, -20, output_type=address)\r\n    # do something now impersonated\r\n```\r\n\r\n### How can it be fixed?\r\n\r\n1. Function level validation should allow `msg.data` to be used with `extract32` as well as the previously allowed `len` and `slice` functions. [Link to source](https://github.com/vyperlang/vyper/blob/31dd77671f7cfa29af496334373a11429422226c/vyper/semantics/validation/local.py#L186-L197)\r\n\r\nIt should be changed to something like this:\r\n\r\n```python\r\n    def visit_Attribute(self, node):\r\n        if node.get(\"value.id\") == \"msg\" and node.attr == \"data\":\r\n            parent = node.get_ancestor()\r\n            if parent.get(\"func.id\") not in (\"slice\", \"len\", \"extract32\"):\r\n                raise SyntaxException(\r\n                    \"Invalid usage of msg.data, acceptable functions are (slice, len, extract32)\",\r\n                    node.node_source_code,\r\n                    node.lineno,\r\n                    node.col_offset,\r\n                )\r\n```\r\n\r\n2. In the `vyper/old_codegen/expr.py` file, [here](https://github.com/vyperlang/vyper/blob/master/vyper/old_codegen/expr.py#L377-L396), my simple brain says, to just return an LLLNode which extracts the whole calldata ... but that also doesn't sound good since, calldata can be huge, and we really only want one piece of it. In which case we can extract to memory just the portion needed, from 0 to start + 32, but again also could be arbitrarily large. Alternative is to return None ? ... and then in the class [`Extract32`](https://github.com/vyperlang/vyper/blob/31dd77671f7cfa29af496334373a11429422226c/vyper/builtin_functions/functions.py#L804) identify the fact that we are interacting with calldata instead of storage or memory, to then copy the portion requested (start, start + 32) to memory and then take it from there converting to the appropriate type.\r\n\r\nSide note: Annotation visitor `visit_Attribute` [here](https://github.com/vyperlang/vyper/blob/master/vyper/semantics/validation/annotation.py#L57-L63), could probably get scraped since in `expr.py` we can access the metadata we are storing via the `_parent` attribute of the `expr` object/argument. But that's more of a refactoring issue.",
   "closed_by": null,
@@ -153,7 +153,7 @@
     },
     "created_at": "2021-08-10T18:05:07Z",
     "updated_at": "2021-08-10T18:05:33Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "Yeah! Thinking some more about it, definitely does feel like modifying the `Extract32` class and adding a new `_calldata_element_getter`, seems like the best route",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/896201741/reactions",
@@ -241,7 +241,7 @@
     },
     "created_at": "2021-08-10T18:08:41Z",
     "updated_at": "2021-08-10T18:08:41Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "lol, on it @fubuloubu 💪",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/896204436/reactions",

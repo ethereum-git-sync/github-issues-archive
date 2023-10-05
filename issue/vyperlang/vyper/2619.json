@@ -148,8 +148,8 @@
     "body": "> I think injecting the `def supportsInterface(interface_id: bytes4) -> bool` function based on the `implements:` keyword can be confusing given Vyper's goal of simplicity. I have in mind someone starting out in Vyper implementing a simple ERC20, deploying it to a testnet and then trying to verify the Vyper code on Etherscan but it fails because the compiled code includes this function but the local copy of the written contract does not. Furthermore, it also seems like a creeping in of class inheritance (of the ERC165 interface).\r\n> \r\n> IMO, I think it is better to require the `def supportsInterface(interface_id: bytes4) -> bool` to be expressly included in the contract, but have a built-in attribute for interfaces that provides the interface ID (e.g. Solidity has an `interfaceId` for interfaces).\r\n\r\nYes, got a lot of feedback from @charles-cooper about this too. I think adding the `MyInterface.interface_id` property to an interface object would be a better way to go. Then you can just do something like this:\r\n\r\n```py\r\n@view\r\n@external\r\ndef supportsInterface(interface_id: bytes4) -> bool:\r\n    return interface_id in [\r\n        ERC20.interface_id,\r\n        ERC721.interface_id,\r\n        ...  # as many as you want to support\r\n    ]\r\n```\r\n\r\nThis has the most optimal balance of flexibility and convenience",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1020298875/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 2,
+      "+1": 2,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
