@@ -39,13 +39,13 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-10-03T15:19:26Z",
-  "updated_at": "2023-10-03T15:19:26Z",
+  "updated_at": "2023-10-05T08:54:04Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "### Description\r\n\r\n`ProtoArray.applyScoreChanges()` method has quadratic complexity when the chain if justified but not finalized \r\n\r\n### Steps to Reproduce (Bug)\r\n\r\nThe following test running times depending on `nonFinalizedBlockCount`:\r\n- 10000 - 3.5s\r\n- 20000 - 13s\r\n- 40000 - 70s\r\n\r\n```diff\r\nIndex: storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\r\nIDEA additional info:\r\nSubsystem: com.intellij.openapi.diff.impl.patch.CharsetEP\r\n<+>UTF-8\r\n===================================================================\r\ndiff --git a/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java b/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\r\n--- a/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\t(revision 6adad2a394243b0013b6031af2ebb9d69019abdc)\r\n+++ b/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\t(date 1696345959423)\r\n@@ -67,6 +67,39 @@\r\n     addOptimisticBlock(0, Bytes32.ZERO, Bytes32.ZERO);\r\n   }\r\n \r\n+\r\n+  @Test\r\n+  void testNoQuadraticComplexity() {\r\n+    int nonFinalizedBlockCount = 40000;\r\n+    Bytes32 parentBlockRoot = GENESIS_CHECKPOINT.getRoot();\r\n+    for (int epoch = 0; epoch < nonFinalizedBlockCount; epoch++) {\r\n+      UInt64 slot = UInt64.valueOf(1 + 8 * epoch);\r\n+\r\n+      Bytes32 newBlockRoot = dataStructureUtil.randomBytes32();\r\n+\r\n+      Checkpoint justifiedCheckpoint = new Checkpoint(UInt64.valueOf(epoch), parentBlockRoot);\r\n+\r\n+      protoArray.onBlock(\r\n+              slot,\r\n+              newBlockRoot,\r\n+              parentBlockRoot,\r\n+              dataStructureUtil.randomBytes32(),\r\n+              new BlockCheckpoints(\r\n+                      justifiedCheckpoint, GENESIS_CHECKPOINT, justifiedCheckpoint, GENESIS_CHECKPOINT),\r\n+              getExecutionBlockHash(newBlockRoot),\r\n+              true);\r\n+      protoArray.findOptimisticHead(UInt64.valueOf(epoch), justifiedCheckpoint, GENESIS_CHECKPOINT);\r\n+\r\n+      parentBlockRoot = newBlockRoot;\r\n+    }\r\n+\r\n+    voteUpdater.putVote(UInt64.ZERO, new VoteTracker(Bytes32.ZERO, block1b, UInt64.ZERO));\r\n+    voteUpdater.putVote(UInt64.ONE, new VoteTracker(Bytes32.ZERO, block1b, UInt64.ZERO));\r\n+    voteUpdater.putVote(UInt64.valueOf(2), new VoteTracker(Bytes32.ZERO, block1b, UInt64.ZERO));\r\n+    protoArray.applyScoreChanges(\r\n+            computeDeltas(), UInt64.valueOf(5), GENESIS_CHECKPOINT, GENESIS_CHECKPOINT);\r\n+  }\r\n+\r\n   @Test\r\n   void findHead_shouldAlwaysConsiderJustifiedNodeAsViableHead() {\r\n     // The justified checkpoint is the default chain head to use when there are no other blocks\r\n```\r\n\r\n**Expected behavior:** all `ProtoArray` methods should have linear complexity \r\n\r\n**Actual behavior:** `ProtoArray.applyScoreChanges()` method has quadratic complexity\r\n\r\n**Frequency:** Always\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.9.1\r\n",
+  "body": "### Description\r\n\r\n`ProtoArray.applyScoreChanges()` method has quadratic complexity when the chain if justified but not finalized \r\n\r\n### Steps to Reproduce (Bug)\r\n\r\nThe following test running times depending on `nonFinalizedBlockCount`:\r\n- 10000 - 1s\r\n- 20000 - 5s\r\n- 40000 - 25s\r\n\r\n```diff\r\nIndex: storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\r\nIDEA additional info:\r\nSubsystem: com.intellij.openapi.diff.impl.patch.CharsetEP\r\n<+>UTF-8\r\n===================================================================\r\ndiff --git a/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java b/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\r\n--- a/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\t(revision 6adad2a394243b0013b6031af2ebb9d69019abdc)\r\n+++ b/storage/src/test/java/tech/pegasys/teku/storage/protoarray/ProtoArrayTest.java\t(date 1696495894392)\r\n@@ -67,6 +67,44 @@\r\n     addOptimisticBlock(0, Bytes32.ZERO, Bytes32.ZERO);\r\n   }\r\n \r\n+\r\n+  @Test\r\n+  void testNoQuadraticComplexity() {\r\n+    int nonFinalizedBlockCount = 40000;\r\n+    Bytes32 parentBlockRoot = GENESIS_CHECKPOINT.getRoot();\r\n+\r\n+    Checkpoint justifiedCheckpoint = GENESIS_CHECKPOINT;\r\n+    Checkpoint finalizedCheckpoint = GENESIS_CHECKPOINT;\r\n+    int epoch = 0;\r\n+    for (; epoch < nonFinalizedBlockCount; epoch++) {\r\n+      UInt64 slot = UInt64.valueOf(8L * epoch + 1);\r\n+\r\n+      Bytes32 newBlockRoot = dataStructureUtil.randomBytes32();\r\n+\r\n+      if (epoch == 1) {\r\n+        justifiedCheckpoint = new Checkpoint(UInt64.valueOf(epoch), newBlockRoot);\r\n+        finalizedCheckpoint = new Checkpoint(UInt64.valueOf(epoch), parentBlockRoot);\r\n+      }\r\n+\r\n+      protoArray.onBlock(\r\n+              slot,\r\n+              newBlockRoot,\r\n+              parentBlockRoot,\r\n+              dataStructureUtil.randomBytes32(),\r\n+              new BlockCheckpoints(\r\n+                      justifiedCheckpoint, finalizedCheckpoint, justifiedCheckpoint, finalizedCheckpoint),\r\n+              getExecutionBlockHash(newBlockRoot),\r\n+              true);\r\n+      protoArray.markNodeValid(newBlockRoot);\r\n+\r\n+      parentBlockRoot = newBlockRoot;\r\n+    }\r\n+\r\n+    long s = System.currentTimeMillis();\r\n+    protoArray.findOptimisticHead(UInt64.valueOf(epoch), justifiedCheckpoint, finalizedCheckpoint);\r\n+    System.out.println(\"findOptimisticHead took \" + (System.currentTimeMillis() - s) + \" ms\");\r\n+  }\r\n+\r\n   @Test\r\n   void findHead_shouldAlwaysConsiderJustifiedNodeAsViableHead() {\r\n     // The justified checkpoint is the default chain head to use when there are no other blocks\r\n```\r\n\r\n**Expected behavior:** all `ProtoArray` methods should have linear complexity \r\n\r\n**Actual behavior:** `ProtoArray.applyScoreChanges()` method has quadratic complexity\r\n\r\n**Frequency:** Always\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.9.1\r\n",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/7570/reactions",
@@ -64,5 +64,92 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1748184530",
+    "html_url": "https://github.com/Consensys/teku/issues/7570#issuecomment-1748184530",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7570",
+    "id": 1748184530,
+    "node_id": "IC_kwDOCM9I9M5oMy3S",
+    "user": {
+      "login": "Nashatyrev",
+      "id": 8173857,
+      "node_id": "MDQ6VXNlcjgxNzM4NTc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8173857?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Nashatyrev",
+      "html_url": "https://github.com/Nashatyrev",
+      "followers_url": "https://api.github.com/users/Nashatyrev/followers",
+      "following_url": "https://api.github.com/users/Nashatyrev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Nashatyrev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Nashatyrev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Nashatyrev/subscriptions",
+      "organizations_url": "https://api.github.com/users/Nashatyrev/orgs",
+      "repos_url": "https://api.github.com/users/Nashatyrev/repos",
+      "events_url": "https://api.github.com/users/Nashatyrev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Nashatyrev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-05T06:40:47Z",
+    "updated_at": "2023-10-05T06:40:47Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Here the stacktrace with 2 nested loops over the protoarray nodes: \r\n```\r\nO(n) ===> hasAncestorAtSlot:657, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  nodeIsViableForHead:644, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  apply:-1, ProtoArray$$Lambda$1744/0x000000080132e4d0 (tech.pegasys.teku.storage.protoarray)\r\n  map:260, Optional (java.util)\r\n  nodeLeadsToViableHead:603, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  maybeUpdateBestChildAndDescendant:525, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  lambda$updateBestDescendantOfParent$9:700, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  accept:-1, ProtoArray$$Lambda$661/0x00000008011564b0 (tech.pegasys.teku.storage.protoarray)\r\n  ifPresent:178, Optional (java.util)\r\n  updateBestDescendantOfParent:700, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  onNode:-1, ProtoArray$$Lambda$752/0x0000000801174aa8 (tech.pegasys.teku.storage.protoarray)\r\nO(n) ===> applyToNodes:722, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  applyDeltas:695, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  applyScoreChanges:427, ProtoArray (tech.pegasys.teku.storage.protoarray)\r\n  applyPendingVotes:125, ForkChoiceStrategy (tech.pegasys.teku.storage.protoarray)\r\n  applyForkChoiceScoreChanges:82, StoreVoteUpdater (tech.pegasys.teku.storage.store)\r\n  updateHeadTransaction:357, ForkChoice (tech.pegasys.teku.statetransition.forkchoice)\r\n  lambda$processHead$12:334, ForkChoice (tech.pegasys.teku.statetransition.forkchoice)\r\n  get:-1, ForkChoice$$Lambda$733/0x000000080116f380 (tech.pegasys.teku.statetransition.forkchoice)\r\n  ```",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1748184530/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1748411382",
+    "html_url": "https://github.com/Consensys/teku/issues/7570#issuecomment-1748411382",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7570",
+    "id": 1748411382,
+    "node_id": "IC_kwDOCM9I9M5oNqP2",
+    "user": {
+      "login": "Nashatyrev",
+      "id": 8173857,
+      "node_id": "MDQ6VXNlcjgxNzM4NTc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8173857?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Nashatyrev",
+      "html_url": "https://github.com/Nashatyrev",
+      "followers_url": "https://api.github.com/users/Nashatyrev/followers",
+      "following_url": "https://api.github.com/users/Nashatyrev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Nashatyrev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Nashatyrev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Nashatyrev/subscriptions",
+      "organizations_url": "https://api.github.com/users/Nashatyrev/orgs",
+      "repos_url": "https://api.github.com/users/Nashatyrev/repos",
+      "events_url": "https://api.github.com/users/Nashatyrev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Nashatyrev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-05T08:54:04Z",
+    "updated_at": "2023-10-05T08:54:04Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "* updated the test in description",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1748411382/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
