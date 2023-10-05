@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28251",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28251/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28251/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28251/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28251",
+  "id": 1926862654,
+  "node_id": "I_kwDOAOvK985y2Zc-",
+  "number": 28251,
+  "title": "Private blockchain is not working",
+  "user": {
+    "login": "TrustNobodySaltandSugarLookTheSame",
+    "id": 146994460,
+    "node_id": "U_kgDOCML1HA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/146994460?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame",
+    "html_url": "https://github.com/TrustNobodySaltandSugarLookTheSame",
+    "followers_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/followers",
+    "following_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/following{/other_user}",
+    "gists_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/subscriptions",
+    "organizations_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/orgs",
+    "repos_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/repos",
+    "events_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/TrustNobodySaltandSugarLookTheSame/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-04T19:41:14Z",
+  "updated_at": "2023-10-04T19:46:53Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I have been testing using latest geth version and I don't understand why its not working fully.\r\n\r\ngeth version: 1.13.2\r\nusing guide: https://geth.ethereum.org/docs/fundamentals/private-network\r\n\r\ngenesis.json:\r\n\r\n```\r\n{\r\n  \"config\": {\r\n    \"chainId\": 97197,\r\n    \"homesteadBlock\": 0,\r\n    \"eip150Block\": 0,\r\n    \"eip155Block\": 0,\r\n    \"eip158Block\": 0,\r\n    \"byzantiumBlock\": 0,\r\n    \"constantinopleBlock\": 0,\r\n    \"petersburgBlock\": 0,\r\n    \"istanbulBlock\": 0,\r\n    \"muirGlacierBlock\": 0,\r\n    \"berlinBlock\": 0,\r\n    \"londonBlock\": 0,\r\n    \"arrowGlacierBlock\": 0,\r\n    \"grayGlacierBlock\": 0,\r\n    \"clique\": {\r\n      \"period\": 5,\r\n      \"epoch\": 30000\r\n    }\r\n  },\r\n  \"difficulty\": \"1\",\r\n  \"gasLimit\": \"800000000\",\r\n  \"extradata\": \"0x00000000000000000000000000000000000000000000000000000000000000003177de278886C632d5B519269CB97B91960f2737a6f95a5807fcfC3834fFaf315A0C3f9a0c3497Ff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n  \"alloc\": {\r\n    \"0x3177de278886C632d5B519269CB97B91960f2737\": { \"balance\": \"10000000000000000000000000\" },\r\n    \"0xa6f95a5807fcfC3834fFaf315A0C3f9a0c3497Ff\": { \"balance\": \"10000000000000000000000000\" }\r\n  }\r\n}\r\n```\r\n\r\nTo reproduce:\r\nCreate 2 accounts for both node1 & node2\r\nAfter:\r\n```\r\ngeth init --datadir node1 genesis.json\r\ngeth init --datadir node2 genesis.json\r\n```\r\n\r\n```\r\nbootnode -genkey boot.key\r\nbootnode -nodekey boot.key -addr :30305\r\n```\r\n\r\n```geth --datadir node1 --port 30306 --bootnodes enode://7f6670c46d4cf34eb7fe50b914ef3953da468a13efe85f63a8acbe2a24311777d904424a5b7a3c37c6483070ed390e9a105b526938c4c41c8788d4422708b2e7@127.0.0.1:0?discport=30305  --networkid 97197 --unlock 0x3177de278886C632d5B519269CB97B91960f2737 --password node1/password.txt --authrpc.port 8551```\r\n\r\n```geth --datadir node2 --port 30307 --bootnodes enode://7f6670c46d4cf34eb7fe50b914ef3953da468a13efe85f63a8acbe2a24311777d904424a5b7a3c37c6483070ed390e9a105b526938c4c41c8788d4422708b2e7@127.0.0.1:0?discport=30305 --networkid 97197 --unlock 0xa6f95a5807fcfC3834fFaf315A0C3f9a0c3497Ff --password node2/password.txt --authrpc.port 8552```\r\n\r\nBoth nodes show this after running:\r\n`Looking for peers                        peercount=1 tried=0 static=0`\r\n\r\nThen:\r\n`geth attach node1/geth.ipc`\r\n\r\n`eth.getBalance(eth.accounts[0])`\r\n//Balance is showing fine here\r\n\r\n```\r\neth.sendTransaction({\r\n  to: '0x8119c8E0651e6599a0a1E6408CB8a68e1FFC86D8',\r\n  from: eth.accounts[0],\r\n  value: 1000000000000000000\r\n});\r\n```\r\n//it returns tx hash\r\n\r\nIssue:\r\nWhen I check the balance again using  `eth.getBalance(eth.accounts[0])`\r\nit shows the same like nothing has been sent... why the transaction is not being mined?\r\nChecking the window running the first node it shows details of the transaction but that's about it.\r\n\r\nWhat is wrong here? Did I miss something excuse my brain.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28251/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28251/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
