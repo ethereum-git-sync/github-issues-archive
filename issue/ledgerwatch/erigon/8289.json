@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "somnathb1",
@@ -79,12 +79,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-09-25T20:31:38Z",
-  "updated_at": "2023-10-03T10:40:33Z",
-  "closed_at": null,
+  "updated_at": "2023-10-05T09:59:17Z",
+  "closed_at": "2023-10-05T09:59:17Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "This is a re-opening of https://github.com/ledgerwatch/erigon-lib/issues/1112 which was assigned to @somnathb1 before the repository was archived.  Since Github does not allow any comments or updates on issues for archived repositories, I thought I would re-open it here.\r\n\r\nI've run into an issue where on a dev network, when the block baseFee is adequately low (say, 1 Wei), that the txpool begins rejecting transactions claiming they have an insufficient fee when their fee is in fact adequate. I traced it down to the following bit of code:\r\n\r\n[erigon-lib/txpool/pool.go](https://github.com/ledgerwatch/erigon-lib/blob/2d6e293a15e8d930c827a11d3e78e1e21bcb3885/txpool/pool.go#L178-L180)\r\n\r\nUnfortunately, there's no comment, but it looks to me like this function is probably supposed to implement some heuristic based on the pending block base fee to compute a 'protocol base fee' (maybe say, some fraction of the pending base fee?), but instead returns a constant 7.\r\n\r\nDoing a git blame shows @AskAlexSharov as the author in https://github.com/ledgerwatch/erigon-lib/commit/29bf077da4600e4e5599b0dea2daaac872c7a9f8 and that the protocolBaseFee used to be an atomic that got set and retrieved. But, I wasn't able to glean much from the PR https://github.com/ledgerwatch/erigon-lib/pull/48 it came in with.\r\n\r\nSo, can anyone explain to me why this function returns a constant 7? Is there some other behavior it should be doing that's documented? Would a patch which returns something equivalent to min(7, baseFee) be accepted as a fix for these devnet transactions being rejected when the basefee is adequately small?\r\n\r\nI first raised this on Discord, but @AskAlexSharov suggested I create this in an issue https://discord.com/channels/687972960811745322/687972960811745326/1149164360644706355\r\n\r\n> I think you are right and it’s something mainnet-specific hardcode. Let’s do next way: create github issue from this comment - i will ask somebody in team to take a look. Likely we need “add support of non-mainnet chains to txpool”.\r\n\r\nFrom the other issue @AskAlexSharov commented\r\n\r\n> adding link to pool docs: https://github.com/ledgerwatch/erigon/wiki/Transaction-Pool-Design",
-  "closed_by": null,
+  "closed_by": {
+    "login": "AskAlexSharov",
+    "id": 46885206,
+    "node_id": "MDQ6VXNlcjQ2ODg1MjA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/46885206?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AskAlexSharov",
+    "html_url": "https://github.com/AskAlexSharov",
+    "followers_url": "https://api.github.com/users/AskAlexSharov/followers",
+    "following_url": "https://api.github.com/users/AskAlexSharov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AskAlexSharov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AskAlexSharov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AskAlexSharov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AskAlexSharov/orgs",
+    "repos_url": "https://api.github.com/users/AskAlexSharov/repos",
+    "events_url": "https://api.github.com/users/AskAlexSharov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AskAlexSharov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8289/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8289/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
