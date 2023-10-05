@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14589",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14589/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14589/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14589/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14589",
+  "id": 1928532015,
+  "node_id": "I_kwDOAm_5kc5y8xAv",
+  "number": 14589,
+  "title": "Cannot use word `_offset` in local variable name in inline assembly because of old 0.7.x syntax",
+  "user": {
+    "login": "CJ42",
+    "id": 31145285,
+    "node_id": "MDQ6VXNlcjMxMTQ1Mjg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/31145285?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CJ42",
+    "html_url": "https://github.com/CJ42",
+    "followers_url": "https://api.github.com/users/CJ42/followers",
+    "following_url": "https://api.github.com/users/CJ42/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CJ42/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CJ42/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CJ42/subscriptions",
+    "organizations_url": "https://api.github.com/users/CJ42/orgs",
+    "repos_url": "https://api.github.com/users/CJ42/repos",
+    "events_url": "https://api.github.com/users/CJ42/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CJ42/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-05T15:12:51Z",
+  "updated_at": "2023-10-05T15:13:25Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nI have the following Solidity code with the inline assembly part that does not compile. See example below.\r\nIt always return me the following error:\r\n\r\n```\r\nDeclarationError: Identifier not found. Use \".slot\" and \".offset\" to access storage variables.\r\n  --> contracts/Playground.sol:23:24:\r\n   |\r\n23 |                 revert(resultdata_offset, resultdata_size)\r\n   |                        ^^^^^^^^^^^^^^^^^\r\n```\r\n\r\n![image](https://github.com/ethereum/solidity/assets/31145285/c41d5693-42a0-43ce-8d1e-72c7dd2ab6a7)\r\n\r\nI am wondering if this is normal. As far as I am aware, this is related to the old syntax from v0.7.x, where the suffixes `_slot` and `_offset` were used to access the slot number of a state variable (or its offset position in a storage slot). This was replaced by `.slot` and `.offset`.\r\n\r\nhttps://docs.soliditylang.org/en/v0.8.21/070-breaking-changes.html#inline-assembly\r\n\r\n![image](https://github.com/ethereum/solidity/assets/31145285/a07704ea-4208-4417-b8c5-5722b3c83932)\r\n\r\n\r\nHowever, in this instance, I am just writing the local variable in assembly in `snake_case` with the word `_offset` and the compiler seems to confuse this with the old syntax. I am not sure if this is a bug or an inaccuracy in the error reported. If the two words `_slot` and `_offset` are not allowed for local variables in inline assembly, it would be useful I guess to mention it somewhere in the docs maybe?\r\n\r\n\r\n\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.21\r\n- Target EVM version (as per compiler settings): default\r\n- Framework/IDE (e.g. Truffle or Remix): Remix\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity 0.8.21;\r\n\r\ncontract Example {\r\n\r\n    address someAddress = 0xCAfEcAfeCAfECaFeCaFecaFecaFECafECafeCaFe;\r\n\r\n    bytes4 private constant _SOME_SELECTOR = bytes4(keccak256(\"hey()\"));\r\n\r\n    function test() public payable {\r\n        (bool success, bytes memory result) = someAddress.call(\r\n            abi.encodePacked(_SOME_SELECTOR, msg.sender, msg.value)\r\n        );\r\n\r\n        assembly {\r\n            // `mload(result)` -> offset in memory where `result.length` is located\r\n            // `add(result, 32)` -> offset in memory where `result` data starts\r\n            let resultdata_size := mload(result)\r\n            let resultdata_offset := add(result, 32)\r\n\r\n            // if call failed, revert\r\n            if eq(success, 0) {\r\n                revert(resultdata_offset, resultdata_size)\r\n            }\r\n\r\n            // otherwise return the data returned by the external call\r\n            return(resultdata_offset, resultdata_size)\r\n        }\r\n    }\r\n\r\n}\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14589/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14589/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
