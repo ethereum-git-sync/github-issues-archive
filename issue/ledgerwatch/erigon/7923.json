@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 10,
+  "comments": 11,
   "created_at": "2023-07-23T21:26:31Z",
-  "updated_at": "2023-09-28T02:09:36Z",
-  "closed_at": null,
+  "updated_at": "2023-10-06T02:04:46Z",
+  "closed_at": "2023-10-06T02:04:45Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### description of the problem\r\n\r\nI synced `sepolia` chain from scratch on one machine and it worked just fine. Then I moved the files (rsynced) to another machine (the same operating system/cpu arch), preserved access/modification time fot the `datadir`, but the chain won't sync any further. I've performed the rsync with erigon stopped. \r\n\r\nNow I tried to continue the sync on the new machine, but It's stuck at `2/15 Waiting for Consensus Layer` with peers changing, but progress moving no further. The `print_stages` output differs between old and new machines but it's mystery to me how to read it so I'll count on your help.\r\n\r\nThanks!\r\n\r\n#### System information\r\n\r\n```\r\n❯ erigon --version\r\nerigon version 2.48.0-stable\r\n\r\n❯ uname -a\r\nLinux _ 6.4.2-arch1-1 #1 SMP PREEMPT_DYNAMIC Thu, 06 Jul 2023 18:35:54 +0000 x86_64 GNU/Linux\r\n```\r\n\r\nConcensus Layer: internal\r\nChain/Network: sepolia\r\n\r\n#### start command\r\n```\r\n/usr/bin/erigon \\\r\n    --chain=sepolia \\\r\n    --datadir=/mnt/storage/ansible-managed/ethereum/data \\\r\n    --ethash.dagdir=/mnt/storage/ansible-managed/ethereum/data \\\r\n    --http=true \\\r\n    --healthcheck=true \\\r\n    --sentinel.addr=127.0.0.1 \\\r\n    --http.addr=127.0.0.1 \\\r\n    --http.port=8545 \\\r\n    --private.api.addr 127.0.0.1:8546 \\\r\n    --http.api=eth,erigon,engine,web3,net,txpool \\\r\n    --authrpc.addr=127.0.0.1 \\\r\n    --authrpc.jwtsecret=/mnt/storage/ansible-managed/ethereum/jwt.hex \\\r\n    --metrics=true \\\r\n    --internalcl \\\r\n    --snapshots=true \\\r\n    --torrent.download.slots=4 \\\r\n    --torrent.download.rate=128mb \\\r\n    --torrent.upload.rate=4mb \\\r\n    --verbosity info \\\r\n    --log.console.verbosity info\r\n```\r\n\r\n### print_stages OLD machine\r\n\r\n```\r\nINFO[07-23|23:24:13.183] [snapshots] Blocks Stat                  blocks=3855k indices=3855k alloc=100.9MB sys=127.0MB\r\nNote: prune_at doesn't mean 'all data before were deleted' - it just mean stage.Prune function were run to this block. Because 1 stage may prune multiple data types to different prune distance.\r\n\r\n \t\t\t\t stage_at \t prune_at\r\nSnapshots \t\t\t 3945832 \t 0\r\nHeaders \t\t\t 3945833 \t 0\r\nBlockHashes \t\t\t 3945833 \t 0\r\nBodies \t\t\t\t 3945833 \t 0\r\nSenders \t\t\t 3945833 \t 0\r\nExecution \t\t\t 3945833 \t 3945833\r\nTranslation \t\t\t 0 \t\t 0\r\nHashState \t\t\t 3945833 \t 0\r\nIntermediateHashes \t\t 3945833 \t 3945833\r\nAccountHistoryIndex \t\t 3945833 \t 0\r\nStorageHistoryIndex \t\t 3945833 \t 0\r\nLogIndex \t\t\t 3945833 \t 0\r\nCallTraces \t\t\t 3945833 \t 3945833\r\nTxLookup \t\t\t 3945833 \t 3559600\r\nFinish \t\t\t\t 3945833 \t 0\r\n--\r\nprune distance:\r\n\r\nblocks.v2: blocks=3854999, segments=3854999, indices=3854999\r\n\r\nhistory.v3: false,  idx steps: 0.00, lastMaxTxNum=0->1, lastBlockInSnap=0\r\n\r\nsequence: EthTx=48195739, NonCanonicalTx=0\r\n\r\nin db: first header 3855000, last header 3945833, first body 3855000, last body 3945833\r\n```\r\n\r\n### print_stages NEW machine\r\n\r\n```\r\nINFO[07-23|23:22:05.550] [snapshots] Blocks Stat                  blocks=3855k indices=3855k alloc=101.9MB sys=160.6MB\r\nNote: prune_at doesn't mean 'all data before were deleted' - it just mean stage.Prune function were run to this block. Because 1 stage may prune multiple data types to different prune distance.\r\n\r\n \t\t\t\t stage_at \t prune_at\r\nSnapshots \t\t\t 3854999 \t 0\r\nHeaders \t\t\t 3854999 \t 0\r\nBlockHashes \t\t\t 3945833 \t 0\r\nBodies \t\t\t\t 3854999 \t 0\r\nSenders \t\t\t 3854999 \t 0\r\nExecution \t\t\t 3945833 \t 3945833\r\nTranslation \t\t\t 0 \t\t 0\r\nHashState \t\t\t 3945833 \t 0\r\nIntermediateHashes \t\t 3945833 \t 3945833\r\nAccountHistoryIndex \t\t 3945833 \t 0\r\nStorageHistoryIndex \t\t 3945833 \t 0\r\nLogIndex \t\t\t 3945833 \t 0\r\nCallTraces \t\t\t 3945833 \t 3945833\r\nTxLookup \t\t\t 3945833 \t 3559600\r\nFinish \t\t\t\t 3945833 \t 0\r\n--\r\nprune distance:\r\n\r\nblocks.v2: blocks=3854999, segments=3854999, indices=3854999\r\n\r\nhistory.v3: false,  idx steps: 0.00, lastMaxTxNum=0->0, lastBlockInSnap=0\r\n\r\nsequence: EthTx=43472220, NonCanonicalTx=0\r\n\r\nin db: first header 0, last header 0, first body 0, last body 0\r\n--\r\n```\r\n\r\n#### Log\r\n\r\n```\r\nStarted Erigon execution client.\r\n[INFO] [07-23|23:09:17.026] logging to file system                   log dir=/mnt/storage/ansible-managed/ethereum/data/logs file prefix=erigon log level=info json=false\r\n[INFO] [07-23|23:09:17.027] Starting metrics server                  addr=http://127.0.0.1:6060/debug/metrics/prometheus\r\n[INFO] [07-23|23:09:17.027] Build info                               git_branch= git_tag=v2.48.0 git_commit=\r\n[INFO] [07-23|23:09:17.027] Starting Erigon on Sepolia testnet...\r\n[INFO] [07-23|23:09:17.028] Maximum peer count                       ETH=100 total=100\r\n[INFO] [07-23|23:09:17.028] starting HTTP APIs                       APIs=eth,erigon,engine,web3,net,txpool\r\n[INFO] [07-23|23:09:17.028] torrent verbosity                        level=WRN\r\n[INFO] [07-23|23:09:19.133] Set global gas cap                       cap=50000000\r\n[INFO] [07-23|23:09:19.134] [Downloader] Runnning with               ipv6-enabled=true ipv4-enabled=true download.rate=128mb upload.rate=4mb\r\n[INFO] [07-23|23:09:19.134] Opening Database                         label=chaindata path=/mnt/storage/ansible-managed/ethereum/data/chaindata\r\n[INFO] [07-23|23:09:19.319] Initialised chain configuration          config=\"{ChainID: 11155111, Homestead: 0, DAO: <nil>, Tangerine Whistle: 0, Spurious Dragon: 0, Byzantium: 0, Constantinople: 0, Petersburg: 0, Istanbul: 0, Muir Glacier: 0, Berlin: 0, London: 0, Arrow Glacier: <nil>, Gray Glacier: <nil>, Terminal Total Difficulty: 17000000000000000, Merge Netsplit: 1735371, Shanghai: 1677557088, Cancun: <nil>, Prague: <nil>, Engine: ethash}\" genesis=0x25a5cc106eea7138acab33231d7160d69cb777ee0c2c553fcddf5138993e6dd9\r\n[INFO] [07-23|23:09:19.380] Initialising Ethereum protocol           network=11155111\r\n[INFO] [07-23|23:09:19.380] Disk storage enabled for ethash DAGs     dir=/mnt/storage/ansible-managed/ethereum/data count=2\r\n[INFO] [07-23|23:09:19.382] Starting private RPC server              on=127.0.0.1:8546\r\n[INFO] [07-23|23:09:19.382] new subscription to logs established\r\n[INFO] [07-23|23:09:19.382] [Checkpoint Sync] Requesting beacon state uri=https://checkpoint-sync.sepolia.ethpandaops.io/eth/v2/debug/beacon/states/finalized\r\n[INFO] [07-23|23:09:21.268] Static peers                             len=0\r\n[INFO] [07-23|23:09:21.268] [Sentinel] Sentinel started              enr=enr:-Ly4QCIpZR6dAeg0596PkTyT0jjmutWreYIyBi1Ksv42K2tDAHdffByAYCN5278oqJQM4l4JEJKa6dtKE3pW2zE5jncBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpBH63KzBAAAAP__________gmlkgnY0gmlwhH8AAAGJc2VjcDI1NmsxoQL0onynPEVVhRUtpMjN5SGezaF5KPr4j2k5UHAWVcm41YhzeW5jbmV0cwCDdGNwgg-hg3VkcIIPoA\r\n[INFO] [07-23|23:09:21.269] rpc filters: subscribing to Erigon events\r\n[INFO] [07-23|23:09:21.269] new subscription to newHeaders established\r\n[INFO] [07-23|23:09:21.269] New txs subscriber joined\r\n[INFO] [07-23|23:09:21.269] Reading JWT secret                       path=/mnt/storage/ansible-managed/ethereum/jwt.hex\r\n[INFO] [07-23|23:09:21.270] HTTP endpoint opened for Engine API      url=127.0.0.1:8551 ws=true ws.compression=true\r\n[INFO] [07-23|23:09:21.270] HTTP endpoint opened                     url=127.0.0.1:8545 ws=false ws.compression=true grpc=false\r\n[INFO] [07-23|23:09:21.275] Started P2P networking                   version=68 self=enode://8029b30e80b12b7c9a2255bcb30b23066232397ac191a146610c5c5ac4f03cbb4b670b98a89a52422a0eb54cac90aea39c9fe99fb066958c6cd084cd6da9c1b5@127.0.0.1:0 name=erigon/v2.48.0/linux-amd64/go1.20.5\r\n[INFO] [07-23|23:09:21.278] Started P2P networking                   version=67 self=enode://8029b30e80b12b7c9a2255bcb30b23066232397ac191a146610c5c5ac4f03cbb4b670b98a89a52422a0eb54cac90aea39c9fe99fb066958c6cd084cd6da9c1b5@127.0.0.1:0 name=erigon/v2.48.0/linux-amd64/go1.20.5\r\n[INFO] [07-23|23:09:21.279] [txpool] Started\r\n[INFO] [07-23|23:09:21.324] [1/15 Snapshots] Fetching torrent files metadata\r\n[INFO] [07-23|22:03:59.160] Started Ethereum 2.0 Gossip Service\r\n[INFO] [07-23|22:03:59.255] [snapshots] Blocks Stat                  blocks=3855k indices=3855k alloc=152.1MB sys=219.4MB\r\n[INFO] [07-23|22:03:59.256] [2/15 Headers] Waiting for Consensus Layer...\r\n[EROR] [07-23|22:04:56.859] [pubsubhandler] stream handler           name=/eth2/beacon_chain/req/status/1/ssz_snappy err=\"unable to read varint from message prefix: stream reset\"\r\n[INFO] [07-23|22:04:59.067] [txpool] stat                            pending=10 baseFee=0 queued=331 alloc=372.1MB sys=499.6MB\r\n[INFO] [07-23|22:04:59.160] [Caplin] P2P                             peers=3\r\n[INFO] [07-23|22:05:56.131] [p2p] GoodPeers                          eth67=5 eth68=1\r\n[INFO] [07-23|22:05:59.068] [txpool] stat                            pending=23 baseFee=0 queued=512 alloc=217.1MB sys=500.1MB\r\n[INFO] [07-23|22:05:59.161] [Caplin] P2P                             peers=4\r\n[INFO] [07-23|22:06:59.067] [txpool] stat                            pending=42 baseFee=0 queued=712 alloc=263.2MB sys=544.8MB\r\n[INFO] [07-23|22:06:59.160] [Caplin] P2P                             peers=5\r\n[INFO] [07-23|22:07:56.131] [p2p] GoodPeers                          eth68=1 eth67=5\r\n[INFO] [07-23|22:07:59.067] [txpool] stat                            pending=56 baseFee=0 queued=888 alloc=316.1MB sys=570.2MB\r\n[INFO] [07-23|22:07:59.160] [Caplin] P2P                             peers=6\r\n[INFO] [07-23|22:08:59.067] [txpool] stat                            pending=75 baseFee=0 queued=1076 alloc=240.6MB sys=676.0MB\r\n[INFO] [07-23|22:08:59.161] [Caplin] P2P                             peers=6\r\n[EROR] [07-23|22:09:16.573] [pubsubhandler] stream handler           name=/eth2/beacon_chain/req/status/1/ssz_snappy err=\"unable to read varint from message prefix: stream reset\"\r\n[INFO] [07-23|22:09:56.131] [p2p] GoodPeers                          eth68=2 eth67=5\r\n[INFO] [07-23|22:09:59.067] [txpool] stat                            pending=102 baseFee=0 queued=1254 alloc=230.3MB sys=676.3MB\r\n[INFO] [07-23|22:09:59.161] [Caplin] P2P                             peers=5\r\n[INFO] [07-23|22:10:59.068] [txpool] stat                            pending=131 baseFee=0 queued=1425 alloc=251.4MB sys=676.5MB\r\n[INFO] [07-23|22:10:59.161] [Caplin] P2P                             peers=6\r\n[INFO] [07-23|22:11:56.131] [p2p] GoodPeers                          eth68=3 eth67=6\r\n[INFO] [07-23|22:11:59.067] [txpool] stat                            pending=151 baseFee=0 queued=1589 alloc=285.6MB sys=676.5MB\r\n[INFO] [07-23|22:11:59.160] [Caplin] P2P                             peers=7\r\n[INFO] [07-23|22:12:59.067] [txpool] stat                            pending=173 baseFee=0 queued=1793 alloc=259.0MB sys=676.8MB\r\n[INFO] [07-23|22:12:59.160] [Caplin] P2P                             peers=8\r\n[INFO] [07-23|22:13:56.131] [p2p] GoodPeers                          eth68=3 eth67=6\r\n[INFO] [07-23|22:13:59.067] [txpool] stat                            pending=187 baseFee=0 queued=1985 alloc=364.8MB sys=676.8MB\r\n[INFO] [07-23|22:13:59.160] [Caplin] P2P                             peers=8\r\n[INFO] [07-23|22:14:59.069] [txpool] stat                            pending=205 baseFee=0 queued=2146 alloc=315.2MB sys=676.8MB\r\n[INFO] [07-23|22:14:59.160] [Caplin] P2P                             peers=11\r\n[EROR] [07-23|22:15:52.117] [pubsubhandler] stream handler           name=/eth2/beacon_chain/req/status/1/ssz_snappy err=\"unable to read varint from message prefix: stream reset\"\r\n[INFO] [07-23|22:15:56.131] [p2p] GoodPeers                          eth68=4 eth67=6\r\n[INFO] [07-23|22:15:59.067] [txpool] stat                            pending=223 baseFee=0 queued=2331 alloc=472.8MB sys=677.0MB\r\n[INFO] [07-23|22:15:59.161] [Caplin] P2P                             peers=9\r\n[INFO] [07-23|22:16:59.067] [txpool] stat                            pending=247 baseFee=0 queued=2536 alloc=379.9MB sys=677.3MB\r\n[INFO] [07-23|22:16:59.160] [Caplin] P2P                             peers=14\r\n[INFO] [07-23|22:17:56.131] [p2p] GoodPeers                          eth68=6 eth67=6 eth66=1\r\n[INFO] [07-23|22:17:59.068] [txpool] stat                            pending=269 baseFee=0 queued=2725 alloc=263.4MB sys=677.3MB\r\n[INFO] [07-23|22:17:59.161] [Caplin] P2P                             peers=16\r\n[INFO] [07-23|22:18:59.067] [txpool] stat                            pending=289 baseFee=0 queued=3014 alloc=423.3MB sys=677.3MB\r\n[INFO] [07-23|22:18:59.160] [Caplin] P2P                             peers=21\r\n[INFO] [07-23|22:19:56.131] [p2p] GoodPeers                          eth68=8 eth67=7 eth66=1\r\n[INFO] [07-23|22:19:59.068] [txpool] stat                            pending=310 baseFee=0 queued=3188 alloc=316.4MB sys=677.3MB\r\n[INFO] [07-23|22:19:59.161] [Caplin] P2P                             peers=18\r\n[INFO] [07-23|22:20:59.067] [txpool] stat                            pending=323 baseFee=0 queued=3360 alloc=369.3MB sys=677.3MB\r\n[INFO] [07-23|22:20:59.160] [Caplin] P2P                             peers=14\r\n[EROR] [07-23|22:21:46.335] [pubsubhandler] stream handler           name=/eth2/beacon_chain/req/status/1/ssz_snappy err=\"unable to read varint from message prefix: stream reset\"\r\n[INFO] [07-23|22:21:56.131] [p2p] GoodPeers                          eth68=8 eth67=7 eth66=1\r\n[INFO] [07-23|22:21:59.067] [txpool] stat                            pending=347 baseFee=0 queued=3532 alloc=354.2MB sys=677.3MB\r\n[INFO] [07-23|22:21:59.160] [Caplin] P2P                             peers=12\r\n[EROR] [07-23|22:21:59.920] [pubsubhandler] stream handler           name=/eth2/beacon_chain/req/status/1/ssz_snappy err=\"unable to read varint from message prefix: stream reset\"\r\n[INFO] [07-23|22:22:59.067] [txpool] stat                            pending=367 baseFee=0 queued=3718 alloc=274.9MB sys=677.3MB\r\n[INFO] [07-23|22:22:59.161] [Caplin] P2P                             peers=12\r\n[INFO] [07-23|22:23:56.131] [p2p] GoodPeers                          eth68=8 eth67=7 eth66=1\r\n[INFO] [07-23|22:23:59.067] [txpool] stat                            pending=395 baseFee=0 queued=3902 alloc=273.2MB sys=677.3MB\r\n[INFO] [07-23|22:23:59.160] [Caplin] P2P                             peers=13\r\n[INFO] [07-23|22:24:59.067] [txpool] stat                            pending=430 baseFee=0 queued=4068 alloc=318.3MB sys=686.4MB\r\n[INFO] [07-23|22:24:59.161] [Caplin] P2P                             peers=13\r\n[INFO] [07-23|22:25:56.131] [p2p] GoodPeers                          eth66=1 eth67=7 eth68=8\r\n[INFO] [07-23|22:25:59.068] [txpool] stat                            pending=451 baseFee=0 queued=4222 alloc=396.7MB sys=702.4MB\r\n[INFO] [07-23|22:25:59.160] [Caplin] P2P                             peers=15\r\n[INFO] [07-23|22:26:59.067] [txpool] stat                            pending=472 baseFee=0 queued=4337 alloc=316.3MB sys=702.4MB\r\n[INFO] [07-23|22:26:59.160] [Caplin] P2P                             peers=20\r\n[INFO] [07-23|22:27:56.131] [p2p] GoodPeers                          eth68=8 eth67=8 eth66=1\r\n[INFO] [07-23|22:27:59.067] [txpool] stat                            pending=503 baseFee=0 queued=4445 alloc=463.4MB sys=702.4MB\r\n[INFO] [07-23|22:27:59.160] [Caplin] P2P                             peers=16\r\n[EROR] [07-23|22:28:33.017] [pubsubhandler] stream handler           name=/eth2/beacon_chain/req/status/1/ssz_snappy err=\"unable to read varint from message prefix: stream reset\"\r\n[INFO] [07-23|22:28:59.068] [txpool] stat                            pending=516 baseFee=0 queued=4528 alloc=257.5MB sys=702.4MB\r\n[INFO] [07-23|22:28:59.161] [Caplin] P2P                             peers=14\r\n[INFO] [07-23|22:29:20.260] Got interrupt, shutting down...\r\nStopping Erigon execution client...\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "github-actions[bot]",
+    "id": 41898282,
+    "node_id": "MDM6Qm90NDE4OTgyODI=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+    "html_url": "https://github.com/apps/github-actions",
+    "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7923/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7923/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -500,6 +519,50 @@
     "body": "This issue is stale because it has been open for 40 days with no activity. Remove stale label or comment, or this will be closed in 7 days.",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1738338899/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1749887122",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/7923#issuecomment-1749887122",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/7923",
+    "id": 1749887122,
+    "node_id": "IC_kwDOC0FsAM5oTSiS",
+    "user": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "site_admin": false
+    },
+    "created_at": "2023-10-06T02:04:45Z",
+    "updated_at": "2023-10-06T02:04:45Z",
+    "author_association": "NONE",
+    "body": "This issue was closed because it has been stalled for 7 days with no activity.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1749887122/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
