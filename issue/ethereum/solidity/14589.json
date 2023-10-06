@@ -38,6 +38,33 @@
       "color": "fc1313",
       "default": false,
       "description": ""
+    },
+    {
+      "id": 4438003076,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaNhA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20effort",
+      "name": "medium effort",
+      "color": "ff7df7",
+      "default": false,
+      "description": "Default level of effort"
+    },
+    {
+      "id": 4438157609,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
+      "name": "low impact",
+      "color": "5d71ff",
+      "default": false,
+      "description": "Changes are not very noticeable or potential benefits are limited."
+    },
+    {
+      "id": 4438481746,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3bUg",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/must%20have%20eventually",
+      "name": "must have eventually",
+      "color": "ffb04d",
+      "default": false,
+      "description": "Something we consider essential but not enough to prevent us from releasing Solidity 1.0 without it."
     }
   ],
   "state": "open",
@@ -47,9 +74,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-05T15:12:51Z",
-  "updated_at": "2023-10-05T15:13:25Z",
+  "updated_at": "2023-10-06T17:22:56Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -72,5 +99,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1751147745",
+    "html_url": "https://github.com/ethereum/solidity/issues/14589#issuecomment-1751147745",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14589",
+    "id": 1751147745,
+    "node_id": "IC_kwDOAm_5kc5oYGTh",
+    "user": {
+      "login": "cameel",
+      "id": 137030,
+      "node_id": "MDQ6VXNlcjEzNzAzMA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cameel",
+      "html_url": "https://github.com/cameel",
+      "followers_url": "https://api.github.com/users/cameel/followers",
+      "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+      "organizations_url": "https://api.github.com/users/cameel/orgs",
+      "repos_url": "https://api.github.com/users/cameel/repos",
+      "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cameel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-06T17:22:31Z",
+    "updated_at": "2023-10-06T17:22:31Z",
+    "author_association": "MEMBER",
+    "body": "Thanks for the report!\r\n\r\nI investigated this and it seems to be unintended. Both [the comment that suggested the check in the PR that introduced this breaking change](https://github.com/ethereum/solidity/pull/9285#pullrequestreview-447092300) and [the way the check is implemented](https://github.com/ethereum/solidity/blob/v0.8.21/libsolidity/analysis/ReferencesResolver.cpp#L288-L300) indicate that this was meant to be a helpful suggestion to be shown only when the identifier is undeclared. And we only have test cases covering the cases where it is undeclared ([storage_reference_old.sol](https://github.com/ethereum/solidity/blob/v0.8.21/test/libsolidity/syntaxTests/inlineAssembly/storage_reference_old.sol)) or refers to a storage variable ([storage_reference_old_shadow.sol](https://github.com/ethereum/solidity/blob/v0.8.21/test/libsolidity/syntaxTests/inlineAssembly/storage_reference_old_shadow.sol)). The case where it is shadowed by a local assembly variable is not covered.\r\n\r\nThe direct cause is that `ReferencesResolver` seems unable to resolve local assembly variables to their declarations in the same block (not sure if that in itself is a bug or not). However, for those that do not have the suffix, it just continues without doing anything. It's only those with the suffix that trigger the error on the assumption that the declaration is missing.\r\n\r\nBy the way, this problem does not exist for Solidity variables, so until we fix this the workaround is to declare it outside of the assembly block is you really want it to have that name.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1751147745/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
