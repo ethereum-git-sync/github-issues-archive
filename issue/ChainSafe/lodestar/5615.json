@@ -58,7 +58,7 @@
   "milestone": null,
   "comments": 4,
   "created_at": "2023-06-06T13:58:01Z",
-  "updated_at": "2023-10-06T20:38:58Z",
+  "updated_at": "2023-10-06T22:17:23Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -240,9 +240,9 @@
       "site_admin": false
     },
     "created_at": "2023-10-06T14:43:19Z",
-    "updated_at": "2023-10-06T20:38:58Z",
+    "updated_at": "2023-10-06T22:17:23Z",
     "author_association": "MEMBER",
-    "body": "Was looking into calculating proposer effectiveness based on new block proposal metric (https://github.com/ChainSafe/lodestar/pull/5603) but had some issues due to non-existent values, i.e. no value at all due to no block proposal or no value with the corresponding label. It is also not rendering the chart for some reason, just returns the value 0.9918 which at least looks like the calculation itself works.\r\n\r\n```\r\n(\r\n  1 -\r\n  (\r\n    sum(rate(validator_monitor_prev_epoch_block_proposal_summary{summary=\"canonical\"}[1d])) or vector(0)\r\n    +\r\n    0.25\r\n    *\r\n    sum(rate(validator_monitor_prev_epoch_block_proposal_summary{summary!=\"canonical\"}[1d])) or vector(0)\r\n  )\r\n  /\r\n  sum(rate(validator_monitor_prev_epoch_block_proposal_summary[1d])) or vector(0)\r\n)\r\n```\r\n\r\n> proposer_effectiveness = [non_empty_blocks + empty_blocks * 0.25] / total_proposer_slots_attributed\r\n\r\nHow do we want to handle the case if `total_proposer_slots_attributed` is `0`? I'd guess this should result in the same value as no missed proposals.",
+    "body": "Was looking into calculating proposer effectiveness based on new block proposal metric (https://github.com/ChainSafe/lodestar/pull/5603). Have to use `or vector(0)` as there might be no data points for the selected time range. [Rated docs on proposer-effectiveness](https://docs.rated.network/methodologies/ethereum-beacon-chain/rated-effectiveness-rating/proposer-effectiveness) was helpful but there is no information what value should be used if there are no proposals at all. Could just set the same value for no proposals as if there were no missed proposals.\r\n\r\n```\r\n(\r\n  1 -\r\n  sum(rate(validator_monitor_prev_epoch_block_proposal_summary{summary!=\"canonical\"}[1d])) or vector(0)\r\n  /\r\n  sum(rate(validator_monitor_prev_epoch_block_proposal_summary[1d])) or vector(0)\r\n)\r\n```\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1750801099/reactions",
       "total_count": 0,
