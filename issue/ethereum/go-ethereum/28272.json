@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28272",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28272/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28272/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28272/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28272",
+  "id": 1931248316,
+  "node_id": "I_kwDOAOvK985zHIK8",
+  "number": 28272,
+  "title": "Pebble level0 compaction configuration",
+  "user": {
+    "login": "rjl493456442",
+    "id": 5959481,
+    "node_id": "MDQ6VXNlcjU5NTk0ODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5959481?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rjl493456442",
+    "html_url": "https://github.com/rjl493456442",
+    "followers_url": "https://api.github.com/users/rjl493456442/followers",
+    "following_url": "https://api.github.com/users/rjl493456442/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rjl493456442/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rjl493456442/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rjl493456442/subscriptions",
+    "organizations_url": "https://api.github.com/users/rjl493456442/orgs",
+    "repos_url": "https://api.github.com/users/rjl493456442/repos",
+    "events_url": "https://api.github.com/users/rjl493456442/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rjl493456442/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-07T08:04:47Z",
+  "updated_at": "2023-10-07T08:05:20Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "In Pebble, the default file number threshold for Level 0 is configured as 500 to serve as an indicator for triggering Level 0 compaction. According to Pebble's clarification, this number is chosen as a tradeoff between efficient Level 0 compaction and preventing the accumulation of too many files in Level 0.\r\n\r\n```\r\nSome justification for the default of 500:\r\n\r\nWhy not smaller?:\r\n\r\n- The default target file size for L0 is 2MB, so 500 files is <= 1GB\r\nof data. At observed compaction speeds of > 20MB/s, L0 can be\r\ncleared of all files in < 1min, so this backlog is not huge.\r\n\r\n- 500 files is low overhead for instantiating L0 sublevels from scratch.\r\n\r\n- Lower values were observed to cause excessive and inefficient\r\n  compactions out of L0 in a TPCC import benchmark.\r\n\r\n\r\nWhy not larger?:\r\n\r\n- More than 1min to compact everything out of L0.\r\n\r\n- CockroachDB's admission control system uses a threshold of 1000\r\nfiles to start throttling writes to Pebble. Using 500 here gives\r\nus headroom between when Pebble should start compacting L0 and\r\nwhen the admission control threshold is reached.\r\n\r\nWe can revisit this default in the future based on better experimental understanding.\r\n\r\n// TODO(jackson): Experiment with slightly lower thresholds [or higher\r\n// admission control thresholds] to see whether a higher L0 score at the\r\n// threshold (currently 2.0) is necessary for some workloads to avoid\r\n// starving L0 in favor of lower-level compactions.\r\no.L0CompactionFileThreshold = 500\r\n```\r\n\r\n##\r\n\r\nHowever, having too many Level 0 files can negatively impact the database's read efficiency, significantly slow down the read especially when the bloom filter is not configured. The Get operation happens in level0 needs to traverse the whole level0 fileset, which at least needs to resolve the (1) filter block and (2) index block of files, and potentially one or two data blocks of each file if bloom filter is not enabled.\r\n\r\nFor example, in the worst case scenario, where 500 files reside in Level 0, each file requiring the loading of 2 data blocks (each 4KiB in size), this results in the resolution of 4MiB of data for a single database read. The read amplification is significantly huge.\r\n\r\n##\r\n\r\nIn the case of go-ethereum, I think we should lower this configuration. Leveldb configures it as 4, because of a inefficient compaction. Perhaps we can choose `64` or `128` as the attempts to see the impacts.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28272/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28272/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
