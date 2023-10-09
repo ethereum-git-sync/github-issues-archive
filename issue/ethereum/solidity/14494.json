@@ -49,7 +49,7 @@
       "description": "It's on our short-term development"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "cameel",
@@ -143,21 +143,40 @@
       "site_admin": false
     },
     "open_issues": 12,
-    "closed_issues": 9,
+    "closed_issues": 10,
     "state": "open",
     "created_at": "2023-06-05T13:39:54Z",
-    "updated_at": "2023-09-18T14:35:58Z",
+    "updated_at": "2023-10-09T13:49:32Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 16,
   "created_at": "2023-08-15T15:18:49Z",
-  "updated_at": "2023-09-22T18:10:42Z",
-  "closed_at": null,
+  "updated_at": "2023-10-09T13:49:32Z",
+  "closed_at": "2023-10-09T13:49:31Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Here I am again with another issue with extra files in compilation causing trouble 🫡 \r\n\r\nBy extra files I mean files that the target contract does not depend on.\r\n\r\n## Recap \r\nFirst a recap on previous issues similarly on extra files in compilation:\r\n1. https://github.com/ethereum/solidity/issues/12281 \r\nThis was an older issue that seems to affect the AST IDs in `0.6.12` and `0.7.0`. We also encountered this and handled in Sourcify's case https://github.com/ethereum/sourcify/issues/618\r\n2. https://github.com/ethereum/solidity/issues/14250 \r\nI've encountered this in a `0.8.19` contract and got fixed in `0.8.21` with https://github.com/ethereum/solidity/pull/14311.\r\n\r\n\r\n## Current Issue\r\nI've encountered the current issue in https://github.com/ethereum/sourcify/issues/1065. \r\n\r\nMy initial suspicion was that it's an instance of the 2. case because the contract was a `0.8.19` contract. Unfortunately, I was able to reproduce the case in `0.8.21`.\r\n\r\nAlthough the 1. case should have been resolved, I suspect it still can be related because **the metadata hashes are identical** but the bytecodes differ. \r\n\r\n### To reproduce\r\nI named inputs as \"hardhat\" and \"sourcify\". \"Sourcify\" uses the minimum number of source files, because it is based on the ones listed in the contract metadata. \"Hardhat\" uses extra because by default Hardhat inputs everything to the compiler. Sourcify has two different inputs `0.8.19` and `0.8.21` because it includes the `evmVersion` inside the input i.e. `paris` vs `shanghai`.\r\n\r\n[N2MERC721-hardhat-input.json.txt](https://github.com/ethereum/solidity/files/12345384/N2MERC721-hardhat-input.json.txt)\r\n[N2MERC721-sourcify-input-0.8.21.json.txt](https://github.com/ethereum/solidity/files/12345386/N2MERC721-sourcify-input.json.txt)\r\n[N2MERC721-sourcify-input-0.8.19.json.txt](https://github.com/ethereum/solidity/files/12345498/N2MERC721-sourcify-input-0.8.19.json.txt)\r\n\r\nYou can see the two inputs differ only in some extra files + some of the compiler settings \r\n<details>\r\n<summary> These are the extra files in Hardhat input </summary>\r\n\r\n```js\r\n[\r\n  '@nfts2me/contracts/interfaces/IN2MBeaconFactory.sol',\r\n  '@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol',\r\n  '@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155SupplyUpgradeable.sol',\r\n  '@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/IERC1155MetadataURIUpgradeable.sol',\r\n  '@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol',\r\n  '@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol',\r\n  '@openzeppelin/contracts/governance/utils/IVotes.sol',\r\n  '@openzeppelin/contracts/proxy/Proxy.sol',\r\n  '@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol',\r\n  '@openzeppelin/contracts/token/ERC1155/IERC1155.sol',\r\n  '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol',\r\n  '@openzeppelin/contracts/token/ERC721/IERC721.sol',\r\n  '@openzeppelin/contracts/utils/introspection/IERC165.sol',\r\n  'contracts/beacon/N2MERC1155Upgradeable.sol',\r\n  'contracts/beacon/N2MERC721Upgradeable.sol',\r\n  'contracts/beacon/N2MUpgradeable.sol',\r\n  'contracts/interfaces/IN2M_ERCBase.sol',\r\n  'contracts/interfaces/IN2M_ERCCommon.sol',\r\n  'contracts/interfaces/IN2M_ERCLibrary.sol',\r\n  'contracts/interfaces/IN2M_ERCStorage.sol',\r\n  'contracts/interfaces/IN2MBeaconFactory.sol',\r\n  'contracts/interfaces/IN2MCrossFactory.sol',\r\n  'contracts/interfaces/IN2MERC1155.sol',\r\n  'contracts/interfaces/IN2MERC721.sol',\r\n  'contracts/interfaces/IOperatorFilterRegistry.sol',\r\n  'contracts/interfaces/IReverseRegistrar.sol',\r\n  'contracts/N2MERC1155.sol',\r\n  'contracts/ownable/NFTOwnableUpgradeable.sol',\r\n  'contracts/TextUtils.sol'\r\n]\r\n```\r\n\r\n</details>\r\n\r\n<details>\r\n<summary> Also leaving the JS script I used to check the differences of the keys of `.sources` in the JSON inputs </summary>\r\n\r\nUsage:\r\n`node checkFileKeysDifferences.js solcInput-1.json solcInput-2.json`\r\n\r\n```js\r\nconst fs = require(\"fs\");\r\n\r\nfunction findKeyDifferences(file1, file2) {\r\n  const json1 = JSON.parse(fs.readFileSync(file1, \"utf8\"));\r\n  const json2 = JSON.parse(fs.readFileSync(file2, \"utf8\"));\r\n\r\n  const sources1 = new Set(Object.keys(json1.sources) || []);\r\n  const sources2 = new Set(Object.keys(json2.sources) || []);\r\n\r\n  const keysOnlyInFile1 = Array.from(sources1).filter(\r\n    (key) => !sources2.has(key)\r\n  );\r\n  const keysOnlyInFile2 = Array.from(sources2).filter(\r\n    (key) => !sources1.has(key)\r\n  );\r\n\r\n  return {\r\n    keysOnlyInFile1,\r\n    keysOnlyInFile2,\r\n  };\r\n}\r\n\r\n// Retrieve file paths from command-line arguments\r\nconst [file1Path, file2Path] = process.argv.slice(2);\r\n\r\nif (!file1Path || !file2Path) {\r\n  console.log(\"Please provide two file paths as command-line arguments.\");\r\n  process.exit(1);\r\n}\r\n\r\nconst { keysOnlyInFile1, keysOnlyInFile2 } = findKeyDifferences(\r\n  file1Path,\r\n  file2Path\r\n);\r\n\r\nconsole.log(\"Keys only in file 1:\", keysOnlyInFile1);\r\nconsole.log(\"Keys only in file 2:\", keysOnlyInFile2);\r\n```\r\n\r\n</details>\r\n\r\nTo extract the runtime bytecode:\r\n```\r\ncat N2MERC721-sourcify-input-0.8.19.json | solc --standard-json | jq '.contracts.\"contracts/N2MERC721.sol\".N2MERC721.evm.deployedBytecode.object' > N2MERC721-0.8.19-sourcify-runtime-bytecode-from-solc.txt\r\n```\r\n\r\n### My Bytecode outputs\r\n[N2MERC721-0.8.21-sourcify-runtime-bytecode.txt](https://github.com/ethereum/solidity/files/12345499/N2MERC721-0.8.21-sourcify-runtime-bytecode.txt)\r\n[N2MERC721-0.8.21-hardhat-runtime-bytecode.txt](https://github.com/ethereum/solidity/files/12345501/N2MERC721-0.8.21-hardhat-runtime-bytecode.txt)\r\n[N2MERC721-0.8.19-sourcify-runtime-bytecode.txt](https://github.com/ethereum/solidity/files/12345502/N2MERC721-0.8.19-sourcify-runtime-bytecode.txt)\r\n[N2MERC721-0.8.19-hardhat-runtime-bytecode.txt](https://github.com/ethereum/solidity/files/12345503/N2MERC721-0.8.19-hardhat-runtime-bytecode.txt)\r\n\r\nTo check the diff:\r\n```\r\ngit diff --word-diff --word-diff-regex=. N2MERC721-0.8.19-hardhat-runtime-bytecode.txt N2MERC721-0.8.19-sourcify-runtime-bytecode.txt\r\n```\r\n\r\nWill give you a diff like this:\r\n<img width=\"1045\" alt=\"image\" src=\"https://github.com/ethereum/solidity/assets/13069972/930e94dd-33e4-4146-94fe-19f730539948\">\r\n\r\n## Environment\r\n\r\n- Compiler version: `0.8.19` and `0.8.21` (both Emscripten and Darwin.appleclang)  \r\n- Target EVM version (as per compiler settings): `paris` and `shanghai`\r\n- Framework/IDE (e.g. Truffle or Remix): none\r\n- EVM execution environment / backend / blockchain client:\r\n- Operating system: MacOS\r\n\r\n\r\nAgain, one particular thing that got my attention was that the metadata hashes were identical in all cases. This leaves me thinking if this is similar to the 1. case I mentioned.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14494/reactions",
     "total_count": 0,
@@ -172,7 +191,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14494/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -867,13 +886,13 @@
     "body": "I debugged this yesterday and found the problem - the direct cause of the disappearance of the `var_mid` variable in @ekpyron's snippet is the fact that `CommonSubexpressionEliminator` chooses a different replacement expression. This in turn is caused by a bug in `DataFlowAnalyzer`.\r\n\r\nHere's the analysis I posted on the channel:\r\n\r\n> The reason that CSE chooses a different variable is that in one case `DataFlowAnalyzer` loses knowledge about the value of that variable and in the other that knowledge is present. Without that knowledge it won't substitute that variable in expressions. It instead moves on to choose another candidate.\r\n>\r\n> The bug is in [the variable clearing loop in `DataFlowAnalyzer::clearValues()`](https://github.com/ethereum/solidity/blob/v0.8.21/libyul/optimiser/CommonSubexpressionEliminator.cpp#L122-L126). The loop iterates over a set while adding new items to it, which probably results in some items being skipped and not cleared (if they happen to sort before the element we're currently at). Which elements are skipped depends on how they sort and that depends on variable names. In this case it's actually not just different AST IDs but a variable having an ID in one case and not having it in another: `var_low` vs `var_low_7623`. I suspect that just a different number would not cause this on their own because the IDs would still retain their order relative to each other.\r\n>\r\n> Fixing the loop makes the variable stay in the generated IR. I haven't compared bytecode yet, but I'm convinced that this is the root cause.\r\n>\r\n> The funny thing is that this bug is something that I already noticed a few months ago, while reviewing @nikola-matic's changes to the `DataFlowAnalyser` PR that's still pending: https://github.com/ethereum/solidity/pull/14112#discussion\\_r1207017088. It looked fishy and broken, but not _that_ serious. I did not even realize that it could have such deep consequences.\r\n\r\nToday I prepared a proper fix for it (#14574) and verified that it really works. I also created a smaller repro to include as a regression test. At first I tried from Solidity level but it was too hard because the bug requires naming differences to be triggered and these differences are caused by the AST ID differences. It would probably have to be based on that multi-file repro I posted above. In the and I gave up and instead trimmed down the unoptimized Yul output. That reproduces the problem when passed through `solc --strict-assembly --optimize`.\r\n\r\nCombined with @r0qs's fix, this now compiles the Standard JSON input from the description without bytecode differences",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1731847433/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 0,
+      "heart": 1,
       "rocket": 0,
       "eyes": 0
     },
