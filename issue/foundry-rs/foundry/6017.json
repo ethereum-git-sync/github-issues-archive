@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6017",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6017/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6017/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6017/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6017",
+  "id": 1933699233,
+  "node_id": "I_kwDOGBlvNc5zQeih",
+  "number": 6017,
+  "title": "Memory Consumption Steadily Increases during Prolonged Transaction Replays",
+  "user": {
+    "login": "mshakeg",
+    "id": 40227090,
+    "node_id": "MDQ6VXNlcjQwMjI3MDkw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/40227090?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mshakeg",
+    "html_url": "https://github.com/mshakeg",
+    "followers_url": "https://api.github.com/users/mshakeg/followers",
+    "following_url": "https://api.github.com/users/mshakeg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mshakeg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mshakeg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mshakeg/subscriptions",
+    "organizations_url": "https://api.github.com/users/mshakeg/orgs",
+    "repos_url": "https://api.github.com/users/mshakeg/repos",
+    "events_url": "https://api.github.com/users/mshakeg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mshakeg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-09T19:56:25Z",
+  "updated_at": "2023-10-09T20:33:53Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nAnvil\r\n\r\n### Describe the feature you would like\r\n\r\n**Description**\r\n\r\nI've been utilizing Anvil `0.2.0` (5be158b 2023-10-02T00:23:45.472182000Z) as a local Ethereum node for a Uniswap V3 backtester project. The backtester replays all transactions for a specific Uniswap V3 Pool. However, I've noticed a consistent and steady increase in memory usage over time as more transactions are replayed, even with the `--prune-history` flag enabled. Below is the exact command I'm using to start the anvil node:\r\n\r\n```shell\r\nanvil --prune-history --timestamp 1619820000 --order fifo --code-size-limit 4294967296 -m \"test test test test test test test test test test test junk\" --gas-limit 100000000000 --gas-price 0 --base-fee 0\r\n```\r\n\r\n**Observations**\r\n\r\n1. The memory consumption increases steadily with the replaying of transactions.\r\n2. When replaying transactions for backtesting, I first set the block's timestamp using `evm_setNextBlockTimestamp` and then utilize `evm_mine` to mine the block.\r\n3. After around 10 minutes of running, the Docker stats indicate that Anvil has consumed around 9.247GiB of memory:\r\n\r\n```\r\nde526102010a   web3-backtester-anvil-1-1        98.78%    9.247GiB / 62.01GiB   14.91%    12.3MB / 15.6MB   4.77MB / 0B       11\r\n```\r\n\r\n4. I'm only deploying contracts at the very start and the rest(and vast majority) of the runtime is spent replaying transactions for the backtest.\r\n\r\n**Expected Behavior**\r\n\r\nStable memory consumption or a slower, more controlled growth in memory usage over time when replaying transactions.\r\n\r\n**Possible Solutions**\r\n\r\nWhile I'm not certain about the root cause, I'd appreciate if the team could investigate:\r\n\r\n1. Whether transaction replays might be causing memory leaks or if there are specific internal data structures growing unbounded.\r\n2. If the `--prune-history` flag could be further optimized or if there's a possibility of introducing additional pruning or memory management features.\r\n\r\n### Additional context\r\n\r\n**Environment Details**\r\n\r\n- Anvil Version: `0.2.0`\r\n- Host: EC2 instance (8 vCPU, 64 GB RAM)\r\n- Docker container",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6017/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6017/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
