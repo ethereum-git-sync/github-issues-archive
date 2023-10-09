@@ -110,7 +110,7 @@
     "node_id": "MI_kwDOD5KrTM4AlzRG",
     "number": 77,
     "title": "0.15.5 - Stabilizing release",
-    "description": "A point milestone where we focus 100% on bug fixing, stabilisation and finishing any unfinished items from 0.15  \r\n\r\nZero new messaging and community features.\r\n\r\n--- Wallet ---\r\n\r\n- Community Asset and NFT designs for Asset screens\r\n- Community token visibility\r\n- Minor updates to Asset screens",
+    "description": "A point milestone where we focus 100% on bug fixing, stabilisation, reliability and finishing any unfinished items from 0.15  \r\n\r\n**1.**  Reduce size of community description metadata\r\n- better compressions, less duplication\r\n\r\n**2.** Use data sync layer (or other mechanism) to improve community description reliability\r\n- Every time a new user joins the community, the Control Node updates and signs the description.\r\n- Random back off to stop it being too chatty \r\n\r\n--- Wallet ---\r\n\r\n- Database re-encryption flows\r\n- Community Asset and NFT designs for Asset screens\r\n- Community token visibility\r\n- Minor updates to Asset screens",
     "creator": {
       "login": "John-44",
       "id": 22846356,
@@ -131,21 +131,21 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 57,
-    "closed_issues": 9,
+    "open_issues": 96,
+    "closed_issues": 5,
     "state": "open",
     "created_at": "2023-09-11T16:40:59Z",
-    "updated_at": "2023-10-02T17:41:29Z",
+    "updated_at": "2023-10-09T12:24:02Z",
     "due_on": "2023-12-07T08:00:00Z",
     "closed_at": null
   },
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-09-29T12:15:11Z",
-  "updated_at": "2023-10-02T14:48:09Z",
+  "updated_at": "2023-10-09T11:11:34Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "# Wallet Connect v2\r\n\r\n## Prototype\r\n\r\n- [ ] Integrate web SDK in WebView\r\n- [ ] Communicate externally to forward actions and propagate events to/from the wallet\r\n\r\n## Implementation\r\n\r\nOptions\r\n\r\n- WebView + Web SDK\r\n  - not sure if it is properly supported on all platforms without relaying on the heavy Qt WebEngine\r\n- Cross-platform library\r\n  - It looks like there is no option. There is a [rust SDK](https://github.com/WalletConnect/WalletConnectRust/tree/main) in the work, but no guarantee it will be usable for cross-compilation\r\n\r\n## Info\r\n\r\nWeb3Wallet SDK ([web3wallet](https://github.com/WalletConnect/walletconnect-monorepo/tree/v2.0/packages/web3wallet))\r\n\r\n- Web\r\n- iOS (Swift)\r\n- Flutter\r\n- React Native\r\n- C#\r\n\r\nThe client SDKs are supported in the \"Web3Modal SDK\"\r\n\r\n- React + wagmi (react hooks for ethereum)\r\n- Vue + wagmi\r\n- HTML + wagmi\r\n- Flutter\r\n- Android\r\n\r\n## User Flow\r\n\r\n[Overview](https://specs.walletconnect.com/2.0/specs/clients/sign/session-proposal)\r\n\r\nIntegration steps\r\n\r\n```mermaid\r\nsequenceDiagram\r\n  participant dApp\r\n  participant WalletConnect\r\n  participant StatusWallet\r\n\r\n  dApp->>WalletConnect: Request Connection\r\n  WalletConnect->>StatusWallet: Show QR Code / Deep Link\r\n  StatusWallet->>WalletConnect: Scan QR Code / Follow Deep Link\r\n  WalletConnect->>dApp: Confirm Connection\r\n\r\n  dApp->>WalletConnect: Send Transaction Request\r\n  WalletConnect->>StatusWallet: Push Notification (Approve/Reject)\r\n  StatusWallet->>WalletConnect: Approve Transaction\r\n  WalletConnect->>dApp: Confirm Transaction\r\n```\r\n\r\nUX steps\r\n\r\n1. App displays qrcode or **deep link** to connect wallet\r\n2. User scans qrcode or **redirects to wallet**\r\n3. User approves session proposal from App\r\n4. User returns to app after success prompt\r\n5. App receives accounts and namespaces from Wallet\r\n6. App sends request to sign transaction or message\r\n7. User redirects to wallet to inspect request\r\n8. User approves transaction or message request\r\n9. User returns to app after success prompt\r\n10. App receives transaction confirmation or signature\r\n\r\n## APIS\r\n\r\nSign - establishes a session between a dapp and a wallet in order to expose a set of blockchain accounts that can sign transactions\r\n\r\nAuth - simple and lean interface to enable applications to authenticate wallet users to login/signin into applications with their wallets by automatically signing an authentication message.\r\n\r\nVerify - allows wallets to notify end-users when they may be connecting to a suspicious or malicious domain, helping to prevent phishing attacks across the industry.",
+  "body": "# Wallet Connect v2\r\n\r\n## Prototype\r\n\r\n- [x] Integrate web SDK in WebView\r\n- [ ] Communicate externally to forward actions and propagate events to/from the wallet\r\n  - [x] offline (no web server) was demonstrated using `WebView.runJavaScript` and a `Timer` for a pooling behaviour.\r\n  - [ ] webserver might provide a simpler reactive alternative but with higher risk of exposing a webserver with a specific port to the environment\r\n\r\n## Implementation\r\n\r\nOptions\r\n\r\n- WebView + Web SDK\r\n  - not sure if it is properly supported on all platforms without relaying on the heavy Qt WebEngine\r\n- Cross-platform library\r\n  - It looks like there is no option. There is a [rust SDK](https://github.com/WalletConnect/WalletConnectRust/tree/main) in the work, but no guarantee it will be usable for cross-compilation\r\n\r\n## Info\r\n\r\nWeb3Wallet SDK ([web3wallet](https://github.com/WalletConnect/walletconnect-monorepo/tree/v2.0/packages/web3wallet))\r\n\r\n- Web\r\n- iOS (Swift)\r\n- Flutter\r\n- React Native\r\n- C#\r\n\r\nThe client SDKs are supported in the \"Web3Modal SDK\"\r\n\r\n- React + wagmi (react hooks for ethereum)\r\n- Vue + wagmi\r\n- HTML + wagmi\r\n- Flutter\r\n- Android\r\n\r\n## User Flow\r\n\r\n[Overview](https://specs.walletconnect.com/2.0/specs/clients/sign/session-proposal)\r\n\r\nIntegration steps\r\n\r\n```mermaid\r\nsequenceDiagram\r\n  participant dApp\r\n  participant WalletConnect\r\n  participant StatusWallet\r\n\r\n  dApp->>WalletConnect: Request Connection\r\n  WalletConnect->>StatusWallet: Show QR Code / Deep Link\r\n  StatusWallet->>WalletConnect: Scan QR Code / Follow Deep Link\r\n  WalletConnect->>dApp: Confirm Connection\r\n\r\n  dApp->>WalletConnect: Send Transaction Request\r\n  WalletConnect->>StatusWallet: Push Notification (Approve/Reject)\r\n  StatusWallet->>WalletConnect: Approve Transaction\r\n  WalletConnect->>dApp: Confirm Transaction\r\n```\r\n\r\nUX steps\r\n\r\n1. App displays qrcode or **deep link** to connect wallet\r\n2. User scans qrcode or **redirects to wallet**\r\n3. User approves session proposal from App\r\n4. User returns to app after success prompt\r\n5. App receives accounts and namespaces from Wallet\r\n6. App sends request to sign transaction or message\r\n7. User redirects to wallet to inspect request\r\n8. User approves transaction or message request\r\n9. User returns to app after success prompt\r\n10. App receives transaction confirmation or signature\r\n\r\n## APIS\r\n\r\nSign - establishes a session between a dapp and a wallet in order to expose a set of blockchain accounts that can sign transactions\r\n\r\nAuth - simple and lean interface to enable applications to authenticate wallet users to login/signin into applications with their wallets by automatically signing an authentication message.\r\n\r\nVerify - allows wallets to notify end-users when they may be connecting to a suspicious or malicious domain, helping to prevent phishing attacks across the industry.",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/12301/reactions",
@@ -164,5 +164,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1752788596",
+    "html_url": "https://github.com/status-im/status-desktop/issues/12301#issuecomment-1752788596",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/12301",
+    "id": 1752788596,
+    "node_id": "IC_kwDOD5KrTM5oeW50",
+    "user": {
+      "login": "stefandunca",
+      "id": 47554641,
+      "node_id": "MDQ6VXNlcjQ3NTU0NjQx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47554641?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stefandunca",
+      "html_url": "https://github.com/stefandunca",
+      "followers_url": "https://api.github.com/users/stefandunca/followers",
+      "following_url": "https://api.github.com/users/stefandunca/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stefandunca/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stefandunca/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stefandunca/subscriptions",
+      "organizations_url": "https://api.github.com/users/stefandunca/orgs",
+      "repos_url": "https://api.github.com/users/stefandunca/repos",
+      "events_url": "https://api.github.com/users/stefandunca/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stefandunca/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-09T10:57:56Z",
+    "updated_at": "2023-10-09T10:58:52Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Following my Wallet Connect integration and QML prototype, here are my latest findings and understanding:\r\n\r\n- The closest option for desktop is to use the **Web Wallet SDK** via QML's *WebView*\r\n  - Alternatively, a closer-to-native experience can be achieved by integrating a `NodeJS` library in the app and executing the web SDK internally. However, the complexity, risks and maintenance burden are too high and not worth given that Mobile has react-native SDKs\r\n- The major limitation is that the integrated web view has to be visible to process Wallet Connect events, which can be done in one of two ways\r\n  - **QML UX**: embed and \"hide\" the `WebView` in the WalletConnect modal popup by filling it with background\r\n    - This allows us to provide a **Status themed** wallet-connect integration\r\n    - This can have side effects (an HTML error might appear in some corner cases in the web view)\r\n    - Mixing WebView (web controls) with QML controls is not possible so the web view will be posted at the bottom without any content and background colour matching the QML's modal\r\n    - More complexity on the wallet integration side\r\n  - **HTML UX**: Use a web browser HTML5 interface\r\n    - This limits the UX experience by providing a non-themed visual experience\r\n    - Might be easier to integrate with the SDK, allowing a lighter wallet integration\r\n    - More maintenance burden due to the HTML code\r\n- Other limitations:\r\n  - Could not make the \"offline\" bundle work to load from disk; providing an in-process web server might be necessary or load the wallet connect from the online servers\r\n  - Will require another build step (could be made)\r\n\r\nSome more background:\r\n\r\n- The Wallet Connect doesn't provide any desktop platform native SDKs\r\n  - There is a client-side attempt in Rust, but it is not production-ready, and no wallet integration support",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1752788596/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
