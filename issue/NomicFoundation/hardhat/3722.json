@@ -40,13 +40,13 @@
       "description": "Something isn't working"
     },
     {
-      "id": 4937720577,
-      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
-      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
-      "name": "status:ready",
+      "id": 4937119027,
+      "node_id": "LA_kwDOB7jojM8AAAABJkZ1Mw",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:triaging",
+      "name": "status:triaging",
       "color": "0E8A16",
       "default": false,
-      "description": "This issue is ready to be worked on"
+      "description": ""
     },
     {
       "id": 5666138810,
@@ -65,9 +65,9 @@
 
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 8,
   "created_at": "2023-02-27T19:43:38Z",
-  "updated_at": "2023-10-04T00:30:44Z",
+  "updated_at": "2023-10-10T18:34:59Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -386,6 +386,50 @@
     "body": "> I created a reproduction example [here](https://github.com/fvictorio/hardhat-parallel-compilations-bug). It doesn't really produces the same error as the one reported by OP, but assuming the underlying cause is the same, it should be enough.\r\n> \r\n> @HenryNguyen5 I tried your PR in that repository and it didn't really fix the problem. This makes sense because, while you added a mutex, that is local to the process. The problem here is that multiple hardhat compile processes are executed at the same time.\r\n> \r\n> Edit: better reproduction repository here -> [robercano/hardhat-concurrency-issue](https://github.com/robercano/hardhat-concurrency-issue)\r\n\r\nCould you explain to me why this portion of the code had a `getConcurrencySafeDownloader` call in the first place then? It led me to believe this is where concurrent operations happen regarding multiple hardhat compilers being downloaded. Running the PR branch against our repository `smartcontractkit/chainlink` fixes the issue of multiple compiler downloads, leading to the PR checks passing.\r\n\r\nI think your reproduction repository is exposing a different concurrency bug. The one I was running into was that a _single_ invocation of `hardhat` compile with _multiple_ supported versions would cause a race cond. The reproduction repo assumes that `hardhat compile` is called multiple times, so that each process is unaware of each other.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1745926768/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1756007424",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/3722#issuecomment-1756007424",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3722",
+    "id": 1756007424,
+    "node_id": "IC_kwDOB7jojM5oqowA",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-10T18:34:49Z",
+    "updated_at": "2023-10-10T18:34:49Z",
+    "author_association": "MEMBER",
+    "body": "> I think your reproduction repository is exposing a different concurrency bug. The one I was running into was that a single invocation of hardhat compile with multiple supported versions would cause a race cond. The reproduction repo assumes that hardhat compile is called multiple times, so that each process is unaware of each other.\r\n\r\nAh, my bad. We might need to re-visit this then to see if there are actually two problems here.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1756007424/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
