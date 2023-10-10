@@ -49,21 +49,40 @@
       "description": "Performance issue and ideas to improve performance."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2021-07-22T22:32:01Z",
-  "updated_at": "2021-10-14T12:36:02Z",
-  "closed_at": null,
+  "updated_at": "2023-10-10T16:34:22Z",
+  "closed_at": "2023-10-10T16:34:21Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "<!--\r\nNOTE:\r\n- General questions should go to the discord chat instead of the issue tracker.\r\n-->\r\n\r\n**What is your question?**\r\n\r\nWith https://github.com/ChainSafe/lodestar/pull/2876 I've been able to check that most of the attestations and aggregates in the queue point to the same target (in good network conditions).\r\n\r\nOur validation function is split into three sections: pre state, post state, and signature verification. If we could group attestations by target we could run the validation \"once\" for a group of attestations which may be good for performance and reduce load on the event loop with less promises. This is just an idea and may not improve performance, but it may be worth it if https://github.com/ChainSafe/lodestar/pull/2801 fails to deliver the expected performance gains.\r\n\r\nIt is possible to efficiently extract the target checkpoint from an uncompressed attestation or aggregates bytes, like how we do with blocks to read their slot.\r\n\r\n```ts\r\nconst targetCheckpointOffset =\r\n  4 + // SignedAggregateAndProof.message offset\r\n  96 + // SignedAggregateAndProof.signature\r\n  8 + // AggregateAndProof.aggregator_index\r\n  4 + // AggregateAndProof.aggregate offset\r\n  96 + // AggregateAndProof.selection_proof\r\n  4 + // Attestation.aggregation_bits offset\r\n  8 + // AttestationData.slot\r\n  8 + // AttestationData.index\r\n  32 + // AttestationData.beacon_block_root\r\n  8 + // AttestationData.source.epoch\r\n  32; // AttestationData.source.root\r\n\r\n// 0x64000000\r\n//   984572953cce4590f22b96ca08a80f0c15f46f5f8d26323f37e567e29d6869e8adcb8f0da223b5cd30cef0cf1a86cb9b02eb5b53705094ccce4d9100f292286d7322918e4bc80430251e83b6324aaddb2a3e75338d26053bbff9e0185ea07d5a\r\n//   2ae0010000000000\r\n//   6c000000\r\n//   94b839db17d09c3474a74497f6bf5315cb4b7806ae1b1c87b817dc413efd60e6d870722e6d6b24dcccb3f2b5165f82070c96f1ed5b927da447fdb5c6577deabf7cc818eaf714087cdc067999ff1f1546b61b1de0bbc03a9fe177761c11fc7cba\r\n//   e4000000\r\n//   829e190000000000\r\n//   1600000000000000\r\n//   2eb9af4323a8b996e5b2c990e712d94f2e5c11a454e5c064c908305f77ce67ca\r\n//   f3cc000000000000\r\n//   bc05b20fd366e57d42a899178727b50fc3f17130ea55042a89308da562ab9239\r\n//   f4cc000000000000\r\n//   aa4ec5eb76d15c1e9531b03648afb5f34d0679c8c65b3b0f4c7849a79acd193f\r\n//   ab8ac7f1c90074bd2706cd89bcead9088c15fc7f64f195c14b3d5321c1d2384199c5ccdb9ab2b680306d2649b40df4aa14389c00094a54181299d0472cb3e86dc76f2c7ac7a220e0ffc54725deea489051d2e6bb1a1e34c0cbbcf3ad6bb4b6ff\r\n//   ffffffffffffffffffffffffffffffff03\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "wemeetagain",
+    "id": 1348242,
+    "node_id": "MDQ6VXNlcjEzNDgyNDI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1348242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wemeetagain",
+    "html_url": "https://github.com/wemeetagain",
+    "followers_url": "https://api.github.com/users/wemeetagain/followers",
+    "following_url": "https://api.github.com/users/wemeetagain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wemeetagain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wemeetagain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wemeetagain/subscriptions",
+    "organizations_url": "https://api.github.com/users/wemeetagain/orgs",
+    "repos_url": "https://api.github.com/users/wemeetagain/repos",
+    "events_url": "https://api.github.com/users/wemeetagain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wemeetagain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/2877/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/2877/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -113,6 +132,50 @@
     "body": "This issue has been automatically marked as stale because it has not had recent activity. It will be closed in 15 days if no further activity occurs. Thank you for your contributions.\n",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/941122494/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1755806018",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/2877#issuecomment-1755806018",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/2877",
+    "id": 1755806018,
+    "node_id": "IC_kwDOCD5_Gc5op3lC",
+    "user": {
+      "login": "wemeetagain",
+      "id": 1348242,
+      "node_id": "MDQ6VXNlcjEzNDgyNDI=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1348242?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wemeetagain",
+      "html_url": "https://github.com/wemeetagain",
+      "followers_url": "https://api.github.com/users/wemeetagain/followers",
+      "following_url": "https://api.github.com/users/wemeetagain/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wemeetagain/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wemeetagain/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wemeetagain/subscriptions",
+      "organizations_url": "https://api.github.com/users/wemeetagain/orgs",
+      "repos_url": "https://api.github.com/users/wemeetagain/repos",
+      "events_url": "https://api.github.com/users/wemeetagain/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wemeetagain/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-10T16:34:22Z",
+    "updated_at": "2023-10-10T16:34:22Z",
+    "author_association": "MEMBER",
+    "body": "resolved by https://github.com/ChainSafe/lodestar/pull/5896",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1755806018/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
