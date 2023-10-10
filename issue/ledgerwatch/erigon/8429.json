@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8429",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8429/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8429/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8429/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8429",
+  "id": 1935348606,
+  "node_id": "I_kwDOC0FsAM5zWxN-",
+  "number": 8429,
+  "title": "Invalid memory address or nil pointer dereference ",
+  "user": {
+    "login": "damianlluch",
+    "id": 1463804,
+    "node_id": "MDQ6VXNlcjE0NjM4MDQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1463804?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/damianlluch",
+    "html_url": "https://github.com/damianlluch",
+    "followers_url": "https://api.github.com/users/damianlluch/followers",
+    "following_url": "https://api.github.com/users/damianlluch/following{/other_user}",
+    "gists_url": "https://api.github.com/users/damianlluch/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/damianlluch/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/damianlluch/subscriptions",
+    "organizations_url": "https://api.github.com/users/damianlluch/orgs",
+    "repos_url": "https://api.github.com/users/damianlluch/repos",
+    "events_url": "https://api.github.com/users/damianlluch/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/damianlluch/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-10T13:13:49Z",
+  "updated_at": "2023-10-10T13:14:06Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hi people, I've been working on this project for a few days now. I have managed to synchronize the node, and connect from curl. It has been impossible from web3.\r\nNow I'm getting this error when starting the node.\r\n\r\nSystem information\r\n\r\nErigon 2.51.0\r\n\r\nOS & Version: Linux\r\n\r\nCommand:\r\n\r\n```./build/bin/erigon --chain=mumbai --bor.heimdall=https://heimdall-api-testnet.polygon.technology --bor.milestone=true --http=true --http.addr=0.0.0.0 --http.port=8545 --http.compression=true --http.vhosts=* --http.corsdomain=* --ws=true --ws.compression=true --http.api=eth,net,trace,web3,erigon --torrent.download.rate=512mb --torrent.upload.rate=512mb```\r\n\r\nActual behaviour\r\n\r\n```\r\nINFO[10-10|12:56:57.193] [5/15 Bodies] Processing bodies...       from=40940501 to=41049390\r\nINFO[10-10|12:57:07.155] Got new milestone from heimdall          start=41049298 end=41049321 hash=0xee855a2c94287ab31200d2eb86a1ae970d11055d8bbc627066d181a1f3140ac8\r\npanic: runtime error: invalid memory address or nil pointer dereference\r\n[signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0xf3feb8]\r\n\r\ngoroutine 11621 [running]:\r\ngithub.com/ledgerwatch/erigon/core/types.(*Block).Hash(0xc027329740?)\r\n        github.com/ledgerwatch/erigon/core/types/block.go:1669 +0x38\r\ngithub.com/ledgerwatch/erigon/eth/borfinality.borVerify({0x2f3a8f0?, 0xc02504df20?}, 0xc050930310, 0x2725cd2, 0x2725ce9, {0xc02787bf42, 0x40}, 0x0)\r\n        github.com/ledgerwatch/erigon/eth/borfinality/bor_checkpoint_verifier.go:92 +0x525\r\ngithub.com/ledgerwatch/erigon/eth/borfinality.fetchWhitelistMilestone({0x2f3a8f0, 0xc02504df20}, {0x2f4cce8?, 0xc04ded3860?}, 0xc02d733e48, 0x465c2c0?)\r\n        github.com/ledgerwatch/erigon/eth/borfinality/whitelist_helpers.go:80 +0x51e\r\ngithub.com/ledgerwatch/erigon/eth/borfinality.handleMilestone({0x2f3a8f0?, 0xc02504df20?}, {0x2f4cce8?, 0xc04ded3860?}, 0xc04ecb3f50?)\r\n        github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:172 +0x85\r\ngithub.com/ledgerwatch/erigon/eth/borfinality.retryHeimdallHandler(0x2c239e8, 0xc050930310, 0xc03db790a0?, 0x46c945?, {0x2808253, 0x13})\r\n        github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:133 +0x31a\r\ngithub.com/ledgerwatch/erigon/eth/borfinality.RetryHeimdallHandler(...)\r\n        github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:100\r\ngithub.com/ledgerwatch/erigon/eth/borfinality.startMilestoneWhitelistService(0xc03e5d55c0?)\r\n        github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:76 +0x45\r\ncreated by github.com/ledgerwatch/erigon/eth/borfinality.Whitelist\r\n        github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:47 +0x265\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8429/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8429/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
