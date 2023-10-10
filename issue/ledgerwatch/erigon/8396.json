@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-10-07T00:51:47Z",
-  "updated_at": "2023-10-07T07:31:05Z",
-  "closed_at": null,
+  "updated_at": "2023-10-10T18:02:03Z",
+  "closed_at": "2023-10-10T18:02:03Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nErigon version: `./erigon --version`\r\n2.51.0\r\n\r\nOS & Version: Windows/Linux/OSX\r\nUbuntu Server 22.04.3\r\n\r\nCommit hash:\r\na0160beee4032491501d89c5347bb1c4710ee6cc\r\n\r\nErigon Command (with flags/config):\r\n```\r\n[Unit]\r\nDescription=Erigon Execution Client\r\nWants=network-online.target\r\nAfter=network-online.target\r\n\r\n[Service]\r\nUser=erigon\r\nGroup=erigon\r\n\r\nType=simple\r\nRestart=always\r\n\r\nExecStart=/usr/local/bin/erigon \\\r\n        --datadir=/var/lib/erigon \\\r\n        --port=30403 \\\r\n        --p2p.allowed-ports=30403,30404 \\\r\n        --authrpc.jwtsecret=/var/lib/ethereum-shared/jwt-backup.hex \\\r\n        --authrpc.port=8552 \\\r\n        --http.addr=10.0.0.110 \\\r\n        --http.port=8546 \\\r\n        --http.vhosts=not.telling.you.com \\\r\n        --http.api=eth,erigon,engine,net,ots \\\r\n        --http.corsdomain=* \\\r\n        --rpc.returndata.limit=1000000 \\\r\n        --torrent.download.rate=64mb \\\r\n        --maxpeers=20 \\\r\n\r\n[Install]\r\nWantedBy=multi-user.target\r\n```\r\n\r\nConcensus Layer:\r\nLighthouse v4.5.0-441fc16\r\n\r\nConcensus Layer Command (with flags/config):\r\n```\r\n[Unit]\r\nDescription=Lighthouse Beacon Node Backup\r\nWants=network-online.target\r\nAfter=network-online.target\r\n\r\n[Service]\r\nUser=lighthouse-beacon\r\nGroup=lighthouse-beacon\r\n\r\nType=simple\r\nRestart=always\r\n\r\nExecStart=/usr/local/bin/lighthouse bn \\\r\n        --datadir=/var/lib/lighthouse-beacon-backup \\\r\n        --execution-endpoint=http://127.0.0.1:8552 \\\r\n        --execution-jwt=/var/lib/ethereum-shared/jwt-backup.hex \\\r\n        --builder=http://127.0.0.1:18550 \\\r\n        --port=9100 \\\r\n        --http=true \\\r\n        --http-address=10.0.0.110 \\\r\n        --http-port=5053 \\\r\n        --http-allow-origin=https://not.telling.you.com \\\r\n        --reconstruct-historic-states=true \\\r\n        --genesis-backfill=true \\\r\n        --disable-backfill-rate-limiting=true \\\r\n\r\n[Install]\r\nWantedBy=multi-user.target\r\n```\r\n\r\nChain/Network: \r\nmainnet\r\n\r\n#### Expected behaviour\r\nerigon starts normally.\r\n\r\n#### Actual behaviour\r\nerigon crashes immediately with a panic.\r\n\r\n#### Steps to reproduce the behaviour\r\nStart erigon from a systemd service file using a system user that doesn't have a home directory.\r\nI'm speculating that this is part of the issue, due to the panic error referencing `/home/erigon` which doesn't exist.\r\n\r\n#### Backtrace\r\n\r\n````\r\nOct 07 00:19:49 nuc systemd[1]: Started Erigon Execution Client.\r\nOct 07 00:19:49 nuc erigon[578745]: panic: mkdir /home/erigon: permission denied\r\nOct 07 00:19:49 nuc erigon[578745]: goroutine 1 [running]:\r\nOct 07 00:19:49 nuc erigon[578745]: github.com/ledgerwatch/erigon-lib/common/dir.MustExist(...)\r\nOct 07 00:19:49 nuc erigon[578745]:         github.com/ledgerwatch/erigon-lib@v1.0.0/common/dir/rw_dir.go:28\r\nOct 07 00:19:49 nuc erigon[578745]: github.com/ledgerwatch/erigon-lib/common/datadir.New({0xc00079a4e0, 0x20})\r\nOct 07 00:19:49 nuc erigon[578745]:         github.com/ledgerwatch/erigon-lib@v1.0.0/common/datadir/dirs.go:74 +0x86e\r\nOct 07 00:19:49 nuc erigon[578745]: github.com/ledgerwatch/erigon/node/nodecfg.init()\r\nOct 07 00:19:49 nuc erigon[578745]:         github.com/ledgerwatch/erigon/node/nodecfg/defaults.go:43 +0x33\r\nOct 07 00:19:49 nuc systemd[1]: erigon.service: Main process exited, code=exited, status=2/INVALIDARGUMENT\r\nOct 07 00:19:49 nuc systemd[1]: erigon.service: Failed with result 'exit-code'.\r\n````\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "yperbasis",
+    "id": 34320705,
+    "node_id": "MDQ6VXNlcjM0MzIwNzA1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34320705?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yperbasis",
+    "html_url": "https://github.com/yperbasis",
+    "followers_url": "https://api.github.com/users/yperbasis/followers",
+    "following_url": "https://api.github.com/users/yperbasis/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yperbasis/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yperbasis/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yperbasis/subscriptions",
+    "organizations_url": "https://api.github.com/users/yperbasis/orgs",
+    "repos_url": "https://api.github.com/users/yperbasis/repos",
+    "events_url": "https://api.github.com/users/yperbasis/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yperbasis/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8396/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8396/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,13 +115,13 @@
     "body": "fixed by https://github.com/ledgerwatch/erigon/pull/8398",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1751636549/reactions",
-      "total_count": 0,
+      "total_count": 3,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 0,
+      "heart": 3,
       "rocket": 0,
       "eyes": 0
     },
