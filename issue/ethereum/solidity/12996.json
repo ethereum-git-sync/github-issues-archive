@@ -74,6 +74,15 @@
       "color": "18F737",
       "default": false,
       "description": "The proposal is too vague to be implemented right away"
+    },
+    {
+      "id": 4699444681,
+      "node_id": "LA_kwDOAm_5kc8AAAABGBvVyQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/stale",
+      "name": "stale",
+      "color": "BF4801",
+      "default": false,
+      "description": "The issue/PR was marked as stale because it has been open for too long."
     }
   ],
   "state": "open",
@@ -83,9 +92,9 @@
 
   ],
   "milestone": null,
-  "comments": 31,
+  "comments": 33,
   "created_at": "2022-05-10T08:08:39Z",
-  "updated_at": "2023-07-11T14:51:22Z",
+  "updated_at": "2023-10-10T12:06:15Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -93,8 +102,8 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/12996/reactions",
-    "total_count": 15,
-    "+1": 13,
+    "total_count": 14,
+    "+1": 12,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -140,8 +149,8 @@
     "body": "Just a comment on the name of the modifier: I don't like opinionated words like \"safe\" or \"protected\" because they give a false impression of safety or protection, we should find a more neutral one.\r\n\r\nAlso more generally: Also wrt. free functions, it might be a good idea to explicitly pass/provide something like a \"context\" as a parameter to functions that allows external calls (or maybe even state changes without external calls). In this case, we could have a special property on this context that allows state changes after an external call. By default, the context would transform into a \"constant state\" context after an external call - there are the linear types again.\r\n\r\nAlso something to consider more specifically to this issue: Is it OK to do another external call after the first external call? What about a delegatecall? Even if we do not use delegatecall, how do we distinguish a \"data contract\" that is associated to the current contract from a potentially malicious external contract?\r\n\r\nAfter all these questions, I'm more and more inclined that this should rather be \"off-loaded\" to user code and the compiler should instead provide the required features for the type system.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1122093106/reactions",
-      "total_count": 5,
-      "+1": 5,
+      "total_count": 6,
+      "+1": 6,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -712,8 +721,8 @@
     "body": "Adding a mutex to functions that write after external calls would not address cases where separate functions read from stale values or overwrite the same storage value. \r\n\r\nTake an example from the SAILFISH paper where adding a mutex is insufficient: \r\n```\r\ncontract Test { \r\n\tmapping(uint => uint) splits;\r\n\tmapping(uint => uint) deposits;\r\n\tmapping(uint => address payable) payee1;\r\n\tmapping(uint => address payable) payee2;\r\n\tuint lock;\r\n\tmodifier nonReentrant() {\r\n\t\tlock = 1;\r\n\t\t_;\r\n\t\tlock = 0;\r\n\t}\r\n\tfunction updateSplit(uint id, uint split) public{\r\n\t\trequire(split <= 100);\r\n\t\tsplits[id] = split;\r\n\t}\r\n\t// [Step 1]: Set split of ’a’ (id = 0) to 100(%)\r\n        // [Step 4]: Set split of ’a’ (id = 0) to 0(%)\r\n\tfunction splitFunds(uint id) public nonReentrant {\r\n\t\taddress payable a = payee1[id];\r\n\t\taddress payable b = payee2[id];\r\n\t\tuint depo = deposits[id];\r\n\t\tdeposits[id] = 0;\r\n\r\n                // [Step 2]: Transfer 100% fund to ’a’\r\n                // [Step 3]: Reenter updateSplit\r\n\t\ta.call{value:(depo * splits[id] / 100)}(\"\");\r\n                 \r\n                 // [Step 5]: Transfer 100% fund to ’b’\r\n\t\tb.transfer(depo * (100 - splits[id]) / 100);\r\n \t}\r\n}\r\n```\r\nRather than strictly identifying instances that do not follow check-effects-interact, it would make sense to look for function calls that allow for control flow to be controlled externally (as opposed to explicitly indicated like an if-else statement). I think this is clear if one examines the output of `slither Test.sol --print slithir-ssa`:\r\n```\r\nContract Test\r\n        Function Test.updateSplit(uint256,uint256)\r\n                Expression: require(bool)(split <= 100)\r\n                IRs:\r\n                        TMP_0(bool) = split_1 <= 100\r\n                        TMP_1(None) = SOLIDITY_CALL require(bool)(TMP_0)\r\n                Expression: splits[id] = split\r\n                IRs:\r\n                        REF_0(uint256) -> splits_0[id_1]\r\n                        splits_1(mapping(uint256 => uint256)) := ϕ(['splits_0'])\r\n                        REF_0 (->splits_1) := split_1(uint256)\r\n        Function Test.splitFunds(uint256)\r\n                IRs:\r\n                        splits_2(mapping(uint256 => uint256)) := ϕ(['splits_4', 'splits_1', 'splits_0'])\r\n                        deposits_1(mapping(uint256 => uint256)) := ϕ(['deposits_0', 'deposits_3'])\r\n                        payee1_1(mapping(uint256 => address)) := ϕ(['payee1_2', 'payee1_0'])\r\n                        payee2_1(mapping(uint256 => address)) := ϕ(['payee2_0', 'payee2_2'])\r\n                Expression: a = payee1[id]\r\n                IRs:\r\n                        REF_1(address) -> payee1_2[id_1]\r\n                        a_1(address) := REF_1(address)\r\n                Expression: b = payee2[id]\r\n                IRs:\r\n                        REF_2(address) -> payee2_2[id_1]\r\n                        b_1(address) := REF_2(address)\r\n                Expression: depo = deposits[id]\r\n                IRs:\r\n                        REF_3(uint256) -> deposits_2[id_1]\r\n                        depo_1(uint256) := REF_3(uint256)\r\n                Expression: deposits[id] = 0\r\n                IRs:\r\n                        REF_4(uint256) -> deposits_2[id_1]\r\n                        deposits_3(mapping(uint256 => uint256)) := ϕ(['deposits_2'])\r\n                        REF_4 (->deposits_3) := 0(uint256)\r\n                Expression: a.call{value: (depo * splits[id] / 100)}()\r\n                IRs:\r\n                        REF_6(uint256) -> splits_3[id_1]\r\n                        TMP_2(uint256) = depo_1 (c)* REF_6\r\n                        TMP_3(uint256) = TMP_2 (c)/ 100\r\n                        TUPLE_0(bool,bytes) = LOW_LEVEL_CALL, dest:a_1, function:call, arguments:[''] value:TMP_3 \r\n                        splits_4(mapping(uint256 => uint256)) := ϕ(['splits_3', 'splits_1', 'splits_4'])\r\n                Expression: b.transfer(depo * (100 - splits[id]) / 100)\r\n                IRs:\r\n                        REF_8(uint256) -> splits_4[id_1]\r\n                        TMP_4(uint256) = 100 (c)- REF_8\r\n                        TMP_5(uint256) = depo_1 (c)* TMP_4\r\n                        TMP_6(uint256) = TMP_5 (c)/ 100\r\n                        Transfer dest:b_1 value:TMP_6\r\n                Expression: nonReentrant()\r\n                IRs:\r\n                        MODIFIER_CALL, Test.nonReentrant()()\r\n```\r\nUpon examination, after `a.call` the mapping, `splits`, has a phi value, `splits_1`, that indicates the value can be updated during an external call in `updateSplit` and used to withdraw more funds than intended. This is essentially a source of \"undefined behavior\" that results from a developer not being explicit enough about the anticipated control flow. For background, Slither's SSA form creates phi variables after external calls (non STATICCALL) because it is a point where control flow merges. \r\n\r\nIf we treat reentrancy as an undefined behavior problem, I think we could find a happy medium that is not cumbersome for developers yet eliminates undefined behavior. This would encourage specification and hopefully reduce false positives/ fighting the compiler.\r\n\r\nIn order to introduce these sort of enhancements, I think it would make sense to consider the points raised in this [issue](https://github.com/ethereum/solidity/issues/13247#issuecomment-1175297584) and move towards a modular compiler design. People could opt in to passes that have more advanced analysis than the Solidity compiler and harden their code as they see fit (this is a common practice for other compiled languages). In addition, pruning infeasible paths would likely be slow and only required to run on \"release\" builds.\r\n\r\n\r\nP.S. I also like the use of TLOAD for reentrancy protection and think it would give developers less of a reason to circumvent compiler-generated protections, e.g. turning off reentrancy mitigations to reduce SLOADs. ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1187492897/reactions",
-      "total_count": 5,
-      "+1": 5,
+      "total_count": 6,
+      "+1": 6,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -1020,8 +1029,8 @@
     "body": "With ERC777 it can be the other way around see: https://twitter.com/transmissions11/status/1496944873760428058",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1201178506/reactions",
-      "total_count": 1,
-      "+1": 0,
+      "total_count": 2,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
