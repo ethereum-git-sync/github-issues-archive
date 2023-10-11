@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8441",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8441/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8441/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8441/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8441",
+  "id": 1938302899,
+  "node_id": "I_kwDOC0FsAM5ziCez",
+  "number": 8441,
+  "title": "MDBX_MAP_FULL: Environment mapsize limit reached with v2.52.0",
+  "user": {
+    "login": "crypt0m1nd3r",
+    "id": 30267905,
+    "node_id": "MDQ6VXNlcjMwMjY3OTA1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/30267905?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/crypt0m1nd3r",
+    "html_url": "https://github.com/crypt0m1nd3r",
+    "followers_url": "https://api.github.com/users/crypt0m1nd3r/followers",
+    "following_url": "https://api.github.com/users/crypt0m1nd3r/following{/other_user}",
+    "gists_url": "https://api.github.com/users/crypt0m1nd3r/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/crypt0m1nd3r/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/crypt0m1nd3r/subscriptions",
+    "organizations_url": "https://api.github.com/users/crypt0m1nd3r/orgs",
+    "repos_url": "https://api.github.com/users/crypt0m1nd3r/repos",
+    "events_url": "https://api.github.com/users/crypt0m1nd3r/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/crypt0m1nd3r/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-11T17:10:46Z",
+  "updated_at": "2023-10-11T17:10:46Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `./erigon --version`\r\n```\r\n$. /erigon --version\r\nerigon version 2.52.0\r\n```\r\n\r\nOS & Version: Windows/Linux/OSX\r\n```\r\nDebian 11.7 on ARM64\r\n```\r\n\r\n\r\nCommit hash: \r\n\r\nErigon Command (with flags/config):\r\n```\r\n --datadir=/home/erigon/.local/share/erigon \\\r\n --chain=mainnet \\\r\n --port=31303 \\\r\n --p2p.allowed-ports=31303,31304 \\\r\n --torrent.upload.rate=1mb \\\r\n --downloader.disable.ipv6 \\\r\n --metrics \\\r\n --metrics.addr=0.0.0.0 \\\r\n --metrics.port=6060 \\\r\n --prune=htc \\\r\n --prune.r.before=11052984 \\\r\n --authrpc.jwtsecret=-------\\\r\n --http \\\r\n --http.api=engine,eth,erigon,web3,net,debug,trace,txpool,db \\\r\n --ws \\\r\n --private.api.addr= \\\r\n --sentry.log-peer-info\r\n```\r\n\r\nConcensus Layer: `Lighthouse`\r\n\r\nChain/Network:  `main`\r\n\r\n\r\n#### Expected behaviour\r\nNo `MDBX_MAP_FULL` and `SIGSEV`....\r\n\r\n\r\n#### Actual behaviour\r\nA `MDBX_MAP_FULL` error\r\n\r\n#### Steps to reproduce the behaviour\r\nHappen a few hours after upgrading from v2.48.2 to v2.52.0 .\r\n\r\n#### Backtrace\r\n\r\n````\r\nOct 11 09:39:49 x-host-x erigon[31329]: [INFO] [10-11|09:39:49.900] [snapshots] Dumping txs                  block num=17257994 alloc=4.7GB sys=7.8GB\r\nOct 11 09:40:08 x-host-x erigon[31329]: [INFO] [10-11|09:40:08.744] [snapshots] Dumping txs                  block num=17258780 alloc=3.7GB sys=7.8GB\r\nOct 11 09:40:16 x-host-x erigon[31329]: [INFO] [10-11|09:40:16.479] [] ETL [2/2] Loading                     into=PlainState current_prefix=822cd0ce\r\nOct 11 09:40:23 x-host-x erigon[31329]: [EROR] [10-11|09:40:23.216] [txpool] flush is local history          err=\"mdbx_cursor_del: MDBX_MAP_FULL: Environment mapsize limit reached\"\r\nOct 11 09:40:28 x-host-x erigon[31329]: [INFO] [10-11|09:40:28.751] [snapshots] Dumping txs                  block num=17259813 alloc=4.3GB sys=7.8GB\r\nOct 11 09:40:38 x-host-x erigon[31329]: panic: runtime error: invalid memory address or nil pointer dereference\r\nOct 11 09:40:38 x-host-x erigon[31329]: [signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x15012c0]\r\nOct 11 09:40:38 x-host-x erigon[31329]: goroutine 2475 [running]:\r\nOct 11 09:40:38 x-host-x erigon[31329]: github.com/ledgerwatch/erigon-lib/txpool.(*TxPool).flushLocked(0x4000f7cd80, {0x2c9d5b8?, 0x405c0ee3c0})\r\nOct 11 09:40:38 x-host-x erigon[31329]:         github.com/ledgerwatch/erigon-lib@v1.0.0/txpool/pool.go:1769 +0x70\r\nOct 11 09:40:38 x-host-x erigon[31329]: github.com/ledgerwatch/erigon-lib/txpool.(*TxPool).flushNoFsync.func1({0x2c9d5b8?, 0x405c0ee3c0})\r\nOct 11 09:40:38 x-host-x erigon[31329]:         github.com/ledgerwatch/erigon-lib@v1.0.0/txpool/pool.go:1737 +0x48\r\nOct 11 09:40:38 x-host-x erigon[31329]: github.com/ledgerwatch/erigon-lib/kv/mdbx.(*MdbxKV).UpdateNosync(0x4083637e50?, {0x2c70538?, 0x4000fba0f0?}, 0x405a388580)\r\nOct 11 09:40:38 x-host-x erigon[31329]:         github.com/ledgerwatch/erigon-lib@v1.0.0/kv/mdbx/kv_mdbx.go:657 +0x88\r\nOct 11 09:40:38 x-host-x erigon[31329]: github.com/ledgerwatch/erigon-lib/txpool.(*TxPool).flushNoFsync(0x4000f7cd80, {0x2c70538, 0x4000fba0f0}, {0x2c82958, 0x4099e272b0})\r\nOct 11 09:40:38 x-host-x erigon[31329]:         github.com/ledgerwatch/erigon-lib@v1.0.0/txpool/pool.go:1736 +0x16c\r\nOct 11 09:40:38 x-host-x erigon[31329]: github.com/ledgerwatch/erigon-lib/txpool.(*TxPool).flush(0x4005fb9ed8?, {0x2c70538, 0x4000fba0f0}, {0x2c82958?, 0x4099e272b0?})\r\nOct 11 09:40:38 x-host-x erigon[31329]:         github.com/ledgerwatch/erigon-lib@v1.0.0/txpool/pool.go:1756 +0xac\r\nOct 11 09:40:38 x-host-x erigon[31329]: github.com/ledgerwatch/erigon-lib/txpool.MainLoop({0x2c70538?, 0x4000fba0f0}, {0x2c82958, 0x4099e272b0}, {0x0?, 0x493198?}, 0x4000f7cd80, 0x40436ea360, 0x408dc94d70, 0x4083674018, ...)\r\nOct 11 09:40:38 x-host-x erigon[31329]:         github.com/ledgerwatch/erigon-lib@v1.0.0/txpool/pool.go:1623 +0x24c\r\nOct 11 09:40:38 x-host-x erigon[31329]: created by github.com/ledgerwatch/erigon/eth.New\r\nOct 11 09:40:38 x-host-x erigon[31329]:         github.com/ledgerwatch/erigon/eth/backend.go:681 +0x3350\r\nOct 11 09:40:40 x-host-x systemd[1]: erigon.service: Main process exited, code=exited, status=2/INVALIDARGUMENT\r\nOct 11 09:40:40 x-host-x systemd[1]: erigon.service: Failed with result 'exit-code'.\r\nOct 11 09:40:40 x-host-x systemd[1]: erigon.service: Consumed 4h 58min 29.384s CPU time.\r\nOct 11 09:40:43 x-host-x systemd[1]: erigon.service: Scheduled restart job, restart counter is at 1.\r\nOct 11 09:40:43 x-host-x systemd[1]: Stopped Erigon Execution Layer Client service (Ethereum MainNet).\r\nOct 11 09:40:43 x-host-x systemd[1]: erigon.service: Consumed 4h 58min 29.384s CPU time.\r\nOct 11 09:40:43 x-host-x systemd[1]: Started Erigon Execution Layer Client service (Ethereum MainNet).\r\n````\r\n\r\n#### Extra Info\r\n\r\n```\r\n$ pwd && du -Sh .\r\n/home/erigon/.local/share/erigon\r\n1.2T    ./chaindata\r\n7.3G    ./temp\r\n7.5M    ./nodes/eth67\r\n13M     ./nodes/eth68\r\n4.0K    ./nodes\r\n1.1G    ./txpool\r\n4.0K    ./snapshots/domain\r\n4.0K    ./snapshots/accessor\r\n1008K   ./snapshots/db\r\n4.0K    ./snapshots/history\r\n4.0K    ./snapshots/warm\r\n4.0K    ./snapshots/idx\r\n339G    ./snapshots\r\n14M     ./downloader\r\n18M     ./logs\r\n8.0K    .\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8441/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8441/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
