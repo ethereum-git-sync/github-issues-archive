@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,22 +67,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 31,
-    "closed_issues": 45,
+    "open_issues": 19,
+    "closed_issues": 65,
     "state": "open",
     "created_at": "2022-05-17T19:52:44Z",
-    "updated_at": "2023-06-29T16:00:39Z",
+    "updated_at": "2023-10-11T13:46:47Z",
     "due_on": null,
     "closed_at": null
   },
-  "comments": 7,
+  "comments": 8,
   "created_at": "2022-08-05T05:20:49Z",
-  "updated_at": "2023-06-08T07:28:45Z",
-  "closed_at": null,
+  "updated_at": "2023-10-11T13:07:16Z",
+  "closed_at": "2023-10-11T13:07:15Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**🧐 Motivation**\r\nSave gas for a condition requirement that could never be false\r\n\r\n**📝 Details**\r\nin ERC20.sol you have requirement\r\n\r\n```\r\nrequire(owner != address(0), \"ERC20: approve from the zero address\");\r\n```\r\n\r\nhere\r\n\r\n```\r\n    function _approve(\r\n        address owner,\r\n        address spender,\r\n        uint256 amount\r\n    ) internal virtual {\r\n        require(owner != address(0), \"ERC20: approve from the zero address\");\r\n        require(spender != address(0), \"ERC20: approve to the zero address\");\r\n\r\n        _allowances[owner][spender] = amount;\r\n        emit Approval(owner, spender, amount);\r\n    }\r\n```\r\n\r\nit's used here (but owner=_msgSender)\r\n```\r\n    function approve(address spender, uint256 amount) public virtual override returns (bool) {\r\n        address owner = _msgSender();\r\n        _approve(owner, spender, amount);\r\n        return true;\r\n    }\r\n```\r\n\r\nand here (but owner=_msgSender)\r\n\r\n```\r\n    function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {\r\n        address owner = _msgSender();\r\n        _approve(owner, spender, allowance(owner, spender) + addedValue);\r\n        return true;\r\n    }\r\n```\r\n\r\nand here (but owner=_msgSender)\r\n\r\n```\r\n    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {\r\n        address owner = _msgSender();\r\n        uint256 currentAllowance = allowance(owner, spender);\r\n        require(currentAllowance >= subtractedValue, \"ERC20: decreased allowance below zero\");\r\n        unchecked {\r\n            _approve(owner, spender, currentAllowance - subtractedValue);\r\n        }\r\n\r\n        return true;\r\n    }\r\n```\r\n\r\nand here (but if you try to do transferFrom(address(0), msg.sender, 100) it will raise not enough allowance error)\r\n\r\n```\r\n    function _spendAllowance(\r\n        address owner,\r\n        address spender,\r\n        uint256 amount\r\n    ) internal virtual {\r\n        uint256 currentAllowance = allowance(owner, spender);\r\n        if (currentAllowance != type(uint256).max) {\r\n            require(currentAllowance >= amount, \"ERC20: insufficient allowance\");\r\n            unchecked {\r\n                _approve(owner, spender, currentAllowance - amount);\r\n            }\r\n        }\r\n    }\r\n```\r\n\r\nhow you can see it's not possible for this condition to be false, so you can safely remove it, or at least give motivation why this condition is in ERC20.sol\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3601/reactions",
     "total_count": 0,
@@ -97,7 +116,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3601/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -396,6 +415,50 @@
     "body": "@frangio does this needs to be worked upon?",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1582047409/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1757664624",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3601#issuecomment-1757664624",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/3601",
+    "id": 1757664624,
+    "node_id": "IC_kwDOA9tCBs5ow9Vw",
+    "user": {
+      "login": "Amxx",
+      "id": 2432299,
+      "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Amxx",
+      "html_url": "https://github.com/Amxx",
+      "followers_url": "https://api.github.com/users/Amxx/followers",
+      "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/Amxx/orgs",
+      "repos_url": "https://api.github.com/users/Amxx/repos",
+      "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Amxx/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-11T13:07:16Z",
+    "updated_at": "2023-10-11T13:07:16Z",
+    "author_association": "COLLABORATOR",
+    "body": "We decided against doing that in 5.0, for reason stated above.",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1757664624/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

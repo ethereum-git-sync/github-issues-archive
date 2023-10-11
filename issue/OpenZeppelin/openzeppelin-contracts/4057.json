@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,22 +67,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 31,
-    "closed_issues": 45,
+    "open_issues": 19,
+    "closed_issues": 65,
     "state": "open",
     "created_at": "2022-05-17T19:52:44Z",
-    "updated_at": "2023-06-29T16:00:39Z",
+    "updated_at": "2023-10-11T13:46:47Z",
     "due_on": null,
     "closed_at": null
   },
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-02-18T01:25:51Z",
-  "updated_at": "2023-02-21T14:41:26Z",
-  "closed_at": null,
+  "updated_at": "2023-10-11T13:46:47Z",
+  "closed_at": "2023-10-11T13:46:46Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "**📝 Details**\r\n\r\nCurrently, `IAccessControl` and `IAccessControlEnumerable` are kept along with their implementations. This is done to better support ERC165 without hardcoding the `interfaceId`, as follows:\r\n\r\n```solidity\r\ninterface IAccessControl { ... }\r\n\r\ncontract AccessControl is IAccessControl {\r\n  ...\r\n  \r\n  function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {\r\n    return interfaceId == type(IAccessControl).interfaceId || super.supportsInterface(interfaceId);\r\n  }\r\n  \r\n  ...\r\n}\r\n```\r\n\r\nWe've decided to not make this separation for `AccessControlAdminRules` in #4009, and hardcode the interface id value.\r\n\r\nRemoving the existing interfaces is a breaking change, but we should consider this for 5.0.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4057/reactions",
     "total_count": 0,
@@ -97,7 +116,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4057/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -220,6 +239,50 @@
     "body": "> Also the interfaces are not standard so no need to actually support interfaceId I'd say \r\n\r\nIt doesn't matter that they aren't standard, we needed a way to make it discoverable if a contract was AccessControl and we decided to use EIP-165 for that.\r\n\r\n> What is the added benefit?\r\n\r\nFewer files to maintain. Documentation in one place. \r\n\r\nIn the [docs site](https://docs.openzeppelin.com/contracts/4.x/api/access), we have both the interface and the contract, separate. There is no reason to display the docs like that, we should change it.\r\n\r\nAn alternative to removing the interfaces that gets us these benefits without the above downsides is to put the interface in the same file as the contract, without any docs and not shown in the docs site, only for the purpose of using `type().interfaceId`.\r\n\r\n```solidity\r\ninterface IAccessControl {\r\n    function hasRole(...) external returns (bool);\r\n    function grantRole(...) external;\r\n}\r\n\r\n/**\r\n * ...\r\n */\r\ncontract AccessControl {\r\n    ...\r\n}\r\n```\r\n\r\nThis option is acceptable for me too.\r\n\r\nWe can consider doing this partially in 4.9 in a backwards compatible way.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1438602862/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1757735502",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4057#issuecomment-1757735502",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4057",
+    "id": 1757735502,
+    "node_id": "IC_kwDOA9tCBs5oxOpO",
+    "user": {
+      "login": "Amxx",
+      "id": 2432299,
+      "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Amxx",
+      "html_url": "https://github.com/Amxx",
+      "followers_url": "https://api.github.com/users/Amxx/followers",
+      "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/Amxx/orgs",
+      "repos_url": "https://api.github.com/users/Amxx/repos",
+      "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Amxx/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-11T13:46:47Z",
+    "updated_at": "2023-10-11T13:46:47Z",
+    "author_association": "COLLABORATOR",
+    "body": "This was not done in 5.0. Closing.",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1757735502/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
