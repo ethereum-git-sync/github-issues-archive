@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28314",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28314/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28314/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28314/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28314",
+  "id": 1936904721,
+  "node_id": "I_kwDOAOvK985zctIR",
+  "number": 28314,
+  "title": "Is the Goerli testnet deprecated already?  I can't get Geth and Prysm to sync.",
+  "user": {
+    "login": "klestrong",
+    "id": 102823326,
+    "node_id": "U_kgDOBiD1ng",
+    "avatar_url": "https://avatars.githubusercontent.com/u/102823326?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/klestrong",
+    "html_url": "https://github.com/klestrong",
+    "followers_url": "https://api.github.com/users/klestrong/followers",
+    "following_url": "https://api.github.com/users/klestrong/following{/other_user}",
+    "gists_url": "https://api.github.com/users/klestrong/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/klestrong/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/klestrong/subscriptions",
+    "organizations_url": "https://api.github.com/users/klestrong/orgs",
+    "repos_url": "https://api.github.com/users/klestrong/repos",
+    "events_url": "https://api.github.com/users/klestrong/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/klestrong/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-11T06:15:52Z",
+  "updated_at": "2023-10-11T06:15:52Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I've been trying to get a Goerli execution and consensus running to practice staking withdrawal.  Is the Goerli testnet deprecated already?  I can't get Geth and Prysm to sync.  I keep getting the message in Geth logs, `Beacon client online, but never received consensus updates. Please ensure your beacon client is operational to follow the chain!`.  Beacon is indicating connection the localhost Geth endpoint.\r\nMy execution for Geth docker-compose is:\r\n```\r\nversion: \"3\"\r\nservices:\r\n  geth:\r\n    image: ethereum/client-go:v1.13.2\r\n    restart: unless-stopped\r\n    ports:\r\n      - \"30303:30303\"\r\n      - \"30303:30303/udp\"\r\n      - \"8545:8545\"\r\n      - \"8551:8551\"\r\n      - \"8546:8546\"\r\n    volumes:\r\n      - /mnt/goerli-pv/geth-pv:/geth\r\n      - /home/ubuntu/secret/:/var/lib/jwtsecret\r\n    stop_signal: SIGINT\r\n    stop_grace_period: 2m\r\n    command:\r\n      - --goerli\r\n      - --config\r\n      - /geth/goerli.toml\r\n      - --http\r\n      - --http.api\r\n      - \"eth,net,engine,web3\"\r\n      - --authrpc.jwtsecret\r\n      - \"/var/lib/jwtsecret/goerli-secret\"\r\n      - --authrpc.addr=0.0.0.0\r\n      - --authrpc.port=8551\r\n      - --authrpc.vhosts=*\r\n      - --http.addr=0.0.0.0\r\n      - --http.vhosts=*\r\n      - --http.corsdomain=*\r\n      - --ws\r\n      - --ws.origins=*\r\n      - --ws.addr=0.0.0.0\r\n      - --ws.api\r\n      - \"eth,net,engine,web3\"\r\n      - --graphql\r\n      - --graphql.corsdomain=*\r\n      - --graphql.vhosts=*\r\n      - --datadir\r\n      - \"/geth\"\r\n      - --syncmode=snap\r\n```\r\ngoerli.toml:\r\n```\r\n# Note: this config doesn't contain the genesis block.\r\n\r\n[Eth]\r\nNetworkId = 5\r\nSyncMode = \"full\"\r\nEthDiscoveryURLs = [\"enrtree://AKA3AM6LPBYEUDMVNU3BSVQJ5AD45Y7YPOHJLEF6W26QOE4VTUDPE@all.goerli.ethdisco.net\"]\r\nSnapDiscoveryURLs = [\"enrtree://AKA3AM6LPBYEUDMVNU3BSVQJ5AD45Y7YPOHJLEF6W26QOE4VTUDPE@all.goerli.ethdisco.net\"]\r\nNoPruning = false\r\nNoPrefetch = false\r\nTxLookupLimit = 2350000\r\nLightPeers = 100\r\nDatabaseCache = 512\r\nDatabaseFreezer = \"\"\r\nTrieCleanCache = 154\r\nTrieDirtyCache = 256\r\nTrieTimeout = 3600000000000\r\nSnapshotCache = 102\r\nPreimages = false\r\nFilterLogCacheSize = 32\r\nEnablePreimageRecording = false\r\nRPCGasCap = 50000000\r\nRPCEVMTimeout = 5000000000\r\nRPCTxFeeCap = 1e+00\r\n\r\n[Eth.Miner]\r\nGasFloor = 0\r\nGasCeil = 30000000\r\nGasPrice = 1000000000\r\nRecommit = 2000000000\r\nNewPayloadTimeout = 2000000000\r\n\r\n[Eth.TxPool]\r\nLocals = []\r\nNoLocals = false\r\nJournal = \"transactions.rlp\"\r\nRejournal = 3600000000000\r\nPriceLimit = 1\r\nPriceBump = 10\r\nAccountSlots = 16\r\nGlobalSlots = 5120\r\nAccountQueue = 64\r\nGlobalQueue = 1024\r\nLifetime = 10800000000000\r\n\r\n[Eth.BlobPool]\r\nDatadir = \"blobpool\"\r\nDatacap = 10737418240\r\nPriceBump = 100\r\n\r\n[Eth.GPO]\r\nBlocks = 20\r\nPercentile = 60\r\nMaxHeaderHistory = 1024\r\nMaxBlockHistory = 1024\r\nMaxPrice = 500000000000\r\nIgnorePrice = 2\r\n\r\n[Node]\r\nDataDir = \"/home/ubuntu/.ethereum/goerli\"\r\nIPCPath = \"geth.ipc\"\r\nHTTPHost = \"\"\r\nHTTPPort = 8545\r\nHTTPVirtualHosts = [\"localhost\"]\r\nHTTPModules = [\"net\", \"web3\", \"eth\"]\r\nAuthAddr = \"localhost\"\r\nAuthPort = 8551\r\nAuthVirtualHosts = [\"localhost\"]\r\nWSHost = \"\"\r\nWSPort = 8546\r\nWSModules = [\"net\", \"web3\", \"eth\"]\r\nGraphQLVirtualHosts = [\"localhost\"]\r\nBatchRequestLimit = 1000\r\nBatchResponseMaxSize = 25000000\r\n\r\n[Node.P2P]\r\nMaxPeers = 50\r\nNoDiscovery = false\r\nDiscoveryV4 = true\r\nBootstrapNodes = [\"enode://011f758e6552d105183b1761c5e2dea0111bc20fd5f6422bc7f91e0fabbec9a6595caf6239b37feb773dddd3f87240d99d859431891e4a642cf2a0a9e6cbb98a@51.141.78.53:30303\", \"enode://176b9417f511d05b6b2cf3e34b756cf0a7096b3094572a8f6ef4cdcb9d1f9d00683bf0f83347eebdf3b81c3521c2332086d9592802230bf528eaf606a1d9677b@13.93.54.137:30303\", \"enode://46add44b9f13965f7b9875ac6b85f016f341012d84f975377573800a863526f4da19ae2c620ec73d11591fa9510e992ecc03ad0751f53cc02f7c7ed6d55c7291@94.237.54.114:30313\", \"enode://b5948a2d3e9d486c4d75bf32713221c2bd6cf86463302339299bd227dc2e276cd5a1c7ca4f43a0e9122fe9af884efed563bd2a1fd28661f3b5f5ad7bf1de5949@18.218.250.66:30303\", \"enode://a61215641fb8714a373c80edbfa0ea8878243193f57c96eeb44d0bc019ef295abd4e044fd619bfc4c59731a73fb79afe84e9ab6da0c743ceb479cbb6d263fa91@3.11.147.67:30303\", \"enode://d4f764a48ec2a8ecf883735776fdefe0a3949eb0ca476bd7bc8d0954a9defe8fea15ae5da7d40b5d2d59ce9524a99daedadf6da6283fca492cc80b53689fb3b3@46.4.99.122:32109\", \"enode://d2b720352e8216c9efc470091aa91ddafc53e222b32780f505c817ceef69e01d5b0b0797b69db254c586f493872352f5a022b4d8479a00fc92ec55f9ad46a27e@88.99.70.182:30303\"]\r\nBootstrapNodesV5 = [\"enr:-KG4QOtcP9X1FbIMOe17QNMKqDxCpm14jcX5tiOE4_TyMrFqbmhPZHK_ZPG2Gxb1GE2xdtodOfx9-cgvNtxnRyHEmC0ghGV0aDKQ9aX9QgAAAAD__________4JpZIJ2NIJpcIQDE8KdiXNlY3AyNTZrMaEDhpehBDbZjM_L9ek699Y7vhUJ-eAdMyQW_Fil522Y0fODdGNwgiMog3VkcIIjKA\", \"enr:-KG4QDyytgmE4f7AnvW-ZaUOIi9i79qX4JwjRAiXBZCU65wOfBu-3Nb5I7b_Rmg3KCOcZM_C3y5pg7EBU5XGrcLTduQEhGV0aDKQ9aX9QgAAAAD__________4JpZIJ2NIJpcIQ2_DUbiXNlY3AyNTZrMaEDKnz_-ps3UUOfHWVYaskI5kWYO_vtYMGYCQRAR3gHDouDdGNwgiMog3VkcIIjKA\", \"enr:-Ku4QImhMc1z8yCiNJ1TyUxdcfNucje3BGwEHzodEZUan8PherEo4sF7pPHPSIB1NNuSg5fZy7qFsjmUKs2ea1Whi0EBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhBLf22SJc2VjcDI1NmsxoQOVphkDqal4QzPMksc5wnpuC3gvSC8AfbFOnZY_On34wIN1ZHCCIyg\", \"enr:-Ku4QP2xDnEtUXIjzJ_DhlCRN9SN99RYQPJL92TMlSv7U5C1YnYLjwOQHgZIUXw6c-BvRg2Yc2QsZxxoS_pPRVe0yK8Bh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhBLf22SJc2VjcDI1NmsxoQMeFF5GrS7UZpAH2Ly84aLK-TyvH-dRo0JM1i8yygH50YN1ZHCCJxA\", \"enr:-Ku4QPp9z1W4tAO8Ber_NQierYaOStqhDqQdOPY3bB3jDgkjcbk6YrEnVYIiCBbTxuar3CzS528d2iE7TdJsrL-dEKoBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhBLf22SJc2VjcDI1NmsxoQMw5fqqkw2hHC4F5HZZDPsNmPdB1Gi8JPQK7pRc9XHh-oN1ZHCCKvg\", \"enr:-IS4QLkKqDMy_ExrpOEWa59NiClemOnor-krjp4qoeZwIw2QduPC-q7Kz4u1IOWf3DDbdxqQIgC4fejavBOuUPy-HE4BgmlkgnY0gmlwhCLzAHqJc2VjcDI1NmsxoQLQSJfEAHZApkm5edTCZ_4qps_1k_ub2CxHFxi-gr2JMIN1ZHCCIyg\", \"enr:-IS4QDAyibHCzYZmIYZCjXwU9BqpotWmv2BsFlIq1V31BwDDMJPFEbox1ijT5c2Ou3kvieOKejxuaCqIcjxBjJ_3j_cBgmlkgnY0gmlwhAMaHiCJc2VjcDI1NmsxoQJIdpj_foZ02MXz4It8xKD7yUHTBx7lVFn3oeRP21KRV4N1ZHCCIyg\", \"enr:-Ku4QHqVeJ8PPICcWk1vSn_XcSkjOkNiTg6Fmii5j6vUQgvzMc9L1goFnLKgXqBJspJjIsB91LTOleFmyWWrFVATGngBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC1MD8qAAAAAP__________gmlkgnY0gmlwhAMRHkWJc2VjcDI1NmsxoQKLVXFOhp2uX6jeT0DvvDpPcU8FWMjQdR4wMuORMhpX24N1ZHCCIyg\", \"enr:-Ku4QG-2_Md3sZIAUebGYT6g0SMskIml77l6yR-M_JXc-UdNHCmHQeOiMLbylPejyJsdAPsTHJyjJB2sYGDLe0dn8uYBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC1MD8qAAAAAP__________gmlkgnY0gmlwhBLY-NyJc2VjcDI1NmsxoQORcM6e19T1T9gi7jxEZjk_sjVLGFscUNqAY9obgZaxbIN1ZHCCIyg\", \"enr:-Ku4QPn5eVhcoF1opaFEvg1b6JNFD2rqVkHQ8HApOKK61OIcIXD127bKWgAtbwI7pnxx6cDyk_nI88TrZKQaGMZj0q0Bh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC1MD8qAAAAAP__________gmlkgnY0gmlwhDayLMaJc2VjcDI1NmsxoQK2sBOLGcUb4AwuYzFuAVCaNHA-dy24UuEKkeFNgCVCsIN1ZHCCIyg\", \"enr:-Ku4QEWzdnVtXc2Q0ZVigfCGggOVB2Vc1ZCPEc6j21NIFLODSJbvNaef1g4PxhPwl_3kax86YPheFUSLXPRs98vvYsoBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC1MD8qAAAAAP__________gmlkgnY0gmlwhDZBrP2Jc2VjcDI1NmsxoQM6jr8Rb1ktLEsVcKAPa08wCsKUmvoQ8khiOl_SLozf9IN1ZHCCIyg\"]\r\nStaticNodes = []\r\nTrustedNodes = []\r\nListenAddr = \":30303\"\r\nDiscAddr = \"\"\r\nEnableMsgEvents = false\r\n\r\n[Node.HTTPTimeouts]\r\nReadTimeout = 30000000000\r\nReadHeaderTimeout = 30000000000\r\nWriteTimeout = 30000000000\r\nIdleTimeout = 120000000000\r\n\r\n[Metrics]\r\nHTTP = \"127.0.0.1\"\r\nPort = 6060\r\nInfluxDBEndpoint = \"http://localhost:8086\"\r\nInfluxDBDatabase = \"geth\"\r\nInfluxDBUsername = \"test\"\r\nInfluxDBPassword = \"test\"\r\nInfluxDBTags = \"host=localhost\"\r\nInfluxDBToken = \"test\"\r\nInfluxDBBucket = \"geth\"\r\nInfluxDBOrganization = \"geth\"\r\n```\r\nMy consensus for Prysm is:\r\n```\r\ndocker run --rm -d -v /mnt/goerli-pv/beacon-pv:/data -v /home/ubuntu/prysm/genesis.ssz:/genesis/genesis.ssz -v /home/ubuntu/secret:/var/lib/jwtsecret -p 4000:4000 -p 13000:13000 -p 12000:12000/udp --network=\"host\" --name beacon-node gcr.io/prysmaticlabs/prysm/beacon-chain:v4.0.8 --datadir=/data --rpc-host=0.0.0.0 --grpc-gateway-host=0.0.0.0 --monitoring-host=0.0.0.0 --execution-endpoint=http://localhost:8551 --jwt-secret=/var/lib/jwtsecret/goerli-secret --suggested-fee-recipient=0xDxxxxmywalletxxxx --genesis-state=/genesis/genesis.ssz --goerli --accept-terms-of-use\r\n```\r\nGeth log:\r\n![image](https://github.com/ethereum/go-ethereum/assets/102823326/40afa751-0646-4e29-b6a9-dacc946deec1)\r\nPrysm log:\r\n![image](https://github.com/ethereum/go-ethereum/assets/102823326/3e221595-cd56-49ac-9707-0baacec55d52)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28314/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28314/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
