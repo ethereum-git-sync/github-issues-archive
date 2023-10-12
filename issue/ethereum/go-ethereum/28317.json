@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28317",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28317/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28317/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28317/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28317",
+  "id": 1938863060,
+  "node_id": "I_kwDOAOvK985zkLPU",
+  "number": 28317,
+  "title": "PBSS: engine_newPayloadV2 sometimes taking over 1 minute to respond",
+  "user": {
+    "login": "ryanschneider",
+    "id": 53520,
+    "node_id": "MDQ6VXNlcjUzNTIw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/53520?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ryanschneider",
+    "html_url": "https://github.com/ryanschneider",
+    "followers_url": "https://api.github.com/users/ryanschneider/followers",
+    "following_url": "https://api.github.com/users/ryanschneider/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ryanschneider/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ryanschneider/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ryanschneider/subscriptions",
+    "organizations_url": "https://api.github.com/users/ryanschneider/orgs",
+    "repos_url": "https://api.github.com/users/ryanschneider/repos",
+    "events_url": "https://api.github.com/users/ryanschneider/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ryanschneider/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-11T22:55:19Z",
+  "updated_at": "2023-10-11T22:55:19Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: `1.13.2`\r\nCL client & version: teku/v23.9.1/linux-x86_64/-privatebuild-openjdk64bitservervm-java-17\r\nOS & Version: Linux\r\n\r\n#### Expected behaviour\r\n\r\n`engine_newPayload` should complete quickly, or at most timeout after 8s.\r\n\r\n\r\n#### Actual behaviour\r\n\r\nIn some scenarios running w/ `--storage.scheme=path` I'm seeing `engine_newPayload` hang, and then `teku` resends multiple times, until eventually all of the hung requests seem to complete more or less at once:\r\n\r\n```\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.364] Served engine_newPayloadV2               conn=127.0.0.1:55714 reqid=8265 duration=1m18.51574714s\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.365] Served engine_newPayloadV2               conn=127.0.0.1:35886 reqid=8270 duration=1m5.503575738s\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.366] Served engine_newPayloadV2               conn=127.0.0.1:51874 reqid=8272 duration=52.476870979s\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.368] Served engine_newPayloadV2               conn=127.0.0.1:52324 reqid=8275 duration=39.515087032s\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.370] Served engine_newPayloadV2               conn=127.0.0.1:45594 reqid=8279 duration=26.460411326s\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.371] Served engine_newPayloadV2               conn=127.0.0.1:34414 reqid=8281 duration=13.462109994s\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.377] Served engine_newPayloadV2               conn=127.0.0.1:39476 reqid=8283 duration=442.786115ms\r\nOct 11 22:34:41 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:34:41.408] Served engine_forkchoiceUpdatedV2        conn=127.0.0.1:39476 reqid=8285 duration=23.907882ms\r\nOct 11 22:35:23 ip-10-0-67-102 geth[9804]: DEBUG[10-11|22:35:23.004] Served engine_forkchoiceUpdatedV2        conn=127.0.0.1:34876 reqid=8297 duration=\"551.455µs\"\r\n```\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nThis only seems to happen when both the EL and CL DBs are several hours \"stale\" (e.g. if I sync a node to head, then shutdown the EL and CL, then make a backup of their dbs, then restore that backup (deleting the node keys) onto another machine the next day.\r\n\r\nI suspect a similar reproduction step would be to simply shutdown the EL and CL for say 24h then start them again.\r\n\r\n#### Backtrace\r\n\r\nNot a backtrace per se, but w/ `--pprof` enabled I can see usually anywhere from 1 to 28 goroutines all waiting on the `newPayload` mutex, but strangely enough I don't ever see any _other_ catalyst goroutines also running (except for `heartbeat` sitting inside `time.Sleep` as expected).\r\n\r\nAlso here's the `pprof` file generated via `go tool pprof --http=:8123 -seconds 30 -nodecount=10000 http://localhost:6060/debug/pprof/profile`: https://gist.github.com/ryanschneider/e7572913b46a77b6b0b80a0b3c9064a1\r\n\r\n````\r\n28 @ 0x450a56 0x46222f 0x462206 0x480da6 0x4a1cc5 0x1020734 0x1020707 0x101ff2a 0x4bad8b 0x4ba03c 0xd05f45 0xcfeda5 0xcfe519 0xcfde37 0xcfc40e 0xcfc227 0xcfd0a5 0x485081\r\n#\t0x480da5\tsync.runtime_SemacquireMutex+0x25\t\t\t\t\t\truntime/sema.go:77\r\n#\t0x4a1cc4\tsync.(*Mutex).lockSlow+0x164\t\t\t\t\t\t\tsync/mutex.go:171\r\n#\t0x1020733\tsync.(*Mutex).Lock+0xb3\t\t\t\t\t\t\t\tsync/mutex.go:90\r\n#\t0x1020706\tgithub.com/ethereum/go-ethereum/eth/catalyst.(*ConsensusAPI).newPayload+0x86\tgithub.com/ethereum/go-ethereum/eth/catalyst/api.go:509\r\n#\t0x101ff29\tgithub.com/ethereum/go-ethereum/eth/catalyst.(*ConsensusAPI).NewPayloadV2+0x349\tgithub.com/ethereum/go-ethereum/eth/catalyst/api.go:470\r\n#\t0x4bad8a\treflect.Value.call+0xb0a\t\t\t\t\t\t\treflect/value.go:586\r\n#\t0x4ba03b\treflect.Value.Call+0xbb\t\t\t\t\t\t\t\treflect/value.go:370\r\n#\t0xd05f44\tgithub.com/ethereum/go-ethereum/rpc.(*callback).call+0x3c4\t\t\tgithub.com/ethereum/go-ethereum/rpc/service.go:205\r\n#\t0xcfeda4\tgithub.com/ethereum/go-ethereum/rpc.(*handler).runMethod+0x44\t\t\tgithub.com/ethereum/go-ethereum/rpc/handler.go:565\r\n#\t0xcfe518\tgithub.com/ethereum/go-ethereum/rpc.(*handler).handleCall+0x238\t\t\tgithub.com/ethereum/go-ethereum/rpc/handler.go:512\r\n#\t0xcfde36\tgithub.com/ethereum/go-ethereum/rpc.(*handler).handleCallMsg+0x236\t\tgithub.com/ethereum/go-ethereum/rpc/handler.go:470\r\n#\t0xcfc40d\tgithub.com/ethereum/go-ethereum/rpc.(*handler).handleNonBatchCall+0x1ad\t\tgithub.com/ethereum/go-ethereum/rpc/handler.go:296\r\n#\t0xcfc226\tgithub.com/ethereum/go-ethereum/rpc.(*handler).handleMsg.func1.1+0x26\t\tgithub.com/ethereum/go-ethereum/rpc/handler.go:269\r\n#\t0xcfd0a4\tgithub.com/ethereum/go-ethereum/rpc.(*handler).startCallProc.func1+0xc4\t\tgithub.com/ethereum/go-ethereum/rpc/handler.go:387\r\n\r\n1 @ 0x450a56 0x481ef5 0x102355f 0x485081\r\n#\t0x481ef4\ttime.Sleep+0x134\t\t\t\t\t\t\t\truntime/time.go:195\r\n#\t0x102355e\tgithub.com/ethereum/go-ethereum/eth/catalyst.(*ConsensusAPI).heartbeat+0x9e\tgithub.com/ethereum/go-ethereum/eth/catalyst/api.go:732\r\n````\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28317/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28317/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
