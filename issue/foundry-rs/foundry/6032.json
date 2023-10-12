@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6032",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6032/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6032/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6032/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6032",
+  "id": 1938950759,
+  "node_id": "I_kwDOGBlvNc5zkgpn",
+  "number": 6032,
+  "title": "Contract state persists after creating a new fork",
+  "user": {
+    "login": "sam-goldman",
+    "id": 106038229,
+    "node_id": "U_kgDOBlID1Q",
+    "avatar_url": "https://avatars.githubusercontent.com/u/106038229?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sam-goldman",
+    "html_url": "https://github.com/sam-goldman",
+    "followers_url": "https://api.github.com/users/sam-goldman/followers",
+    "following_url": "https://api.github.com/users/sam-goldman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sam-goldman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sam-goldman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sam-goldman/subscriptions",
+    "organizations_url": "https://api.github.com/users/sam-goldman/orgs",
+    "repos_url": "https://api.github.com/users/sam-goldman/repos",
+    "events_url": "https://api.github.com/users/sam-goldman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sam-goldman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-12T00:07:54Z",
+  "updated_at": "2023-10-12T00:10:42Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\ndeae4f1f37a3ef081b62d7488e876d1a5bec815e\r\n\r\n### What command(s) is the bug in?\r\n\r\n_No response_\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nIt appears that the values of state variables persist when switching to a fork in a Forge script. Here are steps to reproduce:\r\n\r\n1. `forge init hello_foundry`\r\n2. Navigate to `script/Counter.s.sol`, then replace its contents with:\r\n```\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nimport {Script, console2} from \"forge-std/Script.sol\";\r\nimport { StdCheats } from \"forge-std/StdCheats.sol\";\r\nimport { Counter } from \"../src/Counter.sol\";\r\n\r\ncontract CounterScript is Script, StdCheats {\r\n    function setUp() public {}\r\n\r\n    function run() public {\r\n        Counter counter = new Counter();\r\n        counter.setNumber(42);\r\n\r\n        vm.createSelectFork('http://127.0.0.1:8545');\r\n        // `Counter` is not deployed on the fork, which is expected.\r\n        assert(address(counter).code.length == 0);\r\n        // Deploy `Counter` to the same address as the local one.\r\n        deployCodeTo(\"Counter.sol:Counter\", hex\"\", address(counter));\r\n        // `Counter` is now deployed on the fork.\r\n        assert(address(counter).code.length > 0);\r\n        // Logs 42. This should be 0 since the contract should have a fresh state on the fork.\r\n        console2.log(counter.number());\r\n    }\r\n}\r\n```\r\n3. In a new terminal window: `anvil`\r\n4. `forge script script/Counter.s.sol`\r\n\r\nThe comments in the file above describe what appears to be incorrect behavior.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6032/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6032/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
