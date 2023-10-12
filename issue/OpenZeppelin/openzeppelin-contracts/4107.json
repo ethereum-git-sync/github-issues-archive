@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -67,22 +67,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 19,
-    "closed_issues": 65,
+    "open_issues": 18,
+    "closed_issues": 66,
     "state": "open",
     "created_at": "2022-05-17T19:52:44Z",
-    "updated_at": "2023-10-11T13:46:47Z",
+    "updated_at": "2023-10-12T06:09:27Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 8,
   "created_at": "2023-03-11T11:15:50Z",
-  "updated_at": "2023-10-11T13:10:33Z",
-  "closed_at": null,
+  "updated_at": "2023-10-12T06:09:27Z",
+  "closed_at": "2023-10-12T06:09:27Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**🧐 Motivation**\r\nIn the [`ERC20`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol#L223) token contract the validation:\r\n```Solidity\r\n require(from != address(0), \"ERC20: transfer from the zero address\");\r\n```\r\nis redundant.\r\nThis `require` may fail only in case, when address(0) calls the `transfer` function, which is unreal circumstances.\r\n<!-- Is your feature request related to a specific problem? Is it just a crazy idea? Tell us about it! -->\r\n\r\n**📝 Details**\r\nThe only time, when this `require` may fail is when `transferFrom` function is called where `owner` address is `address(0)`.\r\nBut before the `_transfer` call there is a [`_spendAllowance`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol#L160) call, after which [`_approve`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol#L329) is called.\r\nSo, finally, the transaction will revert in [`_approve`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol#L309) function with error message: \"ERC20: approve from the zero address\".\r\n\r\nI think:\r\n* Validation in `_transfer` function of zero address is redundant.\r\n* The case, when user tries to make `transferFrom` from zero address has very strange reason of the revert. I made transfer - but the error is about approve.\r\n<!-- Please describe your feature request in detail. -->\r\n\r\n<!-- Make sure that you have reviewed the OpenZeppelin Contracts Contributor Guidelines. -->\r\n<!-- https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/CONTRIBUTING.md -->\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ernestognw",
+    "id": 33379285,
+    "node_id": "MDQ6VXNlcjMzMzc5Mjg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33379285?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ernestognw",
+    "html_url": "https://github.com/ernestognw",
+    "followers_url": "https://api.github.com/users/ernestognw/followers",
+    "following_url": "https://api.github.com/users/ernestognw/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ernestognw/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ernestognw/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ernestognw/subscriptions",
+    "organizations_url": "https://api.github.com/users/ernestognw/orgs",
+    "repos_url": "https://api.github.com/users/ernestognw/repos",
+    "events_url": "https://api.github.com/users/ernestognw/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ernestognw/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4107/reactions",
     "total_count": 0,
@@ -97,7 +116,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4107/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -440,8 +459,8 @@
     "body": "`ERC20`'s `transfer` mechanism was completelly redesigned in 5.0. Closing",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1757671280/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
