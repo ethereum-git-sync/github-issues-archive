@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 5,
   "created_at": "2022-11-11T19:08:36Z",
-  "updated_at": "2022-11-17T19:01:37Z",
-  "closed_at": null,
+  "updated_at": "2023-10-13T12:11:57Z",
+  "closed_at": "2023-10-13T10:25:19Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "**Motivation**\r\n\r\nAs part of automated testing we want to run longer sim tests at critical moments of our development pipeline.\r\n\r\n**Exploration**\r\n\r\n_from https://github.com/ChainSafe/lodestar/pull/4756#issuecomment-1312079997_\r\n\r\nSelf hosted runners operate differently: they don't start from a clean slate but just run on bare metal and **do not clean up**. Instead Github self hosted runners run on fresh VMs that are destroyed after the fact.\r\n\r\nFrom an offline exchange with Pari:\r\n\r\n> L: When using Github self hosted runners, every registered runner can run exactly 1 job at a time? Do you know if that can be customized? In your usage of it with kurtosis is there any issue with clean-up after the fact? Being used to Github own runners where you get a fresh environment every time that is destroyed after the fact, using self hosted has some challenges\r\n> P: yeah so you can't customize it - we had the same issue on our system. So the fix is to register multiple runners on the same physical host so you \"hack\" it in. When no jobs are running, nothing changes about the usage anyway. The correct way to do it would be to use something like:\r\n> - Actuated: https://blog.alexellis.io/blazing-fast-ci-with-microvms/\r\n> - Kubernetes with the autoscaling option to spin up more runners when there are pending jobs\r\n> - Amazon's free autoscaling service for github runners\r\n>\r\n> But in practice, Github makes this hard so incentivize using their runner services. I have an explicit job that cleans up kurtosis post run irrespective of fail/success - so i haven't had any stale file issues there.\r\n\r\nIMO we should not run every sim test on the self hosted runner, but instead do:\r\n- Run on Github runners on commit a light version of the sim tests that are okay with low power machines. Sim tests have shown to be very stable with correct business logic\r\n- Run on self hosted runners **only on demand** for key commits on key PRs + on merge to master + before release. This less frequent tests could do much longer runs with more nodes.\r\n\r\nThis approach makes sense because the workflow must be different:\r\n- Requires more setup phase\r\n- Must assume another test is running in the background, so ports, paths must not conflict\r\n- Requires a tear-down phase",
-  "closed_by": null,
+  "closed_by": {
+    "login": "nazarhussain",
+    "id": 112468,
+    "node_id": "MDQ6VXNlcjExMjQ2OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/112468?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nazarhussain",
+    "html_url": "https://github.com/nazarhussain",
+    "followers_url": "https://api.github.com/users/nazarhussain/followers",
+    "following_url": "https://api.github.com/users/nazarhussain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nazarhussain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nazarhussain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nazarhussain/subscriptions",
+    "organizations_url": "https://api.github.com/users/nazarhussain/orgs",
+    "repos_url": "https://api.github.com/users/nazarhussain/repos",
+    "events_url": "https://api.github.com/users/nazarhussain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nazarhussain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4758/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4758/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -193,6 +212,94 @@
       "heart": 0,
       "rocket": 0,
       "eyes": 1
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1761281780",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/4758#issuecomment-1761281780",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4758",
+    "id": 1761281780,
+    "node_id": "IC_kwDOCD5_Gc5o-wb0",
+    "user": {
+      "login": "nazarhussain",
+      "id": 112468,
+      "node_id": "MDQ6VXNlcjExMjQ2OA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/112468?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nazarhussain",
+      "html_url": "https://github.com/nazarhussain",
+      "followers_url": "https://api.github.com/users/nazarhussain/followers",
+      "following_url": "https://api.github.com/users/nazarhussain/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nazarhussain/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nazarhussain/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nazarhussain/subscriptions",
+      "organizations_url": "https://api.github.com/users/nazarhussain/orgs",
+      "repos_url": "https://api.github.com/users/nazarhussain/repos",
+      "events_url": "https://api.github.com/users/nazarhussain/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nazarhussain/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-13T10:25:19Z",
+    "updated_at": "2023-10-13T10:25:19Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "> @nazarhussain sim tests on commit taking 10-15 min is perfectly okay. The longer runs on demand should be of ~60-90 minutes\r\n\r\nAs our sim tests are still in reasonable threshold we don't need self hosted on demand runner. In future if needed we can reopen the issue. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1761281780/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1761414270",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/4758#issuecomment-1761414270",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4758",
+    "id": 1761414270,
+    "node_id": "IC_kwDOCD5_Gc5o_Qx-",
+    "user": {
+      "login": "nflaig",
+      "id": 38436224,
+      "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nflaig",
+      "html_url": "https://github.com/nflaig",
+      "followers_url": "https://api.github.com/users/nflaig/followers",
+      "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+      "organizations_url": "https://api.github.com/users/nflaig/orgs",
+      "repos_url": "https://api.github.com/users/nflaig/repos",
+      "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nflaig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-13T12:11:57Z",
+    "updated_at": "2023-10-13T12:11:57Z",
+    "author_association": "MEMBER",
+    "body": "> > @nazarhussain sim tests on commit taking 10-15 min is perfectly okay. The longer runs on demand should be of ~60-90 minutes\r\n> \r\n> As our sim tests are still in reasonable threshold we don't need self hosted on demand runner. In future if needed we can reopen the issue.\r\n\r\nCould be considered for benchmarks, those take 25-30 minutes and produce a lot of false positives all the time.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1761414270/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
     },
     "performed_via_github_app": null
   }
