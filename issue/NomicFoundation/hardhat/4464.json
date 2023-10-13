@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "fvictorio",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-11T11:04:01Z",
-  "updated_at": "2023-10-11T11:04:17Z",
-  "closed_at": null,
+  "updated_at": "2023-10-12T22:19:12Z",
+  "closed_at": "2023-10-12T22:19:11Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\n\n2.18.0\n\n### What happened?\n\nThe long version: I have a hardhat project with foundry, I followed instructions in _both_ foundrybook and hardhat docs and things were going well after I removed the contract and the test Lock.sol, Lock.ts the tests stopped working and started giving 0 passing.\r\n\r\n![image](https://github.com/NomicFoundation/hardhat/assets/52073989/2196ffbb-9b87-4b67-9c0a-8f89436cc738)\r\n\r\n\r\nAfter I found the cause (I didn't know removing lock.ts is the cause at first ), I made a simple hardhat project with my contract and test and I was able to reproduce the bug when I remove the test lock.ts .\n\n### Minimal reproduction steps\n\nCreate a simple TS hardhat project, add any contract with test then remove the test for Lock.ts .\r\n\r\nYou can also just clone the repo that has this issue and try to run the test with and without the Lock.ts test\r\nhttps://github.com/0x0OZ/freeflow-taxableToken/tree/0c74903012bb0ecefc68568fd693787917817c5f\n\n### Search terms\n\nhardhat test passing zero / fix hardhat test /  hardhat test doesn't run",
-  "closed_by": null,
+  "closed_by": {
+    "login": "0x0OZ",
+    "id": 52073989,
+    "node_id": "MDQ6VXNlcjUyMDczOTg5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/52073989?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0x0OZ",
+    "html_url": "https://github.com/0x0OZ",
+    "followers_url": "https://api.github.com/users/0x0OZ/followers",
+    "following_url": "https://api.github.com/users/0x0OZ/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0x0OZ/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0x0OZ/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0x0OZ/subscriptions",
+    "organizations_url": "https://api.github.com/users/0x0OZ/orgs",
+    "repos_url": "https://api.github.com/users/0x0OZ/repos",
+    "events_url": "https://api.github.com/users/0x0OZ/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0x0OZ/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4464/reactions",
     "total_count": 0,
@@ -107,8 +126,51 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4464/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1760450120",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4464#issuecomment-1760450120",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4464",
+    "id": 1760450120,
+    "node_id": "IC_kwDOB7jojM5o7lZI",
+    "user": {
+      "login": "0x0OZ",
+      "id": 52073989,
+      "node_id": "MDQ6VXNlcjUyMDczOTg5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52073989?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/0x0OZ",
+      "html_url": "https://github.com/0x0OZ",
+      "followers_url": "https://api.github.com/users/0x0OZ/followers",
+      "following_url": "https://api.github.com/users/0x0OZ/following{/other_user}",
+      "gists_url": "https://api.github.com/users/0x0OZ/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/0x0OZ/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/0x0OZ/subscriptions",
+      "organizations_url": "https://api.github.com/users/0x0OZ/orgs",
+      "repos_url": "https://api.github.com/users/0x0OZ/repos",
+      "events_url": "https://api.github.com/users/0x0OZ/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/0x0OZ/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-12T22:19:12Z",
+    "updated_at": "2023-10-12T22:19:12Z",
+    "author_association": "NONE",
+    "body": "Hey @fvictorio,\r\n\r\nYou don't need to debug this I found the main cause\r\nIn my Token.ts I was using async with the first `describe` which caused no test to be really executed before the program exits...\r\nand when having the Lock.ts test this gives the execution enough time to run the Async tests to give the results.\r\n\r\n### Solution:\r\nTo solve this I just need to remove the **async** from the main `describe` statement and fix any following-up errors by removing it.\r\n\r\nThis is a native JS behavior and not a hardhat bug, So I will close it as it doesn't require any further actions from your side.\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1760450120/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

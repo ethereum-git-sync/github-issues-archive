@@ -50,7 +50,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": {
     "login": "schaable",
     "id": 1165424,
@@ -96,10 +96,10 @@
   "milestone": null,
   "comments": 23,
   "created_at": "2020-12-20T06:33:02Z",
-  "updated_at": "2023-07-14T09:40:17Z",
+  "updated_at": "2023-10-13T00:13:26Z",
   "closed_at": "2023-07-11T12:39:43Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "when running \r\n\r\n```\r\nnpx hardhat verify --network mainnet\r\n```\r\n\r\ni was getting the error\r\n\r\n```\r\n[Error: ENOENT: no such file or directory, open '/Users/lev/dev/ldub/token-2/artifacts/build-info/4e7389b25e253b27f945b011dc8f896b.json'] {\r\n  errno: -2,\r\n  code: 'ENOENT',\r\n  syscall: 'open',\r\n  path: '/Users/lev/dev/ldub/token-2/artifacts/build-info/4e7389b25e253b27f945b011dc8f896b.json'\r\n}\r\n```\r\n\r\nthis was being thrown by `const buildInfo = await artifacts.getBuildInfo(fqName);` on line https://github.com/nomiclabs/hardhat/blob/master/packages/hardhat-etherscan/src/solc/bytecode.ts#L97 when `fqName` was `hardhat/console.sol:console`. \r\n\r\ni added\r\n\r\n```\r\nif (fqName === \"hardhat/console.sol:console\") continue\r\n```\r\n\r\nin `token-2/node_modules/@nomiclabs/hardhat-etherscan/dist/src/solc/bytecode.js` and then the script verified just fine \r\n\r\n\r\nI am new to hardhat and dont know the root cause of why its even looking at the console but i hope this is sufficient information for @ItsNickBarry or someone else to fix :)\r\n\r\nThanks for the awesome tools all!\r\n",
   "closed_by": {
     "login": "schaable",
@@ -258,13 +258,13 @@
     "body": "For anyone running into the same issue, `npx hardhat clean` resolve the problem for me.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/779213915/reactions",
-      "total_count": 581,
-      "+1": 273,
+      "total_count": 584,
+      "+1": 275,
       "-1": 0,
       "laugh": 51,
       "hooray": 65,
       "confused": 0,
-      "heart": 112,
+      "heart": 113,
       "rocket": 77,
       "eyes": 3
     },
@@ -1138,8 +1138,8 @@
     "body": "We finally fixed this in [Hardhat v2.17.0](https://github.com/NomicFoundation/hardhat/releases/tag/hardhat%402.17.0). The `npx hardhat clean` workaround should no longer be necessary.\r\n\r\nIf someone is using v2.17.0 or later and runs into this problem, please let us know!",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1635591826/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
