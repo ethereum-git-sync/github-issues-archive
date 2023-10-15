@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-10-13T09:33:26Z",
-  "updated_at": "2023-10-13T09:33:26Z",
-  "closed_at": null,
+  "updated_at": "2023-10-15T09:47:49Z",
+  "closed_at": "2023-10-15T09:47:49Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Description\r\nAs an private network maintainer, I want to add new node to our QBFT private network. \r\nThe new node which using X_SNAP sync mode along with BONSAI enabled, sync quite fast the the begining.\r\nHowever, when it's almost catch up with other nodes, it stucks and stops syncing from time to time.\r\nMy private network generate new block each 4 seconds and ~322k blocks in total\r\nThe new node sync the first 320k within 1hour, but for the next hours, the sync proccess become very slow and is 60-120 blocks behind the network.\r\n\r\n\r\n### Acceptance Criteria\r\n\r\n### Steps to Reproduce (Bug)\r\n1. start the first 3 nodes.\r\n2. start the 4th nodes and it begin syncing\r\n\r\n**Expected behavior:** \r\nthe 4th node should catch up with other nodes and join in the generation of new block\r\n\r\n**Actual behavior:** \r\nthe 4th node is always ~100 behind and can't catch up with others. the `eth_syncing` result of the 4th node is as below:\r\n\r\n> curl -X POST --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":51}' http://127.0.0.1:8548\r\n> {\"jsonrpc\":\"2.0\",\"id\":51,\"result\":{\"startingBlock\":\"0x5008a\",\"currentBlock\":\"0x5008a\",\"highestBlock\":\"0x500e0\"}}\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\nI've tried restart the node but it failed.\r\n\r\n### Logs (if a bug)\r\nPlease post relevant logs from Besu (and the consensus client, if running proof of stake) from before and after the issue. \r\n```\r\n2023-10-13 17:15:00.754+08:00 | nioEventLoopGroup-3-1 | TRACE | ApiHandler | Received Message{ code=1, size=7} from PeerInfo{version=5, clientId='besu/v23.7.3/linux-x86_64/zulu-java-17', capabilities=[eth/63, eth/64, eth/65, eth/66, eth/67, eth/68, istanbul/100, snap/1], port=30303, nodeId=0x90e8236756a22c50ebc6d4b287dedbd79930dddcdb437d2c4d367cfa0239d1ad1f583a1e1e6cca97cbc9f99766589f2b05a6bc41b9a8da7dac0190403bc80f46} via protocol snap/1\r\n2023-10-13 17:15:00.754+08:00 | vert.x-eventloop-thread-1 | DEBUG | PeerDiscoveryController | Refreshing peer table: seeking more peers. peer count < max\r\n2023-10-13 17:15:00.754+08:00 | nioEventLoopGroup-3-1 | TRACE | SnapProtocolManager | Process snap message snap/1, 1\r\n2023-10-13 17:15:00.754+08:00 | vert.x-eventloop-thread-1 | DEBUG | RecursivePeerRefreshState | Start peer search.\r\n2023-10-13 17:15:00.755+08:00 | EthScheduler-Services-2 (batchDownloadAccountData) | TRACE | Pipe | Interrupted while waiting for next item java.lang.InterruptedException\r\n        at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1679)\r\n...\r\n2023-10-13 17:15:00.755+08:00 | vert.x-eventloop-thread-1 | DEBUG | RecursivePeerRefreshState | INITIAL PEERS: [DiscoveryPeer{status=bonded, enode=enode://90e8236756a22c50ebc6d4b287dedbd79930dddcdb437d2c4d367cfa0239d1ad1f583a1e1e6cca97cbc9f99766589f2b05a6bc41b9a8da7dac0190403bc80f46@11.124.28.18:30303, firstDiscovered=1697185200721, lastContacted=1697188472304, lastSeen=1697185200959}, DiscoveryPeer{status=bonded, enode=enode://cc7ee95ef68317096637e1d10ec69ac1ba983c6f6ed79ed0e5fed0d0c2e73c2c5e310d84c72befd330b7ebfa456bc6d8f0408484a4cca0c77e615dc4bbe7120e@11.159.249.179:30305, firstDiscovered=1697185201074, lastContacted=1697188487773, lastSeen=1697185201184}, DiscoveryPeer{status=bonded, enode=enode://5b23adb2a71f16cb1fba2a6b25f67f09a3b139f9e4a72b0af42467810eccfec1d8af7355f85e5e67694a179abe95463d9ed3e9e08e26ea3f10cc658943368462@11.167.180.173:30304, firstDiscovered=1697185201048, lastContacted=1697188477901, lastSeen=1697185201148}]\r\n2023-10-13 17:15:00.755+08:00 | vert.x-eventloop-thread-1 | DEBUG | RecursivePeerRefreshState | Skipping bonding round because no candidates are available\r\n2023-10-13 17:15:00.755+08:00 | vert.x-eventloop-thread-1 | TRACE | NodePermissioningController | Node permissioning: Checking ......\r\n...\r\n2023-10-13 17:15:00.755+08:00 | vert.x-eventloop-thread-1 | DEBUG | RecursivePeerRefreshState | Initiating neighbours round with 3 candidates from 3 tracked nodes\r\n2023-10-13 17:15:00.757+08:00 | vert.x-eventloop-thread-1 | TRACE | DiscoveryProtocolLogger | <<< Sending FINDN packet to peer 0x5b23adb2a71f16cb1fba2a6b25f67f09 (enode://5b23adb2a71f16cb1fba2a6b25f67f09a3b139f9e4a72b0af42467810eccfec1d8af7355f85e5e67694a179abe95463d9ed3e9e08e26ea3f10cc658943368462@11.167.180.173:30304): Packet{type=FIND_NEIGHBORS, data=FindNeighborsPacketData{expiration=1697188560, target=0x2869b90f734795b6c8a324c39658b67360af837ad05121c251bb6dfbca9576a5612898ab0810b5a5568d6ac71c2163af4f1d047213846613a46ec417a30b650e}, hash=0xd76b5dfbb46bbe1ea846e757b9c35be27934e167f0ef0e29761ddd03b6f4e0e1, signature=Signature{r=1427098048717736502365603224992195522193596428890832359163938547432860514152, s=19509665976215595649129104895046535829454583832328629347058227842118877925958, recId=0}, publicKey=0xd0c79fc2c0a86b30bfb94eeee7048299e251545bc6b707425f07ceefa3a8609badf4c73ba45c7e3931b723f7f6f267c5c907961c41a56f04d7ddf386d475ac2e}\r\n```\r\n\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.7.3\r\n* Java version:openjdk version \"17.0.8\" 2023-07-18 LTS\r\n* OS Name & Version: CentOS7.2\r\n* Kernel Version: Linux  4.9.151-015.ali3000.alios7.x86_64\r\n* Virtual Machine software & version: [`vmware -v`]\r\n* Docker Version: [`docker version`]\r\n* Cloud VM, type, size: [Amazon Web Services I3-large]\r\n* Consensus Client & Version if using Proof of Stake: [e.g. Teku, Lighthouse, Prysm, Nimbus, Lodestar]\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "iampkuhz",
+    "id": 4539861,
+    "node_id": "MDQ6VXNlcjQ1Mzk4NjE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4539861?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iampkuhz",
+    "html_url": "https://github.com/iampkuhz",
+    "followers_url": "https://api.github.com/users/iampkuhz/followers",
+    "following_url": "https://api.github.com/users/iampkuhz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iampkuhz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iampkuhz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iampkuhz/subscriptions",
+    "organizations_url": "https://api.github.com/users/iampkuhz/orgs",
+    "repos_url": "https://api.github.com/users/iampkuhz/repos",
+    "events_url": "https://api.github.com/users/iampkuhz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iampkuhz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/6030/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6030/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
