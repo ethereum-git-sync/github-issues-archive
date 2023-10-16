@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7691",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7691/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7691/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7691/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/7691",
+  "id": 1945711038,
+  "node_id": "I_kwDODjvEJM5z-TG-",
+  "number": 7691,
+  "title": "contract reinitialization tests",
+  "user": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-16T17:09:11Z",
+  "updated_at": "2023-10-16T17:09:11Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\n**Is your feature request related to a problem? Please describe.**\r\nWe want to have sufficient test coverage of the smart contracts not being able to be reinitialized, meaning that `initialize` should not be able to be called more than once for any contract that is `Initializable`. We also want to be sure that the contract setup is realistic, meaning that the tests run against the same setup code that is used to deploy the contracts. This is possible if we migrate the Solidity unit tests to use the deploy script to setup the system.\r\n\r\nWe want to rewrite `test_cannotReinitializeL1_succeeds` using the following pattern by @mds1:\r\n\r\n```solidity\r\n// Define initialization calls for each contract.\r\nstruct InitializeableContract {\r\n  address target;\r\n  bytes initializationCalldata;\r\n}\r\n\r\nInitializeableContract[] initializeableContracts;\r\ninitializeableContracts.push(InitializeableContract({\r\n    target: address(L1Messenger), \r\n    initializationCalldata: abi.encodeCall(L1Messenger.initialize, (OptimismPortal(payable(address(0)))))\r\n}));\r\ninitializeableContracts.push(etc...);\r\n\r\n// Read artifacts for all contracts in src/L1.\r\n// --- snip ---\r\n\r\n// If it has a method called initialize, increment counter.\r\nuint256 numInitializeableContracts;\r\n// --- snip ---\r\n\r\n// Verify no contracts are missing.\r\nassertEq(initializeableContracts.length, numInitializeableContracts, \"Missing contracts\");\r\n\r\n// Now execute the initialization calls that we expect to revert.\r\n// --- snip ---\r\n```\r\nThis will ensure that all of the initializable contracts are tested and that new ones are tested automatically.\r\n\r\nSee https://github.com/ethereum-optimism/optimism/pull/7679 for context",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7691/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7691/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
