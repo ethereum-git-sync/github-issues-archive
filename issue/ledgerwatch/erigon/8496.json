@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8496",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8496/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8496/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8496/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8496",
+  "id": 1945756522,
+  "node_id": "I_kwDOC0FsAM5z-eNq",
+  "number": 8496,
+  "title": "Erigon runs out of memory on 32GB machine syncing Gnosis Chain",
+  "user": {
+    "login": "yperbasis",
+    "id": 34320705,
+    "node_id": "MDQ6VXNlcjM0MzIwNzA1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34320705?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yperbasis",
+    "html_url": "https://github.com/yperbasis",
+    "followers_url": "https://api.github.com/users/yperbasis/followers",
+    "following_url": "https://api.github.com/users/yperbasis/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yperbasis/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yperbasis/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yperbasis/subscriptions",
+    "organizations_url": "https://api.github.com/users/yperbasis/orgs",
+    "repos_url": "https://api.github.com/users/yperbasis/repos",
+    "events_url": "https://api.github.com/users/yperbasis/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yperbasis/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4450618531,
+      "node_id": "LA_kwDOC0FsAM8AAAABCUcMow",
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/labels/gnosis",
+      "name": "gnosis",
+      "color": "C7D217",
+      "default": false,
+      "description": "Gnosis Chain"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-16T17:38:06Z",
+  "updated_at": "2023-10-16T17:38:29Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "Hey [@yperbasis](https://t.me/yperbasis)  I'm having issues syncing an Erigon node on a 32 GB RAM machine (which I wouldn't consider as being low RAM). It gets OOM killed constantly and then restarts from the same block.\r\nThere's nothing special in the logs, it just gets killed and the restarted by Docker and starts again.\r\nSame happened to us on newest version\r\nWorks fine on lower, no OOM\r\nhttps://dpaste.org/SuJCu\r\nThanks for confirming! And yes, latest too for me: v2.52.5\r\nWhich one are you using now?\r\nSame version on a single batch that gets constant OOMs\r\nOther batches on older version are fine\r\nActually I see that we’ve updated the batch to 2.52.4\r\nAnd no more OOMs there\r\nAt least for last 5 hours\r\nMaybe a memory leak or something?\r\nhttps://github.com/ledgerwatch/erigon/pull/8467/files#diff-e177ddb5610d1f3426c15cb512999613785b20838954e48187883e6263bb282bR656\r\n\r\nThat's pretty much the only change.\r\nGitHub\r\nfix: newly mined blocks now include transactions and check new blocks with empty...\r\nDescription\r\nThis PR is a follow-up of #8442.\r\n\r\n\r\nThe previous PR resolved the issue where newly mined blocks had their receipt hash set to an empty root...\r\ngnosis-erigon-1  | [INFO] [10-16|13:40:18.426] [p2p] GoodPeers                          eth68=30 eth67=27 eth66=1\r\ngnosis-erigon-1  | [INFO] [10-16|13:40:20.440] [4/12 Execution] Executed blocks         number=30157025 blk/s=16.3 tx/s=113.6 Mgas/s=203.4 gasState=0.70 batch=169.1MB alloc=917.9MB sys=2.1GB\r\ngnosis-erigon-1  | [INFO] [10-16|13:40:29.087] [txpool] stat                            pending=251 baseFee=0 queued=6581 alloc=710.3MB sys=2.1GB\r\ngnosis-erigon-1 exited with code 137\r\nStill happens with v2.52.0 :(\r\nI confirm! Facing the same!\r\nMy got stuck 2 times! Earlier 30M , i reatarted with updated image and now at 28M!\r\n\r\nWith resource hogging\r\nAt least yours is making progress 😜\r\nI just keep restarting again and again from 30006999\r\nNot really🥲 my node is down for 1 week still hoping that it will get synced\r\nhttps://github.com/ledgerwatch/erigon/issues/8341\r\n[GitHub](https://github.com/ledgerwatch/erigon/pull/8467/files)\r\nMy Gnosis Archival node with Erigon + Lighthouse is stuck at block 30202550 · Is...\r\nSystem information Erigon version: ./erigon --version v2.50.0 OS & Version: Windows/Linux/OSX Linux (docker_ Commit hash: Erigon Command (with flags/c...\r\nAh yes, this is another issue. Try integrations stage_headers --unwind=2000. That binary should exist in the default Docker container. Stop Erigon first 😉\r\n\r\nThere's a memory leak fix in our devel (PR #8431), but we haven't released it yet. Hopefully that helps with OOM issues.\r\nI did with 89k🤣 (90k is limit) didnt help buy yeah will do that again🤭\r\nSo the Docker devel tag should work, right?\r\nYes, it should\r\n\r\nI'll let it run on v2.50.0 just to see, but I'll upgrade to that right after.\r\nSeems a lot better on that version based on the current RAM usage\r\n(Never mind)\r\nLatest devel OOMed again and still wasn't able to sync on the 32 GB machine\r\n\r\nDo you observe OOM with 2.52.4 as well?\r\nI tried 2.50.0, 2.52.5, 2.52.0 and the latest devel\r\nAnd which have OOM? All?\r\nYes",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8496/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8496/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
