@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6037",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6037/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6037/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6037/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/6037",
+  "id": 1944792599,
+  "node_id": "I_kwDOCD5_Gc5z6y4X",
+  "number": 6037,
+  "title": "Detect and warn about clock drift",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4754137758,
+      "node_id": "LA_kwDOCD5_Gc8AAAABG15ing",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-feature-request",
+      "name": "meta-feature-request",
+      "color": "B5CF5F",
+      "default": false,
+      "description": "Issues to track feature requests."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-16T09:37:33Z",
+  "updated_at": "2023-10-16T11:51:59Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Problem description\r\n\r\nThere have been a lot of issues reported by users due to their system clock being skewed / not synced correctly. Those range from client not being able to sync, to missed head votes / missed attestations, or just in general degraded effectiveness without logging any errors or warnings. \r\n\r\nDetermining that a clock drift as the root cause can be pretty difficult and most of the time just comes down to asking the user to check their system time via terminal or clock drift metric. \r\n\r\nFixing the issue itself it pretty easy by installing [chrony / ntp for time synchronization](https://eth-docker.net/Usage/LinuxSecurity/#time-synchronization-on-linux).\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n### Solution description\r\n\r\nLodestar could try to detect a clock drift by observing messages from the network and if there are many messages that come too early / late a warning could be logged to inform the user. This solution relies on heuristics and might not be that simple to implement but would most likely be the best to solve issues mentioned above.\r\n\r\n\r\n### Alternative solution\r\n\r\nAnother more simple option is to just detect a time discrepancy between the beacon node and validator client. This could be done by comparing the clock slot of the validator client with the head slot + sync distance reported by the beacon node sync API. The problem with this solution is that it might not detect all clock drift issues as the granularity is slot based and it does not help to detect a clock drift if both instances run on the same server which is the setup for most solo stakers. This solution has been [implemented by Lighthouse](https://github.com/sigp/lighthouse/blob/c3321dddb7e8d8d55a39dadaa6be4abee05dd9a4/validator_client/src/check_synced.rs#L62-L74) already but might [produce false positives](https://github.com/ChainSafe/lodestar/issues/5555) due to a different interpretation by clients of what value should be used for `sync_distance` if the node is synced https://github.com/sigp/lighthouse/issues/3421#issuecomment-1764281107.\r\n\r\n\r\n\r\n### Additional context\r\n\r\nAt the moment, Lodestar would throw an error if the clock drift is significant enough to trigger a `ATTESTATION_ERROR_FUTURE_SLOT` / `BLOCK_ERROR_FUTURE_SLOT` error but that has only been observed once (or twice) so far.\r\n\r\nThere is also [metric to track clock drift](https://grafana-lodestar.chainsafe.io/d/lodestar_summary/lodestar?orgId=1&refresh=10s&viewPanel=102) on the Lodestar summary dashboard but this requires to have metrics enabled and it is not something a user would actively look at during normal operation whereas a warning log would most likely get their attention.\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/7ecd81ff-9173-447c-9331-c15ebd0f9067)\r\n\r\n### Related\r\n- https://github.com/ChainSafe/lodestar-ansible-development/issues/197\r\n- https://github.com/dappnode/DNP_CORE/pull/145\r\n- [Discussion in Eth R&D discord](https://discord.com/channels/595666850260713488/598292067260825641/1161251107352367125)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6037/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6037/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
