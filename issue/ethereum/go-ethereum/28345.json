@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-15T13:53:07Z",
-  "updated_at": "2023-10-15T13:53:07Z",
+  "updated_at": "2023-10-16T08:16:22Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1763946191",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28345#issuecomment-1763946191",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28345",
+    "id": 1763946191,
+    "node_id": "IC_kwDOAOvK985pI67P",
+    "user": {
+      "login": "drozdse1",
+      "id": 3651703,
+      "node_id": "MDQ6VXNlcjM2NTE3MDM=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3651703?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/drozdse1",
+      "html_url": "https://github.com/drozdse1",
+      "followers_url": "https://api.github.com/users/drozdse1/followers",
+      "following_url": "https://api.github.com/users/drozdse1/following{/other_user}",
+      "gists_url": "https://api.github.com/users/drozdse1/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/drozdse1/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/drozdse1/subscriptions",
+      "organizations_url": "https://api.github.com/users/drozdse1/orgs",
+      "repos_url": "https://api.github.com/users/drozdse1/repos",
+      "events_url": "https://api.github.com/users/drozdse1/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/drozdse1/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-16T08:06:46Z",
+    "updated_at": "2023-10-16T08:16:22Z",
+    "author_association": "NONE",
+    "body": "I have created bash script which is doing something similar as requested.\r\n\r\n```\r\n#!/bin/bash\r\n\r\ncontainer_name=\"eth-docker-execution-1\"\r\ndesired_event_pattern=\"Peer delivering stale transactions\"\r\nthreshold=20  # Number of consecutive occurrences\r\n\r\ndeclare -A peer_counts\r\n\r\n# Function to perform the action\r\nperform_action() {\r\n  local peer_id=\"$1\"\r\n  local count=${peer_counts[$peer_id]}\r\n  echo \"Performing action for peer ID: $peer_id since '$desired_event_pattern' occurred $count times consecutively.\"\r\n\r\n  # Add your action here, such as notification commands or script execution.\r\n  # Execute the docker exec command to remove the peer\r\n  docker exec -t \"$container_name\" geth attach --datadir /var/lib/goethereum --exec \"admin.removePeer(admin.peers.find((item) => item.id == '$peer_id').enode)\"\r\n\r\n  peer_counts[\"$peer_id\"]=0  # Reset the counter for this peer\r\n}\r\n\r\n# Monitor the Docker container logs\r\ndocker logs \"$container_name\" 2>&1 -f --since 1m | while read line\r\ndo\r\n  if [[ \"$line\" =~ $desired_event_pattern ]]; then\r\n    # Extract the peer ID from the log message\r\n    peer_id=$(echo \"$line\" | grep -oP 'peer=\\K[^ ]+')\r\n    echo \"Peer ID: $peer_id\"\r\n\r\n    if [ -z \"${peer_counts[$peer_id]}\" ]; then\r\n      peer_counts[\"$peer_id\"]=1\r\n    else\r\n      ((peer_counts[\"$peer_id\"]++))\r\n    fi\r\n\r\n    if [ \"${peer_counts[$peer_id]}\" -ge \"$threshold\" ]; then\r\n      perform_action \"$peer_id\"\r\n      peer_counts[\"$peer_id\"]=0  # Reset the counter for this peer\r\n    fi\r\n  else\r\n    # When the event pattern is not found, decrease the counter for all observed peer IDs.\r\n    # The regular INFO logs for newly created blocks serve as a natural clock to decrease the counter again.\r\n    for observed_peer_id in \"${!peer_counts[@]}\"; do\r\n      if [ -n \"${peer_counts[$observed_peer_id]}\" ]; then\r\n        ((peer_counts[\"$observed_peer_id\"]--))\r\n        if [ \"${peer_counts[$observed_peer_id]}\" -le 0 ]; then\r\n          unset peer_counts[\"$observed_peer_id\"]  # Remove peer ID from observation if count reaches or goes below 0\r\n        fi\r\n      fi\r\n    done\r\n  fi\r\ndone\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1763946191/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
