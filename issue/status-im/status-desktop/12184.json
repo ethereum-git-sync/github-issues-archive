@@ -110,7 +110,7 @@
     "node_id": "MI_kwDOD5KrTM4AlzRG",
     "number": 77,
     "title": "0.15.5 - Stabilizing release",
-    "description": "A point milestone where we focus 100% on bug fixing, stabilisation and finishing any unfinished items from 0.15  \r\n\r\nZero new messaging and community features.\r\n\r\n--- Wallet ---\r\n\r\n- Community Asset and NFT designs for Asset screens\r\n- Community token visibility\r\n- Minor updates to Asset screens",
+    "description": "A point milestone where we focus 100% on bug fixing, stabilisation, reliability and finishing any unfinished items from 0.15  \r\n\r\n**1.  Reduce size of community description metadata**\r\n- better compressions, less duplication\r\n\r\n**2. Use data sync layer (or other mechanism) to improve community description reliability**\r\n- Every time a new user joins the community, the Control Node updates and signs the description.\r\n- Random back off to stop it being too chatty \r\n\r\n**3. Refactor synchronisation of contacts**\r\n- To fix various contact request issues, is a large work item\r\n- Mishka and Igor to work on this?\r\n- https://github.com/status-im/status-go/issues/3720\r\n- https://github.com/status-im/status-go/issues/3803#issuecomment-1654588500\r\n\r\n--- Wallet ---\r\n\r\n- Database re-encryption flows\r\n- Community Asset and NFT designs for Asset screens\r\n- Community token visibility\r\n- Minor updates to Asset screens\r\n- WalletConnect",
     "creator": {
       "login": "John-44",
       "id": 22846356,
@@ -131,17 +131,17 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 59,
-    "closed_issues": 6,
+    "open_issues": 83,
+    "closed_issues": 24,
     "state": "open",
     "created_at": "2023-09-11T16:40:59Z",
-    "updated_at": "2023-09-27T15:40:49Z",
+    "updated_at": "2023-10-17T16:56:59Z",
     "due_on": "2023-12-07T08:00:00Z",
     "closed_at": null
   },
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-09-18T06:54:34Z",
-  "updated_at": "2023-09-27T15:40:00Z",
+  "updated_at": "2023-10-17T17:10:26Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -164,5 +164,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1766835090",
+    "html_url": "https://github.com/status-im/status-desktop/issues/12184#issuecomment-1766835090",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/12184",
+    "id": 1766835090,
+    "node_id": "IC_kwDOD5KrTM5pT8OS",
+    "user": {
+      "login": "mprakhov",
+      "id": 117639195,
+      "node_id": "U_kgDOBwMIGw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117639195?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mprakhov",
+      "html_url": "https://github.com/mprakhov",
+      "followers_url": "https://api.github.com/users/mprakhov/followers",
+      "following_url": "https://api.github.com/users/mprakhov/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mprakhov/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mprakhov/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mprakhov/subscriptions",
+      "organizations_url": "https://api.github.com/users/mprakhov/orgs",
+      "repos_url": "https://api.github.com/users/mprakhov/repos",
+      "events_url": "https://api.github.com/users/mprakhov/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mprakhov/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-17T17:10:26Z",
+    "updated_at": "2023-10-17T17:10:26Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Got a repro:\r\n\r\nhttps://github.com/status-im/status-desktop/assets/117639195/43513fed-2c41-4d4d-8ad0-7bf645e2badb\r\n\r\nWhat I can see\r\n1. Control node: when he creates a community permission, after calling status-go to create a community permission, we parse the response and send a toast notification. Here we see it 1 time only. The state is `TokenPermissionApproved`\r\n2. Privileged member: when creating a community permission, after calling status-go to create a community permission, we parse the response and send a toast notification. The state is `TokenPermissionAdditionPending`. When we receive an update from the control node - we send another notification due to state change (from `TokenPermissionAdditionPending` to `TokenPermissionApproved`), that's why we see an `Update` msg and not `Create`\r\n\r\nWhat can be done:\r\nDo not show notification, that the token was created/updated/deleted by the privileged member until the control node verifies this event. When it verifies it - show the appropriate msg based on the previous state (if it was `TokenPermissionAdditionPending`, we will show that permission `Created` and not `Updated` for the privileged member\r\n\r\nCorner case: The control node processes a few permissions events. In this case on each permission update, we will generate a new msg. This can be handled by sending only one msg (for example, we create 3 permissions and instead sending 3 create msg's, send one for a community), but this is optional",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1766835090/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
