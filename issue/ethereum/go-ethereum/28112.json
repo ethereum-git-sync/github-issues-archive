@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "rjl493456442",
@@ -94,14 +94,33 @@
     }
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 8,
   "created_at": "2023-09-13T18:48:45Z",
-  "updated_at": "2023-10-06T19:23:35Z",
-  "closed_at": null,
+  "updated_at": "2023-10-17T13:15:23Z",
+  "closed_at": "2023-10-17T13:15:22Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: `geth version 1.13.0`\r\nCL client & version: Not important\r\nOS & Version: OSX\r\nCommit hash: 8d38b1fe62950e8675795abf63b7c978415ab7ba\r\n\r\n#### Expected behaviour\r\n\r\nNo crash\r\n\r\n#### Actual behaviour\r\n\r\nCrash with:\r\n\r\n```\r\nINFO [09-13|14:27:01.772] Maximum peer count                       ETH=50 LES=0 total=50\r\nINFO [09-13|14:27:01.776] Using leveldb as the backing database\r\nINFO [09-13|14:27:01.776] Allocated cache and file handles         database=/app/geth/chaindata cache=512.00MiB handles=5120 readonly=true\r\nINFO [09-13|14:27:01.778] Using LevelDB as the backing database\r\nChain metadata\r\n  databaseVersion: <nil>\r\n  headBlockHash: 0xc5902001cfab2bfb6cbfb5e752ab11be44af47d50dbd777a02f7098c169e780b\r\n  headFastBlockHash: 0xc5902001cfab2bfb6cbfb5e752ab11be44af47d50dbd777a02f7098c169e780b\r\n  headHeaderHash: 0xc5902001cfab2bfb6cbfb5e752ab11be44af47d50dbd777a02f7098c169e780b\r\n  lastPivotNumber: <nil>\r\n  len(snapshotSyncStatus): 0 bytes\r\n  snapshotDisabled: false\r\n  snapshotJournal: 0 bytes\r\n  snapshotRecoveryNumber: <nil>\r\n  snapshotRoot: 0x0000000000000000000000000000000000000000000000000000000000000000\r\n  txIndexTail: <nil>\r\n  fastTxLookupLimit: <nil>\r\n\r\nFatal: Could not open database: open /app/geth/chaindata/ancient/chain/headers.cidx: no such file or directory\r\n```\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nRight now I have a data dir that looks like this:\r\n\r\n```\r\n├── LOCK\r\n├── chaindata\r\n│   ├── 000001.log\r\n│   ├── CURRENT\r\n│   ├── LOCK\r\n│   ├── LOG\r\n│   ├── MANIFEST-000000\r\n│   └── ancient\r\n│       └── chain\r\n│           └── FLOCK\r\n├── lightchaindata\r\n│   ├── 000001.log\r\n│   ├── CURRENT\r\n│   ├── LOCK\r\n│   ├── LOG\r\n│   └── MANIFEST-000000\r\n└── nodekey\r\n```\r\n\r\nNote that my `ancient` folder contains no tables, only `FLOCK`. On bootstrap of `geth`, there is the inference of the database scheme, which is done in `readonly` mode:\r\n\r\n```go\r\n\t// Parse state scheme, abort the process if it's not compatible.\r\n\tchaindb := tryMakeReadOnlyDatabase(ctx, stack)\r\n```\r\n\r\nThis will reach a some point the `newTable` inside `freezer_table.go` file which does this when `read-only`:\r\n\r\n```\r\n\t\t// Will fail if table index file or meta file is not existent\r\n\t\tindex, err = openFreezerFileForReadOnly(filepath.Join(path, idxName))\r\n\t\tif err != nil {\r\n\t\t\treturn nil, err\r\n\t\t}\r\n\t\tmeta, err = openFreezerFileForReadOnly(filepath.Join(path, fmt.Sprintf(\"%s.meta\", name)))\r\n\t\tif err != nil {\r\n\t\t\treturn nil, err\r\n\t\t}\r\n```\r\n\r\nSo it crashes there because the ancient tables do not exists.\r\n\r\nI must admit this geth's data dir was created a long time ago using I think `geth 1.9.23`. Not sure if it's normal that I have no ancient tables but I think it's actually valid. The write mode simply creates files if they do not exist, so I think it might be possible to have such case where no ancient tables is present.\r\n\r\nNot sure if there is an easy fix here, if the ancient is not required to infer the scheme, maybe it could be refactored to only deal with the \"current\" data set and leave ancient out of the equation.\r\n\r\nAnother thing could be to update `newTable` in `freezer_table.go`to better deal with inexistent tables in readonly mode. The `Freezer.tables` map could then have no tables (or less tables). I'm not sure of the implications of such thing.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "s1na",
+    "id": 1591639,
+    "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/s1na",
+    "html_url": "https://github.com/s1na",
+    "followers_url": "https://api.github.com/users/s1na/followers",
+    "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+    "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+    "organizations_url": "https://api.github.com/users/s1na/orgs",
+    "repos_url": "https://api.github.com/users/s1na/repos",
+    "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/s1na/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28112/reactions",
     "total_count": 1,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28112/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -415,6 +434,50 @@
     "body": "There isn't a whole lot in the config. Let me know if you need anything else!\r\n\r\n```\r\n[Eth]\r\nNetworkId = 1\r\nSyncMode = \"snap\"\r\nNoPruning = false\r\nNoPrefetch = false\r\nLightPeers = 100\r\nDatabaseCache = 2048\r\nDatabaseFreezer = \"/mnt/disks/geth-hdd/ethereum\"\r\nTrieCleanCache = 1023\r\nTrieDirtyCache = 1024\r\nTrieTimeout = 3600000000000\r\nSnapshotCache = 0\r\nPreimages = true\r\nEnablePreimageRecording = false\r\nRPCGasCap = 25000000\r\nRPCTxFeeCap = 1e+00\r\n...\r\n[Node]\r\nDataDir = \"/home/lane/.ethereum\"\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1751303187/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1766397485",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28112#issuecomment-1766397485",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28112",
+    "id": 1766397485,
+    "node_id": "IC_kwDOAOvK985pSRYt",
+    "user": {
+      "login": "s1na",
+      "id": 1591639,
+      "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/s1na",
+      "html_url": "https://github.com/s1na",
+      "followers_url": "https://api.github.com/users/s1na/followers",
+      "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+      "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+      "organizations_url": "https://api.github.com/users/s1na/orgs",
+      "repos_url": "https://api.github.com/users/s1na/repos",
+      "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/s1na/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-17T13:15:22Z",
+    "updated_at": "2023-10-17T13:15:22Z",
+    "author_association": "MEMBER",
+    "body": "I believe this is fixed by https://github.com/ethereum/go-ethereum/pull/28313. Otherwise please feel free to re-open.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1766397485/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
