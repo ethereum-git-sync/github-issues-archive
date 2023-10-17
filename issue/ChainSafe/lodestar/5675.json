@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-06-21T12:27:27Z",
-  "updated_at": "2023-06-22T13:48:17Z",
-  "closed_at": null,
+  "updated_at": "2023-10-17T09:26:26Z",
+  "closed_at": "2023-10-17T09:26:26Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "### Describe the bug\r\n\r\nDoppelganger protection produces false positives if validator publishes attestation in current epoch _N_ with an inclusion delay/(or duplicate inclusion) in epoch _N + 1_.\r\n\r\nThis is due to the fact that liveness of validator is checked based on attestation seen in block attesters cache\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/61c838b84f1d4cd5deba20942d84609432fe8707/packages/beacon-node/src/chain/chain.ts#L315\r\n\r\nwhich is set when importing block\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/61c838b84f1d4cd5deba20942d84609432fe8707/packages/beacon-node/src/chain/blocks/importBlock.ts#L137\r\n\r\nThis is expected to happen because the doppelganger service set epoch _N + 1_ as the next epoch to check\r\nhttps://github.com/ChainSafe/lodestar/blob/61c838b84f1d4cd5deba20942d84609432fe8707/packages/validator/src/services/doppelgangerService.ts#L69\r\n\r\nThere are multiple factors which increase the chance to produce false positives\r\n- validator client is restarted towards the end of epoch\r\n- increased inclusion delay due to bad network conditions (e.g. on goerli)\r\n- inaccurate source, target, or head vote of last attestation?\r\n- number of validator keys\r\n\r\nThis is issue can be fully mitigated by setting next epoch to check to _N + 2_ at the cost of missing more validator duties.\r\n\r\n### Expected behavior\r\n\r\nDoppelganger protection must not produce false positives.\r\n\r\n### Steps to reproduce\r\n\r\nEnable doppelganger protection by setting `--doppelgangerProtectionEnabled` and restart validator client near the end of epoch (slot 28-31), it is important to make sure it is still started in the same epoch.\r\n\r\n### Additional context\r\n\r\n**Examples of false positives on goerli**\r\n\r\nStopped validator client end of epoch [184455](https://goerli.beaconcha.in/epoch/184455) (slot=5902590) and started it in same epoch (slot=5902591)\r\n\r\nStarted doppelganger protection\r\n```\r\nJun-21 09:18:17.474[]                 info: doppelganger protection enabled currentEpoch=184455, detectionEpochs=1\r\n```\r\n\r\nRegistration of validators\r\n```\r\nJun-21 09:18:17.886[]                 info: Registered validator for doppelganger remainingEpochs=1, nextEpochToCheck=184456\r\n```\r\n\r\nLiveness response that triggered detection\r\n```\r\nJun-21 09:24:46.559[]                debug: doppelganger pollLiveness currentEpoch=184456, indicesCount=1962\r\nJun-21 09:24:46.662[]                debug: getLiveness response epoch=184456\r\n```\r\n\r\nDoppelganger error\r\n```\r\nJun-21 09:24:46.664[]                error: Doppelganger(s) detected\r\n        A doppelganger occurs when two different validator clients run the same public key.\r\n        This validator client detected another instance of a local validator on the network\r\n        and is shutting down to prevent potential slashable offenses. Ensure that you are not\r\n        running a duplicate or overlapping validator client 461176, 462364, 460910, 462319, 462359, 460903, 461460, 461144, 461632, 462398, 461023, 461221, 461013, 461130, 461381, 461578, 462233, 460645, 460598, 461119, 462390, 461539, 462379, 461561, 460995, 460566, 460825, 461309, 462318, 460682, 460782, 461827, 461278, 461584, 461873, 461615, 460989, 460941, 462324, 461145, 460700, 461866, 462067, 461452, 461667, 460828, 461485, 461394, 462471, 461922, 462332, 460546, 460776, 461551, 461181, 461966, 461963, 461115, 461370, 461128, 461945, 461228, 461155, 460597, 461838, 461082, 461157, 461372, 462056, 462146, 460699, 462249, 461759, 461494, 460554, 461096, 461151, 460617, 462317, 461347, 460850, 460927, 461995, 461266, 462196, 461336, 462171, 460908, 462182, 462189, 461572, 460586, 461087, 460970, 460897, 460860, 461543, 461733, 460525, 461826, 461272, 461771, 462232, 461689\r\nJun-21 09:24:46.665[]                error: Process shutdown requested  Doppelganger(s) detected\r\nError: Doppelganger(s) detected\r\n    at DoppelgangerService.detectDoppelganger (file:///home/devops/goerli/lodestar/packages/validator/src/services/doppelgangerService.ts:209:36)\r\n    at DoppelgangerService.pollLiveness (file:///home/devops/goerli/lodestar/packages/validator/src/services/doppelgangerService.ts:139:10)\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at Clock.runAtMostEvery (file:///home/devops/goerli/lodestar/packages/validator/src/util/clock.ts:96:7\r\n```\r\n\r\n---\r\n\r\n[Validator 461381](https://goerli.beaconcha.in/validator/461381)\r\n\r\nThe attestation of epoch _N_ was included multiple times in epoch _N_ and _N + 1_ causing the false positive.\r\n\r\nLast signed attestation\r\n```\r\nJun-21 09:15:52.030[]                debug: Signed attestation slot=5902579, index=13, head=0x616b4a8f5af67af88f91bb2010365c64bcf793d9ac77d4456cf7fd49f2402e14, validatorIndex=461381\r\n```\r\n\r\nRegistration of validator\r\n```\r\nJun-21 09:18:17.580[]                 info: Registered validator for doppelganger remainingEpochs=1, nextEpochToCheck=184456, pubkeyHex=0x8a1429569307ada150e14f1c0971d6e418bbcc7f8aafdf1ceb81f487caefbf3109463e563b02459dc4f7a76e024c0e02\r\n```\r\n\r\n`validatorSeenAtEpoch` response on beacon node\r\n```\r\nJun-21 09:24:46.620[chain]           debug: validatorSeenAtEpoch index=461381, epoch=184456, seenBlockAttesters=true, seenAttesters=false, seenAggregators=false, seenBlockProposers=false\r\n```\r\n\r\nBased on data from beaconcha.in there has not been an inclusion delay\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/92a490f6-b441-4b5b-bf4e-e5a613ba7968)\r\n\r\nHowever, the attestation is included in multiple blocks, first in slot [5902580](https://goerli.beaconcha.in/slot/5902580#attestations) which is epoch 184455 but also in slot [5902593](https://goerli.beaconcha.in/slot/5902593#attestations) which is epoch 184456. The 2nd inclusion likely caused `seenBlockAttesters=true`.\r\n\r\n---\r\n\r\n[Validator 461016](https://goerli.beaconcha.in/validator/461016)\r\n\r\nThis is from a another test run, it is expected for this validator that doppelganger protection detected a false positive as attestation inclusion was delayed to next epoch.\r\n\r\nLast signed attestation epoch=184287\r\n```\r\nJun-20 15:22:14.842[]                debug: Signed attestation slot=5897211, index=41, head=0x77443f93430711ab246de346bccbbf8d230089b79e76a399ef7c173878ac6673, validatorIndex=46101\r\n```\r\n\r\nRegistered validator on epoch=184287\r\n```\r\nJun-20 15:23:06.515[]                 info: Registered validator for doppelganger remainingEpochs=1, pubkeyHex=0x8186135e9b5cbba537b93a7a79a615e55b841e61abda623f28de0bcd893a7cf8285e808f48376fc6f97f600e57d65af\r\n```\r\n\r\nLast attestation epoch=184287, slot=5897211, inclusion_slot=5897222 (epoch=184288)\r\n\r\n![image](https://user-images.githubusercontent.com/38436224/247215399-dacd4ba0-d2cd-4046-8acc-6527b3c4c857.png)\r\n\r\n---\r\n\r\nMore examples can be found here: [doppelganger-false-positives.md](https://gist.github.com/nflaig/ab4efbeb6755f311738e30b88f6848cd)\r\n\r\n### Operating system\r\n\r\nLinux\r\n\r\n### Lodestar version or commit hash\r\n\r\nunstable (f6774341d520a0bc3e735417a275313286a59c9b)",
-  "closed_by": null,
+  "closed_by": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5675/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5675/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1766026371",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/5675#issuecomment-1766026371",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5675",
+    "id": 1766026371,
+    "node_id": "IC_kwDOCD5_Gc5pQ2yD",
+    "user": {
+      "login": "nflaig",
+      "id": 38436224,
+      "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nflaig",
+      "html_url": "https://github.com/nflaig",
+      "followers_url": "https://api.github.com/users/nflaig/followers",
+      "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+      "organizations_url": "https://api.github.com/users/nflaig/orgs",
+      "repos_url": "https://api.github.com/users/nflaig/repos",
+      "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nflaig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-17T09:26:26Z",
+    "updated_at": "2023-10-17T09:26:26Z",
+    "author_association": "MEMBER",
+    "body": "- Closing as this is effectively resolved by https://github.com/ChainSafe/lodestar/pull/6012\r\n\r\nThe suggested solution to set the next epoch to check to _N + 2_ won't be required to prevent false positives. The only way to reproduce this issue previously was by restarting the validator client close to the end of the current epoch but in this case we now skip doppelganger protection.\r\n\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1766026371/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
