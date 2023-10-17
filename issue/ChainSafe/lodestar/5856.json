@@ -40,7 +40,7 @@
       "description": "Issues to track feature requests."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-08-07T15:17:16Z",
-  "updated_at": "2023-10-14T22:25:26Z",
-  "closed_at": null,
+  "updated_at": "2023-10-17T08:51:34Z",
+  "closed_at": "2023-10-17T08:51:34Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "### Problem description\r\n\r\nCurrent implementation of doppelganger protection does not differentiate between a simple restart and starting the validator on a new machine. This causes 2-3 missed attestations after every restart such as when upgrading Lodestar to a newer version but DP does not provide any protection in this case.\r\n\r\nFor some users (e.g. on dappnode), DP is enabled by default and every package upgrade introduces unnecessary downtime which causes bad user experience.\r\n\r\n### Solution description\r\n\r\nWe should make our DP implementation a bit smarter and be able to differentiate between a restart and a new installation. Validator duties should only be skipped if it is really required.\r\n\r\nThis can be achieved by looking at the local slashing protection DB and if the validator produced an attestation in the previous epoch it means that the validator client was just restarted and DP can be skipped for this validator.\r\n\r\nIt is even safer in this case to start attestations right away because if two validator clients are started at the same time and one of them has an existing DB it would prevent slashing, whereas if both wait for 2-3 epochs, no chain activity would be detected and both instances would start attesting at the same time, causing validators to be slashed if there are conflicting attestations.\r\n\r\n### Further considerations\r\n\r\nThere is an edge case when importing a validator via keymanager API, it is possible to also import the slashing protection interchange file. This will create an attestation record in the database and could cause doppelganger protection to be skipped if import happens within in the next epoch.\r\n\r\nI don't see this as a huge risk because exporting the slashing protection interchange from a running client is only possible while also deleting the key from that client, there is no risk of getting slashed due to a doppelganger.\r\nIt also assumes slashing protection was exported / imported within short time period, likely in an automated setup which aims to achieve no downtime when switching clients and therefore doppelganger protection would not be enabled anyways.\r\n\r\nConsidering this, I think there is no risk in the suggested approach and it is safe to skip doppelganger in any scenario if an attestation from previous epoch exists in the slashing protection db.\r\n\r\n### Additional context\r\n\r\nSimilar approach is described in https://github.com/prysmaticlabs/prysm/issues/7985#issuecomment-843209422 and https://github.com/status-im/nimbus-eth2/issues/3083.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856/reactions",
     "total_count": 1,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5856/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
