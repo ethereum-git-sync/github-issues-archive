@@ -41,7 +41,7 @@
   "milestone": null,
   "comments": 19,
   "created_at": "2022-09-28T02:36:43Z",
-  "updated_at": "2023-10-16T18:13:00Z",
+  "updated_at": "2023-10-17T13:53:24Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -443,9 +443,9 @@
       "site_admin": false
     },
     "created_at": "2023-07-26T03:04:32Z",
-    "updated_at": "2023-07-26T03:04:32Z",
+    "updated_at": "2023-10-17T13:53:24Z",
     "author_association": "NONE",
-    "body": "@Dexaran if you are serious about reviving erc223 please open a new thread, make an RP with implementation and I promise to test it against my codebase and give you feedback\r\n\r\nmeanwhile, you can check how erc1363 is used in my system.\r\n\r\n```solidity\r\n\r\nbytes4 constant IERC1363_RECEIVER_ID = 0x88a7ca5c;\r\nbytes4 constant IERC1363_ID = 0xb0202a11;\r\n\r\nlibrary ExchangeUtils {\r\n  using Address for address;\r\n  using SafeERC20 for IERC20;\r\n  \r\n  function spendFrom(\r\n    address token,\r\n    uint256 amount,\r\n    address spender,\r\n    address receiver\r\n  ) internal {\r\n    if (_isERC1363Supported(receiver, token)) {\r\n      IERC1363(item.token).transferFromAndCall(spender, receiver, amount);\r\n    } else {\r\n      SafeERC20.safeTransferFrom(IERC20(token), spender, receiver, amount);\r\n    }\r\n  }\r\n\r\n  function _isERC1363Supported(address receiver, address token) internal view returns (bool) {\r\n    return\r\n      (receiver == address(this) ||\r\n        (receiver.isContract() && _tryGetSupportedInterface(receiver, IERC1363_RECEIVER_ID))) &&\r\n      _tryGetSupportedInterface(token, IERC1363_ID);\r\n  }\r\n\r\n  function _tryGetSupportedInterface(address account, bytes4 interfaceId) internal view returns (bool) {\r\n    try IERC165(account).supportsInterface(interfaceId) returns (bool isSupported) {\r\n      return isSupported;\r\n    } catch (bytes memory) {\r\n      return false;\r\n    }\r\n  }\r\n}\r\n```\r\n\r\n@ernestognw that comment about EOA, man you just can't prevent people from shooting their foot",
+    "body": "@Dexaran if you are serious about reviving erc223 please open a new thread, make an RP with implementation and I promise to test it against my codebase and give you feedback\r\n\r\nmeanwhile, you can check how erc1363 is used in my system.\r\n\r\n```solidity\r\n\r\nbytes4 constant IERC1363_RECEIVER_ID = 0x88a7ca5c;\r\nbytes4 constant IERC1363_ID = 0xb0202a11;\r\n\r\nlibrary ExchangeUtils {\r\n  using Address for address;\r\n  using SafeERC20 for IERC20;\r\n  \r\n  function spendFrom(\r\n    address token,\r\n    uint256 amount,\r\n    address spender,\r\n    address receiver\r\n  ) internal {\r\n    if (_isERC1363Supported(receiver, token)) {\r\n      IERC1363(token).transferFromAndCall(spender, receiver, amount);\r\n    } else {\r\n      SafeERC20.safeTransferFrom(IERC20(token), spender, receiver, amount);\r\n    }\r\n  }\r\n\r\n  function _isERC1363Supported(address receiver, address token) internal view returns (bool) {\r\n    return\r\n      (receiver == address(this) ||\r\n        (receiver.isContract() && _tryGetSupportedInterface(receiver, IERC1363_RECEIVER_ID))) &&\r\n      _tryGetSupportedInterface(token, IERC1363_ID);\r\n  }\r\n\r\n  function _tryGetSupportedInterface(address account, bytes4 interfaceId) internal view returns (bool) {\r\n    try IERC165(account).supportsInterface(interfaceId) returns (bool isSupported) {\r\n      return isSupported;\r\n    } catch (bytes memory) {\r\n      return false;\r\n    }\r\n  }\r\n}\r\n```\r\n\r\n@ernestognw that comment about EOA, man you just can't prevent people from shooting their foot",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1650905170/reactions",
       "total_count": 0,
