@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "ethDreamer",
@@ -85,30 +85,92 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-09-20T14:06:53Z",
-  "updated_at": "2023-09-20T14:07:05Z",
-  "closed_at": null,
+  "updated_at": "2023-10-18T17:12:25Z",
+  "closed_at": "2023-10-18T17:12:25Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nThe [OverflowLRUCache](https://github.com/sigp/lighthouse/blob/665334e9368f8c7399a495f85b7409c78ccbc160/beacon_node/beacon_chain/src/data_availability_checker/overflow_lru_cache.rs#L380) was created to prevent lighthouse from using up too much memory in the event that the chain stops finalizing and blocks remain perpetually unavailable. Unfortunately I had failed to realize during its design that part of the [PendingComponents](https://github.com/sigp/lighthouse/blob/665334e9368f8c7399a495f85b7409c78ccbc160/beacon_node/beacon_chain/src/data_availability_checker/overflow_lru_cache.rs#L54) which are stored in memory [include a `BeaconState`](https://github.com/sigp/lighthouse/blob/665334e9368f8c7399a495f85b7409c78ccbc160/beacon_node/beacon_chain/src/block_verification_types.rs#L264) which are significantly larger than any of the `BlobSidecar` objects.\r\n\r\nThis will remain true until tree-states is merged but in the meantime the cache needs an update to prevent the states from consuming all the memory if blocks are perpetually unavailable.\r\n\r\n### Goals\r\n\r\n1. Don't consume excess memory\r\n2. Don't consume excess disk\r\n3. Minimize impact on attestation performance during average network conditions\r\n4. Perform acceptably during adverse network conditions\r\n5. Design fix so that it can be ripped out easily once tree-states is merged\r\n\r\n### Design\r\n\r\nAfter some initial investigation the following design emerged:\r\n\r\n1. Hold at most 2-4 `BeaconStates` in memory for the `LRUCache` (there are various ways to do this)\r\n2. If more than this threshold of states are floating around, write the LRU state to disk using hot state summaries\r\n3. Recover the states when needed by replaying blocks (this code will need to be modified as it assumes necessary blocks are imported)",
-  "closed_by": null,
+  "closed_by": {
+    "login": "realbigsean",
+    "id": 5160426,
+    "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/realbigsean",
+    "html_url": "https://github.com/realbigsean",
+    "followers_url": "https://api.github.com/users/realbigsean/followers",
+    "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+    "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+    "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+    "repos_url": "https://api.github.com/users/realbigsean/repos",
+    "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4757/reactions",
-    "total_count": 0,
+    "total_count": 1,
     "+1": 0,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
     "confused": 0,
-    "heart": 0,
+    "heart": 1,
     "rocket": 0,
     "eyes": 0
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4757/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1768989485",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4757#issuecomment-1768989485",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4757",
+    "id": 1768989485,
+    "node_id": "IC_kwDOCFeAzc5pcKMt",
+    "user": {
+      "login": "realbigsean",
+      "id": 5160426,
+      "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/realbigsean",
+      "html_url": "https://github.com/realbigsean",
+      "followers_url": "https://api.github.com/users/realbigsean/followers",
+      "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+      "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+      "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+      "repos_url": "https://api.github.com/users/realbigsean/repos",
+      "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-18T17:12:25Z",
+    "updated_at": "2023-10-18T17:12:25Z",
+    "author_association": "COLLABORATOR",
+    "body": "resolved in https://github.com/sigp/lighthouse/pull/4801",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1768989485/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
