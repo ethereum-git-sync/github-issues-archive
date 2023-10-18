@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-11T15:27:18Z",
-  "updated_at": "2023-10-11T15:27:18Z",
+  "updated_at": "2023-10-18T12:45:01Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1768319225",
+    "html_url": "https://github.com/ethereum/solidity/issues/14603#issuecomment-1768319225",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14603",
+    "id": 1768319225,
+    "node_id": "IC_kwDOAm_5kc5pZmj5",
+    "user": {
+      "login": "r0qs",
+      "id": 457348,
+      "node_id": "MDQ6VXNlcjQ1NzM0OA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/457348?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/r0qs",
+      "html_url": "https://github.com/r0qs",
+      "followers_url": "https://api.github.com/users/r0qs/followers",
+      "following_url": "https://api.github.com/users/r0qs/following{/other_user}",
+      "gists_url": "https://api.github.com/users/r0qs/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/r0qs/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/r0qs/subscriptions",
+      "organizations_url": "https://api.github.com/users/r0qs/orgs",
+      "repos_url": "https://api.github.com/users/r0qs/repos",
+      "events_url": "https://api.github.com/users/r0qs/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/r0qs/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-18T12:12:36Z",
+    "updated_at": "2023-10-18T12:45:01Z",
+    "author_association": "MEMBER",
+    "body": "Hi @FredCoen, do you have a code which we can reproduce the problem? Note, that external functions which have memory arguments can be overridden with calldata arguments and vice-versa, since they can only be called externally and thereby always get their arguments in calldata. Maybe that's the confusion here.\r\n\r\nFor instance, see the example below:\r\n```solidity\r\npragma solidity >=0.8.2 <0.9.0;\r\n\r\nabstract contract A {\r\n    function f(string memory s) external virtual;\r\n}\r\n\r\ncontract B is A {\r\n    string public a;\r\n\r\n    function f(string calldata s) public virtual override {\r\n        a = s;\r\n    }\r\n}\r\n```\r\n\r\nThis is completely fine. But, if you change the visibility of function `f` in the contract `A` to anything other than `external` you should get a compiler error like this: `Data locations of parameters have to be the same when overriding non-external functions, but they differ`\r\n\r\nYou can see here when this was fixed in Solidity `0.8.14` https://github.com/ethereum/solidity/pull/12850 and read more about the bug at that time in our blog: https://soliditylang.org/blog/2022/05/17/data-location-inheritance-bug/\r\n\r\nHowever, if you can still reproduce this bug in any solidity version greater than `0.8.14`, please share your code with us :) \r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1768319225/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
