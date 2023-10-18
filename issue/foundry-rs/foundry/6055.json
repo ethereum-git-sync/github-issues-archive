@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6055",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6055/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6055/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6055/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6055",
+  "id": 1949419575,
+  "node_id": "I_kwDOGBlvNc50Mcg3",
+  "number": 6055,
+  "title": "Same path but in different case are treated as different files and may cause compilation issues",
+  "user": {
+    "login": "klkvr",
+    "id": 62447812,
+    "node_id": "MDQ6VXNlcjYyNDQ3ODEy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/62447812?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/klkvr",
+    "html_url": "https://github.com/klkvr",
+    "followers_url": "https://api.github.com/users/klkvr/followers",
+    "following_url": "https://api.github.com/users/klkvr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/klkvr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/klkvr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/klkvr/subscriptions",
+    "organizations_url": "https://api.github.com/users/klkvr/orgs",
+    "repos_url": "https://api.github.com/users/klkvr/repos",
+    "events_url": "https://api.github.com/users/klkvr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/klkvr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-18T10:36:48Z",
+  "updated_at": "2023-10-18T10:36:48Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [ ] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\n_No response_\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nNone\n\n### Describe the bug\n\nI have set up a repro for this https://github.com/klkvr/foundry-path-bug-repro\r\n\r\nIt consits of 4 contracts:\r\n\r\n```solidity\r\n// A.sol\r\n\r\ncontract A {\r\n    function foo() public {}\r\n}\r\n```\r\n\r\n```solidity\r\n// B.sol\r\n\r\nimport {A} from \"./a.sol\";\r\n\r\ncontract B is A {}\r\n```\r\n\r\n```solidity\r\n// C.sol\r\n\r\nimport {A} from \"./A.sol\";\r\n\r\ncontract C is A {}\r\n```\r\n\r\n```solidity\r\n// D.sol\r\n\r\nimport {B} from \"./B.sol\";\r\nimport {C} from \"./C.sol\";\r\n\r\ncontract D is B, C {}\r\n```\r\n\r\nWhen running `forge build`, compilation fails:\r\n```\r\nCompiler run failed:\r\nError (6480): Derived contract must override function \"foo\". Two or more base classes define function with same name and parameter types.\r\n --> src/D.sol:6:1:\r\n  |\r\n6 | contract D is B, C {}\r\n  | ^^^^^^^^^^^^^^^^^^^^^\r\nNote: Definition in \"A\": \r\n --> src/A.sol:4:5:\r\n  |\r\n4 |     function foo() public {}\r\n  |     ^^^^^^^^^^^^^^^^^^^^^^^^\r\nNote: Definition in \"A\": \r\n --> src/a.sol:4:5:\r\n  |\r\n4 |     function foo() public {}\r\n  |     ^^^^^^^^^^^^^^^^^^^^^^^^\r\n```\r\n\r\nThis happens because in B.sol we are importing A from `a.sol` and in C.sol we are importing it from `A.sol`.\r\n\r\nExpected behavior would be to raise a error saying that a.sol path does not exist\r\n\r\nI am not sure that it is a foundry issue, may be related to ethers-rs or even solidity compiler\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6055/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6055/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

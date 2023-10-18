@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6057",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6057/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6057/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6057/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6057",
+  "id": 1949756852,
+  "node_id": "I_kwDOGBlvNc50Nu20",
+  "number": 6057,
+  "title": "vm.pauseGasMetering() bricks construction of contracts with external calls",
+  "user": {
+    "login": "3docSec",
+    "id": 145972240,
+    "node_id": "U_kgDOCLNcEA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/145972240?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/3docSec",
+    "html_url": "https://github.com/3docSec",
+    "followers_url": "https://api.github.com/users/3docSec/followers",
+    "following_url": "https://api.github.com/users/3docSec/following{/other_user}",
+    "gists_url": "https://api.github.com/users/3docSec/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/3docSec/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/3docSec/subscriptions",
+    "organizations_url": "https://api.github.com/users/3docSec/orgs",
+    "repos_url": "https://api.github.com/users/3docSec/repos",
+    "events_url": "https://api.github.com/users/3docSec/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/3docSec/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-18T13:26:17Z",
+  "updated_at": "2023-10-18T13:26:17Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (b0b8cfb 2023-10-18T00:17:29.353012000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nThe below test contract shows how the creation of `SomeContract` succeeds with gas metering enabled, but fails when gas metering is disabled.\r\n\r\nThis applies to both CREATE and CREATE2 opcodes.\r\n\r\n```Solidity\r\npragma solidity ^0.8.20;\r\n\r\nimport {Test} from \"forge-std/Test.sol\";\r\n\r\ncontract BugTest is Test {\r\n\r\n    address public something;\r\n\r\n    function testNoBug() public {\r\n        new SomeContract();\r\n    }\r\n\r\n    function testFailBug() public {\r\n        vm.pauseGasMetering();\r\n        new SomeContract();\r\n    }\r\n}\r\n\r\ncontract SomeContract {\r\n    constructor() {\r\n        BugTest(msg.sender).something();\r\n    }\r\n}\r\n```\r\n\r\nExtra-verbose output is:\r\n```\r\n$ forge test -vvvv\r\n[⠢] Compiling...\r\nNo files changed, compilation skipped\r\n\r\nRunning 2 tests for test/Counter.t.sol:BugTest\r\n[PASS] testFailBug() (gas: 9223372036854754743)\r\nTraces:\r\n  [0] BugTest::testFailBug()\r\n    ├─ [0] VM::pauseGasMetering()\r\n    │   └─ ← ()\r\n    ├─ [0] → new <Unknown>@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f\r\n    │   ├─ [0] BugTest::something() [staticcall]\r\n    │   │   └─ ← 0x0000000000000000000000000000000000000000\r\n    │   └─ ← 0 bytes of code\r\n    └─ ← \"EvmError: Revert\"\r\n\r\n[PASS] testNoBug() (gas: 47801)\r\nTraces:\r\n  [47801] BugTest::testNoBug()\r\n    ├─ [15457] → new SomeContract@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f\r\n    │   ├─ [2382] BugTest::something() [staticcall]\r\n    │   │   └─ ← 0x0000000000000000000000000000000000000000\r\n    │   └─ ← 63 bytes of code\r\n    └─ ← ()\r\n\r\nTest result: ok. 2 passed; 0 failed; 0 skipped; finished in 344.46µs\r\n\r\nRan 1 test suites: 2 tests passed, 0 failed, 0 skipped (2 total tests)\r\n```\r\n\r\nThe full project can be found in [this public repo](https://github.com/3docSec/creation-failed). LMK if I can provide more info 🤗",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6057/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6057/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
