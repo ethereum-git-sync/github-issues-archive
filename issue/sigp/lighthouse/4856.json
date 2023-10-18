@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4856",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4856/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4856/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4856/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4856",
+  "id": 1949572849,
+  "node_id": "I_kwDOCFeAzc50NB7x",
+  "number": 4856,
+  "title": "Rewards API: proposer rewards are incorrectly included in phase 0 attestation rewards",
+  "user": {
+    "login": "jimmygchen",
+    "id": 742762,
+    "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmygchen",
+    "html_url": "https://github.com/jimmygchen",
+    "followers_url": "https://api.github.com/users/jimmygchen/followers",
+    "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+    "repos_url": "https://api.github.com/users/jimmygchen/repos",
+    "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 2336800343,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMzQz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/HTTP-API",
+      "name": "HTTP-API",
+      "color": "5A63A2",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-18T11:59:31Z",
+  "updated_at": "2023-10-18T11:59:31Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\n[Attestation Rewards API specification](https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Rewards/getAttestationsRewards)\r\n\r\nWhile reviewing #4512, we noticed that **Phase 0** proposer rewards are being incorrectly included  as part of  `inclusion_delay`, which falls under attestation rewards. We know this because the attestation rewards tests below are passing without taking block rewards into account: \r\n\r\nhttps://github.com/sigp/lighthouse/blob/fc7f1ba6b94ac3300338aad4d5168aaac5df3fac/beacon_node/beacon_chain/tests/rewards.rs#L130 \r\nhttps://github.com/sigp/lighthouse/blob/fc7f1ba6b94ac3300338aad4d5168aaac5df3fac/beacon_node/beacon_chain/tests/rewards.rs#L171\r\nhttps://github.com/sigp/lighthouse/blob/fc7f1ba6b94ac3300338aad4d5168aaac5df3fac/beacon_node/beacon_chain/tests/rewards.rs#L223\r\n\r\nIf we add block rewards to the validator balances, these tests will fail. \r\n\r\nThanks to @zack-scott for working on Altair attestation rewards calculation and adding tests in #4807, which helped uncover this bug! ☺️ \r\n\r\n## Version\r\n\r\nLighthouse 4.5.0\r\n\r\n## Present Behaviour\r\n\r\n`inclusion_delay` in attestation rewards response incorrectly includes proposer rewards, which means the `total_rewards.inclusion_delay` could exceed `ideal_rewards.inclusion_delay` if the validator is a proposer in the epoch.\r\n\r\n## Expected Behaviour\r\n\r\n`inclusion_delay` in attestation rewards response should exclude proposer rewards amount.\r\n\r\n## Additional Info\r\n\r\nSome suggestions on fixing this:\r\n- [Calculate block rewards](https://github.com/sigp/lighthouse/pull/4807/files#diff-1169096a7f174331a2c69819e18b6ede3d40f3951d539f6d6f0de38e01878b39R250-R257) in the tests and apply the rewards to validators balance, this should make the phase 0 rewards tests listed above fail.\r\n- When calculating attestation rewards, we pass a `Vec` of validator indices to [`get_attestation_deltas_subset`](https://github.com/sigp/lighthouse/blob/fc7f1ba6b94ac3300338aad4d5168aaac5df3fac/consensus/state_processing/src/per_epoch_processing/base/rewards_and_penalties.rs#L86), which in turn calls the [`get_attestation_deltas`](https://github.com/sigp/lighthouse/blob/fc7f1ba6b94ac3300338aad4d5168aaac5df3fac/consensus/state_processing/src/per_epoch_processing/base/rewards_and_penalties.rs#L106) function to calculate attestation rewards delta. Note that this same function is also used by the consensus crate during state processing, and we currently use the following logic to decide whether to include validator delta for the rewards API:\r\nhttps://github.com/sigp/lighthouse/blob/fc7f1ba6b94ac3300338aad4d5168aaac5df3fac/consensus/state_processing/src/per_epoch_processing/base/rewards_and_penalties.rs#L122-L127\r\n\r\nThe `include_validator_delta` function is then used to compute:\r\n1. whether to include compute attestation rewards deltas for the validator\r\n2. whether to add proposer rewards delta to the validator delta\r\n\r\nThis is fine for consensus state processing, however we should exclude the proposer rewards (2) above when calling this function from the rewards API. \r\n\r\nA nice suggestion from @michaelsproul is to replace the `maybe_validators_subset` `Option` here with an enum (e.g. `RewardsCalculationType` or a better name!), which contains `Consensus` and `API(&Vec<usize>)` variants, and always exclude proposer rewards if `rewards_calculation_type == API`.\r\n\r\nhttps://github.com/sigp/lighthouse/blob/fc7f1ba6b94ac3300338aad4d5168aaac5df3fac/consensus/state_processing/src/per_epoch_processing/base/rewards_and_penalties.rs#L106-L111",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4856/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4856/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
