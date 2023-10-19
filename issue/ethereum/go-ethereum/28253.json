@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-10-04T21:27:58Z",
-  "updated_at": "2023-10-07T08:31:01Z",
-  "closed_at": null,
+  "updated_at": "2023-10-19T08:34:30Z",
+  "closed_at": "2023-10-19T08:34:30Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: `1.13.2`\r\nCL client & version: `teku/v23.9.1/linux-x86_64/-privatebuild-openjdk64bitservervm-java-17`\r\nOS & Version: `22.04.1-Ubuntu`\r\n\r\n#### Expected behaviour\r\n\r\nI've seen several references to the fact that PBSS is not compatible with archive mode, for example in the 1.13 announcement blog post and also this comment:\r\n\r\n> You should definitely use `--db.engine pebble` and at some point in the future also enable `--state.scheme path` once the path based storage scheme supports archive nodes\r\n\r\n_Originally posted by @MariusVanDerWijden in https://github.com/ethereum/go-ethereum/issues/28050#issuecomment-1706148870_\r\n\r\nHowever it's a bit unclear exact _how_ it's incompatible.  I'm actually syncing a node now w/ `--sepolia --syncmode full --db.engine=pebble --state.scheme=path --gcmode archive` it was somewhat suprised that geth seems to be allowing this.\r\n\r\nSo I figured I'd open this issue to track what happens w/ this node once synced, and also I don't see a general tracking ticket for the status of archive mode on PBSS.\r\n\r\nAssuming the node ends up in some sort of bad state, I think the expected behavior would be for geth to error out on startup if `--state.scheme=path` and` --gcmode=archive` are both set.\r\n\r\n#### Actual behaviour\r\n\r\nWe'll see once the node syncs, but I suspect it'll be broken in some subtle way.  Here's how the logs started out:\r\n\r\n```\r\nOct 04 21:25:29 ip-10-0-69-31 geth[18207]: INFO [10-04|21:25:29.342] Syncing: chain download in progress      synced=100.00% chain=73.45GiB headers=4,425,453@1.53GiB bodies=4,425,376@63.54GiB receipts=4,425,376@8.39GiB eta=724.696ms\r\nOct 04 21:25:29 ip-10-0-69-31 geth[18207]: INFO [10-04|21:25:29.539] Syncing: state download in progress      synced=35.39%  state=10.06GiB  accounts=6,581,173@1.39GiB    slots=35,451,575@7.16GiB   codes=244,803@1.51GiB   eta=25m50.308s\r\n```\r\n\r\nAnd now that it has finished the state download, it appears to have moved onto state healing, but my understanding is that should really only used in `--syncmode snap`?\r\n\r\n```\r\nOct 04 21:43:20 ip-10-0-69-31 geth[18207]: INFO [10-04|21:43:20.501] Syncing: state download in progress      synced=100.00% state=28.32GiB  accounts=18,297,953@3.94GiB   slots=100,393,939@20.79GiB codes=569,862@3.59GiB   eta=-16.010s\r\nOct 04 21:43:22 ip-10-0-69-31 geth[18207]: INFO [10-04|21:43:22.591] Syncing: chain download in progress      synced=100.00% chain=73.45GiB headers=4,425,539@1.53GiB bodies=4,425,433@63.54GiB receipts=4,425,433@8.39GiB eta=2.240s\r\nOct 04 21:43:24 ip-10-0-69-31 geth[18207]: INFO [10-04|21:43:24.523] Forkchoice requested sync to new head    number=4,425,540 hash=9baf0e..d32da9 finalized=4,425,466\r\nOct 04 21:43:28 ip-10-0-69-31 geth[18207]: INFO [10-04|21:43:28.502] Syncing: state healing in progress       accounts=83@5.11KiB           slots=18@1.20KiB           codes=1@23.68KiB        nodes=2288@1.01MiB pending=3934\r\nOct 04 21:43:30 ip-10-0-69-31 geth[18207]: INFO [10-04|21:43:30.593] Syncing: chain download in progress      synced=100.00% chain=73.45GiB headers=4,425,540@1.53GiB bodies=4,425,433@63.54GiB receipts=4,425,433@8.39GiB eta=2.270s\r\nOct 04 21:43:36 ip-10-0-69-31 geth[18207]: INFO [10-04|21:43:36.514] Syncing: state healing in progress       accounts=105@6.32KiB          slots=4642@301.21KiB       codes=1@23.68KiB        nodes=14863@3.41MiB pending=6084\r\n```\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n- Sync a CL\r\n- Sync geth w/ `--gcmode=archive` and `--state.scheme=hash` (or in my case I used a backup from earlier today)\r\n- Stop geth and delete the DB, keeping `chaindata/ancients`\r\n- Change `--state.scheme=hash` to `--state.scheme=path`\r\n- Start geth again",
-  "closed_by": null,
+  "closed_by": {
+    "login": "rjl493456442",
+    "id": 5959481,
+    "node_id": "MDQ6VXNlcjU5NTk0ODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5959481?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rjl493456442",
+    "html_url": "https://github.com/rjl493456442",
+    "followers_url": "https://api.github.com/users/rjl493456442/followers",
+    "following_url": "https://api.github.com/users/rjl493456442/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rjl493456442/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rjl493456442/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rjl493456442/subscriptions",
+    "organizations_url": "https://api.github.com/users/rjl493456442/orgs",
+    "repos_url": "https://api.github.com/users/rjl493456442/repos",
+    "events_url": "https://api.github.com/users/rjl493456442/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rjl493456442/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28253/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28253/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -148,13 +167,13 @@
     "body": "Yeah, `gcmode archive` is still allowed in path mode but it's useless. We are working on a new archive node over the path mode which may deprecate this `gcmode` flag eventually(the states to reserve will be configured with `--history.state`).",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1751644936/reactions",
-      "total_count": 1,
+      "total_count": 2,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 1,
+      "heart": 2,
       "rocket": 0,
       "eyes": 0
     },
