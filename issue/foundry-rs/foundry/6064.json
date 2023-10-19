@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6064",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6064/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6064/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6064/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6064",
+  "id": 1951671092,
+  "node_id": "I_kwDOGBlvNc50VCM0",
+  "number": 6064,
+  "title": "`forge coverage` discrepancies",
+  "user": {
+    "login": "adaki2004",
+    "id": 51912515,
+    "node_id": "MDQ6VXNlcjUxOTEyNTE1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/51912515?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/adaki2004",
+    "html_url": "https://github.com/adaki2004",
+    "followers_url": "https://api.github.com/users/adaki2004/followers",
+    "following_url": "https://api.github.com/users/adaki2004/following{/other_user}",
+    "gists_url": "https://api.github.com/users/adaki2004/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/adaki2004/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/adaki2004/subscriptions",
+    "organizations_url": "https://api.github.com/users/adaki2004/orgs",
+    "repos_url": "https://api.github.com/users/adaki2004/repos",
+    "events_url": "https://api.github.com/users/adaki2004/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/adaki2004/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-19T09:05:22Z",
+  "updated_at": "2023-10-19T09:05:22Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (577dae3 2023-09-01T00:41:50.439385000Z)\n\n### What command(s) is the bug in?\n\nforge coverage\n\n### Operating System\n\nNone\n\n### Describe the bug\n\nSo currently we see discrepancies between 2 of our branches when we are about to export the `forge coverage` reports. On one branch (`main`) it shows somewhat correct numbers, but on the feature branch (`contestable-zkrollup`) it says 0% for most of the contracts.\r\n\r\nThe forge versions are the same, the dependencies (in `package.json`) looks different but locally i tried to have the same (as `main` - which is the working one) and gave no resolution of the problem.\r\n\r\nLet me just get you up to speed how you could re-create the issue quick.\r\n\r\nHere is our repo:\r\n`git@github.com:taikoxyz/taiko-mono.git`\r\n\r\nIn order to replicate it, please create 2 local repositories (so that you can beyond-compare 3 files which are suspicious). One with branch `main` and one with branch `contestable-zkrollup`\r\n\r\n1. Clone main: `git clone git@github.com:taikoxyz/taiko-mono.git`\r\n2. Clone feature: `git clone --branch contestable-zkrollup git@github.com:taikoxyz/taiko-mono.git`\r\n3. Enter into the repos' packages/protocol library: `cd taiko-mono/packages/protocol` (on both)\r\n4. Install deps. `pnpm install`\r\n5. `forge coverage --report summary`\r\n\r\nYou will see different results.\r\n\r\nNow, what seemed to be suspicious (beside the versions and dependencies which we ruled out not be the case) to see the test files itself.\r\n\r\nSo i picked 3 files (`TestBase.sol`, `TaikoL1TestBase.sol`, `TaikoL1.t.sol`) in beyond compare and tried to figure out, why `TaikoL1` tests are on main branch are covered, and on feature branch not.\r\n\r\nObviously there are changes in these 3 files, but not on interface level. We import some additional contracts, or remove other imports, changed the logic inside a function but the function signatures and APIs / inheritance is the same.\r\n\r\nCould you please help us figure out what could be the issue, since it is a prio thing for use to see (and prove) coverage ?",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6064/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6064/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
