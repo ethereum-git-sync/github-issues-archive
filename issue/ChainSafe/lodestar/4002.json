@@ -49,7 +49,7 @@
       "description": "Issues used as milestones and tracking multiple issues."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "tuyennhv",
@@ -94,14 +94,33 @@
     }
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2022-05-10T13:29:14Z",
-  "updated_at": "2022-06-29T14:11:59Z",
-  "closed_at": null,
+  "updated_at": "2023-10-19T13:13:46Z",
+  "closed_at": "2023-10-19T13:13:45Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "NodeJS due to its single threaded nature experiences exponential degradation of performance under heavy load. We have circumstantial evidence that in low power machines, when attempting to run too many keys performance suffers. Overall time to perform tasks increases, but any network call (vc call beacon api) time increases by x10, x100 respective to internal function times (block processing)\r\n\r\nBy running large amounts of keys on not shitty servers the issue is not apparent. However this issue still poses a future risk\r\n- for solo stakers attempting to run Lodestar in under-powered machines\r\n- post-merge due to extra calls to EL and mev-boost on time critical code paths\r\n\r\n**Step 1: quantify**\r\n\r\nCircumstantial evidence is not enough, we need proper documented metrics on when this issue manifest and how bad it is. We will run Lodestar in different configurations and different servers:\r\n\r\nValidator configurations:\r\n- beacon 1 validator\r\n- beacon 1 validator --subscribeAllSubnets\r\n- beacon + 8 validators\r\n- beacon + 16 validators\r\n- beacon + 32 validators\r\n- beacon + 64 validators\r\n\r\nServers:\r\n- Contabo Cloud VPS S\r\n- Contabo Cloud VPS M\r\n- Hetzner cloud CX41\r\n\r\nData to collect:\r\n- Validator request times histogram `vc_rest_api_client_request_time_seconds_bucket{routeId=\"produceAttestationData\"}`. Average, median, p95, p99.\r\n\r\n**Step 2: reproduce**\r\n\r\nIf the data above proves that this issue of sufficient severity we need to have a reproducible simple case to collect help and potential solutions. A reproducible case must be:\r\n- Standalone repo\r\n- Contain no Lodestar specific code, nor any library at all, pure vanilla NodeJS code \r\n- Create similar conditions to which Lodestar experiences: very high load caused by many short async tasks\r\n- Show that requests times by an external caller (in a separate process) show a similar pattern to the data collected in step 1\r\n\r\n**Step 3: mitigate**\r\n\r\n> Disclaimer: The root solution here is to reduce Lodestar load via optimizations of offloading to workers.\r\n\r\nProvided that a Lodestar is under heavy load we want to minimize this I/O lag to acceptable levels, such that validator performance doesn't degrade. If an VC request time increases from 50ms to 500ms, it's tolerable. However if it increases from 50ms to 5000ms, the validator may miss an attestation and reduce profitability.\r\n\r\n**Related issues**\r\n\r\nMay be the cause of this issues:\r\n\r\n- https://github.com/ChainSafe/lodestar/issues/3110\r\n- https://github.com/ChainSafe/lodestar/issues/3442\r\n- https://github.com/ChainSafe/lodestar/issues/3584\r\n- https://github.com/ChainSafe/lodestar/issues/3694\r\n- https://github.com/ChainSafe/lodestar/issues/4009",
-  "closed_by": null,
+  "closed_by": {
+    "login": "tuyennhv",
+    "id": 10568965,
+    "node_id": "MDQ6VXNlcjEwNTY4OTY1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10568965?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tuyennhv",
+    "html_url": "https://github.com/tuyennhv",
+    "followers_url": "https://api.github.com/users/tuyennhv/followers",
+    "following_url": "https://api.github.com/users/tuyennhv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tuyennhv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tuyennhv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tuyennhv/subscriptions",
+    "organizations_url": "https://api.github.com/users/tuyennhv/orgs",
+    "repos_url": "https://api.github.com/users/tuyennhv/repos",
+    "events_url": "https://api.github.com/users/tuyennhv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tuyennhv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4002/reactions",
     "total_count": 1,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4002/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -239,6 +258,50 @@
     "body": "Right now we use sync apis in some places which block the event loop\r\n\r\n- Uncompress gossipsub messages, see https://github.com/ChainSafe/lodestar/issues/4170\r\n- Encrypt/decrypt libp2p connection in libp2p-noise, see https://github.com/ChainSafe/lodestar/issues/4140\r\n- gossipsub heartbeat, need to follow its performance https://github.com/ChainSafe/js-libp2p-gossipsub/issues/256",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1164169186/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1770965327",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/4002#issuecomment-1770965327",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4002",
+    "id": 1770965327,
+    "node_id": "IC_kwDOCD5_Gc5pjslP",
+    "user": {
+      "login": "tuyennhv",
+      "id": 10568965,
+      "node_id": "MDQ6VXNlcjEwNTY4OTY1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10568965?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tuyennhv",
+      "html_url": "https://github.com/tuyennhv",
+      "followers_url": "https://api.github.com/users/tuyennhv/followers",
+      "following_url": "https://api.github.com/users/tuyennhv/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tuyennhv/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tuyennhv/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tuyennhv/subscriptions",
+      "organizations_url": "https://api.github.com/users/tuyennhv/orgs",
+      "repos_url": "https://api.github.com/users/tuyennhv/repos",
+      "events_url": "https://api.github.com/users/tuyennhv/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tuyennhv/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-19T13:13:46Z",
+    "updated_at": "2023-10-19T13:13:46Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "As of Oct 2023, we already implemented network thread and batch attestation validation so this is not an issue anymore",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1770965327/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
