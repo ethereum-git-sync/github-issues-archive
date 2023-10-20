@@ -56,9 +56,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-17T16:45:32Z",
-  "updated_at": "2023-10-17T16:45:32Z",
+  "updated_at": "2023-10-20T15:55:11Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -81,5 +81,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1772994770",
+    "html_url": "https://github.com/hyperledger/besu/issues/6043#issuecomment-1772994770",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/6043",
+    "id": 1772994770,
+    "node_id": "IC_kwDODE2jmc5prcDS",
+    "user": {
+      "login": "matthew1001",
+      "id": 6599269,
+      "node_id": "MDQ6VXNlcjY1OTkyNjk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6599269?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/matthew1001",
+      "html_url": "https://github.com/matthew1001",
+      "followers_url": "https://api.github.com/users/matthew1001/followers",
+      "following_url": "https://api.github.com/users/matthew1001/following{/other_user}",
+      "gists_url": "https://api.github.com/users/matthew1001/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/matthew1001/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/matthew1001/subscriptions",
+      "organizations_url": "https://api.github.com/users/matthew1001/orgs",
+      "repos_url": "https://api.github.com/users/matthew1001/repos",
+      "events_url": "https://api.github.com/users/matthew1001/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/matthew1001/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-20T15:55:11Z",
+    "updated_at": "2023-10-20T15:55:11Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Having raised this, I re-tested the effect of `--tx-pool-price-bump=0` with non-EIP1559 transactions, and even setting it to 0 does not allow you to replace a transaction.\r\n\r\nIt would require the addition of e.g.\r\n\r\n```\r\nif (priceBump.getValue() == 0\r\n        && existingPendingTransaction.getGasPrice().compareTo(newPendingTransaction.getGasPrice())\r\n            == 0) {\r\n      return true;\r\n}\r\n```\r\n\r\nto `TransactionReplacementByGasPriceRule.shouldReplace()` for it to accept a new transaction as the replacement for an old one with the same `gasPrice`.\r\n\r\nI would have added the above under this or another issue, but my concern is that the EIP1559 test (`TransactionReplacementByFeeMarketRule.shouldReplace()`) has a specific check for the new TX having 0:\r\n\r\n```\r\n// bail early if price is not strictly positive\r\n    if (newEffPrice.equals(Wei.ZERO)) {\r\n      return false;\r\n}\r\n```\r\n\r\nSo I'm reticent to put a change like ^^ in since anyone who switched from `gasPrice` to `maxBaseFee/maxPriorityFee` would suddenly see a breaking change in TX replacement behaviour. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1772994770/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
