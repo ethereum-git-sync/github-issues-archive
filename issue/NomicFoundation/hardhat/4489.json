@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "fvictorio",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-17T12:35:20Z",
-  "updated_at": "2023-10-17T12:35:35Z",
-  "closed_at": null,
+  "updated_at": "2023-10-20T14:22:58Z",
+  "closed_at": "2023-10-20T14:22:57Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\r\n\r\n2.18.1\r\n\r\n### What happened?\r\n\r\nextendProvider() should work with 'eth_sendTransaction' request according to the docs https://hardhat.org/hardhat-runner/docs/advanced/building-plugins#extending-the-hardhat-provider however it doesn't.\r\n\r\nOverrided 'request' function works with every other methods except the 'eth_sendTransaction' function.\r\n\r\n### Minimal reproduction steps\r\n\r\nFollowing the example -> used console.log(args) to check but it didn't work\r\n\r\n### Search terms\r\n\r\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4489/reactions",
     "total_count": 0,
@@ -107,8 +126,51 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4489/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1772837153",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4489#issuecomment-1772837153",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4489",
+    "id": 1772837153,
+    "node_id": "IC_kwDOB7jojM5pq1kh",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-20T14:22:57Z",
+    "updated_at": "2023-10-20T14:22:57Z",
+    "author_association": "MEMBER",
+    "body": "Hi @kaliubuntu0206, `extendProvider` works fine for me with `eth_sendTransaction`. Adapting the code from the docs:\r\n\r\n```javascript\r\nconst { ProviderWrapper } = require( 'hardhat/plugins')\r\n\r\nclass LogProvider extends ProviderWrapper {\r\n  constructor(\r\n    _wrappedProvider\r\n  ) {\r\n    super(_wrappedProvider);\r\n  }\r\n\r\n  async request(args) {\r\n    if (args.method === \"eth_sendTransaction\") {\r\n      console.log(\"some eth_sendTransaction\")\r\n    }\r\n\r\n    return this._wrappedProvider.request(args);\r\n  }\r\n}\r\n\r\nextendProvider(async (provider, config, network) => {\r\n  const newProvider = new LogProvider(provider);\r\n  return newProvider;\r\n});\r\n```\r\n\r\nI send some transactions and get that log.\r\n\r\nI'm tentatively closing this, but I'll re-open if you can give us more precise reproduction steps.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1772837153/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

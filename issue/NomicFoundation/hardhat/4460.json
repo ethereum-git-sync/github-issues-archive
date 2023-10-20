@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "ChristopherDedominici",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-10T07:44:45Z",
-  "updated_at": "2023-10-10T07:45:45Z",
-  "closed_at": null,
+  "updated_at": "2023-10-20T13:16:54Z",
+  "closed_at": "2023-10-20T13:16:54Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\r\n\r\n`2.18.0`\r\n\r\n### What happened?\r\n\r\nMinimal repro:\r\nRun `npx hardhat flatten ./contracts/Create2Deployer.sol > flat.sol` using my repo [here](https://github.com/pcaversaccio/create2deployer). \r\n\r\nThe `Create.sol` util by OZ will be flattened like this:\r\n\r\n```sol\r\nfunction computeAddress(bytes32 salt, bytes32 bytecodeHash, address deployer) internal pure returns (address addr) {\r\n    /// @solidity memory-safe-assembly\r\n    assembly {\r\n        let ptr := mload(0x40) // Get free memory pointer\r\n\r\n        // |                   | Γåô ptr ...  Γåô ptr + 0x0B (start) ...  Γåô ptr + 0x20 ...  Γåô ptr + 0x40 ...   |\r\n        // |-------------------|---------------------------------------------------------------------------|\r\n        // | bytecodeHash      |                                                        CCCCCCCCCCCCC...CC |\r\n        // | salt              |                                      BBBBBBBBBBBBB...BB                   |\r\n        // | deployer          | 000000...0000AAAAAAAAAAAAAAAAAAA...AA                                     |\r\n        // | 0xFF              |            FF                                                             |\r\n        // |-------------------|---------------------------------------------------------------------------|\r\n        // | memory            | 000000...00FFAAAAAAAAAAAAAAAAAAA...AABBBBBBBBBBBBB...BBCCCCCCCCCCCCC...CC |\r\n        // | keccak(start, 85) |            ΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæΓåæ |\r\n\r\n        mstore(add(ptr, 0x40), bytecodeHash)\r\n        mstore(add(ptr, 0x20), salt)\r\n        mstore(ptr, deployer) // Right-aligned with 12 preceding garbage bytes\r\n        let start := add(ptr, 0x0b) // The hashed data starts at the final garbage byte which we will set to 0xff\r\n        mstore8(start, 0xff)\r\n        addr := keccak256(start, 85)\r\n    }\r\n}\r\n```\r\n\r\nInstead of:\r\n\r\n```sol\r\nfunction computeAddress(bytes32 salt, bytes32 bytecodeHash, address deployer) internal pure returns (address addr) {\r\n    /// @solidity memory-safe-assembly\r\n    assembly {\r\n        let ptr := mload(0x40) // Get free memory pointer\r\n\r\n        // |                   | ↓ ptr ...  ↓ ptr + 0x0B (start) ...  ↓ ptr + 0x20 ...  ↓ ptr + 0x40 ...   |\r\n        // |-------------------|---------------------------------------------------------------------------|\r\n        // | bytecodeHash      |                                                        CCCCCCCCCCCCC...CC |\r\n        // | salt              |                                      BBBBBBBBBBBBB...BB                   |\r\n        // | deployer          | 000000...0000AAAAAAAAAAAAAAAAAAA...AA                                     |\r\n        // | 0xFF              |            FF                                                             |\r\n        // |-------------------|---------------------------------------------------------------------------|\r\n        // | memory            | 000000...00FFAAAAAAAAAAAAAAAAAAA...AABBBBBBBBBBBBB...BBCCCCCCCCCCCCC...CC |\r\n        // | keccak(start, 85) |            ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ |\r\n\r\n        mstore(add(ptr, 0x40), bytecodeHash)\r\n        mstore(add(ptr, 0x20), salt)\r\n        mstore(ptr, deployer) // Right-aligned with 12 preceding garbage bytes\r\n        let start := add(ptr, 0x0b) // The hashed data starts at the final garbage byte which we will set to 0xff\r\n        mstore8(start, 0xff)\r\n        addr := keccak256(start, 85)\r\n    }\r\n}\r\n```\r\n\r\nIt seems like flattening has issues with special characters like `↑` or `↓`.\r\n\r\n### Minimal reproduction steps\r\n\r\nSee above.\r\n\r\n### Search terms\r\n\r\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4460/reactions",
     "total_count": 0,
@@ -107,8 +126,51 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4460/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1772724708",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4460#issuecomment-1772724708",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4460",
+    "id": 1772724708,
+    "node_id": "IC_kwDOB7jojM5pqaHk",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-20T13:16:54Z",
+    "updated_at": "2023-10-20T13:16:54Z",
+    "author_association": "MEMBER",
+    "body": "I'm pretty sure this is a problem with powershell. If you do this:\r\n\r\n```\r\nnode -e \"console.log('↓')\" > a.txt\r\n```\r\n\r\nYou'll see that the content of `a.txt` is broken.\r\n\r\nI'm going to close this because I think the proper solution is to implement #3430.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1772724708/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
