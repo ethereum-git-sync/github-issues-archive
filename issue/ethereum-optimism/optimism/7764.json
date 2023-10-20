@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7764",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7764/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7764/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7764/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/7764",
+  "id": 1953661127,
+  "node_id": "I_kwDODjvEJM50coDH",
+  "number": 7764,
+  "title": "op-proposer: Unable to create the L2 Output Submitte,  execution reverted",
+  "user": {
+    "login": "wangyufsn",
+    "id": 141099829,
+    "node_id": "U_kgDOCGkDNQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/141099829?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/wangyufsn",
+    "html_url": "https://github.com/wangyufsn",
+    "followers_url": "https://api.github.com/users/wangyufsn/followers",
+    "following_url": "https://api.github.com/users/wangyufsn/following{/other_user}",
+    "gists_url": "https://api.github.com/users/wangyufsn/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/wangyufsn/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/wangyufsn/subscriptions",
+    "organizations_url": "https://api.github.com/users/wangyufsn/orgs",
+    "repos_url": "https://api.github.com/users/wangyufsn/repos",
+    "events_url": "https://api.github.com/users/wangyufsn/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/wangyufsn/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-20T06:57:28Z",
+  "updated_at": "2023-10-20T06:57:28Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\n**Describe the bug**\r\n\r\nI started the `op-proposer` in a development environment and encountered the following error:\r\n```\r\n~/w/f/o/optimism-priv/op-proposer v1.2.0-devnet ❯ ./bin/op-proposer \\                 ▼ wangyufsn\r\n    --poll-interval=12s \\\r\n    --rpc.port=8560 \\\r\n    --rollup-rpc=http://*********:8547 \\\r\n    --l2oo-address=$L2OO_ADDR \\\r\n    --private-key=$PROPOSER_KEY \\\r\n    --l1-eth-rpc=$L1_RPC \\\r\n    --log.level=debug\r\nINFO [10-20|14:16:19.394] Initializing L2 Output Submitter \r\nERROR[10-20|14:16:20.474] Unable to create the L2 Output Submitter error=\"execution reverted\"\r\nCRIT [10-20|14:16:20.474] Application failed                       message=\"execution reverted\"\r\n```\r\n\r\n**To Reproduce**\r\n\r\nI'm certain that the issue isn't with l1_eth_rpc or that the L2OutputOracle contract hasn't been deployed to the network. I've modified the source code as follows:\r\n\r\n```\r\n// NewL2OutputSubmitter creates a new L2 Output Submitter\r\nfunc NewL2OutputSubmitter(cfg Config, l log.Logger, m metrics.Metricer) (*L2OutputSubmitter, error) {\r\n\tctx, cancel := context.WithCancel(context.Background())\r\n\r\n\tl2ooContract, err := bindings.NewL2OutputOracleCaller(cfg.L2OutputOracleAddr, cfg.L1Client)\r\n\tif err != nil {\r\n\t\tcancel()\r\n\t\treturn nil, fmt.Errorf(\"failed to create L2OO at address %s: %w\", cfg.L2OutputOracleAddr, err)\r\n\t}\r\n\r\n\tcCtx, cCancel := context.WithTimeout(ctx, cfg.NetworkTimeout)\r\n\tdefer cCancel()\r\n\r\n\t//======= my code there ========\r\n\tid, err := cfg.L1Client.ChainID(cCtx)\r\n\tfmt.Println(\"===chainID: \", id, err) // l1 eth client is correct\r\n\tvar code string\r\n\terr = cfg.L1Client.Client().Call(&code, \"eth_getCode\", cfg.L2OutputOracleAddr, \"latest\")\r\n\tfmt.Println(\"===code: \", code, err) // contract is deployed\r\n\r\n\tversion, err := l2ooContract.Version(&bind.CallOpts{Context: cCtx})\r\n\tfmt.Println(\"===version: \", version, err) // but it's not working\r\n\tif err != nil {\r\n\t\tcancel()\r\n\t\treturn nil, err\r\n\t}\r\n\tlog.Info(\"Connected to L2OutputOracle\", \"address\", cfg.L2OutputOracleAddr, \"version\", version)\r\n\r\n...\r\n```\r\n\r\nand then I received the following result:\r\n```\r\n~/w/f/o/optimism-priv/op-proposer v1.2.0-devnet !1 ❯ ./bin/op-proposer \\              ▼ wangyufsn\r\n    --poll-interval=12s \\\r\n    --rpc.port=8560 \\\r\n    --rollup-rpc=http://*******:8547 \\\r\n    --l2oo-address=$L2OO_ADDR \\\r\n    --private-key=$PROPOSER_KEY \\\r\n    --l1-eth-rpc=$L1_RPC \\\r\n    --log.level=debug\r\nINFO [10-20|14:46:07.348] Initializing L2 Output Submitter \r\n===chainID: ******** <nil>\r\n===code:  0x60806040526004361061005e5760003560e01c80635c60da1b116100435780635c60da1b146100be5780638f283970146100f8578063f851a440146101185761006d565b80633659cfe6146100755780634f1ef286146100955761006d565b3661006d5761006b61012d565b005b61006b61012d565b34801561008157600080fd5b5061006b6100903660046106dd565b610224565b6100a86100a33660046106f8565b610296565b6040516100b5919061077b565b60405180910390f35b3480156100ca57600080fd5b506100d3610419565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020016100b5565b34801561010457600080fd5b5061006b6101133660046106dd565b6104b0565b34801561012457600080fd5b506100d3610517565b60006101577f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5490565b905073ffffffffffffffffffffffffffffffffffffffff8116610201576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602560248201527f50726f78793a20696d706c656d656e746174696f6e206e6f7420696e6974696160448201527f6c697a656400000000000000000000000000000000000000000000000000000060648201526084015b60405180910390fd5b3660008037600080366000845af43d6000803e8061021e573d6000fd5b503d6000f35b7fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61035473ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16148061027d575033155b1561028e5761028b816105a3565b50565b61028b61012d565b60606102c07fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61035490565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614806102f7575033155b1561040a57610305846105a3565b6000808573ffffffffffffffffffffffffffffffffffffffff16858560405161032f9291906107ee565b600060405180830381855af49150503d806000811461036a576040519150601f19603f3d011682016040523d82523d6000602084013e61036f565b606091505b509150915081610401576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152603960248201527f50726f78793a2064656c656761746563616c6c20746f206e657720696d706c6560448201527f6d656e746174696f6e20636f6e7472616374206661696c65640000000000000060648201526084016101f8565b91506104129050565b61041261012d565b9392505050565b60006104437fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61035490565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16148061047a575033155b156104a557507f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5490565b6104ad61012d565b90565b7fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61035473ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161480610509575033155b1561028e5761028b8161060c565b60006105417fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61035490565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161480610578575033155b156104a557507fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61035490565b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc81815560405173ffffffffffffffffffffffffffffffffffffffff8316907fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b90600090a25050565b60006106367fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61035490565b7fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d61038381556040805173ffffffffffffffffffffffffffffffffffffffff80851682528616602082015292935090917f7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f910160405180910390a1505050565b803573ffffffffffffffffffffffffffffffffffffffff811681146106d857600080fd5b919050565b6000602082840312156106ef57600080fd5b610412826106b4565b60008060006040848603121561070d57600080fd5b610716846106b4565b9250602084013567ffffffffffffffff8082111561073357600080fd5b818601915086601f83011261074757600080fd5b81358181111561075657600080fd5b87602082850101111561076857600080fd5b6020830194508093505050509250925092565b600060208083528351808285015260005b818110156107a85785810183015185820160400152820161078c565b818111156107ba576000604083870101525b50601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016929092016040019392505050565b818382376000910190815291905056fea164736f6c634300080f000a <nil>\r\n===version:   execution reverted\r\nERROR[10-20|14:46:08.596] Unable to create the L2 Output Submitter error=\"execution reverted\"\r\nCRIT [10-20|14:46:08.596] Application failed                       message=\"execution reverted\"\r\n```\r\n\r\nI can use `ether.js` to call the same contract address and retrieve the version value. \r\n\r\nAdditionally, when I use the older release version of optimism to build the `op-proposer` and start it with the same command line and environment variables, it works. Therefore, I suspect there's a bug in version v1.2.0.\r\n\r\n**Expected behavior**\r\n\"Hope it works fine.\r\n\r\n**System Specs:**\r\n - OS: macOs or Linux\r\n - Package Version (or commit hash): v1.2.0\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7764/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7764/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
