@@ -49,7 +49,7 @@
       "description": "Simple Serialize"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 17,
   "created_at": "2019-11-08T14:46:47Z",
-  "updated_at": "2020-05-17T15:39:09Z",
-  "closed_at": null,
+  "updated_at": "2023-10-21T16:43:06Z",
+  "closed_at": "2023-10-21T16:43:06Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "SSZ for general purpose merkleization is lacking a few types, of which sparse merkle trees are probably the most different from what is already there.\r\n\r\nIt only passed by a few times in the specs:\r\n- lists merkleization discussion [`1115`](https://github.com/ethereum/eth2.0-specs/issues/1115)\r\n- multi-proof queries [`644`](https://github.com/ethereum/eth2.0-specs/issues/644)\r\n- lists/vectors, and the desire for a future sparse vector variant [`1160`](https://github.com/ethereum/eth2.0-specs/issues/1160)\r\n\r\nHowever I do think it is necessary to have if SSZ is to be adopted more widely than the current spec state machines.\r\n\r\n## Options\r\n\r\nThere is not one way to implement this, we have many options:\r\n\r\n- With breaking changes:\r\n    - Back to specialized trees like Merkle Patricia Trees, at the cost of complexity and hard to optimize structures/merkleization\r\n    - Hack in extension nodes in the otherwise binary tree\r\n    - Change of hash function for efficient merges with zeroes, but have to maintain some information in the hash, a byte or two: https://ethresear.ch/t/a-nearly-trivial-on-zero-inputs-32-bytes-long-collision-resistant-hash-function/5511\r\n- No breaking changes, but full hashing (large proof size problem, slow on-chain):\r\n    - Compress proof data, but do the full-depth hashes: https://ethresear.ch/t/optimizing-sparse-merkle-trees/3751/12\r\n    - Plasma cash SMTs, bitfield to refer where zero hashes are: https://ethresear.ch/t/plasma-cash-with-sparse-merkle-trees-bloom-filters-and-probabilistic-transfers/2006\r\n- Merkleize based on prefix difference (with vector commitment problem):\r\n    - Preserve position by hashing in the key into each leaf (\"Compressed merkle proofs\"): https://github.com/aergoio/aergo/tree/master/pkg/trie\r\n        - Similarities with the \"1 hash extra\" case I described in the list discussion: harden leaf nodes to then put them anywhere easily.\r\n        - Also called Compact Merkle Trees, with \"split index\" for point of divergence, assuming unique leaf nodes, no precise vector commitment. https://ethresear.ch/t/compact-sparse-merkle-trees/3741/16\r\n        - \"Binary Indexed Tree\": like above, but with max distance between nodes to navigate: https://github.com/ChosunOne/merkle_bit\r\n    - Purposefully forget about positions in favor of fast sparse set merkleization, the \"Merklix\" (Merkle + radix) tree: https://www.deadalnix.me/2016/09/24/introducing-merklix-tree-as-an-unordered-merkle-tree-on-steroid/\r\n    - Libra sparse compact merkle tree: make leaf nodes different by typing them\r\n        - \"jellyfish merkle\" implementation: https://github.com/libra/libra/tree/master/storage/jellyfish-merkle\r\n        - https://developers.libra.org/docs/assets/papers/the-libra-blockchain.pdf\r\n            - \"Secure Merkle trees must use different hash functions to hash the leaves and internal nodes to avoid confusion between the two types of nodes.\"\r\n    - New idea (or thought experiment, not efficient, but new possibilities): Compact merkle tree with special mixin at root, see below. *Separating the vector commitment from the contents commitment, while preserving some other properties with affinity for SSZ in the contents commitment*.\r\n\r\n- More suggestions welcome, it is hard to aggregate it all.\r\n\r\n## Opinion\r\n\r\nPersonally I dislike breaking changes here, and feel like those solutions are too specialized, hard to optimize or simply too incompatible with other parts of the spec.\r\n\r\nThe full hashing is also something I like to avoid, 256 hashes is computationally unacceptable, even with proof encoding compression (something proof backings should be optimizing, not sparse merkle trees).\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "protolambda",
+    "id": 19571989,
+    "node_id": "MDQ6VXNlcjE5NTcxOTg5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19571989?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/protolambda",
+    "html_url": "https://github.com/protolambda",
+    "followers_url": "https://api.github.com/users/protolambda/followers",
+    "following_url": "https://api.github.com/users/protolambda/following{/other_user}",
+    "gists_url": "https://api.github.com/users/protolambda/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/protolambda/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/protolambda/subscriptions",
+    "organizations_url": "https://api.github.com/users/protolambda/orgs",
+    "repos_url": "https://api.github.com/users/protolambda/repos",
+    "events_url": "https://api.github.com/users/protolambda/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/protolambda/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1472/reactions",
     "total_count": 9,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1472/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
