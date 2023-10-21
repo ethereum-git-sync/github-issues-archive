@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14628",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14628/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14628/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14628/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14628",
+  "id": 1954962598,
+  "node_id": "I_kwDOAm_5kc50hlym",
+  "number": 14628,
+  "title": "The `--asm-json` output suppresses `--asm`",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4438006499,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaa4w",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20effort",
+      "name": "low effort",
+      "color": "ffb1fa",
+      "default": false,
+      "description": "There is not much implementation work to be done. The task is very easy or tiny."
+    },
+    {
+      "id": 4438157609,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjpKQ",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20impact",
+      "name": "low impact",
+      "color": "5d71ff",
+      "default": false,
+      "description": "Changes are not very noticeable or potential benefits are limited."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-20T20:18:08Z",
+  "updated_at": "2023-10-20T20:18:17Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "If you request the JSON assembly output on the CLI with `--asm-json` the normal assembly output (`--asm`) no longer appears.\r\n\r\nThis is not how other outputs work on the CLI. Standard JSON also does not behave this way - it is possible to request both `evm.assembly` and `evm.legacyAssembly` at the same time.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.21\r\n\r\n## How to reproduce\r\n\r\n### Only `--asm`\r\n```bash\r\necho 'contract C {}' | solc - --asm\r\n```\r\n\r\n<details>\r\n\r\n<summary>Output</summary>\r\n\r\n```\r\n======= <stdin>:C =======\r\nEVM assembly:\r\n    /* \"<stdin>\":0:13  contract C {} */\r\n  mstore(0x40, 0x80)\r\n  callvalue\r\n  dup1\r\n  iszero\r\n  tag_1\r\n  jumpi\r\n  0x00\r\n  dup1\r\n  revert\r\ntag_1:\r\n  pop\r\n  dataSize(sub_0)\r\n  dup1\r\n  dataOffset(sub_0)\r\n  0x00\r\n  codecopy\r\n  0x00\r\n  return\r\nstop\r\n\r\nsub_0: assembly {\r\n        /* \"<stdin>\":0:13  contract C {} */\r\n      mstore(0x40, 0x80)\r\n      0x00\r\n      dup1\r\n      revert\r\n\r\n    auxdata: 0xa26469706673582212203de2612385ddacb7fd5cc0b2a4bd9f59a2c09a735e08d1d1461c0e3e3f66778264736f6c63430008150033\r\n}\r\n```\r\n</details>\r\n\r\n### Only `--asm-json`\r\n```bash\r\necho 'contract C {}' | solc - --asm-json\r\n```\r\n\r\n<details>\r\n\r\n<summary>Output</summary>\r\n\r\n```\r\n======= <stdin>:C =======\r\nEVM assembly:\r\n{\".code\":[{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"80\"},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"40\"},{\"begin\":0,\"end\":13,\"name\":\"MSTORE\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"CALLVALUE\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"ISZERO\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH [tag]\",\"source\":0,\"value\":\"1\"},{\"begin\":0,\"end\":13,\"name\":\"JUMPI\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"REVERT\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"tag\",\"source\":0,\"value\":\"1\"},{\"begin\":0,\"end\":13,\"name\":\"JUMPDEST\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"POP\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH #[$]\",\"source\":0,\"value\":\"0000000000000000000000000000000000000000000000000000000000000000\"},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH [$]\",\"source\":0,\"value\":\"0000000000000000000000000000000000000000000000000000000000000000\"},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"CODECOPY\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"RETURN\",\"source\":0}],\".data\":{\"0\":{\".auxdata\":\"a26469706673582212203de2612385ddacb7fd5cc0b2a4bd9f59a2c09a735e08d1d1461c0e3e3f66778264736f6c63430008150033\",\".code\":[{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"80\"},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"40\"},{\"begin\":0,\"end\":13,\"name\":\"MSTORE\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"REVERT\",\"source\":0}]}},\"sourceList\":[\"<stdin>\",\"#utility.yul\"]}\r\n```\r\n\r\n</details>\r\n\r\n### `--asm` and `--asm-json`\r\n```bash\r\necho 'contract C {}' | solc - --asm --asm-json\r\n```\r\n\r\n<details>\r\n\r\nNote that the output is identical to the case with only `--asm-json`.\r\n\r\n<summary> Output </summary>\r\n\r\n```\r\n======= <stdin>:C =======\r\nEVM assembly:\r\n{\".code\":[{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"80\"},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"40\"},{\"begin\":0,\"end\":13,\"name\":\"MSTORE\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"CALLVALUE\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"ISZERO\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH [tag]\",\"source\":0,\"value\":\"1\"},{\"begin\":0,\"end\":13,\"name\":\"JUMPI\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"REVERT\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"tag\",\"source\":0,\"value\":\"1\"},{\"begin\":0,\"end\":13,\"name\":\"JUMPDEST\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"POP\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH #[$]\",\"source\":0,\"value\":\"0000000000000000000000000000000000000000000000000000000000000000\"},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH [$]\",\"source\":0,\"value\":\"0000000000000000000000000000000000000000000000000000000000000000\"},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"CODECOPY\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"RETURN\",\"source\":0}],\".data\":{\"0\":{\".auxdata\":\"a26469706673582212203de2612385ddacb7fd5cc0b2a4bd9f59a2c09a735e08d1d1461c0e3e3f66778264736f6c63430008150033\",\".code\":[{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"80\"},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"40\"},{\"begin\":0,\"end\":13,\"name\":\"MSTORE\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"PUSH\",\"source\":0,\"value\":\"0\"},{\"begin\":0,\"end\":13,\"name\":\"DUP1\",\"source\":0},{\"begin\":0,\"end\":13,\"name\":\"REVERT\",\"source\":0}]}},\"sourceList\":[\"<stdin>\",\"#utility.yul\"]}\r\n```\r\n\r\n</details>",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14628/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14628/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
