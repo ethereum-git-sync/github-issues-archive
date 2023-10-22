@@ -8,7 +8,7 @@
   "id": 1921554801,
   "node_id": "I_kwDOAO0i585yiJlx",
   "number": 1296,
-  "title": "sha3 and mload stopped working in the test",
+  "title": "Add opcodes to gas measurement",
   "user": {
     "login": "winsvega",
     "id": 4492341,
@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "qbzzt",
@@ -77,14 +77,33 @@
     }
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-10-02T09:25:43Z",
-  "updated_at": "2023-10-18T11:40:15Z",
-  "closed_at": null,
+  "updated_at": "2023-10-22T00:36:34Z",
+  "closed_at": "2023-10-22T00:36:34Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "looks like the gas measure algo fails for sha3 and mload in this test on latest solc 21\r\n```\r\ninfo: (GeneralStateTests/stBadOpcode/measureGas, fork: Cancun, TrInfo: d: 0, g: 0, v: 0, TrData: `:label CREATE       :abi f(uint) 0xF0..`)\r\ninfo: (GeneralStateTests/stBadOpcode/operationDiffGas, fork: Cancun, TrInfo: d: 6, g: 0, v: 0, TrData: `:label MLOAD        :abi f(uint,uint,uint) ..`)\r\n\r\n```\r\n\r\nwork branch https://github.com/ethereum/tests/pull/1297",
-  "closed_by": null,
+  "closed_by": {
+    "login": "qbzzt",
+    "id": 12722969,
+    "node_id": "MDQ6VXNlcjEyNzIyOTY5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/12722969?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/qbzzt",
+    "html_url": "https://github.com/qbzzt",
+    "followers_url": "https://api.github.com/users/qbzzt/followers",
+    "following_url": "https://api.github.com/users/qbzzt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/qbzzt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/qbzzt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/qbzzt/subscriptions",
+    "organizations_url": "https://api.github.com/users/qbzzt/orgs",
+    "repos_url": "https://api.github.com/users/qbzzt/repos",
+    "events_url": "https://api.github.com/users/qbzzt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/qbzzt/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/tests/issues/1296/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/tests/issues/1296/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -222,6 +241,50 @@
     "body": "this tests fixed by solc optimisation fix. \r\nbut now you mentioned new opcodes so I leave this issue open\r\nand we got new issues: https://github.com/ethereum/tests/issues/1309",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/tests/issues/comments/1768268528/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/tests/issues/comments/1773956667",
+    "html_url": "https://github.com/ethereum/tests/issues/1296#issuecomment-1773956667",
+    "issue_url": "https://api.github.com/repos/ethereum/tests/issues/1296",
+    "id": 1773956667,
+    "node_id": "IC_kwDOAO0i585pvG47",
+    "user": {
+      "login": "qbzzt",
+      "id": 12722969,
+      "node_id": "MDQ6VXNlcjEyNzIyOTY5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12722969?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/qbzzt",
+      "html_url": "https://github.com/qbzzt",
+      "followers_url": "https://api.github.com/users/qbzzt/followers",
+      "following_url": "https://api.github.com/users/qbzzt/following{/other_user}",
+      "gists_url": "https://api.github.com/users/qbzzt/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/qbzzt/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/qbzzt/subscriptions",
+      "organizations_url": "https://api.github.com/users/qbzzt/orgs",
+      "repos_url": "https://api.github.com/users/qbzzt/repos",
+      "events_url": "https://api.github.com/users/qbzzt/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/qbzzt/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-22T00:36:22Z",
+    "updated_at": "2023-10-22T00:36:22Z",
+    "author_association": "MEMBER",
+    "body": "I reconsidered this, and I think the tests we have in this issue (`stBadOpcde/measureGas` and `measureGas/operationDiffGas`) are simple enough they won't benefit from being measured here. The only reason we do these measurements with memory is that memory has two gas costs: the cost of the operation and the cost of memory expansion. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/tests/issues/comments/1773956667/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
