@@ -76,7 +76,7 @@
       "description": "We like the idea but it’s not important enough to be a part of the roadmap."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -85,12 +85,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-10-09T10:24:01Z",
-  "updated_at": "2023-10-13T13:43:56Z",
-  "closed_at": null,
+  "updated_at": "2023-10-23T11:23:32Z",
+  "closed_at": "2023-10-23T11:23:32Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "```\r\n{\r\n    mstore(memoryguard(0x10000), 1)\r\n    sstore(mload(calldataload(0)), 1)\r\n    {\r\n        let x_2, x_3, x_4, x_5 := foo_m_0(0x2000000000000000000000000000000000000000000000001, 0x200000000000000000000000000000000000000000000001, 0x20000000000000000000000000000000000000000000001, 0x2000000000000000000000000000000000000000000001)\r\n        {\r\n            x_2 := add(0x200000000000000000000000000000000000000000001,number())\r\n        }\r\n        let x_13, x_14, x_15, x_16 := foo_m_0(0x20000000000000000000000000000000000001, 0x2000000000000000000000000000000000001, 0x200000000000000000000000000000000001, call(0x20000000000000000000000000000000001, 0x2000000000000000000000000000000001, 0x200000000000000000000000000000001, mod(x_2, 32768), mod(0x20000000000000000000000000000001, 32768), mod(0x2000000000000000000000000000001, 32768), mod(0x200000000000000000000000000001, 32768)))\r\n        function foo_m_0(x_27, x_28, x_29, x_30) -> x_31, x_32, x_33, x_34\r\n        {\r\n        }\r\n    }\r\n}\r\n// ----\r\n// step: fullSimplify\r\n//\r\n```\r\n\r\nRepro\r\n\r\n```bash\r\ncp test.yul test/libyul/yulOptimizerTests/fullSimplify\r\nisoltest -t yulOptimizerTests/fullSimplify/test\r\n```\r\n\r\nThe invalid code is the following\r\n\r\n```\r\n{\r\n    {\r\n        let _1 := 1\r\n        mstore(memoryguard(0x10000), _1)\r\n        sstore(mload(calldataload(0)), _1)\r\n        {\r\n            let x_2, x_3, x_4, x_5 := foo_m_0(0x2000000000000000000000000000000000000000000000001, 0x200000000000000000000000000000000000000000000001, 0x20000000000000000000000000000000000000000000001, 0x2000000000000000000000000000000000000000000001)\r\n            {\r\n                let _11 := number()\r\n                let _12 := 0x200000000000000000000000000000000000000000001\r\n                x_2 := add(_12, _11)\r\n            }\r\n            pop(call(0x20000000000000000000000000000000001, 0x2000000000000000000000000000000001, 0x200000000000000000000000000000001, addmod(_12, _11, 32768), 1, 1, 1))\r\n        }\r\n    }\r\n    function foo_m_0(x_27, x_28, x_29, x_30) -> x_31, x_32, x_33, x_34\r\n    { }\r\n}\r\n```\r\n\r\nNote that `_11` and `_12` are scoped variables and their reference in the following `pop(call(` is hence invalid.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "bshastry",
+    "id": 2388185,
+    "node_id": "MDQ6VXNlcjIzODgxODU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2388185?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/bshastry",
+    "html_url": "https://github.com/bshastry",
+    "followers_url": "https://api.github.com/users/bshastry/followers",
+    "following_url": "https://api.github.com/users/bshastry/following{/other_user}",
+    "gists_url": "https://api.github.com/users/bshastry/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/bshastry/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/bshastry/subscriptions",
+    "organizations_url": "https://api.github.com/users/bshastry/orgs",
+    "repos_url": "https://api.github.com/users/bshastry/repos",
+    "events_url": "https://api.github.com/users/bshastry/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/bshastry/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14596/reactions",
     "total_count": 0,
@@ -105,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14596/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
