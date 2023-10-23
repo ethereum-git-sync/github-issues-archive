@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-10-23T05:40:16Z",
-  "updated_at": "2023-10-23T05:40:16Z",
-  "closed_at": null,
+  "updated_at": "2023-10-23T14:19:53Z",
+  "closed_at": "2023-10-23T14:19:53Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "After upgrading our system from version 2.48.1 to version 2.52.5 we saw a performance regression, where some of our regression tests for our application suddenly started taking longer than expected. We further discovered that the runtime of the regression tests increased (i.e. got worse) each time we ran the tests.\r\n\r\nWe build the separate rpcdaemon binary and do not use the internal one.\r\n\r\nAfter bisecting we isloated the regression to release 2.49.1. Below are the runtimes of two tests, labeled \"A\" and \"B\" which were run in a bash loop. The details of the test are not disclosed here, but they run heavy multi-threaded RPCs against erigon rpcdaemon.\r\n\r\nVersion 2.49.0 / go1.20.7:\r\n\r\nLoop 1:\r\nA: 38.9s\r\nB: 7.0s\r\n\r\nLoop 2:\r\nA: 38.7s\r\nB: 6.8s\r\n\r\nLoop 3:\r\nA: 39.0s\r\nB: 6.9s\r\n\r\nLoop 4:\r\nA: 38.3s\r\nB: 6.7s\r\n\r\nLoop 5:\r\nA: 37.9s\r\nB: 6.8s\r\n\r\n\r\nVersion 2.49.1 / go1.20.7:\r\n\r\nLoop 1:\r\nA: 49.6s\r\nB: 10.6s\r\n\r\nLoop 2:\r\nA: 58.1s\r\nB: 13.3s\r\n\r\nLoop 3:\r\nA: 70.1s\r\nB: 14.5s\r\n\r\nLoop 4:\r\nA: 87.8s\r\nB: 19.0s\r\n\r\n\r\nAs can be seen, in version 2.49.0, the runtimes are ~constant no matter how many iterations of the loop. But in 2.49.1 the runtimes increase after each iteration. If we repeat thi enough times we hit our test timeout (300 secs). So it feels as if there is some kind of resource leak.\r\n\r\nFurther bisection revealed that the following commit is the culprit:\r\nhttps://github.com/ledgerwatch/erigon/commit/35c98cdce999f035b29d0e195fb0ed842de8f68a\r\n\r\nReverting this one commit on top of 2.49.1 fixed the issue (runtimes matched those with 2.49.0). Additionally, reverting this commit on top of 2.52.5 (what we were trying to install in the first place) also fixed the performance regression.\r\n\r\nI am not really sure what this code does though the magnitude of the regression here seems quite substantial. We use metrics when occasionally asked by erigon devs. This has proven quite useful in one or two instances. But I am not sure if reverting this offending change is a good fix? Or there is something better.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mh0lt",
+    "id": 135143369,
+    "node_id": "U_kgDOCA4fyQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/135143369?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mh0lt",
+    "html_url": "https://github.com/mh0lt",
+    "followers_url": "https://api.github.com/users/mh0lt/followers",
+    "following_url": "https://api.github.com/users/mh0lt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mh0lt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mh0lt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mh0lt/subscriptions",
+    "organizations_url": "https://api.github.com/users/mh0lt/orgs",
+    "repos_url": "https://api.github.com/users/mh0lt/repos",
+    "events_url": "https://api.github.com/users/mh0lt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mh0lt/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8558/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8558/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
