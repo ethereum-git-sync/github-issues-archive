@@ -8,7 +8,7 @@
   "id": 1957349292,
   "node_id": "I_kwDOCM9I9M50qses",
   "number": 7622,
-  "title": "Async parallel serialization during `KvStoreDatabase::doUpdate`",
+  "title": "Optimize `KvStoreDatabase::doUpdate`",
   "user": {
     "login": "tbenr",
     "id": 15999009,
@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-10-23T14:45:44Z",
-  "updated_at": "2023-10-23T14:47:34Z",
+  "updated_at": "2023-10-23T16:20:28Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -72,5 +72,92 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1775420102",
+    "html_url": "https://github.com/Consensys/teku/issues/7622#issuecomment-1775420102",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7622",
+    "id": 1775420102,
+    "node_id": "IC_kwDOCM9I9M5p0sLG",
+    "user": {
+      "login": "tbenr",
+      "id": 15999009,
+      "node_id": "MDQ6VXNlcjE1OTk5MDA5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15999009?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tbenr",
+      "html_url": "https://github.com/tbenr",
+      "followers_url": "https://api.github.com/users/tbenr/followers",
+      "following_url": "https://api.github.com/users/tbenr/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tbenr/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tbenr/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tbenr/subscriptions",
+      "organizations_url": "https://api.github.com/users/tbenr/orgs",
+      "repos_url": "https://api.github.com/users/tbenr/repos",
+      "events_url": "https://api.github.com/users/tbenr/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tbenr/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-23T15:08:00Z",
+    "updated_at": "2023-10-23T15:08:00Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "As a reference, on mainnet on my local machine I get:\r\n\r\n```\r\n2023-10-23 16:53:12.315 WARN  - DB operation LevelDbTransaction::commit took too long: 190 ms. The alert threshold is set to: 1 ms. Additional info: N/A\r\n\r\n2023-10-23 16:53:12.319 WARN  - DB operation KvStoreDatabase::doUpdate took too long: 1314 ms. The alert threshold is set to: 1 ms. Additional info: Finalized data updated time: 605 ms - Hot data updated time: 709 ms of which latest finalized state updated time: 113 ms\r\n```\r\n\r\nSo the commit itself was only 190ms, but the `doUpdate` took 1.3s and I think that most of the time has been spent in serialization operations.",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1775420102/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1775476122",
+    "html_url": "https://github.com/Consensys/teku/issues/7622#issuecomment-1775476122",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7622",
+    "id": 1775476122,
+    "node_id": "IC_kwDOCM9I9M5p052a",
+    "user": {
+      "login": "tbenr",
+      "id": 15999009,
+      "node_id": "MDQ6VXNlcjE1OTk5MDA5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15999009?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tbenr",
+      "html_url": "https://github.com/tbenr",
+      "followers_url": "https://api.github.com/users/tbenr/followers",
+      "following_url": "https://api.github.com/users/tbenr/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tbenr/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tbenr/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tbenr/subscriptions",
+      "organizations_url": "https://api.github.com/users/tbenr/orgs",
+      "repos_url": "https://api.github.com/users/tbenr/repos",
+      "events_url": "https://api.github.com/users/tbenr/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tbenr/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-23T15:35:39Z",
+    "updated_at": "2023-10-23T15:35:39Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "well this is actually not correct:\r\n![image](https://github.com/Consensys/teku/assets/15999009/2407cdb6-c108-4ea9-b2a7-41859410c8ec)\r\n\r\nserialization is not the big portion of it. We are wasting a lot of time deserializing blocks to move them from hot to finalized",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1775476122/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
