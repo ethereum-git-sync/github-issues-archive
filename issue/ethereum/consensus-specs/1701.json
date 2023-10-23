@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 6,
   "created_at": "2020-04-01T23:51:08Z",
-  "updated_at": "2023-10-21T13:10:03Z",
-  "closed_at": null,
+  "updated_at": "2023-10-23T12:45:18Z",
+  "closed_at": "2023-10-23T12:45:18Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "We (Lighthouse) are interested in building a \"panic-free\" implementation of the state transitions. I think we're fairly close when compiled in Rust's \"release\" mode (optimized, production-ready), however for Rust's \"debug\" mode (slow but useful for troubleshooting) any integer overflow that is not explicitly handled causes a panic.\r\n\r\nWhen it comes to these overflows we have two choices:\r\n\r\n- Indicate that wrapping on overflow is desired behavior (viz., don't raise an exception).\r\n- Return early with an error if an overflow is encountered (viz., raise an exception).\r\n\r\nThe specification uses `uint...` types that, as I understand it, have undefined behavior when it comes to overflow (perhaps this can be derived from the tests, but this doesn't feel authoritative enough to me). From \"common sense\", I would assume that `uint64_max_value() + 1 == 0` and `0 - 1 == uint64_max_value()`. I also note that a few comments that infer `uint64` overflows:\r\n\r\n> Math safe up to ~10B ETH, afterwhich this overflows uint64.\r\n\r\n> Factored out from balance totals to avoid uint64 overflow\r\n\r\n> Factored out from penalty numerator to avoid uint64 overflow\r\n\r\nSo, I'm _inferring_ that uint64 overflows, _assuming_ that it's desired behavior and _assuming_ the specifics of that behavior.\r\n\r\nIt would be nice to have some clarity around this behavior. I understand that there's an idea that \"valid state transitions shouldn't lead to overflows\", but when it comes to things like fuzzing it's nice to have a distinction between \"expected wrapping overflow\" and \"unexpected wrapping overflow\".\r\n\r\nSo in summary, I have a question and a request please:\r\n- Question: is a state transition considered valid if integer arithmetic overflows?\r\n- Request: Make the spec explicit about the behavior of overflows.\r\n\r\nAs always, thanks! :)",
-  "closed_by": null,
+  "closed_by": {
+    "login": "JustinDrake",
+    "id": 731743,
+    "node_id": "MDQ6VXNlcjczMTc0Mw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/731743?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JustinDrake",
+    "html_url": "https://github.com/JustinDrake",
+    "followers_url": "https://api.github.com/users/JustinDrake/followers",
+    "following_url": "https://api.github.com/users/JustinDrake/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JustinDrake/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JustinDrake/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JustinDrake/subscriptions",
+    "organizations_url": "https://api.github.com/users/JustinDrake/orgs",
+    "repos_url": "https://api.github.com/users/JustinDrake/repos",
+    "events_url": "https://api.github.com/users/JustinDrake/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JustinDrake/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1701/reactions",
     "total_count": 3,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1701/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -324,8 +343,8 @@
     "body": "Spec declares that\r\n\r\n> State transitions that cause a `uint64` overflow or underflow are also considered invalid.\r\n\r\nhttps://github.com/ethereum/consensus-specs/blob/1e552f17a709d8b9d8e20437ff0803d596e9458b/specs/phase0/beacon-chain.md?plain=1#L1249",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/1773787215/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
