@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4876",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4876/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4876/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4876/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4876",
+  "id": 1959933773,
+  "node_id": "I_kwDOCFeAzc500jdN",
+  "number": 4876,
+  "title": "RPC lookups for blobs on local block production",
+  "user": {
+    "login": "realbigsean",
+    "id": 5160426,
+    "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/realbigsean",
+    "html_url": "https://github.com/realbigsean",
+    "followers_url": "https://api.github.com/users/realbigsean/followers",
+    "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+    "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+    "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+    "repos_url": "https://api.github.com/users/realbigsean/repos",
+    "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 4615284981,
+      "node_id": "LA_kwDOCFeAzc8AAAABExeo9Q",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/deneb",
+      "name": "deneb",
+      "color": "B7BBEC",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-24T19:27:14Z",
+  "updated_at": "2023-10-24T19:27:14Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "I observed these logs on devnet 10, it looks like we might be triggering blobs by root lookups during block production:\r\n\r\n```\r\nOct 24 18:20:24.471 DEBG Produced block on state, slot: 10002, block_size: 80656, service: beacon, module: beacon_chain::beacon_chain:5063\r\nOct 24 18:20:24.768 DEBG Processed HTTP API request, method: GET, path: /eth/v2/validator/blocks/10002, status: 200 OK, elapsed: 758.572649ms, module: http_api:194\r\nOct 24 18:20:24.879 DEBG Signed block received in HTTP API, slot: 10002, module: http_api::publish_blocks:64\r\nOct 24 18:20:24.912 INFO Signed block published to network via HTTP API, publish_delay: 33.432828ms, slot: 10002, module: http_api::publish_blocks:77\r\nOct 24 18:20:24.912 DEBG Sending pubsub messages, topics: [BeaconBlock, BlobSidecar(0), BlobSidecar(1), BlobSidecar(2), BlobSidecar(3)], count: 5, service: network, module: network::service:678\r\nOct 24 18:20:25.287 DEBG Invalid sync committee message from network, type: \"sync_contribution\", peer_id: 16Uiu2HAkvL9e2GrjpBv6nsVQm1qWU25iX1Su7fcLrnwJnwQ3yE66, reason: PastSlot { message_slot: Slot(10001), earliest_permissible_slot: Slot(10002) }, module: network::network_beacon_processor::gossip_methods:2756\r\nOct 24 18:20:25.316 DEBG Searching for block components, block: 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30, peer_ids: [BlockAndBlobs(PeerId(\"16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa\"))], service: sync, module: network::sync::block_lookups:232\r\nOct 24 18:20:25.316 DEBG Sending BlocksByRoot Request, lookup_type: Current, peer: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, block_roots: [0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30], method: BlocksByRoot, service: sync, module: network::sync::network_context:421\r\nOct 24 18:20:25.316 DEBG Sending BlobsByRoot Request, lookup_type: Current, peer: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, blob_indices: [0, 1, 2, 3, 4, 5], block_root: 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30, method: BlobsByRoot, service: sync, module: network::sync::network_context:457\r\nOct 24 18:20:25.343 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30, index: 0 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\nOct 24 18:20:25.386 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30, index: 1 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\nOct 24 18:20:25.386 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30, index: 2 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\nOct 24 18:20:25.386 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30, index: 3 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\nOct 24 18:20:25.393 DEBG RPC blobs received, slot: 10002, block_root: 0x1eaa<E2><80><A6>7b30, indices: [0, 1, 2, 3], module: network::network_beacon_processor::sync_methods:296\r\nOct 24 18:20:25.401 DEBG Importing fully available block, num_blobs: 4, slot: 10002, block_root: 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30, service: beacon, modu\r\nle: beacon_chain::beacon_chain:3117\r\nOct 24 18:20:25.403 DEBG Processed HTTP API request, method: GET, path: /eth/v1/node/syncing, status: 200 OK, elapsed: 913.233<C2><B5>s, module: http_api:194\r\nOct 24 18:20:25.435 WARN Missing components over rpc, slot: 10002, block_hash: 0x1eaa<E2><80><A6>7b30, module: network::network_beacon_processor::sync_methods:328\r\nOct 24 18:20:25.435 DEBG Block component processed for lookup, result: Ok(MissingComponents(Slot(10002), 0x1eaa789f91d678a371147a1853d00ed3afdd463c215e902d26c2b31d53f17b30)), response_type: Blob, service: sync, module: network::sync::block_lookups:783\r\nOct 24 18:20:25.463 DEBG Writing blobs to store, count: 4, block_root: 0x1eaa<E2><80><A6>7b30, service: beacon, module: beacon_chain::beacon_chain:3364\r\nOct 24 18:20:25.475 INFO Valid block from HTTP API, slot: 10002, proposer_index: 226916, root: 0x1eaa<E2><80><A6>7b30, block_delay: 879.135252ms, module: http_api::publish_blocks:224\r\nOct 24 18:20:25.482 DEBG Beacon block rejected, reason: BlockIsAlreadyKnown, service: beacon, module: beacon_chain::beacon_chain:2999\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4876/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4876/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
