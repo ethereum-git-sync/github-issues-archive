@@ -94,7 +94,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "garyschulte",
@@ -139,14 +139,33 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-09-20T16:49:23Z",
-  "updated_at": "2023-09-25T22:30:10Z",
-  "closed_at": null,
+  "updated_at": "2023-10-24T02:10:40Z",
+  "closed_at": "2023-10-24T02:10:40Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nDuring snap-sync, especially on a low IO instance, a deadlock can occur that will halt the snap sync pipeline.  See stack trace in logs below.\r\n\r\nBesu should implement a retry policy that will catch the exception and retry the commit before throwing, rather than allowing the exception to abend the pipeline.\r\n\r\n### Acceptance Criteria\r\n* Snap sync pipeline is more tolerant of IO saturated machines\r\n\r\n### Steps to Reproduce (Bug)\r\n1. start snap sync of mainnet with flat db healing, on an IO restricted instance\r\n\r\n**Expected behavior:** [What you expect to happen]\r\nsnap sync to finish with full flat db heal\r\n\r\n**Actual behavior:** [What actually happens]\r\nWhen IO contention is too high, a RocksDB Busy exception will be thrown and abend the sync pipeline\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\n\r\n### Logs (if a bug)\r\n\r\n```\r\n{“@timestamp”:“2023-09-19T13:05:45,780\",“level”:“INFO”,“thread”:“EthScheduler-Services-26 (batchPersistTrieNodeData)“,”class”:“SnapsyncMetricsManager”,“message”:“Healed 74500 world state trie nodes, Peer count: 25”,“throwable”:“”}\r\n{“@timestamp”:“2023-09-19T13:05:55,384”,“level”:“INFO”,“thread”:“EthScheduler-Services-26 (batchPersistTrieNodeData)“,”class”:“Pipeline”,“message”:“Unexpected exception in pipeline. Aborting.“,”throwable”:” org.hyperledger.besu.plugin.services.exception.StorageException: org.rocksdb.RocksDBException: Busy\r\n\tat org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBTransaction.commit(RocksDBTransaction.java:95)\r\n\tat org.hyperledger.besu.services.kvstore.SegmentedKeyValueStorageTransactionValidatorDecorator.commit(SegmentedKeyValueStorageTransactionValidatorDecorator.java:65)\r\n\tat org.hyperledger.besu.ethereum.bonsai.storage.BonsaiWorldStateKeyValueStorage$Updater.commit(BonsaiWorldStateKeyValueStorage.java:472)\r\n\tat org.hyperledger.besu.ethereum.eth.sync.snapsync.PersistDataStep.persist(PersistDataStep.java:80)\r\n\tat org.hyperledger.besu.ethereum.eth.sync.snapsync.SnapWorldStateDownloadProcess$Builder.lambda$build$27(SnapWorldStateDownloadProcess.java:392)\r\n\tat org.hyperledger.besu.services.pipeline.MapProcessor.processNextInput(MapProcessor.java:31)\r\n\tat org.hyperledger.besu.services.pipeline.ProcessingStage.run(ProcessingStage.java:38)\r\n\tat org.hyperledger.besu.services.pipeline.Pipeline.lambda$runWithErrorHandling$3(Pipeline.java:169)\r\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:577)\r\n\tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)\r\n\tat java.base/java.lang.Thread.run(Thread.java:1589)\r\nCaused by: org.rocksdb.RocksDBException: Busy\r\n\tat org.rocksdb.Transaction.commit(Native Method)\r\n\tat org.rocksdb.Transaction.commit(Transaction.java:207)\r\n\tat org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBTransaction.commit(RocksDBTransaction.java:89)\r\n\t... 12 more\r\n”}\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.7.x\r\n* Cloud VM, type, size: Azure d4s\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n* Besu setup info - mainnet, --Xsnapsync-synchronizer-flat-db-healing-enabled=true\r\n* System info - IO constrained \r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "garyschulte",
+    "id": 1238512,
+    "node_id": "MDQ6VXNlcjEyMzg1MTI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1238512?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/garyschulte",
+    "html_url": "https://github.com/garyschulte",
+    "followers_url": "https://api.github.com/users/garyschulte/followers",
+    "following_url": "https://api.github.com/users/garyschulte/following{/other_user}",
+    "gists_url": "https://api.github.com/users/garyschulte/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/garyschulte/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/garyschulte/subscriptions",
+    "organizations_url": "https://api.github.com/users/garyschulte/orgs",
+    "repos_url": "https://api.github.com/users/garyschulte/repos",
+    "events_url": "https://api.github.com/users/garyschulte/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/garyschulte/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5911/reactions",
     "total_count": 0,
@@ -161,8 +180,51 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5911/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1776387956",
+    "html_url": "https://github.com/hyperledger/besu/issues/5911#issuecomment-1776387956",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/5911",
+    "id": 1776387956,
+    "node_id": "IC_kwDODE2jmc5p4Yd0",
+    "user": {
+      "login": "garyschulte",
+      "id": 1238512,
+      "node_id": "MDQ6VXNlcjEyMzg1MTI=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1238512?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/garyschulte",
+      "html_url": "https://github.com/garyschulte",
+      "followers_url": "https://api.github.com/users/garyschulte/followers",
+      "following_url": "https://api.github.com/users/garyschulte/following{/other_user}",
+      "gists_url": "https://api.github.com/users/garyschulte/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/garyschulte/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/garyschulte/subscriptions",
+      "organizations_url": "https://api.github.com/users/garyschulte/orgs",
+      "repos_url": "https://api.github.com/users/garyschulte/repos",
+      "events_url": "https://api.github.com/users/garyschulte/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/garyschulte/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-24T02:10:40Z",
+    "updated_at": "2023-10-24T02:10:40Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "fixed by #6004 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1776387956/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
