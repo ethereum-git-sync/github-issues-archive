@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-09-28T02:37:59Z",
-  "updated_at": "2023-09-28T21:45:46Z",
-  "closed_at": null,
+  "updated_at": "2023-10-24T16:24:15Z",
+  "closed_at": "2023-10-24T16:24:15Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "The current trie benchmarks in geth: https://github.com/ethereum/go-ethereum/blob/master/trie/trie_test.go#L630-L635 allocate a single byte array to use as the key and value when constructing a trie.\r\n\r\nThe key is then overwritten every time to a different value. However, the trie assumes that after a byte slice is passed in it should not be modified by the caller.\r\n\r\nAs an example, modifying `benchUpdate` to add the following correctness check causes the benchmark to fail:\r\n\r\n```\r\n\ttrie := NewEmpty(triedb)\r\n\tk := make([]byte, 32)\r\n\tb.ReportAllocs()\r\n\tfor i := 0; i < b.N; i++ {\r\n\t\te.PutUint64(k, uint64(i))\r\n\t\ttrie.MustUpdate(k, k)\r\n\t}\r\n\r\n\tk2 := make([]byte, 32)\r\n\tres, err := trie.Get(k2)\r\n\tif err != nil {\r\n\t\tb.Fatal(err)\r\n\t}\r\n\tif !bytes.Equal(res, k2) {\r\n\t\tb.Fatal(\"unexpected\")\r\n\t}\r\n```\r\n\r\nchecking that the key equals the value should pass because every call to `MustUpdate` passed in the same key and value argument.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "aaronbuchwald",
+    "id": 24684335,
+    "node_id": "MDQ6VXNlcjI0Njg0MzM1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/24684335?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/aaronbuchwald",
+    "html_url": "https://github.com/aaronbuchwald",
+    "followers_url": "https://api.github.com/users/aaronbuchwald/followers",
+    "following_url": "https://api.github.com/users/aaronbuchwald/following{/other_user}",
+    "gists_url": "https://api.github.com/users/aaronbuchwald/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/aaronbuchwald/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/aaronbuchwald/subscriptions",
+    "organizations_url": "https://api.github.com/users/aaronbuchwald/orgs",
+    "repos_url": "https://api.github.com/users/aaronbuchwald/repos",
+    "events_url": "https://api.github.com/users/aaronbuchwald/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/aaronbuchwald/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28214/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28214/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -144,7 +163,7 @@
     },
     "created_at": "2023-09-28T13:34:35Z",
     "updated_at": "2023-09-28T13:34:35Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Hi @aaronbuchwald , can u please review this [PR](https://github.com/ethereum/go-ethereum/pull/28221), I have suggested a solution.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1739198696/reactions",
@@ -236,6 +255,50 @@
     "body": "It would also be very interesting to either come up with a formula for the expected number of trie node reads when updating k keys in a trie of size n, or since as I understand it a closed form formula for that may be difficult a simulation that helps approximate the expected number of trie node reads that will be needed.\r\n\r\nAssuming the keys are randomly distributed, log_b(n) * k (depth * k) should be a good upper bound approximation, but I'm still curious if there's a straightforward, closer approximation.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1740045760/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1777592326",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28214#issuecomment-1777592326",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28214",
+    "id": 1777592326,
+    "node_id": "IC_kwDOAOvK985p8-gG",
+    "user": {
+      "login": "aaronbuchwald",
+      "id": 24684335,
+      "node_id": "MDQ6VXNlcjI0Njg0MzM1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24684335?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aaronbuchwald",
+      "html_url": "https://github.com/aaronbuchwald",
+      "followers_url": "https://api.github.com/users/aaronbuchwald/followers",
+      "following_url": "https://api.github.com/users/aaronbuchwald/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aaronbuchwald/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aaronbuchwald/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aaronbuchwald/subscriptions",
+      "organizations_url": "https://api.github.com/users/aaronbuchwald/orgs",
+      "repos_url": "https://api.github.com/users/aaronbuchwald/repos",
+      "events_url": "https://api.github.com/users/aaronbuchwald/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aaronbuchwald/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-24T16:24:15Z",
+    "updated_at": "2023-10-24T16:24:15Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Closed by https://github.com/ethereum/go-ethereum/pull/28221",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1777592326/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
