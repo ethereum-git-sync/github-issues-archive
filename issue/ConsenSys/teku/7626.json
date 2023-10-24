@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7626",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7626/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7626/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7626/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7626",
+  "id": 1959484173,
+  "node_id": "I_kwDOCM9I9M50y1sN",
+  "number": 7626,
+  "title": "Bad finalized deposit tree snapshot stored on DB",
+  "user": {
+    "login": "tbenr",
+    "id": 15999009,
+    "node_id": "MDQ6VXNlcjE1OTk5MDA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/15999009?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tbenr",
+    "html_url": "https://github.com/tbenr",
+    "followers_url": "https://api.github.com/users/tbenr/followers",
+    "following_url": "https://api.github.com/users/tbenr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tbenr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tbenr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tbenr/subscriptions",
+    "organizations_url": "https://api.github.com/users/tbenr/orgs",
+    "repos_url": "https://api.github.com/users/tbenr/repos",
+    "events_url": "https://api.github.com/users/tbenr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tbenr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-24T15:07:27Z",
+  "updated_at": "2023-10-24T15:07:27Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "During devnet10 launch I saw several teku nodes complaining about incorrect ordering received from ELs.\r\n\r\nIn particular I analyzed a teku-geth pair that was reporting very frequently the following error on the teku side:\r\n\r\n```\r\nPLEASE CHECK YOUR ETH1 NODE | Encountered a problem retrieving deposit events from eth1 endpoint: Expected next deposit at index 1, but got 0\r\n``` \r\n\r\nEven on restart:\r\n\r\n```\r\n2023-10-24 13:28:54.645 INFO  - Loading deposit tree snapshot from database\r\n2023-10-24 13:28:55.884 INFO  - A deposit snapshot was read with 1 deposits and 0x68cf3d944f75dcf02a1ee31bc421063597634c4b5395ccb53fdab60a0cfacb44 execution block hash.\r\n2023-10-24 13:28:55.886 INFO  - Loaded deposits tree state from snapshot with 1 deposits and 0x68cf3d944f75dcf02a1ee31bc421063597634c4b5395ccb53fdab60a0cfacb44 execution block hash.\r\n2023-10-24 13:28:55.920 INFO  - Loading deposits up to Eth1 block 7404\r\n2023-10-24 13:29:01.264 INFO  - Validator   *** Slashing protection loaded for validators: a49bfca, 85fa598, 977f9af, ae40ab0, 920b491, 9495d4b, 8bfe785, a982e4e, a1c066f, b9d4fc4, a80e305, 97097cb, 8e32fe9, 8bd315d, b59a9da, 8820a60, a521166, 91e639b, a0d0629, ac0206\r\n2<E2><80><A6> (5000 total)\r\n2023-10-24 13:29:01.972 FATAL - PLEASE CHECK YOUR ETH1 NODE | Encountered a problem retrieving deposit events from eth1 endpoint: Expected next deposit at index 1, but got 0\r\ntech.pegasys.teku.ethereum.pow.api.InvalidDepositEventsException: Expected next deposit at index 1, but got 0\r\nat tech.pegasys.teku.ethereum.pow.api.InvalidDepositEventsException.expectedDepositAtIndex(InvalidDepositEventsException.java:26) ~[teku-ethereum-pow-api-develop.jar:UNKNOWN+gd418f8d]\r\nat tech.pegasys.teku.beacon.pow.ValidatingEth1EventsPublisher.assertDepositEventIsValid(ValidatingEth1EventsPublisher.java:57) ~[teku-beacon-pow-develop.jar:UNKNOWN+gd418f8d]\r\nat tech.pegasys.teku.beacon.pow.ValidatingEth1EventsPublisher.onDepositsFromBlock(ValidatingEth1EventsPublisher.java:47) ~[teku-beacon-pow-develop.jar:UNKNOWN+gd418f8d]\r\n```\r\nSo teku wrote on DB a snapshot that was asserting that on genesis block (0x68cf3d944f75dcf02a1ee31bc421063597634c4b5395ccb53fdab60a0cfacb44) there was one deposit.\r\nthe snapshot was reporting `0` block height (consistent with EL genesis block hash)\r\n\r\nbut then each time teku were requesting contract logs:\r\n\r\nrequest `Oct 24 12:52:49.357 2023 REQUEST`\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"method\": \"eth_getLogs\",\r\n  \"params\": [\r\n    {\r\n      \"topics\": [\r\n        \"0x649bbc62d0e31342afea4e5cd82d4049e7e1ee912fc0889aa790803be39038c5\"\r\n      ],\r\n      \"fromBlock\": \"0x1\",\r\n      \"toBlock\": \"0x1c3c\",\r\n      \"address\": [\r\n        \"0x6f22fFbC56eFF051aECF839396DD1eD9aD6BBA9D\"\r\n      ]\r\n    }\r\n  ],\r\n  \"id\": 9\r\n}\r\n```\r\n\r\nresponse `Oct 24 12:52:51.160 2023 RESPONSE (status 200 OK)`:\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 9,\r\n  \"result\": [\r\n    {\r\n      \"address\": \"0x6f22ffbc56eff051aecf839396dd1ed9ad6bba9d\",\r\n      \"topics\": [\r\n        \"0x649bbc62d0e31342afea4e5cd82d4049e7e1ee912fc0889aa790803be39038c5\"\r\n      ],\r\n      \"data\": \"0x00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000030932d2d8b365d53fd5a2c73d3a49182814a507f392948b7a7597fd9a5fdeea2aa4b2b0a35c6b5fbbe059ac2c1183bcb6c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000930674fa97d513c028644a21c386ab06a6f0f3ff9556d61aa00942eee0387d00000000000000000000000000000000000000000000000000000000000000080040597307000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006090a99f68d9d10b6490f8358c6d1de3846576f1a784ad1012b6a61791eb373c73f56f2f1b513c41a512e10d8a87eccd5b0fd7ac6c460cbcf48a2e1e52ae57f1e8155e539667238b3fb891dcc4c3414c0a0c80230b77c0a32626d5d55b65bb122f00000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000\",\r\n      \"blockNumber\": \"0x194\",\r\n      \"transactionHash\": \"0x89b1b56ce20a7b11b16cc30aa151f18af1ef7e66cc3845f3eba156d319443103\",\r\n      \"transactionIndex\": \"0x0\",\r\n      \"blockHash\": \"0x5233c2c545b878b357be4fef6977e81724f18c22d0d720c4161ee53d1f6c852d\",\r\n      \"logIndex\": \"0x0\",\r\n      \"removed\": false\r\n    },\r\n    {\r\n      \"address\": \"0x6f22ffbc56eff051aecf839396dd1ed9ad6bba9d\",\r\n      \"topics\": [\r\n        \"0x649bbc62d0e31342afea4e5cd82d4049e7e1ee912fc0889aa790803be39038c5\"\r\n      ],\r\n      \"data\": \"0x00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000030b320ebce6b3628d7057aa4428022d9c7011f7140b86227300aae706f4a7fe9aee37b5838a16aab21b101c485ae7a6dde00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000509762c8bf34c1b810fec9883a0d9c91097937549bc393d9d98ed8284b68de000000000000000000000000000000000000000000000000000000000000000800405973070000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060ab30dafeeab89e6c76c802af0ee4bec79c7f241fa07fef377d85f2f7d2bc523928d656b5085ffe4911c546e63165283112e2d0ba88dd26d245f57c079eac36ebcfb524e1b4c6423ad295be15603b6756337a7c55c7cc33174885a5165cf27f8c00000000000000000000000000000000000000000000000000000000000000080100000000000000000000000000000000000000000000000000000000000000\",\r\n      \"blockNumber\": \"0x195\",\r\n      \"transactionHash\": \"0xf4b9e639e5c6a02140810864f112e0fd42de450fe8af64993b6787ab51779607\",\r\n      \"transactionIndex\": \"0x0\",\r\n      \"blockHash\": \"0x22bd129997fdecd2de7aeebaa3beacb1b3227b5084e618a4577cfe82b97c3f67\",\r\n      \"logIndex\": \"0x0\",\r\n      \"removed\": false\r\n    },\r\n```\r\n\r\nso geth was reporting first deposit (index 0) at block `0x194` (404).\r\n\r\nwe got stuck there.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7626/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7626/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
