@@ -8,7 +8,7 @@
   "id": 1958884189,
   "node_id": "I_kwDOA9tCBs50wjNd",
   "number": 4704,
-  "title": "Use unchecked field for counter in loop",
+  "title": "Use unchecked block for counter in loop",
   "user": {
     "login": "AntonGulak",
     "id": 55970327,
@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-10-24T09:43:10Z",
-  "updated_at": "2023-10-24T09:43:10Z",
-  "closed_at": null,
+  "updated_at": "2023-10-24T15:05:31Z",
+  "closed_at": "2023-10-24T14:14:45Z",
   "author_association": "NONE",
   "active_lock_reason": null,
-  "body": "For example, instead of https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol#L85\r\n\r\nimplement the loop like this\r\n\r\n```\r\n for (uint256 i = 0; i < accounts.length;) {\r\n            batchBalances[i] = balanceOf(accounts.unsafeMemoryAccess(i), ids.unsafeMemoryAccess(i));\r\n            unchecked {\r\n               ++i;\r\n            }\r\n        }\r\n```\r\n\r\n\r\nBecause the array length cannot exceed uint256, we don't need to check for overflow.",
-  "closed_by": null,
+  "body": "For example, instead of https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol#L85\r\n\r\nimplement the loop like this\r\n\r\n```\r\n for (uint256 i = 0; i < accounts.length;) {\r\n            batchBalances[i] = balanceOf(accounts.unsafeMemoryAccess(i), ids.unsafeMemoryAccess(i));\r\n            unchecked {\r\n               ++i;\r\n            }\r\n        }\r\n```\r\n\r\n\r\nBecause the array length cannot exceed uint256, we don't need to check for overflow.\r\n\r\n\r\nAlso found a few options for gas optimization\r\n\r\n1) https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/finance/VestingWallet.sol#L71\r\n\r\n uint64 _start and uint64 _duration cannot overflow uint256\r\n\r\n2) https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Multicall.sol#L18\r\n\r\nTo optimize gas usage, use prefix increment instead of postfix increment. Also, it can be moved to an unchecked block.\r\n\r\n\r\n\r\n\r\n",
+  "closed_by": {
+    "login": "Amxx",
+    "id": 2432299,
+    "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Amxx",
+    "html_url": "https://github.com/Amxx",
+    "followers_url": "https://api.github.com/users/Amxx/followers",
+    "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+    "organizations_url": "https://api.github.com/users/Amxx/orgs",
+    "repos_url": "https://api.github.com/users/Amxx/repos",
+    "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Amxx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4704/reactions",
     "total_count": 0,
@@ -61,8 +80,95 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4704/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1777309172",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4704#issuecomment-1777309172",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4704",
+    "id": 1777309172,
+    "node_id": "IC_kwDOA9tCBs5p75X0",
+    "user": {
+      "login": "Amxx",
+      "id": 2432299,
+      "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Amxx",
+      "html_url": "https://github.com/Amxx",
+      "followers_url": "https://api.github.com/users/Amxx/followers",
+      "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/Amxx/orgs",
+      "repos_url": "https://api.github.com/users/Amxx/repos",
+      "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Amxx/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-24T14:14:42Z",
+    "updated_at": "2023-10-24T14:14:42Z",
+    "author_association": "COLLABORATOR",
+    "body": "Hello @AntonGulak \r\n\r\nThis was already proposed, and we decided to not implement this change for the following reasons:\r\n- We feel that this syntax reduces readability of the code, by moving some of the `for` logic to some place where it does not belong. As a consequence, it makes review and audit more painfull, and contributes negativelly to the security of the system.\r\n- This is a optimisation that the compiler should take care of. We believe in writting clean high level code, that gets compiled to efficient bytecode. That has been my goal when writting C/C++ for HPC 10 years ago, and its still my goal today writting solidity\r\n\r\n[Note that this was just merged by the solidity team, and it should be in the next release (0.8.22)](https://github.com/ethereum/solidity/pull/13378)\r\n\r\nMy personnal opinion is that writting for loops like that is some trend, that people do to look smart (not saying they are not, but definitelly not for that reason) ... trying to save singular units of gas in places where its not meaningfull at all. I wish all the effort spent on rewritting codebases that way, and sharing these \"tricks\" on social media  would have been put toward improving the compiler.",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1777309172/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1777424245",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4704#issuecomment-1777424245",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4704",
+    "id": 1777424245,
+    "node_id": "IC_kwDOA9tCBs5p8Vd1",
+    "user": {
+      "login": "AntonGulak",
+      "id": 55970327,
+      "node_id": "MDQ6VXNlcjU1OTcwMzI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55970327?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/AntonGulak",
+      "html_url": "https://github.com/AntonGulak",
+      "followers_url": "https://api.github.com/users/AntonGulak/followers",
+      "following_url": "https://api.github.com/users/AntonGulak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/AntonGulak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/AntonGulak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/AntonGulak/subscriptions",
+      "organizations_url": "https://api.github.com/users/AntonGulak/orgs",
+      "repos_url": "https://api.github.com/users/AntonGulak/repos",
+      "events_url": "https://api.github.com/users/AntonGulak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/AntonGulak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-24T15:00:46Z",
+    "updated_at": "2023-10-24T15:05:31Z",
+    "author_association": "NONE",
+    "body": " @Amxx Certainly, the compiler should be optimized to automatically save gas in such scenarios. While idealism has its merits, practical concerns also matter. For instance, I currently expend an additional 6800 gas for 100 cycles in your multicall. Even at a basic level, all your other contracts use a prefix incrementor, while the method where loops are most frequently used employs a postfix incrementor. This is, at the very least, a matter of code style.\r\n\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1777424245/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
