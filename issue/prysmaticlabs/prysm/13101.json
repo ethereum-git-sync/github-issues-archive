@@ -8,7 +8,7 @@
   "id": 1957869963,
   "node_id": "I_kwDOBvuov850srmL",
   "number": 13101,
-  "title": "Bad marking of seen block cache ",
+  "title": "Check blobs by root return",
   "user": {
     "login": "terencechain",
     "id": 21316537,
@@ -49,7 +49,7 @@
       "description": "PRs or issues for the Deneb upgrade"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-10-23T19:20:53Z",
-  "updated_at": "2023-10-24T08:42:33Z",
-  "closed_at": null,
+  "updated_at": "2023-10-24T15:02:46Z",
+  "closed_at": "2023-10-24T15:02:46Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "When we request a block by root, we get the block and mark the block as seen when we insert the block to the pending queue\r\n```go\r\nfunc (s *Service) insertBlockToPendingQueue(_ primitives.Slot, b interfaces.ReadOnlySignedBeaconBlock, r [32]byte) error {\r\n\tif s.seenPendingBlocks[r] {\r\n\t\treturn nil\r\n\t}\r\n\tif err := s.addPendingBlockToCache(b); err != nil {\r\n\t\treturn err\r\n\t}\r\n\ts.seenPendingBlocks[r] = true\r\n\treturn nil\r\n}\r\n```\r\n\r\nOnce we `seenPendingBlocks[r]` is true, we'll never be able to request the same block by root again\r\n```go\r\nfunc (s *Service) sendBatchRootRequest(ctx context.Context, roots [][32]byte, randGen *rand.Rand) error {\r\n\tfor i := len(roots) - 1; i >= 0; i-- {\r\n\t\tr := roots[i]\r\n\t\tif s.seenPendingBlocks[r] || s.cfg.chain.BlockBeingSynced(r) {\r\n\t\t\troots = append(roots[:i], roots[i+1:]...)\r\n\t\t}\r\n\t}\r\n```\r\n\r\nNow, you can imagine a block with one blob that you are asking for. You cycle through your peers. The first peer you request returns a block with a bad blob. But you will never try to make a second request. Your node is officially stuck until a restart",
-  "closed_by": null,
+  "body": "If the returned blobs is different than requested blobs, the node will stuck at DA check",
+  "closed_by": {
+    "login": "prylabs-bulldozer[bot]",
+    "id": 58059840,
+    "node_id": "MDM6Qm90NTgwNTk4NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/47372?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D",
+    "html_url": "https://github.com/apps/prylabs-bulldozer",
+    "followers_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prylabs-bulldozer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13101/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13101/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
