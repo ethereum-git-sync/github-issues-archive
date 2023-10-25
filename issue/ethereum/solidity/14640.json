@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14640",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14640/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14640/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14640/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14640",
+  "id": 1960131194,
+  "node_id": "I_kwDOAm_5kc501Tp6",
+  "number": 14640,
+  "title": "In yul, there's a bug when mixing `verbatim`, `switch`, and unoptimized code",
+  "user": {
+    "login": "qbzzt",
+    "id": 12722969,
+    "node_id": "MDQ6VXNlcjEyNzIyOTY5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/12722969?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/qbzzt",
+    "html_url": "https://github.com/qbzzt",
+    "followers_url": "https://api.github.com/users/qbzzt/followers",
+    "following_url": "https://api.github.com/users/qbzzt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/qbzzt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/qbzzt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/qbzzt/subscriptions",
+    "organizations_url": "https://api.github.com/users/qbzzt/orgs",
+    "repos_url": "https://api.github.com/users/qbzzt/repos",
+    "events_url": "https://api.github.com/users/qbzzt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/qbzzt/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-24T21:47:53Z",
+  "updated_at": "2023-10-24T21:50:26Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWe need unoptimized Yul code to measure gas costs (see https://github.com/ethereum/solidity/issues/14621). This is often facilitated using expressions such as:\r\n\r\n```\r\ndelta := verbatim_1i_1o(hex\"<gas><swap1><operation, which uses the parameter><gas><swap1><sub>\", <input value>)\r\n```\r\n\r\nHowever, such expressions tend to confuse the compiler when put inside a `switch` statement\r\n\r\n## Environment\r\n\r\n- Compiler version:\r\n  ```\r\n  qbzzt1@tests:~/yul$ ./solc --version\r\n  solc, the solidity compiler commandline interface\r\n  Version: 0.8.21+commit.d9974bed.Linux.g++\r\n  ```\r\n\r\n- Target EVM version (as per compiler settings): The default, but I also verified with `--evm-version shanghai`.\r\n\r\n- Framework/IDE (e.g. Truffle or Remix): None\r\n\r\n- EVM execution environment / backend / blockchain client: Geth, but I can prove that's not the issue.\r\n\r\n- Operating system: \r\n\r\n  Running on GCP\r\n  ```\r\n  qbzzt1@tests:~/yul$ uname -a\r\n  Linux tests 5.10.0-26-cloud-amd64 #1 SMP Debian 5.10.197-1 (2023-09-29) x86_64 GNU/Linux\r\n  qbzzt1@tests:~/yul$ \r\n  ```\r\n\r\n## Steps to Reproduce\r\n\r\nCompile this Yul code:\r\n\r\n```yul\r\n{\r\n  let dummy := 0xAABBCCDDEEFF\r\n  let input := sload(0)\r\n  let output\r\n\r\n  // I also verified this when switching on a variable's value\r\n  switch input\r\n  // This is the case that needs to be executed\r\n  case 0x00 {\r\n      output := verbatim_1i_1o(hex\"506000\", dummy)\r\n\r\n      // Case gets executed with this (logically equivalent) code:\r\n      // output := verbatim_0i_1o(hex\"6000\")\r\n  }\r\n  case 0x01 {\r\n      output := 1 \r\n  }\r\n  // This is the case that actually gets executed.\r\n  // It is the last but one case.\r\n  case 0x02 {\r\n      output := verbatim_1i_1o(hex\"506002\", dummy)\r\n\r\n      // The first case gets executed correctly if I put here\r\n      // this (logically equivalent) code\r\n      // output := verbatim_0i_1o(hex\"6002\")\r\n  }          \r\n  case 0x03 {\r\n      output := 3\r\n  }          \r\n\r\n  sstore(0, output)\r\n}\r\n```\r\n\r\nUsing the command line:\r\n\r\n```sh\r\n./solc --strict-assembly --optimize --yul-optimizations=\":\" x.yul \r\n```\r\n\r\nThe binary you get is: \r\n\r\n```\r\n5f805465aabbccddeeff8115602e578160011460385781600214602e57506003146027575f55005b5060035f55005b9150505060025f55005b50505060015f5500\r\n```\r\n\r\nWhen I run it on geth, starting with empty storage, I get this output:\r\n\r\n```\r\n    \"0xcccccccccccccccccccccccccccccccccccccccc\" : {\r\n        \"code\" : \"0x5f805465aabbccddeeff8115602e578160011460385781600214602e57506003146027575f55005b5060035f55005b9150505060025f55005b50505060015f5500\",\r\n        \"nonce\" : \"0x01\",\r\n        \"balance\" : \"0x0186a0\",\r\n        \"storage\" : {\r\n            \"0x00\" : \"0x02\"\r\n        }\r\n    }\r\n```\r\n\r\nEven though `sload(0)` returns zero (we start from an empty storage), so `input` is zero and therefore we'd expect the first case of the `switch` to happen, not the third.\r\n\r\nHere is a raw trace:\r\n\r\n```\r\n{\"pc\":0,\"op\":95,\"gas\":\"0x26207f8\",\"gasCost\":\"0x2\",\"memSize\":0,\"stack\":[],\"depth\":1,\"refund\":0,\"opName\":\"PUSH0\"}\r\n{\"pc\":1,\"op\":128,\"gas\":\"0x26207f6\",\"gasCost\":\"0x3\",\"memSize\":0,\"stack\":[\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"DUP1\"}\r\n{\"pc\":2,\"op\":84,\"gas\":\"0x26207f3\",\"gasCost\":\"0x834\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"SLOAD\"}\r\n{\"pc\":3,\"op\":101,\"gas\":\"0x261ffbf\",\"gasCost\":\"0x3\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"PUSH6\"}\r\n{\"pc\":10,\"op\":129,\"gas\":\"0x261ffbc\",\"gasCost\":\"0x3\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\",\"0xaabbccddeeff\"],\"depth\":1,\"refund\":0,\"opName\":\"DUP2\"}\r\n{\"pc\":11,\"op\":21,\"gas\":\"0x261ffb9\",\"gasCost\":\"0x3\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\",\"0xaabbccddeeff\",\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"ISZERO\"}\r\n{\"pc\":12,\"op\":96,\"gas\":\"0x261ffb6\",\"gasCost\":\"0x3\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\",\"0xaabbccddeeff\",\"0x1\"],\"depth\":1,\"refund\":0,\"opName\":\"PUSH1\"}\r\n{\"pc\":14,\"op\":87,\"gas\":\"0x261ffb3\",\"gasCost\":\"0xa\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\",\"0xaabbccddeeff\",\"0x1\",\"0x2e\"],\"depth\":1,\"refund\":0,\"opName\":\"JUMPI\"}\r\n{\"pc\":46,\"op\":91,\"gas\":\"0x261ffa9\",\"gasCost\":\"0x1\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\",\"0xaabbccddeeff\"],\"depth\":1,\"refund\":0,\"opName\":\"JUMPDEST\"}\r\n{\"pc\":47,\"op\":145,\"gas\":\"0x261ffa8\",\"gasCost\":\"0x3\",\"memSize\":0,\"stack\":[\"0x0\",\"0x0\",\"0xaabbccddeeff\"],\"depth\":1,\"refund\":0,\"opName\":\"SWAP2\"}\r\n{\"pc\":48,\"op\":80,\"gas\":\"0x261ffa5\",\"gasCost\":\"0x2\",\"memSize\":0,\"stack\":[\"0xaabbccddeeff\",\"0x0\",\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"POP\"}\r\n{\"pc\":49,\"op\":80,\"gas\":\"0x261ffa3\",\"gasCost\":\"0x2\",\"memSize\":0,\"stack\":[\"0xaabbccddeeff\",\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"POP\"}\r\n{\"pc\":50,\"op\":80,\"gas\":\"0x261ffa1\",\"gasCost\":\"0x2\",\"memSize\":0,\"stack\":[\"0xaabbccddeeff\"],\"depth\":1,\"refund\":0,\"opName\":\"POP\"}\r\n{\"pc\":51,\"op\":96,\"gas\":\"0x261ff9f\",\"gasCost\":\"0x3\",\"memSize\":0,\"stack\":[],\"depth\":1,\"refund\":0,\"opName\":\"PUSH1\"}\r\n{\"pc\":53,\"op\":95,\"gas\":\"0x261ff9c\",\"gasCost\":\"0x2\",\"memSize\":0,\"stack\":[\"0x2\"],\"depth\":1,\"refund\":0,\"opName\":\"PUSH0\"}\r\n{\"pc\":54,\"op\":85,\"gas\":\"0x261ff9a\",\"gasCost\":\"0x4e20\",\"memSize\":0,\"stack\":[\"0x2\",\"0x0\"],\"depth\":1,\"refund\":0,\"opName\":\"SSTORE\"}\r\n{\"pc\":55,\"op\":0,\"gas\":\"0x261b17a\",\"gasCost\":\"0x0\",\"memSize\":0,\"stack\":[],\"depth\":1,\"refund\":0,\"opName\":\"STOP\"}\r\n{\"output\":\"\",\"gasUsed\":\"0x567e\"}\r\n```\r\n\r\nTracing the code manually shows us what happens:\r\n\r\n| PC | Opcode | Stack (after operation) |\r\n| -: | - | :- |\r\n| 0 | PUSH0 | 0\r\n| 1 | DUP1 | 0,0\r\n| 2 | SLOAD | 0,0\r\n| 3 | PUSH6 0xaabbccddeeff | 0xaa..ff, 0, 0\r\n| 10 | DUP2 | 0, 0xaa..ff, 0, 0\r\n| 11 | ISZERO | 1, 0xaa..ff, 0, 0\r\n| 12 | PUSH1 0x2E | 0x2E, 1, 0xaa..ff, 0, 0\r\n| 14 | JUMPI | 0xaa..ff, 0, 0\r\n| (0x2e=) 46 | JUMPDEST | 0xaa..ff, 0, 0\r\n| 47 | SWAP2 | 0, 0, 0xaa..ff\r\n| 48 | POP | 0, 0xaa..ff\r\n| 49 | POP |  0xaa..ff\r\n| 50 | POP | \r\n| 51 | PUSH1 0x02 | 2\r\n| 53 | PUSH0 | 0, 2\r\n| 54 | SSTORE | \r\n| 55 | STOP |\r\n\r\n \r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14640/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14640/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
