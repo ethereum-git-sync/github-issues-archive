@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14643",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14643/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14643/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14643/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14643",
+  "id": 1961040827,
+  "node_id": "I_kwDOAm_5kc504xu7",
+  "number": 14643,
+  "title": "`pop` without parentheses is accepted by the compiler as a valid storage array type member",
+  "user": {
+    "login": "markolazic01",
+    "id": 80317369,
+    "node_id": "MDQ6VXNlcjgwMzE3MzY5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/80317369?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/markolazic01",
+    "html_url": "https://github.com/markolazic01",
+    "followers_url": "https://api.github.com/users/markolazic01/followers",
+    "following_url": "https://api.github.com/users/markolazic01/following{/other_user}",
+    "gists_url": "https://api.github.com/users/markolazic01/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/markolazic01/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/markolazic01/subscriptions",
+    "organizations_url": "https://api.github.com/users/markolazic01/orgs",
+    "repos_url": "https://api.github.com/users/markolazic01/repos",
+    "events_url": "https://api.github.com/users/markolazic01/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/markolazic01/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-25T10:15:48Z",
+  "updated_at": "2023-10-25T10:15:48Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\n`pop` without parentheses is accepted by the compiler as a valid storage array type member.\r\nAccessing `pop` does not pop the last element of an array nor perform any state-changing action.\r\nIt is perceived as a view-only attribute of the storage array type, returning type 'function (uint`N`[] storage pointer)' where `N`(uint size) is same as of the array we're operating with.\r\n\r\n## Environment\r\n\r\n- Compiler version: latest (0.8.21)\r\n- Target EVM version (as per compiler settings): default (Shanghai)\r\n- Framework/IDE (e.g. Truffle or Remix): any\r\n- EVM execution environment / backend / blockchain client: any\r\n- Operating system: any\r\n\r\n## Steps to Reproduce\r\n```\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity 0.8.21;\r\n\r\ncontract C {\r\n    uint256[] public a = [1,2,3];\r\n\r\n    function c() external view {\r\n        a.pop; //Does not produce error nor warning\r\n    }\r\n}\r\n```\r\n_Please note that the variations of described issue seem not to be present with other storage array members._\r\n_(`push` without parentheses or `length` with parentheses does not compile.)_\r\n\r\n## Return Value\r\n\r\n```\r\nTypeError: Type function (uint256[] storage pointer) is not implicitly convertible to expected type uint256.\r\n --> PopTest.sol:8:9:\r\n  |\r\n8 |         uint256 b = a.pop;\r\n  |         ^^^^^^^^^^^^^^^^^\r\n```\r\n\r\n## Additional Information\r\n\r\nDuring the examination of the code present in the repository I've found piece of code where the `pop` member is added.\r\n(Right after adding 2 variations of the `push` member.)\r\n```\r\nmembers.emplace_back(\"pop\", TypeProvider::function(\r\n    TypePointers{thisAsPointer},\r\n    TypePointers{},\r\n    strings{std::string()},\r\n    strings{},\r\n    FunctionType::Kind::ArrayPop\r\n)->withBoundFirstArgument());\r\n```\r\n_(located at: libsolidity/ast/Types.cpp @ L1927-1933)_\r\n\r\nIf this piece of code is commented out, accessing either `pop` or `pop()` will produce an error.\r\n\r\nSince the similar problem does not occur with `push` and there is seemingly no cases of `pop` member being checked solely, that implies that compiler analyzers can oversee member created with the specific settings that `pop` is created with.\r\n\r\nHope this helps :)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14643/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14643/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
