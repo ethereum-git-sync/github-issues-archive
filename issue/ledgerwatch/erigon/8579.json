@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8579",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8579/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8579/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8579/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8579",
+  "id": 1960947192,
+  "node_id": "I_kwDOC0FsAM504a34",
+  "number": 8579,
+  "title": "prune.before doesn't work correctly",
+  "user": {
+    "login": "academe-01",
+    "id": 95714796,
+    "node_id": "U_kgDOBbR97A",
+    "avatar_url": "https://avatars.githubusercontent.com/u/95714796?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/academe-01",
+    "html_url": "https://github.com/academe-01",
+    "followers_url": "https://api.github.com/users/academe-01/followers",
+    "following_url": "https://api.github.com/users/academe-01/following{/other_user}",
+    "gists_url": "https://api.github.com/users/academe-01/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/academe-01/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/academe-01/subscriptions",
+    "organizations_url": "https://api.github.com/users/academe-01/orgs",
+    "repos_url": "https://api.github.com/users/academe-01/repos",
+    "events_url": "https://api.github.com/users/academe-01/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/academe-01/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-25T09:25:40Z",
+  "updated_at": "2023-10-25T10:31:20Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `erigon version 2.52.5-7c5e4e77`\r\n\r\nOS & Version: Windows/Linux/OSX\r\n\r\nCommit hash: \r\n\r\nErigon Command (with flags/config):\r\n`erigon --batchSize=2G --internalcl --lightclient.discovery.port=4004 --lightclient.discovery.tcpport=4005 --sentinel.port=7777 --graphql --authrpc.jwtsecret /opt/jwt.hex --torrent.download.rate=200mb --snapshots=true --chain=mainnet --datadir=/opt/erigon/mainnet --port=30307 --http.port=8546 --authrpc.port=8552 --torrent.port=42070 --private.api.addr=127.0.0.1:9091 --http --ws --http.api=eth,debug,net,trace,web3,erigon \\\r\n    --prune.h.before=11052984 --prune.r.before=11052984 --prune.t.before=11052984 --prune.c.before=11052984`\r\n\r\nChain/Network: \r\n`mainnet`\r\n\r\n#### Expected behaviour\r\n`Pruning should be done all blocks before 11052984`\r\n\r\n#### Actual behaviour\r\n`Pruned blocks after 11052984`\r\n\r\n#### integration stages\r\n```\r\np@x logs % integration print_stages --datadir /opt/erigon/mainnet --chain mainnet\r\nINFO[10-25|12:28:10.544] logging to file system                   log dir=/opt/erigon/mainnet/logs file prefix=integration log level=info json=false\r\nINFO[10-25|12:28:13.118] [snapshots] Blocks Stat                  blocks=17000k indices=17000k alloc=2.3GB sys=2.4GB\r\nINFO[10-25|12:28:13.120] [bor snapshots] Blocks Stat              blocks=0k indices=0k alloc=2.3GB sys=2.4GB\r\nNote: prune_at doesn't mean 'all data before were deleted' - it just mean stage.Prune function were run to this block. Because 1 stage may prune multiple data types to different prune distance.\r\n\r\n \t\t\t\t stage_at \t prune_at\r\nSnapshots \t\t\t 16999999 \t 0\r\nHeaders \t\t\t 16999999 \t 0\r\nBorHeimdall \t\t\t 0 \t\t 0\r\nBlockHashes \t\t\t 16999999 \t 0\r\nBodies \t\t\t\t 16999999 \t 0\r\nSenders \t\t\t 16999999 \t 0\r\nExecution \t\t\t 16999999 \t 16999999\r\nTranslation \t\t\t 0 \t\t 0\r\nHashState \t\t\t 16999999 \t 0\r\nIntermediateHashes \t\t 16999999 \t 16999999\r\nAccountHistoryIndex \t\t 16999999 \t 16999999\r\nStorageHistoryIndex \t\t 16999999 \t 16999999\r\nLogIndex \t\t\t 16999999 \t 16999999\r\nCallTraces \t\t\t 16999999 \t 16999999\r\nTxLookup \t\t\t 16999999 \t 16999999\r\nFinish \t\t\t\t 16999999 \t 0\r\n--\r\nprune distance: --prune.h.before=11052984 --prune.r.before=11052984 --prune.t.before=11052984 --prune.c.before=11052984\r\n\r\nblocks.v2: blocks=16999999, segments=16999999, indices=16999999\r\n\r\nhistory.v3: false,  idx steps: 0.00, lastMaxTxNum=0->1, lastBlockInSnap=0\r\n\r\nsequence: EthTx=2170404582, NonCanonicalTx=0\r\n\r\nin db: first header 16999999, last header 18416529, first body 16999999, last body 18416529\r\n```\r\n\r\n\r\n#### Log\r\n```\r\np@x logs % cat erigon.log| grep -i prun \r\n[WARN] [10-19|09:33:41.148] specifying prune.before.r might break CL compatibility \r\n[WARN] [10-19|13:55:13.006] specifying prune.before.r might break CL compatibility \r\n[INFO] [10-23|03:14:53.510] [7/12 CallTraces] Pruning call trace table number=11096211 alloc=12.7GB sys=32.1GB\r\n[INFO] [10-23|03:15:13.509] [7/12 CallTraces] Pruning call trace table number=11179172 alloc=13.0GB sys=32.1GB\r\n[INFO] [10-23|03:15:33.530] [7/12 CallTraces] Pruning call trace table number=11268419 alloc=13.2GB sys=32.1GB\r\n[INFO] [10-23|03:15:53.570] [7/12 CallTraces] Pruning call trace table number=11365223 alloc=13.4GB sys=32.1GB\r\n[INFO] [10-23|03:16:13.571] [7/12 CallTraces] Pruning call trace table number=11468554 alloc=13.7GB sys=32.1GB\r\n[INFO] [10-23|03:16:33.571] [7/12 CallTraces] Pruning call trace table number=11562530 alloc=13.9GB sys=32.1GB\r\n[INFO] [10-23|03:16:53.571] [7/12 CallTraces] Pruning call trace table number=11661236 alloc=10.0GB sys=32.1GB\r\n[INFO] [10-23|03:17:13.571] [7/12 CallTraces] Pruning call trace table number=11761220 alloc=10.2GB sys=32.1GB\r\n[INFO] [10-23|03:17:33.572] [7/12 CallTraces] Pruning call trace table number=11860529 alloc=10.4GB sys=32.1GB\r\n[INFO] [10-23|03:17:53.571] [7/12 CallTraces] Pruning call trace table number=11960572 alloc=10.6GB sys=32.1GB\r\n[INFO] [10-23|03:18:13.571] [7/12 CallTraces] Pruning call trace table number=12062053 alloc=10.8GB sys=32.1GB\r\n[INFO] [10-23|03:18:33.572] [7/12 CallTraces] Pruning call trace table number=12161725 alloc=11.1GB sys=32.1GB\r\n[INFO] [10-23|03:18:53.572] [7/12 CallTraces] Pruning call trace table number=12254773 alloc=10.0GB sys=32.1GB\r\n[INFO] [10-23|03:19:13.572] [7/12 CallTraces] Pruning call trace table number=12347613 alloc=10.3GB sys=32.1GB\r\n[INFO] [10-23|03:19:33.573] [7/12 CallTraces] Pruning call trace table number=12445490 alloc=10.5GB sys=32.1GB\r\n[INFO] [10-23|03:19:53.572] [7/12 CallTraces] Pruning call trace table number=12540582 alloc=10.7GB sys=32.1GB\r\n[INFO] [10-23|03:20:13.573] [7/12 CallTraces] Pruning call trace table number=12634945 alloc=10.9GB sys=32.1GB\r\n[INFO] [10-23|03:20:33.573] [7/12 CallTraces] Pruning call trace table number=12735077 alloc=11.2GB sys=32.1GB\r\n[INFO] [10-23|03:20:53.573] [7/12 CallTraces] Pruning call trace table number=12829255 alloc=10.0GB sys=32.1GB\r\n[INFO] [10-23|03:21:13.573] [7/12 CallTraces] Pruning call trace table number=12919150 alloc=10.4GB sys=32.1GB\r\n[INFO] [10-23|03:21:33.573] [7/12 CallTraces] Pruning call trace table number=13026326 alloc=10.7GB sys=32.1GB\r\n[INFO] [10-23|03:21:53.573] [7/12 CallTraces] Pruning call trace table number=13140035 alloc=11.1GB sys=32.1GB\r\n[INFO] [10-23|03:22:13.573] [7/12 CallTraces] Pruning call trace table number=13257862 alloc=11.4GB sys=32.1GB\r\n[INFO] [10-23|03:22:33.573] [7/12 CallTraces] Pruning call trace table number=13374123 alloc=11.7GB sys=32.1GB\r\n[INFO] [10-23|03:22:53.574] [7/12 CallTraces] Pruning call trace table number=13485218 alloc=10.2GB sys=32.1GB\r\n[INFO] [10-23|03:23:13.573] [7/12 CallTraces] Pruning call trace table number=13595704 alloc=10.4GB sys=32.1GB\r\n[INFO] [10-23|03:23:33.574] [7/12 CallTraces] Pruning call trace table number=13708838 alloc=10.6GB sys=32.1GB\r\n[INFO] [10-23|03:23:53.575] [7/12 CallTraces] Pruning call trace table number=13823188 alloc=10.9GB sys=32.1GB\r\n[INFO] [10-23|03:24:13.574] [7/12 CallTraces] Pruning call trace table number=13936472 alloc=11.1GB sys=32.1GB\r\n[INFO] [10-23|03:24:33.575] [7/12 CallTraces] Pruning call trace table number=14049596 alloc=11.3GB sys=32.1GB\r\n[INFO] [10-23|03:24:53.575] [7/12 CallTraces] Pruning call trace table number=14159608 alloc=10.0GB sys=32.1GB\r\n[INFO] [10-23|03:25:13.575] [7/12 CallTraces] Pruning call trace table number=14272076 alloc=10.3GB sys=32.1GB\r\n[INFO] [10-23|03:25:33.575] [7/12 CallTraces] Pruning call trace table number=14385192 alloc=10.5GB sys=32.1GB\r\n[INFO] [10-23|03:25:53.575] [7/12 CallTraces] Pruning call trace table number=14493338 alloc=10.8GB sys=32.1GB\r\n[INFO] [10-23|03:26:13.575] [7/12 CallTraces] Pruning call trace table number=14596615 alloc=11.0GB sys=32.1GB\r\n[INFO] [10-23|03:26:33.576] [7/12 CallTraces] Pruning call trace table number=14703893 alloc=11.2GB sys=32.1GB\r\n[INFO] [10-23|03:26:53.575] [7/12 CallTraces] Pruning call trace table number=14806934 alloc=10.0GB sys=32.1GB\r\n[INFO] [10-23|03:27:13.575] [7/12 CallTraces] Pruning call trace table number=14915249 alloc=10.2GB sys=32.1GB\r\n[INFO] [10-23|03:27:33.576] [7/12 CallTraces] Pruning call trace table number=15019143 alloc=10.4GB sys=32.1GB\r\n[INFO] [10-23|03:27:53.576] [7/12 CallTraces] Pruning call trace table number=15123215 alloc=10.6GB sys=32.1GB\r\n[INFO] [10-23|03:28:13.576] [7/12 CallTraces] Pruning call trace table number=15229149 alloc=10.8GB sys=32.1GB\r\n[INFO] [10-23|03:28:33.576] [7/12 CallTraces] Pruning call trace table number=15337305 alloc=11.0GB sys=32.1GB\r\n[INFO] [10-23|03:28:53.577] [7/12 CallTraces] Pruning call trace table number=15442977 alloc=10.0GB sys=32.1GB\r\n[INFO] [10-23|03:29:13.576] [7/12 CallTraces] Pruning call trace table number=15547926 alloc=10.3GB sys=32.1GB\r\n[INFO] [10-23|03:29:33.577] [7/12 CallTraces] Pruning call trace table number=15646656 alloc=10.8GB sys=32.1GB\r\n[INFO] [10-23|03:29:53.576] [7/12 CallTraces] Pruning call trace table number=15744184 alloc=11.0GB sys=32.1GB\r\n[INFO] [10-23|03:30:13.577] [7/12 CallTraces] Pruning call trace table number=15839004 alloc=11.2GB sys=32.1GB\r\n[INFO] [10-23|03:30:33.578] [7/12 CallTraces] Pruning call trace table number=15927811 alloc=11.4GB sys=32.1GB\r\n[INFO] [10-23|03:30:53.577] [7/12 CallTraces] Pruning call trace table number=16013941 alloc=10.1GB sys=32.1GB\r\n[INFO] [10-23|03:31:13.577] [7/12 CallTraces] Pruning call trace table number=16100729 alloc=10.3GB sys=32.1GB\r\n[INFO] [10-23|03:31:33.578] [7/12 CallTraces] Pruning call trace table number=16186682 alloc=10.6GB sys=32.1GB\r\n[INFO] [10-23|03:31:53.578] [7/12 CallTraces] Pruning call trace table number=16273162 alloc=10.8GB sys=32.1GB\r\n[INFO] [10-23|03:32:13.578] [7/12 CallTraces] Pruning call trace table number=16358450 alloc=11.1GB sys=32.1GB\r\n[INFO] [10-23|03:32:33.578] [7/12 CallTraces] Pruning call trace table number=16444717 alloc=11.4GB sys=32.1GB\r\n[INFO] [10-23|03:32:53.578] [7/12 CallTraces] Pruning call trace table number=16529782 alloc=10.0GB sys=32.1GB\r\n[INFO] [10-23|03:33:13.578] [7/12 CallTraces] Pruning call trace table number=16612874 alloc=10.3GB sys=32.1GB\r\n[INFO] [10-23|03:33:33.586] [7/12 CallTraces] Pruning call trace table number=16693984 alloc=10.6GB sys=32.1GB\r\n[INFO] [10-23|03:33:53.579] [7/12 CallTraces] Pruning call trace table number=16777456 alloc=10.9GB sys=32.1GB\r\n[INFO] [10-23|03:34:13.579] [7/12 CallTraces] Pruning call trace table number=16860734 alloc=11.1GB sys=32.1GB\r\n[INFO] [10-23|03:34:25.418] [7/12 CallTraces] Pruned call trace intermediate table from=11052984 to=16909998\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8579/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8579/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
