@@ -40,21 +40,40 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-10-25T09:01:46Z",
-  "updated_at": "2023-10-26T03:21:53Z",
-  "closed_at": null,
+  "updated_at": "2023-10-26T12:17:12Z",
+  "closed_at": "2023-10-26T12:17:11Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Describe the bug\n\nThe HTTP RPC `eth/v1/node/health` endpoint crashes.\r\n\r\n```bash\r\n> curl localhost:3500/eth/v1/node/health\r\n{\"message\":\"connection error: desc = \\\"transport: authentication handshake failed: tls: failed to verify certificate: x509: cannot validate certificate for 0.0.0.0 because it doesn't contain any IP SANs\\\"\",\"code\":503}\r\n```\r\n\r\nAt  the same time, the syncing endpoint works just fine\r\n```bash\r\n> curl localhost:3500/eth/v1/node/syncing\r\n{\"data\":{\"head_slot\":\"7616690\",\"sync_distance\":\"1\",\"is_syncing\":false,\"is_optimistic\":false,\"el_offline\":false}}\r\n```\n\n### Has this worked before in a previous version?\n\n```text\nThe new HTTP endpoint was just introduced in the previous version.\n```\n\n\n### 🔬 Minimal Reproduction\n\n```bash\r\n> curl localhost:3500/eth/v1/node/health\r\n{\"message\":\"connection error: desc = \\\"transport: authentication handshake failed: tls: failed to verify certificate: x509: cannot validate certificate for 0.0.0.0 because it doesn't contain any IP SANs\\\"\",\"code\":503}\r\n```\n\n### Error\n\n```text\ntransport: authentication handshake failed: tls: failed to verify certificate: x509: cannot validate certificate for 0.0.0.0 because it doesn't contain any IP SANs\n```\n\n\n### Platform(s)\n\nLinux (x86)\n\n### What version of Prysm are you running? (Which release)\n\nv4.1.1\n\n### Anything else relevant (validator index / public key)?\n\nThe beacon node has a TLS certificate configured through `--tls-cert`, `--tls-key`",
-  "closed_by": null,
+  "closed_by": {
+    "login": "prestonvanloon",
+    "id": 7246818,
+    "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prestonvanloon",
+    "html_url": "https://github.com/prestonvanloon",
+    "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+    "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+    "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+    "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+    "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13115/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13115/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -148,6 +167,50 @@
     "body": "@prestonvanloon \r\n\r\n```bash\r\ncurl -vvv localhost:3500/eth/v1/node/health\r\n*   Trying 127.0.0.1:3500...\r\n* Connected to localhost (127.0.0.1) port 3500 (#0)\r\n> GET /eth/v1/node/health HTTP/1.1\r\n> Host: localhost:3500\r\n> User-Agent: curl/7.74.0\r\n> Accept: */*\r\n> \r\n* Mark bundle as not supporting multiuse\r\n< HTTP/1.1 503 Service Unavailable\r\n< Content-Length: 217\r\n< Content-Type: application/json\r\n< Date: Thu, 26 Oct 2023 01:12:15 GMT\r\n< Vary: Origin\r\n< \r\n* Connection #0 to host localhost left intact\r\n{\"message\":\"connection error: desc = \\\"transport: authentication handshake failed: tls: failed to verify certificate: x509: cannot validate certificate for 0.0.0.0 because it doesn't contain any IP SANs\\\"\",\"code\":503}\r\n```\r\n\r\nI'm running Prysm in Docker with `--rpc-host=0.0.0.0`. I removed the `--rpc-host` config and got a slightly different error. Now it says 127.0.0.1 instead of 0.0.0.0.\r\n```bash\r\ncurl -vvv localhost:3500/eth/v1/node/health\r\n*   Trying 127.0.0.1:3500...\r\n* Connected to localhost (127.0.0.1) port 3500 (#0)\r\n> GET /eth/v1/node/health HTTP/1.1\r\n> Host: localhost:3500\r\n> User-Agent: curl/7.74.0\r\n> Accept: */*\r\n> \r\n* Mark bundle as not supporting multiuse\r\n< HTTP/1.1 503 Service Unavailable\r\n< Content-Length: 219\r\n< Content-Type: application/json\r\n< Date: Thu, 26 Oct 2023 02:54:52 GMT\r\n< Vary: Origin\r\n< \r\n* Connection #0 to host localhost left intact\r\n{\"message\":\"connection error: desc = \\\"transport: authentication handshake failed: tls: failed to verify certificate: x509: cannot validate certificate for 127.0.0.1 because it doesn't contain any IP SANs\\\"\",\"code\":503}\r\n```\r\n\r\nUnlike the provided example, my self-signed certificate doesn't include `127.0.0.1` in the alt_names section.\r\n\r\nI added `IP.1 = 127.0.0.1` there and re-generated the certificate and tried again.\r\n\r\n```bash\r\ncurl -vvv localhost:3500/eth/v1/node/health\r\n*   Trying 127.0.0.1:3500...\r\n* Connected to localhost (127.0.0.1) port 3500 (#0)\r\n> GET /eth/v1/node/health HTTP/1.1\r\n> Host: localhost:3500\r\n> User-Agent: curl/7.74.0\r\n> Accept: */*\r\n> \r\n* Mark bundle as not supporting multiuse\r\n< HTTP/1.1 200 OK\r\n< Content-Length: 0\r\n< Content-Type: application/json\r\n< Date: Thu, 26 Oct 2023 03:14:27 GMT\r\n< Vary: Origin\r\n< \r\n* Connection #0 to host localhost left intact\r\n```\r\n\r\nIt worked!\r\n\r\nPrysm requires value from `--rpc-host` (127.0.0.1 by default) to match one of the alt_names in the certificate.",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1780353870/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1781002454",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/13115#issuecomment-1781002454",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13115",
+    "id": 1781002454,
+    "node_id": "IC_kwDOBvuov85qJ_DW",
+    "user": {
+      "login": "prestonvanloon",
+      "id": 7246818,
+      "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/prestonvanloon",
+      "html_url": "https://github.com/prestonvanloon",
+      "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+      "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+      "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+      "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+      "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+      "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-26T12:17:11Z",
+    "updated_at": "2023-10-26T12:17:11Z",
+    "author_association": "MEMBER",
+    "body": "Great! Thanks for confirming. I am glad you have a resolution!",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1781002454/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
