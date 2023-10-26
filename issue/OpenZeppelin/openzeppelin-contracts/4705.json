@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-25T14:46:23Z",
-  "updated_at": "2023-10-25T14:46:37Z",
+  "updated_at": "2023-10-26T17:07:32Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1781513281",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4705#issuecomment-1781513281",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4705",
+    "id": 1781513281,
+    "node_id": "IC_kwDOA9tCBs5qL7xB",
+    "user": {
+      "login": "ernestognw",
+      "id": 33379285,
+      "node_id": "MDQ6VXNlcjMzMzc5Mjg1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33379285?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ernestognw",
+      "html_url": "https://github.com/ernestognw",
+      "followers_url": "https://api.github.com/users/ernestognw/followers",
+      "following_url": "https://api.github.com/users/ernestognw/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ernestognw/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ernestognw/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ernestognw/subscriptions",
+      "organizations_url": "https://api.github.com/users/ernestognw/orgs",
+      "repos_url": "https://api.github.com/users/ernestognw/repos",
+      "events_url": "https://api.github.com/users/ernestognw/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ernestognw/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-26T17:07:31Z",
+    "updated_at": "2023-10-26T17:07:31Z",
+    "author_association": "MEMBER",
+    "body": "Hey @liarco, I see it could be an issue if somebody needs to perform updates based on the subtransfers, but that was also not possible in 4.x, both the before and after hooks are before and [after the whole transfer loop](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.9.3/contracts/token/ERC1155/ERC1155.sol#L224).\r\n\r\n> but then you are wasting a lot of gas by cycling twice.\r\n\r\nI estimate adding an operation inside the cycle or outside in another cycle wouldn't have a significant overhead aside from the extra loop counter increment, a `JUMPI` back to the start of the loop in each iteration, and `ids`/`values` accesses via `MLOAD`.\r\n\r\nI'd expect the majority of 1155 transfers to be single asset transfers or batches with less than 5. Considering `JUMPI` gas cost is 10 and `MLOAD` will cost 3 because the memory is already expanded (no memory expansion cost), thus, I calculate the overhead of around 20-30 units per subtransfer (~100-150 units).\r\n\r\nA PoC demonstrating a significant gas reduction would give us more hint here. If the reduction is in the order of 100-150, I wouldn't worry too much of adding a loop before/after the `_update` function.",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1781513281/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
