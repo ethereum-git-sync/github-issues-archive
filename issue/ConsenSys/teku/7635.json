@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7635",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7635/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7635/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7635/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7635",
+  "id": 1964061867,
+  "node_id": "I_kwDOCM9I9M51ETSr",
+  "number": 7635,
+  "title": "Beacon API endpoint `/eth/v1/beacon/blob_sidecars/` returns 404 on empty blobs block",
+  "user": {
+    "login": "marioevz",
+    "id": 11726710,
+    "node_id": "MDQ6VXNlcjExNzI2NzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marioevz",
+    "html_url": "https://github.com/marioevz",
+    "followers_url": "https://api.github.com/users/marioevz/followers",
+    "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+    "organizations_url": "https://api.github.com/users/marioevz/orgs",
+    "repos_url": "https://api.github.com/users/marioevz/repos",
+    "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marioevz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-26T17:52:24Z",
+  "updated_at": "2023-10-26T18:03:24Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nBeacon API endpoint `/eth/v1/beacon/blob_sidecars/` returns 404 on an empty-blobs block after Deneb, where it should be returning an empty list instead.\r\n\r\nAs per the beacon API, 404 error is reserved for empty slot: https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Beacon/getBlobSidecars\r\n\r\nThis example is from devnet-10:\r\n\r\nTeku:\r\n```bash\r\nmarioevz@hive-simulations:~/Scripts$ curl https://$DEVNET_USER:$DEVNET_PASS@bn.teku-geth-1.dencun-devnet-10.ethpandaops.io/eth/v2/beacon/blocks/24141 | jq '.data.message.body.blob_kzg_commitments'\r\n[]\r\nmarioevz@hive-simulations:~/Scripts$ curl https://$DEVNET_USER:$DEVNET_PASS@bn.teku-geth-1.dencun-devnet-10.ethpandaops.io/eth/v1/beacon/blob_sidecars/24141\r\n{\"code\":404,\"message\":\"Not found\"}\r\n```\r\nLighthouse:\r\n```bash\r\nmarioevz@hive-simulations:~/Scripts$ curl https://$DEVNET_USER:$DEVNET_PASS@bn.lighthouse-geth-1.dencun-devnet-10.ethpandaops.io/eth/v1/beacon/blob_sidecars/24141\r\n{\"data\":[]}\r\n```\r\n\r\nAlso in [hive](https://hiveinterop.ethdevops.io/) teku is failing many of the tests due to this check. The failures are intermittent because most of the blocks in the hive devnets do have blobs, but in the longer running tests, such as the builder tests, there's almost always at least one slot with no blobs.\r\n\r\n### Steps to Reproduce (Bug)\r\nQuery a teku node for a slot where there was a block but it had empty kzg commitments (example used is in devnet-10 with recent slot 24141)\r\n\r\n### Versions (Add all that apply)\r\n* Software version: latest `develop`",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7635/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7635/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
