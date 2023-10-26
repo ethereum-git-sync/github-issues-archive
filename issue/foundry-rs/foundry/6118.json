@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6118",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6118/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6118/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6118/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6118",
+  "id": 1963090010,
+  "node_id": "I_kwDOGBlvNc51AmBa",
+  "number": 6118,
+  "title": "MultiWallet is not `Send`",
+  "user": {
+    "login": "odyslam",
+    "id": 13405632,
+    "node_id": "MDQ6VXNlcjEzNDA1NjMy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13405632?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/odyslam",
+    "html_url": "https://github.com/odyslam",
+    "followers_url": "https://api.github.com/users/odyslam/followers",
+    "following_url": "https://api.github.com/users/odyslam/following{/other_user}",
+    "gists_url": "https://api.github.com/users/odyslam/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/odyslam/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/odyslam/subscriptions",
+    "organizations_url": "https://api.github.com/users/odyslam/orgs",
+    "repos_url": "https://api.github.com/users/odyslam/repos",
+    "events_url": "https://api.github.com/users/odyslam/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/odyslam/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-26T09:26:12Z",
+  "updated_at": "2023-10-26T09:35:02Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [ ] Foundry\r\n- [ ] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\n_No response_\r\n\r\n### What command(s) is the bug in?\r\n\r\n_No response_\r\n\r\n### Operating System\r\n\r\nNone\r\n\r\n### Describe the bug\r\n\r\n## Suggested Solution\r\n\r\nI could open a PR with ledger behind a feature flag.  I prefer this solution over deviating even further from my [minimal fork](https://github.com/odyslam/foundry/tree/minimal_fork) from upstream. If this is not something that we want, I will make the change in my fork and close this issue. \r\n\r\n## Errors\r\n```\r\nerror: future cannot be sent between threads safely\r\n  --> crates/coreNG/src/activities/user_defined/evm_action.rs:33:73\r\n   |\r\n33 |       async fn bootstrap(&mut self, _ctx: &ActivityContext) -> Result<()> {\r\n   |  _________________________________________________________________________^\r\n34 | |         if set_shell(Shell::from_args(true, false)).is_err() {\r\n35 | |             debug!(\"Forge shell has already been set, probably by another forge-based task\");\r\n36 | |         }\r\n...  |\r\n40 | |         Ok(())\r\n41 | |     }\r\n   | |_____^ future created by async block is not `Send`\r\n   |\r\n   = help: the trait `std::marker::Send` is not implemented for `dyn futures_util::Future<Output = Result<coins_ledger::transports::Ledger, coins_ledger::errors::LedgerError>>`\r\nnote: future is not `Send` as this value is used across an await\r\n  --> /Users/odysseas/.cargo/git/checkouts/ethers-rs-c3a7c0a0ae0fe6be/9754f22/ethers-signers/src/ledger/app.rs:57:40\r\n   |\r\n57 |         let transport = Ledger::init().await?;\r\n   |                         -------------- ^^^^^ - `Ledger::init()` is later dropped here\r\n   |                         |              |\r\n   |                         |              await occurs here, with `Ledger::init()` maybe used later\r\n   |                         has type `Pin<Box<dyn futures_util::Future<Output = Result<coins_ledger::transports::Ledger, coins_ledger::errors::LedgerError>>>>` which is not `Send`\r\n   = note: required for the cast from `Pin<Box<[async block@crates/coreNG/src/activities/user_defined/evm_action.rs:33:73: 41:6]>>` to `Pin<Box<(dyn futures_util::Future<Output = Result<(), ErrReport>> + std::marker::Send + 'async_trait)>>`\r\n\r\nerror: future cannot be sent between threads safely\r\n  --> crates/coreNG/src/activities/user_defined/evm_action.rs:33:73\r\n   |\r\n33 |       async fn bootstrap(&mut self, _ctx: &ActivityContext) -> Result<()> {\r\n   |  _________________________________________________________________________^\r\n34 | |         if set_shell(Shell::from_args(true, false)).is_err() {\r\n35 | |             debug!(\"Forge shell has already been set, probably by another forge-based task\");\r\n36 | |         }\r\n...  |\r\n40 | |         Ok(())\r\n41 | |     }\r\n   | |_____^ future created by async block is not `Send`\r\n   |\r\n   = help: within `coins_ledger::transports::Ledger`, the trait `Sync` is not implemented for `*mut c_void`\r\nnote: future is not `Send` as this value is used across an await\r\n  --> /Users/odysseas/.cargo/git/checkouts/ethers-rs-c3a7c0a0ae0fe6be/9754f22/ethers-signers/src/ledger/app.rs:58:86\r\n   |\r\n58 |         let address = Self::get_address_with_path_transport(&transport, &derivation).await?;\r\n   |                                                             ----------               ^^^^^ - `&transport` is later dropped here\r\n   |                                                             |                        |\r\n   |                                                             |                        await occurs here, with `&transport` maybe used later\r\n   |                                                             has type `&coins_ledger::transports::Ledger` which is not `Send`\r\n   = note: required for the cast from `Pin<Box<[async block@crates/coreNG/src/activities/user_defined/evm_action.rs:33:73: 41:6]>>` to `Pin<Box<(dyn futures_util::Future<Output = Result<(), ErrReport>> + std::marker::Send + 'async_trait)>>`\r\n\r\nerror: future cannot be sent between threads safely\r\n  --> crates/coreNG/src/activities/user_defined/evm_action.rs:51:100\r\n   |\r\n51 |       async fn do_work(&mut self, cmds: Vec<EvmActionCmd>, _context: &ActivityContext) -> Result<()> {\r\n   |  ____________________________________________________________________________________________________^\r\n52 | |         for cmd in cmds {\r\n53 | |             match cmd {\r\n54 | |                 EvmActionCmd::RunAction => {\r\n...  |\r\n60 | |         Ok(())\r\n61 | |     }\r\n   | |_____^ future created by async block is not `Send`\r\n   |\r\n   = help: the trait `std::marker::Send` is not implemented for `dyn futures_util::Future<Output = Result<coins_ledger::transports::Ledger, coins_ledger::errors::LedgerError>>`\r\nnote: future is not `Send` as this value is used across an await\r\n  --> /Users/odysseas/.cargo/git/checkouts/ethers-rs-c3a7c0a0ae0fe6be/9754f22/ethers-signers/src/ledger/app.rs:57:40\r\n   |\r\n57 |         let transport = Ledger::init().await?;\r\n   |                         -------------- ^^^^^ - `Ledger::init()` is later dropped here\r\n   |                         |              |\r\n   |                         |              await occurs here, with `Ledger::init()` maybe used later\r\n   |                         has type `Pin<Box<dyn futures_util::Future<Output = Result<coins_ledger::transports::Ledger, coins_ledger::errors::LedgerError>>>>` which is not `Send`\r\n   = note: required for the cast from `Pin<Box<[async block@crates/coreNG/src/activities/user_defined/evm_action.rs:51:100: 61:6]>>` to `Pin<Box<(dyn futures_util::Future<Output = Result<(), ErrReport>> + std::marker::Send + 'async_trait)>>`\r\n\r\nerror: future cannot be sent between threads safely\r\n  --> crates/coreNG/src/activities/user_defined/evm_action.rs:51:100\r\n   |\r\n51 |       async fn do_work(&mut self, cmds: Vec<EvmActionCmd>, _context: &ActivityContext) -> Result<()> {\r\n   |  ____________________________________________________________________________________________________^\r\n52 | |         for cmd in cmds {\r\n53 | |             match cmd {\r\n54 | |                 EvmActionCmd::RunAction => {\r\n...  |\r\n60 | |         Ok(())\r\n61 | |     }\r\n   | |_____^ future created by async block is not `Send`\r\n   |\r\n   = help: within `coins_ledger::transports::Ledger`, the trait `Sync` is not implemented for `*mut c_void`\r\nnote: future is not `Send` as this value is used across an await\r\n  --> /Users/odysseas/.cargo/git/checkouts/ethers-rs-c3a7c0a0ae0fe6be/9754f22/ethers-signers/src/ledger/app.rs:58:86\r\n   |\r\n58 |         let address = Self::get_address_with_path_transport(&transport, &derivation).await?;\r\n   |                                                             ----------               ^^^^^ - `&transport` is later dropped here\r\n   |                                                             |                        |\r\n   |                                                             |                        await occurs here, with `&transport` maybe used later\r\n   |                                                             has type `&coins_ledger::transports::Ledger` which is not `Send`\r\n   = note: required for the cast from `Pin<Box<[async block@crates/coreNG/src/activities/user_defined/evm_action.rs:51:100: 61:6]>>` to `Pin<Box<(dyn futures_util::Future<Output = Result<(), ErrReport>> + std::marker::Send + 'async_trait)>>`\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6118/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6118/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
