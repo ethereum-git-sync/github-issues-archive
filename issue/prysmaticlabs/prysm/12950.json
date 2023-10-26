@@ -40,17 +40,17 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 7,
   "created_at": "2023-09-24T08:42:29Z",
-  "updated_at": "2023-09-29T14:10:08Z",
-  "closed_at": "2023-09-29T14:10:08Z",
+  "updated_at": "2023-10-26T20:50:23Z",
+  "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Describe the bug\n\nWe (Lighthouse) received a report on Discord of a failed proposal due this error being returned from the `/eth/v2/beacon/blocks` endpoint:\r\n\r\n> CRIT Error whilst producing block            info: proposal did not use a builder, block_slot: Slot(X), message: Recoverable(\"Some endpoints failed, num_failed: 1 http://192.168.1.2:5052/ => RequestFailed(Recoverable(\\\"Error from beacon node when producing block: ServerMessage(ErrorMessage { code: 500, message: \\\\\\\"Prepared Capella beacon block is blinded\\\\\\\", stacktraces: [] })\\\"))\"), service: block\r\n\r\nThis is a Lighthouse VC connected to a Prysm BN, and the inner error `Prepared Capella beacon block is blinded` comes from the Prysm BN. I don't understand what this means, because on this code path the Lighthouse VC is definitely hitting the `/eth/v2/beacon/blocks` endpoint. Is this the result of a misconfiguration where the Prysm BN wants to use a builder, and therefore can't build local blocks? Or is this likely related to the recent Geth block-building bug?\n\n### Has this worked before in a previous version?\n\n_No response_\n\n### 🔬 Minimal Reproduction\n\n_No response_\n\n### Error\n\n_No response_\n\n### Platform(s)\n\n_No response_\n\n### What version of Prysm are you running? (Which release)\n\n_No response_\n\n### Anything else relevant (validator index / public key)?\n\n_No response_",
@@ -88,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12950/timeline",
   "performed_via_github_app": null,
-  "state_reason": "completed"
+  "state_reason": "reopened"
 }
 [
   {
@@ -299,6 +299,94 @@
     "body": "Fantastic, thanks!\n\nThis wasn't something I ran into personally, but I'll let you know if I see any more reports!",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1740958060/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1781863327",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/12950#issuecomment-1781863327",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12950",
+    "id": 1781863327,
+    "node_id": "IC_kwDOBvuov85qNROf",
+    "user": {
+      "login": "marioevz",
+      "id": 11726710,
+      "node_id": "MDQ6VXNlcjExNzI2NzEw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/marioevz",
+      "html_url": "https://github.com/marioevz",
+      "followers_url": "https://api.github.com/users/marioevz/followers",
+      "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+      "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+      "organizations_url": "https://api.github.com/users/marioevz/orgs",
+      "repos_url": "https://api.github.com/users/marioevz/repos",
+      "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/marioevz/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-26T20:39:12Z",
+    "updated_at": "2023-10-26T20:39:12Z",
+    "author_association": "NONE",
+    "body": "Hey @james-prysm, this is currently reproducing in hive when I changed the prysm validator client to switch to use the rest API of prysm beacon node:\r\n```\r\ntime=\"2023-10-26 19:54:25\" level=error msg=\"Failed to request block from beacon node\" blockSlot=2 error=\"failed to query GET REST endpoint: error 500: Prepared Capella beacon block is blinded\" prefix=validator pubKey=0xa80e6e09cadb\r\n```\r\nThen the builder is unable to build anything throughout the entire epoch.\r\n\r\nThese are the parameters I'm currently using:\r\n\r\nprysm beacon node:\r\n```bash\r\n--verbosity=trace\r\n--accept-terms-of-use=true\r\n--datadir=/data/beacon\r\n--chain-config-file=/hive/input/config.yaml\r\n--genesis-state=/hive/input/genesis.ssz\r\n--p2p-tcp-port=900\r\n--p2p-udp-port=9000\r\n--p2p-host-ip=172.19.0.5\r\n--p2p-local-ip=172.19.0.5\r\n--execution-endpoint=http://172.19.0.3:8551\r\n--jwt-secret=/jwtsecret\r\n--min-sync-peers=1\r\n--subscribe-all-subnets=true\r\n--enable-debug-rpc-endpoints=true\r\n--disable-monitoring=false\r\n--monitoring-host=0.0.0.0\r\n--monitoring-port=8080\r\n--http-mev-relay=http://0x95fde78acd5f6886ddaf5d0056610167c513d09c1c0efabbc7cdcc69beea113779c4a81e2d24daafc5387dbf6ac5fe48@172.19.0.3:18550\r\n--deposit-contract=0x4242424242424242424242424242424242424242\r\n--contract-deployment-block=0\r\n--rpc-host=0.0.0.0\r\n--rpc-port=4001\r\n--grpc-gateway-host=0.0.0.0\r\n--grpc-gateway-port=4000\r\n--grpc-gateway-corsdomain=*\r\n--suggested-fee-recipient=0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B\r\n```\r\n\r\nvalidator client:\r\n```\r\n--verbosity=trace\r\n--accept-terms-of-use=true\r\n--prater\r\n--enable-beacon-rest-api=true\r\n--beacon-rest-api-provider=http://172.19.0.5:4000\r\n--datadir=/data/vc\r\n--wallet-dir=/data/validators\r\n--wallet-password-file=/wallet.pass\r\n--chain-config-file=/hive/input/config.yaml\r\n--enable-builder\r\n--suggested-fee-recipient=0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b\r\n```\r\n\r\nThis is on `devnet-10` and `develop` branches.",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1781863327/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1781872657",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/12950#issuecomment-1781872657",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12950",
+    "id": 1781872657,
+    "node_id": "IC_kwDOBvuov85qNTgR",
+    "user": {
+      "login": "james-prysm",
+      "id": 90280386,
+      "node_id": "MDQ6VXNlcjkwMjgwMzg2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/90280386?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/james-prysm",
+      "html_url": "https://github.com/james-prysm",
+      "followers_url": "https://api.github.com/users/james-prysm/followers",
+      "following_url": "https://api.github.com/users/james-prysm/following{/other_user}",
+      "gists_url": "https://api.github.com/users/james-prysm/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/james-prysm/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/james-prysm/subscriptions",
+      "organizations_url": "https://api.github.com/users/james-prysm/orgs",
+      "repos_url": "https://api.github.com/users/james-prysm/repos",
+      "events_url": "https://api.github.com/users/james-prysm/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/james-prysm/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-26T20:47:04Z",
+    "updated_at": "2023-10-26T20:50:23Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "@marioevz will investigate perhaps it's related to this bug radek was researching https://github.com/prysmaticlabs/prysm/pull/13116",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1781872657/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
