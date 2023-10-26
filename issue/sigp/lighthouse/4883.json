@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4883",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4883/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4883/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4883/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4883",
+  "id": 1963879140,
+  "node_id": "I_kwDOCFeAzc51Dmrk",
+  "number": 4883,
+  "title": "Request only missing blobs when we haven't seen the block yet",
+  "user": {
+    "login": "realbigsean",
+    "id": 5160426,
+    "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/realbigsean",
+    "html_url": "https://github.com/realbigsean",
+    "followers_url": "https://api.github.com/users/realbigsean/followers",
+    "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+    "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+    "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+    "repos_url": "https://api.github.com/users/realbigsean/repos",
+    "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4615284981,
+      "node_id": "LA_kwDOCFeAzc8AAAABExeo9Q",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/deneb",
+      "name": "deneb",
+      "color": "B7BBEC",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-26T15:57:50Z",
+  "updated_at": "2023-10-26T15:57:50Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "## Description\r\nObserved on devnet 10, the following logs show that we receive 4/5 blobs on gossip and no block. We then request the block and **all** blobs via RPC. We should only be requesting the blobs we haven't seen over gossip (just blobs 4 and 5 in this scenario). The logic should be correct in the scenario where we have the block already. \r\n\r\n```\r\n8678:Oct 26 01:45:24.365 DEBG Gossip blob arrived, commitment: 0x95e9…eed9, index: 1, slot: 19427, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module:\r\nnetwork::network_beacon_processor::gossip_methods:617\r\n8680:Oct 26 01:45:24.410 DEBG Gossip blob arrived, commitment: 0x82b3…2883, index: 3, slot: 19427, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module:\r\n8682:Oct 26 01:45:24.469 DEBG Gossip blob arrived, commitment: 0xab29…2919, index: 0, slot: 19427, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module:\r\n8684:Oct 26 01:45:24.484 DEBG Gossip blob arrived, commitment: 0x8999…d4ad, index: 2, slot: 19427, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module:\r\n8687:Oct 26 01:45:24.629 DEBG Searching for block components, block: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, peer_ids: [BlockAndBlobs(PeerId(\"16Uiu2HAmFjiQYJ1D\r\n8688:Oct 26 01:45:24.629 DEBG Sending BlocksByRoot Request, lookup_type: Current, peer: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, block_roots: [0xaae48b9b49d6bdc37b290eeab85d\r\n8689:Oct 26 01:45:24.629 DEBG Sending BlobsByRoot Request, lookup_type: Current, peer: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, blob_indices: [0, 1, 2, 3, 4, 5], block_root:\r\n8690:Oct 26 01:45:24.654 DEBG Successfully verified gossip block, commitments: [0xab29…2919, 0x95e9…eed9, 0x8999…d4ad, 0x82b3…2883, 0x8f68…b4c4], root: 0xaae48b9b49d6bdc37b290eeab85dd03fd\r\n8691:Oct 26 01:45:24.655 DEBG Gossip block arrived, slot: 19427, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module: network::network_beacon_processor:\r\n8692:Oct 26 01:45:24.655 INFO New block received, root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, slot: 19427, module: network::network_beacon_processor::gossip_methods:948\r\n8693:Oct 26 01:45:24.659 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, index: 0 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\n8694:Oct 26 01:45:24.659 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, index: 1 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\n8695:Oct 26 01:45:24.664 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, index: 2 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\n8696:Oct 26 01:45:24.664 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, index: 3 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\n8697:Oct 26 01:45:24.673 DEBG Peer returned blob for single lookup, blob_id: BlobIdentifier { block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, index: 4 }, peer_id: 16Uiu2HAmFjiQYJ1DpiLVtNTdKJJV4PFAKRhwCXYWA1GF9otoMdFa, service: sync, module: network::sync::manager:951\r\n8701:Oct 26 01:45:24.698 DEBG Block component processed for lookup, result: Ok(MissingComponents(Slot(19427), 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494)), response_type: Blob, service: sync, module: network::sync::block_lookups:785\r\n8703:Oct 26 01:45:24.929 DEBG Gossip blob arrived, commitment: 0x8f68…b4c4, index: 4, slot: 19427, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module: network::network_beacon_processor::gossip_methods:617\r\n8705:Oct 26 01:45:25.096 DEBG Importing fully available block, num_blobs: 5, slot: 19427, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, service: beacon, module: beacon_chain::beacon_chain:3119\r\n8707:Oct 26 01:45:25.144 DEBG Gossipsub block processed, peer_id: 16Uiu2HAmCJVUabd27dzno57fCxvVR8JUxXjrLsZ8L25znf3YQ1un, block: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module: network::network_beacon_processor::gossip_methods:1204\r\n8708:Oct 26 01:45:25.152 DEBG Fork choice updated head, old_head: 0xe1ec826e85ba34a984b1279ea6ee652a72def1f65861c808c69533a7c907485c, old_head_weight: Some(757295200000000), new_head: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, new_head_weight: Some(131919200000000), service: beacon, module: beacon_chain::canonical_head:1152\r\n8709:Oct 26 01:45:25.229 DEBG Issuing engine_forkchoiceUpdated, current_slot: 19427, head_block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, head_block_hash: 0x2c07a57fe8204dd4689a5b7c3df290f53cffc336d6e839eda9b0a45d51176d2b, justified_block_hash: 0x799fae80a33a9e8b3e5d4f782ec2c6a6ecb19776c1c832220423db729293367c, finalized_block_hash: 0xf67a02731e799178413e85a09d2b19bd3a1cbcc3576ecc075e50dc54b6cdb28d, service: exec, module: execution_layer:1392\r\n8710:Oct 26 01:45:25.245 DEBG Processed HTTP API request, method: GET, path: /eth/v2/beacon/blocks/0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, status: 200 OK, elapsed: 101.104364ms, module: http_api:194\r\n8788:Oct 26 01:45:28.683 DEBG Processing RPC block, commitments: [0xab29…2919, 0x95e9…eed9, 0x8999…d4ad, 0x82b3…2883, 0x8f68…b4c4], slot: 19427, proposer: 246533, block_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, module: network::network_beacon_processor::sync_methods:219\r\n8814:Oct 26 01:45:33.038 DEBG Advanced head state one slot, current_slot: 19427, state_slot: 19428, head_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, service: state_advance, module: beacon_chain::state_advance_timer:363\r\n8815:Oct 26 01:45:33.038 DEBG Completed state advance, initial_slot: 19427, advanced_slot: 19428, head_root: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, service: state_advance, module: beacon_chain::state_advance_timer:459\r\n8828:Oct 26 01:45:35.508 DEBG No change in canonical head, head: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, service: beacon, module: beacon_chain::canonical_head:632\r\n8839:Oct 26 01:45:36.012 DEBG No change in canonical head, head: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, service: beacon, module: beacon_chain::canonical_head:632\r\n8862:Oct 26 01:45:36.681 DEBG Fork choice updated head, old_head: 0xaae48b9b49d6bdc37b290eeab85dd03fdd8cbf4822ba34189957a430c7e98494, old_head_weight: Some(439087200000000), new_head: 0x67104a7d56c8f2f4406cf361552b0bc15c69fa7795956582b21809ba9e208488, new_head_weight: Some(131919200000000), service: beacon, module: beacon_chain::canonical_head:1152\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4883/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4883/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
