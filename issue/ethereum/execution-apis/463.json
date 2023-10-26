@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-22T16:15:04Z",
-  "updated_at": "2023-08-22T16:15:04Z",
+  "updated_at": "2023-10-26T12:44:00Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -49,8 +49,8 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/execution-apis/issues/463/reactions",
-    "total_count": 0,
-    "+1": 0,
+    "total_count": 1,
+    "+1": 1,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/1781049561",
+    "html_url": "https://github.com/ethereum/execution-apis/issues/463#issuecomment-1781049561",
+    "issue_url": "https://api.github.com/repos/ethereum/execution-apis/issues/463",
+    "id": 1781049561,
+    "node_id": "IC_kwDOFoG9Gs5qKKjZ",
+    "user": {
+      "login": "MicahZoltu",
+      "id": 886059,
+      "node_id": "MDQ6VXNlcjg4NjA1OQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/886059?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MicahZoltu",
+      "html_url": "https://github.com/MicahZoltu",
+      "followers_url": "https://api.github.com/users/MicahZoltu/followers",
+      "following_url": "https://api.github.com/users/MicahZoltu/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MicahZoltu/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MicahZoltu/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MicahZoltu/subscriptions",
+      "organizations_url": "https://api.github.com/users/MicahZoltu/orgs",
+      "repos_url": "https://api.github.com/users/MicahZoltu/repos",
+      "events_url": "https://api.github.com/users/MicahZoltu/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MicahZoltu/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-26T12:44:00Z",
+    "updated_at": "2023-10-26T12:44:00Z",
+    "author_association": "MEMBER",
+    "body": "Historically, JSON-RPC errors were reserved for protocol errors and not applied to EVM execution errors.  If we want to maintain this pattern, then the JSON-RPC response would be a success with something in the `result` field.  I generally think we should continue following this pattern as upcoming API feature additions like `eth_multicall` may have a subset of calls that revert and some that are a success so from the protocol level, a success should be returned.\r\n\r\nAs to what to put in the `result` field of the JSON-RPC response, I don't think the Ethereum client (JSON-RPC server) should try to do any sort of revert byte decoding.  The JSON-RPC server doesn't have enough context to do this correctly so at best it would just be making educated guesses.  The client (e.g., web app) has far more context and is in a much better position to properly decode the bytes.\r\n\r\nIt does seem like there needs to be some way to indicate that the result was erroneous, and prepending some ASCII text to a hex encoded byte array feels like just about the worst way to achieve this.  An ideal solution, if we were building something from the ground up, would be to have the JSON-RPC `result` be an object like `{ success: false, reason: 'Execution Reverted', data: '0x...' }`.\r\n\r\nThis would allow clients to discriminate on the `success` and if we want to add other failure modes in the future we can include additional strings to a union of possible values for the `reason` field which can also be discriminated on.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/1781049561/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
