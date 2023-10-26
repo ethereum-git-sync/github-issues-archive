@@ -47,6 +47,33 @@
       "color": "000000",
       "default": false,
       "description": "Compiler generates invalid code. Critical."
+    },
+    {
+      "id": 4372329032,
+      "node_id": "LA_kwDOAm_5kc8AAAABBJxySA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/selected%20for%20development",
+      "name": "selected for development",
+      "color": "ff8e00",
+      "default": false,
+      "description": "It's on our short-term development"
+    },
+    {
+      "id": 4438006499,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaa4w",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/low%20effort",
+      "name": "low effort",
+      "color": "ffb1fa",
+      "default": false,
+      "description": "There is not much implementation work to be done. The task is very easy or tiny."
+    },
+    {
+      "id": 4438153180,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjX3A",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/high%20impact",
+      "name": "high impact",
+      "color": "001dff",
+      "default": false,
+      "description": "Changes are very prominent and affect users or the project in a major way."
     }
   ],
   "state": "open",
@@ -92,9 +119,9 @@
     "due_on": null,
     "closed_at": null
   },
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-10-24T21:47:53Z",
-  "updated_at": "2023-10-25T23:36:06Z",
+  "updated_at": "2023-10-26T15:13:28Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -149,6 +176,50 @@
     "body": "Thank you very much for the report - I just confirmed this.\r\n\r\nThis is a genuine bug in the libevmasm block-deduplicator's treatment of verbatim assembly items.\r\nThe comparison used for the block deduplicator is broken - if there are two blocks that are completely identical except for a difference in the data of a verbatim assembly item, they may wrongfully compare equal. (In your example this leads to the optimizer wrongfully collapsing the jump target of the zero case and the two case.)\r\n\r\nYou can work around it by disabling the block deduplicator (that's possible via standard-json in the optimizer detail settings). The fix is https://github.com/ethereum/solidity/pull/14649.\r\n\r\nWe will need to closely evaluate which other effects this bug may have.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1780183993/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1781319297",
+    "html_url": "https://github.com/ethereum/solidity/issues/14640#issuecomment-1781319297",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14640",
+    "id": 1781319297,
+    "node_id": "IC_kwDOAm_5kc5qLMaB",
+    "user": {
+      "login": "cameel",
+      "id": 137030,
+      "node_id": "MDQ6VXNlcjEzNzAzMA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cameel",
+      "html_url": "https://github.com/cameel",
+      "followers_url": "https://api.github.com/users/cameel/followers",
+      "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+      "organizations_url": "https://api.github.com/users/cameel/orgs",
+      "repos_url": "https://api.github.com/users/cameel/repos",
+      "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cameel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-26T15:08:33Z",
+    "updated_at": "2023-10-26T15:13:28Z",
+    "author_association": "MEMBER",
+    "body": "I tried compiling the code with the buggy operator removed and looks like we have exactly 2 places that use it:\r\n\r\nhttps://github.com/ethereum/solidity/blob/28ee5d3fad770dfaf4c5c1addb9f1ee489bc34e3/libevmasm/BlockDeduplicator.cpp#L76\r\nhttps://github.com/ethereum/solidity/blob/28ee5d3fad770dfaf4c5c1addb9f1ee489bc34e3/libevmasm/ConstantOptimiser.cpp#L42-L44\r\n\r\nThe latter will not use the item when `type() == VerbatimBytecode` so looks like `BlockDeduplicator` must be the only affected component.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1781319297/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
