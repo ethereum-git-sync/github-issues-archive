@@ -121,7 +121,7 @@
       "description": "not related to mainnet features - covers privacy, permissioning, IBFT2, QBFT"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "Shritesh99",
@@ -166,14 +166,33 @@
     }
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 7,
   "created_at": "2023-09-26T14:43:44Z",
-  "updated_at": "2023-10-25T08:49:20Z",
-  "closed_at": null,
+  "updated_at": "2023-10-26T21:51:27Z",
+  "closed_at": "2023-10-26T21:51:26Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nAs a besu blockchain consumer, I want that eth_call strict parameter is working as intended defaulting to false when value is not provided.\r\n\r\nNot providing the strict parameter should work as intended as defined in changelog 21.1.0:\r\nhttps://github.com/hyperledger/besu/blob/main/CHANGELOG.md#2110-breaking-changes\r\n\r\nThe implementation for this parameter was included as part of 21.1.0 as we can see in here:\r\nhttps://github.com/hyperledger/besu/blob/21.1.0/ethereum/api/src/main/java/org/hyperledger/besu/ethereum/api/jsonrpc/internal/parameters/JsonCallParameter.java\r\n\r\nIt was working as intended until 21.7.0 version where this code changed:\r\nhttps://github.com/hyperledger/besu/blob/21.7.0/ethereum/api/src/main/java/org/hyperledger/besu/ethereum/api/jsonrpc/internal/parameters/JsonCallParameter.java\r\n\r\nMotivation for this change was this PR https://github.com/hyperledger/besu/pull/2445 but these changes are not working as intended, because not sending the strict parameter is actually working the same as strict: true. \r\n\r\nOnly workaround is to actually send the strict: false.\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Execute any call without providing strict parameter to eth_call in any version post 21.1.7. Call should be performed with an account that doesnt have any balance.\r\n2. Error returned Upfront cost exceeds account balance from Besu\r\n\r\n**Expected behavior:**\r\nNot providing the strict parameter should work as intended as defined in changelog 21.1.0:\r\nhttps://github.com/hyperledger/besu/blob/main/CHANGELOG.md#2110-breaking-changes\r\n\r\n**Actual behavior:**\r\nError returned Upfront cost exceeds account balance from Besu\r\n\r\n**Frequency:** \r\nAlways\r\n\r\n### Versions (Add all that apply)\r\n* Software version: [`besu --version`] Any version > 21.1.7\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/5943/reactions",
     "total_count": 0,
@@ -188,7 +207,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/5943/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -443,6 +462,50 @@
     "body": "@macfarla documentation/changelog is fine as a solution for this, specifying that the absence of strict value is the same as strict true. what is weird to me is if it should not be different for pre-1559 vs post-1559. \r\n\r\nrelated to the gas price itself, it could be a possibility, but technically if i need to change my code, id rather make explicit strict false calls to the blockchain client so im not impacted by unexecpected backwards breaking compatibility changes",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1778802993/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1781942366",
+    "html_url": "https://github.com/hyperledger/besu/issues/5943#issuecomment-1781942366",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/5943",
+    "id": 1781942366,
+    "node_id": "IC_kwDODE2jmc5qNkhe",
+    "user": {
+      "login": "macfarla",
+      "id": 2627919,
+      "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/macfarla",
+      "html_url": "https://github.com/macfarla",
+      "followers_url": "https://api.github.com/users/macfarla/followers",
+      "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+      "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+      "organizations_url": "https://api.github.com/users/macfarla/orgs",
+      "repos_url": "https://api.github.com/users/macfarla/repos",
+      "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/macfarla/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-26T21:51:26Z",
+    "updated_at": "2023-10-26T21:51:26Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "created a docs issue for this - https://github.com/hyperledger/besu-docs/issues/1429\r\n\r\nthanks for raising @nano-adhara ",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1781942366/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
