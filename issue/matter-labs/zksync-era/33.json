@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-05-11T02:53:34Z",
-  "updated_at": "2023-05-12T15:13:19Z",
-  "closed_at": null,
+  "updated_at": "2023-10-27T08:42:32Z",
+  "closed_at": "2023-10-27T08:42:32Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Info\r\nCurrently when attempting to instantiate a wallet with the `with_http_client()` method, it is returning an error if a port is not included in the rpc url.\r\n\r\nexample: when url is without a port number, such as: `https://testnet.era.zksync.dev`, an error is returned, \r\nbut when url includes a port number, like `https://testnet.era.zksync.dev:443`, a wallet is successfully instantiated.\r\n\r\nUnfortunately many rpc urls do not contain a port number (i.e infura links), these rpc urls are unable to successfully instantiate a wallet.\r\n\r\nHere is code that illustrates the issue: (can be pulled from [this repo](https://github.com/sammyshakes/rpc-url-issue))\r\n\r\n### Cargo.toml:\r\n```toml\r\n[dependencies]\r\nzksync = {git = \"https://github.com/matter-labs/zksync-era.git\"}\r\nzksync_eth_signer = {git = \"https://github.com/matter-labs/zksync-era.git\"}\r\n```\r\n### main.rs:\r\n```rs\r\nuse zksync::{\r\n    self,\r\n    signer::Signer,\r\n    wallet::Wallet,\r\n    zksync_types::{L2ChainId, PackedEthSignature, H256},\r\n};\r\nuse zksync_eth_signer::PrivateKeySigner;\r\n\r\nconst CHAIN: u16 = 280;\r\n\r\n// Switch these comments to suppress error\r\nconst RPC_URL: &str = \"https://testnet.era.zksync.dev\";\r\n// const RPC_URL: &str = \"https://testnet.era.zksync.dev:443\";\r\n\r\nfn main() {\r\n    let mut eth_private_key = H256::default();\r\n    eth_private_key.randomize();\r\n\r\n    let eth_signer = PrivateKeySigner::new(eth_private_key);\r\n    let address_from_pk = PackedEthSignature::address_from_private_key(&eth_private_key).unwrap();\r\n    let signer = Signer::new(eth_signer, address_from_pk, L2ChainId(CHAIN));\r\n\r\n    // getting port error retrieving this wallet, if no port provided\r\n    let wallet = Wallet::with_http_client(RPC_URL, signer);\r\n    println!(\"{:#?} wallet\", wallet);\r\n}\r\n```\r\nWhen the above code is run:\r\n```rs\r\ncargo run\r\n```\r\n\r\nOutput:\r\n```rs\r\nErr(\r\n    RpcError(\r\n        Transport(\r\n            Url(\r\n                \"Port number is missing in the URL\",\r\n            ),\r\n        ),\r\n    ),\r\n) wallet\r\n```\r\n\r\n## To Reproduce Error:\r\n\r\n### Clone Repo\r\nClone [rpc-url-issue](https://github.com/sammyshakes/rpc-url-issue)\r\n```bash\r\n# Clone repo\r\ngit clone https://github.com/sammyshakes/rpc-url-issue.git\r\n\r\n# Navigate to folder\r\ncd rpc-url-issue\r\n\r\n#execute\r\ncargo run\r\n```\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "popzxc",
+    "id": 12111581,
+    "node_id": "MDQ6VXNlcjEyMTExNTgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/12111581?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/popzxc",
+    "html_url": "https://github.com/popzxc",
+    "followers_url": "https://api.github.com/users/popzxc/followers",
+    "following_url": "https://api.github.com/users/popzxc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/popzxc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/popzxc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/popzxc/subscriptions",
+    "organizations_url": "https://api.github.com/users/popzxc/orgs",
+    "repos_url": "https://api.github.com/users/popzxc/repos",
+    "events_url": "https://api.github.com/users/popzxc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/popzxc/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/33/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/33/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -92,7 +111,7 @@
     },
     "created_at": "2023-05-12T12:54:48Z",
     "updated_at": "2023-05-12T12:54:48Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "COLLABORATOR",
     "body": "This error comes from jsonrpsee library, that Wallet uses underneath.\r\n\r\nhttps://github.com/paritytech/jsonrpsee/issues/1048",
     "reactions": {
       "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1545701114/reactions",
@@ -140,6 +159,50 @@
     "body": "ok thanks for this, since we cannot modify the jsonrpsee library, i have included some code to force in the default port:\r\n\r\n```rs\r\nuse zksync::{\r\n    self,\r\n    signer::Signer,\r\n    wallet::Wallet,\r\n    zksync_types::{L2ChainId, PackedEthSignature, H256},\r\n};\r\nuse zksync_eth_signer::PrivateKeySigner;\r\n\r\n//added this crate:  url = \"2.3.1\"\r\nuse url::Url;\r\n\r\nconst CHAIN: u16 = 280;\r\n\r\nconst RPC_URL: &str = \"https://testnet.era.zksync.dev\";\r\n// const RPC_URL: &str = \"https://testnet.era.zksync.dev:443\";\r\n\r\nfn main() {\r\n    let mut eth_private_key = H256::default();\r\n    eth_private_key.randomize();\r\n\r\n    let eth_signer = PrivateKeySigner::new(eth_private_key);\r\n    let address_from_pk = PackedEthSignature::address_from_private_key(&eth_private_key).unwrap();\r\n    let signer = Signer::new(eth_signer, address_from_pk, L2ChainId(CHAIN));\r\n\r\n    //-------------------------------------------///\r\n    // Force default URL\r\n\r\n    // Parse the URL string into a Url object\r\n    let url = Url::parse(RPC_URL).expect(\"Failed to parse URL\");\r\n\r\n    // grab default port\r\n    let default_port = url.scheme() == \"https\" && url.port().is_none();\r\n    let port = url\r\n        .port()\r\n        .unwrap_or_else(|| if default_port { 443 } else { 0 });\r\n    \r\n    // Format complete url\r\n    let complete_url = format!(\r\n        \"{}://{}:{}{}\",\r\n        url.scheme(),\r\n        url.host_str().unwrap(),\r\n        port,\r\n        url.path()\r\n    );\r\n\r\n    println!(\"Complete URL: {}\", complete_url);\r\n    let url_str = complete_url.as_str();\r\n\r\n    //-------------------------------------------///\r\n\r\n    // getting port error retrieving this wallet, if no port provided\r\n    let wallet = Wallet::with_http_client(url_str, signer);\r\n    println!(\"{:#?} wallet\", wallet);\r\n}\r\n\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1545901497/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1782531353",
+    "html_url": "https://github.com/matter-labs/zksync-era/issues/33#issuecomment-1782531353",
+    "issue_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/33",
+    "id": 1782531353,
+    "node_id": "IC_kwDOI-FneM5qP0UZ",
+    "user": {
+      "login": "popzxc",
+      "id": 12111581,
+      "node_id": "MDQ6VXNlcjEyMTExNTgx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12111581?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/popzxc",
+      "html_url": "https://github.com/popzxc",
+      "followers_url": "https://api.github.com/users/popzxc/followers",
+      "following_url": "https://api.github.com/users/popzxc/following{/other_user}",
+      "gists_url": "https://api.github.com/users/popzxc/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/popzxc/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/popzxc/subscriptions",
+      "organizations_url": "https://api.github.com/users/popzxc/orgs",
+      "repos_url": "https://api.github.com/users/popzxc/repos",
+      "events_url": "https://api.github.com/users/popzxc/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/popzxc/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-27T08:42:32Z",
+    "updated_at": "2023-10-27T08:42:32Z",
+    "author_association": "MEMBER",
+    "body": "Hello! Development of SDK in this monorepo is discontinued, this SDK currently exists for some internal needs only and will be removed soon.\r\nPlease use a newer official SDK for Rust: https://era.zksync.io/docs/api/rust/",
+    "reactions": {
+      "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1782531353/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
