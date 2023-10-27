@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-08-15T10:44:57Z",
-  "updated_at": "2023-08-16T09:53:55Z",
-  "closed_at": null,
+  "updated_at": "2023-10-27T09:41:07Z",
+  "closed_at": "2023-10-27T09:41:07Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\n`forge 0.2.0 (93ebcdd 2023-08-15T00:21:30.341654717Z)`\n\n### What command(s) is the bug in?\n\n`FOUNDRY_PROFILE=ci forge test --out forge-artifacts`\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nI get the following error if I execute the following command `FOUNDRY_PROFILE=ci forge test --out forge-artifacts`:\r\n\r\n```bash\r\nThe application panicked (crashed).\r\nMessage:  internal error: entered unreachable code: We should never have decoded calldata for contract creations\r\nLocation: crates/evm/src/trace/mod.rs:248\r\n\r\nThis is a bug. Consider reporting it at https://github.com/foundry-rs/foundry\r\n\r\nBacktrace omitted. Run with RUST_BACKTRACE=1 environment variable to display it.\r\nRun with RUST_BACKTRACE=full to include source snippets.\r\nAborted\r\n ELIFECYCLE  Command failed with exit code 134.\r\n```\r\n\r\nMy repository is private, unfortunately, and I'm not sure how I can share a repro best.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5629/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5629/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "Alright, two observations after some debugging: It only happens using the `ci` profile, even if I use the same configurations as in the `default` profile (the default profile always runs successfully). My `foundry.toml` is:\r\n\r\n```\r\n## defaults for all profiles\r\n[profile.default]\r\nsrc = 'src'                                                 # the source directory\r\ntest = 'test'                                               # the test directory\r\nout = 'out'                                                 # the output directory (for artifacts)\r\nlibs = ['lib']                                              # a list of library directories\r\ncache = true                                                # cache the builds\r\ncache_path = 'cache'                                        # where the cache is stored\r\nsolc_version = '0.8.21'                                     # override for the solc version\r\nevm_version = 'paris'                                       # set the EVM target version (prevent using the `PUSH0` opcode)\r\noptimizer = true                                            # enable the solc optimiser\r\noptimizer_runs = 999999                                     # the number of optimiser runs\r\nverbosity = 3                                               # the verbosity of tests\r\nfs_permissions = [{ access = \"read-write\", path = \"./\"}]    # set read-write access to project root\r\n\r\n## default overrides for the CI runs\r\n[profile.ci]\r\nforce = true                                                # always perform a clean build\r\nfuzz = { runs = 10_000 }                                    # increase the number of fuzz runs\r\nverbosity = 4                                               # increase the verbosity of tests\r\n```\r\n\r\nFurthermore, I found that the error is triggered by the following test:\r\n\r\n```solidity\r\nfunction testDeployCreateRevertNonPayable() public {\r\n    vm.expectRevert({revertData: abi.encodeWithSelector(CreateX.FailedContractCreation.selector, createXAddr)});\r\n    createX.deployCreate({initCode: hex\"01\"});\r\n}\r\n```\r\n\r\nIf I replace `hex\"01\"` with `abi.encode(hex\"01\")` it will run successfully (if I use `abi.encodePacked` instead it will revert; the function `deployCreate` uses `bytes` as input for the argument, which is the init code). So two questions @Evalir: why is this throwing only if I use the `ci` profile and why is there an issue with the `hex`/`abi.encodePacked` instruction?",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1680304613/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1782613792",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5629#issuecomment-1782613792",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5629",
+    "id": 1782613792,
+    "node_id": "IC_kwDOGBlvNc5qQIcg",
+    "user": {
+      "login": "mattsse",
+      "id": 19890894,
+      "node_id": "MDQ6VXNlcjE5ODkwODk0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mattsse",
+      "html_url": "https://github.com/mattsse",
+      "followers_url": "https://api.github.com/users/mattsse/followers",
+      "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+      "organizations_url": "https://api.github.com/users/mattsse/orgs",
+      "repos_url": "https://api.github.com/users/mattsse/repos",
+      "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mattsse/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-27T09:41:07Z",
+    "updated_at": "2023-10-27T09:41:07Z",
+    "author_association": "MEMBER",
+    "body": "superseded by https://github.com/foundry-rs/foundry/issues/6139",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1782613792/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
