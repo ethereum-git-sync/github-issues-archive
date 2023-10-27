@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13134",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13134/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13134/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13134/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/13134",
+  "id": 1966143864,
+  "node_id": "I_kwDOBvuov851MPl4",
+  "number": 13134,
+  "title": "Beacon API endpoint `/eth/v1/beacon/blob_sidecars/` returns error 500 on empty blobs block",
+  "user": {
+    "login": "marioevz",
+    "id": 11726710,
+    "node_id": "MDQ6VXNlcjExNzI2NzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marioevz",
+    "html_url": "https://github.com/marioevz",
+    "followers_url": "https://api.github.com/users/marioevz/followers",
+    "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+    "organizations_url": "https://api.github.com/users/marioevz/orgs",
+    "repos_url": "https://api.github.com/users/marioevz/repos",
+    "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marioevz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 802129904,
+      "node_id": "MDU6TGFiZWw4MDIxMjk5MDQ=",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/Bug",
+      "name": "Bug",
+      "color": "ee0701",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1701740543,
+      "node_id": "MDU6TGFiZWwxNzAxNzQwNTQz",
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/labels/API",
+      "name": "API",
+      "color": "30ef13",
+      "default": false,
+      "description": "Api related tasks"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-10-27T20:20:46Z",
+  "updated_at": "2023-10-27T20:58:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nBeacon API endpoint `/eth/v1/beacon/blob_sidecars/` returns error 500 on an empty-blobs block after Deneb, where it should be returning an empty list instead.\r\n\r\nPrysm:\r\n```bash\r\n$ curl https://$DEVNET_USER:$DEVNET_PASS@bn.prysm-geth-1.dencun-devnet-10.ethpandaops.io/eth/v2/beacon/blocks/32141 | jq '.data.message.body.blob_kzg_commitments'\r\n[]\r\n$ curl https://$DEVNET_USER:$DEVNET_PASS@bn.prysm-geth-1.dencun-devnet-10.ethpandaops.io/eth/v1/beacon/blob_sidecars/32141\r\n{\"message\":\"could not retrieve blobs for slot 32141: not found in db\",\"code\":500}\r\n```\r\n\r\nLighthouse:\r\n```bash\r\n$ curl https://$DEVNET_USER:$DEVNET_PASS@bn.lighthouse-geth-1.dencun-devnet-10.ethpandaops.io/eth/v1/beacon/blob_sidecars/32141\r\n{\"data\":[]}\r\n```\r\n\r\nThis is also intermittently affecting Prysm on hive runs, where most of the blocks do contain blobs, but in the rare case where it does not, the test fails because of this unexpected error.\n\n### Has this worked before in a previous version?\n\n```text\nI'm not sure.\n```\n\n\n### 🔬 Minimal Reproduction\n\nQuery a Prysm node for `/eth/v1/beacon/blob_sidecars/` on devnet-10 on any slot where there were no blobs included. E.g. slot 32141.\n\n### Error\n\n```text\n< HTTP/2 500\r\n< server: nginx/1.25.2\r\n< date: Fri, 27 Oct 2023 20:13:53 GMT\r\n< content-type: application/json\r\n< content-length: 81\r\n< vary: Origin\r\n< strict-transport-security: max-age=31536000\r\n<\r\n* Connection #0 to host bn.prysm-geth-1.dencun-devnet-10.ethpandaops.io left intact\r\n{\"message\":\"could not retrieve blobs for slot 32141: not found in db\",\"code\":500}\r\n```\n```\n\n\n### Platform(s)\n\nLinux (x86)\n\n### What version of Prysm are you running? (Which release)\n\nBranch `devnet-10`\n\n### Anything else relevant (validator index / public key)?\n\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13134/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13134/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1783505252",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/13134#issuecomment-1783505252",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13134",
+    "id": 1783505252,
+    "node_id": "IC_kwDOBvuov85qTiFk",
+    "user": {
+      "login": "terencechain",
+      "id": 21316537,
+      "node_id": "MDQ6VXNlcjIxMzE2NTM3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/21316537?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/terencechain",
+      "html_url": "https://github.com/terencechain",
+      "followers_url": "https://api.github.com/users/terencechain/followers",
+      "following_url": "https://api.github.com/users/terencechain/following{/other_user}",
+      "gists_url": "https://api.github.com/users/terencechain/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/terencechain/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/terencechain/subscriptions",
+      "organizations_url": "https://api.github.com/users/terencechain/orgs",
+      "repos_url": "https://api.github.com/users/terencechain/repos",
+      "events_url": "https://api.github.com/users/terencechain/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/terencechain/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-27T20:58:10Z",
+    "updated_at": "2023-10-27T20:58:10Z",
+    "author_association": "MEMBER",
+    "body": "thanks for opening this! we should fix it soon",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1783505252/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]
