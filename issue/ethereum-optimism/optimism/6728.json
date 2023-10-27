@@ -40,7 +40,7 @@
       "description": "Meta: community help wanted"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "danyalprout",
@@ -127,12 +127,31 @@
   "milestone": null,
   "comments": 4,
   "created_at": "2023-08-11T12:16:15Z",
-  "updated_at": "2023-10-10T18:02:53Z",
-  "closed_at": null,
+  "updated_at": "2023-10-27T17:52:28Z",
+  "closed_at": "2023-10-27T17:52:28Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "This issue tracks the necessary changes to support the Shapella L1 upgrade in the OP-Stack. Starting with specs, op-node and op-geth changes.\r\n\r\nThese changes should be stacked together as PRs before merging, since end-to-end testing largely depends on various op-geth & engine API shapella features all being activated.\r\n\r\n# Introduced L1 EIPs\r\n\r\n*Source: https://blog.ethereum.org/2023/03/28/shapella-mainnet-announcement*\r\n\r\n- [EIP-3651: Warm COINBASE](https://eips.ethereum.org/EIPS/eip-3651)\r\n    - Affects EVM execution\r\n- [EIP-3855: PUSH0 instruction](https://eips.ethereum.org/EIPS/eip-3855)\r\n    - Affects EVM execution\r\n- [EIP-3860: Limit and meter initcode](https://eips.ethereum.org/EIPS/eip-3860)\r\n    - Affects EVM execution\r\n    - Need to signal this to users, if they depend on pre-shanghai behavior (large initcode during `CREATE` / `CREATE2`)\r\n- [EIP-4895: Beacon chain push withdrawals as operations](https://eips.ethereum.org/EIPS/eip-4895)\r\n    - Affects block-format\r\n    - Affects Engine API\r\n    - Affects state-transition outside EVM\r\n- [EIP-6049: Deprecate SELFDESTRUCT](https://eips.ethereum.org/EIPS/eip-6049)\r\n    - Soft-change, need to signal this to users\r\n\r\n# Upgrading\r\n\r\nThe shanghai hardfork affects both op-geth and op-node: the fork affects the Engine API.\r\n\r\nWe need to add a `shanghaiTime` rollup-config attribute, and can use the existing geth shanghai upgrade functionality.\r\n\r\n# op-node changes\r\n\r\n## Rollup Config `shanghaiTime` attribute\r\n\r\nThe rollup-config needs to be made aware of the shanghai hardfork time to enable some of the below changes to apply based on the hardfork timestamp: the Engine API usage is dependent on the hardfork timestamp.\r\n\r\nThis needs to be documented in the network-upgrades spec: https://github.com/ethereum-optimism/optimism/blob/develop/specs/network-upgrades.md\r\n\r\n## SSZ ExecutionPayload encoding\r\n\r\nThe SSZ encoding is used in P2P gossip: we need to support the withdrawals list attribute here (even if empty, since empty is different than non-existent as in pre-shanghai blocks).\r\n\r\nThis change needs to be documented in the P2P spec: https://github.com/ethereum-optimism/optimism/blob/develop/specs/rollup-node-p2p.md\r\n\r\nAnd requires a gossip-topic upgrade (the topic identifier is already versioned).\r\n\r\n## L2 Eth-RPC client bindings\r\n\r\nWhen retrieving an execution-payload/block, we need to respect the withdrawals-list. We have missed this in the L1 side of these bindings before (pre-bedrock lauch, durign shanghai upgrade of Goerli).\r\n\r\n## Engine API\r\n\r\nThe Engine API changed with Shanghai to support the new withdrawals attribute, and we must migrate over:\r\n\r\nhttps://github.com/ethereum/execution-apis/blob/main/src/engine/shanghai.md\r\n\r\nThe methods are a hard-requirement for blocks that are past the shanghai timestamp. The methods are backwards compatible with pre-shanghai. We need the V2 methods in op-geth to support Optimism first before we can start using them as the op-node.\r\n\r\nThe optionality depends on the timestamp of the content:\r\n\r\n`engine_newPayloadV2`: optionality between `ExecutionPayloadV1` **and** `ExecutionPayloadV2`\r\n\r\n`engine_forkchoiceUpdatedV2`: optionality between `PayloadAttributesV2` and `PayloadAttributesV2`\r\n\r\n`engine_getPayloadV2`: optionality between `ExecutionPayloadV1` **and** `ExecutionPayloadV2`\r\n\r\nBased on the timestamp the verifier and sequencer codepaths *(already unified to behind the `derive.EngineControl` interface)*\r\n\r\nThese engine-API changes need to be documented in the execution-engine spec: https://github.com/ethereum-optimism/optimism/blob/develop/specs/exec-engine.md\r\n\r\n# op-geth changes\r\n\r\n## Hardfork time config update\r\n\r\nWe need the hardfork to be scheduled for Goerli and Mainnet similar to how Regolith was scheduled:\r\n\r\n- Provide a hardfork override CLI option\r\n- Mutate the chain-config with the shanghai time upon startup, if the chain ID matches\r\n\r\n## Engine API\r\n\r\nReview that all the V2 methods are covered by the Optimism diff.\r\n\r\n# Shanghai testing\r\n\r\n- Update op-geth testing in the geth Engine API tests in op-e2e, covering the V2 methods one by one\r\n- Implement an op-e2e test like the regolith test\r\n- Implement action-tests that run through the Shanghai HF like the Regolith tests\r\n- Enable shanghai by default in the CI-devnet\r\n- Schedule and execute Shanghai on the internal devnet\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "trianglesphere",
+    "id": 11803341,
+    "node_id": "MDQ6VXNlcjExODAzMzQx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11803341?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/trianglesphere",
+    "html_url": "https://github.com/trianglesphere",
+    "followers_url": "https://api.github.com/users/trianglesphere/followers",
+    "following_url": "https://api.github.com/users/trianglesphere/following{/other_user}",
+    "gists_url": "https://api.github.com/users/trianglesphere/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/trianglesphere/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/trianglesphere/subscriptions",
+    "organizations_url": "https://api.github.com/users/trianglesphere/orgs",
+    "repos_url": "https://api.github.com/users/trianglesphere/repos",
+    "events_url": "https://api.github.com/users/trianglesphere/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/trianglesphere/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6728/reactions",
     "total_count": 1,
@@ -147,7 +166,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/6728/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -178,7 +197,7 @@
     },
     "created_at": "2023-10-09T17:59:28Z",
     "updated_at": "2023-10-09T17:59:28Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Hey :wave:\r\n\r\nI’ve got a POC of this, have a couple of things I would like to sanity check.\r\n\r\n> The rollup-config needs to be made aware of the shanghai hardfork time to enable some of the below changes to apply based on the hardfork timestamp\r\n\r\nDo we want to enable Shanghai separately from Canyon or tie them both to the Canyon timestamp? Currently I’ve tied Shanghai enablement to the Canyon timestamp in op-node, but happy to decouple if you think that makes more sense.\r\n\r\n> we need to support the withdrawals list attribute here (even if empty, since empty is different than non-existent as in pre-shanghai blocks\r\n\r\nAs withdrawals will always be nil pre-Shanghai and always empty post Shanghai. Do we want to make gossip changes here? Or can we just ignore withdrawals at the op-node p2p layer and infer whether it should be empty or nil based on the execution payload timestamp?\r\n\r\n> optionality between ExecutionPayloadV1 and ExecutionPayloadV2\r\n\r\nWould you rather we have multiple versions of the ExecutionPayload struct? Right now I’ve extended the existing one with optional withdrawals.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1753428955/reactions",
