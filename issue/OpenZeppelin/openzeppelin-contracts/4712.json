@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4712",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4712/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4712/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4712/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4712",
+  "id": 1966702537,
+  "node_id": "I_kwDOA9tCBs51OX_J",
+  "number": 4712,
+  "title": "Contract `_contract` is not upgrade safe. Implementation is missing a public `upgradeTo(address)` function",
+  "user": {
+    "login": "quiet-node",
+    "id": 66233296,
+    "node_id": "MDQ6VXNlcjY2MjMzMjk2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/66233296?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/quiet-node",
+    "html_url": "https://github.com/quiet-node",
+    "followers_url": "https://api.github.com/users/quiet-node/followers",
+    "following_url": "https://api.github.com/users/quiet-node/following{/other_user}",
+    "gists_url": "https://api.github.com/users/quiet-node/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/quiet-node/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/quiet-node/subscriptions",
+    "organizations_url": "https://api.github.com/users/quiet-node/orgs",
+    "repos_url": "https://api.github.com/users/quiet-node/repos",
+    "events_url": "https://api.github.com/users/quiet-node/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/quiet-node/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-28T18:47:52Z",
+  "updated_at": "2023-10-28T18:47:52Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!-- Briefly describe the issue you're experiencing. Tell us what you were trying to do and what happened instead. -->\r\nSo I have updated @Openzeppelin/contracts-upgradable from v4.x to the latest v.5.0.0, and when I try to deploy a proxy contract, I got this error\r\n\r\n```bash\r\n Error: Contract `contracts/proxy-upgrade/exchange/Exchange.sol:Exchange` is not upgrade safe\r\n\r\ncontracts/proxy-upgrade/exchange/Exchange.sol:12: Implementation is missing a public `upgradeTo(address)` function\r\nInherit UUPSUpgradeable to include this function in your contract\r\n@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol\r\nhttps://zpl.in/upgrades/error-008\r\n  at assertUpgradeSafe (node_modules/@openzeppelin/upgrades-core/src/validate/query.ts:19:11)\r\n  at validateImpl (node_modules/@openzeppelin/hardhat-upgrades/src/utils/validate-impl.ts:42:20)\r\n  at validateProxyImpl (node_modules/@openzeppelin/hardhat-upgrades/src/utils/validate-impl.ts:63:10)\r\n  at deployProxyImpl (node_modules/@openzeppelin/hardhat-upgrades/src/utils/deploy-impl.ts:73:3)\r\n  at Proxy.deployProxy (node_modules/@openzeppelin/hardhat-upgrades/src/deploy-proxy.ts:45:28)\r\n  at deployDEXProxyContract (test/proxy-upgrade/proxyUpgradeContracts.js:75:21)\r\n  at Context.<anonymous> (test/proxy-upgrade/proxyUpgradeContracts.js:55:23)\r\n```\r\n\r\nHere is my setup: \r\n\r\nMy `Exchange` contract has already inherited from the `@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol` like below:\r\n```solidity\r\nimport \"@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol\";\r\nimport \"@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol\";\r\n\r\ncontract Exchange is UUPSUpgradeable, OwnableUpgradeable {\r\n...\r\n}\r\n```\r\n\r\nHere is how I deploy it in my unit test: (Hardhat + Ethersjs + javascript)\r\n```javascript\r\nconst { ethers, upgrades } = require('hardhat')\r\nasync function deployDEXProxyContract(token) {\r\n      const contract = await ethers.getContractFactory(\r\n        Constants.Contract.Exchange\r\n      )\r\n\r\n      const proxy = await upgrades.deployProxy(contract, [token], {\r\n        kind: 'uups',\r\n        initializer: 'initialize',\r\n      })\r\n\r\n      await proxy.deployed()\r\n\r\n      return proxy\r\n    }\r\n```\r\n\r\nI've noticed that in this [PR](https://github.com/OpenZeppelin/openzeppelin-contracts/pull/4382), the `upgradeTo` method has been removed from the UUPSUpgradable contract. Additionally, in this [FAQ question](https://docs.openzeppelin.com/upgrades-plugins/1.x/faq#why-public-upgradeto), it states that I need either `upgradeTo` or `upgradeToAndCall`. While `upgradeToAndCall` is still available in the `UUPSUpgradable`, I'm encountering an error. \r\n\r\nIs this a potential bug or something else?\"\r\n\r\n<!-- Remember, this is not a place to ask for help debugging code. For that, we welcome you in the OpenZeppelin Community Forum: https://forum.openzeppelin.com/. -->\r\n\r\n**💻 Environment**\r\n\r\n<!-- Tell us what version of OpenZeppelin Contracts you're using, and how you're using it: Truffle, Remix, etc. -->\r\n\r\n**📝 Details**\r\n\r\n<!-- Describe the problem you have been experiencing in more detail. Include as much information as you think is relevant. Keep in mind that transactions can fail for many reasons; context is key here. -->\r\n\r\n**🔢 Code to reproduce bug**\r\n\r\n<!-- We will be able to better help if you provide a minimal example that triggers the bug. -->\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4712/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4712/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
