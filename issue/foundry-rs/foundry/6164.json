@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6164",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6164/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6164/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6164/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6164",
+  "id": 1967106668,
+  "node_id": "I_kwDOGBlvNc51P6ps",
+  "number": 6164,
+  "title": "`gasleft()` are inconsistent between tests, appear to depend on test name",
+  "user": {
+    "login": "yi-sun",
+    "id": 5178036,
+    "node_id": "MDQ6VXNlcjUxNzgwMzY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5178036?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yi-sun",
+    "html_url": "https://github.com/yi-sun",
+    "followers_url": "https://api.github.com/users/yi-sun/followers",
+    "following_url": "https://api.github.com/users/yi-sun/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yi-sun/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yi-sun/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yi-sun/subscriptions",
+    "organizations_url": "https://api.github.com/users/yi-sun/orgs",
+    "repos_url": "https://api.github.com/users/yi-sun/repos",
+    "events_url": "https://api.github.com/users/yi-sun/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yi-sun/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-29T18:32:37Z",
+  "updated_at": "2023-10-29T18:36:00Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (dee4181 2023-10-29T00:18:36.507223145Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nThe behavior of `gasleft()` is not consistent across tests.  In particular, it appears to depend on the name of the test.  To reproduce, consider the following 3 test files:\r\n\r\nTest.t.sol:\r\n```\r\npragma solidity 0.8.19;\r\n\r\nimport \"forge-std/console.sol\";\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract GasTest is Test {\r\n    function setUp() public { }\r\n\r\n    function test_x() public {\r\n        console.log(gasleft());\r\n    }\r\n\r\n    function test_x2() public {\r\n        console.log(gasleft());\r\n    }\r\n}\r\n```\r\nTest2.t.sol:\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity 0.8.19;\r\n\r\nimport \"forge-std/console.sol\";\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract GasTest2 is Test {\r\n    function setUp() public { }\r\n\r\n    function test_x() public {\r\n        console.log(gasleft());\r\n    }\r\n}\r\n```\r\nTest3.t.sol\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity 0.8.19;\r\n\r\nimport \"forge-std/console.sol\";\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract GasTest3 is Test {\r\n    function setUp() public { }\r\n\r\n    function test_x3() public {\r\n        console.log(gasleft());\r\n    }\r\n}\r\n```\r\nRunning `forge test --mt test_x -vv` yields:\r\n```\r\nRunning 2 tests for test/query/Test.t.sol:GasTest\r\n[PASS] test_x() (gas: 3220)\r\nLogs:\r\n  9223372036854754427\r\n\r\n[PASS] test_x2() (gas: 3264)\r\nLogs:\r\n  9223372036854754383\r\n\r\nTest result: ok. 2 passed; 0 failed; 0 skipped; finished in 522.66µs\r\n\r\nRunning 1 test for test/query/Test3.t.sol:GasTest3\r\n[PASS] test_x3() (gas: 3132)\r\nLogs:\r\n  9223372036854754515\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 196.88µs\r\n\r\nRunning 1 test for test/query/Test2.t.sol:GasTest2\r\n[PASS] test_x() (gas: 3220)\r\nLogs:\r\n  9223372036854754427\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 408.53µs\r\n \r\nRan 3 test suites: 4 tests passed, 0 failed, 0 skipped (4 total tests)\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6164/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6164/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
