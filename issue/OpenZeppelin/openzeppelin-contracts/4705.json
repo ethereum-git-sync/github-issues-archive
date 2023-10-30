@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-10-25T14:46:23Z",
-  "updated_at": "2023-10-26T17:07:32Z",
-  "closed_at": null,
+  "updated_at": "2023-10-30T10:53:00Z",
+  "closed_at": "2023-10-30T10:52:59Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Reference: @Amxx in https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4328#issuecomment-1582098926\r\n\r\nThe proposed solution works fine whenever you want to perform an action **before** or **after** the loop, but what if you need to do something based on the value of each subtransfer? Your only option here is to run another for loop before/after the `super._update(...)` call, but then you are wasting a lot of gas by cycling twice.\r\n\r\nI thought I could avoid this by copying the whole function body into my own contract and updating it (definitely not a clean solution, kinda hacky and risky), but turns out you can't do that because `_balances` is private, so you can't update that from a child contract.\r\n\r\nAt the moment I guess my only option is to copy the entire contract and tune it to my needs, but I think there should be a better way to achieve such a common goal.\r\n\r\nAm I missing anything here?\r\n\r\nThank you for your time.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "liarco",
+    "id": 1532277,
+    "node_id": "MDQ6VXNlcjE1MzIyNzc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1532277?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/liarco",
+    "html_url": "https://github.com/liarco",
+    "followers_url": "https://api.github.com/users/liarco/followers",
+    "following_url": "https://api.github.com/users/liarco/following{/other_user}",
+    "gists_url": "https://api.github.com/users/liarco/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/liarco/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/liarco/subscriptions",
+    "organizations_url": "https://api.github.com/users/liarco/orgs",
+    "repos_url": "https://api.github.com/users/liarco/repos",
+    "events_url": "https://api.github.com/users/liarco/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/liarco/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4705/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4705/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "Hey @liarco, I see it could be an issue if somebody needs to perform updates based on the subtransfers, but that was also not possible in 4.x, both the before and after hooks are before and [after the whole transfer loop](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.9.3/contracts/token/ERC1155/ERC1155.sol#L224).\r\n\r\n> but then you are wasting a lot of gas by cycling twice.\r\n\r\nI estimate adding an operation inside the cycle or outside in another cycle wouldn't have a significant overhead aside from the extra loop counter increment, a `JUMPI` back to the start of the loop in each iteration, and `ids`/`values` accesses via `MLOAD`.\r\n\r\nI'd expect the majority of 1155 transfers to be single asset transfers or batches with less than 5. Considering `JUMPI` gas cost is 10 and `MLOAD` will cost 3 because the memory is already expanded (no memory expansion cost), thus, I calculate the overhead of around 20-30 units per subtransfer (~100-150 units).\r\n\r\nA PoC demonstrating a significant gas reduction would give us more hint here. If the reduction is in the order of 100-150, I wouldn't worry too much of adding a loop before/after the `_update` function.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1781513281/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1784937230",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4705#issuecomment-1784937230",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4705",
+    "id": 1784937230,
+    "node_id": "IC_kwDOA9tCBs5qY_sO",
+    "user": {
+      "login": "liarco",
+      "id": 1532277,
+      "node_id": "MDQ6VXNlcjE1MzIyNzc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1532277?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/liarco",
+      "html_url": "https://github.com/liarco",
+      "followers_url": "https://api.github.com/users/liarco/followers",
+      "following_url": "https://api.github.com/users/liarco/following{/other_user}",
+      "gists_url": "https://api.github.com/users/liarco/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/liarco/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/liarco/subscriptions",
+      "organizations_url": "https://api.github.com/users/liarco/orgs",
+      "repos_url": "https://api.github.com/users/liarco/repos",
+      "events_url": "https://api.github.com/users/liarco/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/liarco/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-10-30T10:53:00Z",
+    "updated_at": "2023-10-30T10:53:00Z",
+    "author_association": "NONE",
+    "body": "Hi @ernestognw,\r\nI can't thank you enough for the detailed response and for taking the time to provide data and examples to help me better understand your point. I totally agree, and now I see that I may have overestimated the impact of those extra for loops.\r\n\r\nI don't have any real-world cases to present here as an example, since the one I'm working on ATM seems to be already covered by your numbers.\r\n\r\nI'm gonna close this, thanks for your time!",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1784937230/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
