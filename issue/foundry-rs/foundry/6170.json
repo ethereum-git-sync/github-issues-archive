@@ -40,7 +40,7 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,16 +49,35 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-10-30T15:37:35Z",
-  "updated_at": "2023-10-30T15:55:28Z",
-  "closed_at": null,
+  "updated_at": "2023-10-30T18:39:00Z",
+  "closed_at": "2023-10-30T18:39:00Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [x] Foundry\r\n- [x] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (dee4181 2023-10-30T00:17:30.403957319Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\n**The Example**\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity 0.8.21;\r\n\r\nimport {Test} from \"forge-std/Test.sol\";\r\n\r\ncontract Emitter {\r\n    event Values(uint256 indexed a, uint256 indexed b);\r\n\r\n    function plsEmit(uint256 a, uint256 b) external {\r\n        emit Values(a, b);\r\n    }\r\n}\r\n\r\ncontract MyTest is Test {\r\n    event Values(uint256 indexed a, uint256 b);\r\n\r\n    Emitter e = new Emitter();\r\n\r\n    function testCorrect() public {\r\n        vm.expectEmit(true, true, false, true);\r\n        emit Values(69, 420);\r\n        e.plsEmit(69, 420);\r\n    }\r\n}\r\n```\r\n**Description**\r\n\r\nWhen creating asserts about event logs with `vm.expectRevert`. However when the comparison fails the test gives insufficient partially incorrect feedback:\r\n\r\n```\r\n[FAIL. Reason: Expected an emit, but the call reverted instead. Ensure you're testing the happy path when using the `expectEmit` cheatcode.]\r\n```\r\n\r\nYou get a hint at real the cause of the error (log mismatch) if you increase verbosity:\r\n```\r\n[FAIL. Reason: Expected an emit, but the call reverted instead. Ensure you're testing the happy path when using the `expectEmit` cheatcode.] testCorrect() (gas: 11332)\r\nTraces:\r\n  [11332] MyTest::testCorrect() \r\n    ├─ [0] VM::expectEmit(true, true, false, true) \r\n    │   └─ ← ()\r\n    ├─ emit Values(a: 420)\r\n    ├─ [1756] Emitter::plsEmit(69, 420) \r\n    │   ├─ emit Values()\r\n    │   └─ ← ()\r\n    └─ ← \"Log != expected log\"\r\n```\r\n\r\nThe base fail message is however still incorrect. This is made more confusing by the fact that the trace seems to omit logging the parameters (`a` and `b` are missing)?\r\n\r\n**Expected Behavior**\r\n1. The fail message clearly states that the fail was due to a mismatching event\r\n2. The event is displayed in full in the trace\r\n3. The `log != expect ...` message is more specific indicating why the comparison failed:\r\n    1. No event was emitted (ideally also tells you if events were simply out-of-order)\r\n    2. Wrong event (topic0 mismatch)\r\n    3. The value of one of the fields is wrong\r\n    4. Type mismatch, this can be especially hard to debug with the current state (e.g. name match but field missing, type of fields mismatch, and hardest to notice currently: everything matches except `indexed` on some fields)\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6170/reactions",
-    "total_count": 0,
-    "+1": 0,
+    "total_count": 1,
+    "+1": 1,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6170/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
