@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14656",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14656/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14656/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14656/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14656",
+  "id": 1968325152,
+  "node_id": "I_kwDOAm_5kc51UkIg",
+  "number": 14656,
+  "title": "Solc Compiler Crash",
+  "user": {
+    "login": "CarlosAndresRamirez",
+    "id": 12427869,
+    "node_id": "MDQ6VXNlcjEyNDI3ODY5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/12427869?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CarlosAndresRamirez",
+    "html_url": "https://github.com/CarlosAndresRamirez",
+    "followers_url": "https://api.github.com/users/CarlosAndresRamirez/followers",
+    "following_url": "https://api.github.com/users/CarlosAndresRamirez/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CarlosAndresRamirez/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CarlosAndresRamirez/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CarlosAndresRamirez/subscriptions",
+    "organizations_url": "https://api.github.com/users/CarlosAndresRamirez/orgs",
+    "repos_url": "https://api.github.com/users/CarlosAndresRamirez/repos",
+    "events_url": "https://api.github.com/users/CarlosAndresRamirez/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CarlosAndresRamirez/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-10-30T13:11:08Z",
+  "updated_at": "2023-10-30T13:11:08Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\nA crash can be triggered in the Solidity compiler inside the std::regex library when trying to parse malcrafted source code related to the SPDX-License-Identifier. The issue takes place due to insufficient input checks inside source file Parser.cpp function Parser::findLicenseString() of libsolidity.\r\n\r\nConsidering source files can be imported remotely, a DoS attack on the Solidy compiler is possible by providing a malcrafted src input. Attack vector is via local or remote inclusion of source files using the \"import\" directive (ie. attacker controlled source file).  Impact seems to be limited to security principle of Availability.\r\n\r\n## Environment\r\n\r\n- Compiler version: Latest version\r\n- Target EVM version (as per compiler settings): ANY\r\n- Framework/IDE (e.g. Truffle or Remix): N/A\r\n- EVM execution environment / backend / blockchain client: N/A\r\n- Operating system: Linux\r\n\r\n## Steps to Reproduce\r\n// Compile / import the following source. NOTE: Google form limits the size, try growing it over 50KB:\r\n// SEE ATTACHED PoC input\r\n\r\n// SPDX-License-Identifier: GPL-3.0-or-latwwwwwwwwwwwwwwwwwwwwwwwwwwww///\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\99\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4;\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4\\F4...\r\n[in-crash.zip](https://github.com/ethereum/solidity/files/13205438/in-crash.zip)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14656/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14656/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
