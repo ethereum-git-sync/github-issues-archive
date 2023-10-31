@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "smartprogrammer93",
@@ -79,12 +79,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-10-06T14:30:02Z",
-  "updated_at": "2023-10-06T23:58:15Z",
-  "closed_at": null,
+  "updated_at": "2023-10-31T20:51:29Z",
+  "closed_at": "2023-10-31T20:51:29Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**Description**\r\nExecuting:\r\n```\r\ndotnet test Ethereum.Blockchain.Block.Test/Ethereum.Blockchain.Block.Test.csproj\r\n```\r\nfails to find any of the [ethereum/tests](https://github.com/ethereum/tests) test fixtures that originate from the [ethereum/execution-spec-tests](https://github.com/ethereum/execution-spec-tests) repository. This is likely due to directory renaming (that took place in June) within execution-spec-tests, but probably existed in the propagated fixtures in ethereum/tests for much longer.\r\n\r\n**Steps to Reproduce**\r\nUse master (6472650d2c) or cancun (45c4cfcc02) and filter to reduce noise:\r\n```\r\ndotnet test Ethereum.Blockchain.Block.Test/Ethereum.Blockchain.Block.Test.csproj --filter FullyQualifiedName~Ethereum.Blockchain.Block.Test.Pyspecs.VMTests\r\n```\r\n\r\n**Actual behavior**\r\nCurrently, no tests are ran and the command reports:\r\n```\r\nNo test matches the given testcase filter `FullyQualifiedName~Ethereum.Blockchain.Block.Test.Pyspecs.VMTests` in /home/dtopz/code/github/NevermindETH/nethermind/src/Nethermind/Ethereum.Blockchain.Block.Test/bin/Debug/net7.0/Ethereum.Blockchain.Block.Test.dll\r\n```\r\n\r\nModifying the path to a directory that contains JSON fixtures resolves the issue, but probably it'd be desirable to search directories recursively under the provided directory to find all JSON fixtures in the sub-directories under the provided directory. Modifying one of the test files as following works, for example:\r\n```diff\r\ndiff --git a/src/Nethermind/Ethereum.Blockchain.Block.Test/Pyspecs/VMTests.cs b/src/Nethermind/Ethereum.Blockchain.Block.Test/Pyspecs/VMTests.cs\r\nindex 9bdcec07bd..45d4419f5b 100644\r\n--- a/src/Nethermind/Ethereum.Blockchain.Block.Test/Pyspecs/VMTests.cs\r\n+++ b/src/Nethermind/Ethereum.Blockchain.Block.Test/Pyspecs/VMTests.cs\r\n@@ -17,7 +17,7 @@ public class VMTests : BlockchainTestBase\r\n \r\n     public static IEnumerable<BlockchainTest> LoadTests()\r\n     {\r\n-        var loader = new TestsSourceLoader(new LoadBlockchainTestsStrategy(), \"Pyspecs/vm\");\r\n+        var loader = new TestsSourceLoader(new LoadBlockchainTestsStrategy(), \"Pyspecs/frontier/opcodes\");\r\n \r\n         return (IEnumerable<BlockchainTest>)loader.LoadTests();\r\n     }\r\n```\r\n\r\n**Expected behavior**\r\nTests should run and generate the following output:\r\n```\r\nRunning 009-fork=Shanghai at 14:14:21.067649\r\nRunning 007-fork=London at 14:14:21.067634\r\nRunning 006-fork=Berlin at 14:14:21.067589\r\nRunning 005-fork=Istanbul at 14:14:21.067584\r\nRunning 002-fork=Byzantium at 14:14:21.067614\r\nRunning 008-fork=Merge at 14:14:21.067622\r\nRunning 004-fork=ConstantinopleFix at 14:14:21.067614\r\nRunning 003-fork=Constantinople at 14:14:21.067625\r\nRunning 000-fork=Frontier at 14:14:21.067639\r\nRunning 001-fork=Homestead at 14:14:21.067617\r\n\r\nPassed!  - Failed:     0, Passed:    10, Skipped:     0, Total:    10, Duration: 580 ms - Ethereum.Blockchain.Block.Test.dll (net7.0)\r\n```\r\n\r\n**Desktop (please complete the following information):**\r\nPlease provide the following information regarding your setup:\r\n - Operating System: Linux\r\n - Version: Ubuntu 22.04\r\n - Installation Method: Built on command-line.\r\n - Consensus Client: None\r\n\r\n**Additional context**\r\nBackground: I help maintain execution-spec-tests. I'd love to see Nethermind use the execution-spec-test fixtures directly from the repo's releases instead of via ethereum/tests. Currently these are available on the repo's [Github releases page](https://github.com/ethereum/execution-spec-tests/releases/).\r\n(You'd need to use `fixtures_develop.gar.gz`: https://github.com/ethereum/execution-spec-tests/releases/download/v1.0.5/fixtures_develop.tar.gz). We're happy to discuss the best way for you get these artifacts - please reach out. But currently using ethereum/tests will result in a slower feedback loop and a delay in between the execution-spec-tests release and when they'd be available for use via ethereum/tests.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "LukaszRozmej",
+    "id": 12445221,
+    "node_id": "MDQ6VXNlcjEyNDQ1MjIx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/12445221?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/LukaszRozmej",
+    "html_url": "https://github.com/LukaszRozmej",
+    "followers_url": "https://api.github.com/users/LukaszRozmej/followers",
+    "following_url": "https://api.github.com/users/LukaszRozmej/following{/other_user}",
+    "gists_url": "https://api.github.com/users/LukaszRozmej/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/LukaszRozmej/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/LukaszRozmej/subscriptions",
+    "organizations_url": "https://api.github.com/users/LukaszRozmej/orgs",
+    "repos_url": "https://api.github.com/users/LukaszRozmej/repos",
+    "events_url": "https://api.github.com/users/LukaszRozmej/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/LukaszRozmej/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6166/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6166/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
