@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6192",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6192/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6192/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6192/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6192",
+  "id": 1973138373,
+  "node_id": "I_kwDOGBlvNc51m7PF",
+  "number": 6192,
+  "title": "Verifying via Script causes error",
+  "user": {
+    "login": "BrennerSpear",
+    "id": 12127609,
+    "node_id": "MDQ6VXNlcjEyMTI3NjA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/12127609?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BrennerSpear",
+    "html_url": "https://github.com/BrennerSpear",
+    "followers_url": "https://api.github.com/users/BrennerSpear/followers",
+    "following_url": "https://api.github.com/users/BrennerSpear/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BrennerSpear/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BrennerSpear/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BrennerSpear/subscriptions",
+    "organizations_url": "https://api.github.com/users/BrennerSpear/orgs",
+    "repos_url": "https://api.github.com/users/BrennerSpear/repos",
+    "events_url": "https://api.github.com/users/BrennerSpear/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BrennerSpear/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-01T21:26:59Z",
+  "updated_at": "2023-11-01T22:13:45Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (94ae897 2023-10-31T00:17:29.299689000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge script\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nI have a script that works to deploy+verify a contract. it calls this [deploy.s.sol](https://github.com/metagame-xyz/block-lander/blob/main/script/deploy.s.sol) script\r\n\r\n```bash\r\ndeploy_contract() {\r\n    source .env\r\n\r\n    contract_line=$(grep -o 'contract.*is Script' script/deploy.s.sol)\r\n    contract_name=$(echo $contract_line | cut -d \" \" -f 2)\r\n\r\n    if [ \"$1\" = 'mainnet' ]\r\n    then\r\n        rpc_url=$MAINNET_RPC_URL\r\n        private_key=$MAINNET_PRIVATE_KEY\r\n        scan_key=$ETHERSCAN_API_KEY\r\n        chain_info=\"\"\r\n        # verifier_url=\"\"\r\n    elif [ \"$1\" = 'base' ]\r\n    then\r\n        rpc_url=$BASE_RPC_URL\r\n        private_key=$BASE_PRIVATE_KEY\r\n        scan_key=$BASESCAN_API_KEY\r\n        chain_info=\"--chain-id 8453\"\r\n        # verifier_url=\"--verifier-url https://api.basescan.org/api\"\r\n    else\r\n        rpc_url=$SEPOLIA_RPC_URL\r\n        private_key=$SEPOLIA_PRIVATE_KEY\r\n        scan_key=$ETHERSCAN_API_KEY\r\n        chain_info=\"\"\r\n        # verifier_url=\"\"\r\n    fi\r\n\r\n    if [[ $# -gt 1 ]]; then\r\n        gas_price=$(($2 * 1000000000))\r\n        gas_args=\"--with-gas-price $gas_price\"\r\n    else\r\n        gas_args=\"\"\r\n    fi\r\n\r\n    forge_args=\"--rpc-url $rpc_url --private-key $private_key --etherscan-api-key $scan_key $gas_args $chain_info\"\r\n    deploy_command=\"forge script script/deploy.s.sol:$contract_name --broadcast $forge_args -vvvv\"\r\n    verify_command=\"forge script script/deploy.s.sol:$contract_name $forge_args --verify -vvvv --resume\"\r\n\r\n    eval $deploy_command\r\n\r\n    deployment_successful=false\r\n    while [ \"$deployment_successful\" = false ]\r\n    do\r\n        eval $verify_command\r\n        if [ $? -eq 0 ]\r\n        then\r\n            deployment_successful=true\r\n        else\r\n            sleep 2\r\n        fi\r\n    done\r\n}\r\n\r\n```\r\n\r\nIf I *just deploy* the contract, that works too.\r\n\r\nIf I try to verify the contract I just deployed that hasn't been verified yet, it does not work. I try this by running the same script up there, but with `eval $deploy_command` commented out\r\n\r\n```bash\r\n    ...\r\n\r\n    forge_args=\"--rpc-url $rpc_url --private-key $private_key --etherscan-api-key $scan_key $gas_args $chain_info\"\r\n    # deploy_command=\"forge script script/deploy.s.sol:$contract_name --broadcast $forge_args -vvvv\"\r\n    verify_command=\"forge script script/deploy.s.sol:$contract_name $forge_args --verify --resume -vvvv\"\r\n\r\n    # eval $deploy_command\r\n\r\n    deployment_successful=false\r\n    while [ \"$deployment_successful\" = false ]\r\n    do\r\n        eval $verify_command\r\n        if [ $? -eq 0 ]\r\n        then\r\n            deployment_successful=true\r\n        else\r\n            sleep 2\r\n        fi\r\n    done\r\n\r\n\r\n```\r\n\r\nThis is the error I get\r\n```\r\n~/repos/block-lander main| ❯ deploy_contract \r\n[⠊] Compiling...\r\nNo files changed, compilation skipped\r\n\r\n\r\n==========================\r\n\r\nONCHAIN EXECUTION COMPLETE & SUCCESSFUL.\r\nTotal Paid: 0.00616315502465262 ETH (2054385 gas * avg 3.000000012 gwei)\r\n##\r\nStart verification for (1) contracts\r\nStart verifying contract `0x640505112ccf6C3a0D7a65ce8548FF42A96FBd47` deployed on sepolia\r\n\r\nTransactions saved to: /Users/brenner/repos/block-lander/broadcast/deploy.s.sol/11155111/run-latest.json\r\n\r\nSensitive values saved to: /Users/brenner/repos/block-lander/cache/deploy.s.sol/11155111/run-latest.json\r\n\r\nError:\r\nexpected value at line 1 column 1\r\n\r\nIf you were trying to resume or verify a multi chain deployment, add `--multi` to your command invocation.\r\n\r\n\r\n```\r\n\r\nEasiest steps to full repro would be:\r\n```bash\r\n~/ > gh repo clone metagame-xyz/block-lander\r\n~/ > cd block-lander\r\n~/block-lander > touch .env\r\n~/block-lander > foundryup\r\n```\r\nAdd the `deploy_contract()` bash function to your `.zshrc` or similar. comment out the `while do` section\r\nopen a new window or `source` your `.zshrc` file\r\nadd the following to your `.env` file\r\n```\r\nSEPOLIA_RPC_URL=\"https://eth-sepolia.g.alchemy.com/v2/your-project-key\"\r\nETHERSCAN_API_KEY=\"your_etherscan_api_key\"\r\nSEPOLIA_PRIVATE_KEY=\"your_private_key_to_deploy_with\"\r\n```\r\n\r\n```bash\r\n~/block-lander > deploy_contract\r\n```\r\nthe contract should be deployed to sepolia\r\ncomment out `eval $deploy_command`\r\ncomment back in the `while do` section\r\nopen a new window or `source` your `.zshrc` file\r\n```bash\r\n~/block-lander > deploy_contract\r\n```\r\n\r\nat this point, you should get the same error\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6192/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6192/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
