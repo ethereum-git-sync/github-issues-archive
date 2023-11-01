@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6184",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6184/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6184/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6184/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6184",
+  "id": 1972094864,
+  "node_id": "I_kwDOGBlvNc51i8eQ",
+  "number": 6184,
+  "title": "forge script nonce issue related to selectFork",
+  "user": {
+    "login": "sakulstra",
+    "id": 4396533,
+    "node_id": "MDQ6VXNlcjQzOTY1MzM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4396533?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sakulstra",
+    "html_url": "https://github.com/sakulstra",
+    "followers_url": "https://api.github.com/users/sakulstra/followers",
+    "following_url": "https://api.github.com/users/sakulstra/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sakulstra/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sakulstra/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sakulstra/subscriptions",
+    "organizations_url": "https://api.github.com/users/sakulstra/orgs",
+    "repos_url": "https://api.github.com/users/sakulstra/repos",
+    "events_url": "https://api.github.com/users/sakulstra/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sakulstra/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-01T10:23:58Z",
+  "updated_at": "2023-11-01T10:23:58Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (deae4f1 2023-10-11T00:27:48.322843000Z)\n\n### What command(s) is the bug in?\n\nforge script\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nHello, at aave governance v3 we have a script that:\r\n\r\n1. iterates trough multiple chains to check for some configuration correctness\r\n2. submits a single txn on mainnet\r\n\r\nWhile when testing everything works/worked fine, when actually submitting via ledger we're getting nonce issues like:\r\n> nonce changed unexpectedly while sending transactions. Expected 2007 got 2006 from provider.\r\n\r\nThe issue seems to happen whenever we do selectFork within a script.\r\nHere i created a minimal reproduction:\r\nhttps://github.com/bgd-labs/aave-proposals-v3/pull/21/files#diff-7bf3d3e2a751c1ad37d8cb4245702476e1cc4f706940f8c02e94c259fc5cbb76R1-R17\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\nimport {Script} from 'forge-std/Script.sol';\r\n\r\ncontract Reproduction is Script {\r\n  function run() public {\r\n    uint256 previousFork = vm.activeFork();\r\n    uint256 newFork = vm.createFork(vm.rpcUrl('polygon'));\r\n    vm.selectFork(previousFork);\r\n    vm.startBroadcast();\r\n    address(0x25F2226B597E8F9514B3F68F00f494cF4f286491).call{value: 1}(new bytes(0));\r\n  }\r\n}\r\n```\r\n\r\nThe script is started with a mainnet rpc, switches to a polygon fork and switches back to mainnet.\r\n\r\nThe trace looks as follows:\r\n```\r\nTraces:\r\n  [43252] Reproduction::run() \r\n    ├─ [0] VM::activeFork() [staticcall]\r\n    │   └─ ← 0\r\n    ├─ [0] VM::rpcUrl(polygon) [staticcall]\r\n    │   └─ ← https://polygon-mainnet.g.alchemy.com/v2/xxx\r\n    ├─ [0] VM::createFork(https://polygon-mainnet.g.alchemy.com/v2/xxx) \r\n    │   └─ ← 1\r\n    ├─ [0] VM::selectFork(0) \r\n    │   └─ ← ()\r\n    ├─ [0] VM::startBroadcast() \r\n    │   └─ ← ()\r\n    ├─ [7180] 0x25F2226B597E8F9514B3F68F00f494cF4f286491::fallback{value: 1}() \r\n    │   ├─ [55] 0x10c74b37Ad4541E394c607d78062e6d22D9ad632::fallback() [delegatecall]\r\n    │   │   └─ ← ()\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n    \r\nScript ran successfully.\r\n```\r\n\r\nInstead of being able to submit the txn though, i'm getting:\r\n```\r\n###\r\nFinding wallets for all the necessary addresses...\r\n##\r\nSending transactions [0 - 0].\r\n\r\nTransactions saved to: /Users/sakulstra/Documents/BGD/aave-proposals-v3/broadcast/Reproduction.s.sol/1/run-latest.json\r\n\r\nSensitive values saved to: /Users/sakulstra/Documents/BGD/aave-proposals-v3/cache/Reproduction.s.sol/1/run-latest.json\r\n\r\nError: \r\nEOA nonce changed unexpectedly while sending transactions. Expected 46 got 45 from provider.\r\n```\r\n\r\nSeems related:\r\n- https://github.com/foundry-rs/foundry/issues/4701",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6184/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6184/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
