@@ -31,15 +31,6 @@
   },
   "labels": [
     {
-      "id": 4935639218,
-      "node_id": "LA_kwDOB7jojM8AAAABJi_gsg",
-      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:needs-decision",
-      "name": "status:needs-decision",
-      "color": "0E8A16",
-      "default": false,
-      "description": "We need to make a decision about this"
-    },
-    {
       "id": 4937718880,
       "node_id": "LA_kwDOB7jojM8AAAABJk-cYA",
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/type:improvement",
@@ -47,6 +38,15 @@
       "color": "FBCA04",
       "default": false,
       "description": ""
+    },
+    {
+      "id": 4937720577,
+      "node_id": "LA_kwDOB7jojM8AAAABJk-jAQ",
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/labels/status:ready",
+      "name": "status:ready",
+      "color": "0E8A16",
+      "default": false,
+      "description": "This issue is ready to be worked on"
     },
     {
       "id": 4952257781,
@@ -67,16 +67,16 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2022-09-21T16:48:08Z",
-  "updated_at": "2022-12-28T10:22:45Z",
+  "updated_at": "2023-11-01T16:40:11Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "It seems like all our `.reverted*` matchers assume that auto-mining is enabled and dont `tx.wait()` the transaction.\r\n\r\nFor `.reverted` this is an easy fix, we should just wait the transaction before getting the receipt and inspecting the status.\r\n\r\nFor the other matchers, things are harder because we need to obtain the return data, and that's not available when the transaction is interval-mined. In these cases, we can use `debug_traceTransaction` to get it, which is slow but it's the easiest solution that I can think of.\r\n\r\nA problem related to this is that ethers's providers have a `pollingInterval` of 4 seconds by default, which means that tests that use interval mining are super slow. I'm including that here and not as a separate issue because it doesn't make sense to fix this problem if it's going to make all tests that use interval mining super slow. The solution might be to just to use a lower interval (maybe just when the Hardhat network is used?)",
+  "body": "It seems like all our `.reverted*` matchers assume that auto-mining is enabled and dont `tx.wait()` the transaction.\r\n\r\nFor `.reverted` this is an easy fix, we should just wait the transaction before getting the receipt and inspecting the status.\r\n\r\nFor the other matchers, things are harder because we need to obtain the return data, and that's not available when the transaction is interval-mined. In these cases, we can use `debug_traceTransaction` to get it, which is slow but it's the easiest solution that I can think of.\r\n\r\nA problem related to this is that ethers's providers have a `pollingInterval` of 4 seconds by default, which means that tests that use interval mining are super slow. I'm including that here and not as a separate issue because it doesn't make sense to fix this problem if it's going to make all tests that use interval mining super slow. The solution might be to just to use a lower interval (maybe just when the Hardhat network is used?)\r\n\r\nDecision: when the transaction is not automined, we are going to fall back to an implementation that relies on `debug_traceTransaction`",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3203/reactions",
-    "total_count": 0,
-    "+1": 0,
+    "total_count": 1,
+    "+1": 1,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
