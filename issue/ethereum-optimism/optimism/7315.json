@@ -30,7 +30,24 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 3357535896,
+      "node_id": "MDU6TGFiZWwzMzU3NTM1ODk2",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/A-cannon",
+      "name": "A-cannon",
+      "color": "FEF2C0",
+      "default": false,
+      "description": "Area: cannon"
+    },
+    {
+      "id": 3602558442,
+      "node_id": "LA_kwDODjvEJM7Wuq3q",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/C-discussion",
+      "name": "C-discussion",
+      "color": "C5DEF5",
+      "default": false,
+      "description": "Category: A long-form discussion"
+    }
   ],
   "state": "open",
   "locked": false,
@@ -41,7 +58,7 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-09-20T15:03:03Z",
-  "updated_at": "2023-09-25T09:29:06Z",
+  "updated_at": "2023-11-01T19:41:17Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -49,8 +66,8 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7315/reactions",
-    "total_count": 0,
-    "+1": 0,
+    "total_count": 1,
+    "+1": 1,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -96,8 +113,8 @@
     "body": "I definitely hope to support all clients with standard RPC in the future, the debug method is there because it simplified and derisked the MPT a lot, to unblock development of other parts of the proof stack.\r\n\r\nPrevious versions of Cannon have tried `eth_getProof` instead, but this added significant complexity at the time, since `eth_getProof` is meant to provide MPT data only as part of a branch to a leaf node. Edge-cases related to retrieving the right pre-images, even throughout MPT changes (node deletions etc. included), are challenging and resulted in several bugs.\r\n\r\n `debug_dbGet` is thus used instead to retrieve the MPT nodes, providing a much simpler hash->preimage lookup for the MPT nodes (at least when using the old geth tree based DB scheme).\r\n\r\nHowever, with new improvements to the FP design, there may be a way to make `eth_getProof` work: by utilizing the preimage-hinting system. I.e. the op-program client can write a new type of hint, that essentially says to the server: \"I'll need all preimages of state-root X and path y\", and the op-program host can prepare the preimages. The in-memory op-program oracle-backed state DB can then fetch the preimages lazily as necessary, and retain a copy of them to then build any new branches on top of, and cache for future use, without interrupting future preimage lookups, since hints are always written with full path/state-root information, unlike previous versions in the original minigeth that had to deal with MPT edits/deletions to fetch the right preimages.\r\n\r\nSo yes, I believe we can move it back to `eth_getProof` thanks to newer features that were introduced after the original MPT-proving issues with legacy Cannon/minigeth setup, it will still add a little bit of complexity, but remove the `debug_dbGet` dependency.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1733295099/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
