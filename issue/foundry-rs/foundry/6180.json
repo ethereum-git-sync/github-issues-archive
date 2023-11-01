@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6180",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6180/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6180/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6180/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6180",
+  "id": 1971561437,
+  "node_id": "I_kwDOGBlvNc51g6Pd",
+  "number": 6180,
+  "title": "block.timestamp bugs when using skip",
+  "user": {
+    "login": "77abe77",
+    "id": 16051956,
+    "node_id": "MDQ6VXNlcjE2MDUxOTU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16051956?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/77abe77",
+    "html_url": "https://github.com/77abe77",
+    "followers_url": "https://api.github.com/users/77abe77/followers",
+    "following_url": "https://api.github.com/users/77abe77/following{/other_user}",
+    "gists_url": "https://api.github.com/users/77abe77/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/77abe77/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/77abe77/subscriptions",
+    "organizations_url": "https://api.github.com/users/77abe77/orgs",
+    "repos_url": "https://api.github.com/users/77abe77/repos",
+    "events_url": "https://api.github.com/users/77abe77/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/77abe77/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-01T02:04:17Z",
+  "updated_at": "2023-11-01T02:04:17Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (619f3c5 2023-10-22T00:19:08.867786000Z)\n\n### What command(s) is the bug in?\n\nforge test -vvvv --mc \"ForgeBug\"\n\n### Operating System\n\nNone\n\n### Describe the bug\n\nTwo bugs, easy to reproduce:\r\n\r\nConsists of 2 contracts `ForgeBug` and `ForgeBug1`\r\n\r\n## Common bug in both contracts:\r\n\r\n### Actual Behavior: \r\nduration (`end - start`) is always `0`. Implying that `start` is getting erroneously mutated along the way.\r\n### Expected Behavior:\r\nduration (`end - start`) should be non zero and that `start` should be caching the first value of `block.timestamp`\r\n\r\n\r\n\r\n\r\n```\r\ncontract ForgeBug is Test {\r\n    function test_timebug() external {\r\n        uint start = block.timestamp;\r\n        console2.log(\"start: %d\", start);\r\n\r\n        for (uint i; i < 4; i++) {\r\n            skip(15);\r\n            console2.log(\"skip 15 sec: %d\", block.timestamp);\r\n        }\r\n\r\n        uint end = block.timestamp;\r\n        console2.log(\"start: %d\", start);\r\n        console2.log(\"end: %d\", end);\r\n        console2.log(\"duration: %d\", end - start);\r\n    }\r\n\r\n}\r\n```\r\n## ForgeBug Contract Additional Bug\r\n### Actual Behavior:\r\n```\r\nLogs:\r\n  start: 1\r\n  skip 15 sec: 16\r\n  skip 15 sec: 16\r\n  skip 15 sec: 16\r\n  skip 15 sec: 16\r\n  start: 16\r\n  end: 16\r\n  duration: 0\r\n```\r\n### Expected Behavior:\r\n```\r\nLogs:\r\n  start: 1\r\n  skip 15 sec: 16\r\n  skip 15 sec: 31\r\n  skip 15 sec: 46\r\n  skip 15 sec: 61\r\n  start: 61\r\n  end: 61\r\n  duration: 0\r\n```\r\n\r\n## ForgeTest1 has an unrolled for loop version of the test included and causes correct behavior (minus duration bug)\r\n```\r\ncontract ForgeBug1 is Test {\r\n    function test_timebug1() external {\r\n        uint start = block.timestamp;\r\n        console2.log(\"start: %d\", start);\r\n\r\n        skip(15);\r\n        console2.log(\"skip 15 sec: %d\", block.timestamp);\r\n        skip(15);\r\n        console2.log(\"skip 15 sec: %d\", block.timestamp);\r\n        skip(15);\r\n        console2.log(\"skip 15 sec: %d\", block.timestamp);\r\n        skip(15);\r\n        console2.log(\"skip 15 sec: %d\", block.timestamp);\r\n\r\n        uint end = block.timestamp;\r\n        console2.log(\"start: %d\", start);\r\n        console2.log(\"end: %d\", end);\r\n        console2.log(\"duration: %d\", end - start);\r\n    }\r\n\r\n    function test_timebug2() external {\r\n        uint start = block.timestamp;\r\n        console2.log(\"start: %d\", start);\r\n\r\n        for (uint i; i < 4; i++) {\r\n            skip(15);\r\n            console2.log(\"skip 15 sec: %d\", block.timestamp);\r\n        }\r\n\r\n        uint end = block.timestamp;\r\n        console2.log(\"start: %d\", start);\r\n        console2.log(\"end: %d\", end);\r\n    }\r\n\r\n}\r\n```\r\n\r\n### Logs:\r\n\r\n```\r\n[PASS] test_timebug1() (gas: 12642)\r\nLogs:\r\n  start: 1\r\n  skip 15 sec: 16\r\n  skip 15 sec: 31\r\n  skip 15 sec: 46\r\n  skip 15 sec: 61\r\n  start: 61\r\n  end: 61\r\n  duration: 0\r\n  \r\n  \r\n[PASS] test_timebug2() (gas: 12066)\r\nLogs:\r\n  start: 1\r\n  skip 15 sec: 16\r\n  skip 15 sec: 31\r\n  skip 15 sec: 46\r\n  skip 15 sec: 61\r\n  start: 61\r\n  end: 61\r\n``` ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6180/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6180/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
