@@ -40,7 +40,7 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-10-11T09:09:42Z",
-  "updated_at": "2023-10-21T17:50:41Z",
-  "closed_at": null,
+  "updated_at": "2023-11-02T18:40:26Z",
+  "closed_at": "2023-11-02T18:40:26Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (e0722a1 2023-10-10T00:28:23.851012000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nA foundry invariant test assertion reverts and is called twice in a row in a setup with multiple runs and multiple depth. From the sequence printed its not useful to decipher what's going on\r\n\r\nfoundry.toml looks like this:\r\n```\r\n[invariant]\r\nruns = 20\r\ndepth = 5 # “Calls” refer to the number of times functions in the smart contract are called during a single test run. “Reverts” refers to the number of times a call to any function within the smart contract resulted in a transaction being reverted due to an error or exception.\r\nfail_on_revert = true\r\ncall_override = false\r\n```\r\n\r\nThe test looks like this:\r\n```solidity\r\n    function invariant_vaultShares() public useCurrentTimestamp {\r\n        assertEq(vaultSharesStore.superPositionsSum(), vaultSharesStore.vaultShares());\r\n    }\r\n```\r\n\r\nSuperPositionsSum and VaultShares are set at the end of each function call in our handler in a specific store (`vaultSharesStore`).\r\n\r\n\r\n```\r\n  [24210] VaultSharesInvariantTest::invariant_vaultShares()\r\n    ├─ [0] VM::selectFork(0)\r\n    │   └─ ← ()\r\n    ├─ [2407] TimestampStore::currentTimestamp() [staticcall]\r\n    │   └─ ← 1694186515 [1.694e9]\r\n    ├─ [0] VM::warp(1694186515 [1.694e9])\r\n    │   └─ ← ()\r\n    ├─ [2429] VaultSharesStore::superPositionsSum() [staticcall]\r\n    │   └─ ← 2149673676847473860205 [2.149e21]\r\n    ├─ [2495] VaultSharesStore::vaultShares() [staticcall]\r\n    │   └─ ← 2149673676847473860205 [2.149e21]\r\n    └─ ← ()\r\n\r\n  [37972] VaultSharesInvariantTest::invariant_vaultShares()\r\n    ├─ [0] VM::selectFork(0)\r\n    │   └─ ← ()\r\n    ├─ [2407] TimestampStore::currentTimestamp() [staticcall]\r\n    │   └─ ← 1694186515 [1.694e9]\r\n    ├─ [0] VM::warp(1694186515 [1.694e9])\r\n    │   └─ ← ()\r\n    ├─ [2429] VaultSharesStore::superPositionsSum() [staticcall]\r\n    │   └─ ← 1103485652139861249137 [1.103e21]\r\n    ├─ [2495] VaultSharesStore::vaultShares() [staticcall]\r\n    │   └─ ← 2149673676847473860205 [2.149e21]\r\n    ├─ emit log(: Error: a == b not satisfied [uint])\r\n    ├─ emit log_named_uint(key:       Left, val: 1103485652139861249137 [1.103e21])\r\n    ├─ emit log_named_uint(key:      Right, val: 2149673676847473860205 [2.149e21])\r\n    ├─ [0] VM::store(VM: [0x7109709ECfa91a80626fF3989D68f67F5b1DD12D], 0x6661696c65640000000000000000000000000000000000000000000000000000, 0x0000000000000000000000000000000000000000000000000000000000000001)\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n```\r\n\r\nI can't seem to understand this behaviour, but I noticed that instruction [24210] appears multiple times in the different calls that are successful, but only in the last one (where the call sequence reverts) there is a 2nd instruction [37972] (repeated??)\r\n\r\nI noticed as well that the values I am asserting change between these two calls even though nothing happens between them. Is foundry doing something under the hood on these values that is not being logged?\r\n\r\nWhy are two invariant tests called like that in a row?\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6024/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6024/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,8 +211,8 @@
     "body": "> Im seeing this exact issue for a project Ive been working on as well. I basically inspect the state consecutively where there should be no change and for some reason the state gets corrupted similar to what your logs show.\r\n\r\n@Evalir I'm sorry to tag you again, but it's been a week and this impacts our invariant testing severely (cannot proceed). \r\n\r\n\r\nIt's great to see other people are experiencing the same thing, although it's hard to reproduce.\r\n\r\nFor this reason, and because we are advancing in our development cycle, we will soon open source our repo so this issue will be made public and it will be easier for you guys to verify what's going on.\r\n\r\n\r\nIt's a cross-chain protocol, so there's a lot of fork switching going on",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1773876742/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 2,
+      "+1": 2,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
