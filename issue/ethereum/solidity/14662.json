@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14662",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14662/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14662/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14662/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14662",
+  "id": 1973011269,
+  "node_id": "I_kwDOAm_5kc51mcNF",
+  "number": 14662,
+  "title": "Compiler Flag for Upgradeable Storage Arrays Using Mappings",
+  "user": {
+    "login": "quirp",
+    "id": 28508472,
+    "node_id": "MDQ6VXNlcjI4NTA4NDcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/28508472?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/quirp",
+    "html_url": "https://github.com/quirp",
+    "followers_url": "https://api.github.com/users/quirp/followers",
+    "following_url": "https://api.github.com/users/quirp/following{/other_user}",
+    "gists_url": "https://api.github.com/users/quirp/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/quirp/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/quirp/subscriptions",
+    "organizations_url": "https://api.github.com/users/quirp/orgs",
+    "repos_url": "https://api.github.com/users/quirp/repos",
+    "events_url": "https://api.github.com/users/quirp/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/quirp/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4726043980,
+      "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
+      "name": "feature",
+      "color": "fbca02",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-01T19:52:10Z",
+  "updated_at": "2023-11-01T19:52:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Abstract\r\n\r\nIn Solidity, when developing upgradeable contracts, a primary challenge is ensuring consistent storage layouts across upgrades. The current storage array design does not offer a straightforward mechanism for natural upgradeability. This proposal introduces a compiler flag that implicitly converts storage arrays, specifically of type struct, to a schema of an array of mappings from uint8 to the type of struct. In this schema, the 0 key is always implicitly used. This method leverages Solidity's storage slot schema to protect against unforeseen future upgrades and ensures a consistent storage layout.\r\n## Motivation\r\n\r\nWith the rise of upgradeable contracts in the Ethereum ecosystem, there's a significant need to maintain the consistency of storage variables across various contract upgrades. Currently, developers must be cautious when adding or modifying storage variables, especially arrays. Unintended changes to the storage layout can lead to data corruption or other unexpected complications.\r\n\r\nFor instance, consider a scenario where a developer uses an array to store structs:\r\n\r\n```\r\nstruct A {\r\n    uint256 value;\r\n    // ... other fields ...\r\n}\r\n\r\nA[] public data;\r\n```\r\nIf there's a change to the structure of A in a subsequent upgrade or if additional storage variables are introduced to the contract, the storage layout may be at risk. By transitioning arrays to a schema of an array of mappings, where each mapping is from uint8 to the datatype (e.g., A), a layer of indirection is added, ensuring the storage slot's consistency:\r\n\r\n```\r\nmapping(uint8 => A)[] public data;\r\n```\r\n\r\nHere, the zero key is always implicitly used.\r\n\r\nThis approach offers a safeguard against unintentional storage layout changes and ensures data remains accessible and consistent across upgrades.\r\n## Specification\r\n\r\nCompiler Flag: --useUpgradeableArrays\r\n\r\nWhen this flag is enabled, the compiler will implicitly transform all storage arrays in the contract to the array of mappings schema. For any storage array declared as T[], it will be internally represented as mapping(uint8 => T)[], with the zero key being consistently used.\r\n# Syntax:\r\n\r\nNo changes to the existing Solidity language syntax are required. Developers can continue to declare arrays as they typically would.\r\n# Semantics:\r\n\r\n    Addition: When appending a new element to an array, it should be placed into the mapping using the 0 key within a new array element.\r\n\r\n    Access: When accessing an element of an array, the compiler will fetch the data from the mapping using the 0 key.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14662/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14662/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
