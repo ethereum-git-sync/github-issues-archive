@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/matter-labs/zksync/issues/473",
+  "repository_url": "https://api.github.com/repos/matter-labs/zksync",
+  "labels_url": "https://api.github.com/repos/matter-labs/zksync/issues/473/labels{/name}",
+  "comments_url": "https://api.github.com/repos/matter-labs/zksync/issues/473/comments",
+  "events_url": "https://api.github.com/repos/matter-labs/zksync/issues/473/events",
+  "html_url": "https://github.com/matter-labs/zksync/issues/473",
+  "id": 1973910265,
+  "node_id": "I_kwDOC0aUls51p3r5",
+  "number": 473,
+  "title": "Potential issue with contracts/scripts/verify-deployed-contract.ts",
+  "user": {
+    "login": "tudorpintea999",
+    "id": 87604944,
+    "node_id": "MDQ6VXNlcjg3NjA0OTQ0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/87604944?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tudorpintea999",
+    "html_url": "https://github.com/tudorpintea999",
+    "followers_url": "https://api.github.com/users/tudorpintea999/followers",
+    "following_url": "https://api.github.com/users/tudorpintea999/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tudorpintea999/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tudorpintea999/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tudorpintea999/subscriptions",
+    "organizations_url": "https://api.github.com/users/tudorpintea999/orgs",
+    "repos_url": "https://api.github.com/users/tudorpintea999/repos",
+    "events_url": "https://api.github.com/users/tudorpintea999/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tudorpintea999/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-02T10:06:16Z",
+  "updated_at": "2023-11-02T10:06:16Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "The script provided is a Node.js program that uses the `ethers` library to deploy contracts and verify their bytecode against a deployed version on Ethereum. Here are a few observations and potential issues:\r\n\r\n1. **Environment Variable Assumption**:\r\n   The line `const testConfigPath = path.join(process.env.ZKSYNC_HOME as string, ...` assumes that the environment variable `ZKSYNC_HOME` is set. If it's not set, this could cause the script to fail. It's a good practice to check if the environment variable exists and provide a clear error message if not.\r\n\r\n2. **Error Handling for JSON Parsing**:\r\n   The script reads and parses a JSON file without a try-catch block, which could throw an unhandled exception if the file is not found or the JSON is malformed:\r\n   ```javascript\r\n   const ethTestConfig = JSON.parse(fs.readFileSync(`${testConfigPath}/eth.json`, { encoding: 'utf-8' }));\r\n   ```\r\n   It would be safer to wrap this in a try-catch block to handle potential errors gracefully.\r\n\r\n3. **Commander Usage**:\r\n   The `Command` object from the `commander` package is used to define command-line options. However, the `.description()` method is chained after `.option()` calls, which might not set the description as intended for the command. The `.description()` method should be chained directly to the `program` object.\r\n\r\n4. **Potential Issue with Asynchronous Execution**:\r\n   The `action` callback within the `program` definition is an asynchronous function. It's important to ensure that `commander` supports asynchronous actions, otherwise, the script may not work as expected or may exit before the asynchronous operations complete.\r\n\r\n5. **Redundant Code**:\r\n   The `if` statements checking for the contract type and deploying them could be refactored to reduce redundancy. A `switch` statement or a mapping object could be used to map contract names to deploy functions, which would make the code cleaner and more maintainable.\r\n\r\n6. **Bytecode Comparison**:\r\n   The script compares the bytecode of the local and remote contracts with `localBytecode === remoteBytecode`. This is a strict comparison and assumes that the bytecodes must match exactly. Any slight difference, including metadata or constructor parameters, will cause this comparison to fail. It's important to ensure that such differences are accounted for or documented.\r\n\r\n7. **Error Handling in Main Function**:\r\n   The `main` function catches errors and logs them, which is good practice. However, it might be beneficial to log the full error stack for debugging purposes, not just the message.\r\n\r\n8. **Use of `process.exit`**:\r\n   Using `process.exit()` can be considered bad practice because it forces the process to terminate immediately, possibly interrupting asynchronous operations that are still pending. It's better to let the process exit naturally after the event loop is empty unless there's a specific reason to terminate immediately.\r\n\r\n9. **No `await` on `fs.readFileSync`**:\r\n   The `fs.readFileSync` function is used, which is synchronous and can block the event loop. If the file is large or the file system is slow, this could cause performance issues. Consider using the asynchronous version `fs.promises.readFile` with `await` for better performance in an I/O-heavy application.\r\n\r\n10. **Potential Unhandled Promises**:\r\n    The script uses `await` within the `action` callback without a surrounding try-catch block. If any of the promises reject, it could lead to an unhandled promise rejection.\r\n\r\n11. **Missing `await` in Action Callback**:\r\n    The `action` callback is an `async` function, but the call to `verify` does not use `await`. This could lead to issues where the `process.exit(0)` is called before the `verify` function completes its execution.\r\n\r\n12. **Commander Action Parameters**:\r\n    The `action` callback is using `(cmd: Command)` as a parameter, but typically the parameters passed to the action callback are the options defined in the command. This might not cause a functional issue, but it could be misleading.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/matter-labs/zksync/issues/473/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/matter-labs/zksync/issues/473/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
