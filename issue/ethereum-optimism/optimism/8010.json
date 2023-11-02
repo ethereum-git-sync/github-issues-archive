@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-11-02T04:28:36Z",
-  "updated_at": "2023-11-02T04:41:55Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2023-11-02T10:13:57Z",
+  "closed_at": "2023-11-02T10:13:57Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\nHi team! I'm an engineer from ARPA-Network. Thank you very much for the amazing dev tool.\r\n\r\n**Describe the bug**\r\nWhen deploying local devnet, some of our colleagues confront a bunch of \"Waiting for RPC server at 127.0.0.1:8545\". However at the time actually geth(container) on L1 works fine if we use curl or instant `wait_for_rpc_server` to fetch the `eth_chainId`. I traced to `wait_for_rpc_server` in `bedrock-devnet/devnet/__init__.py`, added traceback.print_exc(), and found something wrong with `http.client.HTTPConnection`.\r\n\r\nAs is shown in the second screenshot, first two `ConnectionResetError: [Errno 104] Connection reset by peer` from conn.getresponse(), then `BrokenPipeError: [Errno 32] Broken pipe` from conn.request('POST', '/', body, headers), and finally looping by `http.client.CannotSendRequest: Request-sent` from conn.request('POST', '/', body, headers).\r\n\r\nSo the deployed service is fine actually but the check instruction prevents the script to go ahead. And this usually happens on EC2 instance rather than local. I think the problem is that the container runs relatively slow to get ready for rpc requests, but the http.client has already sent the request. As far as I know the http.client in python is stateful for more low-level HTTP, so we can hardly expect the same one connection to recover from errors like `Broken pipe` when the server is not ready at the beginning. Therefore I think we can build new connection in while loop and dispose it if it fails during last request. With this change things go well.\r\n            \r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\n1. Go to optimism\r\n2. Do as [How to do it](https://community.optimism.io/docs/developers/build/dev-node/#how-to-do-it) says\r\n3. make devnet-up\r\n4. See error(can't be reproduced every times)\r\n\r\n**Expected behavior**\r\nThe script should continue when `wait_for_rpc_server` makes sure that the service on L1/L2 can support rpc requests normally.\r\n\r\n**Screenshots**\r\n![image](https://github.com/ethereum-optimism/optimism/assets/72855105/fd965d74-f4d2-45d1-a78e-17789cddf132)\r\n![image](https://github.com/ethereum-optimism/optimism/assets/72855105/f6d97272-6a1c-4f5c-85bb-5ce553691c1b)\r\n\r\n**System Specs:**\r\n - OS: Linux Ubuntu 20.04 on EC2\r\n - Package Version (or commit hash): latest develop\r\n\r\n**Additional context**\r\nI tried to commit a pr to fix this.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8010/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8010/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
