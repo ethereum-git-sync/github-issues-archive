@@ -49,7 +49,7 @@
       "description": "All issues with regards to the exposed metrics."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "dapplion",
@@ -114,14 +114,33 @@
     }
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2022-02-11T06:32:17Z",
-  "updated_at": "2022-04-01T19:45:47Z",
-  "closed_at": null,
+  "updated_at": "2023-11-05T13:38:01Z",
+  "closed_at": "2023-11-05T13:38:00Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "After the regression in performance of v0.34.0, it is clear that we will need a further, more comprehensive testing process for future releases which includes our various environments, setups and specific parameters we should ensure catches critical regressions in node performance. The end goal of this is to eventually automate this process in our testing environments and automatically detect regression in our defined metrics for passing beta release testing.\n\nOur minimal testing environments include a combination of the following:\n\nHardware Resource Diversity Requirements:\n- Hetzner-powered servers (high-end performance devices)\n- Contabo-powered servers (low-end performance devices)\n\nValidator Set Requirements:\n- Servers with minimal validators attached (<10)\n- Servers with many validators attached (>500)\n\nEnvironment Requirements:\n- Lodestar instances on docker setups\n- Lodestar instances on bare metal setups.\n\nA combination of each of these environments should be tested for no shorter than three days and compared with the previous stable version to analyze regression in any metrics. The following metrics checklist will determine criteria required to pass our release beta testing:\n\n- [ ] Slot chart shows consistent consensus\n- [ ] Stable peer count\n- [ ] Clock drift not greater than 5\n- [ ] No sync status issues\n- [ ] Head drift is not consistently behind (>1)\n- [ ] Heap space used is constant and flat with no signs of memory leaks\n- [ ] External memory used is constant and flat with no signs of memory leaks\n- [ ] Process heap bytes is constant and flat\n- [ ] GC pause time rate does not exceed 20%\n- [ ] Prometheus scrape duration does not show signs of slower response time\n- [ ] Validator inclusion distance at 1 as much as possible. (% of avg delays compared to previous version)\n- [ ] Compare validator correct head percentage average to previous release. \n- [ ] Compare validator previous epoch ATTESTER and TARGET miss ratios to previous release. Should be as low as possible\n- [ ] Compare epoch transition average time to previous release. Should be as low as possible.\n- [ ] Compare epoch transition utilization rate to previous release. Should be as low as possible.\n- [ ] Compare process block average time to previous release. Should be as low as possible.\n- [ ] Compare process block utilization rate to previous release. Should be as low as possible.\n- [ ] Compare epoch transition count per epoch to previous release. Should be at 1 as much as possible.\n- [ ] Compare process block per slot to previous release. Should be at 1 as much as possible.\n\nList is a draft and WIP.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "philknows",
+    "id": 58080811,
+    "node_id": "MDQ6VXNlcjU4MDgwODEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58080811?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/philknows",
+    "html_url": "https://github.com/philknows",
+    "followers_url": "https://api.github.com/users/philknows/followers",
+    "following_url": "https://api.github.com/users/philknows/following{/other_user}",
+    "gists_url": "https://api.github.com/users/philknows/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/philknows/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/philknows/subscriptions",
+    "organizations_url": "https://api.github.com/users/philknows/orgs",
+    "repos_url": "https://api.github.com/users/philknows/repos",
+    "events_url": "https://api.github.com/users/philknows/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/philknows/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3747/reactions",
     "total_count": 0,
@@ -136,7 +155,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3747/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -215,6 +234,50 @@
     "body": "From Apr 1 planning meeting, extra notes in regards to planning out testing infrastructure:\n\nDade: For testing infrastructure, issues don't usually show up unless we run for a couple of days, could affect velocity. How should we manage this?\n\nPhil: We should define how an ideal testing infrastructure should look like. We want to put the work into a good process, but make sure it's accurately giving us metrics/data that helps find potential issues.\n\nPhil: Do we need a controlled devnet environment to do testing in where we can influence parameters to simulate potential issues? Or is that too much work which doesn't reflect realities of public testnets and mainnet?\n\nCayman: Devnets are too small, things scale with validators and it's difficult to reproduce this on our own devnet. Should we focus on how a devnet would be beneficial for preliminary type tests such as sending/receive messages and not getting banned immediately, Beacon API endpoints, etc? Would this infrastructure be worth it? Will take additional servers and such.\n\nCayman: Maybe there's a way to set slots per second higher? Compress the amount of work? Change chain params to have it happen quicker?\n\nDade: The problem is not necessarily functional bugs, but rather performance regression. These are usually seen in a longer period of time. We should invest more in metrics monitoring. Should be some balance resources in setting up better metrics alongside testing infrastructure.\n\nPhil: True. We should ensure the work we put into a testing infrastructure yields good data and results for it to be worth the work. If we do setup a testnet in a controlled environment, it should probably focus more on functional type testing to ensure our Beacon APIs are not broken for example. And push more of the testing infrastructure to help test against a more real-world environment like Prater. It should be focused to help relieve some grunt work (automation).",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1086265174/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1793740216",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/3747#issuecomment-1793740216",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/3747",
+    "id": 1793740216,
+    "node_id": "IC_kwDOCD5_Gc5q6k24",
+    "user": {
+      "login": "philknows",
+      "id": 58080811,
+      "node_id": "MDQ6VXNlcjU4MDgwODEx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58080811?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/philknows",
+      "html_url": "https://github.com/philknows",
+      "followers_url": "https://api.github.com/users/philknows/followers",
+      "following_url": "https://api.github.com/users/philknows/following{/other_user}",
+      "gists_url": "https://api.github.com/users/philknows/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/philknows/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/philknows/subscriptions",
+      "organizations_url": "https://api.github.com/users/philknows/orgs",
+      "repos_url": "https://api.github.com/users/philknows/repos",
+      "events_url": "https://api.github.com/users/philknows/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/philknows/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-05T13:38:00Z",
+    "updated_at": "2023-11-05T13:38:00Z",
+    "author_association": "MEMBER",
+    "body": "Closing for #4724 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1793740216/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

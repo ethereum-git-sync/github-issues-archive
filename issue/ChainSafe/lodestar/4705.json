@@ -49,21 +49,40 @@
       "description": "All issues regarding light client development."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-10-30T16:47:21Z",
-  "updated_at": "2022-11-09T13:44:37Z",
-  "closed_at": null,
+  "updated_at": "2023-11-05T13:36:05Z",
+  "closed_at": "2023-11-05T13:36:04Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "(this write is still WIP and needs discussion with @dapplion to freeze out and subsequent confirmation with @dadepo  for implementation to plug any gaps and provide clarifications) \r\n\r\n## Background\r\nMostly people interacting with Ethereum are concerned about what's known as \"execution land\". In-fact before merge, they could just run `light sync` protocol on the execution client like Geth, which would be able to validate chain building via PoW/PoA rule-set while giving a \"read\" capability to the blockchain.\r\n\r\n## Post Merge Setup\r\nSince the PoW/PoA rule-set can't be used to validate chain building post-merge, the execution client now necessarily need a CL to drive them. This is an extra headache for those who are just concerned about having access to the current ethereum account state (`full` or `light`).\r\nOr now that Ethereum consensus is on PoS rails, how to best utilize the protocol to move to a  `less-trust-verify-more` nirvana where doesn't need to run after `centralized` services and can be more `p2p` which really gels with the ethos of a blockchain world.\r\n\r\nThe answer is a `light node` for `PoS` consensus which can drive `full` or `light` execution node. \r\n\r\nLodestar already allows one to access its light-client api on the current `full` node and has a `light-client` module to subscribe and validate and process light client protocol to follow head. Recently a p2p version of this api has been published, but the `light-client` module is not yet capable to consume it.\r\n\r\n## Goal\r\nThe aim of this effort is to have a p2p `light node` implementation which will connect to the peers supporting `light PoS` capability i.e. nodes hosting p2p version of light-client api and drive a `full` execution node (also coordinate/help execution client support `light` execution nodes)\r\n\r\n## High Level Specs\r\n\r\n### `Full` PoS node\r\nAllow connecting `light` PoS capable nodes and manage them separately than `full` nodes \r\n - [ ] not bother them with beacon block requests\r\n - [ ] extend status to include capability? (like how execution clients have hello requests telling them capabilities like `eth6`/`snap1`/`les..` to process/advertise the `light` node capability\r\n - [ ] keep a separate target/max peer allocation for them\r\n\r\n### `Light` PoS node\r\n- [x] Allow user to startup with a checkpoint root of any `post-altair` epoch to download the boostrap \r\n  - [ ] weak subjectivity checks on the checkpoint post downloading bootstrap\r\n- [x] connect to the bootnodes/full nodes having the `light` p2p capability, allow other peers to connect with `light` p2p capability\r\n- [x] do req/resp with the nodes to sync up (and store) the update period become \"synced\" and subscribe to gossip\r\n- [x] listen and process/validate/store the gossip header update/finalized update/sync committee update / forward the gossip stay/log\r\n- [ ] maintain/log sync/peer status\r\n- [ ] host an execution rpc proxy (take input the execution rpc)\r\n- [x] optionally signal head to `execution` client via `execution api`\r\n  - [x] download beacon block by root to extract and call payload to call `newPayloadV1`\r\n  - [x] followup with an fcU call\r\n  - [ ] maintain/log execution status of the fcU head\r\n\r\n### Target\r\n- [x] `Light` PoS can sync from a checkpoint root via p2p and get synced to current period and stay `Synced` and track latest/finalized\r\n- [x] Can successfully sync an execution client from blank state to synced `valid` state and log it\r\n- [x] Can maintain and support its own network of `light` nodes and seed `lightclient` data into the network\r\n\r\n\r\n### Implementation\r\n\r\n#### Peering/Networking  `full` nodes\r\nPrimarily being more  \"implementation research\" oriented, this will be supported by @g11tech / @dapplion and will be seeded as a separate module that can be independently used by the consumer as well to connect to the `full` node\r\n\r\n#### Implementing the `light` consumer\r\nMinus the networking support, the rest of the implementation of the consumer to sync, gossiping, serving req/resp, and optionally driving the execution fcU falls in this category. This is primarily driven by @dadepo  with @g11tech guiding the effort (with help from @dapplion )\r\n\r\nTo reduce networking scope and allowing access to the current modules and api (like block by root, execution engine api), the `light` consumer will currently piggy back on the `full` node networking and use to to `light-sync`.\r\n\r\n##### What does the piggyback entails (`--piggybackLight`)\r\n\r\nSetup: \r\n\r\n1. A `full` lodestar dev node running in single node mode. This should avoid lodestar looking for any information from peers (and hence not banning/removing/ejecting them) while allowing itself to be peered with the `light` node.\r\n\r\n2. A `light` lodestar dev node with no validators assigned just running to `light-sync` from `full` node\r\n- [ ] Build/maintain its own db and store snapshot/updates \r\n- [ ] Have its own `chain` and maintain its `sync`\r\n- [ ] can hookup to the same `node` of the `full`\r\n- [ ] can use same networking/bootnodes to connect to the `full` peer and use same req/resp\r\n- [ ] use `light-client` to drive `sync` process (replace api calls by req/resp, and hook `onSSE` to the gossip listeners)\r\n- [ ] use `execution` engine to newPayloadV1 and fcU and maintain/log status\r\n- [ ] host/service both light-client api, req/resp and gossip for light client routes\r\n\r\n3. A third `light` lodestar dev node connecting with above (2.) `light` node \r\n  - [ ] using the same `checkpoint` root to sync (download snapshot/bootstrap and req/resp to sync and start processing the `gossip`. Node (2) should not host libp2p udp so that the `full` node is not discovered.\r\n  - [ ] host/service http/req/resp/gossip\r\n\r\n##### Final Integration\r\n- [ ] Integrate the standalone networking module to support light-peers in the `full` node to avoid piggybacking\r\n- [ ] Re-package the code as a standalone mono-repo package with its own options and cmd handler\r\n\r\n### Tests\r\nTBD\r\n\r\n## Next Level\r\nThis is outside current scope/research task\r\n\r\n1. Current Slot: The above `light` bn node will always stay 1 slot behind the current, however if a light node is connected to a `full` node it can listen to the gossip on  to get the current slot as well as its `sync aggregate` and can display the current slot info\r\n2. The forkchoice: The updates the `light` client gets are the previous head, so it doesn't really need to have a forkchoice and its simplest forkchoice state can be latest update (which also has finalized). however it will be worthwhile to track the `branch` in order to provide functionality to `resolve` the execution block number => execution block hash for serving as proxy for execution jsonrpc\r\n\r\n\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "g11tech",
+    "id": 76567250,
+    "node_id": "MDQ6VXNlcjc2NTY3MjUw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/76567250?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/g11tech",
+    "html_url": "https://github.com/g11tech",
+    "followers_url": "https://api.github.com/users/g11tech/followers",
+    "following_url": "https://api.github.com/users/g11tech/following{/other_user}",
+    "gists_url": "https://api.github.com/users/g11tech/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/g11tech/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/g11tech/subscriptions",
+    "organizations_url": "https://api.github.com/users/g11tech/orgs",
+    "repos_url": "https://api.github.com/users/g11tech/repos",
+    "events_url": "https://api.github.com/users/g11tech/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/g11tech/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4705/reactions",
     "total_count": 0,
@@ -78,8 +97,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4705/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1793739768",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/4705#issuecomment-1793739768",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/4705",
+    "id": 1793739768,
+    "node_id": "IC_kwDOCD5_Gc5q6kv4",
+    "user": {
+      "login": "g11tech",
+      "id": 76567250,
+      "node_id": "MDQ6VXNlcjc2NTY3MjUw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/76567250?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/g11tech",
+      "html_url": "https://github.com/g11tech",
+      "followers_url": "https://api.github.com/users/g11tech/followers",
+      "following_url": "https://api.github.com/users/g11tech/following{/other_user}",
+      "gists_url": "https://api.github.com/users/g11tech/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/g11tech/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/g11tech/subscriptions",
+      "organizations_url": "https://api.github.com/users/g11tech/orgs",
+      "repos_url": "https://api.github.com/users/g11tech/repos",
+      "events_url": "https://api.github.com/users/g11tech/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/g11tech/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-05T13:36:04Z",
+    "updated_at": "2023-11-05T13:36:04Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "not relevant/in focus",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1793739768/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
