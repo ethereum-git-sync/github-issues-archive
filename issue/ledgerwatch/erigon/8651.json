@@ -41,11 +41,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-11-04T12:51:34Z",
-  "updated_at": "2023-11-04T12:51:34Z",
+  "updated_at": "2023-11-06T15:43:47Z",
   "closed_at": null,
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
-  "body": "To print requests which take longer than given threshold. Basic implementation may log only after request finish, but more useful variant is - to print currently-running (unfinished yet) slow requests\r\n\r\n\r\nCurrently: only can enable all requests logging - which is expensive and not very useful (under load).\r\n\r\n\r\nNeed to bench impact of enabling it\r\nDisabled by default\r\n",
+  "body": "To print requests which take longer than given threshold. Basic implementation may log only after request finish, but more useful variant is - to print currently-running (unfinished yet) slow requests\r\n\r\n\r\nCurrently: only can enable all requests logging - which is expensive and not very useful (under load).\r\n\r\n\r\nNeed to bench impact of enabling it\r\nDisabled by default\r\n\r\n—-\r\nTbh, i don’t know where will be bottleneck in such feature (maybe naive implementation will be good-enough), and don’t know how many goroutines will write to slowlog. \r\n\r\nBut here are some raw ideas - how can reduce lock contention and timers amount: \r\n- to avoid timers creation - can create new “requests bucket” every 100ms, add new requests to last bucket only. \r\n- when bucket is done (after 100ms) - can add it to linked-list of “complete buckets”\r\n- aggregate goroutine will iterate over “complete buckets”list. It also can remove finished request (clean garbage).\r\n - It’s even can be lock-free - because reads and writes comes to different buckets",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8651/reactions",
