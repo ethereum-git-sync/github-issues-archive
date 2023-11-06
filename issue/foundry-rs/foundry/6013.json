@@ -40,7 +40,7 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2023-10-09T08:33:02Z",
-  "updated_at": "2023-10-19T07:55:23Z",
-  "closed_at": null,
+  "updated_at": "2023-11-06T07:06:56Z",
+  "closed_at": "2023-11-06T07:06:56Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [x] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (fcae63a 2023-10-08T00:31:37.838144000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge script\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nLibrary Deploys Twice error still exists.\r\n\r\nforge version :  forge 0.2.0 (fcae63a 2023-10-08T00:31:37.838144000Z)\r\n\r\nsource code:\r\n\r\n```\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity 0.8.14;\r\n\r\nlibrary Add{\r\n    function addOne(uint256 num) public pure returns(uint256 outNum){\r\n        outNum = num+1;\r\n    }\r\n} \r\n```\r\n```\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity 0.8.14;\r\n\r\nlibrary Reduce{\r\n    function reduceOne(uint256 num) public pure returns(uint256 outNum){\r\n        outNum = num-1;\r\n    }\r\n} \r\n```\r\n```\r\npragma solidity 0.8.14;\r\nimport \"./libraries/add.sol\";\r\nimport \"./libraries/reduce.sol\";\r\n\r\ncontract EthereumTest{\r\n    function test(uint256 input) public pure returns(uint256 output){\r\n        uint256 result = Add.addOne(input);\r\n        output = Reduce.reduceOne(result);\r\n    } \r\n}\r\n```\r\nscript:\r\n\r\n```\r\npragma solidity ^0.8.0;\r\n\r\nimport \"forge-std/Script.sol\";\r\nimport \"../src/ethereum/EthereumTest.sol\";\r\n\r\ncontract DeployTest is Script {\r\n    function run() external {\r\n        uint256 deployerPrivateKey = vm.envUint(\"PRIVATE_KEY\");\r\n        vm.startBroadcast(deployerPrivateKey);\r\n\r\n        new EthereumTest();\r\n\r\n        vm.stopBroadcast();\r\n    }\r\n}\r\n\r\n```\r\n\r\noutput:\r\n\r\n```\r\n###\r\nFinding wallets for all the necessary addresses...\r\n##\r\nSending transactions [0 - 2].\r\n⠙ [00:00:00] [##########################################################################] 3/3 txes (0.0s)\r\nTransactions saved to: /Users/zyq/Contract/Tusima/zkBridge-lightClient/contracts/broadcast/EthereumTest.s.sol/5/run-latest.json\r\n\r\nSensitive values saved to: /Users/zyq/Contract/Tusima/zkBridge-lightClient/contracts/cache/EthereumTest.s.sol/5/run-latest.json\r\n\r\n##\r\nWaiting for receipts.\r\n⠚ [00:00:19] [######################################################################] 3/3 receipts (0.0s)\r\n##### goerli\r\n✅  [Success]Hash: 0x318a78911515c3e0a31fb243590bc95f9fb927b275c97294ee1c1a70fcbebe74\r\nContract Address: 0x22a54684a72A098c8bF475361255B185FCA37390\r\nBlock: 9835454\r\nPaid: 0.00030402900202686 ETH (101343 gas * 3.00000002 gwei)\r\n\r\n\r\n##### goerli\r\n✅  [Success]Hash: 0x7e8e67bffd4c5b0877035baffc5c24d2750b38ac5b5e5b44b3a63fe326fccae3\r\nContract Address: 0x0755517A344160deC513193Dc75D21d25134eeB9\r\nBlock: 9835454\r\nPaid: 0.00030338100202254 ETH (101127 gas * 3.00000002 gwei)\r\n\r\n\r\n##### goerli\r\n✅  [Success]Hash: 0x6f51b3f65caffdbed7f4a855d976a57784d71bc1bbac45879998ff770df76c20\r\nContract Address: 0x371180E01b412606A5749C70534614Eb9Ccb3347\r\nBlock: 9835454\r\nPaid: 0.00044258700295058 ETH (147529 gas * 3.00000002 gwei)\r\n```\r\nthree contract deployed, Two of them are library, details in goerli:\r\n\r\nlibrary Add:[0x318a78911515c3e0a31fb243590bc95f9fb927b275c97294ee1c1a70fcbebe74](https://goerli.etherscan.io/tx/0x318a78911515c3e0a31fb243590bc95f9fb927b275c97294ee1c1a70fcbebe74)\r\n\r\nlibrary Reduce: [0x7e8e67bffd4c5b0877035baffc5c24d2750b38ac5b5e5b44b3a63fe326fccae3](https://goerli.etherscan.io/tx/0x7e8e67bffd4c5b0877035baffc5c24d2750b38ac5b5e5b44b3a63fe326fccae3)\r\n\r\n\r\nThe only contract that should be deployed：[0x6f51b3f65caffdbed7f4a855d976a57784d71bc1bbac45879998ff770df76c20](https://goerli.etherscan.io/tx/0x6f51b3f65caffdbed7f4a855d976a57784d71bc1bbac45879998ff770df76c20)\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "CornersOfTheCity",
+    "id": 20398446,
+    "node_id": "MDQ6VXNlcjIwMzk4NDQ2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20398446?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CornersOfTheCity",
+    "html_url": "https://github.com/CornersOfTheCity",
+    "followers_url": "https://api.github.com/users/CornersOfTheCity/followers",
+    "following_url": "https://api.github.com/users/CornersOfTheCity/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CornersOfTheCity/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CornersOfTheCity/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CornersOfTheCity/subscriptions",
+    "organizations_url": "https://api.github.com/users/CornersOfTheCity/orgs",
+    "repos_url": "https://api.github.com/users/CornersOfTheCity/repos",
+    "events_url": "https://api.github.com/users/CornersOfTheCity/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CornersOfTheCity/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6013/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6013/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,8 +211,8 @@
     "body": "It supports `public` types. The issue is that with `public` types is that even if all functions are inlined by the linker (same as with `internal`), `forge` still sees the `external` functions and assumes it needs to deploy the library (`public` means `internal` and `external`). \r\n\r\nThis is further complicated by libraries first needing to get deployed before linking. Only way I can think of resolving this at the moment, would be to do a dry run on the linking stage and determine whether linking has any effect. If it has no effect, then we can assume the library is not needed. This is unnecessarily complex for something that can be avoided by just using `internal`.",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1770263186/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 2,
+      "+1": 2,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
