@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7663",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7663/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7663/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7663/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7663",
+  "id": 1978084523,
+  "node_id": "I_kwDOCM9I9M515yyr",
+  "number": 7663,
+  "title": "Attestation duty scheduling",
+  "user": {
+    "login": "rolfyone",
+    "id": 2967240,
+    "node_id": "MDQ6VXNlcjI5NjcyNDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2967240?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rolfyone",
+    "html_url": "https://github.com/rolfyone",
+    "followers_url": "https://api.github.com/users/rolfyone/followers",
+    "following_url": "https://api.github.com/users/rolfyone/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rolfyone/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rolfyone/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rolfyone/subscriptions",
+    "organizations_url": "https://api.github.com/users/rolfyone/orgs",
+    "repos_url": "https://api.github.com/users/rolfyone/repos",
+    "events_url": "https://api.github.com/users/rolfyone/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rolfyone/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1048919131,
+      "node_id": "MDU6TGFiZWwxMDQ4OTE5MTMx",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/enhancement%20%F0%9F%95%B5%EF%B8%8F%E2%80%8D%E2%99%80%EF%B8%8F",
+      "name": "enhancement 🕵️‍♀️",
+      "color": "a2eeef",
+      "default": false,
+      "description": "New feature or request"
+    },
+    {
+      "id": 1271198478,
+      "node_id": "MDU6TGFiZWwxMjcxMTk4NDc4",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/performance%20%F0%9F%9A%80",
+      "name": "performance 🚀",
+      "color": "ffcce3",
+      "default": false,
+      "description": "Improves performance without changing functionality"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-06T01:10:36Z",
+  "updated_at": "2023-11-06T01:10:37Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Attestation duty scheduling has 2 aspects of interest.\n\nOne part is scheduling the attestation itself, which is a relatively small impact, but the other is determining whether a validator needs to aggregate at a given slot.\n\nDetermining if an attester is an aggregator requires a signed object to be created, and we do this asynchronously.  We also process (worst case) current AND next epoch, due to lookahead, and it all takes place in the epoch transition slot (which is already the busiest slot of the epoch).\n\nIt'd be good to spread this load a little. In the first instance, we could consider a simple solution.\nin the first epoch slot, ensure that we have duties scheduled already for this epoch.\nIf it's not the first slot, then as long as we have duties for current epoch, ensure we have duties scheduled for the next epoch.\n\nThis relatively simple solution should distribute the load of async signing tasks in the executor queue, because we're no longer performing N x 2 signatures (worst case) in the epoch transition slot, we're only doing N signatures, and the second slot would then need to compute for next epoch.\n\nWe'd want to consider a boundary condition, where a reorg happens in the last slot of an epoch, and then we'd actually want to consider duties for the following epoch as a priority, otherwise we'd possibly not perform duties in that case.\n\nBelow a certain number of validators, this current logic is probably fine, it's just at scale - we could consider a feature toggle (supported and documented) that only is used by larger instances, as the default current logic is often more than adequate.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7663/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7663/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

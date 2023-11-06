@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7661",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7661/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7661/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7661/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7661",
+  "id": 1978072846,
+  "node_id": "I_kwDOCM9I9M515v8O",
+  "number": 7661,
+  "title": "Signer usage at scale",
+  "user": {
+    "login": "rolfyone",
+    "id": 2967240,
+    "node_id": "MDQ6VXNlcjI5NjcyNDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2967240?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rolfyone",
+    "html_url": "https://github.com/rolfyone",
+    "followers_url": "https://api.github.com/users/rolfyone/followers",
+    "following_url": "https://api.github.com/users/rolfyone/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rolfyone/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rolfyone/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rolfyone/subscriptions",
+    "organizations_url": "https://api.github.com/users/rolfyone/orgs",
+    "repos_url": "https://api.github.com/users/rolfyone/repos",
+    "events_url": "https://api.github.com/users/rolfyone/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rolfyone/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1048919131,
+      "node_id": "MDU6TGFiZWwxMDQ4OTE5MTMx",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/enhancement%20%F0%9F%95%B5%EF%B8%8F%E2%80%8D%E2%99%80%EF%B8%8F",
+      "name": "enhancement 🕵️‍♀️",
+      "color": "a2eeef",
+      "default": false,
+      "description": "New feature or request"
+    },
+    {
+      "id": 1271198478,
+      "node_id": "MDU6TGFiZWwxMjcxMTk4NDc4",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/performance%20%F0%9F%9A%80",
+      "name": "performance 🚀",
+      "color": "ffcce3",
+      "default": false,
+      "description": "Improves performance without changing functionality"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-06T00:57:37Z",
+  "updated_at": "2023-11-06T01:10:50Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Currently, we have critical sections around our local signer slashing protection implementation.\n\nAs we scale to more validator keys, this can become a bottleneck, and we need to either decide we're above the number of validators we are happy to support, or clear up the bottleneck to allow better participation.\n\nAt 20k validators, we can sometimes take in excess of 2.5 seconds in the worst case, and generally seems to sit at around 1.8 (95th percentile) (50th percentile is around 0.14-0.16 seconds)\n\nAt 30k validators, we generally sit around 3 seconds at 95th percentile, which is getting not great. (50th percentile is 0.2 seconds, because often we have very little queueing)\n\nThere's 2 main aspects to this overhead, one is the signer throughput, but the other is locking. This ticket should focus on removing the critical section of the slashing protection, but that will require making the ValidatorSigningRecord thread-safe, by introducing locking or something similar so that the marshalling isn't done at the function 'maySign', but rather on the individual records we're protecting (effectively table level v. row level locking concept)\n\nAs an aside, it's likely that 30k validators is 'beyond' where we're likely to go in the short term for normal use-cases, but given that 20k shows the problem pretty clearly it's still worth reducing this contention.\n\nBeing a change to slashing-protection, this should start life as a feature toggle.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7661/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7661/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
