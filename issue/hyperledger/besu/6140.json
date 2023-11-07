@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-07T11:43:08Z",
-  "updated_at": "2023-11-07T11:45:22Z",
+  "updated_at": "2023-11-07T15:59:28Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1799019673",
+    "html_url": "https://github.com/hyperledger/besu/issues/6140#issuecomment-1799019673",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/6140",
+    "id": 1799019673,
+    "node_id": "IC_kwDODE2jmc5rOtyZ",
+    "user": {
+      "login": "matthew1001",
+      "id": 6599269,
+      "node_id": "MDQ6VXNlcjY1OTkyNjk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6599269?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/matthew1001",
+      "html_url": "https://github.com/matthew1001",
+      "followers_url": "https://api.github.com/users/matthew1001/followers",
+      "following_url": "https://api.github.com/users/matthew1001/following{/other_user}",
+      "gists_url": "https://api.github.com/users/matthew1001/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/matthew1001/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/matthew1001/subscriptions",
+      "organizations_url": "https://api.github.com/users/matthew1001/orgs",
+      "repos_url": "https://api.github.com/users/matthew1001/repos",
+      "events_url": "https://api.github.com/users/matthew1001/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/matthew1001/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-07T15:57:23Z",
+    "updated_at": "2023-11-07T15:59:28Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "A few notes after initial investigation.\r\n\r\n- `DefaultBlockchain.appendBlock(...)` is synchronized, and calls `appendBlockHelper(...)` to update both the chain itself and the (`volatile`) `chainHeader` reference.\r\n- `TransactionPool.getChainHeadBlockHeader(...)` calls 2 methods in `DefaultBlockchain`:\r\n  - `getBlockHeader(...)`\r\n  - `getChainHeadHash(...)`\r\n  - Neither of these are `synchronized`\r\n\r\nI'm not sure if there is sufficient protection around the call to `getBlockHeader()` being called with the new `chainHeader` hash, but on a chain that hasn't yet committed the new block. `updater.commit()` is called at the end of `appendBlockHelper` but I think by this point `chainHeader` will have been updated to the new chain head, and a caller of `getBlockHeader(...)` could end up reading stale data with the new chain header.\r\n\r\nAs a side note, there is a block cache mechanism that is only used if `numberOfBlocksToCache != 0`, and after a quick skim through the code I can't see any paths that set it `>0`\r\n\r\n@fab-10 any thoughts? I'm currently running the same test with `getBlockHeader()` and `getChainHeadHash()` marked as `synchronized`. I'm not sure this is the fix needed, but it's just a quick way of proving if it is the logic described above that is causing the issue.",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1799019673/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
