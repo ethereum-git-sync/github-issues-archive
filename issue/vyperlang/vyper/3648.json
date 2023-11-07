@@ -8,7 +8,7 @@
   "id": 1943106435,
   "node_id": "I_kwDOBGDvrM5z0XOD",
   "number": 3648,
-  "title": "Allow non-literal values as default arguments",
+  "title": "Allow non-literal and built-in environment variable values as default arguments",
   "user": {
     "login": "pcaversaccio",
     "id": 25297591,
@@ -41,11 +41,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-10-14T09:07:31Z",
-  "updated_at": "2023-10-14T09:13:57Z",
+  "updated_at": "2023-11-07T18:01:51Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "I think it would be a nice feature to allow non-literal values as default arguments.\r\n\r\n## Example Use Case\r\n\r\n```vy\r\n# pragma version ^0.3.10\r\n\r\n\r\n_COLLISION_OFFSET: constant(bytes1) = 0xFF\r\n\r\n\r\n@external\r\n@pure\r\ndef compute_address(salt: bytes32, bytecode_hash: bytes32, deployer: address=self) -> address:\r\n    \"\"\"\r\n    @dev Returns the address where a contract will be stored if\r\n         deployed via `deployer` using the `CREATE2` opcode.\r\n         Any change in the `bytecode_hash` or `salt` values will\r\n         result in a new destination address.\r\n    @param salt The 32-byte random value used to create the contract\r\n           address.\r\n    @param bytecode_hash The 32-byte bytecode digest of the contract\r\n           creation bytecode.\r\n    @return address The 20-byte address where a contract will be stored.\r\n    \"\"\"\r\n    data: bytes32 = keccak256(concat(_COLLISION_OFFSET, convert(deployer, bytes20), salt, bytecode_hash))\r\n    return convert(convert(data, uint256) & convert(max_value(uint160), uint256), address)\r\n```",
+  "body": "I think it would be a nice feature to allow non-literal and built-in environment variable values as default arguments.\r\n\r\n## Example Use Case\r\n\r\n```vy\r\n# pragma version ^0.3.10\r\n\r\n\r\n_COLLISION_OFFSET: constant(bytes1) = 0xFF\r\n\r\n\r\n@external\r\n@pure\r\ndef compute_address(salt: bytes32, bytecode_hash: bytes32, deployer: address=self) -> address:\r\n    \"\"\"\r\n    @dev Returns the address where a contract will be stored if\r\n         deployed via `deployer` using the `CREATE2` opcode.\r\n         Any change in the `bytecode_hash` or `salt` values will\r\n         result in a new destination address.\r\n    @param salt The 32-byte random value used to create the contract\r\n           address.\r\n    @param bytecode_hash The 32-byte bytecode digest of the contract\r\n           creation bytecode.\r\n    @return address The 20-byte address where a contract will be stored.\r\n    \"\"\"\r\n    data: bytes32 = keccak256(concat(_COLLISION_OFFSET, convert(deployer, bytes20), salt, bytecode_hash))\r\n    return convert(convert(data, uint256) & convert(max_value(uint160), uint256), address)\r\n```",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/vyperlang/vyper/issues/3648/reactions",
