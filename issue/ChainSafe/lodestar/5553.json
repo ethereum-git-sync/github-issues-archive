@@ -49,7 +49,7 @@
       "description": "Issues that fix interop issues between Lodestar and CL, EL or tooling."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -84,22 +84,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 8,
-    "closed_issues": 2,
+    "open_issues": 5,
+    "closed_issues": 15,
     "state": "open",
     "created_at": "2023-07-11T02:13:25Z",
-    "updated_at": "2023-09-28T02:38:48Z",
+    "updated_at": "2023-11-07T19:53:08Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 3,
   "created_at": "2023-05-26T11:25:50Z",
-  "updated_at": "2023-09-29T14:27:44Z",
-  "closed_at": null,
+  "updated_at": "2023-11-07T19:53:08Z",
+  "closed_at": "2023-11-07T19:53:08Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "### Describe the bug\r\n\r\nLighthouse VC is not able to produce aggregate attestations\r\n\r\n```\r\nMay 26 10:45:43.120 CRIT Error during attestation routine        slot: 6522826, committee_index: 19, error: \"Some endpoints failed, num_failed: 1 http://consensus:5052/ => RequestFailed(\\\"Failed to produce an aggregate attestation: StatusCode(500)\\\")\", service: attestation\r\n```\r\n\r\nOn Lodestar BN there is the following error\r\n\r\n```\r\nMay-26 10:45:43.119[rest]            error: Req req-1rji getAggregatedAttestation error  No attestation for slot=6522826 dataRoot=0xa609bb3a48bb75756afbd12c925314c8c274ecaa0ebd2ee5dfdee7ae8807306a\r\nError: No attestation for slot=6522826 dataRoot=0xa609bb3a48bb75756afbd12c925314c8c274ecaa0ebd2ee5dfdee7ae8807306a\r\nat AttestationPool.getAggregate (file:///usr/app/packages/beacon-node/src/chain/opPools/attestationPool.ts:136:13)\r\nat Object.getAggregatedAttestation (file:///usr/app/packages/beacon-node/src/api/impl/validator/index.ts:538:37)\r\nat processTicksAndRejections (node:internal/process/task_queues:95:5)\r\nat Object.handler (file:///usr/app/packages/api/src/utils/server/genericJsonServer.ts:45:23)\r\n```\r\n\r\n### Expected behavior\r\n\r\nAggregated attestations should work when running Lighthouse VC with Lodestar BN. No errors should be logged on both services.\r\n\r\n### Steps to reproduce\r\n\r\n1. Run Lodestar BN\r\n2. Attach Lighthouse VC with active validators\r\n3. Observe logs on both services\r\n\r\n### Versions\r\n\r\n- Lodestar: v1.8.0 / v1.9.0-rc.0\r\n- Lighthouse: v4.1.0 / v4.2.0",
-  "closed_by": null,
+  "closed_by": {
+    "login": "philknows",
+    "id": 58080811,
+    "node_id": "MDQ6VXNlcjU4MDgwODEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58080811?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/philknows",
+    "html_url": "https://github.com/philknows",
+    "followers_url": "https://api.github.com/users/philknows/followers",
+    "following_url": "https://api.github.com/users/philknows/following{/other_user}",
+    "gists_url": "https://api.github.com/users/philknows/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/philknows/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/philknows/subscriptions",
+    "organizations_url": "https://api.github.com/users/philknows/orgs",
+    "repos_url": "https://api.github.com/users/philknows/repos",
+    "events_url": "https://api.github.com/users/philknows/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/philknows/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5553/reactions",
     "total_count": 0,
@@ -114,7 +133,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5553/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -193,8 +212,8 @@
     "body": "After further debugging this and looking in to LH code base, it looks like this is not an actual problem which would prevent Lodestar BN <> Lighthouse VC combinations from producing aggregates. Mixed client sim tests are passing https://github.com/ChainSafe/lodestar/pull/5940.\r\n\r\nWhat's happening is that Lighthouse VC calls `getAggregatedAttestation` even if there is no aggregator for the slot.\r\nhttps://github.com/sigp/lighthouse/blob/2841f60686d642fcc0785c884d43e34e47a800dc/validator_client/src/attestation_service.rs#L494-L518\r\n\r\nThis deviates from what Lodestar VC (and also other VCs) do, those exit the aggregation flow early if there is no aggregator\r\nhttps://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/validator/src/services/attestation.ts#L252-L255\r\n\r\nThe Lodestar BN caches previously submitted attestations (`submitPoolAttestations`) but only if there is an aggregator for the slot which is determined by subnet subscriptions.\r\nhttps://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/beacon-node/src/api/impl/beacon/pool/index.ts#L70-L71\r\nhttps://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/beacon-node/src/network/processor/gossipHandlers.ts#L398-L399\r\n\r\nThis results in an error when calling `getAggregatedAttestation` as Lodestar is not able to fulfill the request\r\nhttps://github.com/ChainSafe/lodestar/blob/6ac8c07023bc72c7ef54a6ea66884790793eda21/packages/beacon-node/src/chain/opPools/attestationPool.ts#L136\r\n\r\nWe could consider to throw an 404 `ApiError` instead of a 500 `Error` but during normal operation this error should never happen and we usually do not throw `ApiError` at a lower level in the stack.\r\n\r\n**To summarize:**\r\n- not an actual problem, attestations and aggregates are produced correctly\r\n- error only happens with Lighthouse VC, all other VCs work as expected\r\n- ideally should be fixed on Lighthouse https://github.com/sigp/lighthouse/issues/4712\r\n- there is no fix required on Lodestar side, it is expected that we can't fulfill the `getAggregatedAttestation` request\r\n- error verbosity could potentially be reduced on Lodestar\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1709851624/reactions",
-      "total_count": 1,
-      "+1": 0,
+      "total_count": 2,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
