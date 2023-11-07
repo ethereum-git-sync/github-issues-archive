@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-10-31T09:28:04Z",
-  "updated_at": "2023-11-07T07:53:16Z",
-  "closed_at": null,
+  "updated_at": "2023-11-07T13:53:42Z",
+  "closed_at": "2023-11-07T13:53:42Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### Description\r\n\r\nWhen `eth_getProof` is called for an account, that does not exist, it returns null hashes for the code and the storage hash. This is inconsistent with the behavior of existing simple accounts and was apparently introduced with #28357. Previously, `codeHash` consistently returned the hash of the empty string `0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470` and `storageHash` returned the empty MPT root hash `0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421`.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n```\r\n$ curl localhost:8545 \\ \r\n      -X POST \\\r\n      -H \"Content-Type: application/json\" \\\r\n      -d '{ \"method\": \"eth_getProof\", \"params\": [\"0x0010000000000000000000000000000000000000\", [], \"latest\"], \"id\": 1, \"jsonrpc\": \"2.0\" }'\r\n```\r\n\r\n#### Actual behaviour\r\n\r\nThe previous command returns\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 1,\r\n  \"result\": {\r\n    \"address\": \"0x0010000000000000000000000000000000000000\",\r\n    \"accountProof\": [\r\n      ...\r\n    ],\r\n    \"balance\": \"0x0\",\r\n    \"codeHash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"nonce\": \"0x0\",\r\n    \"storageHash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"storageProof\": []\r\n  }\r\n}\r\n```\r\n\r\n#### Expected behaviour\r\n\r\nThe previous command should return the correct hash for \"empty\" data:\r\n```json\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 1,\r\n  \"result\": {\r\n    \"address\": \"0x0010000000000000000000000000000000000000\",\r\n    \"accountProof\": [\r\n      ...\r\n    ],\r\n    \"balance\": \"0x0\",\r\n    \"codeHash\": \"0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\",\r\n    \"nonce\": \"0x0\",\r\n    \"storageHash\": \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\r\n    \"storageProof\": []\r\n  }\r\n}\r\n```\r\n\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28441/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28441/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "> This is inconsistent with the behavior of existing simple accounts\r\n\r\nInstead, I think it's pretty good to distinguish \"empty account\" and \"non-existent account\".\r\n\r\n- If the account is existent but with empty code and empty storage, then `0xc5d24...d85a470 ` and `0x56e8...63b421 ` are returned\r\n- If the account is not existent, the code hash and storage root should be null with a \"account non-exsitent\" proof\r\n\r\nIt makes sense to me.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1797982449/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1798565489",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28441#issuecomment-1798565489",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28441",
+    "id": 1798565489,
+    "node_id": "IC_kwDOAOvK985rM-5x",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-07T13:53:42Z",
+    "updated_at": "2023-11-07T13:53:42Z",
+    "author_association": "MEMBER",
+    "body": "I think it works as expected",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1798565489/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
