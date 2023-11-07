@@ -59,7 +59,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": {
     "login": "schaable",
     "id": 1165424,
@@ -105,10 +105,10 @@
   "milestone": null,
   "comments": 5,
   "created_at": "2023-02-11T23:35:21Z",
-  "updated_at": "2023-08-08T14:31:39Z",
+  "updated_at": "2023-11-07T00:13:25Z",
   "closed_at": "2023-08-08T14:31:39Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\r\n\r\n2.12.7\r\n\r\n### What happened?\r\n\r\nI'm running into an issue where only the last chai matcher is being applied.\r\n\r\nIn my case,  `changeEtherBalances` and `changeTokenBalance` aren't being chained correctly:\r\n\r\n```\r\nawait expect(lock.withdraw()).to.changeEtherBalances(\r\n          [owner, lock],\r\n          [lockedAmount, -lockedAmount]\r\n        )\r\n        .and.to.changeTokenBalance(\r\n            token, \"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\", 1\r\n        );\r\n```\r\n\r\nIn this case, only the last condition is actually checked and the first one appears to be skipped entirely. I've attached a minimal reproducible based on the default HH project which demonstrates this.\r\n\r\nI'm definitely not an expert with Mocha/Chai, so I'm assuming there's something I'm doing wrong, but it appears as if there's an issue chaining the matchers since it also happens with other HH matchers like `reverted` and `changeEtherBalances`:\r\n\r\n```\r\nawait expect(lock.withdraw())\r\n          .to.be.reverted // this is ignored\r\n          .and.to.changeEtherBalances(\r\n            [owner, lock],\r\n            [lockedAmount, -lockedAmount]\r\n          );\r\n```\r\n\r\n\r\n### Minimal reproduction steps\r\n\r\nSee reproducible project:\r\n[reproducible.zip](https://github.com/NomicFoundation/hardhat/files/10714922/reproducible.zip)\r\n\r\nNote that I removed the `node_modules` directory for the upload so you'll have to reinstall those.\r\n\r\n### Search terms\r\n\r\nchai matcher ",
   "closed_by": {
     "login": "schaable",
@@ -355,13 +355,13 @@
     "body": "The way to check multiple conditions is by assigning the tx (without awaiting it):\r\n\r\n```js\r\nconst tx = contract.f(1, 2)\r\nawait expect(tx).to.emit(...)\r\nawait expect(tx).to.changeEtherBalances(...)\r\n// etc.\r\n```\r\n\r\n> I'm now faced with the prospect of going back through all of my many dozens of unit tests and manually checking if they use multiple matchers... This has set my schedule back dramatically :(\r\n\r\nI'm super sorry about that. It was an error to not forbid this in the first place.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1461765455/reactions",
-      "total_count": 1,
+      "total_count": 2,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 1,
+      "heart": 2,
       "rocket": 0,
       "eyes": 0
     },
