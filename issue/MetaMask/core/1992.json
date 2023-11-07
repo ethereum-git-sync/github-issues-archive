@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/MetaMask/core/issues/1992",
+  "repository_url": "https://api.github.com/repos/MetaMask/core",
+  "labels_url": "https://api.github.com/repos/MetaMask/core/issues/1992/labels{/name}",
+  "comments_url": "https://api.github.com/repos/MetaMask/core/issues/1992/comments",
+  "events_url": "https://api.github.com/repos/MetaMask/core/issues/1992/events",
+  "html_url": "https://github.com/MetaMask/core/issues/1992",
+  "id": 1980426878,
+  "node_id": "I_kwDOCBB0Cc52Cup-",
+  "number": 1992,
+  "title": "Inconsistent behavior between callback and promise styles in `json-rpc-engine`",
+  "user": {
+    "login": "mcmire",
+    "id": 7371,
+    "node_id": "MDQ6VXNlcjczNzE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7371?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mcmire",
+    "html_url": "https://github.com/mcmire",
+    "followers_url": "https://api.github.com/users/mcmire/followers",
+    "following_url": "https://api.github.com/users/mcmire/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mcmire/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mcmire/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mcmire/subscriptions",
+    "organizations_url": "https://api.github.com/users/mcmire/orgs",
+    "repos_url": "https://api.github.com/users/mcmire/repos",
+    "events_url": "https://api.github.com/users/mcmire/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mcmire/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2022-09-26T17:03:44Z",
+  "updated_at": "2023-11-07T02:36:44Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "You can use `engine.handle` two ways:\r\n\r\n* If you pass a callback, then the [callback will be called with two arguments][1]: `error` and `response`. Assuming that the request is valid, the request will be passed through the middleware stack. If an error is thrown anywhere along the way, the callback will be called with the error as the first argument; otherwise it will be called with the response as the second argument. An exception is made for notifications.\r\n\r\n* If you don't pass a callback, then [`engine.handle` returns a promise][2]. Again, the request is passed through the middleware stack. If an error is thrown along the way, then it will be added to the response object. Regardless, the promise will resolve with the response object. (Again, an exception is made for notifications.)\r\n\r\nSaid another way, when an error occurs, in the callback style, `error` will be populated, even if `res.error` will also be populated; but in the promise style, the promise will always resolve (and `res.error` will be populated). This is where the inconsistency lies. Why is this undesirable? In our various projects, we very frequently make use of `pify` or `util.promisify` to convert a function that takes an errback to promise style. However, if you take `engine.handle` and promisify it, it will have different behavior than the promise form of `engine.handle`. To me, that's a bit surprising.\r\n\r\nTo address this, it seems like it might be beneficial to go one of two routes:\r\n\r\n* Change the callback form so that we set `error` to undefined [after we set it on `res.error`][3]\r\n* Change the promise form so that we reject when we have an error rather than resolving.\r\n\r\n[1]: https://github.com/MetaMask/json-rpc-engine/blob/040a6ba85de32592f3000b90e678a3af1591d0aa/src/JsonRpcEngine.ts#L340\r\n[2]: https://github.com/MetaMask/json-rpc-engine/blob/040a6ba85de32592f3000b90e678a3af1591d0aa/src/JsonRpcEngine.ts#L312\r\n[3]: https://github.com/MetaMask/json-rpc-engine/blob/040a6ba85de32592f3000b90e678a3af1591d0aa/src/JsonRpcEngine.ts#L412",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/MetaMask/core/issues/1992/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/1992/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

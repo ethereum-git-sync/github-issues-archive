@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/MetaMask/core/issues/1993",
+  "repository_url": "https://api.github.com/repos/MetaMask/core",
+  "labels_url": "https://api.github.com/repos/MetaMask/core/issues/1993/labels{/name}",
+  "comments_url": "https://api.github.com/repos/MetaMask/core/issues/1993/comments",
+  "events_url": "https://api.github.com/repos/MetaMask/core/issues/1993/events",
+  "html_url": "https://github.com/MetaMask/core/issues/1993",
+  "id": 1980427929,
+  "node_id": "MDU6SXNzdWUxOTgwNDI3OTI5",
+  "number": 1993,
+  "title": "Throw an error, not an object in `json-rpc-engine`",
+  "user": {
+    "login": "MicahZoltu",
+    "id": 886059,
+    "node_id": "MDQ6VXNlcjg4NjA1OQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/886059?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MicahZoltu",
+    "html_url": "https://github.com/MicahZoltu",
+    "followers_url": "https://api.github.com/users/MicahZoltu/followers",
+    "following_url": "https://api.github.com/users/MicahZoltu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MicahZoltu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MicahZoltu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MicahZoltu/subscriptions",
+    "organizations_url": "https://api.github.com/users/MicahZoltu/orgs",
+    "repos_url": "https://api.github.com/users/MicahZoltu/repos",
+    "events_url": "https://api.github.com/users/MicahZoltu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MicahZoltu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2021-02-16T06:51:03Z",
+  "updated_at": "2023-11-07T02:37:44Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "https://github.com/MetaMask/json-rpc-engine/blob/bece020a9d515e1714ffa3e6ac36c534e33ddfe5/src/JsonRpcEngine.ts#L344\r\n\r\nThis code will (at least sometimes) throw a `{ code: ..., message: ... }` object rather than an instance of `Error`.  This means there is no stack trace and no contextual information which makes debugging quite difficult.\r\n\r\nWe can see in these two locations that the type of this \"error\" is `unknown`, which should never be thrown directly:\r\nhttps://github.com/MetaMask/json-rpc-engine/blob/bece020a9d515e1714ffa3e6ac36c534e33ddfe5/src/JsonRpcEngine.ts#L361\r\nhttps://github.com/MetaMask/json-rpc-engine/blob/bece020a9d515e1714ffa3e6ac36c534e33ddfe5/src/JsonRpcEngine.ts#L396\r\n\r\nA potentially bigger issue, and maybe the source of the problem, is that this code isn't properly rejecting on failure, it is instead returning a successfully resolved async function with an error result rather than rejecting, so I don't think we won't benefit from proper stack traces even if we had an error:\r\nhttps://github.com/MetaMask/json-rpc-engine/blob/bece020a9d515e1714ffa3e6ac36c534e33ddfe5/src/JsonRpcEngine.ts#L404\r\n\r\nI think this is the source of the issue, note that it is just calling `end` with `JsonRpcResponse.error`.  It isn't including any additional context like the original request (which would be immensely valuable for troubleshooting) or a stack trace which (if async/await is used properly) would provide a potentially useful call stack.\r\nhttps://github.com/MetaMask/json-rpc-engine/blob/bece020a9d515e1714ffa3e6ac36c534e33ddfe5/src/JsonRpcEngine.ts#L401\r\n\r\nThis is along the lines of what *should* be returned:\r\nhttps://github.com/MetaMask/json-rpc-engine/blob/bece020a9d515e1714ffa3e6ac36c534e33ddfe5/src/JsonRpcEngine.ts#L415-L423",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/MetaMask/core/issues/1993/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 1
+  },
+  "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/1993/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
