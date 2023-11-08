@@ -49,21 +49,40 @@
       "description": "Area: op-proposer"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 7,
   "created_at": "2023-10-27T08:10:34Z",
-  "updated_at": "2023-11-03T10:03:08Z",
-  "closed_at": null,
+  "updated_at": "2023-11-08T02:49:07Z",
+  "closed_at": "2023-11-08T02:49:07Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**Describe the bug**\r\nI have an OP stack running for several months, and both the batcher and proposer ran out of funds a month ago.\r\nAfter topping up both accounts, the batcher is running fine again, but the proposer is unable to send txns to Sepolia due to this error:\r\n```\r\nt=2023-10-27T07:57:41+0000 lvl=info msg=\"Creating tx\"                         service=proposer to=0x3B3f74F4385F31206E2482d0E7775a826B7c14b3 from=0x74a0a887f46927Aa8F20F947C795Da36984e5115\r\nt=2023-10-27T07:57:41+0000 lvl=eror msg=\"Failed to send proposal transaction\" err=\"failed to create the tx: failed to estimate gas: execution reverted: L2OutputOracle: block hash does not match the hash at the expected height\" l1blocknum=4,417,789 l1blockhash=0xdd48feed5428ae9da110325dd01ec26c0b9ccf9e93af4d2428e40dc5246d477f l1head=4,572,075\r\nt=2023-10-27T07:57:41+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,077 l1blocknum=4,572,078\r\nt=2023-10-27T07:57:54+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,078 l1blocknum=4,572,078\r\nt=2023-10-27T07:58:06+0000 lvl=info msg=\"Creating tx\"                         service=proposer to=0x3B3f74F4385F31206E2482d0E7775a826B7c14b3 from=0x74a0a887f46927Aa8F20F947C795Da36984e5115\r\nt=2023-10-27T07:58:06+0000 lvl=eror msg=\"Failed to send proposal transaction\" err=\"failed to create the tx: failed to estimate gas: execution reverted: L2OutputOracle: block hash does not match the hash at the expected height\" l1blocknum=4,417,789 l1blockhash=0xdd48feed5428ae9da110325dd01ec26c0b9ccf9e93af4d2428e40dc5246d477f l1head=4,572,077\r\nt=2023-10-27T07:58:06+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,079 l1blocknum=4,572,080\r\nt=2023-10-27T07:58:18+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,080 l1blocknum=4,572,080\r\nt=2023-10-27T07:58:30+0000 lvl=info msg=\"Creating tx\"                         service=proposer to=0x3B3f74F4385F31206E2482d0E7775a826B7c14b3 from=0x74a0a887f46927Aa8F20F947C795Da36984e5115\r\nt=2023-10-27T07:58:30+0000 lvl=eror msg=\"Failed to send proposal transaction\" err=\"failed to create the tx: failed to estimate gas: execution reverted: L2OutputOracle: block hash does not match the hash at the expected height\" l1blocknum=4,417,789 l1blockhash=0xdd48feed5428ae9da110325dd01ec26c0b9ccf9e93af4d2428e40dc5246d477f l1head=4,572,079\r\nt=2023-10-27T07:58:30+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,081 l1blocknum=4,572,082\r\nt=2023-10-27T07:58:42+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,082 l1blocknum=4,572,082\r\nt=2023-10-27T07:58:55+0000 lvl=info msg=\"Creating tx\"                         service=proposer to=0x3B3f74F4385F31206E2482d0E7775a826B7c14b3 from=0x74a0a887f46927Aa8F20F947C795Da36984e5115\r\nt=2023-10-27T07:58:55+0000 lvl=eror msg=\"Failed to send proposal transaction\" err=\"failed to create the tx: failed to estimate gas: execution reverted: L2OutputOracle: block hash does not match the hash at the expected height\" l1blocknum=4,417,789 l1blockhash=0xdd48feed5428ae9da110325dd01ec26c0b9ccf9e93af4d2428e40dc5246d477f l1head=4,572,081\r\nt=2023-10-27T07:58:55+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,083 l1blocknum=4,572,084\r\nt=2023-10-27T07:59:07+0000 lvl=dbug msg=\"waiting for l1 head > l1blocknum1+1\" l1head=4,572,084 l1blocknum=4,572,084\r\n```\r\nThis error seems to be generated from here:\r\nhttps://github.com/ethereum-optimism/optimism/blob/a37f81dc4b29eb6f4570ee62d5a6412230ff35c1/packages/contracts-bedrock/src/L1/L2OutputOracle.sol#L210\r\n\r\nBased on the source code comments, it seems the way around this is to let the proposer send `proposeL2Output` without the `_l1BlockHash` value. May I know how that can be done, or whether there's a different way around this problem?\r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\n1. Launch an OP stack according to the guide (https://stack.optimism.io/docs/build/getting-started/)\r\n2. Let batcher and proposer run out of funds for a long interval, then top up both accounts\r\n3. Confirm batcher is back to running normally\r\n4. Confirm proposer `proposeL2Output` txns are rejected by the `L2OutputOracle` due to the error above\r\n\r\n**Additional context**\r\nProposer: https://sepolia.etherscan.io/address/0x74a0a887f46927aa8f20f947c795da36984e5115\r\nBatcher: https://sepolia.etherscan.io/address/0x2f5146dad1d8d30caa695774b6e233f5405c0823\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "antonio-altr",
+    "id": 100987494,
+    "node_id": "U_kgDOBgTyZg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/100987494?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/antonio-altr",
+    "html_url": "https://github.com/antonio-altr",
+    "followers_url": "https://api.github.com/users/antonio-altr/followers",
+    "following_url": "https://api.github.com/users/antonio-altr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/antonio-altr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/antonio-altr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/antonio-altr/subscriptions",
+    "organizations_url": "https://api.github.com/users/antonio-altr/orgs",
+    "repos_url": "https://api.github.com/users/antonio-altr/repos",
+    "events_url": "https://api.github.com/users/antonio-altr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/antonio-altr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7897/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7897/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -333,6 +352,50 @@
     "body": "This is usually because the op-node has not caught up with the L1 block, meaning it hasn't completed synchronization. You can check the synchronization status in the op-node log.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1792158105/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1800925362",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/7897#issuecomment-1800925362",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/7897",
+    "id": 1800925362,
+    "node_id": "IC_kwDODjvEJM5rV_Cy",
+    "user": {
+      "login": "antonio-altr",
+      "id": 100987494,
+      "node_id": "U_kgDOBgTyZg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/100987494?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/antonio-altr",
+      "html_url": "https://github.com/antonio-altr",
+      "followers_url": "https://api.github.com/users/antonio-altr/followers",
+      "following_url": "https://api.github.com/users/antonio-altr/following{/other_user}",
+      "gists_url": "https://api.github.com/users/antonio-altr/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/antonio-altr/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/antonio-altr/subscriptions",
+      "organizations_url": "https://api.github.com/users/antonio-altr/orgs",
+      "repos_url": "https://api.github.com/users/antonio-altr/repos",
+      "events_url": "https://api.github.com/users/antonio-altr/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/antonio-altr/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-08T02:49:07Z",
+    "updated_at": "2023-11-08T02:49:07Z",
+    "author_association": "NONE",
+    "body": "@opfocus thank you, yes it seems after a long while the proposer is finally able to publish txns again, likely because of the op-node synchronization as you said.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1800925362/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
