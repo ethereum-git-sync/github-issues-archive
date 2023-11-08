@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/remix-project/issues/4208",
+  "repository_url": "https://api.github.com/repos/ethereum/remix-project",
+  "labels_url": "https://api.github.com/repos/ethereum/remix-project/issues/4208/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/remix-project/issues/4208/comments",
+  "events_url": "https://api.github.com/repos/ethereum/remix-project/issues/4208/events",
+  "html_url": "https://github.com/ethereum/remix-project/issues/4208",
+  "id": 1982969101,
+  "node_id": "I_kwDODtLRw852MbUN",
+  "number": 4208,
+  "title": "Calling contract functions reloads the IDE",
+  "user": {
+    "login": "0f0crypto",
+    "id": 79452698,
+    "node_id": "MDQ6VXNlcjc5NDUyNjk4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/79452698?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0f0crypto",
+    "html_url": "https://github.com/0f0crypto",
+    "followers_url": "https://api.github.com/users/0f0crypto/followers",
+    "following_url": "https://api.github.com/users/0f0crypto/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0f0crypto/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0f0crypto/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0f0crypto/subscriptions",
+    "organizations_url": "https://api.github.com/users/0f0crypto/orgs",
+    "repos_url": "https://api.github.com/users/0f0crypto/repos",
+    "events_url": "https://api.github.com/users/0f0crypto/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0f0crypto/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-08T07:56:23Z",
+  "updated_at": "2023-11-08T07:56:23Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Calling functions on deployed contracts (loaded in via ABI) reloads/crashes the IDE.\r\n\r\n# Steps to reproduce\r\n\r\n* Write a simple contract with a single address variable `owner`, compile it (here I'm using the 0.6.12 as the target contract was complied with that compiler version)\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.6.12;\r\n\r\ncontract Ownable {\r\n    address private _owner;\r\n\r\n    function owner() external view returns (address) {\r\n        return _owner;\r\n    }\r\n}\r\n```\r\n\r\n* Compile the contract and load, for example, the [USDC](https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48#readProxyContract) contract on main net @ 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\r\n\r\n* Calling the `owner()` function briefly returns the result `0xFcb19e6a322b27c06842A71e8c725399f049AE3a` and then the IDE crashes. \r\n\r\n![image](https://github.com/ethereum/remix-project/assets/79452698/3d6dc3dd-64e4-49c6-8f1b-ec80f71a3b36)\r\n\r\nThe console shows the following errors:\r\n\r\n```\r\nTypeError: Cannot read properties of undefined (reading 'toString')\r\n    at Context (162.0.37.0.1699376748839.js:1:2176997)\r\n    at Ch (main.0.37.0.1699376748839.js:1:3354658)\r\n    at ck (main.0.37.0.1699376748839.js:1:3402248)\r\n    at bk (main.0.37.0.1699376748839.js:1:3394416)\r\n    at ak (main.0.37.0.1699376748839.js:1:3394347)\r\n    at Tj (main.0.37.0.1699376748839.js:1:3394206)\r\n    at Lj (main.0.37.0.1699376748839.js:1:3391056)\r\n    at main.0.37.0.1699376748839.js:1:3340310\r\n    at exports.unstable_runWithPriority (main.0.37.0.1699376748839.js:1:3619133)\r\n    at gg (main.0.37.0.1699376748839.js:1:3340087)\r\n    \r\nTypeError: Cannot set properties of null (setting 'currentContent')\r\n    at ref (162.0.37.0.1699376748839.js:1:2614531)\r\n    at Vi (main.0.37.0.1699376748839.js:1:3380967)\r\n    at bj (main.0.37.0.1699376748839.js:1:3383683)\r\n    at cj (main.0.37.0.1699376748839.js:1:3385506)\r\n    at dk (main.0.37.0.1699376748839.js:1:3397322)\r\n    at exports.unstable_runWithPriority (main.0.37.0.1699376748839.js:1:3619133)\r\n    at gg (main.0.37.0.1699376748839.js:1:3340087)\r\n    at Uj (main.0.37.0.1699376748839.js:1:3395283)\r\n    at Lj (main.0.37.0.1699376748839.js:1:3391264)\r\n    at main.0.37.0.1699376748839.js:1:3340310\r\n    \r\nUncaught TypeError: Cannot set properties of null (setting 'currentContent')\r\n    at ref (162.0.37.0.1699376748839.js:1:2614531)\r\n    at Vi (main.0.37.0.1699376748839.js:1:3380967)\r\n    at bj (main.0.37.0.1699376748839.js:1:3383683)\r\n    at cj (main.0.37.0.1699376748839.js:1:3385506)\r\n    at dk (main.0.37.0.1699376748839.js:1:3397322)\r\n    at exports.unstable_runWithPriority (main.0.37.0.1699376748839.js:1:3619133)\r\n    at gg (main.0.37.0.1699376748839.js:1:3340087)\r\n    at Uj (main.0.37.0.1699376748839.js:1:3395283)\r\n    at Lj (main.0.37.0.1699376748839.js:1:3391264)\r\n    at main.0.37.0.1699376748839.js:1:3340310\r\n    \r\nUncaught (in promise) TypeError: Cannot read properties of undefined (reading 'toString')\r\n    at Context (162.0.37.0.1699376748839.js:1:2176997)\r\n    at Ch (main.0.37.0.1699376748839.js:1:3354658)\r\n    at ck (main.0.37.0.1699376748839.js:1:3402248)\r\n    at bk (main.0.37.0.1699376748839.js:1:3394416)\r\n    at ak (main.0.37.0.1699376748839.js:1:3394347)\r\n    at Tj (main.0.37.0.1699376748839.js:1:3394206)\r\n    at Lj (main.0.37.0.1699376748839.js:1:3391056)\r\n    at main.0.37.0.1699376748839.js:1:3340310\r\n    at exports.unstable_runWithPriority (main.0.37.0.1699376748839.js:1:3619133)\r\n    at gg (main.0.37.0.1699376748839.js:1:3340087)\r\n```\r\n\r\nBrowsers:\r\n\r\nGoogle Chrome: Version 119.0.6045.106 (Official Build) (64-bit)\r\nMicrosoft Edge: Version 119.0.2151.44 (Official build) (64-bit)\r\n\r\nDemo Video:\r\n\r\n[![Youtube video demo](https://img.youtube.com/vi/_Mye2QMqWpA/0.jpg)](https://www.youtube.com/watch?v=_Mye2QMqWpA)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/remix-project/issues/4208/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/remix-project/issues/4208/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
