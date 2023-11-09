@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14677",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14677/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14677/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14677/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14677",
+  "id": 1984138898,
+  "node_id": "I_kwDOAm_5kc52Q46S",
+  "number": 14677,
+  "title": "Slicing calldata arrays out of bounds revert without reason",
+  "user": {
+    "login": "ernestognw",
+    "id": 33379285,
+    "node_id": "MDQ6VXNlcjMzMzc5Mjg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33379285?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ernestognw",
+    "html_url": "https://github.com/ernestognw",
+    "followers_url": "https://api.github.com/users/ernestognw/followers",
+    "following_url": "https://api.github.com/users/ernestognw/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ernestognw/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ernestognw/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ernestognw/subscriptions",
+    "organizations_url": "https://api.github.com/users/ernestognw/orgs",
+    "repos_url": "https://api.github.com/users/ernestognw/repos",
+    "events_url": "https://api.github.com/users/ernestognw/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ernestognw/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-08T18:02:15Z",
+  "updated_at": "2023-11-08T18:02:15Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nAccording to [the documentation](https://docs.soliditylang.org/en/v0.8.23/control-structures.html#panic-via-assert-and-error-via-require), the `0x32` panic code corresponds to an access out of bounds in arrays.\r\n\r\n> If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).\r\n\r\nThe description makes explicit that an out-of-bounds access to an array slice should panic with this code. However, it reverts without a reason when an array slice specifies an end out of bounds (i.e.`end >= x.length`).\r\n\r\nIt's true the description only mentions _access_ to an array, but the result of an array slice is another array, so why would \"array slice\" be mentioned if this panic code only shows up when accessing regular arrays?\r\n\r\nIdeally, an array slice out of bounds would revert with an `0x32` code as well.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.22\r\n- Target EVM version (as per compiler settings): Shanghai\r\n- Framework/IDE (e.g. Truffle or Remix): Foundry\r\n\r\n## Steps to Reproduce\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity 0.8.22;\r\n\r\ncontract OutOfBounds {\r\n    function shouldPanicWithShortCalldata(bytes memory data) public pure {\r\n        // Does panic\r\n        data[4];\r\n    }\r\n\r\n    function shouldPanicWithShortCalldataToo(bytes calldata data) public pure {\r\n        // No panic\r\n        data[:4];\r\n    }\r\n}\r\n```\r\n\r\nTests:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity 0.8.22;\r\n\r\nimport {Test, stdError} from \"forge-std/Test.sol\";\r\nimport \"../src/OutOfBounds.sol\";\r\n\r\ncontract OutOfBoundsTest is Test {\r\n    OutOfBounds public outOfBounds;\r\n    bytes data = hex\"123456\";\r\n\r\n    function setUp() public {\r\n        outOfBounds = new OutOfBounds();\r\n    }\r\n\r\n    function testShouldPanicWithShortCalldata() public {\r\n        vm.expectRevert(stdError.indexOOBError);\r\n        outOfBounds.shouldPanicWithShortCalldata(data);\r\n    }\r\n\r\n    function testShouldPanicWithShortCalldataToo() public {\r\n        vm.expectRevert(stdError.indexOOBError);\r\n        outOfBounds.shouldPanicWithShortCalldataToo(data);\r\n    }\r\n}\r\n```\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14677/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14677/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
