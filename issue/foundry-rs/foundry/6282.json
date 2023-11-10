@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6282",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6282/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6282/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6282/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6282",
+  "id": 1988095842,
+  "node_id": "I_kwDOGBlvNc52f-9i",
+  "number": 6282,
+  "title": "forge(doc): Include `@param` tags provided for events, errors and structs",
+  "user": {
+    "login": "webthethird",
+    "id": 6509209,
+    "node_id": "MDQ6VXNlcjY1MDkyMDk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6509209?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/webthethird",
+    "html_url": "https://github.com/webthethird",
+    "followers_url": "https://api.github.com/users/webthethird/followers",
+    "following_url": "https://api.github.com/users/webthethird/following{/other_user}",
+    "gists_url": "https://api.github.com/users/webthethird/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/webthethird/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/webthethird/subscriptions",
+    "organizations_url": "https://api.github.com/users/webthethird/orgs",
+    "repos_url": "https://api.github.com/users/webthethird/repos",
+    "events_url": "https://api.github.com/users/webthethird/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/webthethird/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-10T17:58:17Z",
+  "updated_at": "2023-11-10T18:13:08Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\nWhen generating user docs with `forge doc`, I would like to have a table for each event, custom error and struct that has parameters, in the same manner as functions, provided that the developer has included `@param` tags for the event/error parameters. For example:\r\n\r\n```solidity\r\n    /// @notice Emitted when a new reward token is added\r\n    /// @param rewardToken Reward token address\r\n    /// @param initialTimestamp Timestamp when reward token was added\r\n    /// @param initialInflationRate Initial inflation rate for the reward token\r\n    /// @param initialReductionFactor Initial reduction factor for the reward token\r\n    event RewardTokenAdded(\r\n        address indexed rewardToken,\r\n        uint256 initialTimestamp,\r\n        uint256 initialInflationRate,\r\n        uint256 initialReductionFactor\r\n    );\r\n```\r\n\r\nshould generate:\r\n\r\n## Events\r\n\r\n### RewardTokenAdded\r\n\r\nEmitted when a new reward token is added\r\n\r\n```solidity\r\nevent RewardTokenAdded(\r\n    address indexed rewardToken, uint256 initialTimestamp, uint256 initialInflationRate, uint256 initialReductionFactor\r\n);\r\n```\r\n\r\n**Parameters**\r\n\r\n| Name                     | Type      | Description                                |\r\n| ------------------------ | --------- | ------------------------------------------ |\r\n| `rewardToken`            | `address` | Reward token address                |\r\n| `initialTimestamp`       | `uint256` | Timestamp when reward token was added      |\r\n| `initialInflationRate`   | `uint256` | Initial inflation rate for the reward token   |\r\n| `initialReductionFactor` | `uint256` | Initial reduction factor for the reward token |\r\n\r\nSimilarly,\r\n\r\n```solidity\r\n    /// @notice Data structure containing essential info for each reward token\r\n    /// @param token Address of the reward token\r\n    /// @param paused Whether the reward token accrual is paused\r\n    /// @param initialTimestamp Time when the reward token was added\r\n    /// @param initialInflationRate Initial rate of reward token emission per year\r\n    /// @param reductionFactor Factor by which the inflation rate is reduced each year\r\n    /// @param marketAddresses List of markets for which the reward token is distributed\r\n    /// @param marketWeights Market reward weights as basis points, i.e., 100 = 1%, 10000 = 100%\r\n    struct RewardInfo {\r\n        IERC20Metadata token;\r\n        bool paused;\r\n        uint256 initialTimestamp;\r\n        uint256 initialInflationRate;\r\n        uint256 reductionFactor;\r\n        address[] marketAddresses;\r\n        uint16[] marketWeights;\r\n    }\r\n```\r\n\r\nshould generate\r\n\r\n## Structs\r\n### RewardInfo\r\nData structure containing essential info for each reward token\r\n\r\n\r\n```solidity\r\nstruct RewardInfo {\r\n    IERC20Metadata token;\r\n    bool paused;\r\n    uint256 initialTimestamp;\r\n    uint256 initialInflationRate;\r\n    uint256 reductionFactor;\r\n    address[] marketAddresses;\r\n    uint16[] marketWeights;\r\n}\r\n```\r\n\r\n**Properties**\r\n| Name                     | Type      | Description                                |\r\n| ------------------------ | --------- | ------------------------------------------ |\r\n| `token`            | `IERC20Metadata` | Address of the reward token                |\r\n|`paused`|`bool`| Whether the reward token accrual is paused |\r\n| `initialTimestamp`       | `uint256` | Time when the reward token was added     |\r\n| `initialInflationRate`   | `uint256` | Initial rate of reward token emission per year  |\r\n| `reductionFactor` | `uint256` | Factor by which the inflation rate is reduced each year |\r\n| `marketAddresses`|`address[]`| List of markets for which the reward token is distributed |\r\n| `marketWeights`|`uint16[]`| Market reward weights as basis points, i.e., 100 = 1%, 10000 = 100% |\r\n\r\n### Additional context\r\n\r\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6282/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6282/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
