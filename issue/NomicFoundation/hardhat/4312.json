@@ -40,7 +40,7 @@
       "description": "There's not enough information to start working on this issue"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "fvictorio",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-08-18T04:32:23Z",
-  "updated_at": "2023-10-13T13:58:21Z",
-  "closed_at": null,
+  "updated_at": "2023-11-10T13:46:51Z",
+  "closed_at": "2023-11-10T13:46:50Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\r\n\r\n2.17.1\r\n\r\n### What happened?\r\n\r\nWhen I invoke the call function in nodejs to get a value from the world contract like this\r\n```\r\nconst contract = new web3.eth.Contract(worldContractABI, process.env.WORLD_ADDRESS);\r\nconst result = await contract.methods.getField(tableId, keys, i).call();\r\n```\r\nIt will raise an error below\r\n```\r\nAbiError: Parameter decoding error: Returned values aren't valid, did it run Out of Gas? You might also see this error if you are not using the correct ABI for the contract you are retrieving data from, requesting data from a block number that does not exist, or querying a node which is not fully synced.\r\n```\r\n\r\nHowever when I change to Ganache or anyother test net, everything works fine.\r\n\r\nI think this maybe has some relations to the issue: https://github.com/NomicFoundation/hardhat/issues/3798\r\n\r\nThe `getField` function is defined here: https://github.com/latticexyz/mud/blob/e9258dae33053eb837f54c4a5d74059cea693f61/packages/store/src/StoreCore.sol#L469\r\n\r\n### Minimal reproduction steps\r\n\r\nInit a mud project\r\n```\r\npnpm create mud@canary bug_reproduce\r\n```\r\nChoose vanilla mode\r\n\r\nstart a hardhat node (install hardhat dependencies before)\r\n```\r\nnpx hardhat node\r\n```\r\nAdd hardhat node to the  `packages/contracts/foundry.toml`\r\n```\r\n# add this line below to the foundry.toml\r\n[profile.local]\r\neth_rpc_url = \"http://127.0.0.1:8545\"\r\n```\r\nchange the private key in the `packages/contracts/.env` to the hardhat node funded private key.\r\n\r\n```\r\ncd bug_reproduce/packages/contracts\r\npnpm run build && mud deploy --profile=local\r\n```\r\nGet  world address from the log like this \r\n```\r\n{\r\n  worldAddress: '0xB29184E083A14dD8deF236D953574b90fdf2f24E',\r\n  blockNumber: 0\r\n}\r\n```\r\n\r\nNow the contract has been deployed and we can create a new project to test this contract.\r\n\r\n```\r\nmkdir contract_test\r\ncd contract_test\r\nnpm install web3\r\ntouch test.js\r\n````\r\nNow paste the code below to the test.js\r\n\r\n```\r\n// test.js\r\nconst {\r\n    Web3\r\n} = require('web3');\r\nconst web3 = new Web3(\"http://127.0.0.1:8545\");\r\n\r\n// Notice: Need to edit to your address and key\r\nconst worldAddress = '0xB29184E083A14dD8deF236D953574b90fdf2f24E';\r\nconst privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';\r\n\r\n// const web3 = \r\nconst abi = [{\r\n        \"inputs\": [],\r\n        \"name\": \"increment\",\r\n        \"outputs\": [{\r\n            \"internalType\": \"uint32\",\r\n            \"name\": \"\",\r\n            \"type\": \"uint32\"\r\n        }],\r\n        \"stateMutability\": \"nonpayable\",\r\n        \"type\": \"function\"\r\n    },\r\n    {\r\n        \"inputs\": [{\r\n                \"internalType\": \"bytes32\",\r\n                \"name\": \"table\",\r\n                \"type\": \"bytes32\"\r\n            },\r\n            {\r\n                \"internalType\": \"bytes32[]\",\r\n                \"name\": \"key\",\r\n                \"type\": \"bytes32[]\"\r\n            },\r\n            {\r\n                \"internalType\": \"uint8\",\r\n                \"name\": \"schemaIndex\",\r\n                \"type\": \"uint8\"\r\n            }\r\n        ],\r\n        \"name\": \"getField\",\r\n        \"outputs\": [{\r\n            \"internalType\": \"bytes\",\r\n            \"name\": \"data\",\r\n            \"type\": \"bytes\"\r\n        }],\r\n    }\r\n\r\n];\r\n\r\nconst contract = new web3.eth.Contract(abi, worldAddress);\r\nconst account = web3.eth.accounts.privateKeyToAccount(privateKey);\r\nconst methodKey = \"0xd09de08a\" // function selector for getField;\r\nconst tableId = '0x00000000000000000000000000000000436f756e746572000000000000000000';\r\nconsole.log(contract.methods);\r\nasync function main() {\r\n    const transactionObject = {\r\n        from: account.address,\r\n        to: worldAddress,\r\n        gas: 200000,\r\n        gasPrice: web3.utils.toWei('10', 'gwei'),\r\n        data: contract.methods[methodKey](tableId, [], 0).encodeABI(),\r\n    };\r\n\r\n    web3.eth.accounts.signTransaction(transactionObject, privateKey)\r\n        .then(signedTx => {\r\n            web3.eth.sendSignedTransaction(signedTx.rawTransaction)\r\n                .on('receipt', receipt => {\r\n                    console.log(receipt.transactionHash);\r\n                })\r\n                .on('error', error => {\r\n                    console.error(error);\r\n                });\r\n        })\r\n        .catch(error => {\r\n            console.error('Sign failed:', error);\r\n        });\r\n\r\n    // Get value\r\n    const increment = await contract.methods[methodKey](tableId, [], 0).call();\r\n    console.log(\"increment\", increment);\r\n}\r\nmain();\r\n```\r\n\r\nNow we can run the test\r\n\r\n```\r\nnode test.js\r\n```\r\n\r\nWe can see the transaction sent successfully, however the `.call()`  raise the error:\r\n\r\n```\r\nAbiError: Parameter decoding error: Returned values aren't valid, did it run Out of Gas? You might also see this error if you are not using the correct ABI for the contract you are retrieving data from, requesting data from a block number that does not exist, or querying a node which is not fully synced.\r\n```\r\n\r\nNow we close the hardhat node, and start a gananche node\r\n```\r\nganache\r\n```\r\nAnd we deploy the contract again, change the world address and private key in the `test.js`, then run `node test.js` again.\r\n\r\nNow increment function works fine, no errors .\r\n\r\n\r\n### Search terms\r\n\r\n_No response_",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fvictorio",
+    "id": 417134,
+    "node_id": "MDQ6VXNlcjQxNzEzNA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fvictorio",
+    "html_url": "https://github.com/fvictorio",
+    "followers_url": "https://api.github.com/users/fvictorio/followers",
+    "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+    "repos_url": "https://api.github.com/users/fvictorio/repos",
+    "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4312/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4312/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -142,6 +161,50 @@
     "body": "Hey @CrazyNorman, sorry for not responding sooner.\r\n\r\nI tried to reproduce your example and I did get the same error, but then I make the same thing with ethers like this (it's not exactly the same because I'm not sending the tx, but since your example doesn't await for it then it's kind of the same):\r\n\r\n```js\r\nconst contract = await ethers.getContractAt(abi, worldAddress);\r\nconst value = await contract.getField.staticCall(tableId, [], 0);\r\n```\r\n\r\nand I didn't get an error. So maybe there's something weird going on with web3? That wouldn't explain why it works on ganache though.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1761566990/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1805760753",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4312#issuecomment-1805760753",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4312",
+    "id": 1805760753,
+    "node_id": "IC_kwDOB7jojM5robjx",
+    "user": {
+      "login": "fvictorio",
+      "id": 417134,
+      "node_id": "MDQ6VXNlcjQxNzEzNA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/417134?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fvictorio",
+      "html_url": "https://github.com/fvictorio",
+      "followers_url": "https://api.github.com/users/fvictorio/followers",
+      "following_url": "https://api.github.com/users/fvictorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fvictorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fvictorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fvictorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/fvictorio/orgs",
+      "repos_url": "https://api.github.com/users/fvictorio/repos",
+      "events_url": "https://api.github.com/users/fvictorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fvictorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-10T13:46:50Z",
+    "updated_at": "2023-11-10T13:46:50Z",
+    "author_association": "MEMBER",
+    "body": "Closing for lack of response, but will re-open if we get more info.",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1805760753/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
