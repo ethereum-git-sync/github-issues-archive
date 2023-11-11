@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8704",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8704/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8704/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8704/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8704",
+  "id": 1989004096,
+  "node_id": "I_kwDOC0FsAM52jctA",
+  "number": 8704,
+  "title": "race in discv4",
+  "user": {
+    "login": "AskAlexSharov",
+    "id": 46885206,
+    "node_id": "MDQ6VXNlcjQ2ODg1MjA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/46885206?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AskAlexSharov",
+    "html_url": "https://github.com/AskAlexSharov",
+    "followers_url": "https://api.github.com/users/AskAlexSharov/followers",
+    "following_url": "https://api.github.com/users/AskAlexSharov/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AskAlexSharov/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AskAlexSharov/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AskAlexSharov/subscriptions",
+    "organizations_url": "https://api.github.com/users/AskAlexSharov/orgs",
+    "repos_url": "https://api.github.com/users/AskAlexSharov/repos",
+    "events_url": "https://api.github.com/users/AskAlexSharov/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AskAlexSharov/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-11T15:35:34Z",
+  "updated_at": "2023-11-11T15:46:39Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "```\r\n==================\r\nWARNING: DATA RACE\r\nWrite at 0x00c0000363e8 by goroutine 194:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).loop()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:609 +0xb12\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4.func2()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:184 +0x33\r\n\r\nPrevious read at 0x00c0000363e8 by goroutine 200:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).ensureBond()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:798 +0x1ba\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).findnode()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:365 +0x67\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).newLookup.func1()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:351 +0x165\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*lookup).query()\r\n      github.com/ledgerwatch/erigon/p2p/discover/lookup.go:157 +0x16b\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*lookup).startQueries.func1()\r\n      github.com/ledgerwatch/erigon/p2p/discover/lookup.go:128 +0x4f\r\n\r\nGoroutine 194 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:184 +0xa6a\r\n  github.com/ledgerwatch/erigon/p2p/discover.newUDPTestContext()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp_test.go:90 +0x786\r\n  github.com/ledgerwatch/erigon/p2p/discover.TestUDPv4_Lookup()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_lookup_test.go:45 +0xc4\r\n  testing.tRunner()\r\n      testing/testing.go:1595 +0x238\r\n  testing.(*T).Run.func1()\r\n      testing/testing.go:1648 +0x44\r\n\r\nGoroutine 200 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*lookup).startQueries()\r\n      github.com/ledgerwatch/erigon/p2p/discover/lookup.go:128 +0x524\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*lookup).advance()\r\n      github.com/ledgerwatch/erigon/p2p/discover/lookup.go:72 +0x3e\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*lookup).run()\r\n      github.com/ledgerwatch/erigon/p2p/discover/lookup.go:64 +0x2e\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).LookupPubkey()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:319 +0x1ec\r\n  github.com/ledgerwatch/erigon/p2p/discover.TestUDPv4_Lookup()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_lookup_test.go:61 +0x584\r\n  testing.tRunner()\r\n      testing/testing.go:1595 +0x238\r\n  testing.(*T).Run.func1()\r\n      testing/testing.go:1648 +0x44\r\n==================\r\n--- FAIL: TestUDPv4_LookupIteratorClose (0.06s)\r\n```\r\n\r\n```\r\n==================\r\nWARNING: DATA RACE\r\nWrite at 0x00c003b8e268 by goroutine 380:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).loop()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:609 +0xb12\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4.func2()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:184 +0x33\r\n\r\nPrevious read at 0x00c003b8e268 by goroutine 6205:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).ping()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:271 +0x1e9\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*Table).doRevalidate()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:404 +0x169\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*Table).loop.func10()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:291 +0x44\r\n\r\nGoroutine 380 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:184 +0xa6a\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).setupDiscovery()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:661 +0xb66\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).Start()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:536 +0x9d5\r\n  github.com/ledgerwatch/erigon/p2p/sentry.(*GrpcServer).SetStatus()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_grpc_server.go:1011 +0xd7e\r\n  github.com/ledgerwatch/erigon-lib/direct.(*SentryClientDirect).SetStatus()\r\n      github.com/ledgerwatch/erigon-lib@v1.0.0/direct/sentry_client.go:230 +0x62\r\n  github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client.sentryReconnectAndPumpStreamLoop[go.shape.*uint8]()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client/sentry_multi_client.go:156 +0x3f9\r\n  github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client.(*MultiClient).RecvMessageLoop()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client/sentry_multi_client.go:113 +0x3f6\r\n  github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client.(*MultiClient).StartStreamLoops.func1()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client/sentry_multi_client.go:60 +0x6e\r\n\r\nGoroutine 6205 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*Table).loop()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:291 +0x72a\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4.func1()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:181 +0x33\r\n==================\r\n==================\r\nWARNING: DATA RACE\r\nWrite at 0x00c0002b01e8 by goroutine 380:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).loop()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:609 +0xb12\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4.func2()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:184 +0x33\r\n\r\nPrevious read at 0x00c0002b01e8 by goroutine 6205:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).ensureBond()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:798 +0x1ba\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*UDPv4).RequestENR()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:411 +0x208\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*Table).doRevalidate()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:409 +0x201\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*Table).loop.func10()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:291 +0x44\r\n\r\nGoroutine 380 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:184 +0xa6a\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).setupDiscovery()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:661 +0xb66\r\n  github.com/ledgerwatch/erigon/p2p.(*Server).Start()\r\n      github.com/ledgerwatch/erigon/p2p/server.go:536 +0x9d5\r\n  github.com/ledgerwatch/erigon/p2p/sentry.(*GrpcServer).SetStatus()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_grpc_server.go:1011 +0xd7e\r\n  github.com/ledgerwatch/erigon-lib/direct.(*SentryClientDirect).SetStatus()\r\n      github.com/ledgerwatch/erigon-lib@v1.0.0/direct/sentry_client.go:230 +0x62\r\n  github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client.sentryReconnectAndPumpStreamLoop[go.shape.*uint8]()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client/sentry_multi_client.go:156 +0x3f9\r\n  github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client.(*MultiClient).RecvMessageLoop()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client/sentry_multi_client.go:113 +0x3f6\r\n  github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client.(*MultiClient).StartStreamLoops.func1()\r\n      github.com/ledgerwatch/erigon/p2p/sentry/sentry_multi_client/sentry_multi_client.go:60 +0x6e\r\n\r\nGoroutine 6205 (running) created at:\r\n  github.com/ledgerwatch/erigon/p2p/discover.(*Table).loop()\r\n      github.com/ledgerwatch/erigon/p2p/discover/table.go:291 +0x72a\r\n  github.com/ledgerwatch/erigon/p2p/discover.ListenV4.func1()\r\n      github.com/ledgerwatch/erigon/p2p/discover/v4_udp.go:181 +0x33\r\n==================\r\nINFO[11-11|15:19:17.602] [6/6 MiningFinish] block ready for seal  block_num=9 transactions=350 gas_used=7350000 gas_limit=20000000 difficulty=2\r\nINFO[11-11|15:19:17.602] Waiting for slot to sign and propagate   number=9 hash=0x2d558c0 delay=397.665ms TxCount=350 Signer=0x71562b71999873DB5b286dF957af199Ec94617F7\r\nINFO[11-11|15:19:18.001] Sealed in-turn                           number=9 delay=397.665504ms headerDifficulty=2 signer=0x71562b71999873DB5b286dF957af199Ec94617F7\r\nINFO[11-11|15:19:18.003] [2/15 Headers] Processed                 highest inserted=9 age=0\r\nINFO[11-11|15:19:18.141] Committed State                          gas reached=0 gasTarget=0\r\nINFO[11-11|15:19:18.146] [7/15 Execution] Completed on            block=9\r\nINFO[11-11|15:19:18.176] RPC Daemon notified of new headers       from=8 to=9 hash=0xe1cd9eb064d66ab146a9c880ff74b62139ea9af8f59e005f48de69ae4f1ee276 header sending=31.43µs log sending=750ns\r\nINFO[11-11|15:19:18.176] Timings (slower than 50ms)               Headers=639ms Execution=98ms\r\nINFO[11-11|15:19:18.178] [2/15 Headers] Waiting for headers...    from=9\r\nINFO[11-11|15:19:18.180] [1/6 MiningCreateBlock] Start mine       block=10 baseFee=<nil> gasLimit=20000000\r\n\r\n\r\nTime to execute 5000 txs: 14.902032828s\r\n--- FAIL: TestMiningBenchmark (15.78s)\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8704/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8704/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
