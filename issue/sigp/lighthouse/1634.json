@@ -60,7 +60,7 @@
   "created_at": "2020-09-19T03:18:59Z",
   "updated_at": "2023-06-06T00:01:21Z",
   "closed_at": "2023-06-06T00:01:20Z",
-  "author_association": "CONTRIBUTOR",
+  "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nInside the RPC we handle requests sent from out side over outbound substreams. When a request receives an end of stream signal or an error, the outbound substream state machine transitions to a closing state. This state only indicates that the substream must be closed, but we will hold it until actually closing it. Between both operations the substream could produce other errors: timeouts, peer sending additional stuff, etc. Those errors are only relevant inside the `Behaviour` for peer scoring, but for the application that sent the request, it is already finished and those additional messages are undesired noice. We should ensure that the application receives exactly one message that indicates the request is finished\r\n\r\n## Version\r\n\r\nmaster, 0.2.10\r\n\r\n## Present Behaviour\r\n\r\nit is possible for the application to receive more than one error for a request\r\n\r\n## Expected Behaviour\r\n\r\nreceive just one :)\r\n\r\n## Steps to resolve\r\n\r\ncheck the code to ensure that if a substream is in a closing state, it has already sent a final chunk/error. And when checking timeouts or newly received responses, inform of the error to the behaviour but also indicate that the error should not be propagated to the application.\r\n\r\nSmall worry out of my head.. a handler might get shutdown before sending the errors, but I guess that's out of scope here",
   "closed_by": {
@@ -172,7 +172,7 @@
     },
     "created_at": "2020-11-09T00:06:11Z",
     "updated_at": "2020-11-09T07:08:06Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "COLLABORATOR",
     "body": "The rpc still sends both errors and stream terminations to sync but we just handle it, maybe we can close it? ",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/723687114/reactions",
@@ -216,7 +216,7 @@
     },
     "created_at": "2023-06-06T00:01:20Z",
     "updated_at": "2023-06-06T00:01:20Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "COLLABORATOR",
     "body": "closing because this doesn't cause any issues even if technically true",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1577704855/reactions",

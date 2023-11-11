@@ -172,7 +172,7 @@
     },
     "created_at": "2021-10-11T21:36:21Z",
     "updated_at": "2021-10-15T20:39:31Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "COLLABORATOR",
     "body": "I think it might have to do with how the handler is polled. My hypothesis would be that when a response is received for an outbound request, the swarm polls the handler and this is processed immediately. When the handler gets a (lh) event injected it gets polled but if we need to queue items, those would be sent until the next poll. I'll check how to (dis)prove this. If this is it then the solution is probably to store a waker.\r\nThis would explain why it's only happening with inbound requests for which `remaining_chunks > 1`\r\n\r\n---------------\r\n\r\nDid some tests with enough load to force the handler to queue chunks (Sometimes as many as a complete batch - 64) and can't make it timeout, so maybe it's something else. ",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/940460265/reactions",

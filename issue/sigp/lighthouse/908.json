@@ -166,7 +166,7 @@
     },
     "created_at": "2020-03-25T19:40:23Z",
     "updated_at": "2020-03-25T19:40:23Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "COLLABORATOR",
     "body": "I'll take this one",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/604045717/reactions",
@@ -298,7 +298,7 @@
     },
     "created_at": "2020-04-14T21:37:34Z",
     "updated_at": "2020-04-14T22:16:18Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "COLLABORATOR",
     "body": "Hi!, here is my take on the matter:\r\n\r\nFirst, I wasn't able to make it fail _properly_ (I'll explain). I asked @paulhauner for steps to reproduce a scenario where things could get misaligned, but he said this was more of a \"It might be happening\" thing, so I took his suggestion of playing with the sync sim.\r\n\r\nWhat I did was run the sync sim several times (all strategies) and check that the boundaries of the epochs in which each slot (start and end) fall are consistent with these slots. So concretely, that: \r\n```rust\r\nbatch_start_slot.epoch(slots_per_epoch).start_slot() == batch_start_slot\r\n``` \r\nand\r\n```rust\r\nbatch_end_slot.epoch(slots_per_epoch).start_slot() == batch_end_slot\r\n```\r\nLast one is the start slot of the epoch since the `end_slot` is not inclusive.\r\n\r\nWith `BLOCKS_PER_BATCH = 64` as in v0.2.0, instead of 50 (current value in master, which needs to be changed) they are consistent _as long as this batch is not the last one_ (thus the _properly_ above)\r\n\r\nIn the case of last batches, (I think) it makes sense to have them misaligned but not sure if it makes sense to have a batch in the first place. Some examples of things I got: \r\n\r\n```bash\r\nbatch_start_slot = 384\r\nbatch_end_slot = 385\r\ntarget_head_slot = 384\r\n# we just want to request one block\r\n-----\r\nbatch_start_slot = 360\r\nbatch_end_slot = 393\r\ntarget_head_slot = 392\r\n# I think this one is ok?\r\n```\r\nAll failures are on final batches, so: \r\n- If these failures (batches in which the `target_head_slot` falls between the start of the batch and the would-be-end) are admissible, I think this is ok. `BLOCKS_PER_BATCH` still needs to be changed tho.\r\n- If the batch should request blocks from slots beyond the `target_head_slot` then I think an improvement would be to change `BLOCKS_PER_BATCH` to `EPOCHS_PER_BATCH` and have each batch have a `start_epoch` and a number of `requested_epochs >= 1`. From what I understand, this is what is actually intended and this way if `slots_per_epoch` changes (I don't think it does? but still..) sync would still be consistent\r\n\r\nWhat do you think?",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/613694295/reactions",
