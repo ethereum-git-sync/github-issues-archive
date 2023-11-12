@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6294",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6294/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6294/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6294/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6294",
+  "id": 1989482040,
+  "node_id": "I_kwDOGBlvNc52lRY4",
+  "number": 6294,
+  "title": "test cannot construct a proxy object while gas metering is on",
+  "user": {
+    "login": "drortirosh",
+    "id": 40341007,
+    "node_id": "MDQ6VXNlcjQwMzQxMDA3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/40341007?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/drortirosh",
+    "html_url": "https://github.com/drortirosh",
+    "followers_url": "https://api.github.com/users/drortirosh/followers",
+    "following_url": "https://api.github.com/users/drortirosh/following{/other_user}",
+    "gists_url": "https://api.github.com/users/drortirosh/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/drortirosh/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/drortirosh/subscriptions",
+    "organizations_url": "https://api.github.com/users/drortirosh/orgs",
+    "repos_url": "https://api.github.com/users/drortirosh/repos",
+    "events_url": "https://api.github.com/users/drortirosh/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/drortirosh/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-12T16:40:48Z",
+  "updated_at": "2023-11-12T16:40:48Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [ ] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (34f684d 2023-11-01T22:19:24.989266000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nNone\n\n### Describe the bug\n\nThe following code reverts in setup.\r\nIt does run OK gas metering is NOT disabled\r\n(which means, we can't filter out meter gas only on inner call)\r\n```solidity \r\npragma solidity ^0.8.17;\r\n\r\nimport {Test} from \"forge-std/Test.sol\";\r\nimport \"forge-std/Vm.sol\";\r\nimport {console} from \"hardhat/console.sol\";\r\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\r\nimport \"@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol\";\r\nimport \"@openzeppelin/contracts/proxy/utils/Initializable.sol\";\r\nimport \"@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol\";\r\n\r\ncontract MyObject is Ownable, UUPSUpgradeable, Initializable {\r\n\r\n    constructor() {\r\n        _disableInitializers();\r\n    }\r\n\r\n    function initialize(address anOwner) public virtual initializer {\r\n        _transferOwnership(anOwner);\r\n    }\r\n\r\n    function _authorizeUpgrade(address newImplementation) internal override {}\r\n}\r\n\r\ncontract TestProxy is Test {\r\n\r\n    MyObject singleton = new MyObject();\r\n\r\n    function setUp() public {\r\n        //with this line enabled, the test revert. comment this line, and the test will pass\r\n        vm.pauseGasMetering();\r\n    }\r\n\r\n    function newObj(address owner, uint salt) internal returns (MyObject) {\r\n        return MyObject(address(new ERC1967Proxy{salt: bytes32(salt)}(\r\n            address(singleton),\r\n            abi.encodeCall(MyObject.initialize, (owner))\r\n        )));\r\n    }\r\n\r\n    function test_send1() public {\r\n        MyObject obj = newObj(msg.sender, 0);\r\n        vm.resumeGasMetering();\r\n        //this is the method we want to test (and meter for gas)\r\n        obj.owner();\r\n    }\r\n}\r\n\r\n```\r\n\r\nThis is the test result when running with `forge test -vvv`\r\n\r\n```sh\r\n[FAIL. Reason: EvmError: Revert] test_send1() (gas: 9223372036854754743)\r\nTraces:\r\n  [0] TestProxy::test_send1()\r\n    ├─ [0] → new <Unknown>@0x3E6e1b3d0069A017c50Cc1d758207728ABb19fdc\r\n    │   ├─ emit Upgraded(implementation: MyObject: [0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f])\r\n    │   ├─ [0] MyObject::initialize(DefaultSender: [0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38]) [delegatecall]\r\n    │   │   ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: DefaultSender: [0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38])\r\n    │   │   ├─ emit Initialized(version: 1)\r\n    │   │   └─ ← ()\r\n    │   └─ ← 0 bytes of code   <<<< this is a constructor call that returns ZERO BYTES\r\n    └─ ← \"EvmError: Revert\"\r\n\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6294/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6294/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
