@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-07T13:27:18Z",
-  "updated_at": "2023-11-07T13:27:18Z",
+  "updated_at": "2023-11-13T00:43:52Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1807310370",
+    "html_url": "https://github.com/Consensys/teku/issues/7673#issuecomment-1807310370",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7673",
+    "id": 1807310370,
+    "node_id": "IC_kwDOCM9I9M5ruV4i",
+    "user": {
+      "login": "rolfyone",
+      "id": 2967240,
+      "node_id": "MDQ6VXNlcjI5NjcyNDA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2967240?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rolfyone",
+      "html_url": "https://github.com/rolfyone",
+      "followers_url": "https://api.github.com/users/rolfyone/followers",
+      "following_url": "https://api.github.com/users/rolfyone/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rolfyone/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rolfyone/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rolfyone/subscriptions",
+      "organizations_url": "https://api.github.com/users/rolfyone/orgs",
+      "repos_url": "https://api.github.com/users/rolfyone/repos",
+      "events_url": "https://api.github.com/users/rolfyone/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rolfyone/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-13T00:42:24Z",
+    "updated_at": "2023-11-13T00:43:52Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Hey thanks for raising this. A couple of initial comments and questions...\n\nI'm assuming you're not in archive mode, given the 404 reference. Basically if you're not in archive mode, anything before the finalized state will be a 404, because we don't have those state to build validator data from.\n\nSo if finalized is slot 3200, and you select 3199 for example, then you're going to receive a 404.\n\nRegarding timeout, you'll probably find a subsequent query with the same parameters will work, becuase by then it'll have rebuilt state so it can get down to business.  If you're doing this kind of query often, you could consider increasing the state cache (which will require more memory), using `--Xstore-state-cache-size` which has defaulted to 8 since about June.  If you increase this to around 96, you'll basically have all states in memory and never need to rebuild states for these queries.\n\nThe other thing that can definitely help is requesting only the validators which you need information on, as the list is very large now.\n\nIn terms of questions\n - what teku version are you using?\n - how much heap are you running with (-Xmx)\n - are you seeing 'Completed regeneration of state' messages while you're running these validator queries?\n - Am I correct in my assertion that you're not using archive mode? If you are using archive mode, are you querying states from earlier than when your database is storing? (before you initialised, its possible to rebuild states from earlier but its not default behavior)\n - what network are you running on? is it a validating node? (more because I won't ask you to test things on a validating node unless we really need to)\n\nHopefully this is a start...\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1807310370/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
