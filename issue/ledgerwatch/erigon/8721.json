@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8721",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8721/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8721/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8721/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8721",
+  "id": 1991321373,
+  "node_id": "I_kwDOC0FsAM52sScd",
+  "number": 8721,
+  "title": "Getting \"tracing failed: nonce too high\" when running debug_traceBlockByHash at the tip",
+  "user": {
+    "login": "quick-pawiromitchel",
+    "id": 103942361,
+    "node_id": "U_kgDOBjII2Q",
+    "avatar_url": "https://avatars.githubusercontent.com/u/103942361?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/quick-pawiromitchel",
+    "html_url": "https://github.com/quick-pawiromitchel",
+    "followers_url": "https://api.github.com/users/quick-pawiromitchel/followers",
+    "following_url": "https://api.github.com/users/quick-pawiromitchel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/quick-pawiromitchel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/quick-pawiromitchel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/quick-pawiromitchel/subscriptions",
+    "organizations_url": "https://api.github.com/users/quick-pawiromitchel/orgs",
+    "repos_url": "https://api.github.com/users/quick-pawiromitchel/repos",
+    "events_url": "https://api.github.com/users/quick-pawiromitchel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/quick-pawiromitchel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-13T19:25:33Z",
+  "updated_at": "2023-11-13T19:31:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `erigon/2.54.0/linux-amd64/go1.20.10`\r\n\r\nOS & Version: Linux\r\n\r\nConsensus Layer: `Lighthouse v4.3.0-dfcb336`\r\n\r\nChain/Network: ETH Mainnet\r\n\r\n#### Expected behaviour\r\nTo give full debug trace results\r\n\r\n#### Actual behaviour\r\nGetting these errors inside the response\r\n```\r\n{\r\n  error: {\r\n    code: -32000,\r\n    message: 'tracing failed: nonce too high: address 0x0000000000000000000000000000000000000000, tx: 137 state: 0'\r\n  }\r\n}\r\n```\r\n\r\nHappened at these blocks:\r\n- 0x7de57820bb4e00876d0269695fcf2c47d28efcde4f43c4062dff96d80f6f6a78\r\n- 0x787d9cdd803ab6a37ea7d888a8a9dad633127f94ddd321cb935f508673a3d846\r\n\r\n#### Steps to reproduce the behaviour\r\n- subscribe to incoming blocks\r\n- run debug_traceBlockByHash at the tip\r\n\r\nScript\r\n```js\r\nconst Web3 = require('web3');\r\nconst fetch = require('node-fetch');\r\n\r\nasync function startConnection() {\r\n    const options = {\r\n        timeout: 30000, // ms\r\n\r\n        clientConfig: {\r\n            // Useful if requests are large\r\n            maxReceivedFrameSize: 100000000,   // bytes - default: 1MiB\r\n            maxReceivedMessageSize: 100000000, // bytes - default: 8MiB\r\n\r\n            // Useful to keep a connection alive\r\n            keepalive: true,\r\n            keepaliveInterval: 60000 // ms\r\n        },\r\n\r\n        // Enable auto reconnection\r\n        reconnect: {\r\n            auto: true,\r\n            delay: 5000, // ms\r\n            maxAttempts: 5,\r\n            onTimeout: false\r\n        }\r\n    };\r\n\r\n    const web3 = new Web3(\"ws://\", options);\r\n    let ws = web3.eth.subscribe('newBlockHeaders')\r\n\r\n    ws.on(\"connected\", function (subscriptionId) {\r\n        console.log('connected to WSS ID:', subscriptionId);\r\n    })\r\n\r\n    ws.on(\"data\", async function (block) {\r\n        const blockHash = block.hash;\r\n\r\n        console.log(`incoming ${blockHash}`);\r\n\r\n        const data = {\r\n            method: \"debug_traceBlockByHash\",\r\n            params: [blockHash, { \"tracer\": \"callTracer\", \"timeout\": \"240s\" }],\r\n            jsonrpc: \"2.0\",\r\n            id: new Date().getTime()\r\n        };\r\n\r\n        fetch(url, {\r\n            method: 'POST',\r\n            body: JSON.stringify(data),\r\n            headers: { 'Content-Type': 'application/json' }\r\n        })\r\n            .then(response => response.json())\r\n            .then(result => {\r\n                result.result.forEach(element => {\r\n                    if (element.result === null) {\r\n                        console.log(url, element.result);\r\n                    }\r\n\r\n                    // if the error field is present\r\n                    if (element.error) {\r\n                        console.log(url, element)\r\n                    }\r\n                });\r\n\r\n                if (result.error) {\r\n                    console.log(url, result.error);\r\n                }\r\n            })\r\n            .catch(error => {\r\n                console.log(url, error);\r\n            });\r\n    });\r\n}\r\n\r\nstartConnection();\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8721/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8721/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
