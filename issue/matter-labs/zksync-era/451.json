@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-09T06:18:37Z",
-  "updated_at": "2023-11-09T06:18:37Z",
+  "updated_at": "2023-11-12T20:30:41Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1807230994",
+    "html_url": "https://github.com/matter-labs/zksync-era/issues/451#issuecomment-1807230994",
+    "issue_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/451",
+    "id": 1807230994,
+    "node_id": "IC_kwDOI-FneM5ruCgS",
+    "user": {
+      "login": "RedaOps",
+      "id": 32748771,
+      "node_id": "MDQ6VXNlcjMyNzQ4Nzcx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32748771?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/RedaOps",
+      "html_url": "https://github.com/RedaOps",
+      "followers_url": "https://api.github.com/users/RedaOps/followers",
+      "following_url": "https://api.github.com/users/RedaOps/following{/other_user}",
+      "gists_url": "https://api.github.com/users/RedaOps/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/RedaOps/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/RedaOps/subscriptions",
+      "organizations_url": "https://api.github.com/users/RedaOps/orgs",
+      "repos_url": "https://api.github.com/users/RedaOps/repos",
+      "events_url": "https://api.github.com/users/RedaOps/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/RedaOps/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-12T20:30:40Z",
+    "updated_at": "2023-11-12T20:30:40Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Hi!\r\n\r\nThis happens because you still include the `{\"tracer\": \"callTracer\"}` param, but it also expects a `tracerConfig` in that JSON object in the second parameter. For example, this request will not fail:\r\n\r\n```\r\ncurl --location 'https://mainnet.era.zksync.io' \\\r\n--header 'Content-Type: application/json' \\\r\n--data '{\"jsonrpc\": \"2.0\",\r\n        \"id\":1,\r\n        \"method\":\"debug_traceBlockByNumber\",\r\n        \"params\":[\"0x11a8bf6\"]\r\n}'\r\n```\r\n\r\nInside the code, the `TracerConfig` is optional:\r\n\r\nhttps://github.com/matter-labs/zksync-era/blob/ab31f031dfcaa7ddf296786ddccb78e8edd2d3c5/core/lib/web3_decl/src/namespaces/debug.rs#L20-L25\r\n\r\nBut inside the `TracerConfig`, the `tracerConfig` is not optional:\r\n\r\nhttps://github.com/matter-labs/zksync-era/blob/ab31f031dfcaa7ddf296786ddccb78e8edd2d3c5/core/lib/types/src/api/mod.rs#L636-L641\r\n\r\nThis means that you either include the whole parameter (`{\"tracer\": \"callTracer\", \"tracerConfig\": { \"onlyTopCall\": false }}`) like you did in the second call or you don't use a 2nd parameter at all.\r\n\r\n\r\n\r\nNow for the zkSync team, should the `tracer_config` inside the `TracerConfig` struct be optional (like ethereum)? Or is this expected behaviour?\r\n\r\nNote, this call works on Ethereum, which is what the original poster tried to request but on zkSync. It does not include the `\"tracerConfig\": { \"onlyTopCall\": false }`:\r\n\r\n```\r\ncurl --location 'https://docs-demo.quiknode.pro' \\\r\n--header 'Content-Type: application/json' \\\r\n--data '{\"jsonrpc\": \"2.0\",\r\n        \"id\":1,\r\n        \"method\":\"debug_traceBlockByNumber\",\r\n        \"params\":[\"0x11B2CD1\",{\"tracer\": \"callTracer\"}]\r\n}'\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1807230994/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
