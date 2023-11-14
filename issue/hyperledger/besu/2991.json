@@ -56,9 +56,9 @@
 
   ],
   "milestone": null,
-  "comments": 11,
+  "comments": 12,
   "created_at": "2021-11-03T05:36:23Z",
-  "updated_at": "2023-08-21T01:39:00Z",
+  "updated_at": "2023-11-14T14:57:37Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -113,7 +113,7 @@
     "body": "Hi @jframe @lucassaldanha ,\r\nHaven't found any updates on this since November 2021.\r\nIs there anything new on this migration feature?",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1179713196/reactions",
-      "total_count": 0,
+      "total_count": 1,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
@@ -121,7 +121,7 @@
       "confused": 0,
       "heart": 0,
       "rocket": 0,
-      "eyes": 0
+      "eyes": 1
     },
     "performed_via_github_app": null
   },
@@ -201,8 +201,8 @@
     "body": "Hi @iamhsk,\r\n\r\nThis is a very disappointing answer, as IBFT 2.0 was THE way to go with Hyperledger Besu based PoA networks before QBFT reached production grade.\r\nExpecting someone in the community with no prior experience on this codebase, to go into the heart of the consensus mechanism and implement a migration path seems highly unrealistic.\r\n\r\nThis significantly lowers the reliability of this software (and we are running three networks with it, one of them is a production network), as taking the risk that something that's being used now won't be supported in the future, and no migration path to whatever replaced that something isn't provided, isn't something that can be afforded on production workloads.\r\n\r\nWe chose Hyperledger Besu because it seemed like the best option available for a private permissioned network with enterprise capabilities, WE TOOK THE RISK, and now we are pretty much stuck with something that's very hard to upgrade, as upgrade means creating an additional network (with all the members deploying nodes to that new network in addition to the current one) and \"copy\" the data somehow from the existing contracts to the one in the new network.\r\n\r\nThis shouldn't happen with software that's considered ready for production!\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1186478681/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 3,
+      "+1": 3,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -289,8 +289,8 @@
     "body": "Thanks for the clarification @iamhsk!\r\n\r\nThe need to migrate was triggered by the docs leading to believe that QBFT is the long-term support consensus algorithm starting from the point it reached a production grade release.\r\nSo, to make sure we are not caught by surprise by IBFT 2.0 being retired, cause as I mentioned before, we are running three networks, one of which is a production network, we wanted to start looking at the migration path as early as possible.\r\n\r\nYour last answer made it clear that IBFT 2.0 won't be going away that fast, and once it does, a migration path will already be available.\r\n\r\nThank you!",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1188640415/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 2,
+      "+1": 2,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -553,6 +553,50 @@
     "body": "I've updated this ticket with the progress that we have made with this feature. Development on this is currently paused and we won't be getting back to this for a while. If you want to pick this up though, would be happy to help get you started and point you in the right direction.\r\n\r\nCreating a new QbftContext from a BftContext could work. That is similar to the solution we were working on. The approach we were taking was to have a ProtocolContext that could switch protocol contexts when reaching the Qbft block. To do this we created a [MigratingProtocolContext](https://github.com/hyperledger/besu/blob/main/consensus/common/src/main/java/org/hyperledger/besu/consensus/common/MigratingProtocolContext.java\r\n) and a [MigratingContext](https://github.com/hyperledger/besu/blob/main/consensus/common/src/main/java/org/hyperledger/besu/consensus/common/MigratingProtocolContext.java\r\n) which allows switching ProtocolContexts.\r\n\r\nThere is also a [ConsensusScheduleBesuControllerBuilder](https://github.com/hyperledger/besu/blob/main/consensus/common/src/main/java/org/hyperledger/besu/consensus/common/MigratingProtocolContext.java\r\n) that will switch consensus mechanisms at a particular block.\r\n\r\nThe general approach we took was to have components for `BesuControllerBuilder`, `ProtocolSchedule`, `ProtocolContext`, `MiningCoordinator` that could switch between consensus mechanisms. In the `BesuController` [fromGensisConfig](https://github.com/hyperledger/besu/blob/main/besu/src/main/java/org/hyperledger/besu/controller/BesuController.java#L346) if we have both IBFT2 and QBFT configured in the genesis then we create a create a ConsensusScheduleBesuControllerBuilder using the IbftBesuControllerBuilder and the QbftBesuControllerBuilder which allows for switching between the consensus mechanisms at runtime.\r\n\r\nWhat's missing is changing subprotocols at the fork from the IBFT2 protocol to the QBFT protocol, edge cases around the extra data codec, RPCs and lots of testing.",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1685491976/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1810386554",
+    "html_url": "https://github.com/hyperledger/besu/issues/2991#issuecomment-1810386554",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/2991",
+    "id": 1810386554,
+    "node_id": "IC_kwDODE2jmc5r6E56",
+    "user": {
+      "login": "Alexander-Herranz",
+      "id": 9007971,
+      "node_id": "MDQ6VXNlcjkwMDc5NzE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9007971?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Alexander-Herranz",
+      "html_url": "https://github.com/Alexander-Herranz",
+      "followers_url": "https://api.github.com/users/Alexander-Herranz/followers",
+      "following_url": "https://api.github.com/users/Alexander-Herranz/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Alexander-Herranz/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Alexander-Herranz/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Alexander-Herranz/subscriptions",
+      "organizations_url": "https://api.github.com/users/Alexander-Herranz/orgs",
+      "repos_url": "https://api.github.com/users/Alexander-Herranz/repos",
+      "events_url": "https://api.github.com/users/Alexander-Herranz/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Alexander-Herranz/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-14T14:57:37Z",
+    "updated_at": "2023-11-14T14:57:37Z",
+    "author_association": "NONE",
+    "body": "Any update on IBFT2 to QBFT migration feature?",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1810386554/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
