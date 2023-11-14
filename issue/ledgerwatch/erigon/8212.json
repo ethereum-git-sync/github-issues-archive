@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "battlmonstr",
@@ -105,14 +105,33 @@
     }
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2023-09-16T07:12:21Z",
-  "updated_at": "2023-10-23T01:30:05Z",
-  "closed_at": null,
+  "updated_at": "2023-11-14T16:27:13Z",
+  "closed_at": "2023-11-14T16:27:12Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "this pic is from mumbai, but i saw some reports from other nets in discord\r\n\r\n![mem](https://github.com/ledgerwatch/erigon/assets/46885206/8b1dd93c-b9a7-4412-bc5b-bc799a97b91a)\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "battlmonstr",
+    "id": 11477595,
+    "node_id": "MDQ6VXNlcjExNDc3NTk1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11477595?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/battlmonstr",
+    "html_url": "https://github.com/battlmonstr",
+    "followers_url": "https://api.github.com/users/battlmonstr/followers",
+    "following_url": "https://api.github.com/users/battlmonstr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/battlmonstr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/battlmonstr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/battlmonstr/subscriptions",
+    "organizations_url": "https://api.github.com/users/battlmonstr/orgs",
+    "repos_url": "https://api.github.com/users/battlmonstr/repos",
+    "events_url": "https://api.github.com/users/battlmonstr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/battlmonstr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8212/reactions",
     "total_count": 0,
@@ -127,7 +146,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8212/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -338,6 +357,50 @@
     "body": "@AskAlexSharov has a new release been tagged with all the above fixes?",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1774286266/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 1
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1810612692",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/8212#issuecomment-1810612692",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8212",
+    "id": 1810612692,
+    "node_id": "IC_kwDOC0FsAM5r68HU",
+    "user": {
+      "login": "battlmonstr",
+      "id": 11477595,
+      "node_id": "MDQ6VXNlcjExNDc3NTk1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11477595?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/battlmonstr",
+      "html_url": "https://github.com/battlmonstr",
+      "followers_url": "https://api.github.com/users/battlmonstr/followers",
+      "following_url": "https://api.github.com/users/battlmonstr/following{/other_user}",
+      "gists_url": "https://api.github.com/users/battlmonstr/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/battlmonstr/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/battlmonstr/subscriptions",
+      "organizations_url": "https://api.github.com/users/battlmonstr/orgs",
+      "repos_url": "https://api.github.com/users/battlmonstr/repos",
+      "events_url": "https://api.github.com/users/battlmonstr/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/battlmonstr/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-14T16:27:13Z",
+    "updated_at": "2023-11-14T16:27:13Z",
+    "author_association": "COLLABORATOR",
+    "body": "A few weeks ago I've managed to fix a major memory leak related to failed header verification:\r\nhttps://github.com/ledgerwatch/erigon/pull/8431\r\nIt still leaks 😓 , but at a much slower pace (+10% in 10 minutes compared to +300% in 2 minutes before).\r\n\r\nThe fix was merged to devel on 2023.10.14 and included in Erigon v2.53.0 release.\r\n\r\nPlease test again on a new version, and post a new issue if the results are still not satisfactory. \r\n\r\n## Analysis\r\n\r\nA header is somewhere between 1400 and 2200 bytes.\r\nThe expected Go memory usage with linkLimit=1M at this stage should be around 2.2Gb. \r\nIf the Headers stage prints some progress with memory usage alloc=... and we divide it by linkLimit (1M), and the result is significantly greater than 2200, it means it leaks.\r\n\r\nOverall the memory there is structured like so:\r\n* 2-3 Gb - Go runtime resident size (mostly not inserted headers)\r\n* 0-2 Gb - Go runtime preallocated size (it grows when some headers get inserted)\r\n* 3.2 Gb - mdbx \"dirty space\" controlled by the dirtySpace option: https://github.com/ledgerwatch/erigon/blob/devel/erigon-lib/kv/mdbx/kv_mdbx.go#L88 . Dirty space max size depends on total RAM: 64 Gb total sets 3.2 Gb dirty space, 32 Gb - 1.6 Gb, 16 Gb - 0.8 Gb. In our setup mdbx transaction writes have 3 stages: first the changes are recorded in memory in this \"dirty space\", then \"spilled\" to disk if \"dirty space\" gets full, and then committed (copied?) to the permanent db location. The final commit  happens when StageLoopIteration ends (all stages pass one iteration), it is not happening during headers download stage. So when headers are \"inserted\", it just moves it from (1) to (3) in a way, and maybe moves some \"dirty\" stuff to disk.\r\n* 0.8-1 Gb - unknown native memory. This stays relatively constant around 1Gb (doesn't leak).\r\n\r\nThe expected total required memory is around 8 Gb for the headers stage on a 64 Gb VM, and 6 Gb on a 16 Gb VM.\r\n\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1810612692/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
