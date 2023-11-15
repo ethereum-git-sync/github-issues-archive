@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28528",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28528/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28528/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28528/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28528",
+  "id": 1994185399,
+  "node_id": "I_kwDOAOvK98523Nq3",
+  "number": 28528,
+  "title": "p2p discovery: public P2P nodes removed from boot nodes after being restarted ",
+  "user": {
+    "login": "aweneagle",
+    "id": 5202055,
+    "node_id": "MDQ6VXNlcjUyMDIwNTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5202055?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/aweneagle",
+    "html_url": "https://github.com/aweneagle",
+    "followers_url": "https://api.github.com/users/aweneagle/followers",
+    "following_url": "https://api.github.com/users/aweneagle/following{/other_user}",
+    "gists_url": "https://api.github.com/users/aweneagle/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/aweneagle/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/aweneagle/subscriptions",
+    "organizations_url": "https://api.github.com/users/aweneagle/orgs",
+    "repos_url": "https://api.github.com/users/aweneagle/repos",
+    "events_url": "https://api.github.com/users/aweneagle/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/aweneagle/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-15T07:11:23Z",
+  "updated_at": "2023-11-15T07:11:23Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: `latest`\r\nCL client & version: `latest`\r\nOS & Version: Linux\r\n\r\n#### Expected behaviour\r\n\r\nExpected:  whenever restarting p2p node, it can rejoin the boot node easily.\r\n\r\n#### Actual behaviour\r\n\r\nActual: When it comes to NLB, It's really very difficult for p2p to rejoin in boot node. \r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nI built a small private network of eth for testing. One node as boot node hidden behind a network load balance service (NLB), Two as p2p nodes , also behind a NLB. The network looked like this:\r\n![opbnb P2P 网络不通问题 (1)](https://github.com/ethereum/go-ethereum/assets/5202055/144e638f-072a-4ae2-b684-cbf6d52b267d)\r\n\r\nWhen I finished the network, it works fine. \r\nBut When I restart the p2p nodes, they were removed by boot node and never came back! \r\n\r\n\r\n#### Backtrace\r\nHere is the debug logs from p2p node when restarting: \"started discovery service\"\r\n<img width=\"1418\" alt=\"截屏2023-11-15 12 08 44\" src=\"https://github.com/ethereum/go-ethereum/assets/5202055/b1a1db3d-24d7-4dd2-a0b3-0dfd830ff0c0\">\r\n\r\nHere is that from boot node when removing the p2p node:  \"dead node\"\r\n<img width=\"1423\" alt=\"截屏2023-11-15 12 07 55\" src=\"https://github.com/ethereum/go-ethereum/assets/5202055/faeedf3d-88d2-4ad3-a3b2-c250d2daa2e4\">\r\n\r\nAnd here are the configurations of p2p node and boot node,\r\np2p node:\r\n```\r\n     --p2p.sync.req-resp \r\n     --p2p.listen.ip=0.0.0.0\r\n     --p2p.listen.tcp=9003\r\n     --p2p.listen.udp=9003\r\n     --p2p.priv.raw={priv key}\r\n     --p2p.advertise.ip={public ip}\r\n```\r\nboot node:\r\n```\r\n    --p2p.listen.ip=0.0.0.0\r\n    --p2p.listen.tcp=9003\r\n    --p2p.listen.udp=9003\r\n    --p2p.priv.raw={priv key}\r\n    --p2p.advertise.ip={public ip}\r\n```\r\n\r\nWe can see that the p2p node was restarted success at \"09:18:01\" and soon removed after 3 seconds at \"09:18:04\". \r\nThe log \"Removed dead node\" means that two things had been done successfully within 3 seconds:\r\n1. boot node handshake with p2p node.\r\n2. boot node  add p2p node into its table.\r\n3. boot node send a PING to p2p node.\r\n\r\nFinally i find the root cause: the first PING packet sent by boot node was transfer to the previous pod ip of p2p nodes, in the NLB of the p2p node side.Illustrated below:\r\n<img width=\"1341\" alt=\"截屏2023-11-15 14 35 43\" src=\"https://github.com/ethereum/go-ethereum/assets/5202055/e5aadda9-38cb-4be8-9fd3-769f0449e502\">\r\n\r\nSince it need sometime to refresh the router info for NLB(usually more than 3 seconds),  the P2P node was very difficult to received the first PING from boot node.\r\nI am wondering that:  **Shall we PING more times rather than only one time before we confirm that the peer is not alive?**  Like After 6 times PING failed then we say it's dead ?\r\n\r\nI can understand that a high quality of network condition can be ensure by \"PING only one time and require PONG within 700 millseconds\",  but it's really a little tricky that they can't be be placed behind NLB....\r\n\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28528/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28528/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
