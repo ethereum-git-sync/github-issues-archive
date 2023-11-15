@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8180",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8180/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8180/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8180/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/8180",
+  "id": 1994900568,
+  "node_id": "I_kwDODjvEJM5258RY",
+  "number": 8180,
+  "title": "feat(devnet): Move from `geth` -> `anvil` for `make devnet-allocs`",
+  "user": {
+    "login": "clabby",
+    "id": 8406232,
+    "node_id": "MDQ6VXNlcjg0MDYyMzI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/8406232?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/clabby",
+    "html_url": "https://github.com/clabby",
+    "followers_url": "https://api.github.com/users/clabby/followers",
+    "following_url": "https://api.github.com/users/clabby/following{/other_user}",
+    "gists_url": "https://api.github.com/users/clabby/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/clabby/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/clabby/subscriptions",
+    "organizations_url": "https://api.github.com/users/clabby/orgs",
+    "repos_url": "https://api.github.com/users/clabby/repos",
+    "events_url": "https://api.github.com/users/clabby/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/clabby/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2978714528,
+      "node_id": "MDU6TGFiZWwyOTc4NzE0NTI4",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/D-good-first-issue",
+      "name": "D-good-first-issue",
+      "color": "F9D0C4",
+      "default": false,
+      "description": "Difficulty: A great task to get started"
+    },
+    {
+      "id": 5852638338,
+      "node_id": "LA_kwDODjvEJM8AAAABXNgsgg",
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/labels/A-bedrock-devnet",
+      "name": "A-bedrock-devnet",
+      "color": "FEF2C0",
+      "default": false,
+      "description": "Area: bedrock-devnet"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-15T14:33:49Z",
+  "updated_at": "2023-11-15T14:45:20Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": " ## Overview\r\n\r\nCurrently, the `make devnet-allocs` job uses `geth` to deploy L1 contracts and generate the genesis state of L1 for `op-e2e`. `geth` is a bit heavy for what we need here.\r\n\r\n**Describe the solution you'd like**\r\nThe `geth` invocation can be found [here](https://github.com/ethereum-optimism/optimism/blob/develop/bedrock-devnet/devnet/__init__.py#L163-L187) in the devnet script. Rather than using `debug_dumpBlock` in `geth`, we should just be able to use `anvil`'s `anvil_dumpState` endpoint.\r\n\r\nAnvil's `anvil_dumpState` endpoint returns a gzip compressed hex string of a JSON object with the following schema:\r\n```json\r\n{\r\n    \"accounts\": {\r\n        \"0x...00\": {\r\n            \"nonce\": \"<hex_number>\",\r\n            \"balance\": \"<hex_number>\",\r\n            \"code\": \"<bytes>\",\r\n            \"storage\": {\r\n                 \"<32b_slot>\": \"<32b_value>\"\r\n            }\r\n        },\r\n        ...\r\n    }\r\n}\r\n```\r\n\r\nTo easily convert the gzipped state back to JSON:\r\n```sh\r\ncast rpc anvil_dumpState --rpc-url http://localhost:8545 | jq -r | xxd -r -p | gzip -d\r\n```\r\n\r\nIn addition, there are several default accounts in anvil that will be present within this state dump. To avoid this, pass `-a 1` to the anvil binary to only generate 1 default account, and filter it out when serializing the allocs in the devnet script. The create2 deployer is also deployed by default @ `0x4e59b44847b379578588920ca78fbf26c0b4956c`\r\n\r\n### Output\r\n\r\nThe end result should be that the devnet is no longer reliant on `geth` to generate the state snapshots for `op-e2e` L1 allocs.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8180/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8180/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
