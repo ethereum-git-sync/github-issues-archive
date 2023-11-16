@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6331",
+  "id": 1997220238,
+  "node_id": "I_kwDOGBlvNc53CymO",
+  "number": 6331,
+  "title": "Unexpected Behaviour with vm.expectRevert()",
+  "user": {
+    "login": "Equious",
+    "id": 76449140,
+    "node_id": "MDQ6VXNlcjc2NDQ5MTQw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/76449140?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Equious",
+    "html_url": "https://github.com/Equious",
+    "followers_url": "https://api.github.com/users/Equious/followers",
+    "following_url": "https://api.github.com/users/Equious/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Equious/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Equious/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Equious/subscriptions",
+    "organizations_url": "https://api.github.com/users/Equious/orgs",
+    "repos_url": "https://api.github.com/users/Equious/repos",
+    "events_url": "https://api.github.com/users/Equious/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Equious/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-16T16:10:56Z",
+  "updated_at": "2023-11-16T16:12:32Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "To summarize - `vm.expectRevert(bytes(\"Custom Error Message\"))` will pass a test regardless of if the custom error message actually matches.\r\n\r\nContract function for reference:\r\n```javascript\r\nfunction fund() public payable {\r\n        require(msg.value >= MINIMUM_USD, \"You need to spend more ETH!\");\r\n        s_addressToAmountFunded[msg.sender] += msg.value;\r\n        s_funders.push(msg.sender);\r\n    }\r\n```\r\n\r\nTest being run:\r\n```javascript\r\nfunction testFailsWithoutEnoughETH() public {\r\n        vm.expectRevert(bytes(\"Different Words!\")); //expect a revert to happen\r\n        fundMe.fund();\r\n    }\r\n```\r\n\r\nResult in Terminal:\r\n```bash\r\nequious@DESKTOP-HTA2B2C:~/github-discussion-help/Foundry__FundMe$ forge test --mt testFailsWithoutEnoughETH -vvvv\r\n[⠒] Compiling...\r\n[⠃] Compiling 3 files with 0.8.21\r\n[⠊] Solc 0.8.21 finished in 662.23ms\r\nCompiler run successful!\r\n\r\nRunning 1 test for test/FundMeTest.t.sol:FundMeTest\r\n[PASS] testFailsWithoutEnoughETH() (gas: 8672)\r\nTraces:\r\n  [8672] FundMeTest::testFailsWithoutEnoughETH()\r\n    ├─ [0] VM::expectRevert(Different Words!)\r\n    │   └─ ← ()\r\n    ├─ [263] FundMe::fund()\r\n    │   └─ ← revert: You need to spend more ETH!\r\n    └─ ← Error != expected error: You need to spend more ETH! != Different Words!\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.38ms\r\n \r\nRan 1 test suites: 1 tests passed, 0 failed, 0 skipped (1 total tests)\r\n```\r\nThe test seems to recognize the error is not what's expected, but passes anyway.\r\n\r\nA further, perhaps related behaviour I can't explain is that removing the arguments passed to `vm.expectRevert()` - which *should* result in a pass for any revert - actually fails, despite catching the revert.\r\n\r\nFunction\r\n```\r\nfunction testFailsWithoutEnoughETH() public {\r\n        vm.expectRevert(); //expect a revert to happen\r\n        fundMe.fund();\r\n    }\r\n```\r\nResult in Terminal:\r\n```bash\r\n  [8302] FundMeTest::testFailsWithoutEnoughETH()\r\n    ├─ [0] VM::expectRevert(custom error f4844814:)\r\n    │   └─ ← ()\r\n    ├─ [263] FundMe::fund()\r\n    │   └─ ← revert: You need to spend more ETH!\r\n    └─ ← ()\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 1.28ms\r\n \r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/FundMeTest.t.sol:FundMeTest\r\n[FAIL. Reason: assertion failed] testFailsWithoutEnoughETH() (gas: 8302)\r\n\r\nEncountered a total of 1 failing tests, 0 tests succeeded\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
