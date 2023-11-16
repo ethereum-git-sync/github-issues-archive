@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4929",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4929/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4929/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4929/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4929",
+  "id": 1996982650,
+  "node_id": "I_kwDOCFeAzc53B4l6",
+  "number": 4929,
+  "title": "Incorrect phase0 block rewards in rewards API",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 2336800343,
+      "node_id": "MDU6TGFiZWwyMzM2ODAwMzQz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/HTTP-API",
+      "name": "HTTP-API",
+      "color": "5A63A2",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 6216406026,
+      "node_id": "LA_kwDOCFeAzc8AAAABcobUCg",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/rewards-api",
+      "name": "rewards-api",
+      "color": "098C8D",
+      "default": false,
+      "description": "Implementation of the rewards API"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-16T14:27:15Z",
+  "updated_at": "2023-11-16T14:27:35Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nThe rewards calculated by the rewards API for phase0 blocks have the potential to be wrong in the presence of _attestations from slashed validators_. The reason for this is that the phase0 calculation reuses the op pool's code for attestation rewards, which ignores slashings as an optimisation:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/441fc1691b69f9edc4bbdc6665f3efab16265c9b/beacon_node/beacon_chain/src/beacon_block_reward.rs#L164-L171\r\n\r\nhttps://github.com/sigp/lighthouse/blob/441fc1691b69f9edc4bbdc6665f3efab16265c9b/beacon_node/operation_pool/src/attestation.rs#L149-L152\r\n\r\nAltair and later blocks are not affected.\r\n\r\n## Version\r\n\r\nLighthouse v4.5.0\r\n\r\n## Detail\r\n\r\n- Validator x is slashed\r\n- Validator x attests in epoch N with one set of flags (e.g. target + source)\r\n- Validator x attests a second time in epoch N with a different set of flags (e.g. head + target + source)\r\n- Validator y includes both attestations from validator x in a block\r\n\r\n## Current Behaviour\r\n\r\nThe current API will reward the proposer (validator y) based on the flags of the attestation that was included in the block first (i.e. head + target).\r\n\r\n## Expected Behaviour\r\n\r\nThe API should reward the proposer based on the flags of the _best_ attestation included for validator x. This is what the spec describes in `process_attestation` (for phase0).",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4929/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4929/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

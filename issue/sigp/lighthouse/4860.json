@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "zack-scott",
@@ -94,14 +94,33 @@
     }
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-10-19T00:46:04Z",
-  "updated_at": "2023-10-23T22:21:04Z",
-  "closed_at": null,
+  "updated_at": "2023-11-16T13:29:20Z",
+  "closed_at": "2023-11-16T13:29:04Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nThe attestation rewards calculator has a bug where it doesn't update justification and finalization (`process_justification_and_finalization`) prior to calculating attestation rewards.\r\n\r\nThis causes faulty output for epoch `N - 1` when finality is restored at the end of epoch `N`. In this case, the `is_in_inactivity_leak` predicate should be `false` (because finality has just been restored), but our code will set it to `true` because it hasn't computed justification & finalization.\r\n\r\nOn mainnet this occurs at epoch `200759` (i.e. finality restored at the end of `200760`).\r\n\r\nRelevant code (see earlier in this function for the lack of justification/finalization processing):\r\n\r\nhttps://github.com/sigp/lighthouse/blob/441fc1691b69f9edc4bbdc6665f3efab16265c9b/beacon_node/beacon_chain/src/attestation_rewards.rs#L169-L174\r\n\r\n## Version\r\n\r\nLighthouse v4.5.0\r\n\r\n## Steps to resolve\r\n\r\nWe should probably just run `process_justification_and_finalization` at the start of attestation rewards calculation. I don't think this should interfere with the block v3 API, as it only needs to calculate the _proposer's block reward_, which is independent of `is_in_inactivity_leak`, and shouldn't share code with the attestation rewards calculations.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4860/reactions",
     "total_count": 0,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4860/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -158,6 +177,50 @@
       "hooray": 0,
       "confused": 0,
       "heart": 3,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1814439045",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4860#issuecomment-1814439045",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4860",
+    "id": 1814439045,
+    "node_id": "IC_kwDOCFeAzc5sJiSF",
+    "user": {
+      "login": "michaelsproul",
+      "id": 4452260,
+      "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/michaelsproul",
+      "html_url": "https://github.com/michaelsproul",
+      "followers_url": "https://api.github.com/users/michaelsproul/followers",
+      "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+      "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+      "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+      "repos_url": "https://api.github.com/users/michaelsproul/repos",
+      "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-16T13:29:04Z",
+    "updated_at": "2023-11-16T13:29:04Z",
+    "author_association": "MEMBER",
+    "body": "Closed by #4877 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1814439045/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
       "rocket": 0,
       "eyes": 0
     },
