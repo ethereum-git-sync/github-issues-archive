@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6332",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6332/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6332/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6332/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6332",
+  "id": 1997338625,
+  "node_id": "I_kwDOGBlvNc53DPgB",
+  "number": 6332,
+  "title": "Error with Anvil & Cast - 'Error: Contract 0x0116686e2291dbd5e317f47fadbfb43b599786ef does not exist'",
+  "user": {
+    "login": "ms4ever7",
+    "id": 21986423,
+    "node_id": "MDQ6VXNlcjIxOTg2NDIz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21986423?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ms4ever7",
+    "html_url": "https://github.com/ms4ever7",
+    "followers_url": "https://api.github.com/users/ms4ever7/followers",
+    "following_url": "https://api.github.com/users/ms4ever7/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ms4ever7/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ms4ever7/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ms4ever7/subscriptions",
+    "organizations_url": "https://api.github.com/users/ms4ever7/orgs",
+    "repos_url": "https://api.github.com/users/ms4ever7/repos",
+    "events_url": "https://api.github.com/users/ms4ever7/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ms4ever7/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-16T17:08:07Z",
+  "updated_at": "2023-11-16T17:08:07Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nCast, Anvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [ ] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (950d863 2023-10-25T11:55:34.079539100Z)\n\n### What command(s) is the bug in?\n\n cast call 0x0116686e2291dbd5e317f47fadbfb43b599786ef --private-key 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba \"pairInfo()(uint, uint, uint)\" --rpc-url http://127.0.0.1:8545\n\n### Operating System\n\nWindows\n\n### Describe the bug\n\nHi all, \r\nI am currently in the stage of learning Solidity and the env it has, and I was suggested to use Foundry to test everything I am leaning, and its seems to be really powerfull.\r\nWhen I am testing the basic Counter that Foundry provide us with initizaliztion - everything works fine, but with my contract it does not.\r\n\r\nSo here is my contract:\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\nimport \"@v2-periphery/contracts/interfaces/IUniswapV2Router02.sol\";\r\nimport \"@openzeppelin/contracts/interfaces/IERC20.sol\";\r\nimport '@v2-core/contracts/interfaces/IUniswapV2Pair.sol';\r\nimport '@v2-periphery/contracts/libraries/UniswapV2Library.sol';\r\n\r\ncontract UniswapV2Swap {\r\n    address private constant UNISWAP_V2_ROUTER =\r\n        0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;\r\n\r\n    address private constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;\r\n    address private constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;\r\n    address constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;\r\n\r\n    IUniswapV2Router02 private router = IUniswapV2Router02(UNISWAP_V2_ROUTER);\r\n    IERC20 private weth = IERC20(WETH);\r\n    IERC20 private dai = IERC20(DAI);\r\n\r\n    address public factory;\r\n    constructor(address factory_) {\r\n        factory = factory_;\r\n    }\r\n    // Swap WETH to DAI\r\n    function swapSingleHopExactAmountIn(\r\n        uint amountIn,\r\n        uint amountOutMin\r\n    ) external returns (uint amountOut) {\r\n        weth.transferFrom(msg.sender, address(this), amountIn);\r\n        weth.approve(address(router), amountIn);\r\n\r\n        address[] memory path;\r\n        path = new address[](2);\r\n        path[0] = WETH;\r\n        path[1] = DAI;\r\n\r\n        uint[] memory amounts = router.swapExactTokensForTokens(\r\n            amountIn,\r\n            amountOutMin,\r\n            path,\r\n            msg.sender,\r\n            block.timestamp\r\n        );\r\n\r\n        return amounts[1];\r\n    }\r\n\r\n    // Swap DAI -> WETH -> USDC\r\n    function swapMultiHopExactAmountIn(\r\n        uint amountIn,\r\n        uint amountOutMin\r\n    ) external returns (uint amountOut) {\r\n        dai.transferFrom(msg.sender, address(this), amountIn);\r\n        dai.approve(address(router), amountIn);\r\n\r\n        address[] memory path;\r\n        path = new address[](3);\r\n        path[0] = DAI;\r\n        path[1] = WETH;\r\n        path[2] = USDC;\r\n\r\n        uint[] memory amounts = router.swapExactTokensForTokens(\r\n            amountIn,\r\n            amountOutMin,\r\n            path,\r\n            msg.sender,\r\n            block.timestamp\r\n        );\r\n\r\n        return amounts[2];\r\n    }\r\n\r\n    // Swap WETH to DAI\r\n    function swapSingleHopExactAmountOut(\r\n        uint amountOutDesired,\r\n        uint amountInMax\r\n    ) external returns (uint amountOut) {\r\n        weth.transferFrom(msg.sender, address(this), amountInMax);\r\n        weth.approve(address(router), amountInMax);\r\n\r\n        address[] memory path;\r\n        path = new address[](2);\r\n        path[0] = WETH;\r\n        path[1] = DAI;\r\n\r\n        uint[] memory amounts = router.swapTokensForExactTokens(\r\n            amountOutDesired,\r\n            amountInMax,\r\n            path,\r\n            msg.sender,\r\n            block.timestamp\r\n        );\r\n\r\n        // Refund WETH to msg.sender\r\n        if (amounts[0] < amountInMax) {\r\n            weth.transfer(msg.sender, amountInMax - amounts[0]);\r\n        }\r\n\r\n        return amounts[1];\r\n    }\r\n\r\n    // Swap DAI -> WETH -> USDC\r\n    function swapMultiHopExactAmountOut(\r\n        uint amountOutDesired,\r\n        uint amountInMax\r\n    ) external returns (uint amountOut) {\r\n        dai.transferFrom(msg.sender, address(this), amountInMax);\r\n        dai.approve(address(router), amountInMax);\r\n\r\n        address[] memory path;\r\n        path = new address[](3);\r\n        path[0] = DAI;\r\n        path[1] = WETH;\r\n        path[2] = USDC;\r\n\r\n        uint[] memory amounts = router.swapTokensForExactTokens(\r\n            amountOutDesired,\r\n            amountInMax,\r\n            path,\r\n            msg.sender,\r\n            block.timestamp\r\n        );\r\n\r\n        // Refund DAI to msg.sender\r\n        if (amounts[0] < amountInMax) {\r\n            dai.transfer(msg.sender, amountInMax - amounts[0]);\r\n        }\r\n\r\n        return amounts[2];\r\n    }\r\n\r\n    function pairInfo() public view returns (uint reserveA, uint reserveB, uint totalSupply) {\r\n        IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, DAI, WETH));\r\n        totalSupply = pair.totalSupply();\r\n        (uint reserves0, uint reserves1,) = pair.getReserves();\r\n        (reserveA, reserveB) = DAI == pair.token0() ? (reserves0, reserves1) : (reserves1, reserves0);\r\n    }\r\n}\r\n\r\ninterface IWETH is IERC20 {\r\n    function deposit() external payable;\r\n\r\n    function withdraw(uint amount) external;\r\n\r\n    function balanceOf(address account) external view returns (uint256);\r\n}\r\n```\r\n\r\nHere I am tryring to write & test simple swap function but for at least getting result of `pairInfo` function would be enough.\r\n\r\nI've done next steps to test it:\r\n- `anvil` - to simply have local chain where I can test everything\r\n```\r\nforge create --rpc-url \"http://127.0.0.1:8545\" --private-key \"0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba\" src/UniswapV2Swap.sol:UniswapV2Swap --constructor-args 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f\r\n[⠆] Compiling...\r\nNo files changed, compilation skipped\r\nDeployer: 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc\r\nDeployed to: 0x0116686E2291dbd5e317F47faDBFb43B599786Ef\r\nTransaction hash: 0xc32955e9cf1ad6d1671d5c04f90911ae49a3dee1cf136e59d307e2bb35131ec7\r\n```\r\n - deploying the contract\r\n- ` cast call 0x0116686e2291dbd5e317f47fadbfb43b599786ef --private-key 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba \"pairInfo()(uint, uint, uint)\" --rpc-url http://127.0.0.1:8545` - trying to call it with cast and have next error:\r\n`Error: Contract 0x0116686e2291dbd5e317f47fadbfb43b599786ef does not exist`\r\n\r\nI've also tried to do that with cast send for other function but I am not sure how to check does they work or not, as I am not so familiar with responses in foundry:\r\n![image](https://github.com/foundry-rs/foundry/assets/21986423/8cb41f76-8584-4299-8841-da2074da5e2c)\r\n\r\nSo please let me know if I am at least on the right path to do that, I am still not sure what aruments I should provide there and should I check the liquidity or provide it at first.\r\n\r\nAlso attaching logs from anvil: \r\n![image](https://github.com/foundry-rs/foundry/assets/21986423/bd66d018-e3a6-440b-9f04-b76531499fdd)\r\n\r\n\r\nI've tried to google that but nth, also tried to get help from AI but same result, so will appreciate any help, thank you :) ",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6332/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6332/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
