@@ -8,7 +8,7 @@
   "id": 1924480881,
   "node_id": "I_kwDOBvuov85ytT9x",
   "number": 12991,
-  "title": "Move light client code from `blockchain` to `core`",
+  "title": "Light client improvements",
   "user": {
     "login": "rkapka",
     "id": 28876818,
@@ -49,11 +49,11 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-10-03T16:11:47Z",
-  "updated_at": "2023-10-03T16:11:47Z",
+  "updated_at": "2023-11-16T16:24:32Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "*NOTE: This should be done after all code from https://github.com/prysmaticlabs/prysm/pull/12854 is merged.*\r\n\r\nStateless function that do not use the blockchain service, such as the ones in `/beacon-chain/blockchain/lightclient.go`, should be placed under `beacon-chain/core`. Let's create a new `/beacon-chain/core/light-client` package and move such functions there.\r\n",
+  "body": "*NOTE: This should be done after all code from https://github.com/prysmaticlabs/prysm/pull/12854 is merged.*\r\n\r\n- [ ] Stateless function that do not use the blockchain service, such as the ones in `/beacon-chain/blockchain/lightclient.go`, should be placed under `beacon-chain/core`. Let's create a new `/beacon-chain/core/light-client` package and move such functions there.\r\n- [ ] Add more solid unit tests to HTTP handlers, as commented here: https://github.com/prysmaticlabs/prysm/pull/12984#discussion_r1347569661\r\n- [ ] Implement the following part of the spec:\r\n> Full nodes SHOULD provide the best derivable LightClientUpdate (according to is_better_update) for each sync committee period covering any epochs in range [max(ALTAIR_FORK_EPOCH, current_epoch - MIN_EPOCHS_FOR_BLOCK_REQUESTS), current_epoch] where current_epoch is defined by the current wall-clock time. Full nodes MAY also provide LightClientUpdate for other sync committee periods.\r\n> - LightClientUpdate are assigned to sync committee periods based on their attested_header.beacon.slot\r\n> - LightClientUpdate are only considered if compute_sync_committee_period_at_slot(update.attested_header.beacon.slot) == compute_sync_committee_period_at_slot(update.signature_slot)\r\n> - Only LightClientUpdate with next_sync_committee as selected by fork choice are provided, regardless of ranking by is_better_update. To uniquely identify a non-finalized sync committee fork, all of period, current_sync_committee and next_sync_committee need to be incorporated, as sync committees may reappear over time.\r\n- [ ] Consider caching blocks in `getLightClientEventBlock`. Original comment: https://github.com/prysmaticlabs/prysm/pull/12984#discussion_r1350412489. Note that it might be better to work on a cache at the level of the `lookup.Blocker` interface.\r\n- [ ] SSZ support in HTTP handlers\r\n\r\n\r\n",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/12991/reactions",
