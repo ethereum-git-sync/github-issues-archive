@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6178",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6178/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6178/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6178/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6178",
+  "id": 1998188463,
+  "node_id": "I_kwDODE2jmc53Ge-v",
+  "number": 6178,
+  "title": "admin_addPeer fails with \"already connected\" when called with disconnected peer",
+  "user": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-17T03:10:49Z",
+  "updated_at": "2023-11-17T03:10:49Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Running a besu node in a private clique network and having trouble keeping peers. lots of timeouts. \r\n\r\nSo I have a peer that was good, then besu has disconnected because of repeated timeouts, but I want to add it back via admin_addPeer\r\nbut - that fails with \"already connected\"\r\n\r\nIt seems the other end may not have disconnected properly.\r\n\r\nadmin add peer\r\n`➜  ~ curl -s -H 'content-type:application/json' -X POST --data '{\"jsonrpc\":\"2.0\",\"method\":\"admin_addPeer\",\"params\":[\"enode://ba69...@<IP>:30303\"],\"id\":51}' http://localhost:8565`\r\n\r\nlogs extract\r\n```\r\n2023-11-17 12:35:07.972+10:00 | vert.x-worker-thread-2 | TRACE | AbstractJsonRpcExecutor | {\"jsonrpc\":\"2.0\",\"method\":\"admin_addPeer\",\"params\":[\"enode://ba69...@<IP>:30303\"],\"id\":51}\r\n2023-11-17 12:35:07.975+10:00 | vert.x-worker-thread-2 | DEBUG | JsonRpcExecutor | JSON-RPC request -> admin_addPeer [\"enode://ba69...@<IP>:30303\"]\r\n2023-11-17 12:35:07.975+10:00 | vert.x-worker-thread-2 | DEBUG | AdminAddPeer | Adding (enode://ba69...) to peers\r\n2023-11-17 12:35:07.978+10:00 | vert.x-eventloop-thread-1 | TRACE | DiscoveryProtocolLogger | <<< Sending PING  packet to peer 0xba69... (enode://ba69...): Packet{type=PING, data=PingPacketData{from=Endpoint{host='Optional[127.0.0.1]', udpPort=50505, getTcpPort=50505}, to=Endpoint{host='Optional[57.129.17.88]', udpPort=30303, getTcpPort=30303}, expiration=1700188567, enrSeq=2}, hash=0x93604cca6ef9e93605d63c59eb9927e32ab27dd4c2f4a40352210020b2461960, signature=Signature{r=8331162506064874344175599332990363017752938593218626303124856737707757977259, s=47854361214479926055014280506801951174272241735927466350040185756917444088107, recId=0}, publicKey=0xdcb9390953aec5dde1d60dd556c36827053ca9adaefd1b03f531592fea43824bae2919743f620bb8a9b6c2b9a54439771d4f9a74d261b74af7a10c2dd9f13c97}\r\n2023-11-17 12:35:07.978+10:00 | vert.x-worker-thread-2 | TRACE | EthProtocolManager | EthPeers should connect is TRUE for peer 0xba69...\r\n2023-11-17 12:35:07.978+10:00 | vert.x-worker-thread-2 | TRACE | RlpxAgent | Initiating connection to peer: enode://ba69...\r\n2023-11-17 12:35:07.979+10:00 | nioEventLoopGroup-3-10 | TRACE | ECIESHandshaker | Prepared ECIES handshake with node 0xba69... under INITIATOR role\r\n2023-11-17 12:35:08.694+10:00 | nioEventLoopGroup-3-10 | TRACE | ECIESHandshaker | Received responder's ECIES handshake message from node 0xba69...: org.hyperledger.besu.ethereum.p2p.rlpx.handshake.ecies.ResponderHandshakeMessageV4@13191e4f\r\n2023-11-17 12:35:08.700+10:00 | nioEventLoopGroup-3-10 | DEBUG | DeFramer | Peer enode://ba69... disconnected before sending HELLO.  Reason: 0x05 ALREADY_CONNECTED\r\n2023-11-17 12:35:08.700+10:00 | nioEventLoopGroup-3-10 | DEBUG | RlpxAgent | Failed to connect to peer 0xba69...: org.hyperledger.besu.ethereum.p2p.network.exceptions.PeerDisconnectedException: Peer disconnected for reason: 0x05 ALREADY_CONNECTED\r\n```\r\n\r\nand we still receive messages from this peer even though we are not connected - are we disconnecting properly? Not sure if it's a problem we can fix on our end?\r\n\r\n```\r\n2023-11-17 13:08:08.753+10:00 | nioEventLoopGroup-3-4 | TRACE | ApiHandler | Received Message{ code=8, size=38} from PeerInfo{version=5, clientId='Geth/v1.12.2-stable-bed84606/linux-amd64/go1.20.7', capabilities=[eth/66, eth/67, eth/68, snap/1], port=0, nodeId=0xba69...} via protocol eth/68\r\n```\r\n\r\n```\r\ncurl -s -H 'content-type:application/json' --data '{\"jsonrpc\":\"2.0\",\"id\":\"53\",\"method\":\"admin_peers\",\"params\":[]}' http://127.0.0.1:8565/\r\n{\"jsonrpc\":\"2.0\",\"id\":\"53\",\"result\":[{\"version\":\"0x5\",\"name\":\"besu/v23.10.3-dev-a13f3067/linux-x86_64/openjdk-java-17\",\"caps\":[\"eth/63\",\"eth/64\",\"eth/65\",\"eth/66\",\"eth/67\",\"eth/68\",\"snap/1\"],\"network\":{\"localAddress\":\"192.168.0.105:56301\",\"remoteAddress\":\"172.173.225.199:30303\"},\"port\":\"0x765f\",\"id\":\"0x45d5...\",\"protocols\":{\"eth\":{\"difficulty\":\"0x3deda3\",\"head\":\"0x76a259557ed35c92b6b9ee237f9c18c8c29bab59e72ae7004cd2b12a1bc76f71\",\"version\":68}},\"enode\":\"enode://45d5...\"},{\"version\":\"0x5\",\"name\":\"Geth/v1.11.6-stable-ea9e62ca/linux-amd64/go1.20.6\",\"caps\":[\"eth/66\",\"eth/67\",\"eth/68\",\"snap/1\"],\"network\":{\"localAddress\":\"192.168.0.105:56298\",\"remoteAddress\":\"184.154.162.117:30303\"},\"port\":\"0x0\",\"id\":\"0x4d33b\",\"protocols\":{\"eth\":{\"difficulty\":\"0x3deda3\",\"head\":\"0x76a259557ed35c92b6b9ee237f9c18c8c29bab59e72ae7004cd2b12a1bc76f71\",\"version\":68}},\"enode\":\"enode://4d33b...\"}]}%\r\n➜  ~ curl -X POST --data '{\"jsonrpc\":\"2.0\",\"method\":\"net_peerCount\",\"params\":[],\"id\":53}' http://127.0.0.1:8565\r\n{\"jsonrpc\":\"2.0\",\"id\":53,\"result\":\"0x2\"}%\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6178/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6178/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
