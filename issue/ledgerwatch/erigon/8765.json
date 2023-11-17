@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8765",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8765/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8765/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8765/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8765",
+  "id": 1999402497,
+  "node_id": "I_kwDOC0FsAM53LHYB",
+  "number": 8765,
+  "title": "Erigon node crashing after cancelling request on RPC",
+  "user": {
+    "login": "AymericNoel",
+    "id": 56550097,
+    "node_id": "MDQ6VXNlcjU2NTUwMDk3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/56550097?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AymericNoel",
+    "html_url": "https://github.com/AymericNoel",
+    "followers_url": "https://api.github.com/users/AymericNoel/followers",
+    "following_url": "https://api.github.com/users/AymericNoel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AymericNoel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AymericNoel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AymericNoel/subscriptions",
+    "organizations_url": "https://api.github.com/users/AymericNoel/orgs",
+    "repos_url": "https://api.github.com/users/AymericNoel/repos",
+    "events_url": "https://api.github.com/users/AymericNoel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AymericNoel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-17T15:36:17Z",
+  "updated_at": "2023-11-17T15:36:17Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `2.53.4`\r\n\r\nOS & Version: Linux\r\n\r\nErigon Command (with flags/config): Running Erigon with config file :\r\n\r\n````\r\n# Enable http rpc requests\r\nhttp = true\r\n\"http.addr\" = \"0.0.0.0\"\r\n\"http.api\" = [\"eth\",\"net\",\"engine\",\"erigon\",\"web3\",\"ots\",\"txpool\"]\r\n\"http.vhosts\" = \"*\"\r\n\"http.corsdomain\" = \"*\"\r\n\r\n# Enable metrics at port 6060 and exposed\r\nmetrics = true\r\n\"metrics.addr\" = \"0.0.0.0\"\r\n\r\n# Increase txpool size\r\n\"txpool.globalslots\" = 30000\r\n\"txpool.globalbasefeeslots\" = 90000\r\n\"txpool.accountqueue\" = 256\r\n\"txpool.globalqueue\" = 90000\r\n\r\n# Otterscan namespace configuration\r\n\"ots.search.max.pagesize\" = 5000\r\n````\r\n\r\nConsensus Layer: Embedded erigon consensus client \r\n\r\nChain/Network: Ethereum mainnet\r\n\r\n#### Expected behaviour\r\n\r\nWhen requesting Otterscan rpc endpoint: `ots_searchTransactionsAfter` or even  `ots_searchTransactionsBefore` and cancelling it after, the request should be aborted normally.\r\n\r\n#### Actual behaviour\r\n\r\nActually when pressing `CTRL-C` after hitting a request, Node crashes and restarts immediately after.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n1. Activate `ots` namespace\r\n2. Run a request in order to fetch transactions for a specific address: `curl -X POST -H \"Content-Type: application/json\" --data '{\"jsonrpc\":\"2.0\", \"id\": 1, \"method\":\"ots_searchTransactionsAfter\",\"params\":[\"0x7e794eD35788b698AE60cefC98eE48015C4876dA\", 16308945, 5000]}' http://localhost:8545`\r\n3. Press `CTRL-C` in order to cancel that request\r\n\r\n#### Backtrace\r\n\r\n````\r\n2023-11-16 14:04:14.232\t\r\n[INFO] [11-16|14:04:14.232] Starting private RPC server              on=127.0.0.1:9090\r\n2023-11-16 14:04:05.143\t\r\n18429999\r\n2023-11-16 14:04:05.140\t\r\n[INFO] [11-16|14:04:05.140] Disk storage enabled for ethash DAGs     dir=/opt/node/ethereum/ethash-dags count=2\r\n2023-11-16 14:04:05.140\t\r\n[INFO] [11-16|14:04:05.140] Initialising Ethereum protocol           network=1\r\n2023-11-16 14:03:34.059\t\r\n[INFO] [11-16|14:03:34.059] Initialised chain configuration          config=\"{ChainID: 1, Homestead: 1150000, DAO: 1920000, Tangerine Whistle: 2463000, Spurious Dragon: 2675000, Byzantium: 4370000, Constantinople: 7280000, Petersburg: 7280000, Istanbul: 9069000, Muir Glacier: 9200000, Berlin: 12244000, London: 12965000, Arrow Glacier: 13773000, Gray Glacier: 15050000, Terminal Total Difficulty: 58750000000000000000000, Merge Netsplit: <nil>, Shanghai: 1681338455, Cancun: <nil>, Prague: <nil>, Engine: ethash}\" genesis=0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3\r\n2023-11-16 14:03:34.050\t\r\n[INFO] [11-16|14:03:34.050] [db] chaindata                           sizeLimit=3TB pageSize=4096\r\n2023-11-16 14:03:34.045\t\r\n[INFO] [11-16|14:03:34.044] Opening Database                         label=chaindata path=/opt/node/ethereum/chaindata\r\n2023-11-16 14:03:33.893\t\r\n[INFO] [11-16|14:03:33.893] [Downloader] Runnning with               ipv6-enabled=true ipv4-enabled=true download.rate=16mb upload.rate=4mb\r\n2023-11-16 14:03:33.807\t\r\n[INFO] [11-16|14:03:33.807] Set global gas cap                       cap=50000000\r\n2023-11-16 14:03:31.700\t\r\n[INFO] [11-16|14:03:31.699] torrent verbosity                        level=WRN\r\n2023-11-16 14:03:31.698\t\r\n[INFO] [11-16|14:03:31.698] starting HTTP APIs                       APIs=eth,net,engine,erigon,web3,ots,txpool\r\n2023-11-16 14:03:31.698\t\r\n[INFO] [11-16|14:03:31.698] Maximum peer count                       ETH=100 total=100\r\n2023-11-16 14:03:31.691\t\r\n[INFO] [11-16|14:03:31.689] Starting Erigon on Ethereum mainnet...\r\n2023-11-16 14:03:31.691\t\r\n[INFO] [11-16|14:03:31.689] Build info                               git_branch= git_tag= git_commit=\r\n2023-11-16 14:03:31.691\t\r\n[INFO] [11-16|14:03:31.689] Enabling metrics export to prometheus    path=http://0.0.0.0:6060/debug/metrics/prometheus\r\n2023-11-16 14:03:31.689\t\r\n[INFO] [11-16|14:03:31.687] logging to file system                   log dir=/opt/node/ethereum/logs file prefix=erigon log level=info json=false\r\n2023-11-16 14:03:11.811\t\r\npanic: runtime error: index out of range [42] with length 0\r\n\r\n\r\n\r\n2023-11-16 14:03:11.811\t\r\ncreated by github.com/ledgerwatch/erigon/turbo/jsonrpc.(*OtterscanAPIImpl).traceBlocks\r\n2023-11-16 14:03:11.811\t\r\n\t/go/src/github.com/ledgerwatch/erigon/turbo/jsonrpc/otterscan_search_trace.go:33 +0x206\r\n2023-11-16 14:03:11.811\t\r\ngithub.com/ledgerwatch/erigon/turbo/jsonrpc.(*OtterscanAPIImpl).searchTraceBlock(0xc0997eed00, {0x31823e0, 0xc0d5ffc000}, 0xc1763c956c?, {0x7e, 0x79, 0x4e, 0xd3, 0x57, 0x88, ...}, ...)\r\n2023-11-16 14:03:11.811\t\r\n\t/go/src/github.com/ledgerwatch/erigon/turbo/jsonrpc/otterscan_search_trace.go:99 +0x12f3\r\n2023-11-16 14:03:11.811\t\r\ngithub.com/ledgerwatch/erigon/turbo/jsonrpc.(*OtterscanAPIImpl).traceBlock(0xc0997eed00, {0x31a22d8?, 0xc08e190780}, {0x31823e0?, 0xc0d5ffc000}, 0x4896db?, {0x7e, 0x79, 0x4e, 0xd3, ...}, ...)\r\n2023-11-16 14:03:11.811\t\r\ngoroutine 700995314 [running]:\r\n2023-11-16 14:03:11.811\t\r\n[EROR] [11-16|14:03:11.799] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.811\t\r\n\t/go/src/github.com/ledgerwatch/erigon/turbo/jsonrpc/otterscan_api.go:461 +0xa7\r\n2023-11-16 14:03:11.810\t\r\n[EROR] [11-16|14:03:11.797] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.810\t\r\n[EROR] [11-16|14:03:11.799] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.809\t\r\n[EROR] [11-16|14:03:11.796] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.809\t\r\n[EROR] [11-16|14:03:11.797] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.808\t\r\n[EROR] [11-16|14:03:11.797] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.807\t\r\n[EROR] [11-16|14:03:11.797] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.807\t\r\n[EROR] [11-16|14:03:11.798] Search trace error                       err=\"context canceled\"\r\n2023-11-16 14:03:11.806\t\r\n[EROR] [11-16|14:03:11.797] Search trace error                       err=\"context canceled\"\r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8765/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8765/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
