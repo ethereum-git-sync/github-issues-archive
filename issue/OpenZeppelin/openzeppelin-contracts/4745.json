@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-11-16T16:22:59Z",
-  "updated_at": "2023-11-17T09:42:49Z",
-  "closed_at": null,
+  "updated_at": "2023-11-17T17:44:55Z",
+  "closed_at": "2023-11-17T17:44:55Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!-- Briefly describe the issue you're experiencing. Tell us what you were trying to do and what happened instead. -->\r\nI'm trying to recover the signature object properties (uint8 v, bytes32 r, bytes32 s) from a signature hash. I'm creating the signature in Foundry as follows.\r\n\r\n```solidity\r\n function testLockRequestSignatureRecovery() external {\r\n        (address guardian, bytes guardianPK) = vm.getAddrAndKey(\"guardian\");\r\n        // SETUP\r\n        vm.startPrank(guardian);\r\n        bytes32 lockRequest = accountLock.createLockRequest(account);\r\n\r\n        (uint8 v, bytes32 r, bytes32 s) = vm.sign(guardianPK, lockRequest);\r\n        bytes memory signature = abi.encodePacked(v, r, s);\r\n        address guardianRecovered = ECDSA.recover(lockRequest, signature); // throws error \"ECDSA: invalid signature 'v' value\"\r\n\r\n        address guardianRecovered = ECDSA.recover(lockRequest, v, r, s); // works!\r\n```\r\n\r\n**💻 Environment**\r\nFramework: Foundry\r\n\r\n**📝 Details**\r\nWhen calling `ECDSA.recover(lockRequest, signature)` the ECDSA contract tries to first retrieve the `v, r, s` values from the `signature` using the `function tryRecover(bytes32 hash, bytes memory signature)` which further calls `tryRecover(hash, v, r, s)` which throws the error indicating invalid value of `v`, whereas if I bypass the `function tryRecover(bytes32 hash, bytes memory signature)` and directly call the `ECDSA.tryRecover(hash, v, r, s)` function, it works. That concludes that the value of `v` retrieved by `vm.sign(guardianPK, lockRequest)` is correct. I can even see it in my logs that `v = 27` which is a valid value:\r\n\r\n```zsh\r\nVM::sign(<pk>, 0x46a4a6b86560880572154cc245188597806bacb2ed65aa43fdd0c670c5f762dc) [staticcall]\r\n    │   └─ ← 27, 0x1b5ae0bf91052a8ac3cfbc285fb915cca056865a1db7b832b851e2907107540b, 0x01a519d1066a48c2f4e43fb12f35144065c7dc82ee057f284502d34908703ca5\r\n    └─ ← \"ECDSA: invalid signature 'v' value\"\r\n```\r\n\r\n**🔢 Code to reproduce bug**\r\nhttps://github.com/alfheimrShiven/smart-wallet\r\n\r\n<!-- We will be able to better help if you provide a minimal example that triggers the bug. -->\r\n**🐞Cmd to reproduce bug**\r\n`forge test --mt testLockRequestConcensysEvaluation -vvvv`",
-  "closed_by": null,
+  "closed_by": {
+    "login": "alfheimrShiven",
+    "id": 50408041,
+    "node_id": "MDQ6VXNlcjUwNDA4MDQx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/50408041?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/alfheimrShiven",
+    "html_url": "https://github.com/alfheimrShiven",
+    "followers_url": "https://api.github.com/users/alfheimrShiven/followers",
+    "following_url": "https://api.github.com/users/alfheimrShiven/following{/other_user}",
+    "gists_url": "https://api.github.com/users/alfheimrShiven/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/alfheimrShiven/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/alfheimrShiven/subscriptions",
+    "organizations_url": "https://api.github.com/users/alfheimrShiven/orgs",
+    "repos_url": "https://api.github.com/users/alfheimrShiven/repos",
+    "events_url": "https://api.github.com/users/alfheimrShiven/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/alfheimrShiven/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4745/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4745/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -184,6 +203,50 @@
     "body": "In JS you can use [ether's `compactSerialized` version of the Signature class](https://docs.ethers.org/v6/api/crypto/#Signature-compactSerialized).\r\n\r\nUnfortunately, I don't have an example in Solidity right now, but I don't think it requires assembly, just a bit of bits manipulation as in the reference from our test I just pointed you out.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1816045067/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1816839756",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4745#issuecomment-1816839756",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4745",
+    "id": 1816839756,
+    "node_id": "IC_kwDOA9tCBs5sSsZM",
+    "user": {
+      "login": "alfheimrShiven",
+      "id": 50408041,
+      "node_id": "MDQ6VXNlcjUwNDA4MDQx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50408041?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/alfheimrShiven",
+      "html_url": "https://github.com/alfheimrShiven",
+      "followers_url": "https://api.github.com/users/alfheimrShiven/followers",
+      "following_url": "https://api.github.com/users/alfheimrShiven/following{/other_user}",
+      "gists_url": "https://api.github.com/users/alfheimrShiven/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/alfheimrShiven/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/alfheimrShiven/subscriptions",
+      "organizations_url": "https://api.github.com/users/alfheimrShiven/orgs",
+      "repos_url": "https://api.github.com/users/alfheimrShiven/repos",
+      "events_url": "https://api.github.com/users/alfheimrShiven/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/alfheimrShiven/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-17T17:44:55Z",
+    "updated_at": "2023-11-17T17:44:55Z",
+    "author_association": "NONE",
+    "body": "@ernestognw the order in which I was concatenating the v, r, s values to create the signature object was wrong. Hence `ECDSA.recover(bytes32 hash, bytes memory signature) ` was throwing the invalid signature error. \r\nI changed the order of concatenation of v, r, s value to \r\n```solidity\r\n(uint8 v, bytes32 r, bytes32 s) = vm.sign(guardianPK, digest);\r\nbytes memory signature = abi.encodePacked(r, s, v); // note the order here\r\nECDSA.recover(digest, signature); // works well\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1816839756/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
