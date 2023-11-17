@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-11-16T16:10:56Z",
-  "updated_at": "2023-11-16T21:33:42Z",
-  "closed_at": null,
+  "updated_at": "2023-11-17T15:35:17Z",
+  "closed_at": "2023-11-17T15:33:41Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "To summarize - `vm.expectRevert(bytes(\"Custom Error Message\"))` will pass a test regardless of if the custom error message actually matches.\r\n\r\nContract function for reference:\r\n```javascript\r\nfunction fund() public payable {\r\n        require(msg.value >= MINIMUM_USD, \"You need to spend more ETH!\");\r\n        s_addressToAmountFunded[msg.sender] += msg.value;\r\n        s_funders.push(msg.sender);\r\n    }\r\n```\r\n\r\nTest being run:\r\n```javascript\r\nfunction testFailsWithoutEnoughETH() public {\r\n        vm.expectRevert(bytes(\"Different Words!\")); //expect a revert to happen\r\n        fundMe.fund();\r\n    }\r\n```\r\n\r\nResult in Terminal:\r\n```bash\r\nequious@DESKTOP-HTA2B2C:~/github-discussion-help/Foundry__FundMe$ forge test --mt testFailsWithoutEnoughETH -vvvv\r\n[⠒] Compiling...\r\n[⠃] Compiling 3 files with 0.8.21\r\n[⠊] Solc 0.8.21 finished in 662.23ms\r\nCompiler run successful!\r\n\r\nRunning 1 test for test/FundMeTest.t.sol:FundMeTest\r\n[PASS] testFailsWithoutEnoughETH() (gas: 8672)\r\nTraces:\r\n  [8672] FundMeTest::testFailsWithoutEnoughETH()\r\n    ├─ [0] VM::expectRevert(Different Words!)\r\n    │   └─ ← ()\r\n    ├─ [263] FundMe::fund()\r\n    │   └─ ← revert: You need to spend more ETH!\r\n    └─ ← Error != expected error: You need to spend more ETH! != Different Words!\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.38ms\r\n \r\nRan 1 test suites: 1 tests passed, 0 failed, 0 skipped (1 total tests)\r\n```\r\nThe test seems to recognize the error is not what's expected, but passes anyway.\r\n\r\nA further, perhaps related behaviour I can't explain is that removing the arguments passed to `vm.expectRevert()` - which *should* result in a pass for any revert - actually fails, despite catching the revert.\r\n\r\nFunction\r\n```\r\nfunction testFailsWithoutEnoughETH() public {\r\n        vm.expectRevert(); //expect a revert to happen\r\n        fundMe.fund();\r\n    }\r\n```\r\nResult in Terminal:\r\n```bash\r\n  [8302] FundMeTest::testFailsWithoutEnoughETH()\r\n    ├─ [0] VM::expectRevert(custom error f4844814:)\r\n    │   └─ ← ()\r\n    ├─ [263] FundMe::fund()\r\n    │   └─ ← revert: You need to spend more ETH!\r\n    └─ ← ()\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 1.28ms\r\n \r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/FundMeTest.t.sol:FundMeTest\r\n[FAIL. Reason: assertion failed] testFailsWithoutEnoughETH() (gas: 8302)\r\n\r\nEncountered a total of 1 failing tests, 0 tests succeeded\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "DaniPopes",
+    "id": 57450786,
+    "node_id": "MDQ6VXNlcjU3NDUwNzg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/57450786?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/DaniPopes",
+    "html_url": "https://github.com/DaniPopes",
+    "followers_url": "https://api.github.com/users/DaniPopes/followers",
+    "following_url": "https://api.github.com/users/DaniPopes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/DaniPopes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/DaniPopes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/DaniPopes/subscriptions",
+    "organizations_url": "https://api.github.com/users/DaniPopes/orgs",
+    "repos_url": "https://api.github.com/users/DaniPopes/repos",
+    "events_url": "https://api.github.com/users/DaniPopes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/DaniPopes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -240,6 +259,50 @@
       "+1": 0,
       "-1": 0,
       "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1816644384",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6331#issuecomment-1816644384",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6331",
+    "id": 1816644384,
+    "node_id": "IC_kwDOGBlvNc5sR8sg",
+    "user": {
+      "login": "DaniPopes",
+      "id": 57450786,
+      "node_id": "MDQ6VXNlcjU3NDUwNzg2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57450786?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/DaniPopes",
+      "html_url": "https://github.com/DaniPopes",
+      "followers_url": "https://api.github.com/users/DaniPopes/followers",
+      "following_url": "https://api.github.com/users/DaniPopes/following{/other_user}",
+      "gists_url": "https://api.github.com/users/DaniPopes/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/DaniPopes/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/DaniPopes/subscriptions",
+      "organizations_url": "https://api.github.com/users/DaniPopes/orgs",
+      "repos_url": "https://api.github.com/users/DaniPopes/repos",
+      "events_url": "https://api.github.com/users/DaniPopes/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/DaniPopes/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-17T15:33:41Z",
+    "updated_at": "2023-11-17T15:35:17Z",
+    "author_association": "MEMBER",
+    "body": "Ah I see what's happening here, @Equious your test name starts with \"testFail\" which expects the test to fail. Either rename the test to `test_fails...` (or anything other than starting with exactly `\"testFail\"`), or remove the `expectRevert`",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1816644384/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 1,
       "hooray": 0,
       "confused": 0,
       "heart": 0,
