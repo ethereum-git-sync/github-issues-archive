@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28541",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28541/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28541/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28541/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28541",
+  "id": 1999637229,
+  "node_id": "I_kwDOAOvK9853MArt",
+  "number": 28541,
+  "title": "Data race when accessing dirties map in hashdb.Database.commit",
+  "user": {
+    "login": "magicxyyz",
+    "id": 10907694,
+    "node_id": "MDQ6VXNlcjEwOTA3Njk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10907694?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/magicxyyz",
+    "html_url": "https://github.com/magicxyyz",
+    "followers_url": "https://api.github.com/users/magicxyyz/followers",
+    "following_url": "https://api.github.com/users/magicxyyz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/magicxyyz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/magicxyyz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/magicxyyz/subscriptions",
+    "organizations_url": "https://api.github.com/users/magicxyyz/orgs",
+    "repos_url": "https://api.github.com/users/magicxyyz/repos",
+    "events_url": "https://api.github.com/users/magicxyyz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/magicxyyz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-17T17:43:28Z",
+  "updated_at": "2023-11-17T17:43:28Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nCommit hash: c8a22020287e0260e2310a1b91a1aa9b795ca445  (current master)\r\n\r\n#### Issue description\r\n\r\nIn `trie/triedb/hashdb.Database.commit` a key is read from dirites map without locking db lock, while `trie/tiredb/hashdb.Database.dereference` may modify the map concurrently resulting in `concurrent map read and map write` panic.\r\n\r\n#### Possible scenario affected by the issue\r\n\r\nOne scenario affected by the race is when a new block state is committed and concurrently an rpc is called (e.g. `debug_traceBlockByNumber`) which executes `eth.StateAtBlock` querying a state that is available in live database and then executes `tracers.StateReleaseFunc` which dereferences a node.\r\n\r\n#### Code pointers\r\n\r\n* Read access to `dirties` map:\r\nhttps://github.com/ethereum/go-ethereum/blob/c8a22020287e0260e2310a1b91a1aa9b795ca445/trie/triedb/hashdb/database.go#L479-L484\r\n\r\n* Write access to `dirties` map:\r\nhttps://github.com/ethereum/go-ethereum/blob/c8a22020287e0260e2310a1b91a1aa9b795ca445/trie/triedb/hashdb/database.go#L337\r\n\r\n* Example of place where `dereference` is called in rpc handling goroutine:\r\n\r\nhttps://github.com/ethereum/go-ethereum/blob/c8a22020287e0260e2310a1b91a1aa9b795ca445/eth/tracers/api.go#L569-L586\r\n\r\nhttps://github.com/ethereum/go-ethereum/blob/c8a22020287e0260e2310a1b91a1aa9b795ca445/eth/api_backend.go#L411-L412\r\n\r\nhttps://github.com/ethereum/go-ethereum/blob/c8a22020287e0260e2310a1b91a1aa9b795ca445/eth/state_accessor.go#L211-L214\r\n\r\nhttps://github.com/ethereum/go-ethereum/blob/c8a22020287e0260e2310a1b91a1aa9b795ca445/eth/state_accessor.go#L50-L60\r\n\r\n* Example of place where `commit` is called in another goroutine:\r\nhttps://github.com/ethereum/go-ethereum/blob/c8a22020287e0260e2310a1b91a1aa9b795ca445/core/blockchain.go#L1457-L1457\r\n\r\n#### Proposed solution\r\n\r\nLock db lock when accessing `dirties` map in `hashdb.Database.commit`.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28541/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28541/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
