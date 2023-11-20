@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6114",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6114/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6114/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6114/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/6114",
+  "id": 2002140207,
+  "node_id": "I_kwDOCD5_Gc53Vjwv",
+  "number": 6114,
+  "title": "Doppelganger getLiveness errors on holesky",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-20T12:53:46Z",
+  "updated_at": "2023-11-20T12:53:46Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nOn holesky it might happen that `getLiveness` request in doppelganger service throws the following error\r\n```\r\nNov-13 11:47:12.941[]                error: Error getting liveness data for epoch 10346 - Bad Request: Request epoch 10346 is more than one epoch before or after the current epoch 10348\r\nError: Bad Request: Request epoch 10346 is more than one epoch before or after the current epoch 10348\r\n    at DoppelgangerService.getLiveness (file:///usr/app/packages/validator/src/services/doppelgangerService.ts:178:9)\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at async Promise.all (index 0)\r\n    at DoppelgangerService.pollLiveness (file:///usr/app/packages/validator/src/services/doppelgangerService.ts:160:33)\r\n    at Clock.runAtMostEvery (file:///usr/app/packages/validator/src/util/clock.ts:96:7)\r\n```\r\n\r\nThis happens due to the fact that the doppelganger detection is run at the end of the epoch (3/4 into the last slot)\r\nhttps://github.com/ChainSafe/lodestar/blob/698e6557e68f69a2b118401272650bdd66074e90/packages/validator/src/services/doppelgangerService.ts#L122-L124\r\n\r\nIt includes polling validator indices which might take up to 3 seconds (highly depends on host performance)\r\nhttps://github.com/ChainSafe/lodestar/blob/698e6557e68f69a2b118401272650bdd66074e90/packages/validator/src/services/doppelgangerService.ts#L143\r\n\r\ndue to the fact that the beacon node is extremly busy at the end of the epoch (epoch transition) and the `getStateValidators` request is really slow\r\nhttps://github.com/ChainSafe/lodestar/blob/698e6557e68f69a2b118401272650bdd66074e90/packages/validator/src/services/indices.ts#L129\r\n\r\nIn case this takes more than 3 seconds, the `currentEpoch` which is passed to `getLiveness` API is already the previous epoch and the previous epoch (`currentEpoch - 1`) is 2 epochs in the past. This request will cause the error on the beacon node because there is a strict check that ensures the API is only called for +/- 1 epoch.\r\nhttps://github.com/ChainSafe/lodestar/blob/698e6557e68f69a2b118401272650bdd66074e90/packages/beacon-node/src/api/impl/validator/index.ts#L1082-L1086\n\n### Expected behavior\n\nDoppelganger protection should consistently work on holesky.\r\n\r\nPossible solution could be to poll indices earlier or ideally the validators request should resolve much quicker (requires performance improvements in epoch transition)\n\n### Steps to reproduce\n\nRun beacon node and validator client with `--network holesky` flag and enable doppelganger protection (`--doppelgangerProtection`). It also requires that there a pending / undiscovered pubkeys / validators as otherwise the doppelganger serivce will not try to discover new indices.\n\n### Additional context\n\nDue to this issue it is currently not possible to enable doppelganger protection on the dappnode holesky package. This is not a huge issue at the moment since holesky is just a testnet but once mainnet has a similar validator count will see the same issues there.\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nv1.12.0",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6114/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6114/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
