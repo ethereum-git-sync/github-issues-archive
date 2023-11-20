@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8781",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8781/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8781/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8781/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8781",
+  "id": 2001049056,
+  "node_id": "I_kwDOC0FsAM53RZXg",
+  "number": 8781,
+  "title": "Panic",
+  "user": {
+    "login": "Snawoot",
+    "id": 3524671,
+    "node_id": "MDQ6VXNlcjM1MjQ2NzE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3524671?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Snawoot",
+    "html_url": "https://github.com/Snawoot",
+    "followers_url": "https://api.github.com/users/Snawoot/followers",
+    "following_url": "https://api.github.com/users/Snawoot/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Snawoot/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Snawoot/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Snawoot/subscriptions",
+    "organizations_url": "https://api.github.com/users/Snawoot/orgs",
+    "repos_url": "https://api.github.com/users/Snawoot/repos",
+    "events_url": "https://api.github.com/users/Snawoot/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Snawoot/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-19T21:38:44Z",
+  "updated_at": "2023-11-19T21:38:44Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `2.51.0-a0160bee`\r\n\r\nOS & Version: Linux\r\n\r\nCommit hash: `a0160beee4032491501d89c5347bb1c4710ee6cc`\r\n\r\nErigon Command (with flags/config): \r\n\r\n```\r\n/usr/local/bin/erigon --datadir=/data/polygon/erigon \\\r\n        --db.size.limit 8246651162368 \\\r\n        --maxpeers=300 \\\r\n        --chain=bor-mainnet \\\r\n        --http.addr=0.0.0.0 \\\r\n        --bodies.cache=21474836480 \\\r\n        '--http.vhosts=*' \\\r\n        --http.port=8545\r\n```\r\n\r\nConsensus Layer: heimdall\r\n\r\nConsensus Layer Command (with flags/config):\r\n\r\n```\r\n/usr/bin/heimdalld start --home \"/data/polygon/heimdall\" \\\r\n    --chain=mainnet \\\r\n    --rest-server\r\n```\r\n\r\nChain/Network: `bor-mainnet` (Polygon Mainnet)\r\n\r\n#### Expected behaviour\r\n\r\nDon't panic, proceed to work\r\n\r\n#### Actual behaviour\r\n\r\nPanics, can't proceed to work\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n1. Ran erigon @ polygon mainnet\r\n\r\n#### Backtrace\r\n\r\n````\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: panic: runtime error: invalid memory address or nil pointer dereference\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: [signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0xee51cc]\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: goroutine 11392 [running]:\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: github.com/ledgerwatch/erigon/core/types.(*Block).Hash(0xc1118b6ea0?)\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/core/types/block.go:1669 +0x2c\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: github.com/ledgerwatch/erigon/eth/borfinality.borVerify({0x2e57b70?, 0xc000eca770?}, 0xc0efc55420, 0x2fd2560, 0x2fd2575, {0xc1118dc3c2, >\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/eth/borfinality/bor_checkpoint_verifier.go:92 +0x516\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: github.com/ledgerwatch/erigon/eth/borfinality.fetchWhitelistMilestone({0x2e57b70, 0xc000eca770}, {0x2e69d10?, 0xc105682e40?}, 0xc111957e>\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/eth/borfinality/whitelist_helpers.go:85 +0x67b\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: github.com/ledgerwatch/erigon/eth/borfinality.handleMilestone({0x2e57b70?, 0xc000eca770?}, {0x2e69d10?, 0xc105682e40?}, 0x800?)\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:172 +0x75\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: github.com/ledgerwatch/erigon/eth/borfinality.retryHeimdallHandler(0x2b3fca0, 0xc0efc55420, 0x124c3e5?, 0xc0d671e5a0?, {0x26d32be, 0x13})\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:118 +0xcb\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: github.com/ledgerwatch/erigon/eth/borfinality.RetryHeimdallHandler(...)\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:100\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: github.com/ledgerwatch/erigon/eth/borfinality.startMilestoneWhitelistService(0xc10cbb92c0?)\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:76 +0x3f\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]: created by github.com/ledgerwatch/erigon/eth/borfinality.Whitelist in goroutine 1\r\nNov 19 20:56:14 polygon-archive-de-1 erigon[773773]:         github.com/ledgerwatch/erigon/eth/borfinality/whitelist.go:47 +0x245\r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8781/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8781/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
