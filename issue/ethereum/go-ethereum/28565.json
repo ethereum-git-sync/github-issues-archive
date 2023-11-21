@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28565",
+  "id": 2002877946,
+  "node_id": "I_kwDOAOvK9853YX36",
+  "number": 28565,
+  "title": "Repeated call to pebbleIterator.Release accesses memory returned to sync.Pool",
+  "user": {
+    "login": "magicxyyz",
+    "id": 10907694,
+    "node_id": "MDQ6VXNlcjEwOTA3Njk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10907694?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/magicxyyz",
+    "html_url": "https://github.com/magicxyyz",
+    "followers_url": "https://api.github.com/users/magicxyyz/followers",
+    "following_url": "https://api.github.com/users/magicxyyz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/magicxyyz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/magicxyyz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/magicxyyz/subscriptions",
+    "organizations_url": "https://api.github.com/users/magicxyyz/orgs",
+    "repos_url": "https://api.github.com/users/magicxyyz/repos",
+    "events_url": "https://api.github.com/users/magicxyyz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/magicxyyz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-20T19:42:34Z",
+  "updated_at": "2023-11-20T19:46:59Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nCommit hash : c8a22020287e0260e2310a1b91a1aa9b795ca445 (current master)\r\n\r\n#### Expected behaviour\r\n\r\n`pebbleIterator` release should always succeed and can be called multiple times without causing error.\r\n\r\nhttps://github.com/ethereum/go-ethereum/blob/460cc1673e583512cd83843ac2ab0186f0ddf1ab/ethdb/pebble/pebble.go#L659-L661\r\n\r\n#### Actual behaviour\r\n\r\nCalling `pebbleIterator.Release` more then once will result in calling `github.com/cockroachdb/pebble.Iterator.Close` more then once, what is an invalid operation, as \"it is not valid to call any method, including Close, after the iterator has been closed\". \r\n\r\nhttps://github.com/cockroachdb/pebble/blob/aa077af625936fb6b52d8efdd1a8bcf7070a1509/iterator.go#L2225-L2229\r\n\r\nSecond call to `pebble.Iterator.Close` will result in access to memory that was returned to `sync.Pool` and may have already been acquired by another iterator in another goroutine.\r\n\r\nhttps://github.com/cockroachdb/pebble/blob/aa077af625936fb6b52d8efdd1a8bcf7070a1509/iterator.go#L2327-L2327\r\n\r\nhttps://github.com/cockroachdb/pebble/blob/aa077af625936fb6b52d8efdd1a8bcf7070a1509/db.go#L1045-L1049\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
