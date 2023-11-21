@@ -49,21 +49,40 @@
       "description": "Low priority item"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2021-03-06T11:48:33Z",
-  "updated_at": "2021-05-27T20:23:33Z",
-  "closed_at": null,
+  "updated_at": "2023-11-21T19:32:10Z",
+  "closed_at": "2023-11-21T19:32:10Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!--💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎\r\n\r\nHellooo! 😄 \r\n\r\nTo help us tend to your issue faster, please search our currently open issues before submitting a new one.\r\nExisting issues often contain information about workarounds, resolution, or progress updates.\r\n\r\n💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎💎-->\r\n\r\n# 🐞 Bug Report\r\n\r\n### Description\r\n\r\nConfigs files: \r\nhttps://docs.prylabs.network/assets/grafana-dashboards/big_amount_validators.json\r\nhttps://docs.prylabs.network/assets/grafana-dashboards/small_amount_validators.json\r\n\r\nThe 2 grafana configuration files are missing a section for the alert \"name\": \"WARN NODE/VALIDATOR: The process just restarted\"\r\n\r\nThe alert runs 2 queries against prometheus to get the uptime of the beacon-chain and validator, but the alert doesn't process the validator uptime, so the alert doesn't trigger if only the validator service restarts.\r\n\r\n### Has this worked before in a previous version?\r\n\r\nmost likely not.\r\n\r\n## 🔬 Minimal Reproduction\r\n\r\n<!--\r\nPlease let us know how we can reproduce this issue. Include the exact method you used to run Prysm along with any flags used in your beacon chain and/or validator. Make sure you don't upload any confidential files or private keys.\r\n-->\r\n\r\nScreenshot 1: Current alert\r\nScreenshot 2: Supposed alert\r\n[Screenshots](https://imgur.com/a/WqtFOCh)\r\n*Note that according to the .json the first picture of the IS situation should have query(**A**,10s,now) instead of query(**B**...), I accidentally made the screenshot after I changed the config, then only fixed my error for screenshot 2.\r\n\r\n## Proposed solution\r\n\r\nReplace the conditions section of the alert (small_amount_validators.json lines 2726 - 2750, big_amount_validation.json lines 2711 - 2735) to add the alerting condition for query(B,10s,now)\r\nfrom\r\n```\r\n\"conditions\": [\r\n          {\r\n            \"evaluator\": {\r\n              \"params\": [\r\n                0.1\r\n              ],\r\n              \"type\": \"lt\"\r\n            },\r\n            \"operator\": {\r\n              \"type\": \"and\"\r\n            },\r\n            \"query\": {\r\n              \"params\": [\r\n                \"A\",\r\n                \"10s\",\r\n                \"now\"\r\n              ]\r\n            },\r\n            \"reducer\": {\r\n              \"params\": [],\r\n              \"type\": \"last\"\r\n            },\r\n            \"type\": \"query\"\r\n          }\r\n        ],\r\n```\r\nto\r\n\r\n```\r\n\"conditions\": [\r\n          {\r\n            \"evaluator\": {\r\n              \"params\": [\r\n                0.1\r\n              ],\r\n              \"type\": \"lt\"\r\n            },\r\n            \"operator\": {\r\n              \"type\": \"and\"\r\n            },\r\n            \"query\": {\r\n              \"params\": [\r\n                \"A\",\r\n                \"10s\",\r\n                \"now\"\r\n              ]\r\n            },\r\n            \"reducer\": {\r\n              \"params\": [],\r\n              \"type\": \"last\"\r\n            },\r\n            \"type\": \"query\"\r\n          },\r\n          {\r\n            \"evaluator\": {\r\n              \"params\": [\r\n                0.1\r\n              ],\r\n              \"type\": \"lt\"\r\n            },\r\n            \"operator\": {\r\n              \"type\": \"or\"\r\n            },\r\n            \"query\": {\r\n              \"params\": [\r\n                \"B\",\r\n                \"10s\",\r\n                \"now\"\r\n              ]\r\n            },\r\n            \"reducer\": {\r\n              \"params\": [],\r\n              \"type\": \"last\"\r\n            },\r\n            \"type\": \"query\"\r\n          }\r\n        ],\r\n```\r\n        \r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "prestonvanloon",
+    "id": 7246818,
+    "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prestonvanloon",
+    "html_url": "https://github.com/prestonvanloon",
+    "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+    "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+    "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+    "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+    "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/8569/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/8569/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -113,6 +132,50 @@
     "body": "@prestonvanloon know anything about this?",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/849916617/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1821557761",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/8569#issuecomment-1821557761",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/8569",
+    "id": 1821557761,
+    "node_id": "IC_kwDOBvuov85sksQB",
+    "user": {
+      "login": "prestonvanloon",
+      "id": 7246818,
+      "node_id": "MDQ6VXNlcjcyNDY4MTg=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7246818?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/prestonvanloon",
+      "html_url": "https://github.com/prestonvanloon",
+      "followers_url": "https://api.github.com/users/prestonvanloon/followers",
+      "following_url": "https://api.github.com/users/prestonvanloon/following{/other_user}",
+      "gists_url": "https://api.github.com/users/prestonvanloon/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/prestonvanloon/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/prestonvanloon/subscriptions",
+      "organizations_url": "https://api.github.com/users/prestonvanloon/orgs",
+      "repos_url": "https://api.github.com/users/prestonvanloon/repos",
+      "events_url": "https://api.github.com/users/prestonvanloon/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/prestonvanloon/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-21T19:32:10Z",
+    "updated_at": "2023-11-21T19:32:10Z",
+    "author_association": "MEMBER",
+    "body": "Closing old issue. These dashboards are out of date and there are many options for monitoring now.",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1821557761/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
