@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6284",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6284/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6284/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6284/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/6284",
+  "id": 2004515698,
+  "node_id": "I_kwDOBggaLc53enty",
+  "number": 6284,
+  "title": "Add throttling to networking of blob transactions",
+  "user": {
+    "login": "marcindsobczak",
+    "id": 77129288,
+    "node_id": "MDQ6VXNlcjc3MTI5Mjg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/77129288?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marcindsobczak",
+    "html_url": "https://github.com/marcindsobczak",
+    "followers_url": "https://api.github.com/users/marcindsobczak/followers",
+    "following_url": "https://api.github.com/users/marcindsobczak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marcindsobczak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marcindsobczak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marcindsobczak/subscriptions",
+    "organizations_url": "https://api.github.com/users/marcindsobczak/orgs",
+    "repos_url": "https://api.github.com/users/marcindsobczak/repos",
+    "events_url": "https://api.github.com/users/marcindsobczak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marcindsobczak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1286932566,
+      "node_id": "MDU6TGFiZWwxMjg2OTMyNTY2",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/network",
+      "name": "network",
+      "color": "0e556b",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4731151000,
+      "node_id": "LA_kwDOBggaLc8AAAABGf-imA",
+      "url": "https://api.github.com/repos/NethermindEth/nethermind/labels/eip-4844",
+      "name": "eip-4844",
+      "color": "296EB8",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-21T15:17:19Z",
+  "updated_at": "2023-11-21T15:17:19Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "**Is your feature request related to a problem? Please describe.**\r\nWe need some kind of throttling when sending/receiving blob txs\r\n\r\nHow networking of blob txs works?\r\nBlob txs are never gossiped as full txs to other peers. Blob txs are announced in form of `NewPooledTransactionHashesMessage` - in message with hashes, types and sizes.\r\n\r\n1st scenario:\r\nWe are sending `NewPooledTransactionHashesMessage` when we receive new blob tx\r\nPeer can response with `GetPooledTransactionsMessage` - hashes of requested transactions\r\nWe are then responding with `PooledTransactionsMessage` - message with full transactions\r\nIt is handled here: https://github.com/NethermindEth/nethermind/blob/master/src/Nethermind/Nethermind.Network/P2P/Subprotocols/Eth/V66/Eth66ProtocolHandler.cs#L161-L167\r\n\r\nAt this point we need some limitation for amount of data which we are sending, to not affect health of the node. Maybe reduce/throttle announces when there is too much data flowing? Maybe not, and just create a queue with `GetPooledTransactionsMessages` waiting for response?\r\n\r\n2nd scenario:\r\nWe are receiving `NewPooledTransactionHashesMessage`. It is handled here https://github.com/NethermindEth/nethermind/blob/master/src/Nethermind/Nethermind.Network/P2P/Subprotocols/Eth/V68/Eth68ProtocolHandler.cs#L76-L102\r\nWith actual requests send here: https://github.com/NethermindEth/nethermind/blob/master/src/Nethermind/Nethermind.Network/P2P/Subprotocols/Eth/PooledTxsRequestor.cs#L75-L109\r\n\r\nThen we are receiving `PooledTransactionsMessage` with full txs.\r\n\r\nWe need some limitation here as well. Maybe it would be enough to change flag `CanReceiveTransactions` when we need to throttle a bit?\r\nFlag is used in both places, when receiving hashes:\r\nhttps://github.com/NethermindEth/nethermind/blob/master/src/Nethermind/Nethermind.Network/P2P/Subprotocols/Eth/V68/Eth68ProtocolHandler.cs#L56\r\nand when receiving full txs:\r\nhttps://github.com/NethermindEth/nethermind/blob/master/src/Nethermind/Nethermind.Network/P2P/Subprotocols/Eth/V66/Eth66ProtocolHandler.cs#L102\r\n\r\nIf flag will be changed to not accept hashes/txs, maybe it's worth to save hashes to request it later? But it's optional, most important part is to not let the node die when spammed hard",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6284/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6284/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
