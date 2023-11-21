@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-11-20T19:42:34Z",
-  "updated_at": "2023-11-20T19:46:59Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2023-11-21T14:22:24Z",
+  "closed_at": "2023-11-21T14:22:24Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nCommit hash : c8a22020287e0260e2310a1b91a1aa9b795ca445 (current master)\r\n\r\n#### Expected behaviour\r\n\r\n`pebbleIterator` release should always succeed and can be called multiple times without causing error.\r\n\r\nhttps://github.com/ethereum/go-ethereum/blob/460cc1673e583512cd83843ac2ab0186f0ddf1ab/ethdb/pebble/pebble.go#L659-L661\r\n\r\n#### Actual behaviour\r\n\r\nCalling `pebbleIterator.Release` more then once will result in calling `github.com/cockroachdb/pebble.Iterator.Close` more then once, what is an invalid operation, as \"it is not valid to call any method, including Close, after the iterator has been closed\". \r\n\r\nhttps://github.com/cockroachdb/pebble/blob/aa077af625936fb6b52d8efdd1a8bcf7070a1509/iterator.go#L2225-L2229\r\n\r\nSecond call to `pebble.Iterator.Close` will result in access to memory that was returned to `sync.Pool` and may have already been acquired by another iterator in another goroutine.\r\n\r\nhttps://github.com/cockroachdb/pebble/blob/aa077af625936fb6b52d8efdd1a8bcf7070a1509/iterator.go#L2327-L2327\r\n\r\nhttps://github.com/cockroachdb/pebble/blob/aa077af625936fb6b52d8efdd1a8bcf7070a1509/db.go#L1045-L1049\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28565/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
