@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-11-21T16:04:55Z",
-  "updated_at": "2023-11-21T16:04:55Z",
-  "closed_at": null,
+  "updated_at": "2023-11-21T18:08:40Z",
+  "closed_at": "2023-11-21T18:08:39Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (7b45265 2023-11-21T00:18:30.267248000Z)\n\n### What command(s) is the bug in?\n\nforge test -vvvv\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nI am trying to use the `mockCall` function in a test file as described in the [book](https://book.getfoundry.sh/cheatcodes/mock-call), but the compiler doesn't seem to recognise the exported (external) `mockCall` from the imported `forge-std/Test.sol` contract (`Vm`).\r\nAll the other `vm`'s functions in the snippet below work with no issues.\r\n\r\nCode snippet:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.17;\r\n\r\nimport \"forge-std/Test.sol\";\r\n\r\ncontract SafePayoutsModuleTest is Test {\r\n   ...\r\n\r\n    function test_executePayouts_OperatorIsAllowed() public {\r\n        vm.deal(address(safeAccount), 10 ether);\r\n        assertEq(address(safeAccount).balance, 10 ether);\r\n\r\n        vm.startPrank(address(this));\r\n        payoutsModule.addPayout(alice, 1 ether); \r\n        payoutsModule.addPayout(bob, 2 ether); \r\n        payoutsModule.addPayout(charlie, 3 ether);\r\n        vm.stopPrank();\r\n\r\n        vm.mockCall(\r\n            safeAccount,\r\n            0,\r\n            abi.encodeWithSelector(safeAccount.execTransactionFromModule.selector, address(alice), 1 ether, \"\", 0),\r\n            abi.encode(true)\r\n        );\r\n \r\n        ...\r\n\r\n   }\r\n}\r\n```\r\n\r\nError log:\r\n\r\n```bash\r\n➜ forge test -vvvv                             \r\n[⠰] Compiling...\r\n[⠆] Compiling 12 files with 0.8.23\r\n[⠰] Solc 0.8.23 finished in 886.64ms\r\nError: \r\nCompiler run failed:\r\nError (9582): Member \"mockCall\" not found or not visible after argument-dependent lookup in contract Vm.\r\n   --> test/SafePayoutsModule.t.sol:126:9:\r\n    |\r\n126 |         vm.mockCall(\r\n    |         ^^^^^^^^^^^\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "czar0",
+    "id": 14276211,
+    "node_id": "MDQ6VXNlcjE0Mjc2MjEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14276211?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/czar0",
+    "html_url": "https://github.com/czar0",
+    "followers_url": "https://api.github.com/users/czar0/followers",
+    "following_url": "https://api.github.com/users/czar0/following{/other_user}",
+    "gists_url": "https://api.github.com/users/czar0/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/czar0/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/czar0/subscriptions",
+    "organizations_url": "https://api.github.com/users/czar0/orgs",
+    "repos_url": "https://api.github.com/users/czar0/repos",
+    "events_url": "https://api.github.com/users/czar0/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/czar0/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6387/reactions",
     "total_count": 0,
@@ -69,8 +88,95 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6387/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1821382309",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6387#issuecomment-1821382309",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6387",
+    "id": 1821382309,
+    "node_id": "IC_kwDOGBlvNc5skBal",
+    "user": {
+      "login": "DaniPopes",
+      "id": 57450786,
+      "node_id": "MDQ6VXNlcjU3NDUwNzg2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57450786?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/DaniPopes",
+      "html_url": "https://github.com/DaniPopes",
+      "followers_url": "https://api.github.com/users/DaniPopes/followers",
+      "following_url": "https://api.github.com/users/DaniPopes/following{/other_user}",
+      "gists_url": "https://api.github.com/users/DaniPopes/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/DaniPopes/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/DaniPopes/subscriptions",
+      "organizations_url": "https://api.github.com/users/DaniPopes/orgs",
+      "repos_url": "https://api.github.com/users/DaniPopes/repos",
+      "events_url": "https://api.github.com/users/DaniPopes/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/DaniPopes/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-21T17:46:43Z",
+    "updated_at": "2023-11-21T17:46:43Z",
+    "author_association": "MEMBER",
+    "body": "What type is `safeAccount`? I see you used `address(safeAccount)` above so can you try that?",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1821382309/reactions",
+      "total_count": 1,
+      "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1821414558",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6387#issuecomment-1821414558",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6387",
+    "id": 1821414558,
+    "node_id": "IC_kwDOGBlvNc5skJSe",
+    "user": {
+      "login": "czar0",
+      "id": 14276211,
+      "node_id": "MDQ6VXNlcjE0Mjc2MjEx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14276211?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/czar0",
+      "html_url": "https://github.com/czar0",
+      "followers_url": "https://api.github.com/users/czar0/followers",
+      "following_url": "https://api.github.com/users/czar0/following{/other_user}",
+      "gists_url": "https://api.github.com/users/czar0/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/czar0/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/czar0/subscriptions",
+      "organizations_url": "https://api.github.com/users/czar0/orgs",
+      "repos_url": "https://api.github.com/users/czar0/repos",
+      "events_url": "https://api.github.com/users/czar0/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/czar0/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-21T18:08:39Z",
+    "updated_at": "2023-11-21T18:08:39Z",
+    "author_association": "NONE",
+    "body": "That worked! My bad. The error message was a bit confusing. I thought it was something related to the visibility of the function, not to its signature. Thanks!",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1821414558/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
