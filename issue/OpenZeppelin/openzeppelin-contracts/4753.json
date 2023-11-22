@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4753",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4753/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4753/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4753/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4753",
+  "id": 2005611753,
+  "node_id": "I_kwDOA9tCBs53izTp",
+  "number": 4753,
+  "title": "The overflow flag in the math lib is inverted",
+  "user": {
+    "login": "cryptonomicon46",
+    "id": 94910274,
+    "node_id": "U_kgDOBag3Qg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/94910274?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cryptonomicon46",
+    "html_url": "https://github.com/cryptonomicon46",
+    "followers_url": "https://api.github.com/users/cryptonomicon46/followers",
+    "following_url": "https://api.github.com/users/cryptonomicon46/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cryptonomicon46/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cryptonomicon46/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cryptonomicon46/subscriptions",
+    "organizations_url": "https://api.github.com/users/cryptonomicon46/orgs",
+    "repos_url": "https://api.github.com/users/cryptonomicon46/repos",
+    "events_url": "https://api.github.com/users/cryptonomicon46/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cryptonomicon46/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-22T05:38:52Z",
+  "updated_at": "2023-11-22T05:40:03Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!-- Briefly describe the issue you're experiencing. Tell us what you were trying to do and what happened instead. -->\r\nIn the math library, it looks like the return value of the overflow flag is inverted. \r\nIt returns a `false` when there is an overflow and returns a `true` for a valid result. \r\nThe impact might be minimal, if the contracts using the library don't track the overflow flag. \r\nBut the logic would be incorrect in case they do track the overflow flag return param. \r\n\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts/blob/932fddf69a699a9a80fd2396fd1a2ab91cdda123/contracts/utils/math/Math.sol#L25\r\n\r\n\r\n<!-- Remember, this is not a place to ask for help debugging code. For that, we welcome you in the OpenZeppelin Community Forum: https://forum.openzeppelin.com/. -->\r\nv5.0.0\r\nhttps://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.0.0/contracts/utils/math/Math.sol#L25\r\n\r\n**💻 Environment**\r\nManual review on the code repo.\r\n\r\n<!-- Tell us what version of OpenZeppelin Contracts you're using, and how you're using it: Truffle, Remix, etc. -->\r\n\r\n**📝 Details**\r\n\r\n<!-- Describe the problem you have been experiencing in more detail. Include as much information as you think is relevant. Keep in mind that transactions can fail for many reasons; context is key here. -->\r\nThe `overflow` flag in the math library is inverted. \r\nFor instance below is the `tryAdd` function which returns a (bool,uint256). \r\nThe `bool` is an overflow flag as shown in the NatSpec comment below. \r\nHowever, the return is a `false` when there is an overflow and the return is a `true` when the result is valid.\r\nThis also extends to the other functions.\r\n\r\n    /**\r\n     * @dev Returns the addition of two unsigned integers, with an overflow flag.\r\n     */\r\n    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {\r\n        unchecked {\r\n            uint256 c = a + b;\r\n            if (c < a) return (false, 0); //@audit should be `return (true,0)` \r\n            return (true, c);  //@audit should be `return (false,c)`\r\n        }\r\n    }\r\n**🔢 Code to reproduce bug**\r\n\r\n<!-- We will be able to better help if you provide a minimal example that triggers the bug. -->\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4753/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4753/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
