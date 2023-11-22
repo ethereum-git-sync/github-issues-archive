@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6402",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6402/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6402/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6402/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6402",
+  "id": 2006821402,
+  "node_id": "I_kwDOGBlvNc53naoa",
+  "number": 6402,
+  "title": "Incorrect CREATE2 addresses when not broadcast",
+  "user": {
+    "login": "0xCLARITY",
+    "id": 11398766,
+    "node_id": "MDQ6VXNlcjExMzk4NzY2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11398766?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xCLARITY",
+    "html_url": "https://github.com/0xCLARITY",
+    "followers_url": "https://api.github.com/users/0xCLARITY/followers",
+    "following_url": "https://api.github.com/users/0xCLARITY/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xCLARITY/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xCLARITY/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xCLARITY/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xCLARITY/orgs",
+    "repos_url": "https://api.github.com/users/0xCLARITY/repos",
+    "events_url": "https://api.github.com/users/0xCLARITY/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xCLARITY/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-22T17:40:13Z",
+  "updated_at": "2023-11-22T17:40:13Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (7b45265 2023-11-21T00:18:30.267248000Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nWhen trying to deploy a contract using a salt calculated using `cast create2`, it works correctly when `vm.startBroadcast()` is called (and pointing to a local anvil node) - but does not generate the correct address when not broadcast.\r\n\r\nThe following script will fail the `require()` statement at the end - but uncommenting the `vm.startBroadcast()` line will cause it to pass.\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\nimport {Script, console2} from \"forge-std/Script.sol\";\r\n\r\nimport {Counter} from \"../src/Counter.sol\";\r\n\r\ncontract CounterScript is Script {\r\n    function run() external {\r\n        // vm.startBroadcast();\r\n        bytes32 counterInitCodeHash = keccak256(type(Counter).creationCode);\r\n\r\n        console2.log(\"Counter initCodeHash: \");\r\n        console2.logBytes32(counterInitCodeHash);\r\n\r\n        // $ cast create2 --starts-with 0x000000 --init-code-hash 0x479d7e8f31234e208d704ba1a123c76385cea8a6981fd675b784fbd9cffb918d\r\n        //\r\n        // Starting to generate deterministic contract address...\r\n        // Successfully found contract address(es) in 2.492678083s\r\n        // Address: 0x0000002e9eEF048A3ccDf115aF53A51Ae312870d\r\n        // Salt: 0x0000000000000000000000000000000000000000000000006d3aaf0100000000 (7870795717613191168)\r\n\r\n        address expectedAddress = address(0x0000002e9eEF048A3ccDf115aF53A51Ae312870d);\r\n        bytes32 salt = bytes32(0x0000000000000000000000000000000000000000000000006d3aaf0100000000);\r\n\r\n        Counter counter = new Counter{salt: salt}();\r\n        console2.log(\"Counter address: %s\", address(counter));\r\n\r\n        require(address(counter) == expectedAddress, \"Counter address mismatch\");\r\n\r\n        // vm.stopBroadcast();\r\n    }\r\n}\r\n```\r\n\r\nExample repo: https://github.com/0xCLARITY/test-create2\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6402/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6402/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
