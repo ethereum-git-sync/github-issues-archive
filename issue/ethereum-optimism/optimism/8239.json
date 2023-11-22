@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-22T14:41:02Z",
-  "updated_at": "2023-11-22T14:41:02Z",
-  "closed_at": null,
+  "updated_at": "2023-11-22T20:45:55Z",
+  "closed_at": "2023-11-22T20:45:55Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\n**Describe the bug**\r\nThe method estimateL1Gas doesn't give the exact L1 gas used of the transaction \r\n\r\n**To Reproduce**\r\n\r\n```\r\n const HASH = '0xd9fe2820aba65a22ee959f4c203ea34ffb3dedfeac39889783b77bf63a204a6f'\r\n\r\n    const l2RpcProvider = optimismSDK.asL2Provider(\r\n        new ethers.providers.JsonRpcProvider('<RPC_URL>')\r\n    )\r\n    let transaction = await l2RpcProvider.getTransaction(HASH)\r\n    let receipt = await l2RpcProvider.getTransactionReceipt(HASH)\r\n    let l1GasUsed = await optimismSDK.estimateL1Gas(l2RpcProvider, transaction)\r\n    console.log('COMPUTED',l1GasUsed.toString())\r\n    console.log('REAL', receipt.l1GasUsed.toString())\r\n```\r\n\r\nthis output : \r\n```\r\nCOMPUTED 9108\r\nREAL 9092\r\n```\r\n\r\n\r\n**Expected behavior**\r\noptimismSDK.estimateL1Gas() should return the same as the receipt\r\n\r\n\r\nWhy is there a difference? I'm getting crazy over this",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ajsutton",
+    "id": 72675,
+    "node_id": "MDQ6VXNlcjcyNjc1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/72675?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ajsutton",
+    "html_url": "https://github.com/ajsutton",
+    "followers_url": "https://api.github.com/users/ajsutton/followers",
+    "following_url": "https://api.github.com/users/ajsutton/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ajsutton/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ajsutton/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ajsutton/subscriptions",
+    "organizations_url": "https://api.github.com/users/ajsutton/orgs",
+    "repos_url": "https://api.github.com/users/ajsutton/repos",
+    "events_url": "https://api.github.com/users/ajsutton/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ajsutton/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8239/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8239/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1823482310",
+    "html_url": "https://github.com/ethereum-optimism/optimism/issues/8239#issuecomment-1823482310",
+    "issue_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8239",
+    "id": 1823482310,
+    "node_id": "IC_kwDODjvEJM5ssCHG",
+    "user": {
+      "login": "ajsutton",
+      "id": 72675,
+      "node_id": "MDQ6VXNlcjcyNjc1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72675?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ajsutton",
+      "html_url": "https://github.com/ajsutton",
+      "followers_url": "https://api.github.com/users/ajsutton/followers",
+      "following_url": "https://api.github.com/users/ajsutton/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ajsutton/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ajsutton/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ajsutton/subscriptions",
+      "organizations_url": "https://api.github.com/users/ajsutton/orgs",
+      "repos_url": "https://api.github.com/users/ajsutton/repos",
+      "events_url": "https://api.github.com/users/ajsutton/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ajsutton/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-22T20:45:55Z",
+    "updated_at": "2023-11-22T20:45:55Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "For the record, it would be better to post these kinds of questions in https://github.com/ethereum-optimism/developers/discussions\r\n\r\nThe difference is because the estimate is done based on the unsigned transaction whereas the actual cost is calculated based on the signed transaction.  L1 charges a different amount of gas for 0s in transaction data than it does for 1s (one of those crazy quirks of Ethereum...).  So the estimate uses a worst case where the signature is all `1` bits to compute the maximum possible L1 cost but in reality the signature will have some mix of 0s and 1s resulting in the actual cost always being slightly lower.\r\n\r\nThe estimate is done on the unsigned transaction primarily because it's a really bad idea to be signing transactions before you know what they might cost you.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/comments/1823482310/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
