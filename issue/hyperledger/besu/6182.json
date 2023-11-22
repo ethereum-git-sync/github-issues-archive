@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "shemnon",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-11-18T01:41:26Z",
-  "updated_at": "2023-11-21T14:42:14Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2023-11-22T13:23:31Z",
+  "closed_at": "2023-11-22T13:23:31Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Description\r\nAs specified in [EIP-1767](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1767.md), the type of `Transaction` should contain fields of `from` and `to` with the `Account` type. As a _full_ node would store all transaction receipts of the whole Ethereum blockchain without pruning, users should be able to obtain the details of any transaction in the past starting from the genesis block, as specified in the Ethereum RPC API from the GraphQL node, including `from` and `to` fields.\r\n\r\n### Acceptance Criteria\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Invoke the GraphQL endpoint with the following request:\r\n```\r\nquery{\r\n    block(number: 17000000){ // or any other block long in the past\r\n        transactions{\r\n            from { address }\r\n            to { address }\r\n        }\r\n    }\r\n}\r\n```\r\n2. Invoke the GraphQL endpoint then with another request (omitting `from`):\r\n```\r\nquery{\r\n    block(number: 17000000){ // or any other block long in the past\r\n        transactions{\r\n            to { address }\r\n        }\r\n    }\r\n}\r\n```\r\n\r\n**Expected behavior:**\r\nThe GraphQL endpoint returns the sender and the destination address of all transactions within a past block.\r\n\r\n**Actual behavior:**\r\n1. The `from` fields from each transaction contains a `java.lang.reflect.InvocationTargetException` and other fields were not returned.\r\n2. The `to` field returns a `null` value.\r\n\r\n**Frequency:**\r\nAlways\r\n\r\n### Logs (if a bug)\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 23.10.2\r\n* Java version: OpenJ9 Java 20\r\n* OS Name & Version: Ubuntu 22.04\r\n* Kernel Version: Linux x86-64\r\n* Consensus Client & Version if using Proof of Stake: Teku 23.11.0\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n* I suspect the `getAndMapWorldState` in the `getFrom` and `getTo` methods to be the culprit.\r\n    * The world state is pruned in a _full_ node and only stored in an _archive_ node. Therefore it would be impossible to obtain the world state if users request a world state long in the past.\r\n    * During the GraphQL request execution, upon asking for the `from` account, the endpoint attempts to retrieve the world state, which would fail.\r\n    * However, it should still return the address, which is definitely retained, and `null` in pruned fields.\r\n* https://github.com/hyperledger/besu/blob/2f47e5cd73b261e6ada98078136407e70904604f/ethereum/api/src/main/java/org/hyperledger/besu/ethereum/api/graphql/internal/pojoadapter/TransactionAdapter.java#L90-L97\r\n* https://github.com/hyperledger/besu/blob/2f47e5cd73b261e6ada98078136407e70904604f/ethereum/api/src/main/java/org/hyperledger/besu/ethereum/api/graphql/internal/pojoadapter/TransactionAdapter.java#L107-L113\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "shemnon",
+    "id": 38109,
+    "node_id": "MDQ6VXNlcjM4MTA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38109?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shemnon",
+    "html_url": "https://github.com/shemnon",
+    "followers_url": "https://api.github.com/users/shemnon/followers",
+    "following_url": "https://api.github.com/users/shemnon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shemnon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shemnon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shemnon/subscriptions",
+    "organizations_url": "https://api.github.com/users/shemnon/orgs",
+    "repos_url": "https://api.github.com/users/shemnon/repos",
+    "events_url": "https://api.github.com/users/shemnon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shemnon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/6182/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6182/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
