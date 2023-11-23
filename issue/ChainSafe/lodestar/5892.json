@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-08-16T06:19:17Z",
-  "updated_at": "2023-08-16T06:19:17Z",
+  "updated_at": "2023-11-23T08:54:21Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -57,20 +57,63 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5892/reactions",
-    "total_count": 0,
-    "+1": 0,
+    "total_count": 2,
+    "+1": 1,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
     "confused": 0,
     "heart": 0,
     "rocket": 0,
-    "eyes": 0
+    "eyes": 1
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5892/timeline",
   "performed_via_github_app": null,
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1824013951",
+    "html_url": "https://github.com/ChainSafe/lodestar/issues/5892#issuecomment-1824013951",
+    "issue_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/5892",
+    "id": 1824013951,
+    "node_id": "IC_kwDOCD5_Gc5suD5_",
+    "user": {
+      "login": "tuyennhv",
+      "id": 10568965,
+      "node_id": "MDQ6VXNlcjEwNTY4OTY1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10568965?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tuyennhv",
+      "html_url": "https://github.com/tuyennhv",
+      "followers_url": "https://api.github.com/users/tuyennhv/followers",
+      "following_url": "https://api.github.com/users/tuyennhv/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tuyennhv/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tuyennhv/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tuyennhv/subscriptions",
+      "organizations_url": "https://api.github.com/users/tuyennhv/orgs",
+      "repos_url": "https://api.github.com/users/tuyennhv/repos",
+      "events_url": "https://api.github.com/users/tuyennhv/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tuyennhv/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-23T08:54:20Z",
+    "updated_at": "2023-11-23T08:54:20Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Some tests using BigInt vector vs Number vector `BeaconState.slashings` in updated `processSlashingsAllForks.test.ts` in #6121 using node v20.5.0:\r\n\r\nNumber version\r\n```typescript\r\nexport const Slashings = new VectorBasicType(UintNum64, EPOCHS_PER_HISTORICAL_VECTOR);\r\n```\r\n\r\nBigInt version (as in unstable up until today), or refer to v1.12 https://github.com/ChainSafe/lodestar/blob/v1.12.0/packages/types/src/phase0/sszTypes.ts#L251\r\n\r\n```typescript\r\nexport const Slashings = new VectorBasicType(Gwei, EPOCHS_PER_SLASHINGS_VECTOR);\r\n```\r\n\r\n```typescript\r\nfunction getProcessSlashingsTestData(indicesToSlashLen: number): {\r\n  state: CachedBeaconStateAllForks;\r\n  cache: EpochTransitionCache;\r\n} {\r\n  const state = generatePerfTestCachedStatePhase0({goBackOneSlot: true});\r\n  const cache = beforeProcessEpoch(state);\r\n  state.slashings.set(0, indicesToSlashLen * MAX_EFFECTIVE_BALANCE);\r\n  for (let i = 1; i < state.slashings.length; i++) {\r\n    state.slashings.set(i, MAX_EFFECTIVE_BALANCE);\r\n  }\r\n  state.commit();\r\n\r\n  cache.indicesToSlash = linspace(indicesToSlashLen);\r\n\r\n  return {\r\n    state,\r\n    cache,\r\n  };\r\n}\r\n```\r\n\r\n|EPOCHS_PER_SLASHINGS_VECTOR|BigInt|Number|\r\n|-------------------------------------|-----|---------|\r\n|8192|2.3ms/op|1.3ms/op|\r\n|10M|2.3s/op|289.6655 ms/op|\r\n|20M|7.59s/op|1.14s/op|\r\n|30M| Out of memory | 1.9s/op|\r\n\r\nThis is an example showing both memory and performance issue using BigInt ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/comments/1824013951/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
