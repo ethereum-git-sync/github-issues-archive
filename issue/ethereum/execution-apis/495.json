@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-23T11:37:23Z",
-  "updated_at": "2023-11-23T11:37:23Z",
+  "updated_at": "2023-11-23T21:00:52Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -49,11 +49,11 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/execution-apis/issues/495/reactions",
-    "total_count": 0,
+    "total_count": 2,
     "+1": 0,
     "-1": 0,
     "laugh": 0,
-    "hooray": 0,
+    "hooray": 2,
     "confused": 0,
     "heart": 0,
     "rocket": 0,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/1824897726",
+    "html_url": "https://github.com/ethereum/execution-apis/issues/495#issuecomment-1824897726",
+    "issue_url": "https://api.github.com/repos/ethereum/execution-apis/issues/495",
+    "id": 1824897726,
+    "node_id": "IC_kwDOFoG9Gs5sxbq-",
+    "user": {
+      "login": "protolambda",
+      "id": 19571989,
+      "node_id": "MDQ6VXNlcjE5NTcxOTg5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19571989?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/protolambda",
+      "html_url": "https://github.com/protolambda",
+      "followers_url": "https://api.github.com/users/protolambda/followers",
+      "following_url": "https://api.github.com/users/protolambda/following{/other_user}",
+      "gists_url": "https://api.github.com/users/protolambda/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/protolambda/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/protolambda/subscriptions",
+      "organizations_url": "https://api.github.com/users/protolambda/orgs",
+      "repos_url": "https://api.github.com/users/protolambda/repos",
+      "events_url": "https://api.github.com/users/protolambda/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/protolambda/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-23T21:00:51Z",
+    "updated_at": "2023-11-23T21:00:51Z",
+    "author_association": "MEMBER",
+    "body": "In the OP-Stack we've been aliasing the `pending` RPC label to `latest`, to:\r\n- Save the cost of computing a pending-block (low block-time of 2 seconds makes recomputing a 30M gas block quite expensive).\r\n- Serve sensible data, when the tx-pool is private.\r\n\r\nThis has been working well enough for L2 users (although maybe better than L1 due to the lower block time). I support the aliasing of it to `latest` as deprecation strategy on L1.\r\n\r\nAnd we still support `eth_getTransactionCount`, since it's attached to the mem-pool, not the actual pending state, so is not as costly to maintain. And since it does not reveal the full transaction data, generally not regarded as privacy issue, and a good UX trade-off.\r\n\r\nSo far we've left computation of `pending` state still as opt-in feature for individual node users, which then allows them to inspect the block-building of their local mempool (which just contains a copy of their own transactions, that the node passed on privately to the sequencer endpoint), which they can tune the gas-limit of as well (again to save unnecessary re-computation cost). But from user-issues it appears that nobody is actually using the opt-in feature.\r\n\r\nWith the removal of Clique from EL clients, removing the `pending` flag unblocks the cleanup of a lot of legacy pre-engine-API block-building, so I'm very much in favor from the perspective of reducing code complexity.\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/execution-apis/issues/comments/1824897726/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
