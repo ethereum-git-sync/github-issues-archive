@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6128",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6128/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6128/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6128/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/6128",
+  "id": 2010799164,
+  "node_id": "I_kwDOCD5_Gc532lw8",
+  "number": 6128,
+  "title": "Redundant eth1 (Eth1Provider) logs vs execution logging when (dis)connected ",
+  "user": {
+    "login": "philknows",
+    "id": 58080811,
+    "node_id": "MDQ6VXNlcjU4MDgwODEx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/58080811?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/philknows",
+    "html_url": "https://github.com/philknows",
+    "followers_url": "https://api.github.com/users/philknows/followers",
+    "following_url": "https://api.github.com/users/philknows/following{/other_user}",
+    "gists_url": "https://api.github.com/users/philknows/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/philknows/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/philknows/subscriptions",
+    "organizations_url": "https://api.github.com/users/philknows/orgs",
+    "repos_url": "https://api.github.com/users/philknows/repos",
+    "events_url": "https://api.github.com/users/philknows/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/philknows/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4116885308,
+      "node_id": "LA_kwDOCD5_Gc71Yq88",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-ux",
+      "name": "scope-ux",
+      "color": "980043",
+      "default": false,
+      "description": "Issues for CLI UX or general consumer UX."
+    },
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-25T21:16:26Z",
+  "updated_at": "2023-11-25T21:16:26Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nWhen a connected execution client goes offline, Lodestar detects the disconnection, but prints out the two following logs:\r\n\r\n```ts\r\nNov-25 21:04:33.334[execution]       error: Execution client went offline oldState=SYNCED, newState=OFFLINE\r\nNov-25 21:04:33.558[network]         error: Error receiving block slot=420322, peer=16Uiu2HAmC7eA5UzuYxRrUwshzEZaTkh2ByPuES7fpcBAhFVV3AuN, code=BLOCK_ERROR_EXECUTION_ERROR, execStatus=UNAVAILABLE, errorMessage=Request to http://localhost:8551 failed, reason: connect ECONNREFUSED 127.0.0.1:8551\r\nError: BLOCK_ERROR_EXECUTION_ERROR\r\n    at verifyBlockExecutionPayload (file:///usr/app/packages/beacon-node/src/chain/blocks/verifyBlocksExecutionPayloads.ts:366:25)\r\n    at verifyBlocksExecutionPayload (file:///usr/app/packages/beacon-node/src/chain/blocks/verifyBlocksExecutionPayloads.ts:157:28)\r\n    at async Promise.all (index 0)\r\n    at BeaconChain.verifyBlocksInEpoch (file:///usr/app/packages/beacon-node/src/chain/blocks/verifyBlock.ts:91:70)\r\n    at BeaconChain.processBlocks (file:///usr/app/packages/beacon-node/src/chain/blocks/index.ts:75:68)\r\n    at JobItemQueue.runJob (file:///usr/app/packages/beacon-node/src/util/queue/itemQueue.ts:101:22)\r\nNov-25 21:05:03.219[eth1]            error: Eth1Provider faced error state=OFFLINE, lastErrorAt=12:12:06 AM - Request to http://localhost:8551 failed, reason: connect ECONNREFUSED 127.0.0.1:8551\r\nFetchError: Request to http://localhost:8551 failed, reason: connect ECONNREFUSED 127.0.0.1:8551\r\n    at wrappedFetch (file:///usr/app/packages/api/src/utils/client/fetch.ts:10:11)\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at JsonRpcHttpClient.fetchJsonOneUrl (file:///usr/app/packages/beacon-node/src/eth1/provider/jsonRpcHttpClient.ts:276:19)\r\n    at JsonRpcHttpClient.fetchJson (file:///usr/app/packages/beacon-node/src/eth1/provider/jsonRpcHttpClient.ts:229:16)\r\n    at wrapWithEvents.payload.payload (file:///usr/app/packages/beacon-node/src/eth1/provider/jsonRpcHttpClient.ts:147:37)\r\n    at JsonRpcHttpClient.wrapWithEvents (file:///usr/app/packages/beacon-node/src/eth1/provider/jsonRpcHttpClient.ts:208:24)\r\n    at Eth1Provider.getBlockNumber (file:///usr/app/packages/beacon-node/src/eth1/provider/eth1Provider.ts:186:28)\r\n    at Eth1DepositDataTracker.update (file:///usr/app/packages/beacon-node/src/eth1/eth1DepositDataTracker.ts:197:32)\r\n    at Eth1DepositDataTracker.runAutoUpdate (file:///usr/app/packages/beacon-node/src/eth1/eth1DepositDataTracker.ts:169:29)\r\n```\r\nWe get errors from `eth1`, `execution`, and `network` relating to the same issue. When execution is online again, we receive the following logs:\r\n\r\n```ts\r\nNov-25 21:05:25.577[eth1]             info: Eth1Provider is back online oldState=OFFLINE, newState=ONLINE\r\nNov-25 21:05:29.186[execution]        info: Execution client became online oldState=OFFLINE, newState=ONLINE\r\n```\n\n### Expected behavior\n\nThere shouldn't be an overwhelming amount, nor redundant logging for users when an execution client goes offline. We should aim to just keep the `execution` logging and disregard the `Eth1Provider` logs unless it is necessary for something else.\n\n### Steps to reproduce\n\n1. Run Lodestar and an execution client locally (mine was run with Nethermind)\r\n2. Shut off execution client\r\n3. Observe logs\r\n4. Start execution client\r\n5. Observe logs\n\n### Additional context\n\n_No response_\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nunstable",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6128/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6128/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
