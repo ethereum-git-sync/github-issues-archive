@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6442",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6442/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6442/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6442/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6442",
+  "id": 2012454631,
+  "node_id": "I_kwDOGBlvNc53857n",
+  "number": 6442,
+  "title": "Random setUp failed errors in forge coverage",
+  "user": {
+    "login": "bearpebble",
+    "id": 90795310,
+    "node_id": "MDQ6VXNlcjkwNzk1MzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/90795310?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/bearpebble",
+    "html_url": "https://github.com/bearpebble",
+    "followers_url": "https://api.github.com/users/bearpebble/followers",
+    "following_url": "https://api.github.com/users/bearpebble/following{/other_user}",
+    "gists_url": "https://api.github.com/users/bearpebble/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/bearpebble/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/bearpebble/subscriptions",
+    "organizations_url": "https://api.github.com/users/bearpebble/orgs",
+    "repos_url": "https://api.github.com/users/bearpebble/repos",
+    "events_url": "https://api.github.com/users/bearpebble/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/bearpebble/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-27T14:53:29Z",
+  "updated_at": "2023-11-27T14:53:29Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (89f74f2 2023-11-23T00:16:20.422885370Z)\n\n### What command(s) is the bug in?\n\nforge coverage\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nRunning `forge coverage` for the optimism tests sometimes leads to missing random parts of coverage.\r\nSpecifically, it would print `setUp failed reason=execution error contract=0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496` whenever some coverage was missing.\r\nThe `forge test` command never exhibited that issue, so I'm assuming only the coverage command is affected.\r\n\r\nThe command never really fails, it just has missing coverage due to the above mentioned error while running the `setUp` function.\r\nI finally managed to get it to fail while using `RUST_LOG=trace` and found that all of the failures had a similar pattern.\r\n\r\n```\r\nTestA: evm::executors: cleared broadcastable transactions\r\nTestB: something with cheat codes\r\nTestA: setUp failed\r\n```\r\n\r\n\r\nOne actual trace snippet (there are several this run)\r\n```\r\n2023-11-27T14:06:35.579527Z DEBUG run_tests{name=contracts/test/Proxy.t.sol:Proxy_Test}: evm::executors: cleared broadcastable transactions\r\n2023-11-27T14:06:35.579525Z TRACE run_tests{name=contracts/test/Hashing.t.sol:Hashing_hashDepositTransaction_Test}:fuzz-test{name=testDiff_hashDepositTransaction_succeeds(address,address,uint256,uint256,uint64,bytes,uint64) should_fail=false}:apply{cheat=toString_4Call { value: 0x000000000000000000000000000000000000000000000000000000a8157c9a9c_U256 }}: cheatcodes: applying\r\n2023-11-27T14:06:35.579536Z TRACE run_tests{name=contracts/test/Hashing.t.sol:Hashing_hashDepositTransaction_Test}:fuzz-test{name=testDiff_hashDepositTransaction_succeeds(address,address,uint256,uint256,uint64,bytes,uint64) should_fail=false}:apply{cheat=toString_4Call { value: 0x000000000000000000000000000000000000000000000000000000a8157c9a9c_U256 }}: cheatcodes: return=\"0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000c3732313931343939333330380000000000000000000000000000000000000000\"\r\n2023-11-27T14:06:35.579546Z ERROR run_tests{name=contracts/test/Proxy.t.sol:Proxy_Test}: forge::runner: setUp failed reason=execution error contract=0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496\r\n```\r\n\r\nThe full trace can be found here:\r\nhttps://drive.google.com/file/d/1VefltIFYAH1GULCmOkt7S5TWch3nToj_/view?usp=sharing\r\n\r\nBecause of this pattern and the execution only failing sometimes, I'm assuming it's a race condition.\r\nReproducing the issue is unfortunately not very consistent and it seems to fail more frequently on CI tests compared to local execution. I hope the trace is enough to find the root cause.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6442/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6442/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
