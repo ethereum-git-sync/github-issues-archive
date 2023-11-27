@@ -40,7 +40,7 @@
       "description": "Various features needed in Desktop app overall for 0.16 release"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "gravityblast",
@@ -92,7 +92,7 @@
     "node_id": "MI_kwDOD5KrTM4AhVqd",
     "number": 61,
     "title": "0.16",
-    "description": "**1. Complete initial airdrop functionality**\r\n- Airdrop history screens\r\n- Ability to airdrop based on in-Community activity (No. of msg, No. msg in time range, joining a community, length of community membership)  Ability to combine multiple attributes into an airdrop\r\n- Ability to token gate airdrops\r\n- Live airdrop gas estimation when setting up airdrop\r\n\r\n**2. Community Admin functionality enhancements**\r\n- optional service to once a month auto-kick all members who haven't been online for between 30 and 60 days (e.g. auto-kick members whose profile information like Name, Avatar, etc... can no longer be fetched)\r\n\r\n**3.  IPFS service for community minted NFTs and other binary community assets**\r\n\r\n- In order for NFT tokens minted in our UI to be correctly displayed with all metadata on OpenSea, their assets need to be stored in IPFS (because IPFS is supported by OpenSea)\r\n\r\n- Will work something like this: IPFS pinning server is integrated into Status Desktop. When a community mints a NFT, the associated assets are IPFS pinned by the community control node.  The community control node then sends a 'user invisible message' to all other community members via Waku, and the Status Desktop installs of all community members then fetch the NFT assets and pin them as well.  This means that every member of a community that is running Status Desktop will always be 'IPFS pinning' all assets related to the community, so that as long as one community member that uses Status Desktop is online, the assets are guaranteed to be available via IPFS.\r\n\r\n- Use a similar scheme to the above could be used for other community assets (that are not related to token minting) in the future like: Community banner image, community icon, community description, etc...\r\n\r\n- Use a similar scheme to the above could be used for status user data in the future.  Status users pin assets related to their profile (banner image, avatar, showcase contents) using IPFS, and all of the user's mutual contacts also pin that user's profile data.  Must incorporate a setting so that users can opt-out of pinning their mutual contact's profile data.\r\n\r\n**4. QR scanner**\r\n- Needed for private key transfer\r\n- Ethereum key QRs (send modal triggered)\r\n- User Share URL in a QR (opens user profile dialogue) \r\n- Community and Channel inside Community URL in QRs (takes user to Community or Channel in Community)\r\n\r\n\r\n**5. Telegram history import into a single channel in an existing community**\r\n\r\n\r\n**--- Wallet Team ---**\r\n\r\n1. Total balance graphs for 'All accounts' and each individual account\r\n\r\n2. Advanced transaction signing\r\n\r\n",
+    "description": "**1. Actioning Communities and Messaging dogfooding feedback**\r\n\r\n**2. Continue stabilization and bug fixing**\r\n\r\n**3. Complete the profile showcase**\r\n\r\n\r\n\r\n**--- Wallet Team ---**\r\n\r\n1. Complete support for Community minted assets\r\n\r\n2. Complete token visibility management screens\r\n\r\n3. Continue working on WalletConnect support\r\n\r\n4. Continue fixing bugs, making optimisations and keeping tech debt low\r\n\r\n\r\n\r\n\r\n",
     "creator": {
       "login": "iurimatias",
       "id": 176720,
@@ -113,22 +113,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 56,
-    "closed_issues": 0,
+    "open_issues": 49,
+    "closed_issues": 2,
     "state": "open",
     "created_at": "2022-12-09T15:06:43Z",
-    "updated_at": "2023-11-06T15:40:53Z",
+    "updated_at": "2023-11-27T18:39:13Z",
     "due_on": "2024-01-31T08:00:00Z",
     "closed_at": null
   },
   "comments": 1,
   "created_at": "2023-03-18T17:29:17Z",
-  "updated_at": "2023-11-06T16:15:40Z",
-  "closed_at": null,
+  "updated_at": "2023-11-27T17:57:33Z",
+  "closed_at": "2023-11-27T17:57:33Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "**This is an improvement for the 0.12 release**\r\n\r\n-- Change request --\r\n\r\n@jrainville recently mentioned that the NFT contract that a community owner deploys to mint a token via the community admin UI requires a lot of gas to deploy.\r\n\r\nThis issue is to optimise the contract to reduce the amount of gas needed to deploy the NFT contract.  \r\n\r\nOne approach could be to split the contract into multiple contracts.  Currently the UI lets users change the following contract settings prior to deployment:\r\n\r\n- soulbound/not soulbound\r\n- unlimited supply/specific finite supply\r\n- remotely destructible / not remotely destructible \r\n\r\nInstead of having one large contract that handles all these permutations, one optimisation idea would be to instead have a number of contracts, each optimised for a specific permutation e.g.\r\n\r\n1. A soulbound, unlimited supply, remotely destructible contract\r\n2. A soulbound, specific finite supply, remotely destructible contract\r\n3. A soulbound, unlimited supply, not remotely destructible contract\r\n4. A soulbound, specific finite supply, not remotely destructible contract\r\n5. A not soulbound, unlimited supply, remotely destructible contract\r\n6. A not soulbound, specific finite supply, remotely destructible contract\r\n7. A not soulbound, unlimited supply, not remotely destructible contract\r\n8. A not soulbound, specific finite supply, not remotely destructible contract\r\n\r\nAnd then depending on what options the community owner choses in the UI, a different contract would be deployed.  \r\n\r\nThis is just one idea for optimising the gas usage of our NFT contract, other changes that can also further reduce gas usage are also welcome :-)\r\n\r\ncc'ing @gravityblast @jrainville @iurimatias  ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "iurimatias",
+    "id": 176720,
+    "node_id": "MDQ6VXNlcjE3NjcyMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/176720?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iurimatias",
+    "html_url": "https://github.com/iurimatias",
+    "followers_url": "https://api.github.com/users/iurimatias/followers",
+    "following_url": "https://api.github.com/users/iurimatias/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iurimatias/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iurimatias/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iurimatias/subscriptions",
+    "organizations_url": "https://api.github.com/users/iurimatias/orgs",
+    "repos_url": "https://api.github.com/users/iurimatias/repos",
+    "events_url": "https://api.github.com/users/iurimatias/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iurimatias/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/9943/reactions",
     "total_count": 0,
@@ -143,7 +162,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/9943/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
