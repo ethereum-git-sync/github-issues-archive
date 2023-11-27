@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4952",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4952/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4952/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4952/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4952",
+  "id": 2011334216,
+  "node_id": "I_kwDOCFeAzc534oZI",
+  "number": 4952,
+  "title": "Decide on a policy for Rayon usage",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1232620456,
+      "node_id": "MDU6TGFiZWwxMjMyNjIwNDU2",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/RFC",
+      "name": "RFC",
+      "color": "4aaa19",
+      "default": false,
+      "description": "Request for comment"
+    },
+    {
+      "id": 1690958121,
+      "node_id": "MDU6TGFiZWwxNjkwOTU4MTIx",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/code-quality",
+      "name": "code-quality",
+      "color": "77a7ff",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-27T01:40:26Z",
+  "updated_at": "2023-11-27T01:40:59Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nI've spent the last few days of downtime after Devconnect mulling over how to deal with Rayon and deadlocks (https://github.com/rayon-rs/rayon/issues/592).\r\n\r\nWe are faced with an acute instance of this problem in https://github.com/sigp/lighthouse/pull/4507#discussion_r1392025769.\r\n\r\n## Background\r\n\r\nRayon can deadlock if both of the following conditions are true:\r\n\r\n1. Lock `L` is held while calling into Rayon (e.g. calling `rayon::join` while holding a mutex).\r\n2. Lock `L` is accessed from within Rayon tasks (e.g. calling `mutex.lock()` within `par_iter`).\r\n\r\nDeadlocks can occur in multiple ways: if the first thread that is holding the lock calls into Rayon and _steals_ some of the jobs of type (2) which require the lock, then those jobs will not complete because of the circular dependency (they are waiting for the thread to release the lock, but the thread is waiting for them to complete because it is waiting for the Rayon call to return). There's a similar variant if the thread holding the lock is itself a Rayon thread, in which case the deadlock occurs because the thread tries to re-lock the lock it already holds.\r\n\r\n## Observations\r\n\r\n- Weakening either of the conditions is sufficient to avoid the deadlock. We can either avoid holding locks while calling into Rayon, _or_ avoid obtaining locks from within Rayon tasks.\r\n- There is spooky action-at-a-distance. The deadlock is a property of lock usage _throughout the entire codebase_ which makes it difficult to check manually.\r\n- We are currently only using Rayon in 2 places: in the op pool for attestation packing, and while tree hashing beacon states.\r\n\r\n## Strategies\r\n\r\n### Avoid Rayon\r\n\r\nWe could use Tokio (or another futures executor?) instead, as `tokio::sync::Mutex` is explicitly safe to hold across an `.await`. I had a go at benchmarking tree hashing with Tokio and it was around 3.5x slower (https://github.com/sigp/milhouse/pull/31). We probably don't want to switch tree-hashing out, but _could_ switch out some of the cases where we use Rayon and aren't as driven by performance.\r\n\r\nProblematically, Tokio doesn't like it when we spawn compute-heavy tasks on the main executor, so we may need a _separate_ async executor for compute-heavy tasks. Using Tokio's blocking threads is not desirable as then we can't use `tokio::sync::Mutex`.\r\n\r\n### Static Analysis\r\n\r\nI've opened an issue on the `lockbud` tool to detect Rayon-related deadlocks (https://github.com/BurtonQin/lockbud/issues/55). The author of `lockbud` previously used it to find double-locking bugs in Lighthouse, so it would be cool to support the tool, contribute to its development, and run it on CI. Even if we do detect deadlocks using the tool, we still need one of the other strategies to mitigate them.\r\n\r\n### Avoid Locks\r\n\r\nRayon is only dangerous when locks are involved, so we could refactor code to avoid using locks inside Rayon tasks. This is potentially difficult to do comprehensively without a static analyser, as it can be unclear whether some function is running under Rayon, or may call into Rayon. For tree-hashing it is easy to guarantee that we don't obtain any non-local locks, so it is more obviously safe. In the op pool, we are currently faced with a mess of deeply nested function calls and interactions with the fork choice lock, which are more difficult to eyeball. _If_ we had a persistent and cheap-to-copy data structure for fork choice, then the op pool could use a copy rather than locking.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4952/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4952/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
