@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6433",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6433/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6433/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6433/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6433",
+  "id": 2011793181,
+  "node_id": "I_kwDOGBlvNc536Ycd",
+  "number": 6433,
+  "title": "BUG: Debugger layout displays the wrong SSTORE and JUMP opcode cost",
+  "user": {
+    "login": "alex0207s",
+    "id": 52899347,
+    "node_id": "MDQ6VXNlcjUyODk5MzQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/52899347?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/alex0207s",
+    "html_url": "https://github.com/alex0207s",
+    "followers_url": "https://api.github.com/users/alex0207s/followers",
+    "following_url": "https://api.github.com/users/alex0207s/following{/other_user}",
+    "gists_url": "https://api.github.com/users/alex0207s/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/alex0207s/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/alex0207s/subscriptions",
+    "organizations_url": "https://api.github.com/users/alex0207s/orgs",
+    "repos_url": "https://api.github.com/users/alex0207s/repos",
+    "events_url": "https://api.github.com/users/alex0207s/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/alex0207s/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-27T08:52:18Z",
+  "updated_at": "2023-11-27T08:53:08Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [x] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (55dd5de 2023-11-24T00:21:15.586516000Z)\n\n### What command(s) is the bug in?\n\nforge debug src/setNumber.sol --sig \"setNumber(uint256)\" 0\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nRepro example\r\n\r\nPaste the contract `setNumber.sol` in `src` folder\r\n```\r\n// SPDX-License-Identifier: MIT\r\npragma solidity 0.8.7;\r\n\r\ncontract SetNumber {\r\n    uint256 num = 1;\r\n\r\n    function setNumber(uint256 _num) external payable {\r\n        num = _num;\r\n    }\r\n}\r\n```\r\n\r\nRun:\r\n```\r\nforge debug src/setNumber.sol --sig \"setNumber(uint256)\" 0\r\n```\r\n\r\nIn the debugger  layout, the ```SSTORE``` and ```JUMP``` opcode are 3969 and 6 gas, respectively.\r\n\r\n<img width=\"779\" alt=\"screenshot\" src=\"https://github.com/foundry-rs/foundry/assets/52899347/fc226bf7-f3f8-4e2f-8d94-ff26b73adde6\">\r\n\r\n### Issues Identified:\r\n- The reported gas cost for the ```JUMP``` opcode is incorrect. It should be 8 gas, but it is currently reported as 6 gas.\r\n- The reported gas cost for the ```SSTORE``` opcode is incorrect. It should be 3967 gas (5000 - refund gas calculated in local test, see below explanation), but it is currently reported as  3969, leading to the inaccurate display of a 6-gas cost for the ```JUMP``` opcode.\r\n\r\n### Additional Info\r\n\r\n- The gas cost for the SSTORE opcode is [dynamic](https://github.com/wolflo/evm-opcodes/blob/main/gas.md#a7-sstore) and depends on various factors such as refund gas, warm access, and cold access.\r\n- Foundry only calculates the sum of opcode cost and does not include the [intrinsic gas](https://github.com/wolflo/evm-opcodes/blob/main/gas.md#a0-0-intrinsic-gas)\r\n- Therefore, Foundry might fail to calculate the correct refund gas when the total transaction cost is low\r\n   - The refund gas formula is ```min(refund_gas_accmulated_in_refund_counter, tx.gas_consumed // 5)```\r\n   - In this case, \r\n      - On-chain: ```refund_gas_accmulated_in_refund_counter``` is 4800 and ```tx.gas_consumed``` is 26358 (before get refund gas)\r\n      - Local test: ```refund_gas_accmulated_in_refund_counter``` is 4800 and ```tx.gas_consumed``` is 5166 ([the sum of all opcode cost in this example](https://sepolia.etherscan.io/vmtrace?txhash=0x4f1f83f9f01c10cd08e3029984305eebf0d765a23ea980daf17970db3fd4abf6))\r\n   - According to the refund gas formula:\r\n      - On-chain: get ```4800``` refund gas\r\n      - Local test: get ```1033``` refund gas\r\n   - Therefore, in local test,  the ```SSTORE```  opcode costs 3967 (5000-1033) gas",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6433/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6433/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
