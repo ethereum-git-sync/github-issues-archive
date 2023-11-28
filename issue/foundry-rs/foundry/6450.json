@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6450",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6450/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6450/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6450/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6450",
+  "id": 2015373811,
+  "node_id": "I_kwDOGBlvNc54ICnz",
+  "number": 6450,
+  "title": "Race condition in tests with false negative results",
+  "user": {
+    "login": "0xmikko",
+    "id": 26343374,
+    "node_id": "MDQ6VXNlcjI2MzQzMzc0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26343374?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xmikko",
+    "html_url": "https://github.com/0xmikko",
+    "followers_url": "https://api.github.com/users/0xmikko/followers",
+    "following_url": "https://api.github.com/users/0xmikko/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xmikko/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xmikko/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xmikko/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xmikko/orgs",
+    "repos_url": "https://api.github.com/users/0xmikko/repos",
+    "events_url": "https://api.github.com/users/0xmikko/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xmikko/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-28T21:46:32Z",
+  "updated_at": "2023-11-28T21:46:32Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [ ] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (23aa303 2023-11-28T00:21:45.422470192Z)\n\n### What command(s) is the bug in?\n\nforge t\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\n## Problem \r\nOccasionally, when we run all the tests, a weird thing happens: after some time and a few successful tests (a few fully successful test suites, then a few test suites with a few  successful first tests), all the tests start failing, and the failing ones include deterministic tests that pass when run separately.\r\nRe-running the test suite usually makes all the tests pass.\r\n\r\nThe trickiest part is that it occurs sporadically  and is very hard to reproduce.\r\nPreviously, having a fuzzing test that fails with some large probability was a great opportunity to make this thing happen, but at this point it seems to occur even when everything works well.\r\n\r\nJust by thinking about it, seems like there is some race condition with snapshot states when running test suites in parallel, but hard to confirm without analyzing the code deeply.\r\n\r\n##  How to reproduce\r\n\r\n1. git clone `https://github.com/Gearbox-protocol/core-v3.git`\r\n2. `cd core-v3/`\r\n3. `yarn`\r\n4. `export FOUNDRY_FUZZ_RUNS=10000`\r\n5. `forge t`\r\n\r\nYou'll get picture like that:\r\n\r\n![image](https://github.com/foundry-rs/foundry/assets/26343374/53fbe3c7-72d5-4e5c-93f1-8dccf19a2a24)\r\n\r\nAs you can see, the problem exists in `contracts/test/unit/traits/USDT_TransferUnitTest.t.sol:USDT_TransferUnitTest`, so run tests with this particular contact:\r\n\r\n7. `forge t --mc USDT_TransferUnitTest` and you'll get that everything is okay:\r\n\r\n![image](https://github.com/foundry-rs/foundry/assets/26343374/3448c414-ded0-4949-bf8b-f1c3c3df1c36)\r\n\r\nRunning tests and specify contract with `--mt` or `--mc` key will provide you `ok`.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6450/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6450/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
