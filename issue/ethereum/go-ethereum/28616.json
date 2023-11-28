@@ -30,15 +30,7 @@
     "site_admin": false
   },
   "labels": [
-    {
-      "id": 72233652,
-      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
-      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
-      "name": "type:feature",
-      "color": "84b6eb",
-      "default": false,
-      "description": null
-    }
+
   ],
   "state": "open",
   "locked": false,
@@ -47,13 +39,13 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-11-28T06:08:24Z",
-  "updated_at": "2023-11-28T06:08:43Z",
+  "updated_at": "2023-11-28T07:55:50Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "Statedb has two data sources for state access: Trie and Snapshot.\r\n\r\nThe availability of the state trie is always ensured, allowing it to be utilized for state access and the computation of the post-transition hash.\r\n\r\nOn the other hand, the availability of the state snapshot is not guaranteed. It can be used exclusively for state access, offering a more efficient method.\r\n\r\nNow both trie and snapshot is hardcoded in statedb like\r\n\r\n```go\r\ntype StateDB struct {\r\n\ttrie      Trie\r\n\tsnaps  *snapshot.Tree        // Nil if snapshot is not available\r\n\tsnap    snapshot.Snapshot // Nil if snapshot is not available\r\n}\r\n```\r\n\r\nUnfortunately, this approach is not flexible enough. In path mode archive design, a new data source is required to access state from state history. \r\n\r\nBesides, in the foreseeable future, state snapshot will be merged into underlying pathdb and a comprehensive reader will be offered which can either access node or state. \r\n\r\nIn light of these considerations, I propose the implementation of a `StateReader` abstraction to ensure the necessary flexibility.\r\n\r\n",
+  "body": "Statedb has two data sources for state access: Trie and Snapshot.\r\n\r\nThe availability of the state trie is always ensured, allowing it to be utilized for state access and the computation of the post-transition hash.\r\n\r\nOn the other hand, the availability of the state snapshot is not guaranteed. It can be used exclusively for state access, offering a more efficient method.\r\n\r\nNow both trie and snapshot is hardcoded in statedb like\r\n\r\n```go\r\ntype StateDB struct {\r\n\ttrie      Trie\r\n\tsnaps  *snapshot.Tree        // Nil if snapshot is not available\r\n\tsnap    snapshot.Snapshot // Nil if snapshot is not available\r\n}\r\n```\r\n\r\nUnfortunately, this approach is not flexible enough. In path mode archive design, a new data source is required to access state from state history. \r\n\r\nBesides, in the foreseeable future, state snapshot will be merged into underlying pathdb and a comprehensive reader will be offered which can either access node or state. \r\n\r\nIn light of these considerations, I propose the implementation of a `StateReader` abstraction to ensure the necessary flexibility.\r\n\r\n--- \r\n\r\nThe `StateReader` interface will be something like this\r\n\r\n```go\r\n// StateReader defines the interface for accessing accounts or storage slots\r\n// associated with a specific state.\r\ntype StateReader interface {\r\n\t// Account retrieves the account associated with a particular address.\r\n\tAccount(addr common.Address) (*types.StateAccount, error)\r\n\r\n\t// Storage retrieves the storage slot associated with a particular account\r\n\t// address and slot key.\r\n\tStorage(addr common.Address, slot common.Hash) (common.Hash, error)\r\n}\r\n```\r\n\r\nAnd I can imagine a few corresponding implementations\r\n\r\n- `LightReader`: the reader implemented by light client, a wrapper on top of on-demand-state-retriever\r\n- `MerkleReader`: the reader for chain execution, which composed by state trie and optional state snapshot\r\n- `ArchiveReader`: the reader for accessing historic states, a wrapper on top of state history\r\n- `VerkleReader`: the reader for chain execution, but in the manner of verkle. It's also composed by verkle trie and verkle state snapshot\r\n",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28616/reactions",
@@ -72,5 +64,92 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1829277369",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28616#issuecomment-1829277369",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28616",
+    "id": 1829277369,
+    "node_id": "IC_kwDOAOvK985tCI65",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-28T07:50:24Z",
+    "updated_at": "2023-11-28T07:51:01Z",
+    "author_association": "MEMBER",
+    "body": "I fully agree about the need for a StateReader. However:\r\n\r\n- Exposing a `*types.StateAccount` might be problematic. Handing out an object raises a question about ownership. If the upper layer modifies the object, will it 'punch through' to the underlying layers? If, through other channels, the balance of account `X` is increased, will the value in the object that I'm holding, which represents `X`, also increase? \r\n\r\nTherefore, maybe the interface should be more granular, e.g. \r\n```golang\r\n// StateReader defines the interface for accessing accounts or storage slots\r\n// associated with a specific state.\r\ntype StateReader interface {\r\n\t// StateRoot returns the state root that this reader originates from. \r\n\tStateRoot() common.Hash \r\n\t// AccountBalance returns the balance for the account at address addr\r\n\tAccountBalance(addr common.Address) (*uint256.Int, error)\r\n\tAccountNonce(addr common.Address) (uint64, error)\r\n\tAccountRoot(addr common.Address) (common.Hash, error)\r\n\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1829277369/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1829283530",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28616#issuecomment-1829283530",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28616",
+    "id": 1829283530,
+    "node_id": "IC_kwDOAOvK985tCKbK",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-28T07:55:48Z",
+    "updated_at": "2023-11-28T07:55:48Z",
+    "author_association": "MEMBER",
+    "body": "The existing statedb has the following methods. Perhaps a good simple first step would be to make these into an interface:\r\n```golang\r\nfunc (s *StateDB) Exist(addr common.Address) bool \r\n// Empty returns whether the state object is either non-existent\r\n// or empty according to the EIP161 specification (balance = nonce = code = 0)\r\nfunc (s *StateDB) Empty(addr common.Address) bool \r\n// GetBalance retrieves the balance from the given address or 0 if object not found\r\nfunc (s *StateDB) GetBalance(addr common.Address) *uint256.Int \r\n// GetNonce retrieves the nonce from the given address or 0 if object not found\r\nfunc (s *StateDB) GetNonce(addr common.Address) uint64 \r\n// GetStorageRoot retrieves the storage root from the given address or empty\r\n// if object not found.\r\nfunc (s *StateDB) GetStorageRoot(addr common.Address) common.Hash \r\nfunc (s *StateDB) GetCode(addr common.Address) []byte \r\nfunc (s *StateDB) GetCodeSize(addr common.Address) int \r\nfunc (s *StateDB) GetCodeHash(addr common.Address) common.Hash \r\n// GetState retrieves a value from the given account's storage trie.\r\nfunc (s *StateDB) GetState(addr common.Address, hash common.Hash) common.Hash \r\n// GetCommittedState retrieves a value from the given account's committed storage trie.\r\nfunc (s *StateDB) GetCommittedState(addr common.Address, hash common.Hash) common.Hash \r\nfunc (s *StateDB) HasSelfDestructed(addr common.Address) bool \r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1829283530/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
