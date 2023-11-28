@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "dvovk",
@@ -79,12 +79,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-11-04T12:51:34Z",
-  "updated_at": "2023-11-08T10:10:17Z",
-  "closed_at": null,
+  "updated_at": "2023-11-28T15:03:05Z",
+  "closed_at": "2023-11-28T15:03:05Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "To print requests which take longer than given threshold. Basic implementation may log only after request finish, but more useful variant is - to print currently-running (unfinished yet) slow requests\r\n\r\n\r\nCurrently: only can enable all requests logging - which is expensive and not very useful (under load).\r\n\r\n\r\nNeed to bench impact of enabling it\r\nDisabled by default\r\n\r\n—-\r\nTbh, i don’t know where will be bottleneck in such feature (maybe naive implementation will be good-enough), and don’t know how many goroutines will write to slowlog. \r\n\r\nBut here are some raw ideas - how can reduce lock contention and timers amount: \r\n- to avoid timers creation - can create new “requests bucket” every 100ms, add new requests to last bucket only. \r\n- when bucket is done (after 100ms) - can add it to linked-list of “complete buckets”\r\n- aggregate goroutine will iterate over “complete buckets”list. It also can remove finished request (clean garbage).\r\n - It’s even can be lock-free - because reads and writes comes to different buckets",
-  "closed_by": null,
+  "closed_by": {
+    "login": "dvovk",
+    "id": 29065143,
+    "node_id": "MDQ6VXNlcjI5MDY1MTQz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29065143?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dvovk",
+    "html_url": "https://github.com/dvovk",
+    "followers_url": "https://api.github.com/users/dvovk/followers",
+    "following_url": "https://api.github.com/users/dvovk/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dvovk/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dvovk/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dvovk/subscriptions",
+    "organizations_url": "https://api.github.com/users/dvovk/orgs",
+    "repos_url": "https://api.github.com/users/dvovk/repos",
+    "events_url": "https://api.github.com/users/dvovk/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dvovk/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8651/reactions",
     "total_count": 0,
@@ -99,7 +118,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8651/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
