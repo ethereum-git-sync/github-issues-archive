@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-14T08:03:45Z",
-  "updated_at": "2023-11-14T08:04:39Z",
+  "updated_at": "2023-11-27T22:53:35Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -57,8 +57,8 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6308/reactions",
-    "total_count": 0,
-    "+1": 0,
+    "total_count": 3,
+    "+1": 3,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1828760301",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6308#issuecomment-1828760301",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6308",
+    "id": 1828760301,
+    "node_id": "IC_kwDOGBlvNc5tAKrt",
+    "user": {
+      "login": "lukehungngo",
+      "id": 26456607,
+      "node_id": "MDQ6VXNlcjI2NDU2NjA3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26456607?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/lukehungngo",
+      "html_url": "https://github.com/lukehungngo",
+      "followers_url": "https://api.github.com/users/lukehungngo/followers",
+      "following_url": "https://api.github.com/users/lukehungngo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/lukehungngo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/lukehungngo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/lukehungngo/subscriptions",
+      "organizations_url": "https://api.github.com/users/lukehungngo/orgs",
+      "repos_url": "https://api.github.com/users/lukehungngo/repos",
+      "events_url": "https://api.github.com/users/lukehungngo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/lukehungngo/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-27T22:51:54Z",
+    "updated_at": "2023-11-27T22:53:35Z",
+    "author_association": "NONE",
+    "body": "After some days of trying, I change the `internal` function to `public`\r\n\r\n```\r\n// SPDX-License-Identifier: AGPL-3.0-only\r\npragma solidity ^0.8.21;\r\n\r\nimport \"weighted-math-lib/WeightedMathLib.sol\";\r\n\r\nlibrary MyLibrary {\r\n    function computeReservesAndWeights(SomeArgs memory args)\r\n        public // change from **Internal**\r\n        view\r\n        returns (\r\n            uint256 xReserve,\r\n            uint256 yReserve,\r\n            uint256 xWeight,\r\n            uint256 yWeight\r\n        )\r\n    {\r\n        xReserve = args.xReserve;\r\n        yReserve = args.yReserve;\r\n\r\n        xWeight = WeightedMathLib.linearInterpolation({\r\n            x: args.weightStart,\r\n            y: args.weightEnd,\r\n            i: block.timestamp.max(args.saleStart),\r\n            n: args.end\r\n        });\r\n\r\n        yWeight = uint256(1e18).rawSub(xWeight);\r\n    }\r\n}\r\n```\r\n\r\nThen I ran `forge coverage` again, I hit 100% Lines coverage. Our auditor also followed this method and finally got us approval for the Library test coverage.\r\n\r\nHope this information help",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1828760301/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
