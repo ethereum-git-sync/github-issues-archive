@@ -1,0 +1,128 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6208",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6208/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6208/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6208/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6208",
+  "id": 2013542646,
+  "node_id": "I_kwDODE2jmc54BDj2",
+  "number": 6208,
+  "title": "if all peers get disconnected, attempt to reconnect to bootnodes",
+  "user": {
+    "login": "macfarla",
+    "id": 2627919,
+    "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/macfarla",
+    "html_url": "https://github.com/macfarla",
+    "followers_url": "https://api.github.com/users/macfarla/followers",
+    "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+    "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+    "organizations_url": "https://api.github.com/users/macfarla/orgs",
+    "repos_url": "https://api.github.com/users/macfarla/repos",
+    "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/macfarla/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3805591260,
+      "node_id": "LA_kwDODE2jmc7i1Lbc",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/peering",
+      "name": "peering",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 5290172097,
+      "node_id": "LA_kwDODE2jmc8AAAABO1GewQ",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/non%20mainnet%20(private%20networks)",
+      "name": "non mainnet (private networks)",
+      "color": "0052cc",
+      "default": false,
+      "description": "not related to mainnet features - covers privacy, permissioning, IBFT2, QBFT"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2023-11-28T03:23:15Z",
+  "updated_at": "2023-11-28T07:16:57Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Currently no attempt is made to reconnect to static nodes or bootnodes. This can leave besu with 0 peers for some time.\r\n\r\nPeerDiscoveryController.refreshPeerTable() is called periodically but we only try to attempt to connect to bootnodes at startup\r\n\r\n```\r\n2023-11-28 10:59:35.515 | 2023-11-28 00:59:35.515+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n-- | -- | --\r\n  |   | 2023-11-28 10:59:18.095 | 2023-11-28 00:59:18.095+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:59:16.681 | 2023-11-28 00:59:16.681+00:00 \\| vertx-blocked-thread-checker \\| WARN  \\| BlockedThreadChecker \\| Thread Thread[vert.x-eventloop-thread-1,5,main] has been blocked for 3132 ms, time limit is 2000 ms |  \r\n  |   | 2023-11-28 10:59:16.681 | 2023-11-28 00:59:16.681+00:00 \\| vertx-blocked-thread-checker \\| WARN  \\| BlockedThreadChecker \\| Thread Thread[vert.x-eventloop-thread-2,5,main] has been blocked for 3391 ms, time limit is 2000 ms |  \r\n  |   | 2023-11-28 10:59:15.680 | 2023-11-28 00:59:15.680+00:00 \\| vertx-blocked-thread-checker \\| WARN  \\| BlockedThreadChecker \\| Thread Thread[vert.x-eventloop-thread-1,5,main] has been blocked for 2131 ms, time limit is 2000 ms |  \r\n  |   | 2023-11-28 10:59:15.680 | 2023-11-28 00:59:15.680+00:00 \\| vertx-blocked-thread-checker \\| WARN  \\| BlockedThreadChecker \\| Thread Thread[vert.x-eventloop-thread-2,5,main] has been blocked for 2390 ms, time limit is 2000 ms |  \r\n  |   | 2023-11-28 10:59:04.032 | 2023-11-28 00:59:04.032+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:58:54.729 | 2023-11-28 00:58:54.729+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:58:48.339 | 2023-11-28 00:58:48.339+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:58:40.865 | 2023-11-28 00:58:40.865+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:58:33.070 | 2023-11-28 00:58:33.069+00:00 \\| vert.x-eventloop-thread-0 \\| WARN  \\| EngineQosTimer \\| Execution engine not called in 120 seconds, consensus client may not be connected |  \r\n  |   | 2023-11-28 10:58:29.702 | 2023-11-28 00:58:29.702+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:58:14.675 | 2023-11-28 00:58:14.674+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:58:06.323 | 2023-11-28 00:58:06.323+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:57:56.279 | 2023-11-28 00:57:56.279+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:57:50.541 | 2023-11-28 00:57:50.541+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness |  \r\n  |   | 2023-11-28 10:57:35.657 | 2023-11-28 00:57:35.657+00:00 \\| EthScheduler-Timer-0 \\| INFO  \\| FullSyncTargetManager \\| Unable to find sync target. Currently checking 0 peers for usefulness\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6208/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6208/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1829241166",
+    "html_url": "https://github.com/hyperledger/besu/issues/6208#issuecomment-1829241166",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/6208",
+    "id": 1829241166,
+    "node_id": "IC_kwDODE2jmc5tCAFO",
+    "user": {
+      "login": "macfarla",
+      "id": 2627919,
+      "node_id": "MDQ6VXNlcjI2Mjc5MTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2627919?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/macfarla",
+      "html_url": "https://github.com/macfarla",
+      "followers_url": "https://api.github.com/users/macfarla/followers",
+      "following_url": "https://api.github.com/users/macfarla/following{/other_user}",
+      "gists_url": "https://api.github.com/users/macfarla/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/macfarla/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/macfarla/subscriptions",
+      "organizations_url": "https://api.github.com/users/macfarla/orgs",
+      "repos_url": "https://api.github.com/users/macfarla/repos",
+      "events_url": "https://api.github.com/users/macfarla/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/macfarla/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-28T07:16:56Z",
+    "updated_at": "2023-11-28T07:16:56Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "I think we don't attempt to reconnect because the status is already \"bonded\" with eg this bootnode, even though peer count is zero\r\n\r\n DiscoveryPeer{status=bonded, enode=enode://cb\r\nbaacaf..., firstDiscovered=1701153716532, lastContacted=1701153716572, lastSeen=1701153716899},\r\n\r\nso it's not a bondingCandidate per RecursivePeerRefreshState\r\n\r\n```\r\n    private boolean isBondingCandidate() {\r\n      return !bondingComplete && !bondingStarted && peer.getStatus() == PeerDiscoveryStatus.KNOWN;\r\n    }\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1829241166/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
+]
