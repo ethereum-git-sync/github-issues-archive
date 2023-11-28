@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2022-08-30T04:06:12Z",
-  "updated_at": "2022-08-30T06:47:28Z",
-  "closed_at": null,
+  "updated_at": "2023-11-28T11:17:32Z",
+  "closed_at": "2023-11-28T11:17:32Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "```\r\n{\r\n  for { let i_0 := 0 } lt(i_0, 1) { i_0 := add(i_0, 1) } {\r\n    mstore(lt(mload(0x100000000), and(signextend(true, 0), 4)), 0)\r\n  }\r\n}\r\n```\r\n\r\nthrows\r\n\r\nhttps://github.com/ethereum/solidity/blob/7fdd494da7afba5172cbbe7933c66bfde17284b7/test/tools/ossfuzz/StackReuseCodegenFuzzer.cpp#L152-L157\r\n\r\nEssentially\r\n  - unoptimized code may be successfully deployed and called\r\n  - optimized code may be successfully deployed but call returns `OUT_OF_GAS`\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "ekpyron",
+    "id": 1347491,
+    "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekpyron",
+    "html_url": "https://github.com/ekpyron",
+    "followers_url": "https://api.github.com/users/ekpyron/followers",
+    "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+    "repos_url": "https://api.github.com/users/ekpyron/repos",
+    "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/13453/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/13453/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "~~Why doesn't the unoptimized byte code execute the for loop?~~ Why is `MLOAD` missing in the unoptimized byte code?",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1231174703/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1829617463",
+    "html_url": "https://github.com/ethereum/solidity/issues/13453#issuecomment-1829617463",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/13453",
+    "id": 1829617463,
+    "node_id": "IC_kwDOAm_5kc5tDb83",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-28T11:17:32Z",
+    "updated_at": "2023-11-28T11:17:32Z",
+    "author_association": "MEMBER",
+    "body": "``and(signextend(true, 0), 4)`` is zero, so the comparison is ``lt(mload(0x100000000), 0)``. Since nothing is ever less than zero, this can be optimized out to false (i.e. ``0``).\r\n\r\nNow the divergence is due to the fact that the mload itself will always run out of gas in practice - however, the optimizer has to assume unbounded gas to be available after which this is semantically correct.\r\n\r\nAt least that's my guess about what's happening here - although I'm not sure if optimized and unoptimized have been labelled incorrectly here :-).\r\n\r\nIn any case, there's no issue here, so I'm closing this.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1829617463/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
