@@ -97,9 +97,9 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-27T14:25:53Z",
-  "updated_at": "2023-11-27T14:25:53Z",
+  "updated_at": "2023-11-28T12:30:46Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -122,5 +122,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1829744496",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28613#issuecomment-1829744496",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28613",
+    "id": 1829744496,
+    "node_id": "IC_kwDOAOvK985tD69w",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-28T12:27:58Z",
+    "updated_at": "2023-11-28T12:30:46Z",
+    "author_association": "MEMBER",
+    "body": "My branch https://github.com/holiman/go-ethereum/tree/witness_experiments_2 has some experiments on it. \r\n\r\n- For 'trie-backed' excution, the `tracer` inside a trie is used to soup up the nodes. \r\n- For 'snapshot-backed' execution, the trie prefetcher has been rewritten, so that it always completes: instead of just aborting it, the caller needs to wait for it to finish it's tasks. Inside it, the same trie.tracer is used. The prefetcher delivers the `trie` to the caller, who proceeds to use it for updates, thus adding any extra sibling-nodes that are required to produce the poststate. \r\n- At this point, I have not added reads. I therefore expect the 'trie-backed' witness to differ from the 'snapshot-backed' witness. \r\n\r\nIt can be tested with e.g. blockchain tests\r\n```\r\n[user@work go-ethereum]$ go run  ./cmd/evm/  --json --dump blocktest ./tests/testdata/BlockchainTests/GeneralStateTests/stCallCodes/callcall_00.json  2>&1  | grep witness | head -n 20\r\n[witness] Root 56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\r\n[witness] Root 56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\r\n[witness] Root 56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\r\n[witness] Root ae67c412e08547562faf01687b0881f8bd873913f3610a8f11e531f3f1870fbb\r\n[witness] Owner 0x0000000000000000000000000000000000000000000000000000000000000000, 5 entries: \r\n[witness] - '0x0c': 0xf869a035b6e52f52fba98eb72592089d858d06f258aba915c994662489a03e35e97cc8b846f8448080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a05566b23433ebe4760cced954cd4416fe4dac80925794b857dc0543b9150a18c7\r\n[witness] - '': 0xf891a0784817176baf8005fc2e6438e8ecc5f8aa896e82ada0c7506abad768d7fd75958080a05d53e51757bd1ac9dc53fd330a19afe11ea5b6f86095372ffec4246f418b26fc8080808080808080a0d13f3d81d1de21e71fc77ca5bd72e36e25d68ba4b00549d6bbc999e323a602bc80a085e69184ea38227c33cf3291651e5d3a8b8f3f2b3e9183b25b4a220c31efe1e48080\r\n[witness] - '0x00': 0xf871a033601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616bb84ef84c80880de0b6b3a7640000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\r\n[witness] - '0x0e': 0xf871a03e51ea7e15b3ec83d9e87eac953fcb2444be7f09e9b1e6e02a47fe32c5a9163ab84ef84c80880de0b6b3a7640000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c2688c82aba81dcb585a1c48e70b72b372db0e918e71803b43c9aed25f59e38f\r\n[witness] - '0x03': 0xf871a03ed02be1e351ddbcc2bf3ffafc25fb42a533df024b33c85f9805e17b60f7230cb84ef84c80880de0b6b3a7640000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0298cfc41a13d4d9675691303d2b73e1551b3f2721254099297bd0bc73807b432\r\n[witness] Root 56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\r\n[witness] Root 56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\r\n[witness] Root 56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\r\n``` ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1829744496/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
