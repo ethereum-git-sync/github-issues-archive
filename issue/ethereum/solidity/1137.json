@@ -49,7 +49,7 @@
       "description": "Changes are not very noticeable or potential benefits are limited."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 5,
   "created_at": "2016-10-02T13:47:44Z",
-  "updated_at": "2023-11-29T04:56:14Z",
-  "closed_at": null,
+  "updated_at": "2023-11-29T07:36:13Z",
+  "closed_at": "2023-11-29T07:36:13Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "This bug affects Solidity v0.3.6 (at least, didn't test versions prior), and the latest nightly v0.4.3-nightly.2016.9.30.\n\nTake this example contract:\n\n```\npragma solidity ^0.4.0;\ncontract c {\n    string test;\n    function setString(string _test) {\n        test = _test;\n    }\n}\n```\n\nThen pass a short string (i.e. one that fits in a single 32-byte storage slot) to the `setString()` method. For example, passing \"example string\":\n\n<img width=\"858\" alt=\"short byte array sstore bug first tx\" src=\"https://cloud.githubusercontent.com/assets/997681/19020766/306df486-88b2-11e6-8e8f-6e837f0a21de.png\">\n\nWe can see above that on the first execution of `setString()`, only one SSTORE occurs. \n\nNow call `setString()` a second time, for example with \"example string 2\":\n<img width=\"902\" alt=\"short byte array sstore bug second tx\" src=\"https://cloud.githubusercontent.com/assets/997681/19020777/77e8a720-88b2-11e6-9147-1ed38dc40a08.png\">\n\nWe can see that on the second execution, two SSTOREs occurred. The first SSTORE set the `0x0` slot to \"example string 2\" (0x6578616d...), and the second SSTORE cleared the `0x290de...` slot (i.e. set the slot to 0). But since the `0x290de...` slot was already empty, the second SSTORE was a needless operation.\n\nThis needless storage clear originates at [libsolidity/codegen/ArrayUtils.cpp#L99-L100](https://github.com/ethereum/solidity/blob/af6afb0415761b53721f89c7f65064807f41cbd3/libsolidity/codegen/ArrayUtils.cpp#L99-L100), since if the target storage size (i.e the value of `convertLengthToSize(_targetType)`) is 1, after adding it to `target_data_pos`, `target_data_pos` and `target_data_end` will span two storage slots. After the new string is written to the first storage slot (overwriting the previously-existing value at that slot), the second slot is then cleared in [`clearStorageLoop(*targetBaseType)`](https://github.com/ethereum/solidity/blob/af6afb0415761b53721f89c7f65064807f41cbd3/libsolidity/codegen/ArrayUtils.cpp#L267). On the first execution, the bug did not occur because the target storage size was 0, so `target_data_pos` and `target_data_end` are equal (and thus span only a single storage slot).\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mehtavishwa30",
+    "id": 32997409,
+    "node_id": "MDQ6VXNlcjMyOTk3NDA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/32997409?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mehtavishwa30",
+    "html_url": "https://github.com/mehtavishwa30",
+    "followers_url": "https://api.github.com/users/mehtavishwa30/followers",
+    "following_url": "https://api.github.com/users/mehtavishwa30/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mehtavishwa30/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mehtavishwa30/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mehtavishwa30/subscriptions",
+    "organizations_url": "https://api.github.com/users/mehtavishwa30/orgs",
+    "repos_url": "https://api.github.com/users/mehtavishwa30/repos",
+    "events_url": "https://api.github.com/users/mehtavishwa30/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mehtavishwa30/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/1137/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/1137/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
