@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "mikesposito",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-11-28T14:00:23Z",
-  "updated_at": "2023-11-28T15:31:51Z",
-  "closed_at": null,
+  "updated_at": "2023-11-29T17:41:03Z",
+  "closed_at": "2023-11-29T17:41:03Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "We have a couple of opportunities for optimizing the performance of vault encryption, specifically within the `EthKeyringController` and the `KeyringController` setup:\r\n\r\n#### 1. Improve Key Caching in EthKeyringController:\r\nThe `EthKeyringController` is currently set up to derive a new encryption key from the user's password for every keychain operation. This approach is inefficient as it unnecessarily repeats the key derivation process.\r\n\r\nWe should amend the `EthKeyringController` to prioritize the use of a cached encryption key rather than re-deriving it from the password. This would only apply in instances where the cached encryption key is still in memory, and it would significantly reduce the processing time by avoiding redundant derivations.\r\n\r\n#### 2. Initialize `KeyringController` with Caching Enabled (in the extension):\r\nAs a separate but related improvement, when initializing `KeyringController` in the extension, we should enable the `cacheEncryptionKey` option by default (instead of MV3-only). This adjustment would ensure that the `KeyringController` itself utilizes the performance benefits of key caching.\r\n\r\n#### 3. Replace `updateVault` with `isVaultUpdated`:\r\nThe `EthKeyringController` currently uses the `updateVault` function from `browser-passworder` for a simple comparison with the existing vault, which leads to needless re-encryption.\r\n\r\nWe should export `isVaultUpdated` from `browser-passworder`, and use it in the `EthKeyringController`. This function would allow us to check if the vault is updated by analyzing its metadata, which is far more efficient than performing a full `derivation -> decryption -> derivation -> encryption` operation.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mikesposito",
+    "id": 34438276,
+    "node_id": "MDQ6VXNlcjM0NDM4Mjc2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34438276?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mikesposito",
+    "html_url": "https://github.com/mikesposito",
+    "followers_url": "https://api.github.com/users/mikesposito/followers",
+    "following_url": "https://api.github.com/users/mikesposito/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mikesposito/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mikesposito/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mikesposito/subscriptions",
+    "organizations_url": "https://api.github.com/users/mikesposito/orgs",
+    "repos_url": "https://api.github.com/users/mikesposito/repos",
+    "events_url": "https://api.github.com/users/mikesposito/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mikesposito/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/MetaMask/core/issues/3582/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/3582/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
