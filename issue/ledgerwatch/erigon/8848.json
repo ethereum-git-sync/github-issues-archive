@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8848",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8848/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8848/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8848/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8848",
+  "id": 2015667956,
+  "node_id": "I_kwDOC0FsAM54JKb0",
+  "number": 8848,
+  "title": "newHeads ws subscription not publishing root header during reorg",
+  "user": {
+    "login": "jotto",
+    "id": 16573,
+    "node_id": "MDQ6VXNlcjE2NTcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16573?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jotto",
+    "html_url": "https://github.com/jotto",
+    "followers_url": "https://api.github.com/users/jotto/followers",
+    "following_url": "https://api.github.com/users/jotto/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jotto/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jotto/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jotto/subscriptions",
+    "organizations_url": "https://api.github.com/users/jotto/orgs",
+    "repos_url": "https://api.github.com/users/jotto/repos",
+    "events_url": "https://api.github.com/users/jotto/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jotto/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-29T02:15:08Z",
+  "updated_at": "2023-11-29T02:16:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: v2.54.0\r\n\r\nOS & Version: Linux\r\n\r\nErigon Command (with flags/config):\r\n\r\n```\r\n--chain=mainnet\r\n--http.addr=0.0.0.0\r\n--http\r\n--ws\r\n--http.api=eth,debug,net,trace,web3,erigon\r\n```\r\n\r\nConsensus Layer Command (with flags/config):\r\n\r\n```\r\n--externalcl=false\r\n```\r\n\r\nChain/Network: ethereum mainnet\r\n\r\n#### Expected behaviour\r\n\r\nif the reorg begins with 18673916, I expect 18673916 to be republished\r\n\r\n18673915, 18673916, **18673916**, **18673917**, **18673918**\r\n\r\n#### Actual behaviour\r\n\r\n18673916 is not republished, and 18673917's parentHash points to a 18673916 header that was never received\r\n\r\n18673915, 18673916, **18673917**, **18673918**\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n```golang\r\nimport (\r\n  \"github.com/ethereum/go-ethereum/ethclient\"\r\n  \"github.com/ethereum/go-ethereum/rpc\"\r\n  \"github.com/ethereum/go-ethereum/core/types\"\r\n)\r\n\r\nrpcClient, err := rpc.Dial(\"ws://localhost:8545\")\r\nif err != nil {\r\n  panic(err)\r\n}\r\nclient := ethclient.NewClient(rpcClient)\r\n\r\nvar headerPC = make(chan *types.Header, 10)\r\nclient.SubscribeNewHead(context.Background(), headerPC)\r\n\r\nfor newHeader := range headerPC {\r\n  fmt.Printf(\"new header received: %d\\n\\thash: %s\\n\\tparentHash: %s\\n\",\r\n    newHeader.Number.Uint64(), newHeader.Hash().String(), newHeader.ParentHash.String(),\r\n  )\r\n}\r\n```\r\n\r\n#### golang log output\r\n\r\n```\r\nnew header received: 18673915\r\n  hash: 0xbe0b325962b2c29e8ead4ed70f0e62528856e8bf2659d49f8fc3c12b4b015cdd\r\n  parentHash: 0x2fa1de31e4f1dafc3778aa60f0f97dd4cdf36279cce30421df7cf1160dca843e\r\nnew header received: 18673916\r\n  hash: 0xc70ada05d79f36c9d17d762fc651c0d54fa7e62df417a8c6d806bd4179fab5c7\r\n  parentHash: 0xbe0b325962b2c29e8ead4ed70f0e62528856e8bf2659d49f8fc3c12b4b015cdd\r\nnew header received: 18673917\r\n  hash: 0xac48845a43c1158dc310b34c583328653028a69bd2c7d5007da233e73a6816f1\r\n  parentHash: 0x8ea7a7ab7991b914b0013ace4129a91d37b135123e407d356929558ee778c80f\r\nnew header received: 18673918\r\n  hash: 0x95ae4130df1613c1af9ea8d7e5949b5fcf94a4941a8862567256e8fe29caef43\r\n  parentHash: 0xac48845a43c1158dc310b34c583328653028a69bd2c7d5007da233e73a6816f1\r\n```\r\n\r\n#### erigon logs\r\n\r\n````\r\n[INFO] [11-29|01:12:48.621] RPC Daemon notified of new headers       from=18673914 to=18673915 hash=0xbe0b325962b2c29e8ead4ed70f0e62528856e8bf2659d49f8fc3c12b...\r\n[INFO] [11-29|01:12:48.621] head updated                             hash=0xbe0b325962b2c29e8ead4ed70f0e62528856e8bf2659d49f8fc3c12b4b015cdd number=18673915     \r\n[INFO] [11-29|01:13:03.129] [NewPayload] Handling new payload        height=18673916 hash=0xc70ada05d79f36c9d17d762fc651c0d54fa7e62df417a8c6d806bd4179fab5c7     \r\n[INFO] [11-29|01:13:03.638] [updateForkchoice] Fork choice update: flushing in-memory state (built by previous newPayload)                                       \r\n[INFO] [11-29|01:13:04.058] RPC Daemon notified of new headers       from=18673915 to=18673916 hash=0xc70ada05d79f36c9d17d762fc651c0d54fa7e62df417a8c6d806bd41...\r\n[INFO] [11-29|01:13:04.058] head updated                             hash=0xc70ada05d79f36c9d17d762fc651c0d54fa7e62df417a8c6d806bd4179fab5c7 number=18673916     \r\n[INFO] [11-29|01:13:12.606] [NewPayload] Handling new payload        height=18673916 hash=0x8ea7a7ab7991b914b0013ace4129a91d37b135123e407d356929558ee778c80f     \r\n[INFO] [11-29|01:13:13.101] [5/12 HashState] Unwinding started       from=18673916 to=18673915 storage=false codes=true                                          \r\n[INFO] [11-29|01:13:13.102] [5/12 HashState] Unwinding started       from=18673916 to=18673915 storage=false codes=false                                         \r\n[INFO] [11-29|01:13:13.105] [5/12 HashState] Unwinding started       from=18673916 to=18673915 storage=true codes=false                                          \r\n[INFO] [11-29|01:13:13.111] [6/12 IntermediateHashes] Unwinding      from=18673916 to=18673915 csbucket=AccountChangeSet                                         \r\n[INFO] [11-29|01:13:13.113] [6/12 IntermediateHashes] Unwinding      from=18673916 to=18673915 csbucket=StorageChangeSet                                         \r\n[INFO] [11-29|01:13:13.146] [6/12 IntermediateHashes] Trie root      hash=0x9ae17ccebb28ab234900448c18571a746f1646bfda12c21c8307ba8b4212ec09                     \r\n[INFO] [11-29|01:13:13.162] [4/12 Execution] Unwind Execution        from=18673916 to=18673915                                                                   \r\n[INFO] [11-29|01:13:13.244] [4/12 Execution] Completed on            block=18673916                                                                              \r\n[INFO] [11-29|01:13:13.517] head updated                             hash=0x8ea7a7ab7991b914b0013ace4129a91d37b135123e407d356929558ee778c80f number=18673916     \r\n[INFO] [11-29|01:13:26.206] [NewPayload] Handling new payload        height=18673917 hash=0xac48845a43c1158dc310b34c583328653028a69bd2c7d5007da233e73a6816f1     \r\n[INFO] [11-29|01:13:26.542] [updateForkchoice] Fork choice update: flushing in-memory state (built by previous newPayload)                                       \r\n[INFO] [11-29|01:13:26.853] RPC Daemon notified of new headers       from=18673916 to=18673917 hash=0xac48845a43c1158dc310b34c583328653028a69bd2c7d5007da233e7...\r\n[INFO] [11-29|01:13:26.853] head updated                             hash=0xac48845a43c1158dc310b34c583328653028a69bd2c7d5007da233e73a6816f1 number=18673917     \r\n[INFO] [11-29|01:13:35.972] [NewPayload] Handling new payload        height=18673918 hash=0x95ae4130df1613c1af9ea8d7e5949b5fcf94a4941a8862567256e8fe29caef43  \r\n````\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8848/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8848/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
