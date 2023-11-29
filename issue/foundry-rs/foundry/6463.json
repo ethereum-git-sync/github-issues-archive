@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6463",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6463/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6463/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6463/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6463",
+  "id": 2017387066,
+  "node_id": "I_kwDOGBlvNc54PuI6",
+  "number": 6463,
+  "title": "Anvil evm_revert with the same snapshotId is inconsistent on subsequent calls",
+  "user": {
+    "login": "vlad-blana",
+    "id": 42930668,
+    "node_id": "MDQ6VXNlcjQyOTMwNjY4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/42930668?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vlad-blana",
+    "html_url": "https://github.com/vlad-blana",
+    "followers_url": "https://api.github.com/users/vlad-blana/followers",
+    "following_url": "https://api.github.com/users/vlad-blana/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vlad-blana/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vlad-blana/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vlad-blana/subscriptions",
+    "organizations_url": "https://api.github.com/users/vlad-blana/orgs",
+    "repos_url": "https://api.github.com/users/vlad-blana/repos",
+    "events_url": "https://api.github.com/users/vlad-blana/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vlad-blana/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-29T20:44:43Z",
+  "updated_at": "2023-11-29T21:34:33Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nAnvil\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [ ] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (d7d2901 2023-11-29T00:25:43.341327400Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\n.\\anvil.exe --fork-url \"http://127.0.0.1:8547\" --auto-impersonate\r\n\r\n### Operating System\r\n\r\nWindows\r\n\r\n### Describe the bug\r\n\r\nReusing the same snapshot with evm_revert via JSON RPC works as expected the first time:\r\n- reverts the state\r\n- the block number is back to the one the evm_snapshot was called at\r\n- the memory used by new data seems to be freed \r\n\r\nOn subsequent calls the state is reverted, but the block number doesn't change and the new blocks can be fetched. The anvil process memory used increases and leads to dangerous memory leaks when enough transactions and blocks are mined in between evm_revert. The memory never goes down.\r\n\r\nI suspect this could be fixed if the blocks get discarded just like after the first evm_revert call.\r\n\r\nThere's an aditional child issue, that I will come back to only after this issue is resolved since the cause might be different. After a while anvil doesn't answer back to rpc calls on the existing connection. Establishing a new connection works, but it's inconsistent with regular behavior of the live evm json rpc nodes.\r\n\r\nI'm running anvil forking a local node - but it happens with any other remote node.\r\nI'm communicating with it with ethers.js 6.8.0 in node.js.\r\n\r\nHere's a demo of the issue. I've made it platform independent to the best of my abilities.\r\nThe README.md contains setup and run instructions, as well as the console output I get from running the code on my end.\r\nRunning it should yield the same results on your end.\r\n\r\nIt creates a snapshot one time.\r\nThen loops 5 times\r\n- prints the iteration index and block number\r\n- prints USDT balances of a sender and receiver account before the transfer operation\r\n- sends 1000 USDT between 2 accounts and prints the iteration index\r\n- print the USDT balances again\r\n- calls evm_revert\r\n- waits 3 seconds for evm_revert to do its magic because it doesn't seem to be a sync command in my live tests with 100-30k transactions when it takes a few seconds for evm_revert or anvil_reset to finish the state transitions\r\n\r\nThis is the anvil command for the node fork used with the demo\r\n\r\nanvil --fork-url \"https://rpc.mevblocker.io\" --fork-block-number 18679420 --auto-impersonate\r\n\r\nIt forks ethereum mainnet. The code is build around ethereum mainnet only, but the issue occurs on all evm networks I managed to play with.\r\n\r\nI've disabled the ethers cache in the code to avoid its quirks and make it seem like it's related to it.\r\n\r\n[2023_11_29_foundry_anvil_same_snapshot_block_number_bug.zip](https://github.com/foundry-rs/foundry/files/13505241/2023_11_29_foundry_anvil_same_snapshot_block_number_bug.zip)\r\n\r\nExpectations\r\n1. The block number should be 18679420 in every iteration\r\n\r\n2. fetching blocks after 18679420 should not be possible\r\n- currently it is possible\r\n\r\n3. Memory should not increase after evm_revert\r\n- it should actually decrease if any data gets erased in the process",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6463/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6463/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
