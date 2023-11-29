@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14709",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14709/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14709/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14709/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14709",
+  "id": 2016820952,
+  "node_id": "I_kwDOAm_5kc54Nj7Y",
+  "number": 14709,
+  "title": "Solidity compiler produces incorrect bytecode - The semantics of the program are inconsistent after compilation.",
+  "user": {
+    "login": "jayden-sudo",
+    "id": 5867853,
+    "node_id": "MDQ6VXNlcjU4Njc4NTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5867853?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jayden-sudo",
+    "html_url": "https://github.com/jayden-sudo",
+    "followers_url": "https://api.github.com/users/jayden-sudo/followers",
+    "following_url": "https://api.github.com/users/jayden-sudo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jayden-sudo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jayden-sudo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jayden-sudo/subscriptions",
+    "organizations_url": "https://api.github.com/users/jayden-sudo/orgs",
+    "repos_url": "https://api.github.com/users/jayden-sudo/repos",
+    "events_url": "https://api.github.com/users/jayden-sudo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jayden-sudo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-29T15:17:40Z",
+  "updated_at": "2023-11-29T16:29:36Z",
+  "closed_at": "2023-11-29T16:29:36Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description: Solidity compiler produces incorrect bytecode - The semantics of the program are inconsistent after compilation.\r\n\r\n- Affected Versions: Nearly all (found to affect all versions from v0.6+ in testing).\r\n\r\n- Affected Projects: Unknown (This issue can be found in test cases. Any thoroughly tested project should not be affected by this issue).\r\n\r\n- Description: During the Solidity compilation process, the compiler alters the original semantics of the program, causing it not to execute as expected.\r\n\r\n## Environment\r\n\r\n- Compiler version: Nearly all\r\n- Target EVM version (as per compiler settings): shanghai and more\r\n\r\n## Steps to Reproduce\r\n\r\n\r\n```solidity\r\n// SPDX-License-Identifier: Apache-2.0\r\npragma solidity ^0.8;\r\n\r\ncontract test {\r\n    mapping(uint256 => bool) public map;\r\n\r\n    constructor() {\r\n        map[1] = true;\r\n        map[2] = true;\r\n    }\r\n\r\n    function tryClean(uint256 key) private returns (bool) {\r\n        if (map[key]) {\r\n            map[key] = false;\r\n            return true;\r\n        }\r\n        return false;\r\n    }\r\n\r\n    function step_1() public returns (bool) {\r\n        // clean <1> and <2>\r\n        if (tryClean(1) == false && tryClean(2) == false) {\r\n            return false;\r\n        }\r\n        return true;\r\n    }\r\n\r\n    function step_2() public view returns (bool) {\r\n        // check if data cleaned\r\n        return ((map[1] == false) && (map[2] == false));\r\n    }\r\n}\r\n```\r\n\r\nIn the `step_1` function, when using `&&`, the original intention expects both expressions to execute. However, it is incorrectly optimized by the compiler to:\r\n\r\n```solidity\r\nif (tryClean(1) == true || tryClean(2) == true) {\r\n    return true;\r\n}\r\nreturn false;\r\n```\r\n\r\nThis leads to the execution differing from the original intent.\r\n\r\nNote: The compiler, when optimizing code, should ensure semantic consistency and consider whether the `tryClean` function internally modifies the state with opcodes such as sstore, mstore, call, logN, create, revert, etc.",
+  "closed_by": {
+    "login": "jayden-sudo",
+    "id": 5867853,
+    "node_id": "MDQ6VXNlcjU4Njc4NTM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5867853?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jayden-sudo",
+    "html_url": "https://github.com/jayden-sudo",
+    "followers_url": "https://api.github.com/users/jayden-sudo/followers",
+    "following_url": "https://api.github.com/users/jayden-sudo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jayden-sudo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jayden-sudo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jayden-sudo/subscriptions",
+    "organizations_url": "https://api.github.com/users/jayden-sudo/orgs",
+    "repos_url": "https://api.github.com/users/jayden-sudo/repos",
+    "events_url": "https://api.github.com/users/jayden-sudo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jayden-sudo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14709/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14709/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
