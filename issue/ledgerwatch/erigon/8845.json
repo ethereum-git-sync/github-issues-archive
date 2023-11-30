@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "AlexeyAkhunov",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-28T08:49:25Z",
-  "updated_at": "2023-11-28T08:55:17Z",
-  "closed_at": null,
+  "updated_at": "2023-11-30T13:48:48Z",
+  "closed_at": "2023-11-30T13:48:47Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nerigon version 2.55.0-dev-8cfafa44\r\n\r\nOS & Version: Ubuntu 23.10\r\n\r\nCommit hash: 8cfafa446a708600ea4f98f0e41829c54a0a2b75\r\n\r\nErigon Command (with flags/config):\r\n```\r\nerigon --chain bor-mainnet --datadir /mnt/giant/erigon/polygon --bor.heimdall='https://heimdall-api.polygon.technology'\r\n```\r\n\r\nConsensus Layer: N/A\r\n\r\nConsensus Layer Command (with flags/config): N/A\r\n\r\nChain/Network: bor-mainnet\r\n\r\n#### Expected behaviour\r\n\r\nAble to do full sync fine.\r\n\r\n#### Actual behaviour\r\n\r\nSync is not progressing due to a nil pointer in stage BorHeimdall.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nTry syncing Polygon mainnet from scratch.\r\n\r\n#### Backtrace\r\n\r\n````\r\n[INFO] [11-27|17:05:18.070] [p2p] GoodPeers                          eth68=6 eth67=3 eth66=2\r\n[INFO] [11-27|17:05:18.696] [txpool] stat                            pending=206 baseFee=0 queued=2404 alloc=3.8GB sys=5.5GB\r\n[INFO] [11-27|17:05:22.851] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=13521792\r\n[INFO] [11-27|17:05:42.851] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=15835776\r\n[INFO] [11-27|17:05:59.171] [bor.heimdall] Got new checkpoint        start=50454438 end=50456741 rootHash=0xff5de8219117f87e455574f06dcdba5c45679013b6272102d61f7cc70b1e540c\r\n[WARN] [11-27|17:05:59.171] [bor.heimdall] Failed to whitelist checkpoint err=\"missing blocks\"\r\n[WARN] [11-27|17:05:59.171] [bor] unable to handle whitelist checkpoint err=\"missing blocks\"\r\n[INFO] [11-27|17:06:02.851] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=18215690\r\n[INFO] [11-27|17:06:22.850] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=20611561\r\n[INFO] [11-27|17:06:42.850] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=23022383\r\n[INFO] [11-27|17:07:02.850] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=25394342\r\n[INFO] [11-27|17:07:22.850] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=27764031\r\n[INFO] [11-27|17:07:38.918] [bor.heimdall] Got new checkpoint        start=50454438 end=50456741 rootHash=0xff5de8219117f87e455574f06dcdba5c45679013b6272102d61f7cc70b1e540c\r\n[WARN] [11-27|17:07:38.918] [bor.heimdall] Failed to whitelist checkpoint err=\"missing blocks\"\r\n[WARN] [11-27|17:07:38.918] [bor] unable to handle whitelist checkpoint err=\"missing blocks\"\r\n[INFO] [11-27|17:07:42.850] [3/15 BorHeimdall] Computing validator proposer prorities (forward) blockNum=30131902\r\n[EROR] [11-27|17:07:46.656] Staged Sync                              err=\"runtime error: invalid memory address or nil pointer dereference, trace: [stageloop.go:105 panic.go:920 panic.go:261 signal_unix.go:861 snapshot.go:128 stage_bor_heimdall.go:617 stage_bor_heimdall.go:291 default_stages.go:68 sync.go:430 sync.go:331 stageloop.go:149 stageloop.go:71 asm_amd64.s:1650]\"\r\n[INFO] [11-27|17:07:47.334] [3/15 BorHeimdall] Processing spans...   from=7110 to=7885\r\n[INFO] [11-27|17:08:18.070] [p2p] GoodPeers                          eth68=8 eth66=3 eth67=4\r\n[INFO] [11-27|17:08:18.696] [txpool] stat                            pending=298 baseFee=0 queued=3247 alloc=3.4GB sys=5.5GB\r\n[INFO] [11-27|17:09:18.921] [bor.heimdall] Got new checkpoint        start=50454438 end=50456741 rootHash=0xff5de8219117f87e455574f06dcdba5c45679013b6272102d61f7cc70b1e540c\r\n[WARN] [11-27|17:09:18.921] [bor.heimdall] Failed to whitelist checkpoint err=\"missing blocks\"\r\n[WARN] [11-27|17:09:18.921] [bor] unable to handle whitelist checkpoint err=\"missing blocks\"\r\n[INFO] [11-27|17:09:23.818] [3/15 BorHeimdall] Processing sync events... from=45500000 to=50457819\r\n[INFO] [11-27|17:09:23.818] [3/15 BorHeimdall] StateSync Progress    progress=45500000 lastSpanId=7885 lastEventId=2730179 total records=0 fetch time=0s process time=1m36.492855827s\r\n[INFO] [11-27|17:09:23.879] invoking updateTotalVotingPower before returning it \r\n[INFO] [11-27|17:09:23.879] [3/15 BorHeimdall] Stored proposer snapshot to disk number=0 hash=0xa9c28ce2141b56c474f1dc504bee9b01eb1bd7d1a507580d5519d4437a97de1b\r\n````\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "yperbasis",
+    "id": 34320705,
+    "node_id": "MDQ6VXNlcjM0MzIwNzA1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34320705?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yperbasis",
+    "html_url": "https://github.com/yperbasis",
+    "followers_url": "https://api.github.com/users/yperbasis/followers",
+    "following_url": "https://api.github.com/users/yperbasis/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yperbasis/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yperbasis/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yperbasis/subscriptions",
+    "organizations_url": "https://api.github.com/users/yperbasis/orgs",
+    "repos_url": "https://api.github.com/users/yperbasis/repos",
+    "events_url": "https://api.github.com/users/yperbasis/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yperbasis/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8845/reactions",
     "total_count": 0,
@@ -107,8 +126,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8845/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1833818399",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/8845#issuecomment-1833818399",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8845",
+    "id": 1833818399,
+    "node_id": "IC_kwDOC0FsAM5tTdkf",
+    "user": {
+      "login": "yperbasis",
+      "id": 34320705,
+      "node_id": "MDQ6VXNlcjM0MzIwNzA1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34320705?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/yperbasis",
+      "html_url": "https://github.com/yperbasis",
+      "followers_url": "https://api.github.com/users/yperbasis/followers",
+      "following_url": "https://api.github.com/users/yperbasis/following{/other_user}",
+      "gists_url": "https://api.github.com/users/yperbasis/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/yperbasis/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/yperbasis/subscriptions",
+      "organizations_url": "https://api.github.com/users/yperbasis/orgs",
+      "repos_url": "https://api.github.com/users/yperbasis/repos",
+      "events_url": "https://api.github.com/users/yperbasis/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/yperbasis/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-30T13:48:47Z",
+    "updated_at": "2023-11-30T13:48:47Z",
+    "author_association": "COLLABORATOR",
+    "body": "Due to holes in the CanonicalHeader table, which probably happened because the DB hit the default limit of 3TB. See PR #8869.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1833818399/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
