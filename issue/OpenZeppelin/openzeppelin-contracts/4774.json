@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4774",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4774/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4774/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4774/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4774",
+  "id": 2018811574,
+  "node_id": "I_kwDOA9tCBs54VJ62",
+  "number": 4774,
+  "title": "Increase ERC4626 virtual assets to decrease `mint` slippage due to conversion rate rounding",
+  "user": {
+    "login": "Rubilmax",
+    "id": 3147812,
+    "node_id": "MDQ6VXNlcjMxNDc4MTI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3147812?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Rubilmax",
+    "html_url": "https://github.com/Rubilmax",
+    "followers_url": "https://api.github.com/users/Rubilmax/followers",
+    "following_url": "https://api.github.com/users/Rubilmax/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Rubilmax/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Rubilmax/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Rubilmax/subscriptions",
+    "organizations_url": "https://api.github.com/users/Rubilmax/orgs",
+    "repos_url": "https://api.github.com/users/Rubilmax/repos",
+    "events_url": "https://api.github.com/users/Rubilmax/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Rubilmax/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-30T14:41:13Z",
+  "updated_at": "2023-11-30T14:41:13Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**🧐 Motivation**\r\n\r\nBy default, the conversion rate of an ERC4626 vault is `1e(_decimalsOffset())` shares are worth `1` assets.\r\n\r\nLet's assume that this conversion rate grows to `1e(_decimalsOffset())` shares are worth `1.05` assets (in real numbers via, for example, accrued interest.\r\nIf the vault's `totalSupply` is redeemed, the exchange rate would get rounded **up** to: `1e(_decimalsOffset())` shares are worth `2` assets.\r\n\r\nThis rounding can lead to high slippage when minting/redeeming shares of the vault. In fact, the worst-case is: you expect to mint `x` shares against `x / 1e(_decimalsOffset())` assets, but you actually deposit `2 * x / 1e(_decimalsOffset())` assets (ie 100% slippage).\r\n\r\n**📝 Details**\r\n\r\nSuch a manipulation of the conversion rate requires the `totalSupply` to be in the hands of a single player, which is a strong assumption.\r\n\r\nBut it is interesting to see that by increasing the order of magnitude of virtual assets (currently set at `1`), you can decrease the order of magnitude of the slippage. And it is linear: `10` virtual assets lead to a maximum 10% slippage upon minting.\r\n\r\nSo it could be interesting to either:\r\n1. be able to customize the virtual assets used (currently set at `1`)\r\n2. increase the virtual assets to `1e4` to limit the slippage to an arbitrary value of 1 bps",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4774/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4774/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
