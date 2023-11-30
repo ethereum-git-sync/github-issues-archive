@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-30T14:41:13Z",
-  "updated_at": "2023-11-30T14:41:13Z",
+  "updated_at": "2023-11-30T17:21:18Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1834200737",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4774#issuecomment-1834200737",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4774",
+    "id": 1834200737,
+    "node_id": "IC_kwDOA9tCBs5tU66h",
+    "user": {
+      "login": "ernestognw",
+      "id": 33379285,
+      "node_id": "MDQ6VXNlcjMzMzc5Mjg1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33379285?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ernestognw",
+      "html_url": "https://github.com/ernestognw",
+      "followers_url": "https://api.github.com/users/ernestognw/followers",
+      "following_url": "https://api.github.com/users/ernestognw/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ernestognw/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ernestognw/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ernestognw/subscriptions",
+      "organizations_url": "https://api.github.com/users/ernestognw/orgs",
+      "repos_url": "https://api.github.com/users/ernestognw/repos",
+      "events_url": "https://api.github.com/users/ernestognw/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ernestognw/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-30T17:17:35Z",
+    "updated_at": "2023-11-30T17:21:18Z",
+    "author_association": "MEMBER",
+    "body": "Hey @Rubilmax, thanks for reporting this\r\n\r\nYour analysis sounds about right, but I'm not sure that increasing the default virtual assets is the right choice. The reason is that this issue happens only at very low values (dififcult to get there if there's at least 1 legit holder with a minimal amount). Let me elaborate:\r\n\r\nIf I understand correctly, the issue is that a majority holder (perhaps a single holder) can manipulate the rate by abusing that both the `withdraw()` and `redeem()` functions will round divisions favoring the vault, inflating the rate of assets per share.\r\n\r\nThe scenario you present is one in which after the manipulation, the rate assets/share rate gets to 100% slippage. However, this only happens if the amount of shares is extremely low (will be `1` after redeeming the `totalSupply()`). I made an interactive visualization in the past that I think will help us to understand the scenario a bit better (note it's not using 18 decimals for simplicity as most tokens do): https://www.desmos.com/calculator/abafa0l3ss\r\n\r\nWhen there's only 1 share with no virtual offset, the amount loss on deposits is 100% slippage as you mention (purple line). In the example, the loss is of `2100 / 2 = 1050`:\r\n\r\n<img width=\"600\" alt=\"Captura de pantalla 2023-11-30 a la(s) 10 51 34 a m\" src=\"https://github.com/OpenZeppelin/openzeppelin-contracts/assets/33379285/020ef6df-58d3-45b8-8ff2-0aa6de7468f8\">\r\n\r\nAs expected, the deposit loss gets reduced to `19` and `20` after increasing the virtual offset:\r\n\r\n#### Virtual Offset = 1 | (190 units captured by the vault)\r\n<img width=\"600\" alt=\"Captura de pantalla 2023-11-30 a la(s) 10 54 46 a m\" src=\"https://github.com/OpenZeppelin/openzeppelin-contracts/assets/33379285/f84101eb-4304-45cd-9eaf-22b124e1ab48\">\r\n\r\n#### Virtual Offset = 2 | (20 units captured by the vault)\r\n<img width=\"600\" alt=\"Captura de pantalla 2023-11-30 a la(s) 10 55 00 a m\" src=\"https://github.com/OpenZeppelin/openzeppelin-contracts/assets/33379285/06d52978-848f-4426-a397-9a9cc6a0ca58\">\r\n\r\nThis suggests that a higher virtual offset should be set to reduce this deposit \"loss\" captured by the vault. However, the catch is in the following:\r\n\r\n> Such a manipulation of the conversion rate requires the totalSupply to be in the hands of a single player, which is a strong assumption.\r\n\r\nRemember that the virtual offset is there to increase the cost of manipulating the rate when the vault is empty. However, any deposit adds offset. For example, if at least one user has a balance of `1e-16` shares (of an 18 decimals vault with no offset), the single entity manipulating the price will need to fight against a `1e2` offset.\r\n\r\n#### A single legit holder has 1e-16 shares  | (175 units captured by the vault)\r\n\r\n<img width=\"600\" alt=\"Captura de pantalla 2023-11-30 a la(s) 11 11 38 a m\" src=\"https://github.com/OpenZeppelin/openzeppelin-contracts/assets/33379285/e323362d-2355-4258-aa91-18e7d1ed0d06\">\r\n\r\n#### A single legit holder has 1e-15 shares | (20 units captured by the vault)\r\n\r\n<img width=\"600\" alt=\"Captura de pantalla 2023-11-30 a la(s) 11 11 52 a m\" src=\"https://github.com/OpenZeppelin/openzeppelin-contracts/assets/33379285/80a8bda4-c9fc-439f-87c4-54d0d62702e8\">\r\n\r\nMy conclusion is that on one hand, the virtual offset should be used to avoid manipulating when the vault is empty, but the assets captured after deployment introduce a regular offset that makes it more difficult to manipulate the rate. And on the other, adding a default offset (let's say `1e4`) won't provide a lot of value and it's breaking the assumption that most tokens have 18 decimals.\r\n\r\nAlthough the ecosystem should be ready to handle tokens that are not 18 decimals, we don't feel we should decide the default decimals used by the ERC4626 and the value is currently customizable via `override` before deployment.\r\n\r\nHappy to hear your comments!",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1834200737/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
