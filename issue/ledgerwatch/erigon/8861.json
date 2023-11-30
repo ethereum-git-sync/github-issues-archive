@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8861",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8861/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8861/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8861/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8861",
+  "id": 2017751970,
+  "node_id": "I_kwDOC0FsAM54RHOi",
+  "number": 8861,
+  "title": "[Sepolia] Stuck syncing with \"[1/12 Snapshots] Waiting for torrents metadata: 38/39\"",
+  "user": {
+    "login": "rarecrumb",
+    "id": 99095402,
+    "node_id": "U_kgDOBegTag",
+    "avatar_url": "https://avatars.githubusercontent.com/u/99095402?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rarecrumb",
+    "html_url": "https://github.com/rarecrumb",
+    "followers_url": "https://api.github.com/users/rarecrumb/followers",
+    "following_url": "https://api.github.com/users/rarecrumb/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rarecrumb/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rarecrumb/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rarecrumb/subscriptions",
+    "organizations_url": "https://api.github.com/users/rarecrumb/orgs",
+    "repos_url": "https://api.github.com/users/rarecrumb/repos",
+    "events_url": "https://api.github.com/users/rarecrumb/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rarecrumb/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-30T02:26:04Z",
+  "updated_at": "2023-11-30T02:27:10Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `2.55.0-dev-473e0414`\r\n\r\nOS & Version: Linux/Docker/Kubernetes\r\n\r\nErigon Command (with flags/config):\r\n```yaml\r\n        - sh\r\n        - '-ac'\r\n        - >\r\n          exec erigon --datadir=/data --nat=extip:$(POD_IP) --port=30303\r\n          --http=false --healthcheck --private.api.addr=127.0.0.1:9090\r\n          --authrpc.jwtsecret=/data/jwt.hex --authrpc.addr=0.0.0.0\r\n          --authrpc.port=8551 --authrpc.vhosts=* --metrics\r\n          --metrics.addr=0.0.0.0 --metrics.port=6060 --chain=sepolia\r\n          --maxpeers=200 --torrent.download.rate=1000mb\r\n          --torrent.download.slots=100 --log.console.verbosity=4\r\n          --torrent.verbosity=5\r\n```\r\n\r\nConsensus Layer: Teku \r\n\r\nConsensus Layer Command (with flags/config): \r\n```yaml\r\n    args:\r\n        - '--config-file=/config/config.yaml'\r\n        - '--data-base-path=/data'\r\n        - '--metrics-enabled=true'\r\n        - '--metrics-host-allowlist=*'\r\n        - '--metrics-port=8008'\r\n        - '--log-destination=CONSOLE'\r\n        - '--rest-api-cors-origins=*'\r\n        - '--rest-api-enabled=true'\r\n        - '--rest-api-host-allowlist=*'\r\n        - '--log-include-validator-duties-enabled=true'\r\n```\r\n\r\nChain/Network:  Sepolia\r\n\r\n#### Expected behaviour\r\nExpected node to start syncing with clear logs showing progress\r\n\r\n#### Actual behaviour\r\nSeeing repeating logs \r\n\r\n#### Steps to reproduce the behaviour\r\nRun erigon on Kubernetes in AWS EKS on EC2 nodes\r\n\r\n#### Logs\r\n```\r\n[INFO] [11-30|02:23:22.424] [1/12 Snapshots] Waiting for torrents metadata: 38/39\r\n[DBUG] [11-30|02:23:22.441] [p2p] Dial scheduler                     protocol=67 peers=63/66 tried=90017 static=20 i/o timeout=12240 connect: no route to host=88 connect: connection refused=1755\r\n[DBUG] [11-30|02:23:22.441] [p2p] Discovery table                    protocol=67 version=v4 len=189 live=181 unsol=500 ips=289 db=0 reval=4470 RPC timeout=86 invalid IP in response record: zero address=19 invalid IP in response record: loopback address from non-loopback host=59 invalid ID in response record=14 unsolicited reply=8187 unknown node=65 expired=12\r\n[DBUG] [11-30|02:23:22.442] [p2p] Server                             protocol=67 peers=63 trusted=0 inbound=0 too many peers=1\r\n[DBUG] [11-30|02:23:22.449] [p2p] Dial scheduler                     protocol=68 peers=62/66 tried=116460 static=20 connect: connection refused=1865 i/o timeout=13116 connect: no route to host=95 connect: network is unreachable=12\r\n[DBUG] [11-30|02:23:22.449] [p2p] Discovery table                    protocol=68 version=v4 len=188 live=180 unsol=500 ips=288 db=0 reval=4479 RPC timeout=85 invalid ID in response record=15 invalid IP in response record: zero address=20 invalid IP in response record: loopback address from non-loopback host=40 unsolicited reply=3507 expired=1 unknown node=70\r\n[DBUG] [11-30|02:23:22.498] [p2p] Server                             protocol=68 peers=62 trusted=0 inbound=0 EOF=1\r\n[DBUG] [11-30|02:23:29.835] [txpool] Commit                          written_kb=0 in=2.559887ms\r\n[DBUG] [11-30|02:23:42.382] [snapshots] no metadata yet              files=1 list=v1-004400-004500-transactions.seg\r\n[INFO] [11-30|02:23:42.424] [1/12 Snapshots] Waiting for torrents metadata: 38/39\r\n[DBUG] [11-30|02:23:45.810] [txpool] Commit                          written_kb=0 in=818.375µs\r\n[DBUG] [11-30|02:24:01.789] [txpool] Commit                          written_kb=0 in=2.607368ms\r\n[DBUG] [11-30|02:24:02.382] [snapshots] no metadata yet              files=1 list=v1-004400-004500-transactions.seg\r\n[INFO] [11-30|02:24:02.424] [1/12 Snapshots] Waiting for torrents metadata: 38/39\r\n```\r\n\r\nWhat are these logs showing? Is there anything I need to do when running in AWS?",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8861/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8861/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
