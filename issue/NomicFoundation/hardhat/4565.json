@@ -40,7 +40,7 @@
       "description": "There's not enough information to start working on this issue"
     }
   ],
-  "state": "closed",
+  "state": "open",
   "locked": false,
   "assignee": {
     "login": "fvictorio",
@@ -85,10 +85,10 @@
     }
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-11-07T01:56:31Z",
-  "updated_at": "2023-11-21T01:28:57Z",
-  "closed_at": "2023-11-21T01:26:14Z",
+  "updated_at": "2023-11-30T01:27:42Z",
+  "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\n\n2.18.0\n\n### What happened?\n\nMy package.json does not specify `\"type\": \"module\"`.\r\n\r\nIf I use `import` in my `hardhat.config.ts` file, then hardhat works fine, but nextjs complains \"Cannot use import statement outside a module\"\r\n\r\nAs a result, I tried changing my hardhat.config.ts from \r\n\r\n```ts\r\nimport '@typechain/hardhat';\r\nimport '@nomicfoundation/hardhat-ethers';\r\nimport '@nomicfoundation/hardhat-chai-matchers';\r\nimport '@nomicfoundation/hardhat-toolbox';\r\n\r\nconst config = {\r\n    solidity: '0.8.18',\r\n    paths: {\r\n        root: './hardhat',\r\n    },\r\n};\r\n\r\nmodule.exports = config;\r\n```\r\n\r\nto\r\n\r\n```ts\r\nrequire('@typechain/hardhat');\r\nrequire('@nomicfoundation/hardhat-ethers');\r\nrequire('@nomicfoundation/hardhat-chai-matchers');\r\nrequire('@nomicfoundation/hardhat-toolbox');\r\n\r\nconst config = {\r\n    solidity: '0.8.18',\r\n    paths: {\r\n        root: './hardhat',\r\n    },\r\n};\r\n\r\nmodule.exports = config;\r\n```\r\n\r\nThe [Typescript docs ](https://hardhat.org/hardhat-runner/docs/guides/typescript) say you need to use import instead of require, but given the hardhat.config.ts is going to get transpiled anyway...\r\n\r\nHardhat itself still works when I use require, but now I get a `Module '\"hardhat\"' has no exported member 'ethers'.ts(2305)` error` in vscode / a bunch of linting errors about unsafe use of any type.\r\n\r\nThere are a number of similar-sounding issues (#1137 #1279 #1627 #1640 #2291 #3811), but I believe this is distinct, as the issue only happens when using `require` in a `.ts` config file, and it happens even when I include the config file in my `files` section of tsconfig.\r\n\r\nThe two workarounds I've found so far:\r\n- explicitly include path to the .d.ts file in your tsconfig.json (messy)\r\n- add `/// <reference types=\"@nomicfoundation/hardhat-ethers\" />` at the top of `hardhat.config.ts`\r\n- add `compilerOptions.types` section and include `@nomicfoundation/hardhat-ethers`\n\n### Minimal reproduction steps\n\nCreate a Hardhat Typescript project, but use `require` instead of `import` in your `hardhat.config.ts`\n\n### Search terms\n\nethers, import",
@@ -126,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4565/timeline",
   "performed_via_github_app": null,
-  "state_reason": "completed"
+  "state_reason": "reopened"
 }
 [
   {
@@ -205,6 +205,50 @@
     "body": "My original code had that (I made a typo in the bug ticket). That said, I tried again in the latest version of my code and now the original issue doesn't seem to reproduce either way. Not sure why, but I'll take it.\r\n\r\nMy guess is that in the original version, the nextjs tsconfig was directly including `hardhat.config.ts`, but I'm not doing that anymore.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1820066781/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1832959334",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4565#issuecomment-1832959334",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4565",
+    "id": 1832959334,
+    "node_id": "IC_kwDOB7jojM5tQL1m",
+    "user": {
+      "login": "FFdhorkin",
+      "id": 59899746,
+      "node_id": "MDQ6VXNlcjU5ODk5NzQ2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/59899746?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/FFdhorkin",
+      "html_url": "https://github.com/FFdhorkin",
+      "followers_url": "https://api.github.com/users/FFdhorkin/followers",
+      "following_url": "https://api.github.com/users/FFdhorkin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/FFdhorkin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/FFdhorkin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/FFdhorkin/subscriptions",
+      "organizations_url": "https://api.github.com/users/FFdhorkin/orgs",
+      "repos_url": "https://api.github.com/users/FFdhorkin/repos",
+      "events_url": "https://api.github.com/users/FFdhorkin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/FFdhorkin/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-30T01:27:40Z",
+    "updated_at": "2023-11-30T01:27:40Z",
+    "author_association": "NONE",
+    "body": "OK, started having this issue again.\r\n\r\nhardhat.config.ts:\r\n```\r\nimport '@typechain/hardhat';\r\nimport '@nomicfoundation/hardhat-ethers';\r\nimport '@nomicfoundation/hardhat-chai-matchers';\r\nimport '@nomicfoundation/hardhat-toolbox';\r\nimport 'tsconfig-paths/register';\r\n\r\nimport type { HardhatUserConfig } from 'hardhat/config';\r\n\r\nconst config: HardhatUserConfig = {\r\n    solidity: '0.8.18',\r\n    paths: {\r\n        root: './hardhat',\r\n    },\r\n    typechain: {\r\n        discriminateTypes: true,\r\n    },\r\n};\r\n\r\nexport default config;\r\n```\r\n\r\ntrying to do `import hre from 'hardhat';` results in:\r\n```\r\n ⨯ /home/dhorkin/repos/*****/hardhat.config.ts:1\r\nimport '@typechain/hardhat';\r\n^^^^^^\r\n\r\nSyntaxError: Cannot use import statement outside a module\r\n    at Object.hardhat (/home/dhorkin/repos/*****/nextjs/.next/server/app/[gameType]/[[...gameId]]/page.js:22:18)\r\n    at __webpack_require__ (/home/dhorkin/repos/*****/nextjs/.next/server/webpack-runtime.js:33:43)\r\n    at eval (../game/web3/gameDatabase.ts:11:65)\r\n    at (rsc)/../game/web3/gameDatabase.ts (/home/dhorkin/repos/*****/nextjs/.next/server/_rsc_Game_web3_gameDatabase_ts.js:690:1)\r\n    at Function.__webpack_require__ (/home/dhorkin/repos/*****/nextjs/.next/server/webpack-runtime.js:33:43)\r\n    at async GameDirector (./app/[gameType]/[[...gameId]]/page.tsx:22:286)\r\n ⨯ /home/dhorkin/repos/*****/hardhat.config.ts:1\r\n```\r\n\r\nI suspect this issue has something to do with the fact that the place where I used `import hre from 'hardhat';` is being run through webpack",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1832959334/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
