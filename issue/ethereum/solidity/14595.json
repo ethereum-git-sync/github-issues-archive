@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-10-09T09:22:14Z",
-  "updated_at": "2023-11-26T15:23:40Z",
-  "closed_at": null,
+  "updated_at": "2023-11-30T10:32:55Z",
+  "closed_at": "2023-11-30T10:32:54Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nThe prefix (`++i` / `--i`) and postfix (`i++` / `i--`) decrement and increment operators differ by the order in which the value is updated and returned. Sometimes this is crucial, but sometimes it makes no difference, because the modified value isn't used in the expression, e.g.:\r\n```solidity\r\nmyVar--;\r\n```\r\n```solidity\r\nfor(uint i = 0; i < 9; ++i) {\r\n```\r\nIn such cases it makes no difference whether a prefix or postfix operator is used, the behavior of the code is identical. The problem is that **using one version or another affects the gas cost**. Ideally as long as there's no difference in the behavior, the optimizer should generate identical bytecodes for both versions, and the prefix or postfix choice should be a purely aesthetic one. The Solidity ecosystem is strongly focused on gas optimization, and the programmers are actually spending their time switching between equivalent prefix and postfix operators and benchmarking the gas differences, this should be the optimizer's job.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.21\r\n- Target EVM version (as per compiler settings): london\r\n- Framework/IDE (e.g. Truffle or Remix): Foundry\r\n- EVM execution environment / backend / blockchain client: revm\r\n- Operating system: Linux\r\n\r\n## Steps to Reproduce\r\n\r\nHere's a simple benchmark compatible with Foundry:\r\n```solidity\r\nfunction testDecrPost() public view returns (uint x) {\r\n    x = gasleft();\r\n    x--;\r\n}\r\n\r\nfunction testDecrPre() public view returns (uint x) {\r\n    x = gasleft();\r\n    --x;\r\n}\r\n\r\nfunction testIncrPost() public view returns (uint x) {\r\n    x = gasleft();\r\n    x++;\r\n}\r\n\r\nfunction testIncrPre() public view returns (uint x) {\r\n    x = gasleft();\r\n    ++x;\r\n}\r\n\r\nfunction testLoopDecrPost() public view returns (uint x) {\r\n    for(uint i = 9; i > 0; i--)\r\n        x += gasleft() * i;\r\n}\r\n\r\nfunction testLoopDecrPre() public view returns (uint x) {\r\n    for(uint i = 9; i > 0; --i)\r\n        x += gasleft() * i;\r\n}\r\n\r\nfunction testLoopIncrPost() public view returns (uint x) {\r\n    for(uint i = 1; i < 10; i++)\r\n        x += gasleft() * i;\r\n}\r\n\r\nfunction testLoopIncrPre() public view returns (uint x) {\r\n    for(uint i = 1; i < 10; ++i)\r\n        x += gasleft() * i;\r\n}\r\n```\r\n\r\nThe results for 20K runs optimizer:\r\n```\r\n[PASS] testDecrPost():(uint256) (gas: 271)\r\n[PASS] testDecrPre():(uint256) (gas: 288)\r\n[PASS] testIncrPost():(uint256) (gas: 342)\r\n[PASS] testIncrPre():(uint256) (gas: 271)\r\n[PASS] testLoopDecrPost():(uint256) (gas: 2763)\r\n[PASS] testLoopDecrPre():(uint256) (gas: 2673)\r\n[PASS] testLoopIncrPost():(uint256) (gas: 2854)\r\n[PASS] testLoopIncrPre():(uint256) (gas: 2810)\r\n```\r\n\r\nThe results for 20K runs optimizer and via-IR enabled:\r\n```\r\n[PASS] testDecrPost():(uint256) (gas: 204)\r\n[PASS] testDecrPre():(uint256) (gas: 226)\r\n[PASS] testIncrPost():(uint256) (gas: 361)\r\n[PASS] testIncrPre():(uint256) (gas: 296)\r\n[PASS] testLoopDecrPost():(uint256) (gas: 2392)\r\n[PASS] testLoopDecrPre():(uint256) (gas: 2436)\r\n[PASS] testLoopIncrPost():(uint256) (gas: 2545)\r\n[PASS] testLoopIncrPre():(uint256) (gas: 2457)\r\n```\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "CodeSandwich",
+    "id": 26183680,
+    "node_id": "MDQ6VXNlcjI2MTgzNjgw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26183680?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CodeSandwich",
+    "html_url": "https://github.com/CodeSandwich",
+    "followers_url": "https://api.github.com/users/CodeSandwich/followers",
+    "following_url": "https://api.github.com/users/CodeSandwich/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CodeSandwich/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CodeSandwich/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CodeSandwich/subscriptions",
+    "organizations_url": "https://api.github.com/users/CodeSandwich/orgs",
+    "repos_url": "https://api.github.com/users/CodeSandwich/repos",
+    "events_url": "https://api.github.com/users/CodeSandwich/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CodeSandwich/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14595/reactions",
     "total_count": 1,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14595/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -155,6 +174,50 @@
       "hooray": 0,
       "confused": 0,
       "heart": 3,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1833494394",
+    "html_url": "https://github.com/ethereum/solidity/issues/14595#issuecomment-1833494394",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14595",
+    "id": 1833494394,
+    "node_id": "IC_kwDOAm_5kc5tSOd6",
+    "user": {
+      "login": "CodeSandwich",
+      "id": 26183680,
+      "node_id": "MDQ6VXNlcjI2MTgzNjgw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26183680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/CodeSandwich",
+      "html_url": "https://github.com/CodeSandwich",
+      "followers_url": "https://api.github.com/users/CodeSandwich/followers",
+      "following_url": "https://api.github.com/users/CodeSandwich/following{/other_user}",
+      "gists_url": "https://api.github.com/users/CodeSandwich/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/CodeSandwich/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/CodeSandwich/subscriptions",
+      "organizations_url": "https://api.github.com/users/CodeSandwich/orgs",
+      "repos_url": "https://api.github.com/users/CodeSandwich/repos",
+      "events_url": "https://api.github.com/users/CodeSandwich/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/CodeSandwich/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-11-30T10:32:54Z",
+    "updated_at": "2023-11-30T10:32:54Z",
+    "author_association": "NONE",
+    "body": "The issue is non-existent in the via-IR pipeline, so I think that it can be considered resolved.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1833494394/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
       "rocket": 0,
       "eyes": 0
     },
