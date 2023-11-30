@@ -40,7 +40,7 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-11-30T03:56:42Z",
-  "updated_at": "2023-11-30T03:56:42Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2023-11-30T15:48:29Z",
+  "closed_at": "2023-11-30T15:48:29Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (d7d2901 2023-11-29T00:17:24.163799000Z)\n\n### What command(s) is the bug in?\n\nforge create --verify\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nCurrently, defining etherscan API keys in `foundry.toml` cannot be used with `forge create --verify`.\r\n\r\nExample:\r\n\r\n```foundry.toml\r\n[etherscan]\r\nscroll_sepolia = { key = \"goodAPIKey\", url = \"https://api-sepolia.scrollscan.com/api/\", chain = 534351 }\r\n```\r\n\r\n```bash\r\nforge create Contract --rpc-url scroll_sepolia --private-key 0xabc123 --verify --legacy\r\n[⠒] Compiling...\r\nNo files changed, compilation skipped\r\nError:\r\nETHERSCAN_API_KEY must be set\r\n```\r\n\r\nAfter some digging, the reason for this behavior is that create does a \"verify preflight check\", but doesn't load `foundry.toml`'s etherscan config until it actually runs the verification. So, you _must_ define the API key as an env var or as a flag to the `create` command in order to pass the preflight check and deploy the contract.\r\n\r\nNow, you also can't pass in a dummy API keys. The env var and command flag taking precedence over `foundry.toml`'s etherscan values. (And so does the `etherscan_api_key` value in a profile.)\r\n\r\nAs far as I can tell, the values do get read, but `get_etherscan_config_with_chain()` in `config/src/lib.rs` defaults to using an env var if available.\r\n\r\nThis approach seems a little counter intuitive since Etherscan now has a fragmented API Key setup across lots of chains, and it's easy to pull env vars into the `foundry.toml` file.\r\n\r\nI will follow-up with a PR suggesting a change that worked for the example above.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "dghelm",
+    "id": 4205837,
+    "node_id": "MDQ6VXNlcjQyMDU4Mzc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4205837?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dghelm",
+    "html_url": "https://github.com/dghelm",
+    "followers_url": "https://api.github.com/users/dghelm/followers",
+    "following_url": "https://api.github.com/users/dghelm/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dghelm/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dghelm/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dghelm/subscriptions",
+    "organizations_url": "https://api.github.com/users/dghelm/orgs",
+    "repos_url": "https://api.github.com/users/dghelm/repos",
+    "events_url": "https://api.github.com/users/dghelm/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dghelm/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6466/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6466/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 

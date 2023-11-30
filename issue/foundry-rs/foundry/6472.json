@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6472",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6472/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6472/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6472/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6472",
+  "id": 2018759107,
+  "node_id": "I_kwDOGBlvNc54U9HD",
+  "number": 6472,
+  "title": "bug: Uint conversion error on memory offset or size > usize::MAX",
+  "user": {
+    "login": "greged93",
+    "id": 82421016,
+    "node_id": "MDQ6VXNlcjgyNDIxMDE2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/82421016?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/greged93",
+    "html_url": "https://github.com/greged93",
+    "followers_url": "https://api.github.com/users/greged93/followers",
+    "following_url": "https://api.github.com/users/greged93/following{/other_user}",
+    "gists_url": "https://api.github.com/users/greged93/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/greged93/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/greged93/subscriptions",
+    "organizations_url": "https://api.github.com/users/greged93/orgs",
+    "repos_url": "https://api.github.com/users/greged93/repos",
+    "events_url": "https://api.github.com/users/greged93/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/greged93/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-11-30T14:15:07Z",
+  "updated_at": "2023-11-30T15:58:44Z",
+  "closed_at": "2023-11-30T15:58:44Z",
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nOther (please describe)\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [x] Foundry\r\n- [x] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\ncast 0.2.0 (27956b3 2023-11-30T00:24:55.614692000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\ncast run `tx_hash` --debug\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nThe debugger object won't handle a memory read/ write offset for which the size is bigger than usize::MAX. The bug can be reproduced with the following:\r\nSets the code to `PUSH1 0x01 PUSH32 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff6 PUSH2 0x0100 LOG1`\r\n```\r\ncast rpc anvil_setCode 0x00000000000000000000000000000000deadbeef 60017ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff6610100a1\r\n```\r\nSet the block gas limit\r\n```\r\ncast rpc evm_setBlockGasLimit 0x05f5e100\r\n```\r\nCall 0x00000000000000000000000000000000deadbeef\r\n```\r\ncast send 0x00000000000000000000000000000000deadbeef --value 1 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --gas-limit 80000000\r\n```\r\n\r\nOnce done, run `cast run tx_hash --debug`. Click on `MAJ-G` to jump to the latest instruction. You should get `panicked at crates/debugger/src/lib.rs:897:65: Uint conversion error: Overflow(256, 18446744073709551606, 18446744073709551615)`. \r\n\r\nThis comes from this line shown below:\r\nhttps://github.com/foundry-rs/foundry/blob/e26f4d8585cc543dea8aa719ab89426fc17fcdaa/crates/debugger/src/lib.rs#L897\r\n\r\nWhich tries to convert `Uint256` into a `usize`. We should convert it safely and display on the debugger that this instruction caused an out of gas due to dynamic gas costs if bigger than usize::MAX.",
+  "closed_by": {
+    "login": "DaniPopes",
+    "id": 57450786,
+    "node_id": "MDQ6VXNlcjU3NDUwNzg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/57450786?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/DaniPopes",
+    "html_url": "https://github.com/DaniPopes",
+    "followers_url": "https://api.github.com/users/DaniPopes/followers",
+    "following_url": "https://api.github.com/users/DaniPopes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/DaniPopes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/DaniPopes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/DaniPopes/subscriptions",
+    "organizations_url": "https://api.github.com/users/DaniPopes/orgs",
+    "repos_url": "https://api.github.com/users/DaniPopes/repos",
+    "events_url": "https://api.github.com/users/DaniPopes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/DaniPopes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6472/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6472/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
