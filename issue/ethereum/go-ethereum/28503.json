@@ -40,21 +40,40 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-11-10T08:31:15Z",
-  "updated_at": "2023-11-10T16:01:56Z",
-  "closed_at": null,
+  "updated_at": "2023-12-01T09:43:25Z",
+  "closed_at": "2023-12-01T09:43:25Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "# Rationale\r\n\r\nIn the context of customizing the EVM, we need to be aware that `Interpreter.Run` [here](https://github.com/ethereum/go-ethereum/blob/master/core/vm/interpreter.go#L107)  did have an `errStopToken`. However, this is being cleared at the end of the function, which make sense, since it's an internal error, but it would be useful for having that info for a library that build on top of `geth` and wants to know this detail (my case).\r\n\r\n# Implementation\r\n\r\nThis feature doesn't imply any feature change to the `Interpreter.Run` function, but a refactor that will separate the body of the function, from the clearing of the error. The function could look something like this\r\n\r\n```go\r\nfunc (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (ret []byte, err error) {\r\n\t\r\n        in.CallRunBody(...)\r\n\r\n\tif err == errStopToken {\r\n\t\terr = nil // clear stop token error\r\n\t}\r\n\r\n\treturn res, err\r\n}\r\n```\r\n\r\nThis would make `Interpreter.CallRunBody` available for developers not willing to clear the `errStopToken` error.\r\n\r\nI could do a PR for this, if this is something you would consider having in the codebase",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28503/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28503/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -148,6 +167,50 @@
     "body": "We have a custom data structure that goes in parallel to the VM, and we have to make different changes to it based on whether it finished or stopped via an `errStopToken`. So even if they are semantically the same in terms of EVM, they have a different impact on our side. Having an API to call without the clearing part could help us avoid having to maintain a fork of `geth`.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1806004497/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1835780529",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28503#issuecomment-1835780529",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28503",
+    "id": 1835780529,
+    "node_id": "IC_kwDOAOvK985ta8mx",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-01T09:43:25Z",
+    "updated_at": "2023-12-01T09:43:25Z",
+    "author_association": "MEMBER",
+    "body": "> I could do a PR for this, if this is something you would consider having in the codebase\r\n\r\nPlease make the PR, I think it's better to discuss a code-change on the PR that implements the change, rather than theorizing on a ticket about a potential future change. (I mean, at least for small changes, if it's about a very large change then it's fine to discuss beforehand -- but afaiu you're proposing basically a one-liner) . \r\n\r\nWhen you file it, please explain/motivate why this change is beneficial for someone. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1835780529/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
