@@ -1,14 +1,14 @@
 {
-  "url": "https://api.github.com/repos/MetaMask/core/issues/3597",
+  "url": "https://api.github.com/repos/MetaMask/core/issues/3606",
   "repository_url": "https://api.github.com/repos/MetaMask/core",
-  "labels_url": "https://api.github.com/repos/MetaMask/core/issues/3597/labels{/name}",
-  "comments_url": "https://api.github.com/repos/MetaMask/core/issues/3597/comments",
-  "events_url": "https://api.github.com/repos/MetaMask/core/issues/3597/events",
-  "html_url": "https://github.com/MetaMask/core/issues/3597",
-  "id": 2019574001,
-  "node_id": "I_kwDOCBB0Cc54YEDx",
-  "number": 3597,
-  "title": "[assets-controllers] `TokenRatesController` state `contractExchangeRates` is stale after calling  `updateExchangeRatesByChainId`",
+  "labels_url": "https://api.github.com/repos/MetaMask/core/issues/3606/labels{/name}",
+  "comments_url": "https://api.github.com/repos/MetaMask/core/issues/3606/comments",
+  "events_url": "https://api.github.com/repos/MetaMask/core/issues/3606/events",
+  "html_url": "https://github.com/MetaMask/core/issues/3606",
+  "id": 2021362586,
+  "node_id": "I_kwDOCBB0Cc54e4ua",
+  "number": 3606,
+  "title": "[assets-controllers] Prevent overlapping token rate updates",
   "user": {
     "login": "Gudahtt",
     "id": 2459287,
@@ -31,13 +31,13 @@
   },
   "labels": [
     {
-      "id": 948148992,
-      "node_id": "MDU6TGFiZWw5NDgxNDg5OTI=",
-      "url": "https://api.github.com/repos/MetaMask/core/labels/bug",
-      "name": "bug",
-      "color": "d73a4a",
+      "id": 948148996,
+      "node_id": "MDU6TGFiZWw5NDgxNDg5OTY=",
+      "url": "https://api.github.com/repos/MetaMask/core/labels/enhancement",
+      "name": "enhancement",
+      "color": "a2eeef",
       "default": true,
-      "description": "Something isn't working"
+      "description": "New feature or request"
     },
     {
       "id": 5330766523,
@@ -95,15 +95,15 @@
   ],
   "milestone": null,
   "comments": 0,
-  "created_at": "2023-11-30T21:55:44Z",
-  "updated_at": "2023-12-01T18:11:46Z",
+  "created_at": "2023-12-01T18:11:22Z",
+  "updated_at": "2023-12-01T18:25:23Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "When the method `updateExchangeRatesByChainId` is called directly, it never updates the `contractExchangeRates` state. It should update that state as well when appropriate (e.g. when the chain ID that we're fetching exchange rates for happens to be the current selected chain) so that the controller state does not become contradictory.\r\n\r\nTo give some context, at the moment this controller has two sets of exchange rates: one for the current selected chain, and another that is the same thing but for all chains (keyed by chain ID). The  `updateExchangeRatesByChainId` method is only updating the `contractExchangeRatesByChainId` state, not the `contractExchangeRates`  state.\r\n\r\nThis is risky because different parts of the application may be obtaining the same information (the exchange rates for a given network), and getting a different answer depending on which state they got the answer from.",
+  "body": "We don't currently prevent token rate updates from overlapping with each other. For example, if the same token rate update is requested twice in a row in quick succession, we will perform the update twice concurrently.\r\n\r\nInstead we should keep track of in-progress token updates, and prevent additional redundant updates from being triggered.\r\nIf we get two calls asking for the same update, we can return the results from the first call to both callers.",
   "closed_by": null,
   "reactions": {
-    "url": "https://api.github.com/repos/MetaMask/core/issues/3597/reactions",
+    "url": "https://api.github.com/repos/MetaMask/core/issues/3606/reactions",
     "total_count": 0,
     "+1": 0,
     "-1": 0,
@@ -114,7 +114,7 @@
     "rocket": 0,
     "eyes": 0
   },
-  "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/3597/timeline",
+  "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/3606/timeline",
   "performed_via_github_app": null,
   "state_reason": null
 }
