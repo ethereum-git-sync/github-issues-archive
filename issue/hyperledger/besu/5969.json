@@ -110,9 +110,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-09-28T15:29:28Z",
-  "updated_at": "2023-10-09T08:08:16Z",
+  "updated_at": "2023-12-01T10:10:57Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -135,5 +135,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1835821203",
+    "html_url": "https://github.com/hyperledger/besu/issues/5969#issuecomment-1835821203",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/5969",
+    "id": 1835821203,
+    "node_id": "IC_kwDODE2jmc5tbGiT",
+    "user": {
+      "login": "dlutzardo",
+      "id": 8124305,
+      "node_id": "MDQ6VXNlcjgxMjQzMDU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8124305?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dlutzardo",
+      "html_url": "https://github.com/dlutzardo",
+      "followers_url": "https://api.github.com/users/dlutzardo/followers",
+      "following_url": "https://api.github.com/users/dlutzardo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dlutzardo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dlutzardo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dlutzardo/subscriptions",
+      "organizations_url": "https://api.github.com/users/dlutzardo/orgs",
+      "repos_url": "https://api.github.com/users/dlutzardo/repos",
+      "events_url": "https://api.github.com/users/dlutzardo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dlutzardo/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-01T10:10:57Z",
+    "updated_at": "2023-12-01T10:10:57Z",
+    "author_association": "NONE",
+    "body": "Hi @ahamlat!\r\n\r\nI have reviewed this issue:\r\n- I have created a private network using Ethash.\r\n- I have reviewed code from this part (EthHashCacheFactory, EthHashDescriptor, EthashLight, PoWSolver, etc)\r\n- I have analyzed the JVM heap.\r\n\r\nThere is no problem with the memory, it is normal use. Exist a very long array of int in memory for each EthHashDescriptor (field 'cache'), this is used during block validation (PoW).\r\n\r\nEthHashCacheFactory has a maximum of 5 cached elements (instances of EthHashDescriptor). For each (EthHash.EPOCH_LENGTH * 2) an instance of EthHashDescriptor is generated (EPOCH_LENGTH = 30000) but only the last 5 will be in EthHashCacheFactory. The cache key is calculated in this way: \"Long.divideUnsigned(**numblock**, EthHash.EPOCH_LENGTH * 2)\" => 60000 blocks have the same cache key (same EthHashDescriptor)\r\n\r\nThe validation process for a block obtains the corresponding EthHashCacheFactory for that block, if it does not exist it is generated.\r\n\r\nIf you restart the node,  you will see in the heap that there is only one instance of EthHashCacheFactory (little memory at that moment) but if you check the memory 2 or 3 days later you will see that there are 5 elements in memory of EthHashCacheFactory, the JVM heap  is high (420MB on your network, 84 MB x 5 = 420MB). The EthHashCacheFactory size depends on the network configuration.\r\n\r\nIt is not a problem. Someone decided it was correct 5 elements cached in EthHashCacheFactory. The last 5 generated and used are cached, although your node is synchronized you will have 5 elements when your node is started for a long time, or very different numbers of blocks have been validated.\r\n\r\nIn my test ethhash network this is the heap of the JVM, there are 5 cached elements of 20MB. The field 'cache' of EthHashDescriptor has 20MB (20MB x 5 = 100MB)\r\n![heap_dump_node_ethhash_2](https://github.com/hyperledger/besu/assets/8124305/f4931d64-d8d4-426b-9ce1-f7baa06f2ddd)\r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1835821203/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
