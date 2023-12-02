@@ -30,31 +30,42 @@
     "site_admin": false
   },
   "labels": [
-    {
-      "id": 249074435,
-      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
-      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
-      "name": "bug :bug:",
-      "color": "fc1313",
-      "default": false,
-      "description": ""
-    }
+
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-30T18:10:09Z",
-  "updated_at": "2023-11-30T18:11:53Z",
-  "closed_at": null,
+  "updated_at": "2023-12-01T18:39:56Z",
+  "closed_at": "2023-12-01T18:39:04Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nSince version ```0.4.24```, the empty tuple expression as a statement, ```();```, isn't allowed by the parser. Obviously, this statement is not very useful, but I think that a parser should be able to accept any valid syntax, even if meaningless.\r\n\r\nConsider for example that the statement ```() + 1;``` is disallowed by the parser, but the statement ```1 + ();``` is disallowed by the type checker. Perhaps both errors should be reported by the type checker.\r\n\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity ^0.8.23;\r\n\r\ncontract C {\r\n  function f() public pure {\r\n    ();\r\n  }\r\n}\r\n```\r\n\r\nCompiler output:\r\n```\r\nError: Expected primary expression.\r\n --> Empty.sol:7:6:\r\n  |\r\n7 |     ();\r\n  |      ^\r\n```\r\n\r\n## Environment\r\n\r\n- Compiler version: ```>= 0.4.24```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "matheusaaguiar",
+    "id": 95899911,
+    "node_id": "U_kgDOBbdRBw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/95899911?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/matheusaaguiar",
+    "html_url": "https://github.com/matheusaaguiar",
+    "followers_url": "https://api.github.com/users/matheusaaguiar/followers",
+    "following_url": "https://api.github.com/users/matheusaaguiar/following{/other_user}",
+    "gists_url": "https://api.github.com/users/matheusaaguiar/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/matheusaaguiar/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/matheusaaguiar/subscriptions",
+    "organizations_url": "https://api.github.com/users/matheusaaguiar/orgs",
+    "repos_url": "https://api.github.com/users/matheusaaguiar/repos",
+    "events_url": "https://api.github.com/users/matheusaaguiar/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/matheusaaguiar/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14713/reactions",
     "total_count": 0,
@@ -69,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14713/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1836598794",
+    "html_url": "https://github.com/ethereum/solidity/issues/14713#issuecomment-1836598794",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14713",
+    "id": 1836598794,
+    "node_id": "IC_kwDOAm_5kc5teEYK",
+    "user": {
+      "login": "matheusaaguiar",
+      "id": 95899911,
+      "node_id": "U_kgDOBbdRBw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95899911?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/matheusaaguiar",
+      "html_url": "https://github.com/matheusaaguiar",
+      "followers_url": "https://api.github.com/users/matheusaaguiar/followers",
+      "following_url": "https://api.github.com/users/matheusaaguiar/following{/other_user}",
+      "gists_url": "https://api.github.com/users/matheusaaguiar/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/matheusaaguiar/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/matheusaaguiar/subscriptions",
+      "organizations_url": "https://api.github.com/users/matheusaaguiar/orgs",
+      "repos_url": "https://api.github.com/users/matheusaaguiar/repos",
+      "events_url": "https://api.github.com/users/matheusaaguiar/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/matheusaaguiar/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-01T18:39:04Z",
+    "updated_at": "2023-12-01T18:39:04Z",
+    "author_association": "MEMBER",
+    "body": "Hi @alex1448! \r\nI don't think this is a bug, albeit it is a bit weird. In your example, the compiler is actually expecting an expression wrapped in parenthesis and that expression never appears. In the case of `1 + ()`, the empty tuple is parsed because it is part of the binary add operation which is already the expected expression.\r\nI understand your point that it would be best for the compiler to recognize that in reality the empty tuple is the one expression there. But unless there is a potential attack or code generation problem arising from this, the team does not have the capacity to commit work to improve this specific case which seems harmless.\r\nI will be closing the issue for now, but, please, don't take that as an end to the discussion. Feel free to provide more information and considerations that can further clarify the situation. In case I am mistaken, we can always reopen the issue, no problem :)",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1836598794/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
