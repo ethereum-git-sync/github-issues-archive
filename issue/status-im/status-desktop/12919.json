@@ -40,7 +40,7 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "saledjenic",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-11-29T18:06:56Z",
-  "updated_at": "2023-12-04T10:06:27Z",
-  "closed_at": null,
+  "updated_at": "2023-12-04T15:43:18Z",
+  "closed_at": "2023-12-04T15:43:18Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Bug description\r\n\r\nIt should be possible to set the run-time log level in 2 ways:\r\n- `--log-level` CLI option\r\n- `STATUS_RUNTIME_LOG_LEVEL` environment variable\r\n\r\nThe switch kinda works, but with limitations.\r\n- In debug build: I'm not getting TRACE logs.\r\n- In release build: I'm not getting DEBUG and TRACE logs.\r\n\r\nAll other settings like ERROR, WARN, INFO always work.\r\n\r\nEven though I can see that the log level is set to correct value here:\r\nhttps://github.com/status-im/status-desktop/blob/34d0719b397efba9e7b2ffbea541d5e748fcb67d/src/nim_status_client.nim#L63\r\n\r\nI still don't see desired log messages in the terminal.\r\n\r\n## `TRACE` level and status-go\r\n\r\nActually, if you try to set log level to `TRACE`, you won't be able to login to the account, because we pass this value to status-go, which doesn't support `TRACE` value. This should also be fixed, it's kinda related.\r\n\r\n## Possible reason\r\n\r\nThere're 2 places where we check if `LOG_LEVEL` env variable is set:\r\nhttps://github.com/status-im/status-desktop/blob/34d0719b397efba9e7b2ffbea541d5e748fcb67d/src/app/boot/app_controller.nim#L441\r\n\r\nhttps://github.com/status-im/status-desktop/blob/34d0719b397efba9e7b2ffbea541d5e748fcb67d/src/app/boot/app_controller.nim#L136\r\n\r\nThis is definitely wrong, at least because the env variable name is now `STATUS_RUNTIME_LOG_LEVEL`.\r\nAlso, we should check is `--log-level` CLI option was set.\r\n\r\nI tried to fix it, but it still didn't work for me 🙁 \r\n\r\n## My attempts\r\n\r\nI tried to fix it, you can find my attempts in `temp/runtime-log-level-fix-attempt` branch.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "saledjenic",
+    "id": 86303051,
+    "node_id": "MDQ6VXNlcjg2MzAzMDUx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/86303051?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/saledjenic",
+    "html_url": "https://github.com/saledjenic",
+    "followers_url": "https://api.github.com/users/saledjenic/followers",
+    "following_url": "https://api.github.com/users/saledjenic/following{/other_user}",
+    "gists_url": "https://api.github.com/users/saledjenic/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/saledjenic/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/saledjenic/subscriptions",
+    "organizations_url": "https://api.github.com/users/saledjenic/orgs",
+    "repos_url": "https://api.github.com/users/saledjenic/repos",
+    "events_url": "https://api.github.com/users/saledjenic/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/saledjenic/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/12919/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/12919/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
