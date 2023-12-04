@@ -58,21 +58,40 @@
       "description": "ETA Q4 2023"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-09-04T09:41:55Z",
-  "updated_at": "2023-10-12T06:02:04Z",
-  "closed_at": null,
+  "updated_at": "2023-12-04T00:31:10Z",
+  "closed_at": "2023-12-04T00:31:09Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Summary\r\n\r\n- Causes HTTP requests for states & blocks to fail.\r\n- Causes responses to peers for blocks to fail.\r\n- Doesn't affect the node's ability to follow the chain or validate (low impact).\r\n- Doesn't affect newly synced nodes.\r\n- Only occurs for a limited time before it self-heals, which is how it was missed during our release testing.\r\n\r\n## Description\r\n\r\nMy PR #4663 which fixed a bug #4610 inadvertently introduced a new database bug, which thankfully is capable of self-healing.\r\n\r\nThat PR changed the invariant for block roots in the freezer database from:\r\n\r\n```\r\nslot < last_restore_point_slot -> block root is in the freezer\r\n```\r\n\r\nto:\r\n\r\n```\r\nslot < split.slot -> block root is in the freezer\r\n```\r\n\r\nAlthough #4663 took care to maintain the new invariant once it was established, it failed to establish it in the period immediately after upgrading. This means that until a new restore-point is stored in the database (on a slot with `slot % slots-per-restore-point == 0`), the linear block roots array will have a gap in it between `last_restore_point_slot` and `split.slot`.\r\n\r\n## Steps to resolve\r\n\r\nWe _could_ do nothing, and wait for the issue to resolve itself once everyone has upgraded and waited for 27h. However, this is not really ideal, and I suspect many users will be scared off upgrading by the error log.\r\n\r\nTo fix it properly, we could make a patch release to immediately establish the new invariant on updating. This could be implemented as so:\r\n\r\n- Add a DB schema migration from v17 to itself.\r\n- Load the split state, and use a `ChunkWriter` to fill-in the slots between `last_restore_point_slot` (if any) and `split.slot`.\r\n\r\nThe only downside to this is that it is potentially a bit wasteful to re-do this _every time_ the node starts up. Pragmatically, it probably wouldn't take very long (a few seconds max) and would stop recurring once we update the DB schema to v18 for Deneb (see #4693).\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "jimmygchen",
+    "id": 742762,
+    "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmygchen",
+    "html_url": "https://github.com/jimmygchen",
+    "followers_url": "https://api.github.com/users/jimmygchen/followers",
+    "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+    "repos_url": "https://api.github.com/users/jimmygchen/repos",
+    "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4697/reactions",
     "total_count": 0,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4697/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -122,6 +141,50 @@
     "body": "- Run \"fix beacon roots\" during v18 db migration \r\n- Add \"fix beacon roots\" command `lighthouse db fix-block-roots`",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1758958544/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1837663265",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4697#issuecomment-1837663265",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4697",
+    "id": 1837663265,
+    "node_id": "IC_kwDOCFeAzc5tiIQh",
+    "user": {
+      "login": "jimmygchen",
+      "id": 742762,
+      "node_id": "MDQ6VXNlcjc0Mjc2Mg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/742762?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jimmygchen",
+      "html_url": "https://github.com/jimmygchen",
+      "followers_url": "https://api.github.com/users/jimmygchen/followers",
+      "following_url": "https://api.github.com/users/jimmygchen/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jimmygchen/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jimmygchen/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jimmygchen/subscriptions",
+      "organizations_url": "https://api.github.com/users/jimmygchen/orgs",
+      "repos_url": "https://api.github.com/users/jimmygchen/repos",
+      "events_url": "https://api.github.com/users/jimmygchen/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jimmygchen/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-04T00:31:09Z",
+    "updated_at": "2023-12-04T00:31:09Z",
+    "author_association": "MEMBER",
+    "body": "Fixed in #4875 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1837663265/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
