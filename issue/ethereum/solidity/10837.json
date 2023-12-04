@@ -49,21 +49,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2021-01-22T22:10:35Z",
-  "updated_at": "2023-11-28T09:10:51Z",
-  "closed_at": null,
+  "updated_at": "2023-12-04T14:59:39Z",
+  "closed_at": "2023-12-04T14:59:39Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nSo, this bug was found in an 0.5.16 project that I can't easily upgrade to a current version; however I'm filing a bug report anyway because I don't see any indication that this issue was ever reported elsewhere or explicitly fixed.  So, there's still a chance it might exist.  Apologies for the poor, highly-non-minimal, reproduction example, but this isn't my project and I'm not very familiar with it.\r\n\r\nThe bug seems to be that, under certain situations, the compiler outputs a source map that is too short.  I have no idea what causes this.  In the particular example where I found it, the bytecode is 2976 instructions long, with a total length of 5221 bytes.  (Note that this is constructor bytecode.)  However, the source map is a mere 472 instructions long, cutting off abruptly after the `AND` instruction at PC 843.\r\n\r\nSo, apologies again for the less-than-ideal reproduction example and the outdated version, but there definitely seems to be a problem here.  Of course, there's a decent chance it's already fixed!  But I figure I have to report this anyway.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.5.16\r\n- Target EVM version (as per compiler settings): default\r\n- Framework/IDE (e.g. Truffle or Remix): Truffle\r\n- Operating system: Linux Mint 20.1 Ulyssa 64-bit\r\n\r\n## Steps to Reproduce\r\n\r\nThe issue can be observed in [this Truffle project](https://github.com/fodisi/hackapay).  (More specifically, commit 515f2b1, if there's any ambiguity there.)\r\n\r\nWith Truffle installed, run `truffle compile --all`.  Then inspect `build/contracts/ContestTeam.json`.  Specifically, the `bytecode` field, which holds the constructor bytecode, and the `sourceMap` field, which holds the constructor source map.  You'll see that the constructor source map is only 472 instructions long.  If you disassemble the bytecode, or if you capture the `opcodes` compiler output, you'll see that it's much longer than 472 instructions.\r\n\r\nFor ease of reference, I've put the relevant information, including the full JSON compiler input, in [this GitHub gist](https://gist.github.com/haltman-at/ba346ea19f90b20b49dead4a2ff70708).  This way you won't need to use Truffle to reproduce the issue.  For the compiler output, I just listed the parts that seemed to be relevant -- the assembly, constructor bytecode, constructor opcodes, and constructor sourcemap for the `ContestTeam` contract.  Again, sorry about the non-minimality of the example, but it's what I have.\r\n\r\nThank you!",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mehtavishwa30",
+    "id": 32997409,
+    "node_id": "MDQ6VXNlcjMyOTk3NDA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/32997409?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mehtavishwa30",
+    "html_url": "https://github.com/mehtavishwa30",
+    "followers_url": "https://api.github.com/users/mehtavishwa30/followers",
+    "following_url": "https://api.github.com/users/mehtavishwa30/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mehtavishwa30/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mehtavishwa30/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mehtavishwa30/subscriptions",
+    "organizations_url": "https://api.github.com/users/mehtavishwa30/orgs",
+    "repos_url": "https://api.github.com/users/mehtavishwa30/repos",
+    "events_url": "https://api.github.com/users/mehtavishwa30/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mehtavishwa30/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/10837/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/10837/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -245,6 +264,50 @@
     "body": "FWIW, I've found a second example of this, although it's also with Solidity 0.5.x.  Specifically it can be observed in [this](https://github.com/cds-amal/balancer-core) Truffle project, in the constructor bytecode for the `BPool` contract.  The constructor source map is only 241 instructions long, ending at PC 408, but the constructor code continues past that position and on running it you'll find a jump to PC 409.  So once again on running it you end up past the end of the sourcemap.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/786954275/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1838826433",
+    "html_url": "https://github.com/ethereum/solidity/issues/10837#issuecomment-1838826433",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/10837",
+    "id": 1838826433,
+    "node_id": "IC_kwDOAm_5kc5tmkPB",
+    "user": {
+      "login": "mehtavishwa30",
+      "id": 32997409,
+      "node_id": "MDQ6VXNlcjMyOTk3NDA5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32997409?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mehtavishwa30",
+      "html_url": "https://github.com/mehtavishwa30",
+      "followers_url": "https://api.github.com/users/mehtavishwa30/followers",
+      "following_url": "https://api.github.com/users/mehtavishwa30/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mehtavishwa30/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mehtavishwa30/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mehtavishwa30/subscriptions",
+      "organizations_url": "https://api.github.com/users/mehtavishwa30/orgs",
+      "repos_url": "https://api.github.com/users/mehtavishwa30/repos",
+      "events_url": "https://api.github.com/users/mehtavishwa30/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mehtavishwa30/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-04T14:59:39Z",
+    "updated_at": "2023-12-04T14:59:39Z",
+    "author_association": "MEMBER",
+    "body": "Thank you for detailing the issue. We will be closing this for now and will only investigate further in case we are able to reproduce this for the currently supported compiler versions.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1838826433/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
