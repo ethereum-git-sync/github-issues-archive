@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/Consensys/teku/issues/7784",
+  "repository_url": "https://api.github.com/repos/Consensys/teku",
+  "labels_url": "https://api.github.com/repos/Consensys/teku/issues/7784/labels{/name}",
+  "comments_url": "https://api.github.com/repos/Consensys/teku/issues/7784/comments",
+  "events_url": "https://api.github.com/repos/Consensys/teku/issues/7784/events",
+  "html_url": "https://github.com/Consensys/teku/issues/7784",
+  "id": 2024693509,
+  "node_id": "I_kwDOCM9I9M54rl8F",
+  "number": 7784,
+  "title": "Implement slashing interchange format tests for teku",
+  "user": {
+    "login": "rolfyone",
+    "id": 2967240,
+    "node_id": "MDQ6VXNlcjI5NjcyNDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2967240?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rolfyone",
+    "html_url": "https://github.com/rolfyone",
+    "followers_url": "https://api.github.com/users/rolfyone/followers",
+    "following_url": "https://api.github.com/users/rolfyone/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rolfyone/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rolfyone/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rolfyone/subscriptions",
+    "organizations_url": "https://api.github.com/users/rolfyone/orgs",
+    "repos_url": "https://api.github.com/users/rolfyone/repos",
+    "events_url": "https://api.github.com/users/rolfyone/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rolfyone/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-04T20:42:15Z",
+  "updated_at": "2023-12-04T21:02:06Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "https://github.com/eth-clients/slashing-protection-interchange-tests/releases/tag/v5.3.0\n\nWe've got all of the plumbing required, I did a quick hack to see if it would be painful...\n\nBelow shows one specific test basically running (in a really nasty way)\n\nI view this as similar to our reference tests. I'm hoping at least initially we won't need to disable groups etc like we need to in reference tests.\n\nWe should be able to download a bundle and run through the stated tests, and maybe have a manual runner in the same way we do for the eth-reference-tests.\nIt should probably be its own module, rather than live in the dataexchange (which is where i wrote the test below)...\n\nThe TL/DR:\n - we can use the importer to import data to a slashing folder\n - we can use `LocalSlashingProtector` to check `maySignAttestation` and `maySignBlock` to verify test conditions\n \n```\npublic class InterchangeReferenceTest {\n  final String sourceFile =\n      \"slashing-protection-interchange-tests-5.3.0/tests/generated/duplicate_pubkey_not_slashable.json\";\n  private final JsonProvider jsonProvider = new JsonProvider();\n  private final ObjectMapper mapper = jsonProvider.getObjectMapper();\n\n  @Test\n  void shouldReadFile(@TempDir Path tempDir) throws IOException {\n    final JsonNode jsonData = mapper.readTree(Resources.getResource(sourceFile));\n    final Path slashprotectionPath = tempDir.resolve(\"slashprotection\");\n    final Bytes32 genesisValidatorsRoot =\n        Bytes32.fromHexString(jsonData.get(\"genesis_validators_root\").asText());\n    final String name = jsonData.get(\"name\").asText();\n    final SlashingProtectionInterchangeFormat interchangeFormat =\n        jsonProvider.jsonToObject(\n            jsonData.get(\"steps\").get(0).get(\"interchange\").toString(),\n            SlashingProtectionInterchangeFormat.class);\n    Files.writeString(\n        tempDir.resolve(\"import.yml\"),\n        jsonData.get(\"steps\").get(0).get(\"interchange\").toString(),\n        StandardCharsets.UTF_8);\n    final BLSPublicKey pubkey =\n        BLSPublicKey.fromHexString(\n            \"0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c\");\n    Files.createDirectories(slashprotectionPath);\n    SlashingProtectionImporter importer =\n        new SlashingProtectionImporter(tempDir.resolve(\"slashprotection\"));\n    importer.initialise(new File(tempDir.resolve(\"import.yml\").toString()));\n    final Map<BLSPublicKey, String> errors = importer.updateLocalRecords((__) -> {});\n    assertThat(errors).isEmpty();\n\n    LocalSlashingProtector localSlashingProtector =\n        new LocalSlashingProtector(\n            SyncDataAccessor.create(slashprotectionPath), slashprotectionPath);\n    assertThat(\n            localSlashingProtector.maySignBlock(pubkey, genesisValidatorsRoot, UInt64.valueOf(10)))\n        .isCompletedWithValue(false);\n    assertThat(\n            localSlashingProtector.maySignBlock(pubkey, genesisValidatorsRoot, UInt64.valueOf(13)))\n        .isCompletedWithValue(false);\n    assertThat(\n            localSlashingProtector.maySignBlock(pubkey, genesisValidatorsRoot, UInt64.valueOf(14)))\n        .isCompletedWithValue(true);\n    assertThat(\n            localSlashingProtector.maySignAttestation(\n                pubkey, genesisValidatorsRoot, UInt64.valueOf(0), UInt64.valueOf(2)))\n        .isCompletedWithValue(false);\n    assertThat(\n            localSlashingProtector.maySignAttestation(\n                pubkey, genesisValidatorsRoot, UInt64.valueOf(1), UInt64.valueOf(3)))\n        .isCompletedWithValue(false);\n  }\n}\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/7784/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7784/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
