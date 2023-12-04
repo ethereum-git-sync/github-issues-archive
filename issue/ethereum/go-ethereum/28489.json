@@ -40,7 +40,7 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-11-08T19:23:15Z",
-  "updated_at": "2023-12-04T11:00:25Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2023-12-04T12:25:18Z",
+  "closed_at": "2023-12-04T12:25:18Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "During the whole block fetching mechanism, in certain cases, the `ReceivedAt` field of a block is tracked incorrectly due to reasons explained below. \r\n\r\nOn new block announcement, the header is requested [here](https://github.com/ethereum/go-ethereum/blob/master/eth/fetcher/block_fetcher.go#L474), which ultimately uses request one header as mentioned [here](https://github.com/ethereum/go-ethereum/blob/master/eth/protocols/eth/peer.go#L339). When the dispatcher flow completes and response is received, we track the time in the response as mentioned [here](https://github.com/ethereum/go-ethereum/blob/master/eth/protocols/eth/dispatcher.go#L242). On receiving the response [here](https://github.com/ethereum/go-ethereum/blob/master/eth/fetcher/block_fetcher.go#L486) back in the channel, the time used to pass in the `FilterHeaders` function is `time.Now().Add(res.Time)` where `res.Time` is what we set before in the dispatcher. According to this logic, I believe it sets a future time by adding the delay of p2p request to current time. The logic here should just use `time.Now()` or `time.Now().Sub(res.Time)` instead. When we process the headers and create block objects, we set the same time as set above in the block's `ReceivedAt` field as mentioned [here](https://github.com/ethereum/go-ethereum/blob/master/eth/fetcher/block_fetcher.go#L606), thus incorrectly tracking the time and updating metrics using that incorrect time. \r\n\r\nThe `FilterBodies` function on the other hand uses a correct time i.e. `time.Now()`. Hence, to be specific, wrong field is *only* set when the body is empty as we don't try to fetch bodies in that case. \r\n\r\nThe fix for should be pretty simple: use `time.Now()` or `time.Now().Sub(res.Time)` instead over [here](https://github.com/ethereum/go-ethereum/blob/master/eth/fetcher/block_fetcher.go#L486) as the last parameter. \r\n\r\nTL;DR: The time used to set the received at field in block is wrongly set as the initial function uses wrong time value. \r\n\r\nIf this turns out to be an issue, I can raise a quick PR fixing this. Thank you!\r\n\r\nEDIT: the tag was auto chosen to \"docs\". I'd put it under \"bug\" but have created a generic issue as we it's not yet finalised if this is an issue yet. ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "karalabe",
+    "id": 129561,
+    "node_id": "MDQ6VXNlcjEyOTU2MQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/129561?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/karalabe",
+    "html_url": "https://github.com/karalabe",
+    "followers_url": "https://api.github.com/users/karalabe/followers",
+    "following_url": "https://api.github.com/users/karalabe/following{/other_user}",
+    "gists_url": "https://api.github.com/users/karalabe/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/karalabe/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/karalabe/subscriptions",
+    "organizations_url": "https://api.github.com/users/karalabe/orgs",
+    "repos_url": "https://api.github.com/users/karalabe/repos",
+    "events_url": "https://api.github.com/users/karalabe/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/karalabe/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28489/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28489/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -144,7 +163,7 @@
     },
     "created_at": "2023-12-04T11:00:23Z",
     "updated_at": "2023-12-04T11:00:23Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "Thank you. Created a PR here: https://github.com/ethereum/go-ethereum/pull/28637",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1838394359/reactions",

@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "s1na",
@@ -94,14 +94,33 @@
     }
   ],
   "milestone": null,
-  "comments": 4,
+  "comments": 5,
   "created_at": "2023-04-29T02:03:25Z",
-  "updated_at": "2023-09-18T07:36:52Z",
-  "closed_at": null,
+  "updated_at": "2023-12-04T15:19:43Z",
+  "closed_at": "2023-12-04T15:19:31Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nGeth version: geth version 1.11.7-unstable-523fe430-20230428\r\nCL client & version: prysm@v4.0.3\r\nOS & Version: Linux\r\nCommit hash : (if `develop`)\r\n\r\n#### Expected behaviour\r\nOn an Ethereum client, after subscribing to geth, immediately after a new blockheader arrives, a lookup with eth_getBlockByHash using the block's hash should result in a lookup.\r\n\r\n#### Actual behaviour\r\nReturns not_found as the result.\r\n\r\n#### Steps to reproduce the behaviour\r\n1. Subscribe the NewHead to the Geth.\r\n2. When a new header arrives, call eth_getBlockByHash with the hash of the arrived header.\r\n3. Check for not_found.\r\n\r\n#### Backtrace\r\nN/A\r\n\r\n#### Please Note Below\r\nI have also conducted a test with a few code modification,  wherein I utilized the eth_getBlockByNumber method under the exact same circumstances as described above,\r\nand it worked perfectly fine. \r\n\r\nAnd my code was working fine before, but it breaks with the latest version of geth.\r\n\r\nI didn't analyze it in detail because I didn't have time. \r\n\r\nHowever, I strongly suspect that the bug is in the code that notifies the client of the arrival of a new blockheader before the code that maps the block hash to the block number and stores it.\r\n\r\nI'm hoping that someone who is an expert on the issue will fix it soon.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27197/reactions",
     "total_count": 0,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27197/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -283,6 +302,50 @@
     "body": "Can't reproduce either, if someone is interested in this, here is a simple example:\r\n\r\n```go\r\n// issue https://github.com/ethereum/go-ethereum/issues/27197\r\n// eth_getBlockByHash with the hash of the latest block\r\npackage main\r\n\r\nimport (\r\n\t\"context\"\r\n\t\"flag\"\r\n\t\"fmt\"\r\n\t\"os\"\r\n\t\"sync\"\r\n\t\"time\"\r\n\r\n\t\"github.com/ethereum/go-ethereum/core/types\"\r\n\t\"github.com/ethereum/go-ethereum/ethclient\"\r\n\t\"github.com/ethereum/go-ethereum/log\"\r\n)\r\n\r\nvar (\r\n\tprovider = flag.String(\"rpc\", \"ws://localhost:8546\", \"RPC provider address in ws\")\r\n\tworkers  = flag.Int(\"worker\", 20, \"Number of workers\")\r\n)\r\n\r\nfunc subscribeNewHead(wid string, provider string) {\r\n\tclient, err := ethclient.Dial(provider)\r\n\tif err != nil {\r\n\t\tlog.Crit(\"error creating client\", \"wid\", wid, \"err\", err)\r\n\t}\r\n\tdefer client.Close()\r\n\r\n\tctx := context.Background()\r\n\tch := make(chan *types.Header)\r\n\tsub, err := client.SubscribeNewHead(ctx, ch)\r\n\tif err != nil {\r\n\t\tlog.Crit(\"Failed to subscribe NewHead event\", \"wid\", wid, \"err\", err)\r\n\t}\r\n\tdefer sub.Unsubscribe()\r\n\r\n\tlog.Info(\"Success subscribe NewHead\", \"wid\", wid)\r\nLOOP:\r\n\tfor {\r\n\t\tselect {\r\n\t\tcase err := <-sub.Err():\r\n\t\t\tlog.Error(\"Subscribe error\", \"wid\", wid, \"err\", err)\r\n\t\t\tbreak LOOP\r\n\r\n\t\tcase e := <-ch:\r\n\t\t\tt := time.Unix(int64(e.Time), 0).Format(\"2006-01-02 15:04:05\")\r\n\t\t\tlog.Info(\"NewHeader\", \"wid\", wid, \"number\", e.Number, \"hash\", e.Hash(), \"time\", t)\r\n\t\t\t_, err := client.BlockByHash(ctx, e.Hash())\r\n\t\t\tif err != nil {\r\n\t\t\t\tlog.Error(\"BlockByHash\", \"wid\", wid, \"number\", e.Number, \"hash\", e.Hash(), \"err\", err)\r\n\t\t\t\tcontinue\r\n\t\t\t}\r\n\r\n\t\tcase err := <-ctx.Done():\r\n\t\t\tlog.Error(\"context error\", \"wid\", wid, \"err\", err)\r\n\t\t\tbreak LOOP\r\n\t\t}\r\n\t}\r\n\tclose(ch)\r\n}\r\n\r\nfunc main() {\r\n\tflag.Parse()\r\n\tlog.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stdout, log.TerminalFormat(true))))\r\n\r\n\tvar wg sync.WaitGroup\r\n\tfor i := 0; i < *workers; i++ {\r\n\t\ti := i\r\n\t\twg.Add(1)\r\n\t\tgo func() {\r\n\t\t\tdefer wg.Done()\r\n\t\t\tsubscribeNewHead(fmt.Sprintf(\"%02d\", i), *provider)\r\n\t\t}()\r\n\t}\r\n\twg.Wait()\r\n}\r\n``` ",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1722890999/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1838866686",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/27197#issuecomment-1838866686",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/27197",
+    "id": 1838866686,
+    "node_id": "IC_kwDOAOvK985tmuD-",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-04T15:19:31Z",
+    "updated_at": "2023-12-04T15:19:43Z",
+    "author_association": "MEMBER",
+    "body": "Despite diligent efforts, this ticket seems not reproducable. Closing",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1838866686/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
