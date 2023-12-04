@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8887",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8887/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8887/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8887/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/8887",
+  "id": 2023398567,
+  "node_id": "I_kwDOC0FsAM54mpyn",
+  "number": 8887,
+  "title": "Getting 0x0 for eth_getBalance even though Geth returns value",
+  "user": {
+    "login": "Aracki",
+    "id": 6129986,
+    "node_id": "MDQ6VXNlcjYxMjk5ODY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6129986?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Aracki",
+    "html_url": "https://github.com/Aracki",
+    "followers_url": "https://api.github.com/users/Aracki/followers",
+    "following_url": "https://api.github.com/users/Aracki/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Aracki/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Aracki/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Aracki/subscriptions",
+    "organizations_url": "https://api.github.com/users/Aracki/orgs",
+    "repos_url": "https://api.github.com/users/Aracki/repos",
+    "events_url": "https://api.github.com/users/Aracki/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Aracki/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-04T09:28:40Z",
+  "updated_at": "2023-12-04T09:40:31Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### We have differences in responses between Erigon and Geth.\r\n\r\n```\r\ncurl --request POST \\\r\n  --url http://<ERIGON_URL> \\\r\n  --header 'Content-Type: application/json' \\\r\n  --data '{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 1,\r\n  \"method\": \"eth_getBalance\",\r\n  \"params\": [\"0x5C43754319639Fd9E1b500AA64DF87BEce0a4381\", \"0x23636c9\"]\r\n}'\r\n```\r\n\r\nOur Erigon (thorax/erigon:v2.52.4) returns:\r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"id\": 1,\r\n  \"result\": \"0x0\"\r\n}\r\n```\r\n\r\nalthough Geth returns:\r\n```\r\n{\r\n  \"jsonrpc\": \"2.0\",\r\n  \"result\": \"0xe22a75e2f19a7d7\",\r\n  \"id\": 1\r\n}\r\n```\r\n\r\nLatest synced block in our node is `40,669,809` which came 7 days after the problematic block used for `eth_getBalance` example.\r\n\r\n### Flags we use to start Erigon are:\r\n\r\n```\r\n            \"--chain=bor-mainnet\",\r\n            \"--bor.heimdall=http://localhost:1317\",\r\n            \"--datadir=/root/erigon\",\r\n            \"--db.pagesize=8kb\",\r\n            \"--db.size.limit=6TB\",\r\n            \"--private.api.addr=0.0.0.0:9090\",\r\n            \"--txpool.api.addr=0.0.0.0:9090\",\r\n            \"--http.addr=0.0.0.0\",\r\n            \"--http.port=8545\",\r\n            \"--http.vhosts=*\",\r\n            \"--http.corsdomain=*\",\r\n            \"--http.api=eth,erigon,web3,net,debug,trace,txpool\",\r\n            \"--ws\",\r\n            \"--port=30303\",\r\n            \"--metrics\",\r\n            \"--metrics.addr=0.0.0.0\",\r\n            \"--metrics.port=6060\",\r\n            \"--torrent.download.rate=1gb\",\r\n            \"--maxpeers=200\",\r\n            \"--staticpeers=enode://64862bb2030a145d5fb5e7ed916710ac8ae6044defb20b2b8e2a4fdcd1ef67640c356db21b122f8141d13273f6754dd07fb779516e1e22e6b1dbb8cd795c1064@198.244.228.171:30303,enode://09d2b80bb0a77cf4cdba9173d4dbfcb23794658db222f579c7486282d4fc25245b306eccbb250adfd10d906949e918354a0c7b99a8a441528596883bc77dd304@65.21.137.228:30625,enode://e86779dd349b2d17186b893327448ca707f8026b0602f9d8c0db6b0335f297c8ef4eb652e5da046d7f50d9ceefaac96f4a2c22cf057c8da0dceabea0359c5c8f@65.21.137.228:30664,enode://20b0ea306ed98b895b959fd3d2135c5d306855c2e05177233c306cb445ac7bc29728ec62357e5280bd51cd5cc66d462eae01cf2e150c19df5a5f474f494da5f4@65.21.137.228:30527,enode://3d31c3be68d1ed871f18bc3aead140cadaeeb0b555eb378e26cddd66785987d8343ed605ec0dce1500c67b695ab6e058c80e9f85b304aa4950ed06fe0f90a35b@65.21.137.228:30471,enode://f214289c9e156edce45ff79331a7e2ca8449ebe4e0e8e0b0fe7c7740a6d925aa8fcc592e6ae4d7f64d216553185ad6904c60dcc6c498de9222ce4cd30743475a@65.21.229.175:38323,enode://b5fca7649d060aa008dd9310a575ece1aa11819409ddc9d20825512b5a609696bc550bf5b074a7bb1ec1f12e2686565a2d9c181a72ebbe682823606c0e431192@5.161.57.89:30307,enode://366012310f9bc5e37f67f5f6f2e0d185a74c93f0eefc1d4ec5b36c0530de42fea5f5be5b3415a9efcaec62b1e2318838507ac1a504ab2ac27273ab10b54e4e54@162.55.0.250:30345,enode://5ea9b10b8aa28154a865604d5b5eea9a9b803428506c8892921a75522b5aca99b6140fb5098466f5ef03c2617832bd304b49de551ef43fdb0097b4709c39e7ae@167.235.34.105:30788,enode://f11b3c44b6d85975529f8e1eccbcc0fd9b66deb7af1a40c90f0cd9c56b1868ceba431c1d71bd42e2ca8b45d9a785aafd253f29c7ff397a3fbb23b9249cc2db4f@143.244.63.70:30010,enode://219c3848da97335817a1944dbb50877927cdf77262e201c3fa453b3257f33682e90bae04207ecfd79a1e33e94171aa099b9a921cd9156960f6259fb024ab3c78@137.220.50.231:30304,enode://086c9857533c05148f98fabc8a94e159512073cf730c0abe16db17a9a85d293f64b4423a2b5b0f3121e37c6833b7d58b28eba25f26726ec05e60108ee023aec9@94.130.88.243:30303,enode://9db42fb233cd066a0a4a9f3362534d3b6c2331309127fe335b71d91724dde1c056ba3c4d7aeec4ac5d68270694129d1c01ae0bb4fca718e30f98eeddc64d7286@51.195.62.133:30303,enode://501430e7e186333649e0fb924a11a2323317a109f8aadeffdd750e1d896af570bf9ea78e81ca3f385f723f9f5f166b91cd1867f0ce5175703d0c0f814174cf47@65.108.71.81:20303,enode://c080b8ebcf43fd25de8314e504b98a2f7043c195f1982474c67673d464cac88777157292a12814f8e243f0f605a564f5f4940105f225e8f83958dec843644021@65.109.84.26:30303?discport=60239,enode://68d773418fc49c4bbfd13415b55bd2972bcfee2d754f4a1dac77f04a92d0b4d9044472a5381c3ffe59c01f2dc4e54bf9e0a60a66b7545864c49f45113ba9c5de@136.243.32.189:30303,enode://37b590dea78a77214cfc64a153a0a5aa3950ee35952e4dba10b5b601c950ced22527f0792a820c2bd654bbd043381d847aa04d381932b60e97e1b5871949bf8c@10.2.22.149:51683,enode://2fc99f2b92f1dc9dafde3224a63b9019861f24158fa67fecd80103f6aaa8265590d60c4907786357e5830d78136c5be8163d5fd32634b975e110dffded69aaaa@127.0.0.1:30303\"\r\n\r\n```\r\n\r\nI've seen similar issues happened before (https://github.com/ledgerwatch/erigon/issues/3630)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8887/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8887/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
