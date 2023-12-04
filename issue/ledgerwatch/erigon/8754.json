@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-11-17T05:24:21Z",
-  "updated_at": "2023-11-17T05:24:21Z",
+  "updated_at": "2023-12-04T20:46:43Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1839377073",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/8754#issuecomment-1839377073",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8754",
+    "id": 1839377073,
+    "node_id": "IC_kwDOC0FsAM5toqqx",
+    "user": {
+      "login": "rarecrumb",
+      "id": 99095402,
+      "node_id": "U_kgDOBegTag",
+      "avatar_url": "https://avatars.githubusercontent.com/u/99095402?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rarecrumb",
+      "html_url": "https://github.com/rarecrumb",
+      "followers_url": "https://api.github.com/users/rarecrumb/followers",
+      "following_url": "https://api.github.com/users/rarecrumb/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rarecrumb/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rarecrumb/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rarecrumb/subscriptions",
+      "organizations_url": "https://api.github.com/users/rarecrumb/orgs",
+      "repos_url": "https://api.github.com/users/rarecrumb/repos",
+      "events_url": "https://api.github.com/users/rarecrumb/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rarecrumb/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-04T19:56:06Z",
+    "updated_at": "2023-12-04T20:46:43Z",
+    "author_association": "NONE",
+    "body": "Same here, running on Sepolia.\r\n\r\nErigon version: `v2.55.0`\r\n\r\nStatefulSet manifest:\r\n```yaml\r\napiVersion: apps/v1\r\nkind: StatefulSet\r\nmetadata:\r\n  labels:\r\n    app.kubernetes.io/instance: ethereum\r\n    app.kubernetes.io/managed-by: Helm\r\n    app.kubernetes.io/name: erigon\r\n    argocd.argoproj.io/instance: ethereum\r\n    helm.sh/chart: erigon-1.0.8\r\n  name: erigon\r\n  namespace: ethereum\r\nspec:\r\n  persistentVolumeClaimRetentionPolicy:\r\n    whenDeleted: Retain\r\n    whenScaled: Retain\r\n  podManagementPolicy: Parallel\r\n  replicas: 1\r\n  revisionHistoryLimit: 10\r\n  selector:\r\n    matchLabels:\r\n      app.kubernetes.io/instance: ethereum\r\n      app.kubernetes.io/name: erigon\r\n  serviceName: erigon-headless\r\n  template:\r\n    metadata:\r\n      annotations:\r\n        checksum/secrets: 3b29556c4c07d2ac10020f254dab589e6e9c93c8618e7a311d0dcf28be2383e8\r\n        prometheus.io/path: /debug/metrics/prometheus\r\n        prometheus.io/port: \"6061\"\r\n        prometheus.io/scrape: \"true\"\r\n      creationTimestamp: null\r\n      labels:\r\n        app.kubernetes.io/instance: ethereum\r\n        app.kubernetes.io/name: erigon\r\n    spec:\r\n      containers:\r\n      - command:\r\n        - sh\r\n        - -ac\r\n        - |\r\n          exec erigon --datadir=/data --nat=extip:$(POD_IP) --port=30303 --http=false --private.api.addr=127.0.0.1:9090 --authrpc.jwtsecret=/data/jwt.hex --authrpc.addr=0.0.0.0 --authrpc.port=8551 --authrpc.vhosts=* --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 --chain=sepolia --internalcl --log.console.json=true --log.console.verbosity=info --log.dir.disable=true --maxpeers=200 --torrent.download.rate=1000mb --torrent.download.slots=100\r\n        env:\r\n        - name: POD_IP\r\n          valueFrom:\r\n            fieldRef:\r\n              apiVersion: v1\r\n              fieldPath: status.podIP\r\n        image: xxx.dkr.ecr.us-east-1.amazonaws.com/erigon:v2.55.0\r\n        imagePullPolicy: IfNotPresent\r\n        livenessProbe:\r\n          failureThreshold: 3\r\n          initialDelaySeconds: 60\r\n          periodSeconds: 120\r\n          successThreshold: 1\r\n          tcpSocket:\r\n            port: metrics\r\n          timeoutSeconds: 1\r\n        name: erigon\r\n        ports:\r\n        - containerPort: 30303\r\n          name: p2p-tcp\r\n          protocol: TCP\r\n        - containerPort: 30303\r\n          name: p2p-udp\r\n          protocol: UDP\r\n        - containerPort: 8551\r\n          name: auth-rpc\r\n          protocol: TCP\r\n        - containerPort: 6060\r\n          name: metrics\r\n          protocol: TCP\r\n        readinessProbe:\r\n          failureThreshold: 3\r\n          initialDelaySeconds: 10\r\n          periodSeconds: 10\r\n          successThreshold: 1\r\n          tcpSocket:\r\n            port: metrics\r\n          timeoutSeconds: 1\r\n        resources:\r\n          limits:\r\n            cpu: \"2\"\r\n            memory: 10Gi\r\n          requests:\r\n            cpu: \"1\"\r\n            memory: 8Gi\r\n        terminationMessagePath: /dev/termination-log\r\n        terminationMessagePolicy: File\r\n        volumeMounts:\r\n        - mountPath: /data\r\n          name: storage\r\n        - mountPath: /data/jwt.hex\r\n          name: jwt\r\n          readOnly: true\r\n          subPath: jwt.hex\r\n      - command:\r\n        - sh\r\n        - -ac\r\n        - |\r\n          while ! nc -z 127.0.0.1 9090; do sleep 1; done; exec rpcdaemon --datadir=/data --private.api.addr=127.0.0.1:9090 --txpool.api.addr=127.0.0.1:9090 --http.addr=0.0.0.0 --http.port=8545 --http.vhosts=* --metrics --metrics.addr=0.0.0.0 --metrics.port=6061 --http.api=eth,erigon,web3,net,debug,trace,txpool,db --ws\r\n        env:\r\n        - name: POD_IP\r\n          valueFrom:\r\n            fieldRef:\r\n              apiVersion: v1\r\n              fieldPath: status.podIP\r\n        image: xxx.dkr.ecr.us-east-1.amazonaws.com/erigon:v2.55.0\r\n        imagePullPolicy: IfNotPresent\r\n        livenessProbe:\r\n          failureThreshold: 3\r\n          initialDelaySeconds: 60\r\n          periodSeconds: 120\r\n          successThreshold: 1\r\n          tcpSocket:\r\n            port: http-rpc\r\n          timeoutSeconds: 1\r\n        name: erigon-rpcd\r\n        ports:\r\n        - containerPort: 8545\r\n          name: http-rpc\r\n          protocol: TCP\r\n        - containerPort: 6061\r\n          name: metrics-rpcd\r\n          protocol: TCP\r\n        readinessProbe:\r\n          failureThreshold: 3\r\n          httpGet:\r\n            httpHeaders:\r\n            - name: Accept\r\n              value: application/json\r\n            - name: X-ERIGON-HEALTHCHECK\r\n              value: min_peer_count2\r\n            - name: X-ERIGON-HEALTHCHECK\r\n              value: synced\r\n            - name: X-ERIGON-HEALTHCHECK\r\n              value: max_seconds_behind60\r\n            path: /health\r\n            port: http-rpc\r\n            scheme: HTTP\r\n          initialDelaySeconds: 30\r\n          periodSeconds: 10\r\n          successThreshold: 1\r\n          timeoutSeconds: 1\r\n        resources:\r\n          limits:\r\n            cpu: \"2\"\r\n            memory: 10Gi\r\n          requests:\r\n            cpu: \"1\"\r\n            memory: 8Gi\r\n        terminationMessagePath: /dev/termination-log\r\n        terminationMessagePolicy: File\r\n        volumeMounts:\r\n        - mountPath: /data\r\n          name: storage\r\n      dnsPolicy: ClusterFirst\r\n      initContainers:\r\n      - command:\r\n        - chown\r\n        - -R\r\n        - 10001:10001\r\n        - /data\r\n        image: busybox:1.34.0\r\n        imagePullPolicy: IfNotPresent\r\n        name: init-chown-data\r\n        securityContext:\r\n          runAsNonRoot: false\r\n          runAsUser: 0\r\n        terminationMessagePath: /dev/termination-log\r\n        terminationMessagePolicy: File\r\n        volumeMounts:\r\n        - mountPath: /data\r\n          name: storage\r\n      nodeSelector:\r\n        group: ethereum\r\n      restartPolicy: Always\r\n      schedulerName: default-scheduler\r\n      securityContext:\r\n        fsGroup: 10001\r\n        runAsGroup: 10001\r\n        runAsNonRoot: true\r\n        runAsUser: 10001\r\n      serviceAccount: erigon\r\n      serviceAccountName: erigon\r\n      shareProcessNamespace: true\r\n      terminationGracePeriodSeconds: 30\r\n      tolerations:\r\n      - effect: NoSchedule\r\n        key: group\r\n        operator: Equal\r\n        value: ethereum\r\n      volumes:\r\n      - name: jwt\r\n        secret:\r\n          defaultMode: 420\r\n          secretName: erigon-jwt\r\n  updateStrategy:\r\n    type: RollingUpdate\r\n  volumeClaimTemplates:\r\n  - apiVersion: v1\r\n    kind: PersistentVolumeClaim\r\n    metadata:\r\n      creationTimestamp: null\r\n      name: storage\r\n    spec:\r\n      accessModes:\r\n      - ReadWriteOnce\r\n      resources:\r\n        requests:\r\n          storage: 1Ti\r\n      storageClassName: fast-gp3\r\n      volumeMode: Filesystem\r\n    status:\r\n      phase: Pending\r\n```\r\n\r\nLatest block call:\r\n```\r\n$ curl -s -X POST --header 'Content-Type: application/json' localhost:8545 --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":1}' | jq .result.number | xargs printf \"%d\\n\"\r\n\r\n3999999\r\n```\r\n\r\nAs of this comment, Sepolia is currently at: [4822615](https://sepolia.etherscan.io/block/4822615)\r\n\r\nHealth check shows \"HEALTHY\":\r\n```\r\n$ curl -H \"X-ERIGON-HEALTHCHECK: synced\" -H \"X-ERIGON-HEALTHCHECK: max_seconds_behind10\" localhost:8545/health && echo\r\n{\"check_block\":\"DISABLED\",\"max_seconds_behind\":\"HEALTHY\",\"min_peer_count\":\"DISABLED\",\"synced\":\"HEALTHY\"}\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1839377073/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
