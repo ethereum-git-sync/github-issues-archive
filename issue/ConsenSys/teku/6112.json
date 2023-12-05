@@ -8,7 +8,7 @@
   "id": 1347216759,
   "node_id": "I_kwDOCM9I9M5QTOV3",
   "number": 6112,
-  "title": "Minimise Subnet Subscriptions",
+  "title": "BNs load balancing for optimal DoS protection (attestations processing, duties calculation, blocks/attestation creation, blocks publishing)",
   "user": {
     "login": "lucassaldanha",
     "id": 1766440,
@@ -38,6 +38,33 @@
       "color": "a2eeef",
       "default": false,
       "description": "New feature or request"
+    },
+    {
+      "id": 1271198478,
+      "node_id": "MDU6TGFiZWwxMjcxMTk4NDc4",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/performance%20%F0%9F%9A%80",
+      "name": "performance 🚀",
+      "color": "ffcce3",
+      "default": false,
+      "description": "Improves performance without changing functionality"
+    },
+    {
+      "id": 1846421702,
+      "node_id": "MDU6TGFiZWwxODQ2NDIxNzAy",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/Epic",
+      "name": "Epic",
+      "color": "3E4B9E",
+      "default": false,
+      "description": null
+    },
+    {
+      "id": 5730319360,
+      "node_id": "LA_kwDOCM9I9M8AAAABVY28AA",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/bn-failovers",
+      "name": "bn-failovers",
+      "color": "41173A",
+      "default": false,
+      "description": "Changes regarding failover functionality"
     }
   ],
   "state": "open",
@@ -85,13 +112,13 @@
     }
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2022-08-23T02:00:33Z",
-  "updated_at": "2023-12-05T08:36:18Z",
+  "updated_at": "2023-12-05T14:54:12Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "To reduce the bandwidth and CPU requirements for beacon nodes in a large staking service, we should be able to delegate which beacon node to use for specific attestation subnets. Subscription requests, creating aggregates and publishing attestations should be directed to the beacon node assigned to that attestation/aggregate’s subnet.\n\nMore info here: https://hackmd.io/0jhD6wEzQLWnE3huXLkjgg#Minimize-Subnet-Subscriptions",
+  "body": "To **reduce the bandwidth and CPU requirements** for beacon nodes in a large staking service and **provide optimal DoS protection**, we should be able to delegate which beacon node to use for specific tasks:\n- Attestations subnets subscriptions\n- Calculating duties and creating blocks and attestations\n- Publishing blocks\n\nThe VC requests could be spread across different BNs (2 or 3) based on a configuration file. Two different approches are possible:\n1- Endpoint centric approach. 3 nodes example:\n```\n{\n    \"beacon_nodes\": [\n        {\n            \"url\": \"http://nodeA:5051\", // Source of truth node\n            \"calculate_duties\": true,\n            \"create_blocks\": true,\n            \"publish_blocks\": false,\n            \"create_attestations\": true,\n            \"publish_attestations\": false,\n            \"create_aggregates\": false,\n            \"attestation_subnets\": {\n                \"start\": 0,\n                \"count\": 32\n            },\n            \"sync_committee_subnets\": {\n                \"start\": 0,\n                \"count\": 32\n            }\n        },\n        {\n            \"url\": \"http://nodeB:5051\", // Attestation node\n            \"calculate_duties\": false,\n            \"create_blocks\": false,\n            \"publish_blocks\": false,\n            \"create_attestations\": false,\n            \"publish_attestations\": true,\n            \"create_aggregates\": true,\n            \"attestation_subnets\": {\n                \"start\": 32,\n                \"count\": 32\n            },\n            \"sync_committee_subnets\": {\n                \"start\": 32,\n                \"count\": 32\n            }\n        },\n        {\n            \"url\": \"http://nodeB:5051\", // Block node\n            \"calculate_duties\": false,\n            \"create_blocks\": false,\n            \"publish_blocks\": true,\n            \"create_attestations\": false,\n            \"publish_attestations\": false,\n            \"create_aggregates\": false\n        }\n    ]\n}\n```\n2- role centric config/ 3 nodes example:\n```\n{\n    \"beacon_nodes\": {\n        \"duties_provider\": {\n            \"endpoints\": [\n                \"http://nodeA:5051\"\n            ],\n        },\n        \"block_publisher\": {\n            \"endpoints\": [\n                \"http://nodeB:5051\"\n            ],\n            \"mode\": \"priority\"\n        },\n        \"attestation_publisher\": {\n            \"endpoints\": [\n                \"http://nodeC:5051\"\n            ],\n            \"mode\": \"priority\"\n        },\n    }\n}\n```\nThe node tasks modes could be:\n- priority: first suitable and online node found in the list\n- random: randomly select one suitable node (select another if on fail)\n- broadcast: publish to all suitable nodes\n\nMore info here: https://hackmd.io/0jhD6wEzQLWnE3huXLkjgg#Minimize-Subnet-Subscriptions",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/6112/reactions",
@@ -110,5 +137,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1840952658",
+    "html_url": "https://github.com/Consensys/teku/issues/6112#issuecomment-1840952658",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/6112",
+    "id": 1840952658,
+    "node_id": "IC_kwDOCM9I9M5turVS",
+    "user": {
+      "login": "mehdi-aouadi",
+      "id": 1208687,
+      "node_id": "MDQ6VXNlcjEyMDg2ODc=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1208687?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mehdi-aouadi",
+      "html_url": "https://github.com/mehdi-aouadi",
+      "followers_url": "https://api.github.com/users/mehdi-aouadi/followers",
+      "following_url": "https://api.github.com/users/mehdi-aouadi/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mehdi-aouadi/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mehdi-aouadi/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mehdi-aouadi/subscriptions",
+      "organizations_url": "https://api.github.com/users/mehdi-aouadi/orgs",
+      "repos_url": "https://api.github.com/users/mehdi-aouadi/repos",
+      "events_url": "https://api.github.com/users/mehdi-aouadi/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mehdi-aouadi/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-05T14:54:02Z",
+    "updated_at": "2023-12-05T14:54:02Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Turned out this issue is broader than expected. To start I converted it to an Epic and here is why:\n- [The subnets subscription revamp](https://github.com/Consensys/teku/pull/7341) solves a small part of what is suggested only. The BN subscribes to 2 persistent subnets only now and to others according to the VC assigned attestation aggregation duties (running more than 64 validators could end u making the BN connecting to all subnets though). The proposed solution is to make the user able to assign specific subnet ranges to specific BNs (when many are used) in order to balance the load.\n- What is suggested doesn't concern the attestations subnets handling only but also how the VC requests are handled by the BNs in general (the attestations subnets being what triggered this reflection imu). The proposed solution is to make it possible, using a configuration file, to assign tasks to specific BNs (`calculate_duties`, `create_blocks`, `publish_blocks`, `create_attestations`, `publish_attestations`, `create_aggregates`...). More details can be found in [this note](https://hackmd.io/0jhD6wEzQLWnE3huXLkjgg#Minimize-Subnet-Subscriptions)\n- The suggested changes will probably affect how the BNs failover mechanism is currently implemented\n- The feature requires new configurations files in order to orchestrate the VC requests across different BNs",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1840952658/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
