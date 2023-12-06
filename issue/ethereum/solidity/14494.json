@@ -142,11 +142,11 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 12,
-    "closed_issues": 10,
+    "open_issues": 0,
+    "closed_issues": 15,
     "state": "open",
     "created_at": "2023-06-05T13:39:54Z",
-    "updated_at": "2023-10-09T13:49:32Z",
+    "updated_at": "2023-10-27T10:54:19Z",
     "due_on": null,
     "closed_at": null
   },
@@ -886,13 +886,13 @@
     "body": "I debugged this yesterday and found the problem - the direct cause of the disappearance of the `var_mid` variable in @ekpyron's snippet is the fact that `CommonSubexpressionEliminator` chooses a different replacement expression. This in turn is caused by a bug in `DataFlowAnalyzer`.\r\n\r\nHere's the analysis I posted on the channel:\r\n\r\n> The reason that CSE chooses a different variable is that in one case `DataFlowAnalyzer` loses knowledge about the value of that variable and in the other that knowledge is present. Without that knowledge it won't substitute that variable in expressions. It instead moves on to choose another candidate.\r\n>\r\n> The bug is in [the variable clearing loop in `DataFlowAnalyzer::clearValues()`](https://github.com/ethereum/solidity/blob/v0.8.21/libyul/optimiser/CommonSubexpressionEliminator.cpp#L122-L126). The loop iterates over a set while adding new items to it, which probably results in some items being skipped and not cleared (if they happen to sort before the element we're currently at). Which elements are skipped depends on how they sort and that depends on variable names. In this case it's actually not just different AST IDs but a variable having an ID in one case and not having it in another: `var_low` vs `var_low_7623`. I suspect that just a different number would not cause this on their own because the IDs would still retain their order relative to each other.\r\n>\r\n> Fixing the loop makes the variable stay in the generated IR. I haven't compared bytecode yet, but I'm convinced that this is the root cause.\r\n>\r\n> The funny thing is that this bug is something that I already noticed a few months ago, while reviewing @nikola-matic's changes to the `DataFlowAnalyser` PR that's still pending: https://github.com/ethereum/solidity/pull/14112#discussion\\_r1207017088. It looked fishy and broken, but not _that_ serious. I did not even realize that it could have such deep consequences.\r\n\r\nToday I prepared a proper fix for it (#14574) and verified that it really works. I also created a smaller repro to include as a regression test. At first I tried from Solidity level but it was too hard because the bug requires naming differences to be triggered and these differences are caused by the AST ID differences. It would probably have to be based on that multi-file repro I posted above. In the and I gave up and instead trimmed down the unoptimized Yul output. That reproduces the problem when passed through `solc --strict-assembly --optimize`.\r\n\r\nCombined with @r0qs's fix, this now compiles the Standard JSON input from the description without bytecode differences",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1731847433/reactions",
-      "total_count": 1,
+      "total_count": 2,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 1,
+      "heart": 2,
       "rocket": 0,
       "eyes": 0
     },

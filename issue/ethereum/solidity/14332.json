@@ -148,14 +148,14 @@
     "body": "Not anymore since I fixed the underlying problem but I can now exactly tell whats happening.\r\n\r\nFirst of all the error is correct, it's just really unhelpful that even in verbose mode there is absolutely no hint where the error is (file, contract, line).\r\n\r\nWhat you need to reproduce is.\r\nFileA.sol containing InterfaceA and ContractA deriving from InterfaceA.\r\nFileB.sol containing InterfaceB and ContractB deriving form InterfaceB.\r\n\r\nAdditional Nodes: In my case I updated ContractB from and old version to the current version of solidity. The reason for the error to appear was the use of abi-encoding v2 which is the current default. After setting back to v1 the Stack to deep error is gone, but that is not the focus of that ticket just a little side information.\r\n\r\nConditions: InterfaceB and ContractB needs to be in the same .sol-File. ContractB needs to raise an Stack to deep error.\r\nLets say ContractB is an externel contract and only included for reference, in this speacial case not even the contract but only the interface is required. So there is no need to use the bytecode of the contract.\r\n\r\nSteps to reproduce\r\nimport only the InterfaceB into FileA.sol. Reference InterfaceB in your contract just as you need.\r\n\r\nIf you compile this setup a Stack too deep exception without any other additional information like code line, contract or even file was raised.\r\nThe reason is (as far as I learned through an other issue I filed at the hardhat repo) that even if you only use the InterfaceB and any errors in the Contract implementation would not affect your code in any way ContractB is compiled during the process even if the bytecode is never used later.\r\n\r\nWith that knowledge I am unsure if this a hardhat problem with compiling contracts that are not needed or an solidity problem that raises up with the relative new feature of being able to import single interfaces/contracts from a .sol file containing multiple ones. At least the solidity compiler should be intelligent enough to skip bytecode genereration contracts from imported .sol-files that are not used.\r\n\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1612637250/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 2,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
       "heart": 0,
-      "rocket": 0,
+      "rocket": 1,
       "eyes": 0
     },
     "performed_via_github_app": null

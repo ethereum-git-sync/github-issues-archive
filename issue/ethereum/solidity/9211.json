@@ -997,8 +997,8 @@
     "body": "```solidity\r\ntype UncheckedInt is int;\r\nfunction mul(UncheckedInt a, int b) returns (UncheckedInt c) {...}\r\nusing {mul as *} for UncheckedInt;\r\n```\r\n\r\nGoing back to the associativity issue, this creates an annoying problem on whether the expression `a * b * c` (where `a`, `b`, `c` has the types `UncheckedInt`, `int` and `int` respectively) is fully unchecked or partially unchecked. The expression, `(a * b) * c` would be unchecked and `a * (b * c)` would be partially unchecked. I think this pattern should be discouraged.\r\n\r\nI'm generally in favour of operators, but allowing mixed operators for `*, +, /, -, ==` etc does not sound safe. \r\n\r\nCustom operators (which can be mixed) surprisingly solve this problem:\r\n\r\n```solidity\r\ninfix function <*>(UncheckedInt a, int b) returns(Unchecked c) {...}\r\n```\r\n\r\nNow for `a <*> b * c`, only `a <*> (b * c)` is well-defined. The other expression, i.e., `(a <*> b) * c` doesn't type check, since there is no `* : UncheckedInt -> int -> UncheckedInt` defined. Similarly, for the expression `a <*> b <*> c`, only `(a <*> b) <*> c` is well-defined.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/918392653/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
