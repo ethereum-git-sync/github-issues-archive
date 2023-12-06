@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/4984",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/4984/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/4984/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/4984/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/4984",
+  "id": 2027643992,
+  "node_id": "I_kwDOCFeAzc5422RY",
+  "number": 4984,
+  "title": "Atomicity bug while adding validators using validator client API",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 985647281,
+      "node_id": "MDU6TGFiZWw5ODU2NDcyODE=",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1245875191,
+      "node_id": "MDU6TGFiZWwxMjQ1ODc1MTkx",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/val-client",
+      "name": "val-client",
+      "color": "9cd6fc",
+      "default": false,
+      "description": "Relates to the validator client binary"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-06T04:45:01Z",
+  "updated_at": "2023-12-06T04:45:01Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nFound by @chong-he:\r\n\r\nIf the certificate for a web3signer validator is invalid while adding a validator using `/lighthouse/validators/web3signer` then the validator will get added _in-memory_ but will not be activated and will not be persisted in the validator definitions on disk. Attempting to re-add the same key with correct values then fails with a duplicate key error :skull:\r\n\r\nE.g.\r\n\r\nStart the VC:\r\n\r\n```\r\nlighthouse vc --http\r\n```\r\n\r\nCreate a file named `request.json`:\r\n\r\n```json\r\n[\r\n    {\r\n        \"enable\": true,\r\n        \"description\": \"validator_one\",\r\n        \"graffiti\": \"Mr F was here\",\r\n        \"suggested_fee_recipient\": \"0xa2e334e71511686bcfe38bb3ee1ad8f6babcc03d\",\r\n        \"voting_public_key\": \"0xa062f95fee747144d5e511940624bc6546509eeaeae9383257a9c43e7ddc58c17c2bab4ae62053122184c381b90db380\",\r\n        \"url\": \"http://path-to-web3signer.com\",\r\n        \"root_certificate_path\": \"/path/on/vc/filesystem/to/certificate.pem\",\r\n        \"request_timeout_ms\": 12000\r\n    }\r\n]\r\n```\r\n\r\nMake the request once (ensuring `certificate.pem` does not exist or is invalid):\r\n\r\n```\r\ncurl -X POST --data @request.json -H \"Content-Type: application/json\" -H \"Authorization: Bearer \"(cat ~/.lighthouse/mainnet/validators/api-token.txt) \"http://localhost:5062/lighthouse/validators/web3signer\"\r\n```\r\n\r\n```json\r\n{\"code\":500,\"message\":\"INTERNAL_SERVER_ERROR: failed to initialize validator: \\\"Unable to add definition: InvalidWeb3SignerRootCertificate(reqwest::Error { kind: Builder, source: Error { code: -50, message: \\\\\\\"One or more parameters passed to a function were not valid.\\\\\\\" } })\\\"\",\"stacktraces\":[]}\r\n```\r\n\r\nMake the request again:\r\n\r\n```\r\ncurl -X POST --data @request.json -H \"Content-Type: application/json\" -H \"Authorization: Bearer \"(cat ~/.lighthouse/mainnet/validators/api-token.txt) \"http://localhost:5062/lighthouse/validators/web3signer\"\r\n```\r\n```json\r\n{\"code\":500,\"message\":\"INTERNAL_SERVER_ERROR: failed to initialize validator: \\\"Unable to add definition: DuplicatePublicKey\\\"\",\"stacktraces\":[]}\r\n```\r\n\r\nWe shouldn't get duplicate validator here, because the validator didn't get added successfully. The VC still logs that no validators are active:\r\n\r\n> INFO No validators present                   msg: see `lighthouse vm create --help` or the HTTP API documentation, service: notifier\r\n\r\nHowever we see that the validator _is_ stored in memory, which is why we get the duplicate error:\r\n\r\n```\r\ncurl -s -H \"Content-Type: application/json\" -H \"Authorization: Bearer \"(cat ~/.lighthouse/mainnet/validators/api-token.txt) \"http://localhost:5062/eth/v1/remotekeys\" | jq\r\n```\r\n```json\r\n{\r\n  \"data\": [\r\n    {\r\n      \"pubkey\": \"0xa062f95fee747144d5e511940624bc6546509eeaeae9383257a9c43e7ddc58c17c2bab4ae62053122184c381b90db380\",\r\n      \"url\": \"http://path-to-web3signer.com\",\r\n      \"readonly\": false\r\n    }\r\n  ]\r\n}\r\n```\r\n\r\n## Version\r\n\r\nLighthouse v4.5.0\r\n\r\n## Steps to resolve\r\n\r\nHarden the atomicity of adding validators. We could use copy-on-write followed by compare-and-set (my favourite), or something like adding the validator initially disabled, then switching it to enabled once everything has succeeded. Or we could just apply stricter pre-validation before we go mutating anything (although this could still cause a failure if a disk op fails, etc).\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/4984/reactions",
+    "total_count": 1,
+    "+1": 1,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4984/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
