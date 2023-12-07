@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13287",
+  "repository_url": "https://api.github.com/repos/prysmaticlabs/prysm",
+  "labels_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13287/labels{/name}",
+  "comments_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13287/comments",
+  "events_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13287/events",
+  "html_url": "https://github.com/prysmaticlabs/prysm/issues/13287",
+  "id": 2029627750,
+  "node_id": "I_kwDOBvuov854-alm",
+  "number": 13287,
+  "title": "Should ensure partial blob is deleted",
+  "user": {
+    "login": "jtraglia",
+    "id": 95511699,
+    "node_id": "U_kgDOBbFkkw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/95511699?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jtraglia",
+    "html_url": "https://github.com/jtraglia",
+    "followers_url": "https://api.github.com/users/jtraglia/followers",
+    "following_url": "https://api.github.com/users/jtraglia/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jtraglia/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jtraglia/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jtraglia/subscriptions",
+    "organizations_url": "https://api.github.com/users/jtraglia/orgs",
+    "repos_url": "https://api.github.com/users/jtraglia/repos",
+    "events_url": "https://api.github.com/users/jtraglia/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jtraglia/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-07T00:30:43Z",
+  "updated_at": "2023-12-07T00:30:43Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "# 💎 Issue\r\n\r\n### Background\r\n\r\nRegarding saving blobs to the filesystem...\r\n\r\n### Description\r\n\r\nIf there's an error while saving, it will not delete the partial file. There might be a way to abuse this.\r\n\r\nI'm not exactly sure how this should be handled, but I think I'd do something like this:\r\n\r\n```diff\r\n--- a/beacon-chain/db/filesystem/blob.go\r\n+++ b/beacon-chain/db/filesystem/blob.go\r\n@@ -91,6 +91,13 @@ func (bs *BlobStorage) Save(sidecar blocks.VerifiedROBlob) error {\r\n                return err\r\n        }\r\n        partPath := fname.partPath()\r\n+\r\n+       // Ensure the partial file is deleted.\r\n+       defer func() {\r\n+               // Ignore return value, it's expected to return an error if the save is successful.\r\n+               _ = bs.fs.Remove(partPath)\r\n+       }()\r\n+\r\n        // Create a partial file and write the serialized data to it.\r\n        partialFile, err := bs.fs.Create(partPath)\r\n        if err != nil {\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13287/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13287/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
