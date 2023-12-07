@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6539",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6539/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6539/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6539/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6539",
+  "id": 2030608666,
+  "node_id": "I_kwDOGBlvNc55CKEa",
+  "number": 6539,
+  "title": "Sort before flatten",
+  "user": {
+    "login": "sakulstra",
+    "id": 4396533,
+    "node_id": "MDQ6VXNlcjQzOTY1MzM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4396533?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sakulstra",
+    "html_url": "https://github.com/sakulstra",
+    "followers_url": "https://api.github.com/users/sakulstra/followers",
+    "following_url": "https://api.github.com/users/sakulstra/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sakulstra/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sakulstra/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sakulstra/subscriptions",
+    "organizations_url": "https://api.github.com/users/sakulstra/orgs",
+    "repos_url": "https://api.github.com/users/sakulstra/repos",
+    "events_url": "https://api.github.com/users/sakulstra/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sakulstra/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-07T11:58:10Z",
+  "updated_at": "2023-12-07T12:13:43Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\n`forge flatten` should sort interfaces/contracts/lib by name before flattening.\r\n\r\nI've had a brief look at how this could be done, but it's non obvious to me:\r\n```\r\n/// Flattens all file imports into a single string\r\n    pub fn flatten(&self, target: &Path) -> Result<String> {\r\n        tracing::trace!(\"flattening file\");\r\n        let mut input_files = self.input_files();\r\n\r\n        // we need to ensure that the target is part of the input set, otherwise it's not\r\n        // part of the graph if it's not imported by any input file\r\n        let flatten_target = target.to_path_buf();\r\n        if !input_files.contains(&flatten_target) {\r\n            input_files.push(flatten_target);\r\n        }\r\n\r\n        let sources = Source::read_all_files(input_files)?;\r\n        let graph = Graph::resolve_sources(self, sources)?;\r\n        self.flatten_node(target, &graph, &mut Default::default(), false, false, false).map(|x| {\r\n            format!(\"{}\\n\", utils::RE_THREE_OR_MORE_NEWLINES.replace_all(&x, \"\\n\\n\").trim())\r\n        })\r\n    }\r\n``` \r\nI don't know rust - potentially it could be as easy as sorting nodes before transforming to a string \r\n\r\n### Additional context\r\n\r\nI'm a heavy user of `forge flatten` as it's quite nice to compare an upstream deployment of a contract with a local version.\r\nDiffing folders usually is a lot harder then diffing single files.\r\n\r\nThat said, diffing flattened files can become problematic, when - for whatever reason - the import order on one of the two sides changes. The diff will grow huge and unreadable. If the contracts and interfaces would be sorted alphabetically on the flattened files it would be far easier to understand differences.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6539/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6539/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
