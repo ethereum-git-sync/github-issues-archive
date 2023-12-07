@@ -8,7 +8,7 @@
   "id": 1347216759,
   "node_id": "I_kwDOCM9I9M5QTOV3",
   "number": 6112,
-  "title": "BNs load balancing for optimal DoS protection (Sentry node continuation)",
+  "title": "Subnet subscriptions configuration for entry nodes",
   "user": {
     "login": "lucassaldanha",
     "id": 1766440,
@@ -49,15 +49,6 @@
       "description": "Improves performance without changing functionality"
     },
     {
-      "id": 1846421702,
-      "node_id": "MDU6TGFiZWwxODQ2NDIxNzAy",
-      "url": "https://api.github.com/repos/Consensys/teku/labels/Epic",
-      "name": "Epic",
-      "color": "3E4B9E",
-      "default": false,
-      "description": null
-    },
-    {
       "id": 5730319360,
       "node_id": "LA_kwDOCM9I9M8AAAABVY28AA",
       "url": "https://api.github.com/repos/Consensys/teku/labels/bn-failovers",
@@ -67,7 +58,7 @@
       "description": "Changes regarding failover functionality"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "mehdi-aouadi",
@@ -114,12 +105,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2022-08-23T02:00:33Z",
-  "updated_at": "2023-12-06T10:58:08Z",
-  "closed_at": null,
+  "updated_at": "2023-12-07T20:42:01Z",
+  "closed_at": "2023-12-07T20:42:00Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "To **reduce the bandwidth and CPU requirements** for beacon nodes in a large staking service and **provide optimal DoS protection**, we should be able to delegate which beacon node to use for specific tasks:\r\n- Attestations subnets subscriptions\r\n- Calculating duties and creating blocks and attestations\r\n- Publishing blocks\r\n\r\nThis is a continuation of the [Sentry Beacon Nodes](https://docs.teku.consensys.io/how-to/use-sentry-nodes#configure-sentry-nodes)\r\n\r\nThe VC requests could be spread across different BNs (2 or 3) based on a configuration file. Two different approches are possible:\r\n1- Endpoint centric approach. 3 nodes example:\r\n```\r\n{\r\n    \"beacon_nodes\": [\r\n        {\r\n            \"url\": \"http://nodeA:5051\", // Source of truth node\r\n            \"calculate_duties\": true,\r\n            \"create_blocks\": true,\r\n            \"publish_blocks\": false,\r\n            \"create_attestations\": true,\r\n            \"publish_attestations\": false,\r\n            \"create_aggregates\": false,\r\n            \"attestation_subnets\": {\r\n                \"start\": 0,\r\n                \"count\": 32\r\n            },\r\n            \"sync_committee_subnets\": {\r\n                \"start\": 0,\r\n                \"count\": 32\r\n            }\r\n        },\r\n        {\r\n            \"url\": \"http://nodeB:5051\", // Attestation node\r\n            \"calculate_duties\": false,\r\n            \"create_blocks\": false,\r\n            \"publish_blocks\": false,\r\n            \"create_attestations\": false,\r\n            \"publish_attestations\": true,\r\n            \"create_aggregates\": true,\r\n            \"attestation_subnets\": {\r\n                \"start\": 32,\r\n                \"count\": 32\r\n            },\r\n            \"sync_committee_subnets\": {\r\n                \"start\": 32,\r\n                \"count\": 32\r\n            }\r\n        },\r\n        {\r\n            \"url\": \"http://nodeB:5051\", // Block node\r\n            \"calculate_duties\": false,\r\n            \"create_blocks\": false,\r\n            \"publish_blocks\": true,\r\n            \"create_attestations\": false,\r\n            \"publish_attestations\": false,\r\n            \"create_aggregates\": false\r\n        }\r\n    ]\r\n}\r\n```\r\n2- role centric config/ 3 nodes example:\r\n```\r\n{\r\n    \"beacon_nodes\": {\r\n        \"duties_provider\": {\r\n            \"endpoints\": [\r\n                \"http://nodeA:5051\"\r\n            ],\r\n        },\r\n        \"block_publisher\": {\r\n            \"endpoints\": [\r\n                \"http://nodeB:5051\"\r\n            ],\r\n            \"mode\": \"priority\"\r\n        },\r\n        \"attestation_publisher\": {\r\n            \"endpoints\": [\r\n                \"http://nodeC:5051\"\r\n            ],\r\n            \"mode\": \"priority\"\r\n        },\r\n    }\r\n}\r\n```\r\nThe node tasks modes could be:\r\n- priority: first suitable and online node found in the list\r\n- random: randomly select one suitable node (select another if on fail)\r\n- broadcast: publish to all suitable nodes\r\n\r\n**The current sentry node mode allows to implement some of this load balancing but not as finely as initially suggested.**\r\nThe not yet implemented features are:\r\n- Subnet subscriptions attribution\r\n- BN modes: priority, random or broadcast\r\n- Configuration error handling\r\n- Offline nodes handling\r\n\r\nMore info here: https://hackmd.io/0jhD6wEzQLWnE3huXLkjgg#Minimize-Subnet-Subscriptions",
-  "closed_by": null,
+  "body": "To reduce the bandwidth and CPU requirements for beacon nodes in a large staking service, we should be able to delegate which beacon node to use for specific attestation subnets. Subscription requests, creating aggregates and publishing attestations should be directed to the beacon node assigned to that attestation/aggregate’s subnet.\n\nThis is a continuation of the [Sentry Beacon Nodes](https://docs.teku.consensys.io/how-to/use-sentry-nodes#configure-sentry-nodes)\n\nThe BN subnet subscriptions could be spread across different BNs based on the sentry node configuration file. \nExample:\n```\n{\n    \"beacon_nodes\": [\n        {\n            \"attestation_subnets\": {\n                \"start\": 0,\n                \"count\": 32,\n                \"endpoints\": [\"http://nodeA:9051\"]\n            },\n            \"attestation_subnets\": {\n                \"start\": 33,\n                \"count\": 31,\n                \"endpoints\": [\"http://nodeB:9051\"]\n            },\n            \"sync_committee_subnets\": {\n                \"start\": 0,\n                \"count\": 32\n                \"endpoints\": [\"http://nodeA:9051\"]\n            }\n            \"sync_committee_subnets\": {\n                \"start\": 33,\n                \"count\": 31\n                \"endpoints\": [\"http://nodeB:9051\"]\n            }\n        }\n    ]\n}\n```",
+  "closed_by": {
+    "login": "mehdi-aouadi",
+    "id": 1208687,
+    "node_id": "MDQ6VXNlcjEyMDg2ODc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1208687?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mehdi-aouadi",
+    "html_url": "https://github.com/mehdi-aouadi",
+    "followers_url": "https://api.github.com/users/mehdi-aouadi/followers",
+    "following_url": "https://api.github.com/users/mehdi-aouadi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mehdi-aouadi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mehdi-aouadi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mehdi-aouadi/subscriptions",
+    "organizations_url": "https://api.github.com/users/mehdi-aouadi/orgs",
+    "repos_url": "https://api.github.com/users/mehdi-aouadi/repos",
+    "events_url": "https://api.github.com/users/mehdi-aouadi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mehdi-aouadi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/6112/reactions",
     "total_count": 0,
@@ -134,15 +144,15 @@
   },
   "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/6112/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
-    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1840952658",
-    "html_url": "https://github.com/Consensys/teku/issues/6112#issuecomment-1840952658",
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1846082578",
+    "html_url": "https://github.com/Consensys/teku/issues/6112#issuecomment-1846082578",
     "issue_url": "https://api.github.com/repos/Consensys/teku/issues/6112",
-    "id": 1840952658,
-    "node_id": "IC_kwDOCM9I9M5turVS",
+    "id": 1846082578,
+    "node_id": "IC_kwDOCM9I9M5uCPwS",
     "user": {
       "login": "mehdi-aouadi",
       "id": 1208687,
@@ -163,12 +173,12 @@
       "type": "User",
       "site_admin": false
     },
-    "created_at": "2023-12-05T14:54:02Z",
-    "updated_at": "2023-12-06T10:58:08Z",
+    "created_at": "2023-12-07T20:42:00Z",
+    "updated_at": "2023-12-07T20:42:00Z",
     "author_association": "CONTRIBUTOR",
-    "body": "Turned out this issue is broader than expected. To start I converted it to an Epic and here is why:\n- [The subnets subscription revamp](https://github.com/Consensys/teku/pull/7341) solves a part of what is suggested only. The BN subscribes to 2 persistent subnets only now and to others according to the VC assigned attestation aggregation duties (running more than 64 validators could end up making the BN connecting to all the subnets). The proposed solution is to make the user able to assign specific subnet ranges to specific BNs.\n- What is suggested doesn't concern the attestations subnets handling only but also how the VC requests are handled by the BNs in general (the attestations subnets being what triggered this reflection). The proposed solution is to make it possible, using a configuration file, to assign tasks to specific BNs (`calculate_duties`, `create_blocks`, `publish_blocks`, `create_attestations`, `publish_attestations`, `create_aggregates`...). This is already provided by the sentry nodes mode but not as finely. More details can be found in [this note](https://hackmd.io/0jhD6wEzQLWnE3huXLkjgg#Minimize-Subnet-Subscriptions)\n- The suggested changes will probably affect how the BNs failover mechanism is currently implemented\n- The feature requires to update the sentry nodes configurations files to add more granularity",
+    "body": "IMO since the subnet [subscription revamp](https://github.com/Consensys/teku/issues/7296) has been merged, this issue could be closed.\n- The motivation behind it was to reduce cpu requirements for BNs because they were subscribing to all subnets but they are now subscribing to 2 persistent subnets only ans we already measured a nice cpu usage drop since the change has been merged\n- This adds  a lot complexity to the sentry nodes configuration and make it error prone and hard to stay consistent\n- We didn't get clear feedback about the sentry nodes feature and not sure if building such feature on top of it could be useful from an end user point of view",
     "reactions": {
-      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1840952658/reactions",
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1846082578/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
