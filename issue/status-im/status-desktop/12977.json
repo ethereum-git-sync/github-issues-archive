@@ -1,14 +1,14 @@
 {
-  "url": "https://api.github.com/repos/status-im/status-desktop/issues/12918",
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/12977",
   "repository_url": "https://api.github.com/repos/status-im/status-desktop",
-  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/12918/labels{/name}",
-  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/12918/comments",
-  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/12918/events",
-  "html_url": "https://github.com/status-im/status-desktop/issues/12918",
-  "id": 2016930506,
-  "node_id": "I_kwDOD5KrTM54N-rK",
-  "number": 12918,
-  "title": "Do not modify the node configuration directly",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/12977/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/12977/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/12977/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/12977",
+  "id": 2032811140,
+  "node_id": "I_kwDOD5KrTM55KjyE",
+  "number": 12977,
+  "title": "Use same endpoints as mobile for login and create accounts",
   "user": {
     "login": "richard-ramos",
     "id": 1106587,
@@ -36,15 +36,6 @@
       "url": "https://api.github.com/repos/status-im/status-desktop/labels/feature",
       "name": "feature",
       "color": "0E8A16",
-      "default": false,
-      "description": ""
-    },
-    {
-      "id": 4548141040,
-      "node_id": "LA_kwDOD5KrTM8AAAABDxcf8A",
-      "url": "https://api.github.com/repos/status-im/status-desktop/labels/messenger-team",
-      "name": "messenger-team",
-      "color": "232858",
       "default": false,
       "description": ""
     }
@@ -95,15 +86,15 @@
   ],
   "milestone": null,
   "comments": 0,
-  "created_at": "2023-11-29T16:07:59Z",
-  "updated_at": "2023-12-08T14:58:20Z",
+  "created_at": "2023-12-08T14:58:01Z",
+  "updated_at": "2023-12-08T14:58:01Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "### Description\r\n\r\nIn desktop we use in a couple of places the function `saveConfiguration` https://github.com/status-im/status-desktop/blob/master/src/app_service/service/node_configuration/service.nim#L82 to update values in the node config, like the log level, waku mode, waku version, etc. This can lead to errors in which the node configuration being saved does not have correct values in case it was modified by status-go by some other function, and we might end up overriding some value we didnt intend to.\r\n\r\nSolving this will require status-go work to implement new API methods to replace the invocations to saveConfiguration. The flow for these functions should be:\r\n\r\n1. Load the current NodeConfig\r\n2. Modify the NodeConfig setting... (i.e. if we want to switch the log level,  we'd set `config.LogLevel = value`\r\n3. Save the NodeConfig\r\n4. Return the updated node config so status-desktop can update its own state (not sure about this step).",
+  "body": "### Description\r\n\r\nTo avoid having different behaviors with account creation and login between mobile and desktop apps, we should use these endpoints, instead of Login, SaveAccountAndLogin, LoginWithConfig, etc...\r\n\r\n- Login:\r\nhttps://github.com/status-im/status-go/blob/238a6e2f2db453d748372721005c6ada7bce2435/mobile/status.go#L293\r\nhttps://github.com/status-im/status-go/blob/develop/protocol/requests/login.go\r\n\r\n- Create Account\r\nhttps://github.com/status-im/status-go/blob/238a6e2f2db453d748372721005c6ada7bce2435/mobile/status.go#L268C6-L268C27\r\nhttps://github.com/status-im/status-go/blob/develop/protocol/requests/create_account.go\r\n\r\n- Restore Account and Login\r\nhttps://github.com/status-im/status-go/blob/238a6e2f2db453d748372721005c6ada7bce2435/mobile/status.go#L268C6-L268C27\r\nhttps://github.com/status-im/status-go/blob/develop/protocol/requests/restore_account.go \r\n\r\nCurrently there's no new endpoint for login with keycard so the existing one should still be used\r\n\r\ncc: @cammellos ",
   "closed_by": null,
   "reactions": {
-    "url": "https://api.github.com/repos/status-im/status-desktop/issues/12918/reactions",
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/12977/reactions",
     "total_count": 0,
     "+1": 0,
     "-1": 0,
@@ -114,7 +105,7 @@
     "rocket": 0,
     "eyes": 0
   },
-  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/12918/timeline",
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/12977/timeline",
   "performed_via_github_app": null,
   "state_reason": null
 }
