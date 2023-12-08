@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6554",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6554/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6554/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6554/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6554",
+  "id": 2032806784,
+  "node_id": "I_kwDOGBlvNc55KiuA",
+  "number": 6554,
+  "title": "Filesystem permissions depends on ordering of permission sets",
+  "user": {
+    "login": "0xCourtney",
+    "id": 23440493,
+    "node_id": "MDQ6VXNlcjIzNDQwNDkz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/23440493?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xCourtney",
+    "html_url": "https://github.com/0xCourtney",
+    "followers_url": "https://api.github.com/users/0xCourtney/followers",
+    "following_url": "https://api.github.com/users/0xCourtney/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xCourtney/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xCourtney/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xCourtney/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xCourtney/orgs",
+    "repos_url": "https://api.github.com/users/0xCourtney/repos",
+    "events_url": "https://api.github.com/users/0xCourtney/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xCourtney/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-08T14:55:15Z",
+  "updated_at": "2023-12-08T14:55:15Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (f460583 2023-12-08T11:40:00.032248000Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nDepending on the order in which the permissions are set in the `fs_permissions` array of `foundry.toml` impacts the permissions that are being set. For example setting the root to have read only permissions and the `./cache` folder to have write only permissions will fail if the read only permission for root are set first.\r\n\r\n``` bash\r\n// foundry.toml\r\n...\r\nfs_permissions = [{ access = \"read\", path = \"./\"}, { access = \"write\", path = \"./cache\"}]\r\n```\r\n\r\n``` javascript\r\n// Test.t.sol\r\n...\r\nfunction test_read_write() public {\r\n    vm.readFile(\"foundry.toml\");\r\n    vm.writeFile(\"./cache/cachedFile.txt\", \"cached data\");\r\n}\r\n\r\n// [FAIL. Reason: the path cache/cachedFile.json is not allowed to be accessed for write operations]\r\n```\r\n\r\nReversing the order of the `fs_permissions` will not fail, implying that the ordering is important. I did not notice anything mentioning this in the docs, so I assume it's unintended .\r\n\r\n``` bash\r\n// foundry.toml\r\n...\r\nfs_permissions = [{ access = \"write\", path = \"./cache\"}, { access = \"read\", path = \"./\"}]\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6554/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6554/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
