@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8518",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8518/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8518/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8518/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/8518",
+  "id": 2031736727,
+  "node_id": "I_kwDODjvEJM55GdeX",
+  "number": 8518,
+  "title": "contracts-bedrock: invariant test flake",
+  "user": {
+    "login": "tynes",
+    "id": 6626818,
+    "node_id": "MDQ6VXNlcjY2MjY4MTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6626818?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tynes",
+    "html_url": "https://github.com/tynes",
+    "followers_url": "https://api.github.com/users/tynes/followers",
+    "following_url": "https://api.github.com/users/tynes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tynes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tynes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tynes/subscriptions",
+    "organizations_url": "https://api.github.com/users/tynes/orgs",
+    "repos_url": "https://api.github.com/users/tynes/repos",
+    "events_url": "https://api.github.com/users/tynes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tynes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-08T00:39:24Z",
+  "updated_at": "2023-12-08T00:39:24Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\nThe invariant tests can flake because they sometimes utilize contracts that they should not. This started happening after we added the ability to import L2 state using `loadAllocs(string)`. `forge-std` has a method `assumeNoPrecompiles` [here](https://github.com/foundry-rs/forge-std/blob/2f112697506eab12d433a65fdc31a639548fe365/src/StdCheats.sol#L317) that we should be using. If this doesn't fix the flakes, we may also need to implement an addition to `assumeNoPrecompiles` that also avoids calling the L2 implementations. Another solution would be to move the L1 contracts and L2 contracts into their own \"chains\" and be deliberate about switching between chains when interacting with the two. This is likely what we want to do long term, see [here](https://book.getfoundry.sh/cheatcodes/create-fork).\r\n\r\nhttps://app.circleci.com/pipelines/github/ethereum-optimism/optimism/35957/workflows/4ca544ed-faef-499b-9129-969b79d38f6d/jobs/1631834\r\n\r\n```\r\nEncountered 1 failing test in test/invariants/CrossDomainMessenger.t.sol:XDM_MinGasLimits_Succeeds\r\n[FAIL. Reason: <no data>]\r\n\t[Sequence]\r\n\t\tsender=0x000000000000000000000000000000000000017a addr=[test/invariants/CrossDomainMessenger.t.sol:RelayActor]0x1E964AC317b4cAD5E2178E3B98752f08A1d2B9E7 calldata=relay(uint8,uint8,bytes) args=[253, 0, 0x0603c07e27e7c582dd318d07332e38bf6786e06e4f970005ebd4b1a2fe4951d759d703dc47dd6c941e5526f38b41e42815a35236d22021f8f42243ba231124cc1dc4c780bfee64e1dad80fc66cf5bcef]\r\n\t\tsender=0x40fF5f219b95bF6Ac9dc48454FAD9266F0C6130a addr=[test/invariants/CrossDomainMessenger.t.sol:RelayActor]0x1E964AC317b4cAD5E2178E3B98752f08A1d2B9E7 calldata=relay(uint8,uint8,bytes) args=[101, 128, 0x0000000000000000000000000000000000000000000000000000000000002db6]\r\n\t\tsender=0x4200000000000000000000000000000000000630 addr=[test/invariants/CrossDomainMessenger.t.sol:RelayActor]0x1E964AC317b4cAD5E2178E3B98752f08A1d2B9E7 calldata=relay(uint8,uint8,bytes) args=[94, 253, 0xd06f159705442bd32ef616b12f81e2cb22393f2182add8caace4665244bdad20b9efab1eec7ffe7c1f5e4c81582179ec1ccd83e3f4548b95]\r\n\t\tsender=0x96d3F6c20EEd2697647F543fE6C08bC2Fbf39758 addr=0x4200000000000000000000000000000000000630 calldata=0x8f283970000000000000000000000000207b8adf30e1bfd8d15b99598d4116a51b70aee2 args=[]\r\n\t\tsender=0x0000000000000000000000000000000000002fFa addr=[test/invariants/CrossDomainMessenger.t.sol:RelayActor]0x1E964AC317b4cAD5E2178E3B98752f08A1d2B9E7 calldata=relay(uint8,uint8,bytes) args=[233, 255, 0x5a1b3074836bcf5f4c63632e765a3efcf516e3db7203e997663751f4b6ade57309d69ba75289751cce14bb5c8be662fc2af9520190fe5173e7ac3801]\r\n invariant_minGasLimits() (runs: 64, calls: 956, reverts: 217)\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8518/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8518/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
