@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2020-07-05T22:21:31Z",
-  "updated_at": "2020-07-24T17:38:34Z",
-  "closed_at": null,
+  "updated_at": "2023-12-08T15:48:12Z",
+  "closed_at": "2023-12-08T15:48:12Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "Supersedes #1850\r\n\r\nAnother round of feedbacks and questions after further alignments with Prysm on phase 1 specs. Latest progresses:\r\n- Shard transitions and crosslinks: 100% completed on beacon node. 0% on validator client\r\n- Light client support: 100% completed on beacon node. 0% on validator client\r\n- Proof of custody and fraud proofs: 0% completed on either side\r\n\r\nThis work is [here](https://github.com/terencechain/prysm-phase1) and the [diff](https://github.com/prysmaticlabs/prysm/compare/master...terencechain:phase1) is here. This will be fully migrated to the official Prysm repo when the time is right\r\n\r\nLeft over from last round:\r\n-  Refactor shard proposer reward portion to its own method inside `process_crosslink_for_shard`. Would love to see `process_crosslink_for_shard` get split to be more granular.\r\n-  Put `unpack_compact_validator` inside light client spec since it’s not used within the scope in phase1 beacon chain\r\n\r\nThis round:\r\n- Decrease `MAX_SHARDS` from 1024 to 64. From tech's standpoint, it doesn't matter because sparse transition objects will be compressed. From social and UX's standpoint, 64 is superior than 1024. Block explorers, application and user levels don't have to deal with empty objects. It'd be nice to eliminate questions such as: why 960 transitions are empty? when will they be used?... etc\r\n- One of the main reason to slowing down shard activity if crosslinking fails because attestation had many custody bits. Given the on going work on #1889, is there plan to increase `SHARD_BLOCK_OFFSETS ` to have more frequent intervals?\r\n- `FullAttestation` can get quite large due to `ShardTransition` (up to 3600 bytes). One way to mitigate this is to have aggregators to covert to `FullAttestation`. An option for this is gossip `ShardTransition` and `AttestationData` separately to create deduplication. I haven't done much analysis on this, this is just an initial thought\r\n- Similar to `eth1_data`, I'm liking following construction for light client data inside beacon block body:\r\n```python\r\nclass LightData(Container):\r\n    light_client_bits: Bitvector[LIGHT_CLIENT_COMMITTEE_SIZE]\r\n    light_client_signature: BLSSignature\r\n\r\nclass BeaconBlockBody(Container):\r\n    light_data: LightData  # light client data vote\r\n```\r\n- I think `compute_committee_source_epoch` should have a more general name. (e.g. `compute_period_source_epoch`)\r\n- `pending_attestation.crosslink_success` is marked to `True` during `process_crosslinks` but it's not used anywhere else\r\n- `is_on_time_attestation` will return true if `attestation_data.slot` and `state.slot` both are both 0. This is unlikely a run time issue but good to make a note on it.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "terencechain",
+    "id": 21316537,
+    "node_id": "MDQ6VXNlcjIxMzE2NTM3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21316537?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/terencechain",
+    "html_url": "https://github.com/terencechain",
+    "followers_url": "https://api.github.com/users/terencechain/followers",
+    "following_url": "https://api.github.com/users/terencechain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/terencechain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/terencechain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/terencechain/subscriptions",
+    "organizations_url": "https://api.github.com/users/terencechain/orgs",
+    "repos_url": "https://api.github.com/users/terencechain/repos",
+    "events_url": "https://api.github.com/users/terencechain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/terencechain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1954/reactions",
     "total_count": 1,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1954/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
