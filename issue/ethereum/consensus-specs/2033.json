@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2020-09-01T08:32:03Z",
-  "updated_at": "2020-09-08T07:26:54Z",
-  "closed_at": null,
+  "updated_at": "2023-12-11T13:25:27Z",
+  "closed_at": "2023-12-11T13:25:27Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "We had some dicussions during previous PR reviews. This issue is a recap for discussing phase 1 shard count setting strategies.\r\n \r\nBased on #2027 changes\r\n\r\n### Previous research:\r\n* https://ethresear.ch/t/registrations-shard-count-and-shuffling/2129: once upon a time when the committee size was fixed, @JustinDrake proposed that *doubling* the shard count when the pending validators registrations queue is very full.\r\n* https://ethresear.ch/t/a-proposal-for-structuring-committees-cross-links-etc/2118: once upon a time when the crosslink was infrequent (i.e., not crosslink at every slot), with committee size `k` and `N` active validators, @vbuterin proposed three solutions:\r\n\t* Fix `k = 135`, set `shard_count = N/k`\r\n\t* Fix `shard_count = 100`, set `k = N/shard_count`\r\n\t* Fix `k = shard_count = sqrt(N)`\r\n\r\nNote that the committee selection algorithm was *very different* from now.\r\n\r\n### Status-quo\r\n* Fixed `TARGET_COMMITTEE_SIZE`\r\n* A `MAX_SHARDS := 2**10` as the upper bound of shard count.\r\n* A phase 1 `INITIAL_ACTIVE_SHARDS := 2**6` as the initial number of shards. \r\n* A stub function  [`get_active_shard_count`](https://github.com/ethereum/eth2.0-specs/blob/43f5da18a4f2c9e7acd6b9cc7316570822862f87/specs/phase1/beacon-chain.md#get_active_shard_count) that returns `INITIAL_ACTIVE_SHARDS`.\r\n\r\n### TBD\r\n\r\n#### 1. Dynamic shard count or fixed shard count (only update by hard forks)\r\n\r\n- **Potential criteria for automatic dynamically upsizing**:\r\n    1. If there are `N` active validators for `E` epochs, increase shard count to `N // (SLOTS_PER_EPOCH * TARGET_COMMITTEE_SIZE)`.\r\n    2. If reaching (1), and the average *gasprice* is higher than `P`, increase shard count.\r\n- **Fixed shard count**:\r\n    - Only increase the shard count with hard forks. (with community consensus)\r\n    - We don’t need the stub size `MAX_SHARDS` in the spec.\r\n\r\n#### 2. Do we downsize shard count if a large number of validators become inactive?\r\n*If* we go with dynamic shard count, it's also possible to \"*freeze*\" the shards with the lowest gasprice when we have a low validator participants rate.\r\n\r\n- **Recap**: since the `TARGET_COMMITTEE_SIZE` is fixed now, lacking enough validators results in infrequent crosslinking for all shards.\r\n- **Pros of downsizing**: The apocalypse-like networking situation that has 0 crosslinking for a long time, downsizing may be helpful to reduce traffics.\r\n- **Cons of downsizing**: complexities, unfair to the less active shards.\r\n\r\n#### 3. Initial shard count\r\n- We currently set `64` initial shards.\r\n- **Capacity research**: need more networking simulations and testnets benchmarking results to evaluate the capacity.\r\n- **Market demand research**: perhaps there is no strong demand of 64 shards initially.\r\n\r\n---\r\n\r\nI personally hope to make it simple (i.e., fixed shard count only increase shard count with hard forks), but also hope to hear more ideas. 🙂 \r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2033/reactions",
     "total_count": 1,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2033/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {

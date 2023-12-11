@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 6,
+  "comments": 7,
   "created_at": "2020-04-30T08:34:53Z",
-  "updated_at": "2020-05-10T21:56:15Z",
-  "closed_at": null,
+  "updated_at": "2023-12-11T13:16:33Z",
+  "closed_at": "2023-12-11T13:16:32Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "_High-level description of the bug [1 sentence]_\r\n\r\nETH committee selection can fork leading to multiple concurrent committees operating, this needs to be at least addressed and explained in the spec.\r\n\r\n_Attack scenario_\r\n\r\nIn ETH2 committees are selected based on the current state of the chain, which in turn depends \r\non the winning branch of the block tree.  \r\n\r\nThe spec seems to not address the fact that since potentially Casper may not finalize for a long time, the LMD GHOST fork rule can lead to long-time reoderings in the chain.  \r\n\r\nAn attacker can potentially reorder the chain, say, one day back in the past, totally changing committee  assignments.  The committee members that thought they were  validating will be invalidated. \r\n\r\nIt then seems  that new true committees will not be able to operate, since no-one can not respond to changes happening back in time, unless there is a time machine invented.\r\n\r\nIt may be that the spec actually does allow multiple alternative committees operating at the same time, that correspond to alternate branches.  If yes, this needs to be explained in the spec. The way the spec currently is written it seems to state that there is a unique committee at each moment in time, which introduces confusion.\r\n\r\nAs I already mentioned, it may be a documentation issue, but the fact that this is not discussed at all in the spec is not good.\r\n\r\n_Impact: Describe the effect this may have in a production setting [1 to 2 sentences]_\r\n\r\nThe chain may lose consistency and irreparably stall.\r\n\r\n_Components: Point to the files, functions, and/or specific line numbers where the bug occurs [1 to 2 sentences]_\r\n\r\ndef get_committee_assignment(state: BeaconState,\r\n                             epoch: Epoch,\r\n                             validator_index: ValidatorIndex\r\n                             ) -> Optional[Tuple[Sequence[ValidatorIndex], CommitteeIndex, Slot]]:\r\n\r\nCommittee assignment depends on the state of the chain, which is not finalized\r\n\r\nhttps://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/validator.md#validator-assignments\r\n\r\n_Reproduction: If used any sort of tools/simulations to find the bug, describe in detail how to reproduce the buggy behavior. Showcasing the bug using the python spec and associated test infrastructure found in the spec repo is preferred!_\r\n\r\n\r\n1. Start the chain.\r\n2. Turn off Casper for a while to simulate LMD Ghost only.\r\n3. Introduce a long-term reorg by  voting to for a very old alternative previously non-winning branch.\r\n\r\n\r\n_Details: Very specific details about the bug. What state must the system be in, what types of messages must be included and in which order, etc_\r\n\r\nI think this is pretty generic, the only condition is a long-term reorg that changes the committees.\r\n\r\nIt may be that the spec provides some type of defense against this, but I was not able to find it after re-reading the spec several times. \r\n\r\nIf some type of protection exist, it needs to be documented. So it may be either a documentation bug or a more fundamental spec issue.\r\n\r\n_Fix: Description of suggested fix if available_\r\n\r\nSeems that committees need to be selected only based on Casper-finalized state.\r\nThis means, that older finalized state needs to be used if newer does not yet exist.\r\n\r\nIt may be that the spec actually does allow multiple alternative committees operating at the same time, that correspond to alternate branches.  If yes, this needs to be explained in the spec.\r\n\r\n\r\nNote: if there is any bounty, please send it to Cancer Discovery fund \r\n\r\nhttp://med.stanford.edu/cancer/about/help/make-a-gift.html\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1776/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1776/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -324,6 +343,50 @@
     "body": "> does one need a check in the source code that specifically reject any new incoming branches older than inactivity leak time?\r\n\r\nSee https://github.com/ethereum/eth2.0-specs/issues/1520",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/626395688/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/1850061162",
+    "html_url": "https://github.com/ethereum/consensus-specs/issues/1776#issuecomment-1850061162",
+    "issue_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1776",
+    "id": 1850061162,
+    "node_id": "IC_kwDOCOoGbc5uRbFq",
+    "user": {
+      "login": "hwwhww",
+      "id": 9263930,
+      "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hwwhww",
+      "html_url": "https://github.com/hwwhww",
+      "followers_url": "https://api.github.com/users/hwwhww/followers",
+      "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+      "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+      "repos_url": "https://api.github.com/users/hwwhww/repos",
+      "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-11T13:16:32Z",
+    "updated_at": "2023-12-11T13:16:32Z",
+    "author_association": "MEMBER",
+    "body": "@dapplion reminded - all clients have implemented weak subjectivity checks to guard against this attack. I'm closing this issue now.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/1850061162/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,

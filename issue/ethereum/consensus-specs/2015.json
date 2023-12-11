@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2020-08-11T16:37:45Z",
-  "updated_at": "2021-07-05T15:02:25Z",
-  "closed_at": null,
+  "updated_at": "2023-12-11T13:24:41Z",
+  "closed_at": "2023-12-11T13:24:41Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "Replace #1974\r\n\r\n## Issue\r\nFor some current phase 0 test cases, the phase 1 custody-reveal-deadlines-slashing is severe if we make `state` forward for a large number of epochs. To fix it naively, it requires adding custody reveals to these tests, which would create large computation overhead and make the simple test generators verbose.\r\n\r\n\r\n## Detailed description\r\n(copied from #1974)\r\nFor example, [`test_process_custody_slashing.py::test_many_epochs_custody`](https://github.com/ethereum/eth2.0-specs/blob/8a2132e65df19643e7c10be93be5451e4eb501aa/tests/core/pyspec/eth2spec/test/phase1/block_processing/test_process_custody_slashing.py#L126) calls [transition_to(spec, state, state.slot + spec.SLOTS_PER_EPOCH * (spec.EPOCHS_PER_CUSTODY_PERIOD - 1))\r\n](https://github.com/ethereum/eth2.0-specs/blob/8a2132e65df19643e7c10be93be5451e4eb501aa/tests/core/pyspec/eth2spec/test/phase1/block_processing/test_process_custody_slashing.py#L95), which would trigger **the epoch processing**. Some validators may get slashed in `process_reveal_deadlines`.\r\n\r\nAnd when we run `process_custody_slashing`, it checks `assert is_slashable_validator(whistleblower, get_current_epoch(state))` and `assert is_slashable_validator(malefactor, get_current_epoch(state))`. The whistleblower and malefactor may have been slashed by `process_reveal_deadlines`, which is not this test case aim to do.\r\n\r\n## Proposed solution\r\nThanks to @djrtwo @dankrad @protolambda for discussing with me. 🙂 \r\n\r\nSimilar to how we handle BLS, we can disable the custody reveal deadline for these test cases optionally.\r\n\r\n- For the running `pytest`: add a pytest option `--disable-reveal-deadline` to flag that it's disabled.\r\n- For the test generator: add meta key-pair `reveal_deadline_setting: int`, where `0` is enabled and `1` is disabled.\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2015/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2015/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 

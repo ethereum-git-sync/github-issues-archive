@@ -40,7 +40,7 @@
       "description": "Presentation (as opposed to content)"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "adiasg",
@@ -113,22 +113,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 12,
-    "closed_issues": 5,
+    "open_issues": 10,
+    "closed_issues": 7,
     "state": "closed",
     "created_at": "2020-08-21T16:23:12Z",
-    "updated_at": "2021-06-07T15:09:56Z",
+    "updated_at": "2023-12-11T13:23:01Z",
     "due_on": null,
     "closed_at": "2021-05-04T14:59:24Z"
   },
-  "comments": 7,
+  "comments": 8,
   "created_at": "2020-06-24T23:19:35Z",
-  "updated_at": "2021-04-16T05:40:10Z",
-  "closed_at": null,
+  "updated_at": "2023-12-11T13:22:30Z",
+  "closed_at": "2023-12-11T13:22:30Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "The specs seem to use different types of signatures for functions. for instance:\r\n\r\nCase 1:\r\n```\r\ndef state_transition(state: BeaconState, signed_block: SignedBeaconBlock, validate_result: bool=True) -> BeaconState:\r\n block = signed_block.message\r\n    # Process slots (including those with no blocks) since block\r\n    process_slots(state, block.slot)\r\n    # Verify signature\r\n    if validate_result:\r\n        assert verify_block_signature(state, signed_block)\r\n    # Process block\r\n    process_block(state, block)\r\n    # Verify state root\r\n    if validate_result:\r\n        assert block.state_root == hash_tree_root(state)\r\n    # Return post-state\r\n    return state\r\n```\r\n\r\nand case 2:\r\n\r\n```\r\ndef process_slots(state: BeaconState, slot: Slot) -> None:\r\n    assert state.slot < slot\r\n    while state.slot < slot:\r\n        process_slot(state)\r\n        # Process epoch on the start slot of the next epoch\r\n        if (state.slot + 1) % SLOTS_PER_EPOCH == 0:\r\n            process_epoch(state)\r\n        state.slot = Slot(state.slot + 1)\r\n```\r\n\r\nIn case 1, it seems redundant to return a `BeaconState` because the `state` variable is passed by reference (I am not Python expert, but AFAIK `state` is mutable and hence passed by reference.) But the fact that the function's return type is a `BeaconState` also gives a false sense of immutability of the input object `state`. The result is actually in `state` (side-effect and in the returned value.\r\n\r\nIn case 2, the mutability of the parameter `state` is used and instead of returning a `state`, `process_slots` modifies `state`, so the result is obtained by a side-effect on input parameter `state` (passed by reference).\r\n\r\n**Main question:** How is the choice of a function signature determined in the specs? \r\nSome functions rely on side-effects, and some may not.\r\n\r\nPython parameters' passing and the interference with local storage is known to be rather cumbersome as described in the additional comment below, so a clear and principled way of specifying functions may help reducing of problems that can arise in implementations.\r\n\r\n**Additional comment**\r\nFor instance (again, I am not a Python expert, so if this is wrong, please correct me), the following code may not have any side-effect on `state` and leave the input parameter (although passed by reference) `state` unchanged:\r\n```\r\nclass BeaconState:\r\n    def __init__(self, slot):\r\n        self.slot = slot\r\n\r\ndef process_slots(state: BeaconState, slot: int) -> None:\r\n    s = BeaconState(0)\r\n    s.slot = state.slot\r\n    # the value of s is the same as the initial value of state\r\n    state = s\r\n    while state.slot < slot:\r\n        state.slot = (state.slot + 1)\r\n\r\n# k is a BeaconState\r\nk = BeaconState(2)\r\nprint (k.slot) # Result is 2\r\nprocess_slots(k, 4)\r\nprint (k.slot) # result is still 2\r\n```\r\n\r\nThe specs may benefit from a clearer definition of the functions (without side-effects).\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1932/reactions",
     "total_count": 5,
@@ -143,7 +162,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1932/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -442,6 +461,50 @@
     "body": "> There are some things which are undesirable in the current version of the pyspec, such as the misleading function signature of `state_transition`, which should be rectified in the coming versions.\r\n\r\nJust wanted to highlight that this should definitely be done. Reading some client code I found it very confusing and then saw that they copied one for one what the spec does. Doesn't look great.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/702857883/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/1850070665",
+    "html_url": "https://github.com/ethereum/consensus-specs/issues/1932#issuecomment-1850070665",
+    "issue_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/1932",
+    "id": 1850070665,
+    "node_id": "IC_kwDOCOoGbc5uRdaJ",
+    "user": {
+      "login": "hwwhww",
+      "id": 9263930,
+      "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hwwhww",
+      "html_url": "https://github.com/hwwhww",
+      "followers_url": "https://api.github.com/users/hwwhww/followers",
+      "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+      "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+      "repos_url": "https://api.github.com/users/hwwhww/repos",
+      "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-11T13:22:30Z",
+    "updated_at": "2023-12-11T13:22:30Z",
+    "author_association": "MEMBER",
+    "body": "closing via #2104",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/comments/1850070665/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
