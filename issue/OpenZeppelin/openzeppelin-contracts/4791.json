@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-12-09T17:58:39Z",
-  "updated_at": "2023-12-09T17:58:39Z",
+  "updated_at": "2023-12-11T12:27:47Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1849977413",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4791#issuecomment-1849977413",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4791",
+    "id": 1849977413,
+    "node_id": "IC_kwDOA9tCBs5uRGpF",
+    "user": {
+      "login": "Amxx",
+      "id": 2432299,
+      "node_id": "MDQ6VXNlcjI0MzIyOTk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2432299?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Amxx",
+      "html_url": "https://github.com/Amxx",
+      "followers_url": "https://api.github.com/users/Amxx/followers",
+      "following_url": "https://api.github.com/users/Amxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Amxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Amxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Amxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/Amxx/orgs",
+      "repos_url": "https://api.github.com/users/Amxx/repos",
+      "events_url": "https://api.github.com/users/Amxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Amxx/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-11T12:25:07Z",
+    "updated_at": "2023-12-11T12:27:47Z",
+    "author_association": "COLLABORATOR",
+    "body": "Hello @SKYBITDev3 \r\n\r\nThe forwarder is set to be immutable for two reasons:\r\n- loading the value from storage (as you propose) is significantly more espensive. It cost 2000 gas to \"warm up\" the slot, and 100 gas per access. Adding +2K gas to all ERC20 / ERC721 transfers is not something we feel like doing.\r\n- moving this value to storage's only value is the ability to update it. This brings advantages (in the case of a bug) but also risks. Moreover, it bring the question of governance. Having the ability to change that value is a tremendous responsability, and developpers should not take this lightly.\r\n\r\nIf a developper wants, its easy for them to create a new `Context` contract and use it in their codebase.\r\n\r\n```\r\nabstract contract ERC2771ContextStorage is ERC2771Context(address(0)) {\r\n    address private _trustedForwarderStorage;\r\n\r\n    constructor(address initialTrustedForwarder) {\r\n        _trustedForwarderStorage = initialTrustedForwarder;\r\n    }\r\n\r\n    function trustedForwarder() public view virtual override returns (address) {\r\n        return _trustedForwarderStorage;\r\n    }\r\n    \r\n    // some custom administration logic.\r\n}\r\n```\r\n\r\nWe are not providing this version because we don't want to create confusion has to which one should be used. We also feel like having an admin that can change the value is to big of a risk to have. In light of the recent events you may disagree.\r\n\r\nOur goal is to remove `Context` at some point. We did not do that in 5.0 because usage of ERC2771 is still very much a thing, particularly on L2s and sidechains. Hopefully Solidity will provide us with a better way to override msg.sender in the future.",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1849977413/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
