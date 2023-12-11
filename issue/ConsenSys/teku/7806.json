@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "courtneyeh",
@@ -55,6 +55,26 @@
     "site_admin": false
   },
   "assignees": [
+    {
+      "login": "lucassaldanha",
+      "id": 1766440,
+      "node_id": "MDQ6VXNlcjE3NjY0NDA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1766440?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/lucassaldanha",
+      "html_url": "https://github.com/lucassaldanha",
+      "followers_url": "https://api.github.com/users/lucassaldanha/followers",
+      "following_url": "https://api.github.com/users/lucassaldanha/following{/other_user}",
+      "gists_url": "https://api.github.com/users/lucassaldanha/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/lucassaldanha/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/lucassaldanha/subscriptions",
+      "organizations_url": "https://api.github.com/users/lucassaldanha/orgs",
+      "repos_url": "https://api.github.com/users/lucassaldanha/repos",
+      "events_url": "https://api.github.com/users/lucassaldanha/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/lucassaldanha/received_events",
+      "type": "User",
+      "site_admin": false
+    },
     {
       "login": "courtneyeh",
       "id": 45641759,
@@ -79,12 +99,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-12-08T13:26:00Z",
-  "updated_at": "2023-12-08T13:38:18Z",
-  "closed_at": null,
+  "updated_at": "2023-12-10T23:52:12Z",
+  "closed_at": "2023-12-10T23:52:12Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "<!-- \r\nBy filing an Issue, you are expected to comply with the Code of Conduct, \r\nincluding treating everyone with respect:\r\nhttps://github.com/Consensys/teku/blob/master/CODE-OF-CONDUCT.md\r\n\r\nNot all sections will apply to all issue types.\r\n-->\r\n\r\n### Description\r\nA follow up to #7793 \r\nDeposit snapshot loading feature in Teku consists of 2 steps\r\n1. Loading. If it's local file it's just read, if it's url we try to download file with header requesting `ssz` by setting type `application/octet-stream`. Support of ssz type is a part of the spec, see: https://github.com/ethereum/beacon-APIs/blob/master/apis/beacon/deposit_snapshot.yaml\r\n2. Reading file. As we download and store it as ssz we expect to read only this type, so we read it as ssz.\r\n\r\nBoth steps are happen in `DepositSnapshotFileLoader` and few other classes it uses.\r\n\r\nThe issue is that since we start to use this feature along with `--checkpoint-sync-url` we are no longer run it only in Teku environment, most public endpoints use another CL-clients which doesn't support ssz output for `DepositTreeSnapshot`. I have checked following public endpoints:\r\n- https://beaconstate.ethstaker.cc\r\n- https://mainnet.checkpoint.sigp.io\r\n- https://sync-mainnet.beaconcha.in\r\n\r\nAll 3 endpoints do not support ssz `application/octet-stream`, only json type is supported.\r\n\r\n\r\nSo to make our feature work as intended, we should add a fallback to json type. It could be done in 2 ways:\r\n1. Simple. In [catch block](https://github.com/ConsenSys/teku/blob/cb15faa048e5330a1cda312953fd003f6369310a/beacon/pow/src/main/java/tech/pegasys/teku/beacon/pow/DepositSnapshotFileLoader.java#L68) of `DepositSnapshotFileLoader` add call to something like loadJsonFromUrl, which should look like (trying to download as json, read as json):\r\n```\r\n  private DepositTreeSnapshot loadFromJsonUrl(final String path) throws IOException {\r\n    final Bytes snapshotData =\r\n        ResourceLoader.urlOrFile()\r\n            .loadBytes(path)\r\n            .orElseThrow(\r\n                () -> new FileNotFoundException(String.format(\"File '%s' not found\", path)));\r\n\r\n    return JsonUtil.parse(new String(snapshotData.toArray(), StandardCharsets.UTF_8), DepositTreeSnapshot.getJsonTypeDefinition());\r\n  }\r\n```\r\nPros of this approach is that we are not only try to download it as json, we will try to read it as json even if local file is provided. Also another `catch (IOException e)` block should be added on failover retry.\r\n2. Read the answer from url and if it has error code 415 `{\"code\":415,\"message\":\"unsupported content-type: application/octet-stream\"}`, try failover. It could be implemented a bit cleaner than 1 but we will get json support only for urls, not for local files \r\n\r\nAlso we may consider not exiting if deposit snapshot is not loaded, we have bundled snapshot, it's not a critical failure, but with failover to json implemented I think we are ok to exit in case of the failure, it should be very rare.\r\n\r\n### Steps to Reproduce (Bug)\r\n```\r\n$ ./teku [...skipped...] --checkpoint-sync-url=https://beaconstate.ethstaker.cc\r\n\r\n[...skipped...]\r\n17:03:02.245 INFO  - Loading deposit tree snapshot from https://beaconstate.ethstaker.cc/eth/v1/beacon/deposit_snapshot\r\n17:03:02.249 INFO  - Syncing     *** Target slot: 7934713, Head slot: 7934592, Remaining slots: 121, Connected peers: 0\r\n17:03:02.253 ERROR - Execution Client request failed. Make sure the Execution Client is online and can respond to requests.\r\nFailed to load deposit tree snapshot from https://beaconstate.ethstaker.cc/eth/v1/beacon/deposit_snapshot: File 'https://beaconstate.ethstaker.cc/eth/v1/beacon/deposit_snapshot' not found\r\n\r\nTo display full help:\r\nteku [COMMAND] --help\r\n\r\n> Task :teku:Teku.main() FAILED\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "lucassaldanha",
+    "id": 1766440,
+    "node_id": "MDQ6VXNlcjE3NjY0NDA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1766440?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lucassaldanha",
+    "html_url": "https://github.com/lucassaldanha",
+    "followers_url": "https://api.github.com/users/lucassaldanha/followers",
+    "following_url": "https://api.github.com/users/lucassaldanha/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lucassaldanha/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lucassaldanha/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lucassaldanha/subscriptions",
+    "organizations_url": "https://api.github.com/users/lucassaldanha/orgs",
+    "repos_url": "https://api.github.com/users/lucassaldanha/repos",
+    "events_url": "https://api.github.com/users/lucassaldanha/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lucassaldanha/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/7806/reactions",
     "total_count": 0,
@@ -99,7 +138,7 @@
   },
   "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7806/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
