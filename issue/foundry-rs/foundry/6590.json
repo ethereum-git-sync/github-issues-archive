@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6590",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6590/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6590/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6590/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6590",
+  "id": 2038639213,
+  "node_id": "I_kwDOGBlvNc55gypt",
+  "number": 6590,
+  "title": "feat(forge): `meterTxGas` cheatcode",
+  "user": {
+    "login": "emo-eth",
+    "id": 6371847,
+    "node_id": "MDQ6VXNlcjYzNzE4NDc=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6371847?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/emo-eth",
+    "html_url": "https://github.com/emo-eth",
+    "followers_url": "https://api.github.com/users/emo-eth/followers",
+    "following_url": "https://api.github.com/users/emo-eth/following{/other_user}",
+    "gists_url": "https://api.github.com/users/emo-eth/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/emo-eth/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/emo-eth/subscriptions",
+    "organizations_url": "https://api.github.com/users/emo-eth/orgs",
+    "repos_url": "https://api.github.com/users/emo-eth/repos",
+    "events_url": "https://api.github.com/users/emo-eth/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/emo-eth/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-12T22:25:26Z",
+  "updated_at": "2023-12-12T22:34:47Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\nAs [suggested](https://github.com/foundry-rs/foundry/issues/6578#issuecomment-1851437216) by @Vectorized, Forge should have a cheatcode with signatures `meterTxGas()` and `meterTxGas(AccessList[] memory)` for accurately measuring how much real-world gas a transaction would use. Currently, gas reporting is misleading for a [number](https://github.com/foundry-rs/foundry/pull/5852) of [reasons](https://github.com/foundry-rs/foundry/issues/6578).\r\n\r\n### Additional context\r\n\r\nReal-world gas metering is hard in Forge because tests are executed in the context of a single transaction. Execution of test setup marks accounts and storage slots as \"warm,\" in addition to affecting gas refund logic by changing \"starting\" storage slot values.\r\n\r\n### Background \r\nThe `pause/resumeGasMetering` cheatcodes affect reported gas by [caching a copy of the interpreter's `Gas` struct when paused](https://github.com/foundry-rs/foundry/blob/e972bf70412e51b1e15041341f7c29725bb6ac17/crates/cheatcodes/src/inspector.rs#L321) and [writing it back to the interpreter with each step.](https://github.com/foundry-rs/foundry/blob/e972bf70412e51b1e15041341f7c29725bb6ac17/crates/cheatcodes/src/inspector.rs#L367). On resume, the cached copy is deleted and the interpreter's `gas` member is left to proceed as normal.\r\n\r\nAfter execution, [`gas_refunded` is subtracted from `gas`,](https://github.com/foundry-rs/foundry/blob/388e181c50c9313ca8cfe2c4f413397100dd1ce7/crates/evm/core/src/utils.rs#L282) and even farther down the line, an extra [\"stipend\"](https://github.com/foundry-rs/foundry/blob/8a31bf1ec2fb386e5441ee2a629b0c12b4433aed/crates/evm/evm/src/executors/mod.rs#L754) (the 21000 + calldata costs of invoking the forge test) is subtracted from the reported number.\r\n\r\n### Approaches\r\n\r\nAfter invoking the cheatcode, the interpreter's `Gas` struct can be reset. The overall \"stipend\" can be calculated by adding 21000 + the calldata cost of the next external call seen by the EVM.\r\n\r\nAfter that, I see two obvious ways to account for differences in gas costs and refunds:\r\n\r\n- Add functionality to `revm` (which Forge can then use) to mark [accounts](https://github.com/bluealloy/revm/blob/e802930cf3be9e773d008203665af9005f14dc2d/crates/revm/src/journaled_state.rs#L542) and [storage](https://github.com/bluealloy/revm/blob/e802930cf3be9e773d008203665af9005f14dc2d/crates/revm/src/journaled_state.rs#L606) [slots](https://github.com/bluealloy/revm/blob/e802930cf3be9e773d008203665af9005f14dc2d/crates/revm/src/journaled_state.rs#L648) in `JournaledState` as cold, and to [override slots' \"original\" values](https://github.com/bluealloy/revm/blob/aa5667764890bc554ea6392ea1e84e3e1991be6d/crates/primitives/src/state.rs#L142)\r\n\t- this may have unintended consequences on the overall state transition\r\n\t- as a separate project, changes that benefit Foundry might not be in revm's best interest\r\n- Track which accounts and storage slots have been accessed + changed since invoking the cheatcode, and do manual gas+refund accounting on the interpreter's `Gas` struct during execution. Similar to #5852's approach, but more comprehensive. See also [`forge-gas-metering`](https://github.com/emo-eth/forge-gas-metering/blob/temp-accounting/src/AccessAccounting.sol#L159) for a similar WIP in Solidity.\r\n\t- adds a lot of overhead both in complexity and execution\r\n\r\nAfter execution, the test runner should at least report calldata portion of the stipend in addition to execution costs.\r\n\r\n### Note\r\n\r\nSupporting many different EVM execution environments or hard forks may require a lot of extra configuration, which should be considered.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6590/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6590/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
