@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6180",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6180/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6180/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6180/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/6180",
+  "id": 2037578762,
+  "node_id": "I_kwDOCD5_Gc55cvwK",
+  "number": 6180,
+  "title": "Eventstream API fallback support",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4754137758,
+      "node_id": "LA_kwDOCD5_Gc8AAAABG15ing",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-feature-request",
+      "name": "meta-feature-request",
+      "color": "B5CF5F",
+      "default": false,
+      "description": "Issues to track feature requests."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-12T11:44:10Z",
+  "updated_at": "2023-12-12T11:45:30Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Problem description\r\n\r\nThe current implementation of [eventstream](https://ethereum.github.io/beacon-APIs/#/Events/eventstream) does not support fallback beacon nodes. \r\n\r\nOnly the URL of the primary node is used\r\nhttps://github.com/ChainSafe/lodestar/blob/959a8af1b757c46a0e57450788fb72773a372608/packages/api/src/beacon/client/index.ts#L31\r\n\r\nThis means if primary node is down, the validator client will stop receiving head events which are currently used to detect reorgs and to prevent querying beacon node for block root when producing sync committe messages\r\nhttps://github.com/ChainSafe/lodestar/blob/959a8af1b757c46a0e57450788fb72773a372608/packages/validator/src/services/attestationDuties.ts#L62\r\nhttps://github.com/ChainSafe/lodestar/blob/959a8af1b757c46a0e57450788fb72773a372608/packages/validator/src/services/syncCommittee.ts#L126\r\nNot detecting dependent root changes might lead to missed attestation duties.\r\n\r\n### Solution description\r\n\r\nEventstream API should support fallback beacon nodes\r\n- if primary node does not have any issue only open one eventstream\r\n- if primary node has an error that is recoverable e.g. not status 400 or 500 then open eventstream with secondary node\r\n- if second has an error then open eventstream with third node, and so on\r\n- the eventstream to primary node should never be closed, if at some point it does not error then swap back to only using primary node and close all fallback eventstream connections\r\n\r\n### Additional context\r\n\r\n_No response_",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6180/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6180/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
