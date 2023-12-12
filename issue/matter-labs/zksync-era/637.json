@@ -40,21 +40,40 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-12-08T08:00:42Z",
-  "updated_at": "2023-12-08T08:46:43Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2023-12-12T15:20:11Z",
+  "closed_at": "2023-12-12T15:20:11Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### 🐛 Bug Report\r\n\r\n#### 📝 Description\r\n\r\nTry to setup a dev environment using `zksync-cli`.\r\n\r\n#### 🔄 Reproduction Steps\r\n\r\n```\r\n❯ npx zksync-cli dev config\r\n? Node type to use Dockerized node\r\n? Additional modules to use (Press <space> to select, <a> to toggle all, <i> to invert selection, and <enter> to proceed)\r\n ◯ Portal - DApp with Wallet and Bridge functionality\r\n❯◯ Block Explorer - zkSync block explorer UI and API\r\n\r\n❯ npx zksync-cli dev start\r\n```\r\n\r\n```\r\n❯ docker image ls\r\nREPOSITORY              TAG         IMAGE ID       CREATED        SIZE\r\nmatterlabs/local-node   latest2.0   944842ed4d32   10 days ago    3.14GB\r\n```\r\n\r\nLooking at the logs of `matterlabs/local-node:latest2.0` , I see:\r\n```\r\n[…]\r\nCONTRACTS_L1_ERC20_BRIDGE_PROXY_ADDR=0x57Ff05Fa631c446d181498df8Ac4A3CdAFCc5a76\r\nError: TypeError: Cannot read properties of undefined (reading 'address')\r\n    at Deployer.<anonymous> (/contracts/ethereum/src.ts/deploy.ts:318:92)\r\n    at step (/contracts/ethereum/src.ts/deploy.ts:33:23)\r\n    at Object.next (/contracts/ethereum/src.ts/deploy.ts:14:53)\r\n    at /contracts/ethereum/src.ts/deploy.ts:8:71\r\n    at new Promise (<anonymous>)\r\n    at __awaiter (/contracts/ethereum/src.ts/deploy.ts:4:12)\r\n    at Deployer.deployWethBridgeImplementation (/contracts/ethereum/src.ts/deploy.ts:390:16)\r\n    at Deployer.<anonymous> (/contracts/ethereum/src.ts/deploy.ts:439:16)\r\n    at step (/contracts/ethereum/src.ts/deploy.ts:33:23)\r\n    at Object.next (/contracts/ethereum/src.ts/deploy.ts:14:53)\r\n^Merror Command failed with exit code 1.\r\ninfo Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.\r\nSkip contract verification on localhost\r\n\r\n[…]\r\n\r\n> Initializing governance\r\n$ ts-node scripts/initialize-governance.ts\r\nUsing deployer wallet: 0x52312AD6f01657413b2eaE9287f6B9ADaD93D5FE\r\nUsing gas price: 1.000003115 gwei\r\nError: <ref *1> Error: cannot estimate gas; transaction may fail or may require manual gas limit [ See: https://links.ethers.org/v5-errors-UNP\r\nREDICTABLE_GAS_LIMIT ] (error={\"reason\":\"execution reverted\",\"code\":\"UNPREDICTABLE_GAS_LIMIT\",\"method\":\"estimateGas\",\"transaction\":{\"from\":\"0x\r\n52312AD6f01657413b2eaE9287f6B9ADaD93D5FE\",\"maxPriorityFeePerGas\":{\"type\":\"BigNumber\",\"hex\":\"0x59682f00\"},\"maxFeePerGas\":{\"type\":\"BigNumber\",\"h\r\nex\":\"0x596841a4\"},\"to\":\"0x5E6D086F5eC079ADFF4FB3774CDf3e8D6a34F7E9\",\"data\":\"0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156b960\r\n5e4f8277\",\"type\":2,\"accessList\":null},\"error\":{\"reason\":\"processing response error\",\"code\":\"SERVER_ERROR\",\"body\":\"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"id\\\":\r\n89,\\\"error\\\":{\\\"code\\\":-32000,\\\"message\\\":\\\"execution reverted\\\"}}\\n\",\"error\":{\"code\":-32000},\"requestBody\":\"{\\\"method\\\":\\\"eth_estimateGas\\\",\\\r\n\"params\\\":[{\\\"type\\\":\\\"0x2\\\",\\\"maxFeePerGas\\\":\\\"0x596841a4\\\",\\\"maxPriorityFeePerGas\\\":\\\"0x59682f00\\\",\\\"from\\\":\\\"0x52312ad6f01657413b2eae9287f6\r\nb9adad93d5fe\\\",\\\"to\\\":\\\"0x5e6d086f5ec079adff4fb3774cdf3e8d6a34f7e9\\\",\\\"data\\\":\\\"0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156\r\nb9605e4f8277\\\"}],\\\"id\\\":89,\\\"jsonrpc\\\":\\\"2.0\\\"}\",\"requestMethod\":\"POST\",\"url\":\"http://geth:8545\"}}, tx={\"data\":\"0x8f28397000000000000000000000\r\n0000b8a8ee67b0bee0832ef8a83ad156b9605e4f8277\",\"to\":{},\"from\":\"0x52312AD6f01657413b2eaE9287f6B9ADaD93D5FE\",\"type\":2,\"maxFeePerGas\":{\"type\":\"Big\r\nNumber\",\"hex\":\"0x596841a4\"},\"maxPriorityFeePerGas\":{\"type\":\"BigNumber\",\"hex\":\"0x59682f00\"},\"nonce\":{},\"gasLimit\":{},\"chainId\":{}}, code=UNPRED\r\nICTABLE_GAS_LIMIT, version=abstract-signer/5.7.0)\r\n    at Logger.makeError (/contracts/ethereum/node_modules/@ethersproject/logger/src.ts/index.ts:269:28)\r\n    at Logger.throwError (/contracts/ethereum/node_modules/@ethersproject/logger/src.ts/index.ts:281:20)\r\n    at /contracts/ethereum/node_modules/@ethersproject/abstract-signer/src.ts/index.ts:301:31\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at async Promise.all (index 7) {\r\n  reason: 'cannot estimate gas; transaction may fail or may require manual gas limit',\r\n  code: 'UNPREDICTABLE_GAS_LIMIT',\r\n  error: Error: cannot estimate gas; transaction may fail or may require manual gas limit [ See: https://links.ethers.org/v5-errors-UNPREDICTA\r\nBLE_GAS_LIMIT ] (reason=\"execution reverted\", method=\"estimateGas\", transaction={\"from\":\"0x52312AD6f01657413b2eaE9287f6B9ADaD93D5FE\",\"maxPriorityFeePerGas\":{\"type\":\"BigNumber\",\"hex\":\"0x59682f00\"},\"maxFeePerGas\":{\"type\":\"BigNumber\",\"hex\":\"0x596841a4\"},\"to\":\"0x5E6D086F5eC079ADFF4FB3774CDf3e8D6a34F7E9\",\"data\":\"0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156b9605e4f8277\",\"type\":2,\"accessList\":null}, error={\"reason\":\"processing response error\",\"code\":\"SERVER_ERROR\",\"body\":\"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"id\\\":89,\\\"error\\\":{\\\"code\\\":-32000,\\\"message\\\":\\\"execution reverted\\\"}}\\n\",\"error\":{\"code\":-32000},\"requestBody\":\"{\\\"method\\\":\\\"eth_estimateGas\\\",\\\"params\\\":[{\\\"type\\\":\\\"0x2\\\",\\\"maxFeePerGas\\\":\\\"0x596841a4\\\",\\\"maxPriorityFeePerGas\\\":\\\"0x59682f00\\\",\\\"from\\\":\\\"0x52312ad6f01657413b2eae9287f6b9adad93d5fe\\\",\\\"to\\\":\\\"0x5e6d086f5ec079adff4fb3774cdf3e8d6a34f7e9\\\",\\\"data\\\":\\\"0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156b9605e4f8277\\\"}],\\\"id\\\":89,\\\"jsonrpc\\\":\\\"2.0\\\"}\",\"requestMethod\":\"POST\",\"url\":\"http://geth:8545\"}, code=UNPREDICTABLE_GAS_LIMIT, version=providers/5.7.2)\r\n      at Logger.makeError (/contracts/ethereum/node_modules/@ethersproject/logger/src.ts/index.ts:269:28)\r\n      at Logger.throwError (/contracts/ethereum/node_modules/@ethersproject/logger/src.ts/index.ts:281:20)\r\n      at checkError (/contracts/ethereum/node_modules/@ethersproject/providers/src.ts/json-rpc-provider.ts:78:20)\r\n      at JsonRpcProvider.<anonymous> (/contracts/ethereum/node_modules/@ethersproject/providers/src.ts/json-rpc-provider.ts:642:20)\r\n      at step (/contracts/ethereum/node_modules/@ethersproject/providers/lib/json-rpc-provider.js:48:23)\r\n      at Object.throw (/contracts/ethereum/node_modules/@ethersproject/providers/lib/json-rpc-provider.js:29:53)\r\n      at rejected (/contracts/ethereum/node_modules/@ethersproject/providers/lib/json-rpc-provider.js:21:65)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5) {\r\n    reason: 'execution reverted',\r\n    code: 'UNPREDICTABLE_GAS_LIMIT',\r\n    code: 'UNPREDICTABLE_GAS_LIMIT',\r\n    method: 'estimateGas',\r\n    transaction: {\r\n      from: '0x52312AD6f01657413b2eaE9287f6B9ADaD93D5FE',\r\n      maxPriorityFeePerGas: [BigNumber],\r\n      maxFeePerGas: [BigNumber],\r\n      to: '0x5E6D086F5eC079ADFF4FB3774CDf3e8D6a34F7E9',\r\n      data: '0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156b9605e4f8277',\r\n      type: 2,\r\n      accessList: null\r\n    },\r\n    error: Error: processing response error (body=\"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"id\\\":89,\\\"error\\\":{\\\"code\\\":-32000,\\\"message\\\":\\\"execution reverted\\\"}}\\n\", error={\"code\":-32000}, requestBody=\"{\\\"method\\\":\\\"eth_estimateGas\\\",\\\"params\\\":[{\\\"type\\\":\\\"0x2\\\",\\\"maxFeePerGas\\\":\\\"0x596841a4\\\",\\\"maxPriorityFeePerGas\\\":\\\"0x59682f00\\\",\\\"from\\\":\\\"0x52312ad6f01657413b2eae9287f6b9adad93d5fe\\\",\\\"to\\\":\\\"0x5e6d086f5ec079adff4fb3774cdf3e8d6a34f7e9\\\",\\\"data\\\":\\\"0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156b9605e4f8277\\\"}],\\\"id\\\":89,\\\"jsonrpc\\\":\\\"2.0\\\"}\", requestMethod=\"POST\", url=\"http://geth:8545\", code=SERVER_ERROR, version=web/5.7.1)\r\n        at Logger.makeError (/contracts/ethereum/node_modules/@ethersproject/logger/src.ts/index.ts:269:28)\r\n        at Logger.throwError (/contracts/ethereum/node_modules/@ethersproject/logger/src.ts/index.ts:281:20)\r\n        at /contracts/ethereum/node_modules/@ethersproject/web/src.ts/index.ts:341:28\r\n        at step (/contracts/ethereum/node_modules/@ethersproject/web/lib/index.js:33:23)\r\n        at Object.next (/contracts/ethereum/node_modules/@ethersproject/web/lib/index.js:14:53)\r\n        at fulfilled (/contracts/ethereum/node_modules/@ethersproject/web/lib/index.js:5:58)\r\n        at processTicksAndRejections (node:internal/process/task_queues:95:5) {\r\n      reason: 'processing response error',\r\n      code: 'SERVER_ERROR',\r\n      body: '{\"jsonrpc\":\"2.0\",\"id\":89,\"error\":{\"code\":-32000,\"message\":\"execution reverted\"}}\\n',\r\n      error: [Error],\r\n      requestBody: '{\"method\":\"eth_estimateGas\",\"params\":[{\"type\":\"0x2\",\"maxFeePerGas\":\"0x596841a4\",\"maxPriorityFeePerGas\":\"0x59682f00\",\"from\":\"0x52312ad6f01657413b2eae9287f6b9adad93d5fe\",\"to\":\"0x5e6d086f5ec079adff4fb3774cdf3e8d6a34f7e9\",\"data\":\"0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156b9605e4f8277\"}],\"id\":89,\"jsonrpc\":\"2.0\"}',\r\n      requestMethod: 'POST',\r\n      url: 'http://geth:8545'\r\n    }\r\n  },\r\n  tx: {\r\n    data: '0x8f283970000000000000000000000000b8a8ee67b0bee0832ef8a83ad156b9605e4f8277',\r\n    to: Promise { '0x5E6D086F5eC079ADFF4FB3774CDf3e8D6a34F7E9' },\r\n    from: '0x52312AD6f01657413b2eaE9287f6B9ADaD93D5FE',\r\n    type: 2,\r\n    maxFeePerGas: BigNumber { _hex: '0x596841a4', _isBigNumber: true },\r\n    maxPriorityFeePerGas: BigNumber { _hex: '0x59682f00', _isBigNumber: true },\r\n    nonce: Promise { 22 },\r\n    gasLimit: Promise { <rejected> [Circular *1] },\r\n    chainId: Promise { 9 }\r\n  }\r\n}\r\n^Merror Command failed with exit code 1.\r\n✔ Initializing governance done (6336ms)\r\nDone in 92.44s.\r\nyarn run v1.22.21\r\n$ node build/index.js f yarn --cwd /infrastructure/local-setup-preparation start\r\n$ ts-node ./src/index.ts\r\n/infrastructure/local-setup-preparation/node_modules/ts-node/src/index.ts:859\r\n    return new TSError(diagnosticText, diagnosticCodes, diagnostics);\r\n           ^\r\nTSError: ⨯ Unable to compile TypeScript:\r\nsrc/index.ts:14:10 - error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\r\n\r\n14     if (!process.env.CONTRACTS_DIAMOND_PROXY_ADDR) {\r\n            ~~~~~~~\r\nsrc/index.ts:22:42 - error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\r\n\r\n22     const contract = new ethers.Contract(process.env.CONTRACTS_DIAMOND_PROXY_ADDR, utils.ZKSYNC_MAIN_ABI, ethProvider);\r\n                                            ~~~~~~~\r\nsrc/index.ts:31:46 - error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.\r\n\r\n31         const contract = new ethers.Contract(process.env.CONTRACTS_DIAMOND_PROXY_ADDR, utils.ZKSYNC_MAIN_ABI, wallet);\r\n                                                ~~~~~~~\r\n\r\n    at createTSError (/infrastructure/local-setup-preparation/node_modules/ts-node/src/index.ts:859:12)\r\n    at reportTSError (/infrastructure/local-setup-preparation/node_modules/ts-node/src/index.ts:863:19)\r\n    at getOutput (/infrastructure/local-setup-preparation/node_modules/ts-node/src/index.ts:1077:36)\r\n    at Object.compile (/infrastructure/local-setup-preparation/node_modules/ts-node/src/index.ts:1433:41)\r\n    at Module.m._compile (/infrastructure/local-setup-preparation/node_modules/ts-node/src/index.ts:1617:30)\r\n    at Module._extensions..js (node:internal/modules/cjs/loader:1310:10)\r\n    at Object.require.extensions.<computed> [as .ts] (/infrastructure/local-setup-preparation/node_modules/ts-node/src/index.ts:1621:12)\r\n    at Module.load (node:internal/modules/cjs/loader:1119:32)\r\n    at Function.Module._load (node:internal/modules/cjs/loader:960:12)\r\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:81:12) {\r\n  diagnosticCodes: [ 2580, 2580, 2580 ]\r\n}\r\nerror Command failed with exit code 1.\r\ninfo Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.\r\nerror Command failed with exit code 1.\r\ninfo Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.\r\n```\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "haraldh",
+    "id": 427825,
+    "node_id": "MDQ6VXNlcjQyNzgyNQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/427825?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/haraldh",
+    "html_url": "https://github.com/haraldh",
+    "followers_url": "https://api.github.com/users/haraldh/followers",
+    "following_url": "https://api.github.com/users/haraldh/following{/other_user}",
+    "gists_url": "https://api.github.com/users/haraldh/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/haraldh/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/haraldh/subscriptions",
+    "organizations_url": "https://api.github.com/users/haraldh/orgs",
+    "repos_url": "https://api.github.com/users/haraldh/repos",
+    "events_url": "https://api.github.com/users/haraldh/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/haraldh/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/637/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/637/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -100,10 +119,54 @@
     },
     "created_at": "2023-12-08T08:46:31Z",
     "updated_at": "2023-12-08T08:46:31Z",
-    "author_association": "NONE",
+    "author_association": "CONTRIBUTOR",
     "body": "```\r\n❯ docker image ls\r\nREPOSITORY              TAG         IMAGE ID       CREATED        SIZE\r\nmatterlabs/local-node   latest2.0   944842ed4d32   10 days ago    3.14GB\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1846781646/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1852248152",
+    "html_url": "https://github.com/matter-labs/zksync-era/issues/637#issuecomment-1852248152",
+    "issue_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/637",
+    "id": 1852248152,
+    "node_id": "IC_kwDOI-FneM5uZxBY",
+    "user": {
+      "login": "haraldh",
+      "id": 427825,
+      "node_id": "MDQ6VXNlcjQyNzgyNQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/427825?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/haraldh",
+      "html_url": "https://github.com/haraldh",
+      "followers_url": "https://api.github.com/users/haraldh/followers",
+      "following_url": "https://api.github.com/users/haraldh/following{/other_user}",
+      "gists_url": "https://api.github.com/users/haraldh/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/haraldh/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/haraldh/subscriptions",
+      "organizations_url": "https://api.github.com/users/haraldh/orgs",
+      "repos_url": "https://api.github.com/users/haraldh/repos",
+      "events_url": "https://api.github.com/users/haraldh/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/haraldh/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-12T15:19:53Z",
+    "updated_at": "2023-12-12T15:19:53Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "https://hub.docker.com/layers/matterlabs/local-node/latest2.0/images/sha256-f6c21f9db5cbb5c04783e9aaa460d7ef7f1315859fe826946e980072cecc286c?context=explore\r\n\r\nseems to work now! Thank you!",
+    "reactions": {
+      "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/comments/1852248152/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
