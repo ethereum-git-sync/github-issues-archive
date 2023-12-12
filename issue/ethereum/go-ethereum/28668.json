@@ -40,7 +40,7 @@
       "description": null
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-12-12T06:23:19Z",
-  "updated_at": "2023-12-12T06:41:21Z",
-  "closed_at": null,
+  "updated_at": "2023-12-12T13:40:52Z",
+  "closed_at": "2023-12-12T13:40:52Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "# Rationale\r\nAs a user, I would assume that specifying flags would overwrite the config files. While this is true for most flags, the behavior is the opposite for `http.addr` and `ws.addr`. Here's an example:\r\n\r\nconfig.toml\r\n```\r\n[Node]\r\nHTTPHost = \"127.0.0.1\"\r\nWSHost = \"127.0.0.1\"\r\n```\r\n\r\nCommand:\r\n```\r\n./geth --datadir node --mainnet --http --http.addr 0.0.0.0 --ws --ws.addr 0.0.0.0\r\n```\r\n\r\nExpected output:\r\n```bash\r\n...\r\nINFO [12-12|14:17:21.325] HTTP server started                      endpoint=[::]:8545 auth=false prefix= cors= vhosts=localhost\r\nINFO [12-12|14:17:21.326] WebSocket enabled                        url=ws://[::]:8546\r\n...\r\n```\r\n\r\nActual output:\r\n```bash\r\n...\r\nINFO [12-12|14:16:47.073] HTTP server started                      endpoint=127.0.0.1:8545 auth=false prefix= cors= vhosts=localhost\r\nINFO [12-12|14:16:47.073] WebSocket enabled                        url=ws://127.0.0.1:8546\r\n...\r\n```\r\n\r\n# Implementation\r\nJust remove the empty check for the address. For example:\r\n\r\n```go\r\n// Before\r\nfunc setHTTP(ctx *cli.Context, cfg *node.Config) {\r\n\tif ctx.Bool(HTTPEnabledFlag.Name) && cfg.HTTPHost == \"\" {\r\n\t\tcfg.HTTPHost = \"127.0.0.1\"\r\n\t\tif ctx.IsSet(HTTPListenAddrFlag.Name) {\r\n\t\t\tcfg.HTTPHost = ctx.String(HTTPListenAddrFlag.Name)\r\n\t\t}\r\n\t}\r\n        ...\r\n\r\n\r\n// After\r\nfunc setHTTP(ctx *cli.Context, cfg *node.Config) {\r\n\tif ctx.Bool(HTTPEnabledFlag.Name) {\r\n\t\tcfg.HTTPHost = \"127.0.0.1\"\r\n\t\tif ctx.IsSet(HTTPListenAddrFlag.Name) {\r\n\t\t\tcfg.HTTPHost = ctx.String(HTTPListenAddrFlag.Name)\r\n\t\t}\r\n\t}\r\n```\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fjl",
+    "id": 6915,
+    "node_id": "MDQ6VXNlcjY5MTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6915?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fjl",
+    "html_url": "https://github.com/fjl",
+    "followers_url": "https://api.github.com/users/fjl/followers",
+    "following_url": "https://api.github.com/users/fjl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fjl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fjl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fjl/subscriptions",
+    "organizations_url": "https://api.github.com/users/fjl/orgs",
+    "repos_url": "https://api.github.com/users/fjl/repos",
+    "events_url": "https://api.github.com/users/fjl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fjl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28668/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28668/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
