@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28673",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28673/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28673/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28673/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28673",
+  "id": 2038444969,
+  "node_id": "I_kwDOAOvK9855gDOp",
+  "number": 28673,
+  "title": "bug: history.transactions flag not honored during resync (keeping ancients)",
+  "user": {
+    "login": "ryanschneider",
+    "id": 53520,
+    "node_id": "MDQ6VXNlcjUzNTIw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/53520?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ryanschneider",
+    "html_url": "https://github.com/ryanschneider",
+    "followers_url": "https://api.github.com/users/ryanschneider/followers",
+    "following_url": "https://api.github.com/users/ryanschneider/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ryanschneider/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ryanschneider/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ryanschneider/subscriptions",
+    "organizations_url": "https://api.github.com/users/ryanschneider/orgs",
+    "repos_url": "https://api.github.com/users/ryanschneider/repos",
+    "events_url": "https://api.github.com/users/ryanschneider/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ryanschneider/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-12T19:45:49Z",
+  "updated_at": "2023-12-12T19:45:49Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: `1.13.5`\r\nCL client & version: `teku v23.11.0`\r\nOS & Version: Linux\r\n\r\n#### Expected behaviour\r\n\r\nAfter using `geth removedb` (and choosing `n` on deleting ancients) and restarting, the node should resync and honor the value of `--history.transactions 0`.\r\n\r\n#### Actual behaviour\r\n\r\nAfter using `geth removedb` (and choosing `n` on deleting ancients) and restarting, the node resyncs but seems to only index \"recent\" transactions.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\n- Sync a node to head (I've tested reproduced on both 1.13.5 and 1.13.1 using both leveldb and pebble/PBSS)\r\n  - relevant arguments: \r\n\r\n```\r\n/usr/bin/geth --mainnet --syncmode full --db.engine=leveldb --history.transactions 0 --snapshot=true --datadir /mnt/local/ethereum\r\n```\r\n\r\n- Stop the node\r\n- Run `geth removedb`\r\n- Choose `y` for deleting full node state, `n` for ancients as shown below:\r\n\r\n```\r\n$ sudo -u geth geth removedb --db.engine=leveldb --datadir /mnt/local/ethereum\r\nINFO [12-12|00:26:24.953] Maximum peer count                       ETH=50 LES=0 total=50\r\nINFO [12-12|00:26:24.955] Smartcard socket not found, disabling    err=\"stat /run/pcscd/pcscd.comm: no such file or directory\"\r\nINFO [12-12|00:26:24.956] Using leveldb as db engine\r\nINFO [12-12|00:26:24.958] Global gas cap set to 10x block gas limit\r\nINFO [12-12|00:26:24.959] Initializing the KZG library             backend=gokzg\r\nRemove full node state database (/mnt/local/ethereum/geth/chaindata)? [y/n] y\r\nRemove full node state database (/mnt/local/ethereum/geth/chaindata)? [y/n] y\r\nINFO [12-12|00:26:57.218] Database successfully deleted            path=/mnt/local/ethereum/geth/chaindata elapsed=26.749s\r\nRemove full node ancient database (/mnt/local/ethereum/geth/chaindata/ancient)? [y/n] n\r\nRemove full node ancient database (/mnt/local/ethereum/geth/chaindata/ancient)? [y/n] n\r\nINFO [12-12|00:27:06.826] Database deletion skipped                path=/mnt/local/ethereum/geth/chaindata/ancient\r\nINFO [12-12|00:27:06.827] Light node database missing              path=/mnt/local/ethereum/geth/lightchaindata\r\n```\r\n\r\n- Restart the node\r\n- Wait \"overnight\" while node resyncs\r\n- Eventually Node is synced to head\r\n- Try retrieving an older tx, e.g.: https://etherscan.io/tx/0xa243c78518ea5b6ebdccb61f54f3f87f44e84b7c028560386196e6bc77de37dd\r\n\r\n```\r\n$ sudo geth attach /mnt/local/ethereum/geth.ipc\r\nWelcome to the Geth JavaScript console!\r\n\r\ninstance: Geth/v1.13.5-omnibus-62a11504/linux-amd64/go1.21.4\r\nat block: 18771040 (Tue Dec 12 2023 15:36:59 GMT+0000 (UTC))\r\n datadir: /mnt/local/ethereum\r\n modules: admin:1.0 debug:1.0 engine:1.0 eth:1.0 miner:1.0 net:1.0 rpc:1.0 txpool:1.0 web3:1.0\r\n\r\nTo exit, press ctrl-d or type exit\r\n> eth.getTransaction(\"0xa243c78518ea5b6ebdccb61f54f3f87f44e84b7c028560386196e6bc77de37dd\")\r\nnull\r\n```\r\n\r\nFurthermore, I scanned the logs for `Indexing transactions` and never had any hits, so as far as I can tell `rawdb.indexTransactions` never runs.\r\n\r\nI'm trying again now w/o using the ancients, and it _seems_ to be working, but I won't know for certain until it fully syncs again.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28673/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28673/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
