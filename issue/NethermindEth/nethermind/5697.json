@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "rubo",
@@ -179,12 +179,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2023-05-15T14:34:45Z",
-  "updated_at": "2023-05-15T14:34:47Z",
-  "closed_at": null,
+  "updated_at": "2023-12-14T18:11:20Z",
+  "closed_at": "2023-12-14T18:11:20Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "**Description**\r\nOn Windows Server 2022 we noticed that we have Invalid Blocks after state creation with SnapSync.\r\nAfter long investigation by @Demuirgos and @smartprogrammer93 they noticed deprecated msvcrt installation (correct me if I'm wrong).\r\n\r\nAfter some discussion few solutions are being proposed:\r\n1. not silencing dependency loading errors. if something is crucial and couldn't be loaded there should be an explicit error indicating that. in this case, throwing DllNotFoundException. this is the case when immediate failure is the right thing to do. otherwise, it leads to an app misbehavior that is hard to identify.\r\n2. the underlying problem with msvc runtime is because of the rust compiler (the lib is in rust) that looks for a hardcoded file name while the file name can be different and it's up to its vendor (microsoft) to handle that. this said, there are two options for addressing it:\r\n       a. do nothing. this issue is an edge case. almost all modern versions of windows have the file rust is looking for. so i'm not sure whether it's even worth bloating readme with this. maybe somewhere in the docs only given no user complained about that so far (did they?)\r\n       b. statically link msvcrt. that's an undesired and potentially problematic approach, and the drawbacks outweigh the benefits given our other native dependencies need some version of msvcrt as well\r\n3. Dynamic resolution for this dll, so when it doesn't found one we can try finding the other\r\n\r\nOpening this issue to discuss some implementation details and how to deal with some missing dlls because those may allow us to proceed with syncing but can destroy node later.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "rubo",
+    "id": 337518,
+    "node_id": "MDQ6VXNlcjMzNzUxOA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/337518?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rubo",
+    "html_url": "https://github.com/rubo",
+    "followers_url": "https://api.github.com/users/rubo/followers",
+    "following_url": "https://api.github.com/users/rubo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rubo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rubo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rubo/subscriptions",
+    "organizations_url": "https://api.github.com/users/rubo/orgs",
+    "repos_url": "https://api.github.com/users/rubo/repos",
+    "events_url": "https://api.github.com/users/rubo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rubo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5697/reactions",
     "total_count": 0,
@@ -199,7 +218,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/5697/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
