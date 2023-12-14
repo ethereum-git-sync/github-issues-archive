@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2023-12-07T15:46:18Z",
-  "updated_at": "2023-12-08T05:34:15Z",
-  "closed_at": null,
+  "updated_at": "2023-12-14T15:00:42Z",
+  "closed_at": "2023-12-14T15:00:41Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (893fc9f 2023-09-12T00:28:57.627748000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\n_No response_\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\n**Summary**\r\n- When running `vm.deal` and `vm.startBroadcast` together in a script and the account runs out of funds, the script throws `The application panicked (crashed). Message: Internal EVM errror` instead of `EvmError: Out of Fund`. \r\n\r\n**1. First script where an account with zero native ETH balance simply tries to deposit native ETH into the WETH contract**\r\n\r\n- Because the account has no native ETH and is attempting to deposit, it throws Out of Fund error as expected. \r\n\r\n```\r\n// Throws EvmError: Out of Fund \r\ncontract SendEthWithoutDeal is Script {\r\n   function run() public {\r\n        vm.startBroadcast(90743482286830539503240959006302832933333810038750515972785732718729991261126);    \r\n        WETH.deposit{ value: 100 ether }(); \r\n        vm.stopBroadcast();\r\n    } \r\n}\r\n```\r\n<img width=\"751\" alt=\"Screenshot 2023-12-08 at 12 42 06 AM\" src=\"https://github.com/foundry-rs/foundry/assets/64379343/b94cb7fb-920c-4c74-a41d-2628054e64af\">\r\n\r\n**2. Second script where I use `vm.deal` before making the WETH deposit** \r\n\r\n```\r\n// throws Application Panic Internal EVM Error  \r\ncontract SendEthWithDeal is Script {\r\n    function run() public {\r\n        vm.startBroadcast(90743482286830539503240959006302832933333810038750515972785732718729991261126);    \r\n        vm.deal(0x7d577a597B2742b498Cb5Cf0C26cDCD726d39E6e, 100 ether); \r\n        WETH.deposit{ value: 100 ether }(); \r\n        vm.stopBroadcast();\r\n    }\r\n}\r\n```\r\n\r\n<img width=\"931\" alt=\"Screenshot 2023-12-08 at 12 44 06 AM\" src=\"https://github.com/foundry-rs/foundry/assets/64379343/a3a55869-d316-40e3-9646-c3a310df1400\">\r\n\r\n`vm.deal` can be called before `vm.startBroadcast` and throws the same error message. \r\n\r\n**Note/Question** \r\n- Both \"scripts\" succeed, except the second case throws the panic on top of the success. \r\n- I'm also seeing that `vm.deal` does not create a transaction even inside `vm.startBroadcast`. Does this mean `vm.deal` was never meant to be used together with any broadcasting transactions and hence the error case here. \r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6540/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6540/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -104,6 +123,50 @@
     "body": "yeah there is no direct integration between cheats like deal and anvil so can't broadcast things depending on them. ",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1846572305/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1856009783",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6540#issuecomment-1856009783",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6540",
+    "id": 1856009783,
+    "node_id": "IC_kwDOGBlvNc5uoHY3",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-14T15:00:41Z",
+    "updated_at": "2023-12-14T15:00:41Z",
+    "author_association": "MEMBER",
+    "body": "Closed by #6549 — anvil is not integrated with cheatcodes.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1856009783/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
