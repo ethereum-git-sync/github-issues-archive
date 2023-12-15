@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3692",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3692/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3692/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3692/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3692",
+  "id": 2043291305,
+  "node_id": "I_kwDOBGDvrM55yiap",
+  "number": 3692,
+  "title": "Improve Debugging Info for Modules",
+  "user": {
+    "login": "pcaversaccio",
+    "id": 25297591,
+    "node_id": "MDQ6VXNlcjI1Mjk3NTkx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/25297591?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pcaversaccio",
+    "html_url": "https://github.com/pcaversaccio",
+    "followers_url": "https://api.github.com/users/pcaversaccio/followers",
+    "following_url": "https://api.github.com/users/pcaversaccio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pcaversaccio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pcaversaccio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pcaversaccio/subscriptions",
+    "organizations_url": "https://api.github.com/users/pcaversaccio/orgs",
+    "repos_url": "https://api.github.com/users/pcaversaccio/repos",
+    "events_url": "https://api.github.com/users/pcaversaccio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pcaversaccio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-15T09:32:46Z",
+  "updated_at": "2023-12-15T09:33:03Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "Let's assume you compile modules based on https://github.com/vyperlang/vyper/pull/3663. Furthermore, let's assume we have the following setup:\r\n\r\n```vy\r\n# Lib.vy\r\n\r\n@internal\r\n@pure\r\ndef vyper_is_cool_af() -> uint256:\r\n    return 1337\r\n\r\n# Main.vy\r\n\r\nimport Lib\r\n\r\nvar: uint256\r\n\r\n@external\r\n@view\r\ndef blocknumber() -> uint256:\r\n    return self.vyper_is_cool_af()\r\n```\r\n\r\nThis will throw with:\r\n\r\n```console\r\nError compiling: Main.vy\r\nvyper.exceptions.UndeclaredDefinition: Storage variable 'vyper_is_cool_af' has not been declared.\r\n  contract \"Main.vy:10\", function \"blocknumber\", line 10:11\r\n        9 def blocknumber() -> uint256:\r\n  ---> 10     return self.vyper_is_cool_af()\r\n  -------------------^\r\n       11\r\n```\r\n\r\nThe issue here is that I mistakenly chose the `self` keyword instead of `Lib`. It would be cool if the compiler not only would make suggestions based on the `self` namespace but also for the imported Lib. Something like:\r\n\r\n```console\r\nError compiling: Main.vy\r\nvyper.exceptions.UndeclaredDefinition: Storage variable 'vyper_is_cool_af' has not been declared. Did you mean 'Lib.vyper_is_cool_af'?\r\n  contract \"Main.vy:10\", function \"blocknumber\", line 10:11\r\n        9 def blocknumber() -> uint256:\r\n  ---> 10     return self.vyper_is_cool_af()\r\n  -------------------^\r\n       11\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3692/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3692/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
