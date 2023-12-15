@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6605",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6605/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6605/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6605/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6605",
+  "id": 2042657167,
+  "node_id": "I_kwDOGBlvNc55wHmP",
+  "number": 6605,
+  "title": "`trace_transaction` returns incorrect result for transactions with `selfdestruct`",
+  "user": {
+    "login": "Psirex",
+    "id": 14151334,
+    "node_id": "MDQ6VXNlcjE0MTUxMzM0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/14151334?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Psirex",
+    "html_url": "https://github.com/Psirex",
+    "followers_url": "https://api.github.com/users/Psirex/followers",
+    "following_url": "https://api.github.com/users/Psirex/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Psirex/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Psirex/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Psirex/subscriptions",
+    "organizations_url": "https://api.github.com/users/Psirex/orgs",
+    "repos_url": "https://api.github.com/users/Psirex/repos",
+    "events_url": "https://api.github.com/users/Psirex/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Psirex/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-14T23:31:50Z",
+  "updated_at": "2023-12-14T23:31:50Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nAnvil\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (53b15e6 2023-12-14T00:20:31.556940000Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nThe result of `trace_transaction` is missing the call trace item for the transactions with the `selfdestruct` call.\r\n\r\nExample of the method:\r\n\r\n```solidity\r\nfunction bye() public {\r\n   selfdestruct(payable(msg.sender));\r\n}\r\n```\r\n\r\nThe example of the method call on the Goerli network: `https://goerli.etherscan.io/tx/0x01f698cd588312eb698606a6a4c5e09701c4659f20c1ff9e61c5504d5d93b144`\r\n\r\nThe output of the `trace_transaction` for the tx using the Infura RPC:\r\n\r\n```\r\n[\r\n  {\r\n    action: {\r\n      from: '0xe8b2097674daf8fc3dccddf05a2cbef8253a4bab',\r\n      to: '0xc26568028faa4571a16ade1f3f09253b47d9da22',\r\n      value: '0x0',\r\n      gas: '0x1400',\r\n      input: '0xe71b8b93',\r\n      callType: 'call'\r\n    },\r\n    result: { gasUsed: '0x1400', output: '0x' },\r\n    traceAddress: [],\r\n    subtraces: 1,\r\n    transactionPosition: 25,\r\n    transactionHash: '0x01f698cd588312eb698606a6a4c5e09701c4659f20c1ff9e61c5504d5d93b144',\r\n    blockNumber: 10213404,\r\n    blockHash: '0x8c1d21fff9e42cd8e50bdfee7ad23d3a0daa4f68bb44a0fc0bf0ce87b195682f',\r\n    type: 'call'\r\n  },\r\n  {\r\n    action: {\r\n      address: '0xc26568028faa4571a16ade1f3f09253b47d9da22',\r\n      refundAddress: '0xe8b2097674daf8fc3dccddf05a2cbef8253a4bab',\r\n      balance: '0x0'\r\n    },\r\n    result: null,\r\n    traceAddress: [ 0 ],\r\n    subtraces: 0,\r\n    transactionPosition: 25,\r\n    transactionHash: '0x01f698cd588312eb698606a6a4c5e09701c4659f20c1ff9e61c5504d5d93b144',\r\n    blockNumber: 10213404,\r\n    blockHash: '0x8c1d21fff9e42cd8e50bdfee7ad23d3a0daa4f68bb44a0fc0bf0ce87b195682f',\r\n    type: 'suicide'\r\n  }\r\n]\r\n```\r\n\r\nThe `trace_transaction` result for the same method call but deployed on the locally run Anvil node:\r\n\r\n```\r\n[\r\n  {\r\n    action: {\r\n      address: '0x5fbdb2315678afecb367f032d93f642f64180aa3',\r\n      refundAddress: '0x0000000000000000000000000000000000000000',\r\n      balance: '0x0'\r\n    },\r\n    result: { gasUsed: '0x142d', output: '0x' },\r\n    traceAddress: [],\r\n    subtraces: 0,\r\n    transactionPosition: 0,\r\n    transactionHash: '0x05589762595b7476b024f0bdd3ce1e9560fbbbe8c0ec9f304d8d0104696cf137',\r\n    blockNumber: 2,\r\n    blockHash: '0xfc9200610dcd133dfe409f46717654fe5aab7ad096e2c7c878f96c609562fb39',\r\n    type: 'suicide'\r\n  }\r\n]\r\n```\r\n\r\nThe `refundAddress` is also incorrect and always equals zero address for the Anvil node traces.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6605/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6605/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
