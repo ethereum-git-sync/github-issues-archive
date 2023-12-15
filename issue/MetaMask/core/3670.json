@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/MetaMask/core/issues/3670",
+  "repository_url": "https://api.github.com/repos/MetaMask/core",
+  "labels_url": "https://api.github.com/repos/MetaMask/core/issues/3670/labels{/name}",
+  "comments_url": "https://api.github.com/repos/MetaMask/core/issues/3670/comments",
+  "events_url": "https://api.github.com/repos/MetaMask/core/issues/3670/events",
+  "html_url": "https://github.com/MetaMask/core/issues/3670",
+  "id": 2042605572,
+  "node_id": "I_kwDOCBB0Cc55v7AE",
+  "number": 3670,
+  "title": "Upgrade jest to v29 and remove `@types/jest`",
+  "user": {
+    "login": "MajorLift",
+    "id": 34228073,
+    "node_id": "MDQ6VXNlcjM0MjI4MDcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34228073?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MajorLift",
+    "html_url": "https://github.com/MajorLift",
+    "followers_url": "https://api.github.com/users/MajorLift/followers",
+    "following_url": "https://api.github.com/users/MajorLift/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MajorLift/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MajorLift/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MajorLift/subscriptions",
+    "organizations_url": "https://api.github.com/users/MajorLift/orgs",
+    "repos_url": "https://api.github.com/users/MajorLift/repos",
+    "events_url": "https://api.github.com/users/MajorLift/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MajorLift/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5330766523,
+      "node_id": "LA_kwDOCBB0Cc8AAAABPb0Kuw",
+      "url": "https://api.github.com/repos/MetaMask/core/labels/team-shared-libraries",
+      "name": "team-shared-libraries",
+      "color": "c5def5",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-14T22:34:03Z",
+  "updated_at": "2023-12-14T22:34:59Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Motivation\r\n\r\n- See https://github.com/MetaMask/core/pull/3609#discussion_r1424664309\r\n\r\n## Explanation\r\n\r\nThe following are errors caused by breaking changes in Jest v28, v29:\r\n\r\n### JSDOM\r\n\r\n```output\r\nTypeError: Cannot read properties of undefined (reading 'html')\r\n\r\n       5 | // in order to add TextEncoder to jsdom. TextEncoder is expected by jose.\r\n       6 |\r\n    >  7 | module.exports = class CustomTestEnvironment extends JSDOMEnvironment {\r\n         |                  ^\r\n       [8](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468025475?pr=3646#step:5:9) |   async setup() {\r\n       [9](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468025475?pr=3646#step:5:10) |     await super.setup();\r\n      [10](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468025475?pr=3646#step:5:11) |     if (typeof this.global.TextEncoder === 'undefined') {\r\n\r\n      at new JSDOMEnvironment (../../node_modules/jest-environment-jsdom/build/index.js:72:44)\r\n      at new CustomTestEnvironment (jest.environment.js:7:[18](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468025475?pr=3646#step:5:19))\r\n```\r\n\r\n### ESM parse failure\r\n\r\n```output\r\nJest encountered an unexpected token\r\n\r\n    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.\r\n\r\n    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.\r\n\r\n    By default \"node_modules\" folder is ignored by transformers.\r\n\r\n    Here's what you can do:\r\n     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.\r\n     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript\r\n     • To have some of your \"node_modules\" files transformed, you can specify a custom \"transformIgnorePatterns\" in your config.\r\n     • If you need a custom transformation specify a \"transform\" option in your config.\r\n     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the \"moduleNameMapper\" config option.\r\n\r\n    You'll find more details and examples of these config options in the docs:\r\n    https://jestjs.io/docs/configuration\r\n    For information about custom transformations, see:\r\n    https://jestjs.io/docs/code-transformation\r\n\r\n    Details:\r\n\r\n    /home/runner/work/core/core/node_modules/uuid/dist/esm-browser/index.js:1\r\n    ({\"Object.<anonymous>\":function(module,exports,require,__dirname,__filename,jest){export { default as v1 } from './v1.js';\r\n                                                                                      ^^^^^^\r\n\r\n    SyntaxError: Unexpected token 'export'\r\n\r\n      3 | import type { Json } from '@metamask/utils';\r\n      4 | import stringify from 'fast-json-stable-stringify';\r\n    > 5 | import { v4 as random } from 'uuid';\r\n        | ^\r\n      6 |\r\n      7 | // Mixin classes require a constructor with an `...any[]` parameter\r\n      [8](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468030172?pr=3646#step:5:9) | // See TS2545\r\n\r\n      at Runtime.createScriptFromCode (../../node_modules/jest-runtime/build/index.js:1505:[14](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468030172?pr=3646#step:5:15))\r\n      at Object.require (src/PollingController.ts:5:1)\r\n      at Object.<anonymous> (src/PollingController.test.ts:5:1)\r\n```\r\n\r\n### Snapshot\r\n\r\n```output\r\n● Package exports › has expected exports\r\n\r\n    expect(received).toMatchInlineSnapshot(snapshot)\r\n\r\n    Snapshot name: `Package exports has expected exports 1`\r\n\r\n    - Snapshot  - 1\r\n    + Received  + 1\r\n\r\n    - Array [\r\n    + [\r\n        \"PermissionLogController\",\r\n      ]\r\n\r\n      3 | describe('Package exports', () => {\r\n      4 |   it('has expected exports', () => {\r\n    > 5 |     expect(Object.keys(allExports)).toMatchInlineSnapshot(`\r\n        |                                     ^\r\n      [6](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468029594?pr=3646#step:5:7) |       Array [\r\n      [7](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468029594?pr=3646#step:5:8) |         \"PermissionLogController\",\r\n      [8](https://github.com/MetaMask/core/actions/runs/7147833591/job/19468029594?pr=3646#step:5:9) |       ]\r\n\r\n      at Object.<anonymous> (tests/index.test.ts:5:37)\r\n```\r\n\r\n### Mock functions not found\r\n\r\n`mockImplementation`, `mockResolvedValue`, `mockResolvedValueOnce`, `mockRejectedValueOnce` \r\n\r\n```output\r\nsrc/SignatureController.test.ts:161:24 - error TS2339: Property 'mockImplementation' does not exist on type '<ActionType extends \"ApprovalController:addRequest\" | \"KeyringController:signMessage\" | \"KeyringController:signPersonalMessage\" | \"KeyringController:signTypedMessage\" | \"LoggingController:add\" | \"SignatureController:getState\">(actionType: ActionType, ...params: ExtractActionParameters<...> | ... 4 more ... | Extract...'.\r\n \r\n     161     messengerMock.call.mockImplementation((actionName, ...rest) => {\r\n                                ~~~~~~~~~~~~~~~~~~\r\n\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/MetaMask/core/issues/3670/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/3670/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
