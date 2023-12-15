@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6197",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6197/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6197/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6197/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/6197",
+  "id": 2044030126,
+  "node_id": "I_kwDOCD5_Gc551Wyu",
+  "number": 6197,
+  "title": "Eventstream API light client events spec compatibility",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 4116812272,
+      "node_id": "LA_kwDOCD5_Gc71YZHw",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/scope-interop",
+      "name": "scope-interop",
+      "color": "980043",
+      "default": false,
+      "description": "Issues that fix interop issues between Lodestar and CL, EL or tooling."
+    },
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-15T16:39:09Z",
+  "updated_at": "2023-12-15T17:19:39Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\r\n\r\nCurrently Lodestar does not return light client events as defined in spec examples [beacon-APIs/#/Events/eventstream](https://ethereum.github.io/beacon-APIs/#/Events/eventstream).\r\n\r\nThe [spec example](https://github.com/ethereum/beacon-APIs/blob/6559c852193b14a33ddcb1ba770db29d62a52878/apis/eventstream/index.yaml#L98-L102) has an additional version field and wrapps the actual light client updates into data layer (similar to REST API)\r\n```yaml\r\n            light_client_finality_update:\r\n              description: The node's latest known `LightClientFinalityUpdate` has been updated\r\n              value: |\r\n                event: light_client_finality_update\r\n                data: {\"version\":\"phase0\", \"data\": {\"attested_header\": {\"beacon\": { ... }}\r\n```\r\n\r\nThis incompatibility causes issues as Lodestar and Nimbus beacon node return different data formats.\r\n- https://lodestar-mainnet.chainsafe.io/eth/v1/events?topics=light_client_optimistic_update\r\n- http://testing.mainnet.beacon-api.nimbus.team/eth/v1/events?topics=light_client_optimistic_update\r\n\r\nThis was brought up by @rdvorkin at the Light Client Summit at Devconnect in [Building a trustless light-client assistant in your browser](https://app.streameth.org/devconnect/light_client_summit/session/remote_presenter_building_a_trustless_lightclient_assistant_in_your_browser) around 11:30\r\n\r\n![image](https://github.com/ChainSafe/lodestar/assets/38436224/f0f50787-d98e-4076-a463-2255793ecf28)\r\n\r\nOther issues that @jeluard brought up about the light client event examples\r\n- version is `phase0` whereas light client was introduced in `altair` (fails our spec tests)\r\n- `sync_committee_bits` too short\r\n\r\nWe should clarify if the current format as outlined in the spec should be the standard or we want to omit version and data layer. Other events do not use a data layer in the serialized json which makes the light client events a bit of an outlier.\r\n\r\n### Additional context\r\n\r\nWe currently just calculate the fork version based on slot in attested header\r\n```python\r\ncompute_fork_version(compute_epoch_at_slot(data.attested_header.beacon.slot))\r\n```\r\n\r\nhttps://github.com/ChainSafe/lodestar/blob/c044d4cdd484a7e5ac90e83169955bd6e4697063/packages/api/src/beacon/routes/events.ts#L213\r\n\r\n### Related\r\n\r\nTesting Lodestar events API against the spec examples causes issues as well and we have to ignore those topics during testing\r\n- https://github.com/ChainSafe/lodestar/issues/6170\r\n\r\nBeacon-API spec PR (there was no discussion around events format)\r\n- https://github.com/ethereum/beacon-APIs/pull/247\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6197/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6197/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
