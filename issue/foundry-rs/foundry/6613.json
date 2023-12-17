@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6613",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6613/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6613/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6613/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6613",
+  "id": 2045294582,
+  "node_id": "I_kwDOGBlvNc556Lf2",
+  "number": 6613,
+  "title": "incompatibility with trace verbosity and fail fast",
+  "user": {
+    "login": "BlazeWasHere",
+    "id": 69124640,
+    "node_id": "MDQ6VXNlcjY5MTI0NjQw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/69124640?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BlazeWasHere",
+    "html_url": "https://github.com/BlazeWasHere",
+    "followers_url": "https://api.github.com/users/BlazeWasHere/followers",
+    "following_url": "https://api.github.com/users/BlazeWasHere/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BlazeWasHere/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BlazeWasHere/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BlazeWasHere/subscriptions",
+    "organizations_url": "https://api.github.com/users/BlazeWasHere/orgs",
+    "repos_url": "https://api.github.com/users/BlazeWasHere/repos",
+    "events_url": "https://api.github.com/users/BlazeWasHere/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BlazeWasHere/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-17T17:02:52Z",
+  "updated_at": "2023-12-17T17:02:52Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (88ae503 2023-12-17T00:18:48.520002484Z)\n\n### What command(s) is the bug in?\n\nforge test -vvv --fail-fast\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nwhen using `-vvv` (or any level verbosity) with `--fail-fast` no traces are shown for failing tests\r\n\r\nminimal repo:\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nimport {Test, console2} from \"forge-std/Test.sol\";\r\nimport {Counter} from \"../src/Counter.sol\";\r\n\r\ncontract CounterTest is Test {\r\n    Counter public counter;\r\n\r\n    function setUp() public {\r\n        counter = new Counter();\r\n        counter.setNumber(0);\r\n    }\r\n\r\n    function test_Fail() public {\r\n        counter.setNumber(1);\r\n        assertEq(counter.number(), 2);\r\n    }\r\n}\r\n```\r\n\r\nwhen running `forge test -vvv --fail-fast` no traces are shown\r\n```\r\n[⠒] Compiling...\r\nNo files changed, compilation skipped\r\n\r\nRunning 1 test for test/Counter.t.sol:CounterTest\r\n[FAIL. Reason: assertion failed] test_Fail() (gas: 42826)\r\n \r\nRan 1 test suites: 0 tests passed, 0 failed, 0 skipped (0 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/Counter.t.sol:CounterTest\r\n[FAIL. Reason: assertion failed] test_Fail() (gas: 42826)\r\n\r\nEncountered a total of 1 failing tests, 0 tests succeeded\r\n```\r\n\r\nexpected behavior should be similar to `forge test -vvv`\r\n```\r\n[⠒] Compiling...\r\nNo files changed, compilation skipped\r\n\r\nRunning 1 test for test/Counter.t.sol:CounterTest\r\n[FAIL. Reason: assertion failed] test_Fail() (gas: 42826)\r\nLogs:\r\n  Error: a == b not satisfied [uint]\r\n        Left: 1\r\n       Right: 2\r\n\r\nTraces:\r\n  [42826] CounterTest::test_Fail()\r\n    ├─ [22290] Counter::setNumber(1)\r\n    │   └─ ← ()\r\n    ├─ [283] Counter::number() [staticcall]\r\n    │   └─ ← 1\r\n    ├─ emit log(val: \"Error: a == b not satisfied [uint]\")\r\n    ├─ emit log_named_uint(key: \"      Left\", val: 1)\r\n    ├─ emit log_named_uint(key: \"     Right\", val: 2)\r\n    ├─ [0] VM::store(VM: [0x7109709ECfa91a80626fF3989D68f67F5b1DD12D], 0x6661696c65640000000000000000000000000000000000000000000000000000, 0x0000000000000000000000000000000000000000000000000000000000000001)\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 861.88µs\r\n \r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/Counter.t.sol:CounterTest\r\n[FAIL. Reason: assertion failed] test_Fail() (gas: 42826)\r\n\r\nEncountered a total of 1 failing tests, 0 tests succeeded\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6613/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6613/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

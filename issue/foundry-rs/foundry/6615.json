@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6615",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6615/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6615/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6615/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6615",
+  "id": 2045389656,
+  "node_id": "I_kwDOGBlvNc556itY",
+  "number": 6615,
+  "title": "Insufficient Funds no matter what on Gnosis Chain",
+  "user": {
+    "login": "divine-comedian",
+    "id": 67759413,
+    "node_id": "MDQ6VXNlcjY3NzU5NDEz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/67759413?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/divine-comedian",
+    "html_url": "https://github.com/divine-comedian",
+    "followers_url": "https://api.github.com/users/divine-comedian/followers",
+    "following_url": "https://api.github.com/users/divine-comedian/following{/other_user}",
+    "gists_url": "https://api.github.com/users/divine-comedian/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/divine-comedian/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/divine-comedian/subscriptions",
+    "organizations_url": "https://api.github.com/users/divine-comedian/orgs",
+    "repos_url": "https://api.github.com/users/divine-comedian/repos",
+    "events_url": "https://api.github.com/users/divine-comedian/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/divine-comedian/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-17T21:50:25Z",
+  "updated_at": "2023-12-17T21:50:25Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (88ae503 2023-12-17T00:18:48.520002484Z)\n\n### What command(s) is the bug in?\n\nforge script\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nCurrently using a script to deploy a contract and do some actions on-chain - specifically Gnosis Chain. \r\n\r\nWhen I run the script I get an error saying\r\n```\r\n(code: -32000, message: INTERNAL_ERROR: insufficient funds, data: None)\r\n```\r\n\r\nHowever the key I am using to send the transactions has 3 xDAI on it - which should be way more than enough to do what the script is for. \r\n\r\nI was able to perform the exact same script on Optimism with no issue. \r\n\r\nthis is my command in the terminal\r\n```\r\nforge script script/upgradeableSupply/upgradeTokensOwned/upgradeMinterGnosisChain.s.sol --chain 100 --broadcast --etherscan-api-key $GNOSISSCAN_API_KEY --verify --rpc-url $GNOSIS_RPC_URL --verifier-url https://api.gnosisscan.io/api --watch -vvv\r\n```\r\n\r\nThis is the script it is trying to run, I've omitted the contract addresses for privacy:\r\n\r\n```\r\ncontract deployMitchMinter is Script {\r\n    using SafeERC20 for IERC20;\r\n\r\n    MitchMinter public mintingContract;\r\n    MitchMinter public mintingContractProxy;\r\n    MitchToken public mitchTokenContract;\r\n    ProxyAdmin public proxyAdmin;\r\n    TransparentUpgradeableProxy public proxy;\r\n    IERC20 public paymentTokenContract;\r\n    address public gnosisProxy = 0x....;\r\n    address multisig = 0x....;\r\n    address mintMitchAdmin = 0x....;\r\n\r\n    function run() external {\r\n        uint256 deployerPrivateKey = vm.envUint('MINTMITCH_PK');\r\n        vm.startBroadcast(deployerPrivateKey);\r\n        address sender = mintMitchAdmin;\r\n        console.log(sender, 'sender is');\r\n        console.log(sender.balance, 'sender balance is');\r\n        proxyAdmin = ProxyAdmin(0x2dd...);\r\n        mintingContract = new MitchMinter();\r\n        proxyAdmin.upgrade(TransparentUpgradeableProxy(payable(gnosisProxy)), address(mintingContract));\r\n        proxyAdmin.transferOwnership(multisig);\r\n        MitchMinter mitchMinter = MitchMinter(gnosisProxy);\r\n        mitchMinter.grantRole(mitchMinter.DEFAULT_ADMIN_ROLE(), multisig);\r\n        mitchMinter.withdrawTokens(multisig);\r\n\r\n        \r\n    }\r\n}\r\n\r\n```\r\n![image](https://github.com/foundry-rs/foundry/assets/67759413/c334d00b-436e-41c0-98fe-00bc9f064324)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6615/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6615/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
