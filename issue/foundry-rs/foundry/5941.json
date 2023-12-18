@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-09-28T15:49:59Z",
-  "updated_at": "2023-09-29T11:01:46Z",
-  "closed_at": null,
+  "updated_at": "2023-12-18T17:42:06Z",
+  "closed_at": "2023-12-18T17:42:06Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (96ab913 2023-09-28T00:20:52.121517000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nThe below test fails with message: `[FAIL. Reason: Call did not revert as expected]`.\r\n\r\nhowever when the `vvm.expectRevert(InvalidMember.selector);` is removed the test again fails with message: `[FAIL. Reason: InvalidMember()]`. \r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.18;\r\n\r\nimport { Test } from \"forge-std/Test.sol\";\r\nimport { GasSnapshot } from \"forge-gas-snapshot/GasSnapshot.sol\";\r\nimport { Merkle } from \"@murky/Merkle.sol\";\r\nimport { MerkleProof } from \"@openzeppelin/contracts/utils/cryptography/MerkleProof.sol\";\r\nimport { IVotingStrategy } from \"../src/interfaces/IVotingStrategy.sol\";\r\n\r\ncontract MerkleWhitelistVotingStrategy is IVotingStrategy {\r\n    error InvalidProof();\r\n    error InvalidMember();\r\n\r\n    struct Member {\r\n        address addr;\r\n        uint96 vp;\r\n    }\r\n\r\n    function getVotingPower(\r\n        uint32 /* blockNumber */,\r\n        address voter,\r\n        bytes calldata params,\r\n        bytes calldata userParams\r\n    ) external pure override returns (uint256 votingPower) {\r\n        bytes32 root = abi.decode(params, (bytes32));\r\n        (bytes32[] memory proof, Member memory member) = abi.decode(userParams, (bytes32[], Member));\r\n\r\n        if (member.addr != voter) revert InvalidMember();\r\n        if (MerkleProof.verify(proof, root, keccak256(abi.encode(member))) != true) revert InvalidProof();\r\n\r\n        return member.vp;\r\n    }\r\n}\r\n\r\ncontract DemoTest is Test, GasSnapshot {\r\n    error InvalidProof();\r\n    error InvalidMember();\r\n\r\n    MerkleWhitelistVotingStrategy public merkleWhitelistVotingStrategy;\r\n    Merkle public merkleLib;\r\n\r\n    function setUp() public {\r\n        merkleWhitelistVotingStrategy = new MerkleWhitelistVotingStrategy();\r\n        merkleLib = new Merkle();\r\n    }\r\n\r\n    function testDemo() public {\r\n        MerkleWhitelistVotingStrategy.Member[] memory members = new MerkleWhitelistVotingStrategy.Member[](4);\r\n        members[0] = MerkleWhitelistVotingStrategy.Member(address(3), 33);\r\n        members[1] = MerkleWhitelistVotingStrategy.Member(address(1), 11);\r\n        members[2] = MerkleWhitelistVotingStrategy.Member(address(5), 55);\r\n        members[3] = MerkleWhitelistVotingStrategy.Member(address(5), 77);\r\n\r\n        bytes32[] memory leaves = new bytes32[](4);\r\n        leaves[0] = keccak256(abi.encode(members[0]));\r\n        leaves[1] = keccak256(abi.encode(members[1]));\r\n        leaves[2] = keccak256(abi.encode(members[2]));\r\n        leaves[3] = keccak256(abi.encode(members[3]));\r\n\r\n        bytes32 root = merkleLib.getRoot(leaves);\r\n\r\n        // Proof is for a different member than the voter address\r\n        vm.expectRevert(InvalidMember.selector);\r\n        merkleWhitelistVotingStrategy.getVotingPower(\r\n            0,\r\n            members[1].addr,\r\n            abi.encode(root),\r\n            abi.encode(merkleLib.getProof(leaves, 2), members[2])\r\n        );\r\n    }\r\n}\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Evalir",
+    "id": 26014927,
+    "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evalir",
+    "html_url": "https://github.com/Evalir",
+    "followers_url": "https://api.github.com/users/Evalir/followers",
+    "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evalir/orgs",
+    "repos_url": "https://api.github.com/users/Evalir/repos",
+    "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evalir/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/5941/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5941/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "repro here: https://github.com/Orland0x/foundry-revert-issue-demo/blob/main/test/Demo.t.sol",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1740710519/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1861163414",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/5941#issuecomment-1861163414",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/5941",
+    "id": 1861163414,
+    "node_id": "IC_kwDOGBlvNc5u7xmW",
+    "user": {
+      "login": "Evalir",
+      "id": 26014927,
+      "node_id": "MDQ6VXNlcjI2MDE0OTI3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Evalir",
+      "html_url": "https://github.com/Evalir",
+      "followers_url": "https://api.github.com/users/Evalir/followers",
+      "following_url": "https://api.github.com/users/Evalir/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Evalir/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Evalir/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Evalir/subscriptions",
+      "organizations_url": "https://api.github.com/users/Evalir/orgs",
+      "repos_url": "https://api.github.com/users/Evalir/repos",
+      "events_url": "https://api.github.com/users/Evalir/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Evalir/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-18T17:42:06Z",
+    "updated_at": "2023-12-18T17:42:06Z",
+    "author_association": "MEMBER",
+    "body": "We've added several fixes to custom error revert handling and decoding/encoding—plus, this is a common pitfall with `expectRevert`—when you use libraries, you have to make sure they don't get \"inlined\", which means wrapping them in a public function that forces solidity to make a `CALL`.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1861163414/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
