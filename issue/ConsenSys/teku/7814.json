@@ -31,6 +31,15 @@
   },
   "labels": [
     {
+      "id": 1048919129,
+      "node_id": "MDU6TGFiZWwxMDQ4OTE5MTI5",
+      "url": "https://api.github.com/repos/Consensys/teku/labels/bug%20%F0%9F%90%9E",
+      "name": "bug 🐞",
+      "color": "dd6c94",
+      "default": false,
+      "description": "Something isn't working"
+    },
+    {
       "id": 1271198478,
       "node_id": "MDU6TGFiZWwxMjcxMTk4NDc4",
       "url": "https://api.github.com/repos/Consensys/teku/labels/performance%20%F0%9F%9A%80",
@@ -47,9 +56,9 @@
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-12-11T23:53:04Z",
-  "updated_at": "2023-12-16T22:31:05Z",
+  "updated_at": "2023-12-18T20:46:54Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -192,6 +201,50 @@
     "body": "> I'd expect given that you're consistently seeing this every slot that you might be calling before the block has been imported so it's missing head?\r\n\r\nThat's certainly plausible, although there seems to be something missing in this timeline.  We listen to all active beacon nodes for a `head` event.  When we see one, we wait 200ms to allow import on other beacon nodes that may take longer to complete importing the block, and then kick off the attestation process.  From what you say, this should be enough time for the import to complete unless we're seeing large discrepancies on block delivery time.",
     "reactions": {
       "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1858944416/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1861599606",
+    "html_url": "https://github.com/Consensys/teku/issues/7814#issuecomment-1861599606",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7814",
+    "id": 1861599606,
+    "node_id": "IC_kwDOCM9I9M5u9cF2",
+    "user": {
+      "login": "rolfyone",
+      "id": 2967240,
+      "node_id": "MDQ6VXNlcjI5NjcyNDA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2967240?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rolfyone",
+      "html_url": "https://github.com/rolfyone",
+      "followers_url": "https://api.github.com/users/rolfyone/followers",
+      "following_url": "https://api.github.com/users/rolfyone/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rolfyone/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rolfyone/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rolfyone/subscriptions",
+      "organizations_url": "https://api.github.com/users/rolfyone/orgs",
+      "repos_url": "https://api.github.com/users/rolfyone/repos",
+      "events_url": "https://api.github.com/users/rolfyone/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rolfyone/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-18T20:46:54Z",
+    "updated_at": "2023-12-18T20:46:54Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Hrm ok, so it'll be doing FcU prior to producing the first attestation still. There's possibly some improvements that would help, will add this to the backlog to consider...\r\n\r\nRe. timings as a workaround, could consider reducing the timeout on teku (if that's easy).\r\n\r\nBasically, we run FcU on block import, and if that has just been done, then another FcU is redundant, so doing it twice in a row is needless overhead. \r\n\r\nIf a block is missed, then the FcU won't have been done, and in that situation it's important that it has been executed correctly still.\r\n\r\nHistorically we automatically promoted the first block without FcU and that was problematic, but flowing on from that we've got a further tweak to attestation production where by we can clean up this FcU if it's already been executed, so i'll mark this as a bug stemming from the fact that we could have removed this when we changed block processing.",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1861599606/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
