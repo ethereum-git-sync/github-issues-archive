@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8678",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8678/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8678/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8678/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/8678",
+  "id": 2048856777,
+  "node_id": "I_kwDODjvEJM56HxLJ",
+  "number": 8678,
+  "title": "chore: organize management of monorepo dependencies",
+  "user": {
+    "login": "mds1",
+    "id": 17163988,
+    "node_id": "MDQ6VXNlcjE3MTYzOTg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/17163988?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mds1",
+    "html_url": "https://github.com/mds1",
+    "followers_url": "https://api.github.com/users/mds1/followers",
+    "following_url": "https://api.github.com/users/mds1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mds1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mds1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mds1/subscriptions",
+    "organizations_url": "https://api.github.com/users/mds1/orgs",
+    "repos_url": "https://api.github.com/users/mds1/repos",
+    "events_url": "https://api.github.com/users/mds1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mds1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-19T15:09:07Z",
+  "updated_at": "2023-12-19T15:09:07Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "## Problem\r\n\r\nCurrently, the management of tool versions and their corresponding installation scripts in our project is fragmented, making it complicated for developers and contributors to get started with the full monorepo. We have 8 `.*rc` files defining versions:\r\n\r\n```sh\r\n$ find . -maxdepth 1 -type f -name '*rc'\r\n\r\n./.gethrc\r\n./.shellcheckrc\r\n./.npmrc\r\n./.abigenrc\r\n./.slitherrc\r\n./.kontrolrc\r\n./.nvmrc\r\n./.foundryrc\r\n```\r\n\r\nSome have install scripts in the root `package.json` (such as `install:foundry`), others have install commands in the root `Makefile` (such as `install-geth`), others have version files but no install script (like shellcheck) and others are not even listed as dependencies anywhere (like direnv).\r\n\r\n## Suggested Solution\r\n\r\nIntroduce a single JSON config file, called something like `tools.json` that lists the tool name, pinned version, and points to the install script for each tool:\r\n\r\n```json\r\n[\r\n  {\r\n    \"tool\": \"geth\",\r\n    \"version\": \"v1.13.4\",\r\n    \"installScript\": \"scripts/tool-installation/install_geth.sh\"\r\n  },\r\n  {\r\n    \"tool,\": \"foundry\",\r\n    \"version\": \"53b15e6cee787a7765988bb7228f26f62eb78129\",\r\n    \"installScript\": \"scripts/tool-installation/install_foundry.sh\"\r\n  },\r\n  // More tools...\r\n]\r\n```\r\n\r\nWe'd then have a `scripts/tool-installation/install.sh` file that reads in `tools.json`, and runs each install script. These install scripts would all have a similar flow:\r\n- Check if the tool is installed.\r\n- If so, check the version. If version is correct, exit, otherwise upgrade to the correct version.\r\n- If not, install the correct version.\r\n\r\nAny packages or dockerfiles that need a specific tool only can still reference the specific install script(s) needed, and users should be able to run something like `make install`  or `pnpm install` to get setup with all deps the repo has. (Related to this: it's unclear why some scripts are in the makefile and some are in `package.json`—we should consider unifying everything with a justfile or similar, but that's probably worthy of a separate issue)\r\n\r\n## Feedback\r\n\r\nI'm open to feedback on the details here: Maybe we don't want to use JSON and shell scripts, maybe we don't like the file names and paths, etc. But I believe this is directionally correct and an improvement compared to  the current approach.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8678/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8678/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
