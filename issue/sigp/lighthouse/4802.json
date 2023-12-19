@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-10-03T23:04:26Z",
-  "updated_at": "2023-10-03T23:04:26Z",
+  "updated_at": "2023-12-19T12:29:43Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1862663713",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4802#issuecomment-1862663713",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4802",
+    "id": 1862663713,
+    "node_id": "IC_kwDOCFeAzc5vBf4h",
+    "user": {
+      "login": "adaszko",
+      "id": 165678,
+      "node_id": "MDQ6VXNlcjE2NTY3OA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/165678?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/adaszko",
+      "html_url": "https://github.com/adaszko",
+      "followers_url": "https://api.github.com/users/adaszko/followers",
+      "following_url": "https://api.github.com/users/adaszko/following{/other_user}",
+      "gists_url": "https://api.github.com/users/adaszko/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/adaszko/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/adaszko/subscriptions",
+      "organizations_url": "https://api.github.com/users/adaszko/orgs",
+      "repos_url": "https://api.github.com/users/adaszko/repos",
+      "events_url": "https://api.github.com/users/adaszko/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/adaszko/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-19T12:23:29Z",
+    "updated_at": "2023-12-19T12:29:43Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "I'm not entirely sure if it's related but I saw another logical path leading to the same symptoms (i.e. proposing an empty block) with Vouch.\r\n\r\nThe problem is that Lighthouse seems to pass an incorrect parentHash to Vouch in a request to build a block that's to be proposed.  There's a re-org happening right before this (it's caused by extraneous circumstances) that I think might be the triggering it.  Here are the logs:\r\n\r\n```\r\nDec 19 09:38:22 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:22.601 WARN Beacon chain re-org                     reorg_distance: 1, new_slot: 8012889, new_head: 0x0b0a274dc8f5805b80611c08b66884740c18b4ee43deb133a7faad8a85758a17, previous_slot: 8012888, previous_head: 0x3c87d6993bdcc2553eba8e2ee5b274ee3b0a6098c0ebbd70df89e7a181330b5f, service: beacon\r\nDec 19 09:38:23 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:23.438 INFO Prepared beacon proposer                parent_root: 0x0b0a274dc8f5805b80611c08b66884740c18b4ee43deb133a7faad8a85758a17, validator: 953658, prepare_slot: 8012890, service: beacon\r\nDec 19 09:38:23 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:23.438 WARN Delayed proposer preparation            validator: 953658, prepare_slot: 8012890, service: beacon\r\nDec 19 09:38:23 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:23.982 INFO Requesting blinded header from connected builder, parent_hash: 0x7d083cb2caaad08d763ef6a5f585946a57f6df2cf9edf09b8291a0d27424737e, pubkey: 0xad779ae44bd3a468c970fecb2f759518497bee30abcbfbd11cad74194cd540c11c503489a4725a2b00a9d8ae8a1fdbaf, slot: Slot(8012890), service: exec\r\nDec 19 09:38:23 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:23.997 INFO Requested blinded execution payload     parent_hash: 0x7d083cb2caaad08d763ef6a5f585946a57f6df2cf9edf09b8291a0d27424737e, local_response_ms: 9, local_fee_recipient: 0xffee087852cb4898e6c3532e776e68bc68b1143b, relay_response_ms: 14, relay_fee_recipient: request failed, service: exec\r\nDec 19 09:38:23 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:23.998 WARN Builder error when requesting payload   parent_hash: 0x7d083cb2caaad08d763ef6a5f585946a57f6df2cf9edf09b8291a0d27424737e, local_block_hash: 0x6ea42fdca3fb3f5bca1ae8c987bd009541a886b3e59d5d06484090213820e4da, relay_error: ServerMessage(ErrorMessage { code: 500, message: \"Failed to obtain bid\", stacktraces: [] }), info: falling back to local execution client, service: exec\r\nDec 19 09:38:25 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:25.087 INFO New block received                      root: 0x8133ca1dce784b2e4fb5823729dae23fa2b0df95d626b451293225a57ec5d4c8, slot: 8012890\r\nDec 19 09:38:25 lighthouse-beacon-node-1 lighthouse[74220]: Dec 19 09:38:25.489 WARN Error processing HTTP API request       method: POST, path: /eth/v1/beacon/blocks, status: 202 Accepted, elapsed: 29.632227ms\r\n```\r\n\r\nOn the Vouch side:\r\n```\r\nDec 19 09:38:23 vouch-lighthouse-1 vouch[3087238]: {\"level\":\"trace\",\"service\":\"daemon\",\"impl\":\"rest\",\"time\":\"2023-12-19T09:38:23Z\",\"message\":\"getBuilderBid called\"}\r\nDec 19 09:38:23 vouch-lighthouse-1 vouch[3087238]: {\"level\":\"trace\",\"service\":\"blockrelay\",\"impl\":\"standard\",\"slot\":8012890,\"parent_hash\":\"0x7d083cb2caaad08d763ef6a5f585946a57f6df2cf9edf09b8291a0d27424737e\",\"pubkey\":\"0xad779ae44bd3a468c970fecb2f759518497bee30abcbfbd11cad74194cd540c11c503489a4725a2b00a9d8ae8a1fdbaf\",\"time\":\"2023-12-19T09:38:23Z\",\"message\":\"Builder bid called\"}\r\nDec 19 09:38:23 vouch-lighthouse-1 vouch[3087238]: {\"level\":\"debug\",\"service\":\"blockrelay\",\"impl\":\"standard\",\"key\":\"8012890\",\"subkey\":\"7d083cb2caaad08d763ef6a5f585946a57f6df2cf9edf09b8291a0d27424737e:ad779ae44bd3a468c970fecb2f759518497bee30abcbfbd11cad74194cd540c11c503489a4725a2b00a9d8ae8a1fdbaf\",\"time\":\"2023-12-19T09:38:23Z\",\"message\":\"Builder bid not found (subkey)\"}\r\nDec 19 09:38:23 vouch-lighthouse-1 vouch[3087238]: {\"level\":\"error\",\"service\":\"daemon\",\"impl\":\"rest\",\"error\":\"builder bid not known (subkey)\",\"time\":\"2023-12-19T09:38:23Z\",\"message\":\"Failed to obtain bid\"}\r\n```\r\n\r\nVouch's `subkey` is just [`sprintf(\"%s:%s\", parentHash, pubkey)`]( https://github.com/attestantio/vouch/blob/fb432a2e1adf055838d8abe09300190149b974d8/services/blockrelay/standard/builderbid.go#L46), so Lighthouse passed `7d083cb2caaad08d763ef6a5f585946a57f6df2cf9edf09b8291a0d27424737e` as parentHash for slot 8012890 whereas [the actual parentHash](https://beaconcha.in/slot/8012890) is `0x0b0a274dc8f5805b80611c08b66884740c18b4ee43deb133a7faad8a85758a17` and it is actually mentioned in the Lighthouse re-org log entry!\r\n\r\nThe question is: Is what we're seeing here a race between Lighthouse's different subsystems' view of the current head?\r\n\r\nPS.  This happens with `--disable-proposer-reorgs` and `--always-prefer-builder-payloads`.",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1862663713/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
