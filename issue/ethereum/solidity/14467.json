@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-08-04T07:12:36Z",
-  "updated_at": "2023-11-08T12:04:43Z",
-  "closed_at": null,
+  "updated_at": "2023-12-19T11:11:42Z",
+  "closed_at": "2023-12-19T11:11:42Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "## Abstract\r\n\r\nFix the try catch pattern.\r\n\r\n## Motivation\r\n\r\nThere are many ways to perform an evm call and decode the result:\r\n\r\n#### simple call\r\n```solidity\r\naddress owner = IERC5313(target).owner()\r\n// do stuff with owner\r\n```\r\n\r\n#### try catch\r\n```solidity\r\ntry IERC5313(target).owner() returns (address owner) {\r\n    // do stuff with owner\r\n} catch {\r\n    // process error\r\n}\r\n```\r\n\r\n#### low level call\r\n```solidity\r\n(bool success, bytes memory returndata) = target.staticcall(abi.encodeCall(IERC5313.owner, ()));\r\nif (success & returndata.length >= 0x20) {\r\n    address owner = abi.decode(returndata, (address));\r\n    // do stuff with owner\r\n} else {\r\n    // process error\r\n}\r\n```\r\n\r\n**None of them is safe to call, is you want to make sure that the operation does not revert and that errors can be catched properly!**\r\n\r\n- Simple call will revert is anything wrong happens, that is ok.\r\n- Try catch will revert if\r\n  - the target has no code: that is something we can check before doing the try catch. Its a bit painfull, but its ok\r\n  - the target does not revert, but the returned data are not long enough for doing `abi.decode`. This is bad\r\n- Low level call doesn't limit the return data, and is vulnerable to the \"returnbomb\" attack.\r\n\r\nSaid otherwize, if I want to look for an `owner()` in a way that will never revert, regardless of the target address, I have no choice but to go heavily into assembly. That is a simple usecase that solidity does not cover.\r\n\r\n\r\n## Specification\r\n\r\nThere are multiple possible solutions:\r\n- change the \"try catch\" behavior so that \"not enough return data for decode\" can be catched.\r\n\r\n- change the `call` and `staticcall` operation by adding a new parameter that is the maximum return data, so that the return bomb is contained.\r\n```solidity\r\ntarget.staticcall{returnsize: 0x20}(abi.encodeCall(IERC5313.owner, ()));\r\n```\r\n\r\n## Backwards Compatibility\r\n\r\nTBD",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mehtavishwa30",
+    "id": 32997409,
+    "node_id": "MDQ6VXNlcjMyOTk3NDA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/32997409?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mehtavishwa30",
+    "html_url": "https://github.com/mehtavishwa30",
+    "followers_url": "https://api.github.com/users/mehtavishwa30/followers",
+    "following_url": "https://api.github.com/users/mehtavishwa30/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mehtavishwa30/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mehtavishwa30/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mehtavishwa30/subscriptions",
+    "organizations_url": "https://api.github.com/users/mehtavishwa30/orgs",
+    "repos_url": "https://api.github.com/users/mehtavishwa30/repos",
+    "events_url": "https://api.github.com/users/mehtavishwa30/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mehtavishwa30/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14467/reactions",
     "total_count": 2,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14467/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -276,6 +295,50 @@
     "body": "this is still relevant\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1798543306/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1862565370",
+    "html_url": "https://github.com/ethereum/solidity/issues/14467#issuecomment-1862565370",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14467",
+    "id": 1862565370,
+    "node_id": "IC_kwDOAm_5kc5vBH36",
+    "user": {
+      "login": "mehtavishwa30",
+      "id": 32997409,
+      "node_id": "MDQ6VXNlcjMyOTk3NDA5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32997409?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mehtavishwa30",
+      "html_url": "https://github.com/mehtavishwa30",
+      "followers_url": "https://api.github.com/users/mehtavishwa30/followers",
+      "following_url": "https://api.github.com/users/mehtavishwa30/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mehtavishwa30/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mehtavishwa30/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mehtavishwa30/subscriptions",
+      "organizations_url": "https://api.github.com/users/mehtavishwa30/orgs",
+      "repos_url": "https://api.github.com/users/mehtavishwa30/repos",
+      "events_url": "https://api.github.com/users/mehtavishwa30/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mehtavishwa30/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-19T11:11:42Z",
+    "updated_at": "2023-12-19T11:11:42Z",
+    "author_association": "MEMBER",
+    "body": "Thanks for your proposal, @Amxx. As we get more inputs on `try`/`catch` improvements of similar nature, we intend to focus these discussions on [our call for feedback on the Solidity forum](https://forum.soliditylang.org/t/call-for-feedback-the-future-of-try-catch-in-solidity/1497). This post details the current state of the `try`/`catch` syntax and aims to collect feedback regarding the evolution of this feature in the future.\r\n\r\nAdditionally, your suggestion to fix the `try`/`catch` pattern (revert from decoding when return data is too short) is covered by a few other open issues listed below:\r\n- #11886\r\n- #13869\r\n- #12725\r\n\r\nConsidering the overlap with other open issues, we will be closing this issue and encourage you to participate or keep an eye out for the developments in the [forum discussion](https://forum.soliditylang.org/t/call-for-feedback-the-future-of-try-catch-in-solidity/1497).",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1862565370/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
