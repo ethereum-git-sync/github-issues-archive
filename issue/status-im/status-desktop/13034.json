@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/13034",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/13034/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/13034/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/13034/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/13034",
+  "id": 2047523686,
+  "node_id": "I_kwDOD5KrTM56Crtm",
+  "number": 13034,
+  "title": "Ban/Unban flows ",
+  "user": {
+    "login": "glitchminer",
+    "id": 50769329,
+    "node_id": "MDQ6VXNlcjUwNzY5MzI5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/50769329?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/glitchminer",
+    "html_url": "https://github.com/glitchminer",
+    "followers_url": "https://api.github.com/users/glitchminer/followers",
+    "following_url": "https://api.github.com/users/glitchminer/following{/other_user}",
+    "gists_url": "https://api.github.com/users/glitchminer/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/glitchminer/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/glitchminer/subscriptions",
+    "organizations_url": "https://api.github.com/users/glitchminer/orgs",
+    "repos_url": "https://api.github.com/users/glitchminer/repos",
+    "events_url": "https://api.github.com/users/glitchminer/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/glitchminer/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2036563458,
+      "node_id": "MDU6TGFiZWwyMDM2NTYzNDU4",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 4548141040,
+      "node_id": "LA_kwDOD5KrTM8AAAABDxcf8A",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/messenger-team",
+      "name": "messenger-team",
+      "color": "232858",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-18T21:52:44Z",
+  "updated_at": "2023-12-18T22:26:38Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "Issue to review the implementation of ban/unban flows as discussed with @benjthayer and @mprakhov. Ban/Unban functions were recently found to move the user to an inbetween state not fully one or the other. Design for what a community should appear like to a banned user is also missing.\r\n\r\nUnban Figma: https://www.figma.com/file/qHfFm7C9LwtXpfdbxssCK3/Kuba%E2%8E%9CDesktop---Communities?type=design&node-id=3250-369531&mode=design&t=jjuJaHJ0zHngpddl-4\r\n\r\nControl node online/offline: https://www.figma.com/file/qHfFm7C9LwtXpfdbxssCK3/Kuba%E2%8E%9CDesktop---Communities?type=design&node-id=35910-617433&mode=design&t=jjuJaHJ0zHngpddl-4\r\n\r\nMobile design: https://www.figma.com/file/h9wo4GipgZURbqqr1vShFN/Communities-for-Mobile?type=design&node-id=7674-521411&mode=design&t=bhBrRFsgWzdUrPfz-4\r\n\r\n# 1. Ban\r\n\r\n## 1.1 Owner/TokenMaster/Admin initiating the ban\r\n* Hovering over a member in the community members list displays the “Ban” button\r\n* Clicking on the ban button displays a popup\r\n\r\n### 1.1.1 Ban popup\r\n* Title: “Ban [member displayname]”\r\n* X to close. Clicking on X closes the pop-up\r\n* Text: Are you sure you want to ban [display name] from [community name]?\r\n* Toggle with label: Delete all messages posted by the user\r\n* “Cancel” button closes the pop-up\r\n\r\n**1.1.1.1 If the control node is offline**\r\n* Clicking the “Ban [display name]” button replaces the “Ban” button with the “Ban pending...” label. When the control node comes online the member is moved from the “All Members” list to the “Banned” list.\r\n\r\n**1.1.1.2 If the control node is online**\r\n* Clicking the \"Ban [display name]\" button moves the member from the “All Members” list to the “Banned” list.\r\n* If “Delete all messages posted by the user” was selected, all the member’s messages are removed from the community\r\n* If “Delete all messages posted by the user” was not selected, all the member’s messages persist in the community\r\n* Member list and count shown to community is updated to not show the member\r\n\r\n## 1.2 Other TokenMasters/Admins/Owner\r\n* While the control node is offline the members list displays the appropriate “Ban pending...” labels.\r\n* Any attempted ban before list is updated is handled appropriately.\r\n* When the control node is online the member lists update to reflect the bans applied.\r\n\r\n## 1.3 Banned community member\r\n* All channels and community message content is hidden from the banned member *design needed\r\n* “You were banned from [community name]” is displayed in place of the join button\r\n* The input field is disabled. “You need to join this community to send messages” is displayed in the input field.\r\n\r\n### 1.3.1 Unknown:\r\n\r\n- Is there a toast on ban?\r\n- Is there a notification added on ban?\r\n- What to display while all channels are hidden?\r\n- What happens to any messages sent by a banned member after the ban is initiated but before the ban is applied their client?\r\n\r\n# 2. Unban\r\n\r\n## 2.1 Owner/TokenMaster/Admin initiating the unban\r\n\r\n- Hovering over a banned member on the “Banned” list displays the “Unban” button\r\n- If the control node is offline, clicking on the “Unban” replaces the \"Unban\" button with the \"Unban pending...\" label *design needed\r\n- If the control node is online, clicking on the “Unban” button unbans the member. The member is moved from the “Banned” list to the “All Members” list. The Member list and count shown to community is updated to show the member\r\n\r\n## 2.2 Other TokenMasters/Admins\r\n- While the control node is offline the members list displays the appropriate “Unban pending...” labels.\r\n- Any attempted unban before the list is updated is handled appropriately.\r\n- When the control node is online the member lists update to reflect the bans applied.\r\n\r\n## 2.3 Unbanned community member\r\n- User receives a toast: “You have been unbanned from [community name]!\r\n- User receives a notification “You have been unbanned from [community name]!\r\n- User automatically rejoins the community if they still meet the criteria of any applicable permissions.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/13034/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/13034/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
