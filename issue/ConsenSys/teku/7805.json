@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2023-12-08T07:52:29Z",
-  "updated_at": "2023-12-18T22:00:43Z",
-  "closed_at": null,
+  "updated_at": "2023-12-19T05:07:40Z",
+  "closed_at": "2023-12-19T05:07:40Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "<!-- \r\nBy filing an Issue, you are expected to comply with the Code of Conduct, \r\nincluding treating everyone with respect:\r\nhttps://github.com/Consensys/teku/blob/master/CODE-OF-CONDUCT.md\r\n\r\nNot all sections will apply to all issue types.\r\n-->\r\n\r\n### Description\r\nWe’ve checked several implementations, but they adopt different data structures for deferring future attestations: Lighthouse and Nimbus are using queue, and Prysm and Teku using map to save early received attestations (Prysm uses non-deterministic map, but Teku uses deterministic map structure).\r\nDue to the above discrepancy, if a slashable pair of attestation (like double voting two different block that shares the same parent block) enter `onAttestation`, Prysm makes a non-deterministic fork choice result. See scenario below.\r\n\r\n\r\n### Steps to Reproduce\r\nScenario\r\nAssumption: No attestation except Attestation X and Y, or B and C has same vote. attester_slashing was not received yet.\r\nSteps:\r\n```\r\n N      N+1     N+2  \r\n[A]  –  [B]  –  [ ] \r\n     \\  [ ]  –  [C] \r\n \r\nSlot N   : Block A\r\nSlot N+1 : Block B (parent: A)\r\nSlot N+2 : Block C (parent also A)\r\n           Receive Attestation_0 from validator X of slot N+3 (attesting block B)\r\n           Receive Attestation_1 from validator X of slot N+3 (attesting block C)\r\nSlot N+3 : Check head\r\n```\r\nExpect: head is B due to other use queue for deferred attestation (later ignored)\r\nResult: Teku deterministically makes the same decisions while Prysm nondeterministically makes different decisions (Note that the results from Teku and Prysm may be different from Lighthouse and Nimbus).\r\n\r\nReferences:\r\nLighthouse: [queued_attestations](https://github.com/sigp/lighthouse/blob/dfcb3363c757671eb19d5f8e519b4b94ac74677a/consensus/fork_choice/src/fork_choice.rs#L1135C13-L1135C17)\r\nTeku: [deferredAttestations](https://github.com/Consensys/teku/blob/8b618b03842ffe866769d9a5192746018290ed18/ethereum/statetransition/src/main/java/tech/pegasys/teku/statetransition/forkchoice/ForkChoice.java#L211C21-L211C21), [futureAttestations](https://github.com/Consensys/teku/blob/e89031eca692b4a4b4df84fa4ae32bae07b491d8/ethereum/statetransition/src/main/java/tech/pegasys/teku/statetransition/attestation/AttestationManager.java#L247C19-L247C37)\r\nPrysm: [processAttestations](https://github.com/prysmaticlabs/prysm/blob/7bc44d9cfe6260964c5c03ae05111cb36088efd1/beacon-chain/blockchain/receive_attestation.go#L163), [AttCaches](https://github.com/prysmaticlabs/prysm/blob/develop/beacon-chain/operations/attestations/kv/kv.go#L27)\r\nNimbus: [queuedAttestations](https://github.com/status-im/nimbus-eth2/blob/d014d0a51cca1dda13d34e3de860aa4287afdb36/beacon_chain/fork_choice/fork_choice.nim#L232)",
-  "closed_by": null,
+  "closed_by": {
+    "login": "hcnam",
+    "id": 43805697,
+    "node_id": "MDQ6VXNlcjQzODA1Njk3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/43805697?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hcnam",
+    "html_url": "https://github.com/hcnam",
+    "followers_url": "https://api.github.com/users/hcnam/followers",
+    "following_url": "https://api.github.com/users/hcnam/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hcnam/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hcnam/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hcnam/subscriptions",
+    "organizations_url": "https://api.github.com/users/hcnam/orgs",
+    "repos_url": "https://api.github.com/users/hcnam/repos",
+    "events_url": "https://api.github.com/users/hcnam/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hcnam/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/Consensys/teku/issues/7805/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/Consensys/teku/issues/7805/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -272,8 +291,52 @@
     "body": "If we're moving this to consensus-specs shall I close this issue here? Not much we can really do to progress this directly...",
     "reactions": {
       "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1861759443/reactions",
-      "total_count": 1,
-      "+1": 1,
+      "total_count": 2,
+      "+1": 2,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1862126054",
+    "html_url": "https://github.com/Consensys/teku/issues/7805#issuecomment-1862126054",
+    "issue_url": "https://api.github.com/repos/Consensys/teku/issues/7805",
+    "id": 1862126054,
+    "node_id": "IC_kwDOCM9I9M5u_cnm",
+    "user": {
+      "login": "hcnam",
+      "id": 43805697,
+      "node_id": "MDQ6VXNlcjQzODA1Njk3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43805697?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hcnam",
+      "html_url": "https://github.com/hcnam",
+      "followers_url": "https://api.github.com/users/hcnam/followers",
+      "following_url": "https://api.github.com/users/hcnam/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hcnam/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hcnam/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hcnam/subscriptions",
+      "organizations_url": "https://api.github.com/users/hcnam/orgs",
+      "repos_url": "https://api.github.com/users/hcnam/repos",
+      "events_url": "https://api.github.com/users/hcnam/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hcnam/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-19T05:07:40Z",
+    "updated_at": "2023-12-19T05:07:40Z",
+    "author_association": "NONE",
+    "body": "I've moved this issue to [consensus-specs/issues/3498](https://github.com/ethereum/consensus-specs/issues/3498)",
+    "reactions": {
+      "url": "https://api.github.com/repos/Consensys/teku/issues/comments/1862126054/reactions",
+      "total_count": 0,
+      "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
