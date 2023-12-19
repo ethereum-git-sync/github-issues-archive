@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ethereum/staking-launchpad/issues/674",
+  "repository_url": "https://api.github.com/repos/ethereum/staking-launchpad",
+  "labels_url": "https://api.github.com/repos/ethereum/staking-launchpad/issues/674/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/staking-launchpad/issues/674/comments",
+  "events_url": "https://api.github.com/repos/ethereum/staking-launchpad/issues/674/events",
+  "html_url": "https://github.com/ethereum/staking-launchpad/issues/674",
+  "id": 2048541202,
+  "node_id": "I_kwDODhgLmM56GkIS",
+  "number": 674,
+  "title": "Deposit out of gas errors and gas estimate",
+  "user": {
+    "login": "hwwhww",
+    "id": 9263930,
+    "node_id": "MDQ6VXNlcjkyNjM5MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9263930?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/hwwhww",
+    "html_url": "https://github.com/hwwhww",
+    "followers_url": "https://api.github.com/users/hwwhww/followers",
+    "following_url": "https://api.github.com/users/hwwhww/following{/other_user}",
+    "gists_url": "https://api.github.com/users/hwwhww/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/hwwhww/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/hwwhww/subscriptions",
+    "organizations_url": "https://api.github.com/users/hwwhww/orgs",
+    "repos_url": "https://api.github.com/users/hwwhww/repos",
+    "events_url": "https://api.github.com/users/hwwhww/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/hwwhww/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-19T12:15:04Z",
+  "updated_at": "2023-12-19T12:18:05Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "Thank @parithosh and users for helping report it.\r\n\r\n## Issue\r\n\r\n#### Issue on Holesky:\r\n> A lot of deposits are randomly failing via the official launchpad due to Warning! Error encountered during contract execution [out of gas]\r\nhttps://holesky.etherscan.io/address/0x4242424242424242424242424242424242424242\r\n> example txn: https://holesky.etherscan.io/tx/0xda360eb53f1d55afedde9077120a8a278ad692364b641462514eed182462cf62\r\n> I also looked at other transactions on the contract and it seems that other users have also been observing this behavior for a few days\r\n\r\n#### Issue on Mainnet:\r\n\r\nI checked the deposit txs since January 1st, 2023, and there are 32 similar cases by 4 different senders.\r\nFor example: https://etherscan.io/tx/0x1f0058046a81d08edcf2c6cd720836434269ee22121e5425311f760451feb0ca\r\n\r\nNote: not sure if they used launchpad or other tools\r\n\r\n## Potential cause\r\nFrom my poor Dapp experience and code trace, I think [Launchpad doesn’t set a specific gas limit](https://github.com/ethereum/staking-launchpad/blob/e092fa428532a55b5f9ff2764e2e416478856040/src/pages/Transactions/transactionUtils.tsx#L73), so it is using the `eth_gasEstimate` RPC call result to set the gas limit.\r\n\r\n[The deposit contract FV report](https://github.com/runtimeverification/deposit-contract-verification/blob/96434de/deposit-contract-verification.pdf) said the best-to-worst gas cost is between [46162, 157642].\r\n\r\n#### A hypothesis\r\n\r\nI suspect the gas estimate was inaccurate when deposit call congestion happened because the TX ordering was unknown; therefore, the user may get out of gas error. Does that make sense?\r\n\r\nHowever, in my previous deposit on Holesky launchpad (via metamask, see [here](https://holesky.beaconcha.in/tx/0xad2e486fe37aa3612be53171fa42e96d4094fbacf7e4517ce7312f69725489d6)), the gas limit was much larger than the gas used.\r\n\r\n/cc @CarlBeek @wackerow  for consulting 🙏\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/staking-launchpad/issues/674/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/staking-launchpad/issues/674/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
