@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 8,
+  "comments": 9,
   "created_at": "2023-08-04T23:29:25Z",
-  "updated_at": "2023-09-05T11:48:07Z",
-  "closed_at": null,
+  "updated_at": "2023-12-20T12:13:54Z",
+  "closed_at": "2023-12-20T12:13:54Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nWhen compiling Yul, setting `enabled: false` and even `yul: false` seems to leave on a lot of optimizations.  Moreover, setting `yul: false` prohibits setting `yulDetails`; this means that to get code that isn't substantially optimized, you actually have to set `yul: true` so you can go into `yulDetails` and turn things off!\r\n\r\nI'm a bit unsure how much this is a bug and how much this is intentional, but it didn't seem right to me (the part about having to set `yul: true` in particular strikes me as perverse), so I thought I'd file an issue.  Thanks!\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.21\r\n- Target EVM version (as per compiler settings): default\r\n\r\n## Steps to Reproduce\r\n\r\nFor what it's worth, the test contract I was trying this with was\r\n\r\n```yul\r\nobject \"YulTest\" {\r\n  code {\r\n    let size := datasize(\"runtime\")\r\n    datacopy(0, dataoffset(\"runtime\"), size)\r\n    return(0, size)\r\n  }\r\n  object \"runtime\" {\r\n    code {\r\n      let a := 1\r\n      let b := 2\r\n      b := add(b,a)\r\n      mstore(0, add(b, a))\r\n      return(0, 0x20)\r\n    }\r\n  }\r\n}\r\n```\r\n\r\n(Well, that, and quite a few variants on it.)  The code above got substantially rewritten even with `enabled: false` and `yul: false`, as mentioned above!  I had to set `yul: true` and go turn things off in `yulDetails` to get something that worked the way I wrote it above...",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mehtavishwa30",
+    "id": 32997409,
+    "node_id": "MDQ6VXNlcjMyOTk3NDA5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/32997409?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mehtavishwa30",
+    "html_url": "https://github.com/mehtavishwa30",
+    "followers_url": "https://api.github.com/users/mehtavishwa30/followers",
+    "following_url": "https://api.github.com/users/mehtavishwa30/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mehtavishwa30/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mehtavishwa30/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mehtavishwa30/subscriptions",
+    "organizations_url": "https://api.github.com/users/mehtavishwa30/orgs",
+    "repos_url": "https://api.github.com/users/mehtavishwa30/repos",
+    "events_url": "https://api.github.com/users/mehtavishwa30/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mehtavishwa30/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14470/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14470/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -412,6 +431,50 @@
     "body": "When we compile inline assembly in legacy (non-via-IR) code generation, we still use the older transformation from Yul to EVM bytecode (the reason for that is that in that pipeline the compiler itself relies on the more predictable allocation of stack slots for tying the assembly/Yul snippets to the opcodes directly generated from the surrounding Solidity code) - so that explains that reconstructing stack locations is simpler in that case.\r\n\r\nConversely, when compiling Yul or when compiling Solidity using the new via-IR pipeline, we use more elaborate and global mechanisms for assigning stack slots (that used to only happen with the optimizer enabled, but after https://github.com/ethereum/solidity/pull/14149 it's also the default behaviour without optimizer - I mentioned that change in solc-tooling here https://matrix.to/#/!nFrzmgewkRourOtwgQ:matrix.org/$8b62xhTVSM_K7tnGnLojkD1h55Mz4EiyWNrCm8dGzfE?via=matrix.org&via=t2bot.io&via=trufflesuite.com and was actually surprised that nobody reported any issues, but in retrospect I should have tried harder to get more attention to it). For that case I'd actually even advice against trying to reconstruct how we assign stack locations in the debugger - the process is complex and based on not readily-reconstructible heuristics; local changes to the Yul code can have global effects on the stack layout, etc.\r\n\r\nThat's one of the main reasons for ethdebug - we know the stack locations during compilation and would ideally just output them for you. It's a bit unfortunate that there will be some compiler versions until we actually output that information for you to bridge.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1706467804/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1864373762",
+    "html_url": "https://github.com/ethereum/solidity/issues/14470#issuecomment-1864373762",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14470",
+    "id": 1864373762,
+    "node_id": "IC_kwDOAm_5kc5vIBYC",
+    "user": {
+      "login": "mehtavishwa30",
+      "id": 32997409,
+      "node_id": "MDQ6VXNlcjMyOTk3NDA5",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32997409?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mehtavishwa30",
+      "html_url": "https://github.com/mehtavishwa30",
+      "followers_url": "https://api.github.com/users/mehtavishwa30/followers",
+      "following_url": "https://api.github.com/users/mehtavishwa30/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mehtavishwa30/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mehtavishwa30/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mehtavishwa30/subscriptions",
+      "organizations_url": "https://api.github.com/users/mehtavishwa30/orgs",
+      "repos_url": "https://api.github.com/users/mehtavishwa30/repos",
+      "events_url": "https://api.github.com/users/mehtavishwa30/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mehtavishwa30/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-20T12:13:54Z",
+    "updated_at": "2023-12-20T12:13:54Z",
+    "author_association": "MEMBER",
+    "body": "Thanks for reporting this issue. We will be closing this for now and expect Ethdebug to address this issue eventually.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1864373762/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
