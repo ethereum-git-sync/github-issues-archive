@@ -47,13 +47,13 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-12-20T09:16:26Z",
-  "updated_at": "2023-12-20T09:16:27Z",
+  "updated_at": "2023-12-20T16:28:17Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
-  "body": "This ticket is meant to soup up the information gathered when investigating https://github.com/ethereum/go-ethereum/pull/28516. \r\n\r\n\r\n### Linux\r\n\r\nOn `linux`, it enumerates three devices. NB: the ledger udev-rules must be applied for any of this to work.  \r\n\r\n0. `usb.DeviceInfo{Path:\"2c97:4015:01\", VendorID:0x2c97, ProductID:0x4015, Release:0x0, Serial:\"\", Manufacturer:\"\", Product:\"\", UsagePage:0x0, Usage:0x0, Interface:2, rawDevice:(*usb._Ctype_struct_libusb_device)(0x7c09bc009590), rawPort:(*uint8)(0xc0007ac050), rawReader:(*uint8)(0xc0007ac040), rawWriter:(*uint8)(0xc0007ac041)}`\r\n1. `usb.DeviceInfo{Path:\"0001:0005:00\", VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0x0, Usage:0x0, Interface:0, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n2. `usb.DeviceInfo{Path:\"0001:0005:01\", VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0x0, Usage:0x0, Interface:1, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n\r\nThe enumeration covers both `raw` and `hid`, and the first device is a `raw`. \r\n\r\nThe selection process will select device number `1` (the hid device `\"0001:0005:00\"`),\r\n- `ProductID` `0x4015` is matched on all\r\n-  `hub.UsageID(0xffa0)` == `device.UsagePage(0x0)` (not matched on any)\r\n- `info.Interface `2`,`0`,`1` is matched to `hub.endpointID=0` on device `1`.\r\n\r\nHowever, both devices `0` and `1` works fine, only the second HID does not work (derive accounts) \r\n\r\nDevice zero: \r\n```\r\nINFO [12-20|08:21:15.246] New wallet appeared                      url=ledger://2c97:4015:01 status=\"Ethereum app v1.9.19 online\"\r\n```\r\nDevice one: \r\n```\r\nINFO [12-20|08:22:26.688] New wallet appeared                      url=ledger://0001:0002:00 status=\"Ethereum app v1.9.19 online\"\r\n```\r\n\r\n### Mac\r\n\r\nOn `mac`, it also enumerates three devices, the first being a `raw` and latter two are `hid`. \r\n\r\n0. `usb.DeviceInfo{Path:\"2c97:4015:01\", VendorID:0x2c97, ProductID:0x4015, Release:0x0,   Serial:\"\",     Manufacturer:\"\",       Product:\"\",       UsagePage:0x0,    Usage:0x0, Interface:2,  rawDevice:(*usb._Ctype_struct_libusb_device)(0x6000003cc3c0), rawPort:(*uint8)(0x140002e84a8), rawReader:(*uint8)(0x140002e8498), rawWriter:(*uint8)(0x140002e8499)} `\r\n1. `usb.DeviceInfo{Path:\"\",             VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0xffa0, Usage:0x1, Interface:-1, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n2. `usb.DeviceInfo{Path:\"\",             VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0xf1d0, Usage:0x1, Interface:-1, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n\r\n\r\nThe selection process will select device `1`: \r\n- `ProductID` `0x4015` is matched on all\r\n-  `hub.UsageID(0xffa0)` == `device.UsagePage` matched on device `1`.\r\n-  `hub.endpointID=0` == `info.Interface` is not matched on any (`2`,`-1`,`-1`). \r\n\r\n@lightclient didn't you get the result that none were matched? Please help amend this. \r\n\r\nOn mac, _only_ device `0`, the `raw` device, works properly (open + derive addresses). \r\n\r\n",
+  "body": "This ticket is meant to soup up the information gathered when investigating https://github.com/ethereum/go-ethereum/pull/28516. \r\n\r\n\r\n### Linux\r\n\r\nOn `linux`, it enumerates three devices. NB: the ledger udev-rules must be applied for any of this to work.  \r\n\r\n0. `usb.DeviceInfo{Path:\"2c97:4015:01\", VendorID:0x2c97, ProductID:0x4015, Release:0x0, Serial:\"\", Manufacturer:\"\", Product:\"\", UsagePage:0x0, Usage:0x0, Interface:2, rawDevice:(*usb._Ctype_struct_libusb_device)(0x7c09bc009590), rawPort:(*uint8)(0xc0007ac050), rawReader:(*uint8)(0xc0007ac040), rawWriter:(*uint8)(0xc0007ac041)}`\r\n1. `usb.DeviceInfo{Path:\"0001:0005:00\", VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0x0, Usage:0x0, Interface:0, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n2. `usb.DeviceInfo{Path:\"0001:0005:01\", VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0x0, Usage:0x0, Interface:1, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n\r\nThe enumeration covers both `raw` and `hid`, and the first device is a `raw`. \r\n\r\nThe selection process will select device number `1` (the hid device `\"0001:0005:00\"`),\r\n- `ProductID` `0x4015` is matched on all\r\n-  `hub.UsageID(0xffa0)` == `device.UsagePage(0x0)` (not matched on any)\r\n- `info.Interface` `2`,`0`,`1` is matched to `hub.endpointID=0` on device `1`.\r\n\r\nHowever, both devices `0` and `1` works fine, only the second HID does not work (derive accounts) \r\n\r\nDevice zero: \r\n```\r\nINFO [12-20|08:21:15.246] New wallet appeared                      url=ledger://2c97:4015:01 status=\"Ethereum app v1.9.19 online\"\r\n```\r\nDevice one: \r\n```\r\nINFO [12-20|08:22:26.688] New wallet appeared                      url=ledger://0001:0002:00 status=\"Ethereum app v1.9.19 online\"\r\n```\r\n\r\n### Mac\r\n\r\nOn `mac`, it also enumerates three devices, the first being a `raw` and latter two are `hid`. \r\n\r\n0. `usb.DeviceInfo{Path:\"2c97:4015:01\", VendorID:0x2c97, ProductID:0x4015, Release:0x0,   Serial:\"\",     Manufacturer:\"\",       Product:\"\",       UsagePage:0x0,    Usage:0x0, Interface:2,  rawDevice:(*usb._Ctype_struct_libusb_device)(0x6000003cc3c0), rawPort:(*uint8)(0x140002e84a8), rawReader:(*uint8)(0x140002e8498), rawWriter:(*uint8)(0x140002e8499)} `\r\n1. `usb.DeviceInfo{Path:\"\",             VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0xffa0, Usage:0x1, Interface:-1, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n2. `usb.DeviceInfo{Path:\"\",             VendorID:0x2c97, ProductID:0x4015, Release:0x201, Serial:\"0001\", Manufacturer:\"Ledger\", Product:\"Nano X\", UsagePage:0xf1d0, Usage:0x1, Interface:-1, rawDevice:interface {}(nil), rawPort:(*uint8)(nil), rawReader:(*uint8)(nil), rawWriter:(*uint8)(nil)}`\r\n\r\n\r\nThe selection process will select device `1`: \r\n- `ProductID` `0x4015` is matched on all\r\n-  `hub.UsageID(0xffa0)` == `device.UsagePage` matched on device `1`.\r\n-  `hub.endpointID=0` == `info.Interface` is not matched on any (`2`,`-1`,`-1`). \r\n\r\n@lightclient didn't you get the result that none were matched? Please help amend this. \r\n\r\nOn mac, _only_ device `0`, the `raw` device, works properly (open + derive addresses). \r\n\r\n",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28711/reactions",
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1864412640",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28711#issuecomment-1864412640",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28711",
+    "id": 1864412640,
+    "node_id": "IC_kwDOAOvK985vIK3g",
+    "user": {
+      "login": "holiman",
+      "id": 142290,
+      "node_id": "MDQ6VXNlcjE0MjI5MA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/holiman",
+      "html_url": "https://github.com/holiman",
+      "followers_url": "https://api.github.com/users/holiman/followers",
+      "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+      "organizations_url": "https://api.github.com/users/holiman/orgs",
+      "repos_url": "https://api.github.com/users/holiman/repos",
+      "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/holiman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-20T12:44:04Z",
+    "updated_at": "2023-12-20T12:54:22Z",
+    "author_association": "MEMBER",
+    "body": "Curious, I tested the https://github.com/todbot/hidapitester (based on hidapi), with the same Nano X plugged in\r\n\r\n```\r\n$ ./hidapitester --list-detail\r\n2C97/4015: Ledger - Nano X\r\n  vendorId:      0x2C97\r\n  productId:     0x4015\r\n  usagePage:     0xFFA0\r\n  usage:         0x0001\r\n  serial_number: 0001 \r\n  interface:     0 \r\n  path: /dev/hidraw0\r\n\r\n2C97/4015: Ledger - Nano X\r\n  vendorId:      0x2C97\r\n  productId:     0x4015\r\n  usagePage:     0xF1D0\r\n  usage:         0x0001\r\n  serial_number: 0001 \r\n  interface:     1 \r\n  path: /dev/hidraw1\r\n```\r\nIt lists only the `raw` device, and also it obtains a `UsagePage` of `0xF1D0`, which our lib does not. \r\n",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1864412640/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
