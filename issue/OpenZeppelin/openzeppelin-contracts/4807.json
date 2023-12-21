@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4807",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4807/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4807/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4807/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4807",
+  "id": 2053055015,
+  "node_id": "I_kwDOA9tCBs56XyIn",
+  "number": 4807,
+  "title": "Split out custom errors into separate interface",
+  "user": {
+    "login": "KholdStare",
+    "id": 836110,
+    "node_id": "MDQ6VXNlcjgzNjExMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/836110?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/KholdStare",
+    "html_url": "https://github.com/KholdStare",
+    "followers_url": "https://api.github.com/users/KholdStare/followers",
+    "following_url": "https://api.github.com/users/KholdStare/following{/other_user}",
+    "gists_url": "https://api.github.com/users/KholdStare/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/KholdStare/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/KholdStare/subscriptions",
+    "organizations_url": "https://api.github.com/users/KholdStare/orgs",
+    "repos_url": "https://api.github.com/users/KholdStare/repos",
+    "events_url": "https://api.github.com/users/KholdStare/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/KholdStare/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-21T21:02:22Z",
+  "updated_at": "2023-12-21T21:02:22Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**🧐 Motivation**\r\nWe have been using custom errors for over a year in our contracts and have found some beneficial usage patterns. The most important is splitting out just the custom errors into their own interface so they can be re-used by final derived contracts.\r\n\r\nWith `revert` statements with strings, the errors were self-describing and did not need to be added to a contract's interface. Since custom errors have to be decoded by a user, all possible errors have to be known in advance. Some approaches that have not worked:\r\n\r\n- Convince the solidity compiler to \"bubble up\" all the errors to the top: https://github.com/ethereum/solidity/issues/13683 . This was rejected.\r\n- Convince tools like Foundry to generate the set of possible errors: https://github.com/foundry-rs/foundry/issues/3656 . This is still pending\r\n\r\nAt the end of the day it's up to the writers of the final contracts to ensure they accurately reflect what errors can be raised so users can effectively decode them. By splitting out just `error`s into their own interface, it is now possible for the final contract to inherit all the error interfaces for all direct and transitive dependencies. It is manual, but better than not specifying anything and leaving users of the final contract in the dark.\r\n\r\n**📝 Details**\r\n\r\nAs an abstract example:\r\n\r\n```solidity\r\n// Before\r\ninterface IFoo {\r\n  error FooError(uint256 foo);\r\n\r\n  function foo() external;\r\n}\r\n\r\ncontract Foo is IFoo { };\r\n\r\ncontract FooCaller {\r\n  Foo private foo;\r\n\r\n  function useFoo() external {\r\n    foo.foo(); // can revert with FooError, but FooCaller does not include it in its interface\r\n  }\r\n};\r\n```\r\n\r\n```solidity\r\n// After\r\ninterface IFooErrors {\r\n  error FooError(uint256 foo);\r\n}\r\n\r\ninterface IFoo is IFooErrors {\r\n  function foo() external;\r\n}\r\n\r\ncontract Foo is IFoo { };\r\n\r\ncontract FooCaller is IFooErrors {\r\n  Foo private foo;\r\n\r\n  function useFoo() external {\r\n    foo.foo(); // FooError is part of the interface\r\n  }\r\n};\r\n```\r\n\r\nAs you can see `FooCaller`'s ABI accurately reflects the fact that `FooError` can be raised by calling the contract's functions. For OpenZeppelin, it should be a backward compatible change. The `error`s can be extracted out into their own interfaces and the main interfaces inherit from the error interface. The interfaceId for ERC165 detection should also not be affected, since `error`s do not affect the interfaceId.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4807/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4807/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
