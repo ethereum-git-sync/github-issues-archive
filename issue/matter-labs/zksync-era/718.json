@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/718",
+  "repository_url": "https://api.github.com/repos/matter-labs/zksync-era",
+  "labels_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/718/labels{/name}",
+  "comments_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/718/comments",
+  "events_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/718/events",
+  "html_url": "https://github.com/matter-labs/zksync-era/issues/718",
+  "id": 2051833283,
+  "node_id": "I_kwDOI-FneM56TH3D",
+  "number": 718,
+  "title": "No errors when running zksync_prover_fri, but a loop that waits for it to finish and then restarts (this is not normal)",
+  "user": {
+    "login": "she110ff",
+    "id": 4507066,
+    "node_id": "MDQ6VXNlcjQ1MDcwNjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4507066?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/she110ff",
+    "html_url": "https://github.com/she110ff",
+    "followers_url": "https://api.github.com/users/she110ff/followers",
+    "following_url": "https://api.github.com/users/she110ff/following{/other_user}",
+    "gists_url": "https://api.github.com/users/she110ff/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/she110ff/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/she110ff/subscriptions",
+    "organizations_url": "https://api.github.com/users/she110ff/orgs",
+    "repos_url": "https://api.github.com/users/she110ff/repos",
+    "events_url": "https://api.github.com/users/she110ff/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/she110ff/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5157016638,
+      "node_id": "LA_kwDOI-FneM8AAAABM2HUPg",
+      "url": "https://api.github.com/repos/matter-labs/zksync-era/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-21T07:10:41Z",
+  "updated_at": "2023-12-21T07:10:41Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### 🐛 Bug Report\r\n\r\n#### 📝 Description\r\n\r\nI am running cpu prover.\r\n\r\nIf I run zksync_prover_fri locally (dev.env) based on this link document (https://github.com/matter-labs/zksync-era/tree/main/prover/prover_fri), it will be executed normally and terminated as shown below.\r\n`\r\n2023-12-21T06:48:25.644031Z  INFO zksync_prover_fri_utils: Started processing prover job: FriProverJobMetadata { id: 43, block_number: L1BatchNumber(1), circuit_id: 1, aggregation_round: BasicCircuits, sequence_number: 42, depth: 0, is_node_final_proof: false }\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:218] interactive_soundness = 106\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:280] quotient_degree = 8\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:622] total_num_lookup_argument_terms = 9\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:623] total_num_gate_terms_for_specialized_columns = 1\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:624] total_num_gate_terms_for_general_purpose_columns = 414\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:625] num_intermediate_partial_product_relations = 19\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:2109] &interpolation_log2s_schedule = [\r\n    3,\r\n    3,\r\n    3,\r\n    3,\r\n    3,\r\n    2,\r\n]\r\n[/home/youngsoo/.cargo/git/checkouts/era-boojum-eee09114f0ca3855/84754b0/src/cs/implementations/prover.rs:2110] cap_size = 16\r\n2023-12-21T06:50:34.045258Z  INFO zksync_prover_fri::utils: Successfully proven job: 43, total time taken: 128.385922546s\r\n2023-12-21T06:50:34.058549Z  INFO zksync_prover_fri_utils: Started processing prover job: FriProverJobMetadata { id: 45, block_number: L1BatchNumber(1), circuit_id: 1, aggregation_round: BasicCircuits, sequence_number: 44, depth: 0, is_node_final_proof: false }\r\nyoungsoo@youngsoo-NUC13ANKi7:~/IdeaProjects/zksync-era/prover$ \r\n\r\n`\r\n\r\nI am running zksync_prover_fri over 40 times to process 40 sequences (based on prover_jobs_fri in the table of database).\r\n\r\n#### 🔄 Reproduction Steps\r\n\r\nSame as [Steps to reproduce the behaviour](https://github.com/matter-labs/zksync-era/tree/main/prover/prover_fri)\r\n\r\n#### 🤔 Expected Behavior\r\n\r\nIf I run the command below, I want it to happen all at once without exiting the program. \r\n\r\n`\r\nzk f cargo +nightly-2023-08-21 run --release --bin zksync_prover_fri\r\n`\r\nAnd I want to know what setting values (timeout, interval) I can set.\r\n\r\n#### 😯 Current Behavior\r\n\r\nThere are no errors when running zksync_prover_fri, but only two or three statuses (types : successful, failed, in progress, queued). \r\n\r\n`\r\nyoungsoo@youngsoo-NUC13ANKi7:~/IdeaProjects/zksync-era$ zk status prover\r\n==== FRI Prover status ====\r\nState keeper: First batch: 0, recent batch: 1\r\nL1 state: block verified: 0, block committed: 1\r\nVerification key hash on contract is 0x750d8e21be7555a6841472a5cacd24c75a7ceb34261aea61e72bb7423a7d30fc\r\nGot 0 rows with protocol versions, expected 1\r\nVerifier params on contract are 0x5a3ef282b21e12fe1f4438e5bb158fc5060b160559c5158c6389d62d9fe3d080, 0x14628525c227822148e718ca1138acfc6d25e759e19452455d89f7f610c3dcb8, 0x0000000000000000000000000000000000000000000000000000000000000000\r\nVerifcation params match.\r\nNext block that should be verified is: 1\r\nChecking status of the proofs...\r\nProof progress for 1 : 44 successful, 0 failed, 3 in progress, 33 queued.  [No compression job found]\r\n\r\n\r\nyoungsoo@youngsoo-NUC13ANKi7:~/IdeaProjects/zksync-era$ zk status prover\r\n==== FRI Prover status ====\r\nState keeper: First batch: 0, recent batch: 1\r\nL1 state: block verified: 0, block committed: 1\r\nVerification key hash on contract is 0x750d8e21be7555a6841472a5cacd24c75a7ceb34261aea61e72bb7423a7d30fc\r\nGot 0 rows with protocol versions, expected 1\r\nVerifier params on contract are 0x5a3ef282b21e12fe1f4438e5bb158fc5060b160559c5158c6389d62d9fe3d080, 0x14628525c227822148e718ca1138acfc6d25e759e19452455d89f7f610c3dcb8, 0x0000000000000000000000000000000000000000000000000000000000000000\r\nVerifcation params match.\r\nNext block that should be verified is: 1\r\nChecking status of the proofs...\r\nProof progress for 1 : 45 successful, 0 failed, 2 in progress, 33 queued.  [No compression job found]\r\n\r\n`\r\n\r\n\r\n#### 🖥️ Environment\r\n\r\n<img width=\"644\" alt=\"image\" src=\"https://github.com/matter-labs/zksync-era/assets/4507066/73626a5b-4101-4bc4-81c8-89aed5ea9b3a\">\r\n\r\n\r\n#### 📋 Additional Context\r\n\r\n#### 📎 Log Output\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/matter-labs/zksync-era/issues/718/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/matter-labs/zksync-era/issues/718/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
