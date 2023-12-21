@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6643",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6643/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6643/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6643/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6643",
+  "id": 2051759980,
+  "node_id": "I_kwDOGBlvNc56S19s",
+  "number": 6643,
+  "title": "Forge test `expectEmit` fails when it should succeed",
+  "user": {
+    "login": "zzh1996",
+    "id": 10773481,
+    "node_id": "MDQ6VXNlcjEwNzczNDgx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10773481?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zzh1996",
+    "html_url": "https://github.com/zzh1996",
+    "followers_url": "https://api.github.com/users/zzh1996/followers",
+    "following_url": "https://api.github.com/users/zzh1996/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zzh1996/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zzh1996/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zzh1996/subscriptions",
+    "organizations_url": "https://api.github.com/users/zzh1996/orgs",
+    "repos_url": "https://api.github.com/users/zzh1996/repos",
+    "events_url": "https://api.github.com/users/zzh1996/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zzh1996/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-21T06:06:19Z",
+  "updated_at": "2023-12-21T06:06:19Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (df49ddd 2023-12-21T00:22:15.620581000Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nmacOS (Intel)\n\n### Describe the bug\n\n1. Run `forge init`\r\n\r\n2. Modify these files accordingly:\r\n\r\nCounter.sol\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\ncontract Counter {\r\n    event TestEvent(uint n);\r\n\r\n    constructor() {\r\n        emit TestEvent(1);\r\n    }\r\n\r\n    function f() external {\r\n        emit TestEvent(2);\r\n    }\r\n}\r\n```\r\n\r\nCounter.t.sol\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nimport {Test, console2} from \"forge-std/Test.sol\";\r\nimport {Counter} from \"../src/Counter.sol\";\r\n\r\ncontract CounterTest is Test {\r\n    Counter public counter;\r\n    event TestEvent(uint n);\r\n\r\n    function setUp() public {\r\n        counter = new Counter();\r\n    }\r\n\r\n    function test_Bug() public {\r\n        // part1\r\n        vm.expectEmit();\r\n        emit TestEvent(1);\r\n        new Counter();\r\n\r\n        // part2\r\n        vm.expectEmit();\r\n        emit TestEvent(2);\r\n        counter.f();\r\n    }\r\n}\r\n```\r\n\r\n3. Run `forge test -vvv`\r\n\r\nExpected behavior: test passed\r\nActual behavior: test failed\r\n\r\n```\r\nTraces:\r\n  [77239] CounterTest::test_Bug()\r\n    ├─ [0] VM::expectEmit()\r\n    │   └─ ← ()\r\n    ├─ emit TestEvent(n: 1)\r\n    ├─ [33338] → new Counter@0x2e234DAe75C793f67A35089C9d99245E1C58470b\r\n    │   ├─ emit TestEvent(n: 1)\r\n    │   └─ ← 161 bytes of code\r\n    ├─ [0] VM::expectEmit()\r\n    │   └─ ← ()\r\n    ├─ emit TestEvent(n: 2)\r\n    ├─ [1179] Counter::f()\r\n    │   ├─ emit TestEvent(n: 2)\r\n    │   └─ ← ()\r\n    └─ ← log != expected log\r\n```\r\n\r\nNote that when you comment out the three lines of code in part1, or the three lines of code in part2, the test can pass normally.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6643/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6643/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
