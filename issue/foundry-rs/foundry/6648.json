@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6648",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6648/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6648/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6648/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6648",
+  "id": 2052752330,
+  "node_id": "I_kwDOGBlvNc56WoPK",
+  "number": 6648,
+  "title": "Failure on `vm.expectCall` is not catchable",
+  "user": {
+    "login": "amusingaxl",
+    "id": 112016538,
+    "node_id": "U_kgDOBq08mg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/112016538?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/amusingaxl",
+    "html_url": "https://github.com/amusingaxl",
+    "followers_url": "https://api.github.com/users/amusingaxl/followers",
+    "following_url": "https://api.github.com/users/amusingaxl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/amusingaxl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/amusingaxl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/amusingaxl/subscriptions",
+    "organizations_url": "https://api.github.com/users/amusingaxl/orgs",
+    "repos_url": "https://api.github.com/users/amusingaxl/repos",
+    "events_url": "https://api.github.com/users/amusingaxl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/amusingaxl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-21T16:43:14Z",
+  "updated_at": "2023-12-21T16:43:14Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (1978a03 2023-12-21T09:45:30.854629898Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nI need to execute a specific test case only when a certain call was made in the subject under test.\r\n\r\nI tried to do that by wrapping the call into a `vm.expectCall` with a `try...catch` block.\r\nPerhaps I'm abusing the mechanism a little bit, but I would expect it to work.\r\n\r\nHere is the minimum reproduceable example:\r\n\r\n```solidity\r\npragma solidity ^0.8.13;\r\n\r\nimport {Test, console2} from \"forge-std/Test.sol\";\r\ncontract A {\r\n    function shouldNotCall() external view {\r\n    }\r\n\r\n    function check() external view {\r\n        this.shouldNotCall(); // Comment this out to fix\r\n    }\r\n}\r\n\r\ncontract ATest is Test {\r\n    A inst = new A();\r\n\r\n    function _shouldFail() external {\r\n        vm.expectCall(address(inst), abi.encodeWithSelector(inst.shouldNotCall.selector), 0);\r\n        inst.check();\r\n    }\r\n\r\n    function testExpectCallRevert() public {\r\n        try this._shouldFail() {\r\n            console2.log(\"In try block!\");\r\n            return;\r\n        } catch {\r\n            console2.log(\"In catch block!\");\r\n            // Keep on with the test\r\n        }\r\n    }\r\n}\r\n```\r\n\r\nIt outputs:\r\n\r\n```\r\nLogs:\r\n  In try block!     <============ This is unexpected!!!!\r\n\r\nTraces:\r\n  [12899] ATest::testExpectCallRevert()\r\n    ├─ [9184] ATest::_shouldFail()\r\n    │   ├─ [0] VM::expectCall(A: [0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f], 0x1b73e40e, 0)\r\n    │   │   └─ ← ()\r\n    │   ├─ [577] A::check() [staticcall]\r\n    │   │   ├─ [98] A::shouldNotCall() [staticcall]\r\n    │   │   │   └─ ← ()\r\n    │   │   └─ ← ()\r\n    │   └─ ← ()\r\n    ├─ [0] console::log(\"In try block!\") [staticcall]\r\n    │   └─ ← ()\r\n    └─ ← ()\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 748.15µs\r\n \r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/ATest.sol:ATest\r\n[FAIL. Reason: expected call to 0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f with data 0x1b73e40e to be called 0 times, but was called 1 time] testExpectCallRevert() (gas: 12899)\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6648/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6648/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
