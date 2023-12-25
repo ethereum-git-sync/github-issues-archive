@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6666",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6666/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6666/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6666/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6666",
+  "id": 2055409964,
+  "node_id": "I_kwDOGBlvNc56gxEs",
+  "number": 6666,
+  "title": "Capacity Overflow During Invariant Testing",
+  "user": {
+    "login": "DanielGelfand",
+    "id": 33498710,
+    "node_id": "MDQ6VXNlcjMzNDk4NzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33498710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/DanielGelfand",
+    "html_url": "https://github.com/DanielGelfand",
+    "followers_url": "https://api.github.com/users/DanielGelfand/followers",
+    "following_url": "https://api.github.com/users/DanielGelfand/following{/other_user}",
+    "gists_url": "https://api.github.com/users/DanielGelfand/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/DanielGelfand/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/DanielGelfand/subscriptions",
+    "organizations_url": "https://api.github.com/users/DanielGelfand/orgs",
+    "repos_url": "https://api.github.com/users/DanielGelfand/repos",
+    "events_url": "https://api.github.com/users/DanielGelfand/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/DanielGelfand/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-25T06:02:31Z",
+  "updated_at": "2023-12-25T06:17:30Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (67ab870 2023-12-25T00:25:37.702950000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\n```\r\n[⠆] Compiling...\r\nNo files changed, compilation skipped\r\nThe application panicked (crashed).\r\nMessage:  capacity overflow\r\nLocation: library/alloc/src/raw_vec.rs:534\r\n\r\nThis is a bug. Consider reporting it at https://github.com/foundry-rs/foundry\r\n\r\n  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ BACKTRACE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\r\n   1: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   2: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   3: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   4: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   5: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   6: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   7: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   8: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n   9: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  10: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  11: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  12: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  13: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  14: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  15: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  16: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  17: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  18: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  19: __mh_execute_header<unknown>\r\n      at <unknown source file>:<unknown line>\r\n  20: __pthread_deallocate<unknown>\r\n      at <unknown source file>:<unknown line>\r\n```\r\n\r\nDuring invariant testing (with a fork), if I were to add a console log or an extra operation such as a simple `balanceOf` the error `capacity overflow` would show up. I would then have to play with removing/rearranging certain lines or modifying runs/depth to get the invariant test to run.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6666/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6666/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
