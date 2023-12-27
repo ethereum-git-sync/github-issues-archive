@@ -49,15 +49,15 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2021-05-21T18:07:38Z",
-  "updated_at": "2021-06-13T10:07:17Z",
+  "updated_at": "2023-12-26T20:44:48Z",
   "closed_at": null,
-  "author_association": "CONTRIBUTOR",
+  "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "After implementing a rough POC web-based light-client consumer in Lodestar, I would like to share some feedback about it.\r\n\r\n1. In `validate_light_client_update` this condition invalidates updates that are technically valid.\r\n```python\r\nif update_period == snapshot_period:\r\n        sync_committee = snapshot.current_sync_committee\r\n        assert update.next_sync_committee_branch == [Bytes32() for _ in range(floorlog2(NEXT_SYNC_COMMITTEE_INDEX))]\r\n```\r\nThe update provider (server) does not know in advance if the update_period is > snapshot_period. It could just check before if `update.next_sync_committee` is zeroed and verify it otherwise\r\n\r\n2. An update provider may want to send the light-client consumer an update for the same slot but with higher consensus. This happens frequently for finalized sync where sync committees will be producing valid updates for the same `update.header.slot` during an epoch but they may have more bits than the previous. This condition invalidates useful updates and I believe it can be omitted.\r\n```python\r\nassert update.header.slot > snapshot.header.slot\r\n```\r\n\r\n3. In `LightClientStore` the purpose of `valid_updates` is to potentially use one of those if there is an update timeout. Instead, `LightClientStore` could just keep a single `best_update` and run the logic the pick the best on every new update. To comply with SSZ it can be zeroed initially to represent a no value.\r\n\r\n4. The UX for finalized sync is not great, the distance from the header you have in the snapshot vs current chain head is way to big. I'm writing this to signal the importance of getting a safe sound protocol for a re-org capable light-client close to Altair release.\r\n\r\n5. Sharing the API we are using currently as a potential proposal for a REST API or to eventually translate it to a ReqResp protocol\r\n\r\n```\r\nGET /eth/v1/lightclient/best_updates/:periods\r\n\r\nReturn updates in batch to a range of periods. Must return exactly 1 update per period requested.\r\nThe definition of \"best-update\" is vague so nodes have the freedom to optimize what to store.\r\nFor example, to persist the latest LightclientUpdate that has the most bits within a period.\r\n\r\nGET /eth/v1/lightclient/latest_update_finalized/\r\n\r\nRequest the latest finalized update seen by the node\r\n\r\nGET /eth/v1/lightclient/latest_update_nonfinalized/\r\n\r\nRequest the latest non finalized update seen by the node\r\n```\r\n\r\nCC: @wemeetagain ",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2429/reactions",
-    "total_count": 1,
+    "total_count": 2,
     "+1": 0,
     "-1": 0,
     "laugh": 0,
@@ -65,7 +65,7 @@
     "confused": 0,
     "heart": 0,
     "rocket": 0,
-    "eyes": 1
+    "eyes": 2
   },
   "timeline_url": "https://api.github.com/repos/ethereum/consensus-specs/issues/2429/timeline",
   "performed_via_github_app": null,
