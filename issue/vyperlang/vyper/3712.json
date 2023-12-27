@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3712",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3712/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3712/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3712/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3712",
+  "id": 2057615987,
+  "node_id": "I_kwDOBGDvrM56pLpz",
+  "number": 3712,
+  "title": "VIP: `__script__()` function",
+  "user": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-27T17:26:11Z",
+  "updated_at": "2023-12-27T17:29:27Z",
+  "closed_at": null,
+  "author_association": "COLLABORATOR",
+  "active_lock_reason": null,
+  "body": "## Simple Summary\r\nadd a native `__script__()` function which allows for simple EVM scripting\r\n\r\n## Motivation\r\nbeing a smart contract language, vyper provides a natural way of interacting with the blockchain. furthermore, as vyper is pythonic, it makes sense for scripting to have first-class support by the language. by adding native `__script__()` functionality, users can write EVM orchestration scripts which don't rely on an external scripting framework to run.\r\n\r\nsince vyper isn't fully dynamic as python is, allowing module-level code execution (a la `if __name__ == \"__main__\"`) isn't currently allowed, nor do i think it is a particularly safe way to expose scripting functionality. by using a special function which is reserved by the language, we can get scripting functionality which is exposed as a deploy/compilation target instead of relying on module-level code execution.\r\n\r\n## Specification\r\n[Draft]\r\n\r\nadd a `__script__()` function which has the same visibility (i.e., not external nor internal, but constructor visibility) as `__init__()`. it functions more or less the same as `__init__()`, but returns nil (the empty bytestring) instead of runtime code.\r\n\r\nTBD:\r\n1. whether `__script__()` is mutually exclusive with the `__init__()` function (i.e. can only one exist in a file)\r\n2. how it looks in the ABI (potentially related to 1.)\r\n3. what else can exist in a file with `__script__()` (external functions? types?)\r\n4. should its execution end with `selfdestruct/sendall(msg.sender)`?\r\n\r\nexample (illustrative)\r\n```vyper\r\nimport some_script  # some_script has `def __script__(x: uint256) -> address`\r\n\r\n@deploy\r\ndef __script__() -> (Contract, Contract):\r\n    c: Contract = create Contract(...)\r\n    c2: Contract = create2 Contract(..., salt=...)\r\n    c.initialize(...)\r\n    c2.do_something(...)\r\n    \r\n    t: address = some_module.__script__(...)\r\n\r\n    log ContractCreation(c.address)\r\n    log ContractCreation(c2.address)\r\n\r\n    return c, c2\r\n```\r\n\r\n## Backwards Compatibility\r\n\r\n## Dependencies\r\nIf this VIP depends on any other VIPs being implemented, please mention them.\r\n\r\n## References\r\nAdd any references that this VIP might reference (other VIPs/issues, links to blog posts, etc.)\r\n\r\n## Copyright\r\nCopyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3712/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3712/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

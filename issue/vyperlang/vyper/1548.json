@@ -40,21 +40,40 @@
       "description": "VIP is not scheduled to move forward at this time"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 16,
+  "comments": 17,
   "created_at": "2019-07-24T15:10:58Z",
-  "updated_at": "2020-01-24T03:21:05Z",
-  "closed_at": null,
+  "updated_at": "2023-12-27T17:13:55Z",
+  "closed_at": "2023-12-27T17:13:54Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "## Simple Summary\r\nAllow contract interface functions to be called as `DELEGATECALL` instead of just staticcall or call\r\n\r\n## Abstract\r\nImplement an optional argument to external_contract_call that allows developers to specify whether the external function should be called as delegate_call.\r\n\r\n## Motivation\r\nTo allow for use of proxy contracts without having to raw_call and deal with the hassles around that.\r\n\r\n## Specification\r\nLooking at [https://github.com/ethereum/vyper/blob/master/vyper/parser/external_call.py](url), way to do this would be something like this:\r\n```\r\ndef external_contract_call(node,\r\n                           context,\r\n                           contract_name,\r\n                           contract_address,\r\n                           pos,\r\n                           value=None,\r\n                           gas=None,\r\n                           delegate_call=None):\r\n```\r\nWhere default would be false and the call stays as non-delegate.\r\n\r\nI think we would just need to add something comparable to what is currently used in raw_call [https://github.com/ethereum/vyper/blob/f890abe1907d9c4329950c400f348f9102a5263b/vyper/functions/functions.py#L667](url)\r\n\r\n```\r\n    if delegate_call.value == 1:\r\n        z = LLLnode.from_list(\r\n            [\r\n                'seq',\r\n                copier,\r\n                [\r\n                    'assert',\r\n                    [\r\n                        'delegatecall',\r\n                        gas,\r\n                        to,\r\n                        ['add', placeholder_node, 32],\r\n                        ['mload', placeholder_node],\r\n                        ['add', output_node, 32],\r\n                        outsize,\r\n                    ],\r\n                ],\r\n                ['mstore', output_node, outsize],\r\n                output_node,\r\n            ],\r\n            typ=ByteArrayType(outsize),\r\n            location='memory',\r\n            pos=getpos(expr),\r\n        )\r\n```\r\nFrom what I can tell, here are the functions that would need to change and how to change them potentially. I don't have full knowledge of underlying functions so these are best guesses.\r\n```\r\ndef get_external_contract_keywords(stmt_expr, context):\r\n    from vyper.parser.expr import Expr\r\n    value, gas = None, None\r\n    for kw in stmt_expr.keywords:\r\n        if kw.arg not in ('value', 'gas', 'delegate_call'):\r\n            raise TypeMismatchException(\r\n                'Invalid keyword argument, only \"gas\", :\"value\", and \"delegate_call\" supported.',\r\n                stmt_expr,\r\n            )\r\n        elif kw.arg == 'gas':\r\n            gas = Expr.parse_value_expr(kw.value, context)\r\n        elif kw.arg == 'value':\r\n            value = Expr.parse_value_expr(kw.value, context)\r\n        elif kw.arg == 'delegate_call':\r\n            delegate_call = Expr.parse_value_expr(kw.value, context)\r\n    return value, gas, delegate_call\r\n```\r\n```\r\ndef external_contract_call(node,\r\n                           context,\r\n                           contract_name,\r\n                           contract_address,\r\n                           pos,\r\n                           value=None,\r\n                           gas=None,\r\n                           delegate_call=None):\r\n    from vyper.parser.expr import (\r\n        Expr,\r\n    )\r\n    if value is None:\r\n        value = 0\r\n    if gas is None:\r\n        gas = 'gas'\r\n    if delegate_call is None:\r\n        delegate_call = False\r\n    if not contract_name:\r\n        raise StructureException(\r\n            f'Invalid external contract call \"{node.func.attr}\".',\r\n            node\r\n        )\r\n    if contract_name not in context.sigs:\r\n        raise VariableDeclarationException(\r\n            f'Contract \"{contract_name}\" not declared yet',\r\n            node\r\n        )\r\n    method_name = node.func.attr\r\n    if method_name not in context.sigs[contract_name]:\r\n        raise FunctionDeclarationException(\r\n            (\r\n                \"Function not declared yet: %s (reminder: \"\r\n                \"function must be declared in the correct contract)\"\r\n                \" The available methods are: %s\"\r\n            ) % (method_name, \",\".join(context.sigs[contract_name].keys())),\r\n            node.func\r\n        )\r\n    sig = context.sigs[contract_name][method_name]\r\n    inargs, inargsize, _ = pack_arguments(\r\n        sig,\r\n        [Expr(arg, context).lll_node for arg in node.args],\r\n        context,\r\n        pos=pos,\r\n    )\r\n    output_placeholder, output_size, returner = get_external_contract_call_output(sig, context)\r\n    sub = [\r\n        'seq',\r\n        ['assert', ['extcodesize', contract_address]],\r\n        ['assert', ['ne', 'address', contract_address]],\r\n    ]\r\n    # NOTE: I don't know how accurate this change is, I am just guessing based on raw_call\r\n    if delegate_call == True:\r\n        sub.append(\r\n            [\r\n                'seq',\r\n                copier,\r\n                [\r\n                    'assert',\r\n                    [\r\n                        'delegatecall',\r\n                        gas,\r\n                        contract_address,\r\n                        ['add', placeholder_node, 32],\r\n                        ['mload', placeholder_node],\r\n                        ['add', output_node, 32],\r\n                        outsize,\r\n                    ],\r\n                ],\r\n                ['mstore', output_node, outsize],\r\n                output_node,\r\n            ]\r\n        )\r\n    elif context.is_constant() or sig.const:\r\n        sub.append([\r\n            'assert',\r\n            [\r\n                'staticcall',\r\n                gas, contract_address, inargs, inargsize, output_placeholder, output_size,\r\n            ]\r\n        ])\r\n    else:\r\n        sub.append([\r\n            'assert',\r\n            [\r\n                'call',\r\n                gas, contract_address, value, inargs, inargsize, output_placeholder, output_size,\r\n            ]\r\n        ])\r\n    sub.extend(returner)\r\n    o = LLLnode.from_list(sub, typ=sig.output_type, location='memory', pos=getpos(node))\r\n    return o\r\n```\r\n\r\nAnd I am not sure what changes would need to be made to `make_external_call(stmt_expr, context)`\r\n## Backwards Compatibility\r\nFully compatible as far as I am aware of, but not sure\r\n\r\n## Dependencies\r\nNone that I am aware of.\r\n\r\n## Copyright\r\nCopyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/vyperlang/vyper/issues/1548/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/1548/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "not_planned"
 }
 [
   {
@@ -764,6 +783,50 @@
     "body": "@brockelmore we can keep it open until #1181 gets implemented.",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/518734734/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1870486338",
+    "html_url": "https://github.com/vyperlang/vyper/issues/1548#issuecomment-1870486338",
+    "issue_url": "https://api.github.com/repos/vyperlang/vyper/issues/1548",
+    "id": 1870486338,
+    "node_id": "IC_kwDOBGDvrM5vfVtC",
+    "user": {
+      "login": "charles-cooper",
+      "id": 3867501,
+      "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/charles-cooper",
+      "html_url": "https://github.com/charles-cooper",
+      "followers_url": "https://api.github.com/users/charles-cooper/followers",
+      "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+      "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+      "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+      "repos_url": "https://api.github.com/users/charles-cooper/repos",
+      "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-27T17:13:54Z",
+    "updated_at": "2023-12-27T17:13:54Z",
+    "author_association": "COLLABORATOR",
+    "body": "closing this as #1181 has been implemented and there are newer proposals which address delegatecall safety: #3306 and #3699 ",
+    "reactions": {
+      "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1870486338/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
