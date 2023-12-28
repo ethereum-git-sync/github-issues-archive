@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6679",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6679/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6679/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6679/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6679",
+  "id": 2057927580,
+  "node_id": "I_kwDOGBlvNc56qXuc",
+  "number": 6679,
+  "title": "anvil --init genesis.json incompatible with --load-state state",
+  "user": {
+    "login": "samlaf",
+    "id": 9342524,
+    "node_id": "MDQ6VXNlcjkzNDI1MjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/9342524?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/samlaf",
+    "html_url": "https://github.com/samlaf",
+    "followers_url": "https://api.github.com/users/samlaf/followers",
+    "following_url": "https://api.github.com/users/samlaf/following{/other_user}",
+    "gists_url": "https://api.github.com/users/samlaf/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/samlaf/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/samlaf/subscriptions",
+    "organizations_url": "https://api.github.com/users/samlaf/orgs",
+    "repos_url": "https://api.github.com/users/samlaf/repos",
+    "events_url": "https://api.github.com/users/samlaf/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/samlaf/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-28T02:49:00Z",
+  "updated_at": "2023-12-28T02:49:29Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nAnvil\n\n### Describe the feature you would like\n\nI need to setup deploy some contracts and setup some state, save it in a state json file, and then load it later. However, importantly, some state depends on the block-number at which the interaction happened, so when I restart the anvil node with `--load-state` option, I need the chain to restart at the same (or greater) block-number, but the `anvil --load-state ...` restarts the chain at block 0.\r\n\r\nOne way to restart the chain at a specific block number is to setup a genesis.json file and start anvil with `anvil --init genesis.json`. However, when trying to use both with `anvil --init ... --load-state ...` I get\r\n```\r\nerror: the argument '--init <PATH>' cannot be used with '--load-state <PATH>'\r\n```\r\n\r\nIs there a reason why the state file being dumped is not just a genesis.json file with default parameters, instead of some subset of it which uses a separate load flag? Would be nice if they were merged, since it would give us a lot more control on the initial configuration.\n\n### Additional context\n\nI tried using jq commands to copy the contents of the state file into the `alloc` section, however the state file looks like\r\n```\r\n        \"0x0165878a594ca255338adfa4d48449f69242eb8f\": {\r\n            \"nonce\": 1,\r\n            \"balance\": \"0x0\",\r\n            \"code\": \"0x...\",\r\n            \"storage\": {\r\n                \"0x0\": \"0x1\",\r\n                \"0x33\": \"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266\",\r\n                \"0x65\": \"0xe7f1725e7734ce288f8367e1bb143e90bb3f0512\",\r\n                \"0x66\": \"0x1e\",\r\n                \"0x97\": \"0x0\",\r\n                \"0x9a\": \"0x0\",\r\n                \"0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc\": \"0xdcd1bf9a1b36ce34237eeafef220932846bcd82\",\r\n                \"0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103\": \"0x5fbdb2315678afecb367f032d93f642f64180aa3\"\r\n            }\r\n        }\r\n```\r\nand when I put it in the genesis.json I get\r\n```\r\nerror: invalid value 'genesis.json' for '--init <PATH>': failed to parse json file: \"genesis.json\": invalid length 1, expected a (both 0x-prefixed or not) hex string or byte array containing 32 bytes at line 18 column 21\r\n```\r\n\r\nSeems like I'd need to parse all of the \"storage\" elements and fill them to 32 byte long (both key and value)... this feels like a bug in anvil.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6679/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6679/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

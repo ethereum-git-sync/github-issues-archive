@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6677",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6677/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6677/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6677/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6677",
+  "id": 2057866005,
+  "node_id": "I_kwDOGBlvNc56qIsV",
+  "number": 6677,
+  "title": "Unexpected Inlining of `block.number` with via-ir in Foundry Tests",
+  "user": {
+    "login": "0xLightt",
+    "id": 109751758,
+    "node_id": "U_kgDOBoqtzg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/109751758?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/0xLightt",
+    "html_url": "https://github.com/0xLightt",
+    "followers_url": "https://api.github.com/users/0xLightt/followers",
+    "following_url": "https://api.github.com/users/0xLightt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/0xLightt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/0xLightt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/0xLightt/subscriptions",
+    "organizations_url": "https://api.github.com/users/0xLightt/orgs",
+    "repos_url": "https://api.github.com/users/0xLightt/repos",
+    "events_url": "https://api.github.com/users/0xLightt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/0xLightt/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-28T00:27:53Z",
+  "updated_at": "2023-12-28T00:27:53Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (67ab870 2023-12-27T00:16:03.636506444Z)\n\n### What command(s) is the bug in?\n\nforge test\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\n**Description**:\r\n\r\nIn my Foundry tests, I've discovered a peculiar issue concerning the handling of `block.number`. Normally, `block.number` should be dynamic, changing as the blockchain progresses, and this is indeed the case in tests when using `vm.roll` to simulate block progression. However, when `block.number` is assigned to a variable (like `uint256 block1 = block.number;`), unexpected behavior arises due to compiler optimizations. Instead of the variable retaining the block number at the time of assignment, it gets updated when `vm.roll` is used to change the block number. This is not in line with the expected behavior of Solidity in a live Ethereum environment, where a variable assigned with `block.number` should remain constant, reflecting the block number at the moment of assignment. This optimization-induced behavior can lead to misleading tests.\r\n\r\n*Was only able to reproduce this issue with `via-ir` enabled!*\r\n\r\n**Code Snippet to Reproduce**:\r\n```solidity\r\nimport {Test} from \"forge-std/Test.sol\";\r\n\r\ncontract BlockNumberTest is Test {\r\n    function test_blockNumber() public {\r\n        uint256 block1 = block.number;\r\n        assertEq(block1, 1);\r\n        assertEq(block1, block.number);\r\n\r\n        vm.roll(2);\r\n\r\n        assertEq(block1, 2);\r\n        assertEq(block1, block.number);\r\n    }\r\n}\r\n```\r\nHere is a passing test run that should fail (CI only fails due to failing to create coverage report): https://github.com/0xLightt/inlined-block-number/actions/runs/7342836645/job/19992591620\r\n\r\n**Expected Behavior**:\r\nThe test should fail because `block1` is expected to hold the value of `block.number` at the time of its assignment. When `vm.roll(2)` is called, `block.number` should change, but `block1` should retain its original value.\r\n\r\n**Actual Behavior**:\r\nThe test passes, indicating that `block1` and `block.number` are treated as the same variable, likely due to compiler optimizations inlining `block.number`. This is inconsistent with how Solidity behaves in a live blockchain environment.\r\n\r\n**Impact**:\r\nThis nuanced issue in Foundry tests, though uncommon, is noteworthy as it can cause unexpected outcomes, especially when comparing specific block numbers in detailed test scenarios.\r\n\r\n**Suggested Solutions/Improvements**:\r\nConsidering that the issue seems to be confined to the test execution environment in Foundry, one possible solution could be the introduction of a cheat code. This cheat code could be designed to fetch the actual block.number value without being affected by the optimization or inlining process.\r\n\r\n**Request for Community Input**:\r\nI would appreciate any insights from other users or maintainers who might have encountered similar issues. Suggestions for temporary workarounds are also welcome until a more permanent solution is implemented. My workaround involved ceasing to record previous block numbers by directly fetching block.number. Instead, I assigned the same value of the expected block number values in the test passed in `vm.roll`.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6677/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6677/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
