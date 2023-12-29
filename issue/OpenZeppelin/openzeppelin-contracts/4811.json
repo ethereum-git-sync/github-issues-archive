@@ -39,9 +39,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-12-29T10:20:53Z",
-  "updated_at": "2023-12-29T10:20:53Z",
+  "updated_at": "2023-12-29T17:03:59Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -64,5 +64,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1872222396",
+    "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4811#issuecomment-1872222396",
+    "issue_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4811",
+    "id": 1872222396,
+    "node_id": "IC_kwDOA9tCBs5vl9i8",
+    "user": {
+      "login": "ernestognw",
+      "id": 33379285,
+      "node_id": "MDQ6VXNlcjMzMzc5Mjg1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33379285?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ernestognw",
+      "html_url": "https://github.com/ernestognw",
+      "followers_url": "https://api.github.com/users/ernestognw/followers",
+      "following_url": "https://api.github.com/users/ernestognw/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ernestognw/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ernestognw/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ernestognw/subscriptions",
+      "organizations_url": "https://api.github.com/users/ernestognw/orgs",
+      "repos_url": "https://api.github.com/users/ernestognw/repos",
+      "events_url": "https://api.github.com/users/ernestognw/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ernestognw/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-29T17:03:57Z",
+    "updated_at": "2023-12-29T17:03:57Z",
+    "author_association": "MEMBER",
+    "body": "Thanks for reporting @engn33r.\r\n\r\nThe reason why we use `memory` across our implementations is because `calldata` can't be constructed from within the contract. Public functions can't be called internally if they don't use `calldata`. This explains mismatches between the interfaces defined with `calldata` and the implementations with `memory`. Note that the implementations are still compliant because the function selector remains the same.\r\n\r\nA good example of this is [ERC1155-balanceOfBatch](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/7bd2b2aaf68c21277097166a9a51eb72ae239b34/contracts/token/ERC1155/ERC1155.sol#L76).\r\n\r\nHowever, I agree `onERC1155BatchReceived` is likely to be called only externally, but I'm not sure about that. We've previously [had discussions considering using `calldata`](https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4216), but it's a matter of analyzing every single use of `memory` to evaluate whether it makes sense to use `calldata` instead.",
+    "reactions": {
+      "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1872222396/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
