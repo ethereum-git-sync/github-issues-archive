@@ -8,7 +8,7 @@
   "id": 1943106435,
   "node_id": "I_kwDOBGDvrM5z0XOD",
   "number": 3648,
-  "title": "Allow non-literal and built-in environment variable values as default arguments",
+  "title": "allow `self` as default argument",
   "user": {
     "login": "pcaversaccio",
     "id": 25297591,
@@ -41,9 +41,9 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-10-14T09:07:31Z",
-  "updated_at": "2023-11-23T09:35:48Z",
+  "updated_at": "2023-12-31T16:23:26Z",
   "closed_at": null,
-  "author_association": "CONTRIBUTOR",
+  "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "I think it would be a nice feature to allow non-literal and built-in environment variable values as default arguments.\r\n\r\n## Example Use Case\r\n\r\n```vy\r\n# pragma version ^0.3.10\r\n\r\n\r\n_COLLISION_OFFSET: constant(bytes1) = 0xFF\r\n\r\n\r\n@external\r\n@pure\r\ndef compute_address(salt: bytes32, bytecode_hash: bytes32, deployer: address=self) -> address:\r\n    \"\"\"\r\n    @dev Returns the address where a contract will be stored if\r\n         deployed via `deployer` using the `CREATE2` opcode.\r\n         Any change in the `bytecode_hash` or `salt` values will\r\n         result in a new destination address.\r\n    @param salt The 32-byte random value used to create the contract\r\n           address.\r\n    @param bytecode_hash The 32-byte bytecode digest of the contract\r\n           creation bytecode.\r\n    @return address The 20-byte address where a contract will be stored.\r\n    \"\"\"\r\n    data: bytes32 = keccak256(concat(_COLLISION_OFFSET, convert(deployer, bytes20), salt, bytecode_hash))\r\n    return convert(convert(data, uint256) & convert(max_value(uint160), uint256), address)\r\n```",
   "closed_by": null,
@@ -92,7 +92,7 @@
     },
     "created_at": "2023-11-23T01:15:13Z",
     "updated_at": "2023-11-23T01:15:13Z",
-    "author_association": "COLLABORATOR",
+    "author_association": "MEMBER",
     "body": "i think `block.timestamp` is allowed. i guess the only question is whether to allow `self`; i lean against it because it seems like an antipattern. see my notes from offline:\r\n\r\n```\r\nCharles Cooper, [11/7/23 10:18 AM]\r\ni think the question here is if self should be an environment variable\r\n\r\nCharles Cooper, [11/7/23 10:18 AM]\r\nAnd like, it looks more like a storage variable\r\n\r\nCharles Cooper, [11/7/23 10:18 AM]\r\nAlso its semantics could change depending on execution target\r\n\r\nCharles Cooper, [11/7/23 10:19 AM]\r\nOr like it could read from code or storage or something\r\n\r\nCharles Cooper, [11/7/23 10:19 AM]\r\nMaybe we should have context.address which compiles to ADDRESS opcode\r\n\r\nCharles Cooper, [11/7/23 10:20 AM]\r\n(Which happens here to be the same as self)\r\n\r\nCharles Cooper, [11/7/23 10:20 AM]\r\nBut it's robust to changes in semantics of self\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1823715477/reactions",
@@ -136,7 +136,7 @@
     },
     "created_at": "2023-11-23T09:29:25Z",
     "updated_at": "2023-11-23T09:35:48Z",
-    "author_association": "CONTRIBUTOR",
+    "author_association": "COLLABORATOR",
     "body": "There are a couple of (library) use cases where \"function overloading\" using `self` would be helpful. What if we store the `self` address as an `immutable` at construction time as part of the code, and use this robust value for such use cases? It's not optimal for bytecode space yes, but would still enable this use case for applications that want to rely on this. This would disallow any semantic changes coming from delegatecalls.\r\n\r\nAnother approach would be having something like `self.address`; I once opened an issue [here](https://github.com/vyperlang/vyper/issues/3279) which is loosely connected, but elaborates the issue in the context of interfaces using `.address`. ",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1824059741/reactions",

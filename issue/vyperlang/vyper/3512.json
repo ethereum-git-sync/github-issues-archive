@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-07-19T09:30:53Z",
-  "updated_at": "2023-07-19T09:30:53Z",
-  "closed_at": null,
+  "updated_at": "2023-12-31T16:49:28Z",
+  "closed_at": "2023-12-31T16:47:28Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): https://github.com/vyperlang/vyper/commit/9e3b9a2b8ae55aa83b5450080f750be15f819de7\r\n* OS: linux\r\n* Python Version (output of `python --version`): 3.10.4\r\n\r\n### What's your issue about?\r\n\r\nWhen a contract is imported, only the function signatures are semantically checked to produce the `InterfaceT`. Contract A can therefore import another contract B that does not compile, but Contract A would compile as long as the signatures of the imported functions of Contract B are semantically correct.\r\n\r\n```\r\n# Contract A\r\n# a.vy\r\nimport b as B\r\n\r\n@external\r\ndef foo(addr: address):\r\n    x: B = B(addr)\r\n    x.foo() \r\n```\r\n```\r\n# Contract B\r\n# b.vy\r\n@external\r\ndef foo():\r\n    x: uint256 = \"foo\"\r\n```\r\n\r\nh/t @trocher \r\n\r\n### How can it be fixed?\r\n\r\nFill this in if you know how to fix it.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/vyperlang/vyper/issues/3512/reactions",
     "total_count": 0,
@@ -61,8 +80,51 @@
   },
   "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3512/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1872992305",
+    "html_url": "https://github.com/vyperlang/vyper/issues/3512#issuecomment-1872992305",
+    "issue_url": "https://api.github.com/repos/vyperlang/vyper/issues/3512",
+    "id": 1872992305,
+    "node_id": "IC_kwDOBGDvrM5vo5gx",
+    "user": {
+      "login": "charles-cooper",
+      "id": 3867501,
+      "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/charles-cooper",
+      "html_url": "https://github.com/charles-cooper",
+      "followers_url": "https://api.github.com/users/charles-cooper/followers",
+      "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+      "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+      "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+      "repos_url": "https://api.github.com/users/charles-cooper/repos",
+      "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-31T16:47:28Z",
+    "updated_at": "2023-12-31T16:49:28Z",
+    "author_association": "MEMBER",
+    "body": "this was fixed in #3663. compiling `a.vy` now raises an exception:\r\n```\r\nError compiling: a.vy\r\nvyper.exceptions.InvalidType: Expected uint256 but literal can only be cast as String[3].\r\n  contract \"b.vy:5\", function \"foo\", line 5:17 \r\n       4 def foo():\r\n  ---> 5     x: uint256 = \"foo\"\r\n  ------------------------^\r\n       6\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1872992305/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]

@@ -40,21 +40,40 @@
       "description": "Bug that shouldn't change language semantics when fixed."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2021-02-16T23:19:46Z",
-  "updated_at": "2022-04-15T17:50:59Z",
-  "closed_at": null,
+  "updated_at": "2023-12-31T16:43:24Z",
+  "closed_at": "2023-12-31T16:43:24Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version Information\r\n\r\n* vyper Version (output of `vyper --version`): 0.2.8+commit.069936f\r\n* OS: linux\r\n* Python Version (output of `python --version`): Python 3.8.5\r\n* Environment (output of `pip freeze`):\r\n```\r\napturl==0.5.2\r\nargcomplete==1.12.2\r\nattrs==19.3.0\r\nAutomat==0.8.0\r\nblinker==1.4\r\nbreezy==3.0.2\r\ncatfish==1.4.13\r\ncertifi==2019.11.28\r\nchardet==3.0.4\r\nClick==7.0\r\ncloud-init==20.4\r\ncolorama==0.4.3\r\ncommand-not-found==0.3\r\nconfigobj==5.0.6\r\nconstantly==15.1.0\r\ncryptography==2.8\r\ncupshelpers==1.0\r\ndbus-python==1.2.16\r\ndefer==1.0.6\r\nDeprecated==1.2.7\r\ndistro==1.4.0\r\ndistro-info===0.23ubuntu1\r\ndulwich==0.19.15\r\nentrypoints==0.3\r\nfastimport==0.9.8\r\ngpg===1.13.1-unknown\r\nhttplib2==0.14.0\r\nhyperlink==19.0.0\r\nidna==2.8\r\nimportlib-metadata==1.5.0\r\nincremental==16.10.1\r\niniconfig==1.1.1\r\nJinja2==2.10.1\r\njsonpatch==1.22\r\njsonpointer==2.0\r\njsonschema==3.2.0\r\nkeyring==18.0.1\r\nlanguage-selector==0.1\r\nlaunchpadlib==1.10.13\r\nlazr.restfulclient==0.14.2\r\nlazr.uri==1.0.3\r\nlightdm-gtk-greeter-settings==1.2.2\r\nmacaroonbakery==1.3.1\r\nMarkupSafe==1.1.0\r\nmenulibre==2.2.1\r\nmore-itertools==4.2.0\r\nmugshot==0.4.2\r\nnetifaces==0.10.4\r\noauthlib==3.1.0\r\nolefile==0.46\r\nonboard==1.4.1\r\npackaging==20.9\r\npexpect==4.6.0\r\nPillow==7.0.0\r\npipx==0.16.0.0\r\npluggy==0.13.1\r\nprotobuf==3.6.1\r\npsutil==5.5.1\r\npy==1.10.0\r\npyasn1==0.4.2\r\npyasn1-modules==0.2.1\r\npycairo==1.16.2\r\npycups==1.9.73\r\nPyGithub==1.43.7\r\nPygments==2.3.1\r\nPyGObject==3.36.0\r\nPyHamcrest==1.9.0\r\nPyJWT==1.7.1\r\npymacaroons==0.13.0\r\nPyNaCl==1.3.0\r\npyOpenSSL==19.0.0\r\npyparsing==2.4.7\r\npyRFC3339==1.1\r\npyrsistent==0.15.5\r\npyserial==3.4\r\npytest==6.2.2\r\npython-apt==2.0.0+ubuntu0.20.4.4\r\npython-dateutil==2.7.3\r\npython-debian===0.1.36ubuntu1\r\npython-gitlab==2.0.1\r\npytz==2019.3\r\nPyYAML==5.3.1\r\nreportlab==3.5.34\r\nrequests==2.22.0\r\nrequests-unixsocket==0.2.0\r\nSecretStorage==2.3.1\r\nservice-identity==18.1.0\r\nsgt-launcher==0.2.5\r\nsimplejson==3.16.0\r\nsix==1.14.0\r\nsos==4.0\r\nssh-import-id==5.10\r\nsystemd-python==234\r\ntoml==0.10.2\r\nTwisted==18.9.0\r\nubuntu-advantage-tools==20.3\r\nubuntu-drivers-common==0.0.0\r\nufw==0.36\r\nunattended-upgrades==0.1\r\nurllib3==1.25.8\r\nuserpath==1.4.2\r\nwadllib==1.3.3\r\nwrapt==1.11.2\r\nxcffib==0.8.1\r\nxkit==0.0.0\r\nzipp==1.0.0\r\nzope.interface==4.7.1\r\n```\r\n\r\n### What's your issue about?\r\n\r\nIn asking about some related interface import issues on Discord, someone noted that code like the following should be expected to work:\r\n\r\n```python\r\n# @version >=0.2.8 <0.3.0\r\n\r\ninterface SomeInterface:\r\n    def f(): nonpayable\r\n\r\nimplements: SomeInterface\r\n\r\n@external\r\ndef f():\r\n    pass\r\n```\r\n\r\nAs it is it produces an error like: `vyper.exceptions.StructureException: Unknown interface specified: SomeInterface`\r\n\r\nPlease include information like:\r\n\r\n* full output of the error you received\r\n    ```\r\n    Error compiling: example.vy\r\n    vyper.exceptions.StructureException: Unknown interface specified: SomeInterface\r\n      contract \"example.vy\", line 6:0\r\n           5\r\n      ---> 6 implements: SomeInterface\r\n      -------^\r\n           7\r\n    ```\r\n* what command you ran\r\n    `vyper example.vy` on a file containing the sample above\r\n* the code that caused the failure (see [this link](https://help.github.com/articles/basic-writing-and-formatting-syntax/) for help with formatting code)\r\n\r\n\r\n### How can it be fixed?\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/vyperlang/vyper/issues/2310/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/2310/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -194,6 +213,50 @@
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/780211697/reactions",
       "total_count": 1,
       "+1": 1,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1872991506",
+    "html_url": "https://github.com/vyperlang/vyper/issues/2310#issuecomment-1872991506",
+    "issue_url": "https://api.github.com/repos/vyperlang/vyper/issues/2310",
+    "id": 1872991506,
+    "node_id": "IC_kwDOBGDvrM5vo5US",
+    "user": {
+      "login": "charles-cooper",
+      "id": 3867501,
+      "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/charles-cooper",
+      "html_url": "https://github.com/charles-cooper",
+      "followers_url": "https://api.github.com/users/charles-cooper/followers",
+      "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+      "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+      "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+      "repos_url": "https://api.github.com/users/charles-cooper/repos",
+      "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2023-12-31T16:43:24Z",
+    "updated_at": "2023-12-31T16:43:24Z",
+    "author_association": "MEMBER",
+    "body": "i just checked, and the code in this issue compiles as of v0.2.13",
+    "reactions": {
+      "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1872991506/reactions",
+      "total_count": 0,
+      "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
