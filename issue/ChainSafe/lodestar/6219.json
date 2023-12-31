@@ -40,7 +40,7 @@
       "description": "Issues that identify a bug and require a fix."
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -75,22 +75,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 2,
-    "closed_issues": 0,
+    "open_issues": 1,
+    "closed_issues": 1,
     "state": "open",
     "created_at": "2023-12-19T20:59:29Z",
-    "updated_at": "2023-12-22T18:18:58Z",
+    "updated_at": "2023-12-31T08:07:52Z",
     "due_on": null,
     "closed_at": null
   },
   "comments": 3,
   "created_at": "2023-12-21T08:19:10Z",
-  "updated_at": "2023-12-22T18:18:58Z",
-  "closed_at": null,
+  "updated_at": "2023-12-31T08:07:52Z",
+  "closed_at": "2023-12-31T08:07:51Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Describe the bug\n\nWhen `vc` and `bn` stay on different machine, `publishBlockV2` may take a long time - normally it takes <0.5s but could be up to >3s randomly. This is the log of 5 longest requests\r\n\r\n```\r\n5636:Dec-21 07:38:50.098[rest]            debug: Req req-4a1 127.0.0.1 publishBlockV2\r\n5637:Dec-21 07:38:50.098[rest]            debug: preParsing req-4a1 127.0.0.1 publishBlockV2\r\n5638:Dec-21 07:38:53.669[rest]            debug: preValidation req-4a1 127.0.0.1 publishBlockV2\r\n5639:Dec-21 07:38:53.669[rest]            debug: Exec req-4a1 127.0.0.1 publishBlockV2\r\n5640:Dec-21 07:38:53.693[rest]            debug: Res req-4a1 publishBlockV2 - 200\r\n\r\n4751:Dec-21 07:03:25.830[rest]            debug: Req req-36v 127.0.0.1 publishBlockV2\r\n4752:Dec-21 07:03:25.830[rest]            debug: preParsing req-36v 127.0.0.1 publishBlockV2\r\n4753:Dec-21 07:03:28.829[rest]            debug: preValidation req-36v 127.0.0.1 publishBlockV2\r\n4754:Dec-21 07:03:28.829[rest]            debug: Exec req-36v 127.0.0.1 publishBlockV2\r\n4755:Dec-21 07:03:28.858[rest]            debug: Res req-36v publishBlockV2 - 200\r\n\r\n5001:Dec-21 07:13:26.321[rest]            debug: Req req-3i1 127.0.0.1 publishBlockV2\r\n5002:Dec-21 07:13:26.321[rest]            debug: preParsing req-3i1 127.0.0.1 publishBlockV2\r\n5003:Dec-21 07:13:29.285[rest]            debug: preValidation req-3i1 127.0.0.1 publishBlockV2\r\n5004:Dec-21 07:13:29.285[rest]            debug: Exec req-3i1 127.0.0.1 publishBlockV2\r\n5005:Dec-21 07:13:29.334[rest]            debug: Res req-3i1 publishBlockV2 - 200\r\n\r\n5681:Dec-21 07:40:38.286[rest]            debug: Req req-4c1 127.0.0.1 publishBlockV2\r\n5682:Dec-21 07:40:38.286[rest]            debug: preParsing req-4c1 127.0.0.1 publishBlockV2\r\n5683:Dec-21 07:40:41.188[rest]            debug: preValidation req-4c1 127.0.0.1 publishBlockV2\r\n5684:Dec-21 07:40:41.189[rest]            debug: Exec req-4c1 127.0.0.1 publishBlockV2\r\n5685:Dec-21 07:40:41.224[rest]            debug: Res req-4c1 publishBlockV2 - 200\r\n\r\n4601:Dec-21 06:57:26.223[rest]            debug: Req req-306 127.0.0.1 publishBlockV2\r\n4602:Dec-21 06:57:26.223[rest]            debug: preParsing req-306 127.0.0.1 publishBlockV2\r\n4603:Dec-21 06:57:29.083[rest]            debug: preValidation req-306 127.0.0.1 publishBlockV2\r\n4604:Dec-21 06:57:29.083[rest]            debug: Exec req-306 127.0.0.1 publishBlockV2\r\n4605:Dec-21 06:57:29.142[rest]            debug: Res req-306 publishBlockV2 - 200\r\n```\r\n\r\nin the worse case it could cause missed or orphaned blocks\n\n### Expected behavior\n\nLooking at the log we can see that it always take time after \"preParsing\" and before \"preValidation\" hook, likely happens at this phase https://github.com/fastify/fastify/blob/bc8743a2f225c92ad68cf2ad11bcd6930249fb69/lib/handleRequest.js#L41\r\n\r\nThis does 2 things: wait for body stream from `vc` to `bn` and `JSON.parse`\r\n\r\nI guess `JSON.parse()` is not an issue because it only happen randomly when `vc` stay on a different machine than `bn`, so could be a network thing. I think we can reduce the bandwidth of this api by either:\r\n- only return BlindedBeaconBlock to `vc` cc @g11tech \r\n- or ssz api cc @wemeetagain @nflaig \n\n### Steps to reproduce\n\nRun `bn` and `vc` in 2 diferent 2 hosts with this branch: `tuyen/produce_block_interop_key` which use interop key to produce and publish block at every slot (but `bn` does not spread block to the network)\n\n### Additional context\n\n_No response_\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nv1.12.0",
-  "closed_by": null,
+  "closed_by": {
+    "login": "g11tech",
+    "id": 76567250,
+    "node_id": "MDQ6VXNlcjc2NTY3MjUw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/76567250?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/g11tech",
+    "html_url": "https://github.com/g11tech",
+    "followers_url": "https://api.github.com/users/g11tech/followers",
+    "following_url": "https://api.github.com/users/g11tech/following{/other_user}",
+    "gists_url": "https://api.github.com/users/g11tech/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/g11tech/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/g11tech/subscriptions",
+    "organizations_url": "https://api.github.com/users/g11tech/orgs",
+    "repos_url": "https://api.github.com/users/g11tech/repos",
+    "events_url": "https://api.github.com/users/g11tech/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/g11tech/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6219/reactions",
     "total_count": 1,
@@ -105,7 +124,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6219/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
