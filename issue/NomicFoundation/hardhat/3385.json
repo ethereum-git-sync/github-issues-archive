@@ -103,9 +103,9 @@
     }
   ],
   "milestone": null,
-  "comments": 30,
+  "comments": 31,
   "created_at": "2022-11-30T13:39:14Z",
-  "updated_at": "2023-12-06T19:08:56Z",
+  "updated_at": "2024-01-01T12:57:09Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -113,8 +113,8 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/3385/reactions",
-    "total_count": 53,
-    "+1": 53,
+    "total_count": 54,
+    "+1": 54,
     "-1": 0,
     "laugh": 0,
     "hooray": 0,
@@ -1392,13 +1392,13 @@
     "body": "Hi everyone, we just released a new version of Hardhat which has **experimental support for TypeScript + ESM projects**. To try it out, upgrade your version of Hardhat and follow these steps.\r\n\r\n# Initial Setup\r\n\r\n1. Modify `package.json`\r\n    - Add `\"type\": \"module\"` to your `package.json`. This indicates that the project uses ESM syntax.\r\n2. Rename Hardhat configuration file\r\n    - Change `hardhat.config.ts` to `hardhat.config.cts`. The `.cts` extension is necessary as the Hardhat config can only be CommonJS.\r\n\r\n# TypeScript Configuration\r\n\r\n1. Update `tsconfig.json`\r\n    - Under `compilerOptions`, set `\"module\": \"node16\"`, `\"target\": \"es2022\"`, and `\"esModuleInterop\": true`. These options ensure compatibility with Node.js v16 and above.\r\n    - Add `experimentalResolver: true` under the `ts-node` configuration. This setting enables file extension inclusion in CommonJS, and can help suppressing some IDE errors.\r\n    - If you’re using `files`, `include` or `exclude` in your config, you may need to add `files: true` the `ts-node` configuration to avoid certain type checking errors.\r\n\r\n```\r\n{\r\n  \"compilerOptions\": {\r\n    \"module\": \"node16\",\r\n    \"target\": \"es2022\",\r\n    \"esModuleInterop\": true\r\n    // ...\r\n  },\r\n  \"ts-node\": {\r\n    \"experimentalResolver\": true\r\n    \"files\": true // only if you have \"files\", \"include\" or \"exclude\" in your config\r\n  }\r\n}\r\n```\r\n\r\n# Code Adjustments\r\n\r\nTo make your Hardhat project compatible with ESM, you'll need to make the following adjustments to your code:\r\n\r\n1. Update relative imports\r\n    - Include the file extension in all your relative import statements. This is a requirement in ESM to correctly resolve modules.\r\n2. Specify full path for Directory Modules\r\n    - Replace any directory module imports with the full file path. For instance, instead of importing from a directory like `./utils`, specify the exact file: `./utils/index.js`.\r\n3. Handling Hardhat imports\r\n    - As Hardhat is still based on CommonJS, you cannot use named imports directly due to the module system difference. Instead:\r\n        - Import the entire module as a default import: `import hre from 'hardhat';`\r\n        - Use destructuring to access specific properties: `const { ethers, network } = hre;`\r\n\r\n## Plugins and types\r\n\r\nPlugins such as `hardhat-ethers` and `hardhat-viem` automatically generate TypeScript typings for contracts during compilation. These files, despite having `.ts` extensions, should be treated as CommonJS modules. However, due to the root `package.json` specifying `\"type\": \"module\"`, they are incorrectly interpreted as ESM modules. This leads to issues in IDEs with type checking and autocomplete features.\r\n\r\nTo resolve this, add a `package.json` file with `\"type\": \"commonjs\"` in the folder where these files are generated (`./typechain-types` for `hardhat-ethers` and `./artifacts` for `hardhat-viem`). To streamline this process, we provide snippets with overrides of the compilation task which you can include in your `hardhat.config.cts`. These tasks automatically create the necessary `package.json` file during the compilation process.\r\n\r\n### hardhat-viem\r\n\r\nIf you’re using `hardhat-viem`, add the following snippet after the `import`s in your `hardhat-config.cts`\r\n\r\n```\r\nimport { join } from \"path\";\r\nimport { writeFile } from \"fs/promises\";\r\nimport { subtask } from \"hardhat/config\";\r\nimport { TASK_COMPILE_SOLIDITY } from \"hardhat/builtin-tasks/task-names\";\r\n\r\nsubtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {\r\n  const superRes = await runSuper();\r\n\r\n  try {\r\n    await writeFile(\r\n      join(config.paths.artifacts, \"package.json\"),\r\n      '{ \"type\": \"commonjs\" }'\r\n    );\r\n  } catch (error) {\r\n    console.error(\"Error writing package.json: \", error);\r\n  }\r\n\r\n  return superRes;\r\n});\r\n```\r\n\r\n### hardhat-ethers\r\n\r\nIf you’re using hardhat-ethers, add the following snippet after the `import`s in your `hardhat-config.cts`\r\n\r\n```\r\nimport { join } from \"path\";\r\nimport { writeFile } from \"fs/promises\";\r\nimport { subtask } from \"hardhat/config\";\r\nimport { TASK_COMPILE_SOLIDITY } from \"hardhat/builtin-tasks/task-names\";\r\n\r\nsubtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {\r\n  const superRes = await runSuper();\r\n\r\n  try {\r\n    await writeFile(\r\n      join(config.paths.root, \"typechain-types\", \"package.json\"),\r\n      '{ \"type\": \"commonjs\" }'\r\n    );\r\n  } catch (error) {\r\n    console.error(\"Error writing package.json: \", error);\r\n  }\r\n\r\n  return superRes;\r\n});\r\n```\r\n\r\n# Running Scripts and Tests\r\n\r\n- Run scripts with:\r\n`NODE_OPTIONS=\"--experimental-loader ts-node/esm/transpile-only\" hh run scripts/deploy.ts`\r\n- Execute tests using:\r\n`NODE_OPTIONS=\"--experimental-loader ts-node/esm/transpile-only\" hh test`\r\n- To avoid experimental feature warnings, append `--no-warnings=ExperimentalWarning` to your `NODE_OPTIONS`\r\n- You can integrate these commands into your project's `package.json` for easy execution:\r\n\r\n```\r\n\"scripts\": {\r\n  \"test\": \"NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning' hardhat test\",\r\n  \"script\": \"NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning' hardhat run\"\r\n}\r\n```",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1841380253/reactions",
-      "total_count": 3,
+      "total_count": 6,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 3,
+      "heart": 6,
       "rocket": 0,
       "eyes": 0
     },
@@ -1436,14 +1436,14 @@
     "body": "Thanks @schaable this works perfectly! Finally dumping CJS in Aztec's Noir stuff!",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1842695893/reactions",
-      "total_count": 1,
+      "total_count": 2,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
       "heart": 0,
-      "rocket": 1,
+      "rocket": 2,
       "eyes": 0
     },
     "performed_via_github_app": null
