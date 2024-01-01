@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6691",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6691/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6691/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6691/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6691",
+  "id": 2061618192,
+  "node_id": "I_kwDOGBlvNc564cwQ",
+  "number": 6691,
+  "title": "Anvil - debug_traceTransaction - storage enabled - some struct logs missing storage object",
+  "user": {
+    "login": "zemse",
+    "id": 22412996,
+    "node_id": "MDQ6VXNlcjIyNDEyOTk2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/22412996?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zemse",
+    "html_url": "https://github.com/zemse",
+    "followers_url": "https://api.github.com/users/zemse/followers",
+    "following_url": "https://api.github.com/users/zemse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zemse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zemse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zemse/subscriptions",
+    "organizations_url": "https://api.github.com/users/zemse/orgs",
+    "repos_url": "https://api.github.com/users/zemse/repos",
+    "events_url": "https://api.github.com/users/zemse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zemse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-01T15:19:30Z",
+  "updated_at": "2024-01-01T15:41:32Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nAnvil\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (2bcb4a1 2024-01-01T00:24:40.423571000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\n_No response_\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\nWhen storage values are SLOADed multiple times across multiple callcontext, the first SLOAD contains a storage object that contains the key, however further SLOADs have empty storage objects.\r\n\r\nHere is [expected geth output](https://github.com/zemse/anvil-issue-6691/blob/main/geth.json), [actual anvil output](https://github.com/zemse/anvil-issue-6691/blob/main/anvil.json) and [diff](https://github.com/zemse/anvil-issue-6691/pull/1) [line 431, 1221 in the pr files changed].\r\n\r\nThis issue is mainly arising because step tracing utilizes revm StorageChanged journaling which also is fired when storage slot value changes or the slot is first accessed. However, subsequent SLOADs are not detected through revm journaling and hence the storage object remains empty for that struct log.\r\n\r\nThis can be reproduced by calling the main function on this contract.\r\n\r\n```solidity\r\n// SPDX-License-Identifier: MIT\r\n\r\npragma solidity ^0.8.0;\r\n\r\ncontract AnvilBug {\r\n    function main() external returns (uint x) {\r\n        assembly {\r\n            sstore(1, 1)\r\n            x := sload(1)\r\n        }\r\n        this.f1();\r\n    }\r\n\r\n    function f1() external returns (uint x) {\r\n        assembly {\r\n            // sload same slot in another call context\r\n            x := sload(1)\r\n        }\r\n    }\r\n}\r\n```\r\n\r\nExample fix [commit](https://github.com/proof-of-exploit/foundry/commit/625a729b045d6b0c849ad553ce8f960bfbc059ff).",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6691/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6691/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
