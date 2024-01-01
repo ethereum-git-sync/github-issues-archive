@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14765",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14765/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14765/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14765/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14765",
+  "id": 2061134765,
+  "node_id": "I_kwDOAm_5kc562mut",
+  "number": 14765,
+  "title": "InternalCompilerError: Internal compiler error",
+  "user": {
+    "login": "Xardesso",
+    "id": 112291196,
+    "node_id": "U_kgDOBrFtfA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/112291196?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Xardesso",
+    "html_url": "https://github.com/Xardesso",
+    "followers_url": "https://api.github.com/users/Xardesso/followers",
+    "following_url": "https://api.github.com/users/Xardesso/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Xardesso/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Xardesso/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Xardesso/subscriptions",
+    "organizations_url": "https://api.github.com/users/Xardesso/orgs",
+    "repos_url": "https://api.github.com/users/Xardesso/repos",
+    "events_url": "https://api.github.com/users/Xardesso/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Xardesso/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2023-12-31T18:08:05Z",
+  "updated_at": "2023-12-31T18:08:05Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hi i creating arbitrage bot using Solidity in Hardhat and i created smart contract which take aave flashloan make 2 swaps and repay flashloan itself and i got error when i tried to compile smart contract \r\nSolidity version ^0.6.12\r\nHardhat version ^2.19.4\r\nOperating System Windows 11\r\nCode:\r\n`// SPDX-License-Identifier: MIT\r\n\r\npragma solidity ^0.6.12;\r\nimport \"@aave/protocol-v2/contracts/interfaces/ILendingPool.sol\";\r\nimport \"@aave/protocol-v2/contracts/interfaces/ILendingPoolAddressesProvider.sol\";\r\nimport \"@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol\";\r\nimport \"@openzeppelin/contracts/math/SafeMath.sol\";\r\n\r\nimport \"@openzeppelin/contracts/token/ERC20/IERC20.sol\";\r\nimport \"@openzeppelin/contracts/utils/ReentrancyGuard.sol\";\r\nimport \"@openzeppelin/contracts/utils/Context.sol\";\r\n\r\ncontract ArbitrageBot1 is Context, ReentrancyGuard {\r\n    using SafeMath for uint256;\r\n\r\n    ILendingPoolAddressesProvider provider;\r\n    ILendingPool lendingPool;\r\n    IUniswapV2Router02 uniswapRouter;\r\n    IUniswapV2Router02 sushiSwapRouter;\r\n    address private owner;\r\n\r\n    constructor(\r\n        address _provider,\r\n        address _uniswapRouter,\r\n        address _sushiSwapRouter\r\n    ) public {\r\n        provider = ILendingPoolAddressesProvider(_provider);\r\n        lendingPool = ILendingPool(provider.getLendingPool());\r\n        uniswapRouter = IUniswapV2Router02(_uniswapRouter);\r\n        sushiSwapRouter = IUniswapV2Router02(_sushiSwapRouter);\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier OnlyOwner() {\r\n        require(msg.sender == owner);\r\n        _;\r\n    }\r\n\r\n    function borrowAndSwap(\r\n        uint256 _amount,\r\n        uint256 amountOutExpected,\r\n        uint256 amountOutExpected2,\r\n        address coin1,\r\n        address coin2\r\n    ) external nonReentrant {\r\n        lendingPool.borrow(coin1, _amount, 1, 0, address(this));\r\n\r\n        address[] memory path2 = new address[](2);\r\n        path2[0] = coin1;\r\n        path2[1] = coin2;\r\n\r\n        sushiSwapRouter.swapExactTokensForTokens(\r\n            _amount,\r\n            amountOutExpected,\r\n            path2,\r\n            address(this),\r\n            block.timestamp\r\n        );\r\n\r\n        address[] memory path = new address[](2);\r\n        path[0] = coin2;\r\n        path[1] = coin1;\r\n\r\n        uniswapRouter.swapExactTokensForTokens(\r\n            IERC20(coin2).balanceOf(address(this)),\r\n            amountOutExpected2,\r\n            path,\r\n            address(this),\r\n            block.timestamp\r\n        );\r\n\r\n        // Get the borrow rate\r\n        DataTypes.ReserveData memory reserveData = lendingPool.getReserveData(\r\n            coin1\r\n        );\r\n        uint256 borrowRate = reserveData.currentVariableBorrowRate;\r\n\r\n        // Calculate the amount of interest\r\n        uint256 interest = _amount.mul(borrowRate).div(1e27);\r\n\r\n        // Calculate the total amount to repay\r\n        uint256 amountToRepay = _amount.add(interest);\r\n\r\n        // Approve the lending pool to transfer the repayment amount\r\n        IERC20(coin1).approve(address(lendingPool), amountToRepay);\r\n\r\n        // Repay the borrowed amount\r\n        lendingPool.repay(coin1, amountToRepay, 1, address(this));\r\n    }\r\n\r\n    function withdrawWETH(address outCoin) external OnlyOwner {\r\n        require(\r\n            IERC20(outCoin).balanceOf(address(this)) > 0,\r\n            \"No funds to withdraw\"\r\n        );\r\n        IERC20(outCoin).transfer(\r\n            owner,\r\n            IERC20(outCoin).balanceOf(address(this))\r\n        );\r\n    }}\r\n\r\nAnd error:\r\n```\r\n $ npx hardhat compile \r\nInternalCompilerError: Internal compiler error (C:\\projects\\solidity\\libsolidity\\codegen\\CompilerUtils.cpp:1441)\r\nError HH600: Compilation failed\r\n\r\nFor more info go to https://hardhat.org/HH600 or run Hardhat with --show-stack-traces",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14765/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14765/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
