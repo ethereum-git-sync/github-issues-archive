@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6335",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6335/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6335/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6335/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6335",
+  "id": 2062397683,
+  "node_id": "I_kwDODE2jmc567bDz",
+  "number": 6335,
+  "title": "Fixed baseFee option",
+  "user": {
+    "login": "suraneti",
+    "id": 26770227,
+    "node_id": "MDQ6VXNlcjI2NzcwMjI3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/26770227?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/suraneti",
+    "html_url": "https://github.com/suraneti",
+    "followers_url": "https://api.github.com/users/suraneti/followers",
+    "following_url": "https://api.github.com/users/suraneti/following{/other_user}",
+    "gists_url": "https://api.github.com/users/suraneti/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/suraneti/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/suraneti/subscriptions",
+    "organizations_url": "https://api.github.com/users/suraneti/orgs",
+    "repos_url": "https://api.github.com/users/suraneti/repos",
+    "events_url": "https://api.github.com/users/suraneti/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/suraneti/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-02T13:07:51Z",
+  "updated_at": "2024-01-02T13:07:51Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nAs a developer, I need to enable EIP-1559 on Besu (`IBFT 2.0` _non-gas-free network_) with `zeroBaseFee: true` to prevent a supply-burning mechanism and fixed `baseFee` as `gasPrice` value.\r\n\r\nCurrently, I've set `zeroBaseFee: true`. It works fine if I fixed `baseFee` to the same as my network's `gasPrice`.  However, when calling the `eth_feeHistory` method, it always returns a `0`, causing Metamask to estimate invalid `maxBaseFee` and `maxPriority`.\r\n\r\nI know it sounds strange but I want to integrate some features that require EIP-1559, such as the `Account Abstraction Bundler Node` on my network.\r\n\r\n### Acceptance Criteria\r\n* Fix `baseFee` to be the same as `gasPrice`.\r\n* Disable the supply-burning mechanism.\r\n* When calling `eth_feeHistory`, it should return the fixed `baseFee`.\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Run Besu IBFT 2.0 with the London upgrade.\r\n2. Enable `zeroBaseFee`.\r\n3. Call `eth_feeHistory` or use a wallet like Metamask to estimate gas.\r\n\r\n\r\n**Expected behavior:** [What you expect to happen]\r\n1. `zeroBaseFee` should be a constant value as `gasPrice`\r\n2. `eth_feeHistory` should return non-zero value\r\n\r\n**Actual behavior:** [What actually happens]\r\n1. `eth_feeHistory` always return zero value\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\n100% on ibft 2.0\r\n\r\n### Logs (if a bug)\r\nPlease post relevant logs from Besu (and the consensus client, if running proof of stake) from before and after the issue. \r\n\r\n### Versions (Add all that apply)\r\n* Software version: [`besu --version`] 22.10.2\r\n* Java version: [`java -version`] Java-17\r\n* OS Name & Version: [`cat /etc/*release`] AWS Linux\r\n* Cloud VM, type, size: [Amazon Web Services I3-large] AWS l3-large\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n* Besu setup info - genesis file, config options\r\n```json\r\n{\r\n  \"config\":{\r\n    \"chainId\": 17778,\r\n    \"homesteadBlock\": 0,\r\n    \"eip150Block\": 0,\r\n    \"eip150Hash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n    \"eip155Block\": 0,\r\n    \"eip158Block\": 0,\r\n    \"byzantiumBlock\": 0,\r\n    \"constantinopleBlock\": 0,\r\n    \"constantinopleFixBlock\": 0,\r\n    \"istanbulBlock\": 0,\r\n    \"muirGlacierBlock\": 0,\r\n    \"berlinBlock\": 0,\r\n    \"londonBlock\": 0,\r\n    \"zeroBaseFee\": true,\r\n    \"ibft2\": {\r\n      \"blockperiodseconds\": 2,\r\n      \"epochlength\": 30000,\r\n      \"requesttimeoutseconds\": 10,\r\n      \"blockreward\": \"0x0\"\r\n    }\r\n  },\r\n  \"nonce\":\"0x0\",\r\n  \"timestamp\":\"0x56bf7d30\",\r\n  \"gasLimit\":\"1500000\",\r\n  \"difficulty\":\"0x1\",\r\n  \"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n  \"coinbase\":\"0x1fb6794b264A29d9D5c3d44BC5799dCD8b80B699\",\r\n  \"extraData\":\"0xf87ea00000000000000000000000000000000000000000000000000000000000000000f85494ddcd845222b6977fd5cbb094b98c9c3e39a4fa4f94acbb577f656ad3dbb7402b9bcf60050ac39aa0fe94ed80f1f186b81e18541a8f562e9d3e592ffbb7819453307539caf3fb8cd8a45cdb435697297c9d1ba9808400000000c0\",\r\n  \"alloc\": {},\r\n  \"baseFeePerGas\":\"0x000000174876E800\"\r\n}\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6335/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6335/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
