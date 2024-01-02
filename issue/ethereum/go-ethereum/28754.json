@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28754",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28754/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28754/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28754/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28754",
+  "id": 2062039254,
+  "node_id": "I_kwDOAOvK98566DjW",
+  "number": 28754,
+  "title": "Fsync is slow on mac os",
+  "user": {
+    "login": "rjl493456442",
+    "id": 5959481,
+    "node_id": "MDQ6VXNlcjU5NTk0ODE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5959481?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rjl493456442",
+    "html_url": "https://github.com/rjl493456442",
+    "followers_url": "https://api.github.com/users/rjl493456442/followers",
+    "following_url": "https://api.github.com/users/rjl493456442/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rjl493456442/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rjl493456442/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rjl493456442/subscriptions",
+    "organizations_url": "https://api.github.com/users/rjl493456442/orgs",
+    "repos_url": "https://api.github.com/users/rjl493456442/repos",
+    "events_url": "https://api.github.com/users/rjl493456442/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rjl493456442/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-02T07:29:58Z",
+  "updated_at": "2024-01-02T07:31:34Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "According to issue https://github.com/golang/go/issues/43342, `file.Sync` operation is extremely slow.\r\n\r\nAfter investigating it a bit further, I realized that for `file.Sync` on mac os X, it's actually a `fcntl(F_FULLFSYNC)` because **OS X and some versions of ext3 have an fsync that doesn't really flush to disk. OS X requires fcntl(F_FULLFSYNC) to flush to disk**\r\n\r\nApparently, `F_FULLFSYNC` is a lot slower than a normal `file.Sync` on the other platforms.\r\n\r\n```go\r\nfunc TestFooBar(t *testing.T) {\r\n\tfilename := \"go.txt\"\r\n\tos.Remove(filename)\r\n\tfp, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)\r\n\tif err != nil {\r\n\t\tpanic(err)\r\n\t}\r\n\tcount := 1000\r\n\tfor i := 0; i < count; i++ {\r\n\t\tvar err error\r\n\t\ts := fmt.Sprintf(\"%010d\\n\", i)\r\n\t\t_, err = fp.WriteString(s)\r\n\t\tif err != nil {\r\n\t\t\tpanic(err)\r\n\t\t}\r\n\t\terr = fp.Sync()\r\n\t\tif err != nil {\r\n\t\t\tpanic(err)\r\n\t\t}\r\n\t}\r\n\tfp.Close()\r\n}\r\n```\r\n\r\n1000 file sync takes 18s on my laptop (Apple M1 Pro)\r\n\r\n--- \r\n\r\nInside of Geth, we use freezer as the chain data backend and state diff backend if path scheme is used, which always do a `file.Sync` after applying writes. Namely it can cause performance degradation on Mac OS X.\r\n\r\nIf the node has finished the initial state sync, then capturing up the progress made in the network should be sufficient even with slow FSYNC, but might be a disaster if people want to do a full-sync on Mac OS X.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28754/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28754/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
