@@ -40,7 +40,7 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-12-29T11:20:29Z",
-  "updated_at": "2023-12-29T15:35:19Z",
-  "closed_at": null,
+  "updated_at": "2024-01-02T09:45:29Z",
+  "closed_at": "2024-01-02T09:45:29Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Describe the bug\r\n\r\n**This ticket discuss the way how validator client database path is managed.**\r\nI'm on MacOS.\r\n\r\nHere are the interesting corresponding lines when running: `./prysm.sh validator --help`:\r\n```\r\ncmd OPTIONS:\r\n...\r\n--datadir value.      Data directory for the databases (default: \"/Users/manu/Library/Eth2\")\r\n...\r\n\r\nvalidator OPTIONS:\r\n...\r\n  --wallet-dir value      Path to a wallet directory on-disk for Prysm validator accounts (default: \"/Users/manu/Library/Eth2Validators/prysm-wallet-v2\")\r\n...\r\n```\r\n\r\n### Without specifying `--datadir`\r\n\r\n**1. Running this command: `./prysm.sh validator --goerli`**\r\nVC DB is stored at `/Users/manu/Library/Eth2Validators/prysm-wallet-v2/direct/validator.db`.\r\n==> `validator.db`is stored in the default value of `--wallet-dir`/`direct`. (`direct` subdirectory is added.)\r\n\r\n**2. Running this command: `./prysm.sh validator --goerli --validators-external-signer-url http://localhost:9000`**\r\nVC DB is stored at `/Users/manu/Library/Eth2Validators/prysm-wallet-v2/validator.db`.\r\n==> `validator.db` is stored in the default value of `--wallet-dir`. (Compared to `1.`, there is no `direct` subdirectory added.)\r\n\r\n**3. Running this command: `./prysm.sh validator --goerli --wallet-dir /tmp/wd`**\r\nVC DB is stored at `/tmp/wd/direct/validator.db`.\r\n==> `validator.db` is stored in the specified value of `--wallet-dir`/`direct` (`direct` subdirectory is added.)\r\n\r\n**4. Running this command: `./prysm.sh validator --goerli --validators-external-signer-url http://localhost:9000 --wallet-dir /tmp/wd`**\r\nVC DB is stored at `/tmp/wd/validator.db`.\r\n==> `validator.db` is stored in the specified value of `--wallet-dir`. (Compared to `3.`, there is no `direct` subdirectory added.)\r\n\r\n### With specifying `--datadir`\r\n\r\n**1. Running this command: `./prysm.sh validator --goerli --datadir /tmp/dd`**\r\nVC DB is stored at `/tmp/dd/validator.db`.\r\n==> `validator.db`is stored in the specified value of `--datadir`. (there is no `direct` subdirectory added.)\r\n\r\n**2. Running this command: `./prysm.sh validator --goerli --validators-external-signer-url http://localhost:9000 --datadir /tmp/dd`**\r\nVC DB is stored at `/tmp/dd/validator.db`.\r\n==> `validator.db`is stored in the specified value of `--datadir`. (there is no `direct` subdirectory added.)\r\n\r\n**3. Running this command: `./prysm.sh validator --goerli --wallet-dir /tmp/wd --datadir /tmp/dd`**\r\nVC DB is stored at `/tmp/dd/validator.db`.\r\n==> `validator.db`is stored in the specified value of `--datadir`. (there is no `direct` subdirectory added.) `--datadir` supersedes `--wallet-dir`.\r\n\r\n**4. Running this command: `./prysm.sh validator --goerli --validators-external-signer-url http://localhost:9000 --wallet-dir /tmp/wd`**\r\nVC DB is stored at `/tmp/dd/validator.db`.\r\n==> `validator.db`is stored in the specified value of `--datadir`. (there is no `direct` subdirectory added.) `--datadir` supersedes `--wallet-dir`.\r\n\r\n### Summary\r\n- Default `--datadir` value is never used. If no `--datadir` is specified, VC DB is stored in the (default or not) value of `--wallet-dir`. If no `--validators-external-signer-url` is specified, a `/direct` subdirectory is added.\r\n- If `--datadir` is specified, the value of `--wallet-dir` is discarded. VC DB is always stored under the value specified under `--datadir`, whatever the use of `--validators-external-signer-url` (No `direct` subdirectory added).\r\n\r\n### Current issues\r\n- In my opinion, there is no really reason to ever store the DB under `--wallet-dir` (default or specified value). The DB should always be stored under `--datadir` (default or specified value), as mentioned in the `--datadir` help message.\r\n- If a user do not specify `--datadir` and switch the `--validators-external-signer-url` flag, then the previous `validator.db` file won't be used any more. (Because of the `/direct` subdirectory)\r\n- Tools like `Migrate Up`, `Migrate Down`, `EIP-3976 export` or `EIP-3076 import` rely on `--dadatir`, and not on `--wallet-dir`\r\n\r\n### Proposed solution\r\n- Always store the DB under the value of `--datadir`, and never add `/direct` subdirectory.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "nalepae",
+    "id": 4943830,
+    "node_id": "MDQ6VXNlcjQ5NDM4MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4943830?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nalepae",
+    "html_url": "https://github.com/nalepae",
+    "followers_url": "https://api.github.com/users/nalepae/followers",
+    "following_url": "https://api.github.com/users/nalepae/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nalepae/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nalepae/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nalepae/subscriptions",
+    "organizations_url": "https://api.github.com/users/nalepae/orgs",
+    "repos_url": "https://api.github.com/users/nalepae/repos",
+    "events_url": "https://api.github.com/users/nalepae/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nalepae/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13391/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13391/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
