@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 5,
+  "comments": 6,
   "created_at": "2023-12-14T13:30:08Z",
-  "updated_at": "2023-12-26T20:58:32Z",
-  "closed_at": null,
+  "updated_at": "2024-01-03T13:30:50Z",
+  "closed_at": "2024-01-03T13:30:50Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\nI'm using \"hardhat-deploy\": \"^0.11.44\" and \"@nomicfoundation/hardhat-toolbox-viem\": \"^2.0.0\" libs\r\nwhich are recommanded by hardhat official templates (with viem)\r\nit automatically run deploy scripts when I run command \"yarn hardhat node --hostname 0.0.0.0\"\r\nbut calls to local hardhat network in golang seems reverted with no reason\r\nIt leads to hard to debug in local env\r\nbut it can call in online chains\r\n\r\n#### Expected behaviour\r\nPlz advise me some paths to debug with golang in local env using viem and hardhat-deploy\r\nCheck hardhat-deploy to fully support for Viem which recommands by hardhat official\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nrunning 'yarn hardhat node --hostname 0.0.0.0' , it deploy contracts before local accounts shows up and didn't cost (may be the problem)\r\n\r\ngenerate go files with abis :\r\nsolc --abi contracts/${name} --include-path node_modules --base-path . -o goBuild/${fileName} --overwrite\r\nabigen --abi=goBuild/${fileName}/${fileName}.abi --pkg=${fileName} --out goBuild/${fileName}/${fileName}.go\r\n\r\nusing generated abi in go to call methods but reverted with no reason (func sig error)\r\nbut it can successfully call in online chain but failed in hardhat node\r\n\r\n#### Version\r\n\r\nhardhat-deploy\": \"^0.11.44\r\n@nomicfoundation/hardhat-toolbox-viem\r\n\"viem\": \"^1.19.11\"\r\n\"hardhat\": \"^2.19.1\"\r\ngo-ethereum\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "s1na",
+    "id": 1591639,
+    "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/s1na",
+    "html_url": "https://github.com/s1na",
+    "followers_url": "https://api.github.com/users/s1na/followers",
+    "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+    "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+    "organizations_url": "https://api.github.com/users/s1na/orgs",
+    "repos_url": "https://api.github.com/users/s1na/repos",
+    "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/s1na/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28678/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28678/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -280,6 +299,50 @@
     "body": "I think I managed to finally get to the bottom of this issue.\r\nWhen go-ethereum creates the request it uses an `input` param instead of a `data` param.\r\nMost RPCs seem to accept either, but the hardhat node only seems to accept `data`.\r\nThe spec available [here](https://ethereum.github.io/execution-apis/api-documentation/) specifies an `input` param so I guess this is more of a hardhat issue than a go-ethereum issue.\r\n\r\n@Aliceonly a hacky fix is to change line 650 in `~/go/pkg/mod/github.com/ethereum/go-ethereum@v1.13.5/ethclient/ethclient.go` from `arg[\"input\"] = hexutil.Bytes(msg.Data)` to `arg[\"data\"] = hexutil.Bytes(msg.Data)`\r\n\r\nOpened a PR in the hardhat repo here: https://github.com/NomicFoundation/hardhat/pull/4718",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1869719479/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1875375966",
+    "html_url": "https://github.com/ethereum/go-ethereum/issues/28678#issuecomment-1875375966",
+    "issue_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28678",
+    "id": 1875375966,
+    "node_id": "IC_kwDOAOvK985vx_de",
+    "user": {
+      "login": "s1na",
+      "id": 1591639,
+      "node_id": "MDQ6VXNlcjE1OTE2Mzk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1591639?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/s1na",
+      "html_url": "https://github.com/s1na",
+      "followers_url": "https://api.github.com/users/s1na/followers",
+      "following_url": "https://api.github.com/users/s1na/following{/other_user}",
+      "gists_url": "https://api.github.com/users/s1na/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/s1na/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/s1na/subscriptions",
+      "organizations_url": "https://api.github.com/users/s1na/orgs",
+      "repos_url": "https://api.github.com/users/s1na/repos",
+      "events_url": "https://api.github.com/users/s1na/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/s1na/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-03T13:30:50Z",
+    "updated_at": "2024-01-03T13:30:50Z",
+    "author_association": "MEMBER",
+    "body": "Thanks for looking into this @krzysztof-cywinski. Indeed we stopped accepting `data` param recently. This field was deprecated a looong time ago. Sorry for the inconvenience but it was time to stop this dual-use. I will close the issue here.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/comments/1875375966/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
