@@ -1,0 +1,87 @@
+{
+  "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8819",
+  "repository_url": "https://api.github.com/repos/ethereum-optimism/optimism",
+  "labels_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8819/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8819/comments",
+  "events_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8819/events",
+  "html_url": "https://github.com/ethereum-optimism/optimism/issues/8819",
+  "id": 2064340819,
+  "node_id": "I_kwDODjvEJM57C1dT",
+  "number": 8819,
+  "title": "--rpc.txfeecap=0 isn't being honored, returning tx fee exceeds the configured cap",
+  "user": {
+    "login": "yaanakbr",
+    "id": 126090886,
+    "node_id": "U_kgDOB4P-hg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/126090886?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yaanakbr",
+    "html_url": "https://github.com/yaanakbr",
+    "followers_url": "https://api.github.com/users/yaanakbr/followers",
+    "following_url": "https://api.github.com/users/yaanakbr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yaanakbr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yaanakbr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yaanakbr/subscriptions",
+    "organizations_url": "https://api.github.com/users/yaanakbr/orgs",
+    "repos_url": "https://api.github.com/users/yaanakbr/repos",
+    "events_url": "https://api.github.com/users/yaanakbr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yaanakbr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-03T16:46:44Z",
+  "updated_at": "2024-01-03T16:49:11Z",
+  "closed_at": "2024-01-03T16:49:11Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "<!--\r\nNeed help?\r\nRefer to our contributing guidelines for additional information about making a good issue:\r\nhttps://github.com/ethereum-optimism/.github/blob/master/CONTRIBUTING.md\r\n-->\r\n\r\n**Describe the bug**\r\nWe are getting an error on our nodes that says: \r\n`\"message\":\"tx fee (1.63 ether) exceeds the configured cap (1.00 ether)`\r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\n\r\nHere is an example of a transaction that is 1.63 ETH that is getting denied and we cant figure out why the txfeecap isn't being overridden: \r\n\r\n```\r\n➜  ~ curl -X POST \"ADD_ANY_URL\"      \\\r\n     -H \"Content-Type: application/json\" \\\r\n     -d '{\"jsonrpc\":\"2.0\",\"id\":61092,\"method\":\"eth_sendRawTransaction\",\"params\":[\"0xf8e7821d1f86018ecb5d3235830e909e941c8a8e0991a18852951cbc18fb19d1f44dcc403d80b87e06cdc42b0000000000000000000016292d14d1778f9df3eee5473a9640f13682e3846f61febc3655000000000a03a0500e2adf9d530568f5c0a2de713a54991e01858fd27a38324018492118000000000003f393c0b1824f3ff585c31ffa3706d1cce9d525a00f1c7d4a2911754ca114000000000000000000001700fbe137a03e77cca2d7965447d699ad64baacc40569d236282f47e5033b2741fd85e66f0aa00c2fb89765726a8e99f209cf9e7efc026355c1864ce1acee0909878b102c0e05\"]}'\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":61092,\"error\":{\"code\":-32000,\"message\":\"tx fee (1.63 ether) exceeds the configured cap (1.00 ether)\"}}\r\n```\r\n\r\nI have [decoded the transaction](https://www.ethereumdecoder.com/?search=0xf8e7821d1f86018ecb5d3235830e909e941c8a8e0991a18852951cbc18fb19d1f44dcc403d80b87e06cdc42b0000000000000000000016292d14d1778f9df3eee5473a9640f13682e3846f61febc3655000000000a03a0500e2adf9d530568f5c0a2de713a54991e01858fd27a38324018492118000000000003f393c0b1824f3ff585c31ffa3706d1cce9d525a00f1c7d4a2911754ca114000000000000000000001700fbe137a03e77cca2d7965447d699ad64baacc40569d236282f47e5033b2741fd85e66f0aa00c2fb89765726a8e99f209cf9e7efc026355c1864ce1acee0909878b102c0e05), and here is what it is returning: \r\n\r\n```\r\n{\"nonce\":7455,\"gasPrice\":{\"_hex\":\"0x018ecb5d3235\"},\"gasLimit\":{\"_hex\":\"0x0e909e\"},\"to\":\"0x1c8a8e0991a18852951cbc18fb19d1f44dcc403d\",\"value\":{\"_hex\":\"0x0\"},\"data\":\"0x06cdc42b0000000000000000000016292d14d1778f9df3eee5473a9640f13682e3846f61febc3655000000000a03a0500e2adf9d530568f5c0a2de713a54991e01858fd27a38324018492118000000000003f393c0b1824f3ff585c31ffa3706d1cce9d525a00f1c7d4a2911754ca114000000000000000000001700fbe1\",\"v\":55,\"r\":\"0x3e77cca2d7965447d699ad64baacc40569d236282f47e5033b2741fd85e66f0a\",\"s\":\"0x0c2fb89765726a8e99f209cf9e7efc026355c1864ce1acee0909878b102c0e05\"}\r\n```\r\n\r\n```\r\n❯ hexdec 0x0e909e\r\n954526\r\n❯ hexdec 0x018ecb5d3235\r\n1712808866357\r\nMultiply those numbers together and you get:\r\n1.634920595968282e18\r\n```\r\n\r\nI also have tested public URLs and they all return the same: \r\n\r\n```\r\ncurl -X POST \"https://optimism.publicnode.com\"      \\\r\n     -H \"Content-Type: application/json\" \\\r\n     -d '{\"jsonrpc\":\"2.0\",\"id\":61092,\"method\":\"eth_sendRawTransaction\",\"params\":[\"0xf8e7821d1f86018ecb5d3235830e909e941c8a8e0991a18852951cbc18fb19d1f44dcc403d80b87e06cdc42b0000000000000000000016292d14d1778f9df3eee5473a9640f13682e3846f61febc3655000000000a03a0500e2adf9d530568f5c0a2de713a54991e01858fd27a38324018492118000000000003f393c0b1824f3ff585c31ffa3706d1cce9d525a00f1c7d4a2911754ca114000000000000000000001700fbe137a03e77cca2d7965447d699ad64baacc40569d236282f47e5033b2741fd85e66f0aa00c2fb89765726a8e99f209cf9e7efc026355c1864ce1acee0909878b102c0e05\"]}'\r\n     \r\n   {\"jsonrpc\":\"2.0\",\"id\":61092,\"error\":{\"code\":-32000,\"message\":\"tx fee (1.63 ether) exceeds the configured cap (1.00 ether)\"}}\r\n```\r\n\r\n**System Specs:**\r\n\r\nAnd here is the following config file (some unnecessary things have been redacted):\r\n\r\n\r\n```\r\n[Service]\r\nUser            = optimism\r\nExecStart   = /usr/local/bin/geth \\\r\n                    --ws \\\r\n                    --ws.port=8546 \\\r\n                    --ws.addr=0.0.0.0 \\\r\n                    --ws.origins=\"*\" \\\r\n                    --http \\\r\n                    --http.port=8545 \\\r\n                    --http.addr=0.0.0.0 \\\r\n                    --http.vhosts=\"*\" \\\r\n                    --http.corsdomain=\"*\" \\\r\n                    --authrpc.addr=0.0.0.0 \\\r\n                    --authrpc.port=8551 \\\r\n                    --datadir=/home/optimism \\\r\n                    --verbosity=3 \\\r\n                    --rollup.disabletxpoolgossip=true \\\r\n                    --rollup.sequencerhttp=https://mainnet-sequencer.optimism.io \\\r\n                    --rollup.historicalrpc=http://opti-l2geth-mainnet.<URL>:8525 \\\r\n                    --rollup.historicalrpctimeout=300s \\\r\n                    --nodiscover \\\r\n                    --networkid=10 \\\r\n                    --op-network=op-mainnet \\\r\n                    --syncmode=full \\\r\n                    --snapshot=false \\\r\n                    --maxpeers=0 \\\r\n                    --txlookuplimit=0 \\\r\n                    --rpc.txfeecap=0 \\\r\n                    --gcmode=full \\\r\n                    --rollup.halt=major\r\nRestart         = on-failure \r\n```\r\n\r\n**Additional context**\r\nWe cant seem to find anywhere in the source code that seems this would be honored. Is it possible the sequencer is rejecting it? ",
+  "closed_by": {
+    "login": "yaanakbr",
+    "id": 126090886,
+    "node_id": "U_kgDOB4P-hg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/126090886?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yaanakbr",
+    "html_url": "https://github.com/yaanakbr",
+    "followers_url": "https://api.github.com/users/yaanakbr/followers",
+    "following_url": "https://api.github.com/users/yaanakbr/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yaanakbr/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yaanakbr/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yaanakbr/subscriptions",
+    "organizations_url": "https://api.github.com/users/yaanakbr/orgs",
+    "repos_url": "https://api.github.com/users/yaanakbr/repos",
+    "events_url": "https://api.github.com/users/yaanakbr/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yaanakbr/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8819/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/8819/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
