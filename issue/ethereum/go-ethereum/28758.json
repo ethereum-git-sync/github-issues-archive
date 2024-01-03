@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28758",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28758/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28758/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28758/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28758",
+  "id": 2062913438,
+  "node_id": "I_kwDOAOvK98569Y-e",
+  "number": 28758,
+  "title": "DB increases despite scheme=path",
+  "user": {
+    "login": "tchaps6",
+    "id": 93048236,
+    "node_id": "U_kgDOBYvNrA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/93048236?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tchaps6",
+    "html_url": "https://github.com/tchaps6",
+    "followers_url": "https://api.github.com/users/tchaps6/followers",
+    "following_url": "https://api.github.com/users/tchaps6/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tchaps6/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tchaps6/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tchaps6/subscriptions",
+    "organizations_url": "https://api.github.com/users/tchaps6/orgs",
+    "repos_url": "https://api.github.com/users/tchaps6/repos",
+    "events_url": "https://api.github.com/users/tchaps6/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tchaps6/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-02T20:35:09Z",
+  "updated_at": "2024-01-02T20:35:09Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: `1.13.7-stable`\r\nCL client & version: prysm@v4.1.1\r\nOS & Version: Linux\r\nCommit hash : (if `develop`)\r\n\r\n#### Expected behaviour\r\nDB does not increase after resyncing with scheme=path setting\r\n\r\n#### Actual behaviour\r\nDB increased by 30GB+ since resync (7 days ago)\r\n\r\nService file:\r\n[Unit]\r\nDescription=Geth Execution Client (Mainnet)\r\nAfter=network.target\r\nWants=network.target\r\n[Service]\r\nUser=geth\r\nGroup=geth\r\nType=simple\r\nRestart=always\r\nRestartSec=3\r\nExecStart=/usr/local/bin/geth \\\r\n  --mainnet \\\r\n  --metrics \\\r\n  --datadir=/var/lib/geth \\\r\n  --authrpc.jwtsecret /var/lib/jwtsecret/jwt.hex \\\r\n  --state.scheme=path\r\n[Install]\r\nWantedBy=default.target\r\n\r\nStartup log:\r\n\r\nJan 02 21:25:14 server-address systemd[1]: Started Geth Execution Client (Mainnet).\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.460] Starting Geth on Ethereum mainnet...\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.462] Bumping default cache on mainnet         provided=1024 updated=4096\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.462] Enabling metrics collection\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.468] Maximum peer count                       ETH=50 total=50\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.472] Smartcard socket not found, disabling    err=\"stat /run/pcscd/pcscd.comm: no such file or directory\"\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.481] Set global gas cap                       cap=50,000,000\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.523] Initializing the KZG library             backend=gokzg\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.610] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.827] Using pebble as the backing database\r\nJan 02 21:25:14 server-address geth[2418330]: INFO [01-02|21:25:14.828] Allocated cache and file handles         database=/var/lib/geth/geth/chaindata cache=2.00GiB handles=262,144\r\nJan 02 21:25:30 server-address geth[2418330]: INFO [01-02|21:25:30.660] Opened ancient database                  database=/var/lib/geth/geth/chaindata/ancient/chain readonly=false\r\nJan 02 21:25:30 server-address geth[2418330]: INFO [01-02|21:25:30.667] State scheme set by user                 scheme=path\r\nJan 02 21:25:30 server-address geth[2418330]: INFO [01-02|21:25:30.677] Initialising Ethereum protocol           network=1 dbversion=8\r\nJan 02 21:25:30 server-address geth[2418330]: WARN [01-02|21:25:30.678] Sanitizing invalid node buffer size      provided=1024.00MiB updated=256.00MiB\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.641] Opened ancient database                  database=/var/lib/geth/geth/chaindata/ancient/state readonly=false\r\nJan 02 21:25:34 server-address geth[2418330]: WARN [01-02|21:25:34.682] Path-based state scheme is an experimental feature\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995] ---------------------------------------------------------------------------------------------------------------------------------------------------------\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995] Chain ID:  1 (mainnet)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995] Consensus: Beacon (proof-of-stake), merged from Ethash (proof-of-work)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995] Pre-Merge hard forks (block based):\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Homestead:                   #1150000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/homestead.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - DAO Fork:                    #1920000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/dao-fork.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Tangerine Whistle (EIP 150): #2463000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/tangerine-whistle.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Spurious Dragon/1 (EIP 155): #2675000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/spurious-dragon.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Spurious Dragon/2 (EIP 158): #2675000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/spurious-dragon.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Byzantium:                   #4370000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/byzantium.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Constantinople:              #7280000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/constantinople.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Petersburg:                  #7280000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/petersburg.md)\r\nJan 02 21:25:34 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Istanbul:                    #9069000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/istanbul.md)\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Muir Glacier:                #9200000  (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/muir-glacier.md)\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Berlin:                      #12244000 (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md)\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - London:                      #12965000 (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/london.md)\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Arrow Glacier:               #13773000 (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/arrow-glacier.md)\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Gray Glacier:                #15050000 (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/gray-glacier.md)\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995] Merge configured:\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Hard-fork specification:    https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/paris.md\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Network known to be merged: true\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Total terminal difficulty:  58750000000000000000000\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995] Post-Merge hard forks (timestamp based):\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]  - Shanghai:                    @1681338455 (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/shanghai.md)\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995] ---------------------------------------------------------------------------------------------------------------------------------------------------------\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:34.995]\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.000] Loaded most recent local block           number=18,922,042 hash=980906..023ce1 td=58,750,003,716,598,352,816,469 age=3m36s\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.000] Loaded most recent local finalized block number=18,921,967 hash=3927f5..9e9664 td=58,750,003,716,598,352,816,469 age=18m48s\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.003] Loaded last snap-sync pivot marker       number=18,835,242\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.731] Initialized transaction indexer          limit=2,350,000\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.738] Loaded local transaction journal         transactions=0 dropped=0\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.738] Regenerated local transaction journal    transactions=0 accounts=0\r\nJan 02 21:25:35 server-address geth[2418330]: WARN [01-02|21:25:35.761] Switch sync mode from snap sync to full sync reason=\"snap sync complete\"\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.761] Chain post-merge, sync via beacon client\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.762] Gasprice oracle is ignoring threshold set threshold=2\r\nJan 02 21:25:35 server-address geth[2418330]: WARN [01-02|21:25:35.777] Engine API enabled                       protocol=eth\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.777] Starting peer-to-peer node               instance=Geth/v1.13.7-stable/linux-amd64/go1.21.3\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.917] New local node record                    seq=1,703,139,276,590 id=66325a6cadbb9768 ip=127.0.0.1 udp=30303 tcp=30303\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.918] Started P2P networking                   self=enode://890787ae21fe01224ca3d87fc3bce735df6cf31e27364aaf998af97f4845a2d64c84c7f36bdcab89eef6cf40fce30c995914bb737bba8e324b9c2f91a2028b5f@127.0.0.1:30303\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.920] IPC endpoint opened                      url=/var/lib/geth/geth.ipc\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.920] Loaded JWT secret file                   path=/var/lib/jwtsecret/jwt.hex crc32=0x402b4eee\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.922] WebSocket enabled                        url=ws://127.0.0.1:8551\r\nJan 02 21:25:35 server-address geth[2418330]: INFO [01-02|21:25:35.922] HTTP server started                      endpoint=127.0.0.1:8551 auth=true prefix= cors=localhost vhosts=localhost\r\nJan 02 21:25:39 server-address geth[2418330]: INFO [01-02|21:25:39.425] New local node record                    seq=1,703,139,276,591 id=66325a6cadbb9768 ip=62.171.152.51 udp=30303 tcp=30303\r\nJan 02 21:25:39 server-address geth[2418330]: INFO [01-02|21:25:39.770] Imported new potential chain segment     number=18,922,043 hash=e5757d..4d631b blocks=1 txs=142 mgas=9.528 elapsed=1.409s mgasps=6.758 age=3m28s  snapdiffs=6.31MiB triediffs=180.85MiB triedirty=54.13MiB\r\nJan 02 21:25:40 server-address geth[2418330]: INFO [01-02|21:25:40.191] Chain head was updated                   number=18,922,043 hash=e5757d..4d631b root=a13390..62a9fc elapsed=5.078837ms age=3m29s\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28758/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28758/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
