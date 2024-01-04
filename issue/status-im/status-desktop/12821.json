@@ -100,7 +100,7 @@
     "node_id": "MI_kwDOD5KrTM4AhVqd",
     "number": 61,
     "title": "0.16",
-    "description": "**1.  Fix bug and stabilise Communities and Messaging functionality**\r\n\r\n**2.  Reduce size of community description metadata**\r\n- better compressions, less duplication\r\n\r\n**3. Use data sync layer (or other mechanism) to improve community description reliability**\r\n- Every time a new user joins the community, the Control Node updates and signs the description.\r\n- Random back off to stop it being too chatty \r\n\r\n**4. Continue work on profile showcase **\r\n\r\n\r\n\r\n**--- Wallet Team ---**\r\n\r\n1. Complete support for Community minted assets\r\n\r\n2. Complete token visibility management screens\r\n\r\n3. Continue working on WalletConnect support\r\n\r\n4. Minor updates to Asset screens\r\n\r\n5. Continue fixing bugs, making optimisations and keeping tech debt low\r\n\r\n\r\n\r\n\r\n",
+    "description": "## Messaging & Communities team\r\n\r\n**1.  Fix bug and stabilise Communities and Messaging functionality**\r\n\r\n**2.  Reduce size of community description metadata**\r\n- better compressions, less duplication\r\n\r\n**3. Use data sync layer (or other mechanism) to improve community description reliability**\r\n- Every time a new user joins the community, the Control Node updates and signs the description.\r\n- Random back off to stop it being too chatty \r\n\r\n**4. Continue work on profile showcase**\r\n\r\n&nbsp;\r\n\r\n## Wallet Team\r\n\r\n**1. Complete support for Community minted assets**\r\n\r\n**2. Complete token visibility management screens**\r\n\r\n**3. Continue working on WalletConnect support**\r\n\r\n**4. Minor updates to Asset screens**\r\n\r\n**5. Continue fixing bugs, making optimisations and keeping tech debt low**\r\n\r\n\r\n\r\n\r\n",
     "creator": {
       "login": "iurimatias",
       "id": 176720,
@@ -121,17 +121,17 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 164,
-    "closed_issues": 141,
+    "open_issues": 168,
+    "closed_issues": 153,
     "state": "open",
     "created_at": "2022-12-09T15:06:43Z",
-    "updated_at": "2023-12-27T12:57:57Z",
+    "updated_at": "2024-01-04T17:54:44Z",
     "due_on": "2024-01-31T08:00:00Z",
     "closed_at": null
   },
   "comments": 3,
   "created_at": "2023-11-22T05:11:06Z",
-  "updated_at": "2023-12-28T07:08:37Z",
+  "updated_at": "2024-01-04T17:42:38Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -225,9 +225,9 @@
       "site_admin": false
     },
     "created_at": "2023-12-22T08:24:23Z",
-    "updated_at": "2023-12-23T09:30:06Z",
+    "updated_at": "2024-01-04T17:41:46Z",
     "author_association": "CONTRIBUTOR",
-    "body": "From my analysis, this ticket requires to add a new column in the sqlite database for the quoted album Images. then follow a process for making the databse migration (I am not aware of this process, I saw couple of PR with similar changes, but it’s quite cryptic how the migrations are done. Example : https://github.com/status-im/status-go/pull/2869) So I need to ask around.\r\n\r\n------\r\n\r\nJust to complete why this is the optimal solution : \r\n\r\nwhen a message has multiple images attached to it, it will be broken to multiple messages as per https://github.com/status-im/status-go/blob/develop/services/chat/api_send_messages.go#L104, and the format of each message contains only 1 image as per https://github.com/status-im/status-desktop/blob/master/src/app_service/service/message/dto/message.nim#L89\r\nThat explains why we get a code to build the album of images https://github.com/status-im/status-desktop/blob/master/src/app/modules/main/chat_section/chat_content/messages/module.nim#L739\r\n\r\nTherefore, the idea is to populate the message quoted images with the images so that the reader of the message on the view side can just display those images accordingly.\r\n\r\n------\r\n\r\nTo be precise, each message should be filled with 1 quoted message image only. A specific code in the chat_content/messages/module.nim will aggregate the split quoted messages images to form the quoted message images.\r\n\r\n```\r\nproc updateItemsByAlbum(self: Module, items: var seq[Item], message: MessageDto): bool =\r\n  for i in 0 ..< items.len:\r\n    let item = items[i]\r\n    if item.albumId == message.albumId:\r\n      # Check if message already in album\r\n      for j in 0 ..< item.albumMessageIds.len:\r\n        if item.albumMessageIds[j] == message.id:\r\n          return true\r\n        \r\n        var albumImages = item.albumMessageImages\r\n        var quotedAlbumImages = item.quotedMessageAlbumMessageImages\r\n        var albumMessagesIds = item.albumMessageIds\r\n        albumMessagesIds.add(message.id)\r\n        albumImages.add(message.image)\r\n        item.albumMessageImages = albumImages\r\n        item.albumMessageIds = albumMessagesIds\r\n\r\n        quotedAlbumImages.add(message.quotedMessage.albumImages)\r\n        item.quotedMessageAlbumMessageImages = quotedAlbumImages\r\n\r\n        items[i] = item\r\n        return true\r\n  return false\r\n```\r\n\r\nto be able to fill each message with a quoted image, we can fill the image path before sending the split message to status-go or use sql query to fill the quoted image",
+    "body": "From my analysis, this ticket requires to add a new column in the sqlite database for the quoted album Images. then follow a process for making the databse migration (I am not aware of this process, I saw couple of PR with similar changes, but it’s quite cryptic how the migrations are done. Example : https://github.com/status-im/status-go/pull/2869) So I need to ask around.\r\n\r\n------\r\n\r\nJust to complete why this is the optimal solution : \r\n\r\nwhen a message has multiple images attached to it, it will be broken to multiple messages as per https://github.com/status-im/status-go/blob/develop/services/chat/api_send_messages.go#L104, and the format of each message contains only 1 image as per https://github.com/status-im/status-desktop/blob/master/src/app_service/service/message/dto/message.nim#L89\r\nThat explains why we get a code to build the album of images https://github.com/status-im/status-desktop/blob/master/src/app/modules/main/chat_section/chat_content/messages/module.nim#L739\r\n\r\nTherefore, the idea is to populate the message quoted images with the images so that the reader of the message on the view side can just display those images accordingly.\r\n\r\n------\r\n\r\nTo be precise, each message should be filled with 1 quoted message image only. A specific code in the chat_content/messages/module.nim will aggregate the split quoted messages images to form the quoted message images.\r\n\r\n```\r\nproc updateItemsByAlbum(self: Module, items: var seq[Item], message: MessageDto): bool =\r\n  for i in 0 ..< items.len:\r\n    let item = items[i]\r\n    if item.albumId == message.albumId:\r\n      # Check if message already in album\r\n      for j in 0 ..< item.albumMessageIds.len:\r\n        if item.albumMessageIds[j] == message.id:\r\n          return true\r\n        \r\n        var albumImages = item.albumMessageImages\r\n        var quotedAlbumImages = item.quotedMessageAlbumMessageImages\r\n        var albumMessagesIds = item.albumMessageIds\r\n        albumMessagesIds.add(message.id)\r\n        albumImages.add(message.image)\r\n        item.albumMessageImages = albumImages\r\n        item.albumMessageIds = albumMessagesIds\r\n\r\n        quotedAlbumImages.add(message.quotedMessage.albumImages)\r\n        item.quotedMessageAlbumMessageImages = quotedAlbumImages\r\n\r\n        items[i] = item\r\n        return true\r\n  return false\r\n```\r\n\r\nto be able to fill each message with a quoted image, we can fill the image path ~~before sending the split message to status-go~~ (previous idea is known to be resource intensive) or use sql query to fill the quoted image",
     "reactions": {
       "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1867382390/reactions",
       "total_count": 0,
@@ -269,9 +269,9 @@
       "site_admin": false
     },
     "created_at": "2023-12-28T07:08:11Z",
-    "updated_at": "2023-12-28T07:08:37Z",
+    "updated_at": "2024-01-04T17:42:38Z",
     "author_association": "CONTRIBUTOR",
-    "body": "Here are steps I set myself to be able to deliver this ticket : \r\n\r\n    - Step 1 : Setup the code for being able to do DB migration — Complete\r\n    - Step 2 : Update unittest in status-go to have reception of the message with QuotedMessage images and return QuotedMessage images persisted in DB — in progress\r\n    - Step 3 : Send PR with :SQL script for altering the user_messages table, and the migration files — in progress\r\n    - Step 4 : Perform changes on the status-desktop to use status-go new changes — waiting to start\r\n    - Step 5 : Send PR with status-desktop changes in the view — waiting to start",
+    "body": "[Steps are complete]\r\n\r\nHere are steps I set myself to be able to deliver this ticket : \r\n\r\n    - Step 1 : Setup the code for being able to do DB migration\r\n    - Step 2 : Update unittest in status-go to have reception of the message with QuotedMessage images and return QuotedMessage images persisted in DB — in progress\r\n    - Step 3 : Send PR with :SQL script for altering the user_messages table, and the migration files — in progress\r\n    - Step 4 : Perform changes on the status-desktop to use status-go new changes — waiting to start\r\n    - Step 5 : Send PR with status-desktop changes in the view — waiting to start",
     "reactions": {
       "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1870886092/reactions",
       "total_count": 0,
