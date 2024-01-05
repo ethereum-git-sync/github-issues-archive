@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28765",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28765/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28765/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28765/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28765",
+  "id": 2066728226,
+  "node_id": "I_kwDOAOvK9857L8Ui",
+  "number": 28765,
+  "title": "Timed out on `eth_getLogs` request through large range of blocks",
+  "user": {
+    "login": "nordschesasa",
+    "id": 117249454,
+    "node_id": "U_kgDOBv0Vrg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/117249454?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nordschesasa",
+    "html_url": "https://github.com/nordschesasa",
+    "followers_url": "https://api.github.com/users/nordschesasa/followers",
+    "following_url": "https://api.github.com/users/nordschesasa/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nordschesasa/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nordschesasa/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nordschesasa/subscriptions",
+    "organizations_url": "https://api.github.com/users/nordschesasa/orgs",
+    "repos_url": "https://api.github.com/users/nordschesasa/repos",
+    "events_url": "https://api.github.com/users/nordschesasa/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nordschesasa/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-05T04:55:52Z",
+  "updated_at": "2024-01-05T04:55:52Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hi, I've been using Geth as my ETH fullnode, it may get timed out on `eth_getLogs` request through large range of blocks, for example with request:\r\n\r\n```json\r\n{\r\n  \"method\": \"eth_getLogs\",\r\n  \"params\": [\r\n    {\r\n      \"fromBlock\": \"0x0\",\r\n      \"toBlock\": \"0x120dc53\",\r\n      \"address\": \"0xb62bcd40a24985f560b5a9745d478791d8f1945c\",\r\n      \"topics\": [\r\n        [\r\n          \"0xcfb473e6c03f9a29ddaf990e736fa3de5188a0bd85d684f5b6e164ebfbfff5d2\"\r\n        ]\r\n      ]\r\n    }\r\n  ],\r\n  \"id\": 62,\r\n  \"jsonrpc\": \"2.0\"\r\n}\r\n```\r\n\r\nResponse from Node:\r\n```json\r\n{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 62,\r\n    \"error\": {\r\n        \"code\": -32002,\r\n        \"message\": \"request timed out\"\r\n    }\r\n}\r\n```\r\n\r\nHowever if the block range is small, it can response quickly without a problem, I've tried Infura/alchemy with same request and it can response quickly with data:\r\n```json\r\n{\r\n    \"jsonrpc\": \"2.0\",\r\n    \"id\": 62,\r\n    \"result\": [\r\n        {\r\n            \"address\": \"0xb62bcd40a24985f560b5a9745d478791d8f1945c\",\r\n            \"blockHash\": \"0xb1c05e3a5f7791b40d9ded2bb67bd2d250f1ccb036dac0f6a046b7ed2d416df0\",\r\n            \"blockNumber\": \"0xed6e42\",\r\n            \"data\": \"0x0000000000000000000000006b7763b749073e892c83e674c1ec4799d6f339ef\",\r\n            \"logIndex\": \"0x151\",\r\n            \"removed\": false,\r\n            \"topics\": [\r\n                \"0xcfb473e6c03f9a29ddaf990e736fa3de5188a0bd85d684f5b6e164ebfbfff5d2\"\r\n            ],\r\n            \"transactionHash\": \"0x87130dfe52f1eb4ec22261333534ee7ac2c15e5256ffa7a59ae7153119c6cd73\",\r\n            \"transactionIndex\": \"0xc9\"\r\n        },\r\n        {\r\n            \"address\": \"0xb62bcd40a24985f560b5a9745d478791d8f1945c\",\r\n            \"blockHash\": \"0xb1c05e3a5f7791b40d9ded2bb67bd2d250f1ccb036dac0f6a046b7ed2d416df0\",\r\n            \"blockNumber\": \"0xed6e42\",\r\n            \"data\": \"0x0000000000000000000000006ea99c6fe2c770c2c46ebe03a4855977282e844f\",\r\n            \"logIndex\": \"0x153\",\r\n            \"removed\": false,\r\n            \"topics\": [\r\n                \"0xcfb473e6c03f9a29ddaf990e736fa3de5188a0bd85d684f5b6e164ebfbfff5d2\"\r\n            ],\r\n            \"transactionHash\": \"0xca00caf8ad277bd23597d497e1c77b4308d40e8787d7e0e5204d320f1f3ab31c\",\r\n            \"transactionIndex\": \"0xcb\"\r\n        }\r\n    ]\r\n}\r\n```\r\n\r\nBy using `web3_clientVersion` to query their(infura and alchemy) node's version I can see they are using Geth as well(version 1.13.4 and 1.13.5).\r\n\r\nI've seen there is a post on Infura, not sure if related to this, https://www.infura.io/blog/post/faster-logs-and-events-e43e2fa13773, I might wonder if this kind of request cannot be handled by Geth itself.\r\n\r\n\r\nThe node it's running with docker compose, with file as below:\r\n```yaml\r\nversion: \"3\"\r\nservices:\r\n  geth:\r\n    image: ethereum/client-go:v1.13.5\r\n    restart: unless-stopped\r\n    ports:\r\n      - 30303:30303\r\n      - 30303:30303/udp\r\n      - 127.0.0.1:8545:8545\r\n      - 127.0.0.1:8546:8546\r\n      - 127.0.0.1:8551:8551\r\n    volumes:\r\n      - ./data:/root/.ethereum\r\n    command:\r\n      - --http\r\n      - --cache=8192\r\n      - --http.api=eth,net,web3,engine,admin\r\n      - --http.addr=0.0.0.0\r\n      - --http.vhosts=*\r\n      - --http.corsdomain=*\r\n      - --maxpeers=200\r\n      - --ws\r\n      - --ws.origins=*\r\n      - --ws.addr=0.0.0.0\r\n      - --ws.api=eth,net,web3\r\n      - --graphql\r\n      - --graphql.corsdomain=*\r\n      - --graphql.vhosts=*\r\n      - --authrpc.addr=0.0.0.0\r\n      - --authrpc.jwtsecret=/root/.ethereum/jwt.hex\r\n      - --authrpc.vhosts=*\r\n      - --authrpc.port=8551\r\n      - --history.transactions=0\r\n\r\n  prysm:\r\n    image: gcr.io/prysmaticlabs/prysm/beacon-chain:latest\r\n    pull_policy: always\r\n    container_name: beacon\r\n    restart: unless-stopped\r\n    stop_grace_period: 2m\r\n    volumes:\r\n      - ./prysm_data:/data\r\n      - ./data:/geth\r\n    depends_on:\r\n      geth:\r\n        condition: service_healthy\r\n    ports:\r\n      - 127.0.0.1:4000:4000\r\n      - 127.0.0.1:3500:3500\r\n    command:\r\n      - --accept-terms-of-use\r\n      - --datadir=/data\r\n      - --disable-monitoring\r\n      - --rpc-host=0.0.0.0\r\n      - --execution-endpoint=http://geth:8551\r\n      - --jwt-secret=/geth/jwt.hex\r\n      - --rpc-host=0.0.0.0\r\n      - --rpc-port=4000\r\n      - --grpc-gateway-corsdomain=*\r\n      - --grpc-gateway-host=0.0.0.0\r\n      - --grpc-gateway-port=3500\r\n      - --checkpoint-sync-url=https://mainnet-checkpoint-sync.attestant.io/\r\n      - --genesis-beacon-api-url=https://mainnet-checkpoint-sync.attestant.io/\r\n\r\n```\r\n\r\nThe server is hosted on GCP with 4T of SSD persistent disk so disk IO shouldn't be a problem here.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28765/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28765/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
