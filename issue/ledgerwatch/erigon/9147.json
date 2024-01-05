@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9147",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9147/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9147/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9147/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/9147",
+  "id": 2067371749,
+  "node_id": "I_kwDOC0FsAM57OZbl",
+  "number": 9147,
+  "title": "Polygon mainnet archive node not fully syncing",
+  "user": {
+    "login": "DaraDoyoung",
+    "id": 95335707,
+    "node_id": "U_kgDOBa61Gw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/95335707?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/DaraDoyoung",
+    "html_url": "https://github.com/DaraDoyoung",
+    "followers_url": "https://api.github.com/users/DaraDoyoung/followers",
+    "following_url": "https://api.github.com/users/DaraDoyoung/following{/other_user}",
+    "gists_url": "https://api.github.com/users/DaraDoyoung/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/DaraDoyoung/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/DaraDoyoung/subscriptions",
+    "organizations_url": "https://api.github.com/users/DaraDoyoung/orgs",
+    "repos_url": "https://api.github.com/users/DaraDoyoung/repos",
+    "events_url": "https://api.github.com/users/DaraDoyoung/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/DaraDoyoung/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5877848882,
+      "node_id": "LA_kwDOC0FsAM8AAAABXljbMg",
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/labels/polygon",
+      "name": "polygon",
+      "color": "0B1179",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-05T13:40:38Z",
+  "updated_at": "2024-01-05T14:24:07Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `erigon version 2.54.0-aeec5221`\r\n\r\nOS & Version: Linux Ubuntu 22.04 LTS\r\n\r\nCommit hash: aeec5221c93be843d282e34379d9281e68906f79\r\n\r\nErigon Command (with flags/config):\r\n```\r\nerigon --datadir $DATA_DIR \\\r\n  --chain=bor-mainnet \\\r\n  --bor.heimdall=http://localhost:1317 \\\r\n  --http --http.addr '0.0.0.0' \\\r\n  --http.vhosts '*' \\\r\n  --http.port 8545 \\\r\n  --http.api 'eth,net,web3,txpool,bor,debug,trace' \\\r\n  --private.api.addr=localhost:9091 \\\r\n  --ws \\\r\n  --torrent.upload.rate=\"1024mb\" \\\r\n  --torrent.download.rate=\"1024mb\" \\\r\n  --p2p.protocol 66 \\\r\n  --metrics \\\r\n  --txpool.globalslots 131072 \\\r\n  --txpool.globalbasefeeslots 60000 \\\r\n  --txpool.globalqueue 131072 \\\r\n  --maxpeers 100 \\\r\n  --rpc.batch.limit 3000 \\\r\n  --db.size.limit 16TB \\\r\n  >> ~/node/logs/bor.log \\\r\n  2>&1 &\r\n```\r\n\r\nConsensus Layer: heimdall\r\n\r\nConsensus Layer Command (with flags/config):\r\n```\r\nheimdalld start --home /home/ubuntu/.heimdalld   >> ~/node/logs/heimdalld.log   2>&1 &\r\n```\r\n\r\nChain/Network: Polygon Mainnet\r\n\r\n#### Expected behaviour\r\nSync on time.\r\n\r\n#### Actual behaviour\r\nThis graph shows block gap the node has compared to the latest block of the network. As seen in the graph node seems to be fully synced, then the syncing process slows down so the gap between the node and the network grows up to 300 blocks.\r\n![image](https://github.com/ledgerwatch/erigon/assets/95335707/5375588b-141d-42df-aa00-fac6ff854cc7)\r\n\r\nThis is happening because the time it takes for erigon to execute received blocks is taking more time than the block creation time, therefore as the node is executing the previous blocks, the network forwards.\r\n\r\n![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/a352406d-7f38-4469-b4f5-\r\n![image](https://github.com/ledgerwatch/erigon/assets/95335707/2b2cc8a3-ebbd-4ea4-bea2-50df56939962)\r\n\r\nThis is iostat from the node. I'm currently using AWS set up by ec2 r6g.8xlarge instance with gp3 16,000 iops, 300 throughput.\r\n\r\nI've successed making the erigon node sync on time with GCP instance and the difference we saw with the AWS node was its read io latency, GCP was under 0.3 seconds, whereas AWS was always above 0.5 seconds.\r\n\r\nI want to know if the node specs are not enough to fully sync.\r\nIf possible I would like to know what instance type in AWS is best practice to run Polygon mainnet erigon archive nodes.\r\n\r\nBy the way, Polygon Mainnet Erigon Full nodes, Polygon Mumbai Erigon Full, Archive nodes work well. It's only the mainnet archive nodes that are having this problem.\r\n\r\nIf more information is needed, pease ask for more.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9147/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9147/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
