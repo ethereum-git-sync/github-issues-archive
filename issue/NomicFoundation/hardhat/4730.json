@@ -40,7 +40,7 @@
       "description": "There's not enough information to start working on this issue"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "fvictorio",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2024-01-04T22:15:46Z",
-  "updated_at": "2024-01-05T10:13:56Z",
-  "closed_at": null,
+  "updated_at": "2024-01-05T10:39:55Z",
+  "closed_at": "2024-01-05T10:39:55Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Version of Hardhat\n\n2.19.4\n\n### What happened?\n\nI initialized a new project and tried to run example tests.\r\n\r\nExpected results: all the required dependencies are automatically installed and tests run successfully from the get-go.\r\n\r\nActual results: I get an error with a broken link (leading to 404 page) about not installed peer dependencies and am required to install them manually. After that `npx hardhat test` fail all the tests with `TypeError: (0 , ethers_1.getAddress) is not a function` error text. Errors are gone after I additionally manually installed `ethers` package, which wasn't mentioned in HH801 error text.\n\n### Minimal reproduction steps\n\nI have Node@20/npm@10 (installed with `nvm`) on WSL2. Also tried with Node@18, and npm@7, and npm@9 with the same results. Here are the commands I used with console output.\r\n```sh\r\nangly@Nekst:~/hardhat-init-test$ node -v\r\nv20.10.0\r\nangly@Nekst:~/hardhat-init-test$ npm -v\r\n10.2.3\r\n```\r\nAn empty npm project is initialized.\r\n```sh\r\nangly@Nekst:~/hardhat-init-test$ npm init -y\r\nWrote to /home/angly/hardhat-init-test/package.json:\r\n\r\n{\r\n  \"name\": \"hardhat-init-test\",\r\n  \"version\": \"1.0.0\",\r\n  \"description\": \"\",\r\n  \"main\": \"index.js\",\r\n  \"scripts\": {\r\n    \"test\": \"echo \\\"Error: no test specified\\\" && exit 1\"\r\n  },\r\n  \"keywords\": [],\r\n  \"author\": \"\",\r\n  \"license\": \"ISC\"\r\n}\r\n```\r\nHardhat is installed.\r\n```sh\r\nangly@Nekst:~/hardhat-init-test$ npm i -D hardhat\r\n\r\nadded 312 packages, and audited 313 packages in 2s\r\n\r\n69 packages are looking for funding\r\n  run `npm fund` for details\r\n\r\nfound 0 vulnerabilities\r\n```\r\nNew hardhat JS project is initialized agreeing to all the options.\r\n```sh\r\nangly@Nekst:~/hardhat-init-test$ npx hardhat init\r\n888    888                      888 888               888\r\n888    888                      888 888               888\r\n888    888                      888 888               888\r\n8888888888  8888b.  888d888 .d88888 88888b.   8888b.  888888\r\n888    888     \"88b 888P\"  d88\" 888 888 \"88b     \"88b 888\r\n888    888 .d888888 888    888  888 888  888 .d888888 888\r\n888    888 888  888 888    Y88b 888 888  888 888  888 Y88b.\r\n888    888 \"Y888888 888     \"Y88888 888  888 \"Y888888  \"Y888\r\n\r\nWelcome to Hardhat v2.19.4\r\n\r\n✔ What do you want to do? · Create a JavaScript project\r\n✔ Hardhat project root: · /home/angly/hardhat-init-test\r\n✔ Do you want to add a .gitignore? (Y/n) · y\r\n✔ Do you want to install this sample project's dependencies with npm (@nomicfoundation/hardhat-toolbox)? (Y/n) · y\r\n\r\nnpm install --save-dev @nomicfoundation/hardhat-toolbox@^4.0.0\r\n\r\nadded 1 package, and audited 314 packages in 552ms\r\n\r\n69 packages are looking for funding\r\n  run `npm fund` for details\r\n\r\nfound 0 vulnerabilities\r\n\r\nProject created\r\n\r\nSee the README.md file for some example tasks you can run\r\n\r\nGive Hardhat a star on Github if you're enjoying it!\r\n\r\n     https://github.com/NomicFoundation/hardhat\r\n\r\nPlease take a moment to complete the 2023 Solidity Survey: https://hardhat.org/solidity-survey-2023\r\n```\r\nTried to run tests, got unmet peer dependencies error with broken https://hardhat.org/HH801 link.\r\n```sh\r\nangly@Nekst:~/hardhat-init-test$ npx hardhat test\r\nError HH801: Plugin @nomicfoundation/hardhat-toolbox requires the following dependencies to be installed: @nomicfoundation/hardhat-chai-matchers, @nomicfoundation/hardhat-ethers, @nomicfoundation/hardhat-network-helpers, @nomicfoundation/hardhat-verify, @typechain/ethers-v6, @typechain/hardhat, @types/chai, @types/mocha, chai, hardhat-gas-reporter, solidity-coverage, ts-node, typechain, typescript.\r\nPlease run: npm install --save-dev \"@nomicfoundation/hardhat-chai-matchers@^2.0.0\" \"@nomicfoundation/hardhat-ethers@^3.0.0\" \"@nomicfoundation/hardhat-network-helpers@^1.0.0\" \"@nomicfoundation/hardhat-verify@^2.0.0\" \"@typechain/ethers-v6@^0.5.0\" \"@typechain/hardhat@^9.0.0\" \"@types/chai@^4.2.0\" \"@types/mocha@>=9.1.0\" \"chai@^4.2.0\" \"hardhat-gas-reporter@^1.0.8\" \"solidity-coverage@^0.8.1\" \"ts-node@>=8.0.0\" \"typechain@^8.3.0\" \"typescript@>=4.5.0\"\r\n\r\nFor more info go to https://hardhat.org/HH801 or run Hardhat with --show-stack-traces\r\n```\r\nInstalled peer dependencies using the command from the output above.\r\n```sh\r\nangly@Nekst:~/hardhat-init-test$ npm install --save-dev \"@nomicfoundation/hardhat-chai-matchers@^2.0.0\" \"@nomicfoundation/hardhat-ethers@^3.0.0\" \"@nomicfoundation/hardhat-network-helpers@^1.0.0\" \"@nomicfoundation/hardhat-verify@^2.0.0\" \"@typechain/ethers-v6@^0.5.0\" \"@typechain/hardhat@^9.0.0\" \"@types/chai@^4.2.0\" \"@types/mocha@>=9.1.0\" \"chai@^4.2.0\" \"hardhat-gas-reporter@^1.0.8\" \"solidity-coverage@^0.8.1\" \"ts-node@>=8.0.0\" \"typechain@^8.3.0\" \"typescript@>=4.5.0\"\r\n\r\nadded 245 packages, and audited 559 packages in 23s\r\n\r\n89 packages are looking for funding\r\n  run `npm fund` for details\r\n\r\nfound 0 vulnerabilities\r\n```\r\nTried to run tests again, got a cryptic error message.\r\n```sh\r\nangly@Nekst:~/hardhat-init-test$ npx hardhat test\r\nCompiled 1 Solidity file successfully (evm target: paris).\r\n\r\n\r\n  Lock\r\n    Deployment\r\n      1) Should set the right unlockTime\r\n      2) Should set the right owner\r\n      3) Should receive and store the funds to lock\r\n      4) Should fail if the unlockTime is not in the future\r\n    Withdrawals\r\n      Validations\r\n        5) Should revert with the right error if called too soon\r\n        6) Should revert with the right error if called from another account\r\n        7) Shouldn't fail if the unlockTime has arrived and the owner calls it\r\n      Events\r\n        8) Should emit an event on withdrawals\r\n      Transfers\r\n        9) Should transfer the funds to the owner\r\n\r\n\r\n  0 passing (431ms)\r\n  9 failing\r\n\r\n  1) Lock\r\n       Deployment\r\n         Should set the right unlockTime:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:30:36)\r\n\r\n  2) Lock\r\n       Deployment\r\n         Should set the right owner:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:36:31)\r\n\r\n  3) Lock\r\n       Deployment\r\n         Should receive and store the funds to lock:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:42:38)\r\n\r\n  4) Lock\r\n       Deployment\r\n         Should fail if the unlockTime is not in the future:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at getContractFactoryByAbiAndBytecode (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:305:21)\r\n      at Context.<anonymous> (test/Lock.js:54:20)\r\n\r\n  5) Lock\r\n       Withdrawals\r\n         Validations\r\n           Should revert with the right error if called too soon:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:64:26)\r\n\r\n  6) Lock\r\n       Withdrawals\r\n         Validations\r\n           Should revert with the right error if called from another account:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:72:52)\r\n\r\n  7) Lock\r\n       Withdrawals\r\n         Validations\r\n           Shouldn't fail if the unlockTime has arrived and the owner calls it:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:86:38)\r\n\r\n  8) Lock\r\n       Withdrawals\r\n         Events\r\n           Should emit an event on withdrawals:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:99:52)\r\n\r\n  9) Lock\r\n       Withdrawals\r\n         Transfers\r\n           Should transfer the funds to the owner:\r\n     TypeError: (0 , ethers_1.getAddress) is not a function\r\n      at new HardhatEthersSigner (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:73:30)\r\n      at Function.create (node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:65:12)\r\n      at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n      at getSigner (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:60:29)\r\n      at async Promise.all (index 0)\r\n      at getSigners (node_modules/@nomicfoundation/hardhat-ethers/src/internal/helpers.ts:45:30)\r\n      at deployOneYearLockFixture (test/Lock.js:20:35)\r\n      at loadFixture (node_modules/@nomicfoundation/hardhat-network-helpers/src/loadFixture.ts:59:18)\r\n      at Context.<anonymous> (test/Lock.js:113:59)\r\n\r\n\r\n\r\n\r\nPlease take a moment to complete the 2023 Solidity Survey: https://hardhat.org/solidity-survey-2023\r\n```\r\nThen I thought of comparing the list of peer dependencies from HH801 error with the list from the docs and discovered that `ethers` was missing in HH801 error's text and installed it manually. After that tests run successfully.\r\n\r\nPlease help me understand how to make peer dependencies to be installed automatically.\n\n### Search terms\n\ninit peer dependencies",
-  "closed_by": null,
+  "closed_by": {
+    "login": "lebedev",
+    "id": 5000549,
+    "node_id": "MDQ6VXNlcjUwMDA1NDk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5000549?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lebedev",
+    "html_url": "https://github.com/lebedev",
+    "followers_url": "https://api.github.com/users/lebedev/followers",
+    "following_url": "https://api.github.com/users/lebedev/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lebedev/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lebedev/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lebedev/subscriptions",
+    "organizations_url": "https://api.github.com/users/lebedev/orgs",
+    "repos_url": "https://api.github.com/users/lebedev/repos",
+    "events_url": "https://api.github.com/users/lebedev/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lebedev/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4730/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4730/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -142,6 +161,50 @@
     "body": "@lebedev can you try this in an empty directory and tell me what happens?\r\n\r\n```\r\nnpm init -y\r\nnpm install --save-dev @nomicfoundation/hardhat-toolbox\r\n```\r\n\r\nThis should auto-install the toolbox peer dependencies, so instead of \"added 1 package\" you should get way more.\r\n\r\nOne possibility here is that (for some reason, perhaps nvm-related), the auto-installation done by Hardhat is using a different version of npm (maybe the sytem version), and that version doesn't auto-install peer deps. But maybe something else is going on here.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1878429901/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1878463075",
+    "html_url": "https://github.com/NomicFoundation/hardhat/issues/4730#issuecomment-1878463075",
+    "issue_url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/4730",
+    "id": 1878463075,
+    "node_id": "IC_kwDOB7jojM5v9xJj",
+    "user": {
+      "login": "lebedev",
+      "id": 5000549,
+      "node_id": "MDQ6VXNlcjUwMDA1NDk=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5000549?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/lebedev",
+      "html_url": "https://github.com/lebedev",
+      "followers_url": "https://api.github.com/users/lebedev/followers",
+      "following_url": "https://api.github.com/users/lebedev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/lebedev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/lebedev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/lebedev/subscriptions",
+      "organizations_url": "https://api.github.com/users/lebedev/orgs",
+      "repos_url": "https://api.github.com/users/lebedev/repos",
+      "events_url": "https://api.github.com/users/lebedev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/lebedev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-05T10:39:55Z",
+    "updated_at": "2024-01-05T10:39:55Z",
+    "author_association": "NONE",
+    "body": "I solved it!\r\n\r\nI wondered why there wasn't any warnings from npm about missing peer dependencies and why my npm 7+ didn't install any peer dependencies when it by all means should have. Turned out I had `legacy-peer-deps` option set (which exists exactly for disabling peer dependencies installation) and completely forgot about it. This option can be provided as a flag to `npm i`, as a key-value pair in a `.npmrc` file, and as a `npm config` option (which was my case), and this option surprisingly persisted node versions uninstallations/reinstallations via `nvm`.\r\n\r\nThanks for you assistance, @fvictorio!",
+    "reactions": {
+      "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1878463075/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
