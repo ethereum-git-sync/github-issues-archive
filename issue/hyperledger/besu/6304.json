@@ -49,7 +49,7 @@
       "description": "not related to mainnet features - covers privacy, permissioning, IBFT2, QBFT"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -58,12 +58,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-12-15T09:45:12Z",
-  "updated_at": "2023-12-21T16:28:46Z",
-  "closed_at": null,
+  "updated_at": "2024-01-06T20:53:02Z",
+  "closed_at": "2024-01-06T20:53:02Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Description\r\nHi, I am trying to deploy a smart contract in my private besu network (IBFT 2.0) but the transaction to do so is being reverted by the EVM. I was succesfully able  to deploy the same smart contract with remix and then interract with it as described in the besu documentation with a js script.\r\n\r\n\r\n### Acceptance Criteria\r\n* Smart contract being deployed successfully.\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Deploy a Besu network following the [documentation](https://besu.hyperledger.org/private-networks/tutorials/ibft) \r\n2. Create a SimpleStorage.sol smart contract using the following \r\n\r\n```\r\npragma solidity ^0.7.0;\r\n\r\ncontract SimpleStorage {\r\n  uint public storedData;\r\n  event stored(address _to, uint _amount);\r\n\r\n  constructor(uint initVal) public {\r\n    emit stored(msg.sender, initVal);\r\n    storedData = initVal;\r\n  }\r\n\r\n  function set(uint x) public {\r\n    emit stored(msg.sender, x);\r\n    storedData = x;\r\n  }\r\n\r\n  function get() view public returns (uint retVal) {\r\n    return storedData;\r\n  }\r\n}\r\n```\r\n\r\n3. Compile the smart contract with a compile.js file just like the [documentation ](https://besu.hyperledger.org/private-networks/tutorials/contracts) and generating the bin and abi with solc\r\n\r\n4. Creating a public_tx.js file \r\n\r\n```\r\nconst host = 'http://127.0.0.1:8545'; // URL of the node\r\nconst fs = require('fs');\r\nconst path = require('path');\r\nconst Tx = require('ethereumjs-tx').Transaction;\r\n\r\nconst { Web3 } = require('web3');\r\n\r\nasync function deployContract() {\r\n  //instance Web3\r\n  const web3 = new Web3(host);\r\n  const privateKey = \"secret...\";\r\n  const account = web3.eth.accounts.privateKeyToAccount(privateKey);\r\n\r\n  const contractJsonPath = path.resolve(__dirname, \"SimpleStorage.json\");\r\n  const contractJson = JSON.parse(fs.readFileSync(contractJsonPath));\r\n\r\n  const contractAbi = contractJson.abi;\r\n  const contractBinPath = path.resolve(__dirname, \"SimpleStorage.bin\");\r\n  const contractBin = fs.readFileSync(contractBinPath);\r\n\r\n  const contractConstructorInit =\r\n    \"000000000000000000000000000000000000000000000000000000000000002F\";\r\n\r\n  const txnCount = await web3.eth.getTransactionCount(account.address);\r\n\r\n  const rawTxOptions = {\r\n    nonce: web3.utils.numberToHex(txnCount),\r\n    from: account.address,\r\n    to: null,\r\n    value: \"0x00\",\r\n    data: \"0x\" + contractBin + contractConstructorInit,\r\n    gasPrice: \"0x0\",\r\n    gasLimit: \"0x24A22\",\r\n  };\r\n\r\n  console.log(\"Creating transaction...\");\r\n  const tx = new Tx(rawTxOptions);\r\n  console.log(\"Signing transaction...\");\r\n  tx.sign(Buffer.from(privateKey.slice(2), 'hex'));\r\n  console.log(\"Sending transaction...\");\r\n  const serializedTx = tx.serialize();\r\n\r\n  const pTx = await web3.eth.sendSignedTransaction(\r\n    \"0x\" + serializedTx.toString(\"hex\").toString(\"hex\")\r\n  );\r\n\r\n  console.log(\"tx transactionHash: \" + pTx.transactionHash);\r\n  console.log(\"tx contractAddress: \" + pTx.contractAddress);\r\n}\r\n\r\n//calling main\r\ndeployContract()\r\n  .then(() => {\r\n    console.log(\"Contrat sucesfully deployed\");\r\n  })\r\n  .catch((error) => {\r\n    console.error(\"Error during contract's deployment :\", error);\r\n  });\r\n```\r\n\r\n**Expected behavior:** The smart contract to be deployed successfully when running the public_tx.js file\r\n\r\n**Actual behavior:** \r\n```\r\nCreating transaction...\r\nSigning transaction...\r\nSending transaction...\r\nErreur lors du déploiement du contrat : TransactionRevertInstructionError: Transaction has been reverted by the EVM\r\n    at /home/.../smartcontracts/node_modules/web3-eth/lib/commonjs/utils/get_transaction_error.js:48:21\r\n    at Generator.next (<anonymous>)\r\n    at /home/.../smartcontracts/node_modules/web3-eth/lib/commonjs/utils/get_transaction_error.js:24:71\r\n    at new Promise (<anonymous>)\r\n    at __awaiter (/home/.../smartcontracts/node_modules/web3-eth/lib/commonjs/utils/get_transaction_error.js:20:12)\r\n    at getTransactionError (/home/.../smartcontracts/node_modules/web3-eth/lib/commonjs/utils/get_transaction_error.js:33:12)\r\n    at SendTxHelper.<anonymous> (/home/.../smartcontracts/node_modules/web3-eth/lib/commonjs/utils/send_tx_helper.js:74:84)\r\n    at Generator.next (<anonymous>)\r\n    at fulfilled (/home/.../smartcontracts/node_modules/web3-eth/lib/commonjs/utils/send_tx_helper.js:5:58)\r\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {\r\n  innerError: undefined,\r\n  reason: 'Internal error',\r\n  signature: undefined,\r\n  receipt: undefined,\r\n  data: undefined,\r\n  code: 402\r\n}\r\n```\r\n\r\nII tried to change the gas and log every data in the script and it seems correctly initialized. So I don't know if it's an error of logic in the public_tx.js or a problem of configuration of my besu network. (or something else)\r\n\r\n\r\n**Frequency:** Always\r\n\r\n\r\n\r\n### Versions\r\n* Software version: besu/v23.10.2/linux-x86_64/openjdk-java-17\r\n* Java version: openjdk version \"17.0.6\" 2023-01-17 / OpenJDK Runtime Environment (build 17.0.6+10-Debian-1) / OpenJDK 64-Bit Server VM (build 17.0.6+10-Debian-1, mixed mode, sharing) \r\n* Consensus : IBFT 2.0 POA consensus\r\n\r\n### Smart contract information \r\n* Solidity version solcjs --version :  0.8.23+commit.f704f362.Emscripten.clang\r\n\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "jeremyGrelaud",
+    "id": 73029242,
+    "node_id": "MDQ6VXNlcjczMDI5MjQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/73029242?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jeremyGrelaud",
+    "html_url": "https://github.com/jeremyGrelaud",
+    "followers_url": "https://api.github.com/users/jeremyGrelaud/followers",
+    "following_url": "https://api.github.com/users/jeremyGrelaud/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jeremyGrelaud/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jeremyGrelaud/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jeremyGrelaud/subscriptions",
+    "organizations_url": "https://api.github.com/users/jeremyGrelaud/orgs",
+    "repos_url": "https://api.github.com/users/jeremyGrelaud/repos",
+    "events_url": "https://api.github.com/users/jeremyGrelaud/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jeremyGrelaud/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/6304/reactions",
     "total_count": 0,
@@ -78,7 +97,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6304/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {

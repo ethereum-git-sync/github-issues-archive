@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6358",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6358/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6358/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6358/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6358",
+  "id": 2068754029,
+  "node_id": "I_kwDODE2jmc57Tq5t",
+  "number": 6358,
+  "title": "UID of besu changed from 1000 to 1001 in 23.10.3 Docker image",
+  "user": {
+    "login": "h4l",
+    "id": 146503,
+    "node_id": "MDQ6VXNlcjE0NjUwMw==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/146503?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/h4l",
+    "html_url": "https://github.com/h4l",
+    "followers_url": "https://api.github.com/users/h4l/followers",
+    "following_url": "https://api.github.com/users/h4l/following{/other_user}",
+    "gists_url": "https://api.github.com/users/h4l/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/h4l/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/h4l/subscriptions",
+    "organizations_url": "https://api.github.com/users/h4l/orgs",
+    "repos_url": "https://api.github.com/users/h4l/repos",
+    "events_url": "https://api.github.com/users/h4l/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/h4l/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-06T18:06:46Z",
+  "updated_at": "2024-01-06T18:06:46Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "```\r\n$ docker container run --rm --entrypoint id hyperledger/besu:23.10.2-openjdk-latest\r\nuid=1000(besu) gid=1000(besu) groups=1000(besu)\r\n\r\n$ docker container run --rm --entrypoint id hyperledger/besu:23.10.3-openjdk-latest\r\nuid=1001(besu) gid=1001(besu) groups=1001(besu),100(users)\r\n```\r\n\r\nWith its data files owned by uid 1000, the 23.10.3 container will fail to start with non-obvious error message:\r\n\r\n```\r\n2024-01-06 17:32:38.521+00:00 | main | INFO  | Besu | Security Module: localfile\r\n2024-01-06 17:32:38.549+00:00 | main | INFO  | Besu | Using the native implementation of alt bn128\r\n2024-01-06 17:32:38.573+00:00 | main | INFO  | Besu | Using the native implementation of modexp\r\n2024-01-06 17:32:38.574+00:00 | main | INFO  | Besu | Using the native implementation of the signature algorithm\r\n2024-01-06 17:32:38.577+00:00 | main | INFO  | Besu | Using the native implementation of the blake2bf algorithm\r\n2024-01-06 17:32:38.663+00:00 | main | INFO  | Besu | 0 Bootnodes configured\r\n2024-01-06 17:32:38.753+00:00 | main | INFO  | KeyPairUtil | Attempting to load public key from /var/lib/besu/data/key\r\n2024-01-06 17:32:38.753+00:00 | main | ERROR | Besu | Failed to start Besu\r\npicocli.CommandLine$ExecutionException: Supplied file does not contain valid keyPair pair.\r\n        at org.hyperledger.besu.cli.BesuCommand.buildController(BesuCommand.java:2167)\r\n        at org.hyperledger.besu.cli.BesuCommand.initController(BesuCommand.java:2153)\r\n        at org.hyperledger.besu.cli.BesuCommand.run(BesuCommand.java:1463)\r\n        at picocli.CommandLine.executeUserObject(CommandLine.java:2026)\r\n        at picocli.CommandLine.access$1500(CommandLine.java:148)\r\n        at picocli.CommandLine$RunLast.executeUserObjectOfLastSubcommandWithSameParent(CommandLine.java:2461)\r\n        at picocli.CommandLine$RunLast.handle(CommandLine.java:2453)\r\n        at picocli.CommandLine$RunLast.handle(CommandLine.java:2415)\r\n        at picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2273)\r\n        at picocli.CommandLine$RunLast.execute(CommandLine.java:2417)\r\n        at picocli.CommandLine.execute(CommandLine.java:2170)\r\n        at org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler.handle(ConfigOptionSearchAndRunHandler.java:62)\r\n        at org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler.handle(ConfigOptionSearchAndRunHandler.java:33)\r\n        at picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2273)\r\n        at picocli.CommandLine$RunLast.execute(CommandLine.java:2417)\r\n        at picocli.CommandLine.execute(CommandLine.java:2170)\r\n        at org.hyperledger.besu.cli.BesuCommand.parse(BesuCommand.java:1628)\r\n        at org.hyperledger.besu.cli.BesuCommand.parse(BesuCommand.java:1423)\r\n        at org.hyperledger.besu.Besu.main(Besu.java:39)\r\nCaused by: java.lang.IllegalArgumentException: Supplied file does not contain valid keyPair pair.\r\n        at org.hyperledger.besu.crypto.KeyPairUtil.loadPrivateKey(KeyPairUtil.java:163)\r\n        at org.hyperledger.besu.crypto.KeyPairUtil.load(KeyPairUtil.java:146)\r\n        at org.hyperledger.besu.crypto.KeyPairUtil.loadKeyPair(KeyPairUtil.java:88)\r\n        at org.hyperledger.besu.cli.BesuCommand.loadKeyPair(BesuCommand.java:1608)\r\n        at org.hyperledger.besu.cli.BesuCommand.defaultSecurityModule(BesuCommand.java:1596)\r\n        at com.google.common.base.Suppliers$NonSerializableMemoizingSupplier.get(Suppliers.java:183)\r\n        at org.hyperledger.besu.cli.BesuCommand.securityModule(BesuCommand.java:3179)\r\n        at org.hyperledger.besu.cli.BesuCommand.getControllerBuilder(BesuCommand.java:2189)\r\n        at org.hyperledger.besu.cli.BesuCommand.buildController(BesuCommand.java:2165)\r\n        ... 18 more\r\nSupplied file does not contain valid keyPair pair.\r\nTo display full help:\r\nbesu [COMMAND] --help\r\n```\r\n\r\nChanging file ownership fixes this, but ideally the container user UID should not change between versions.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6358/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6358/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
