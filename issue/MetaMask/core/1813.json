@@ -87,7 +87,7 @@
   "milestone": null,
   "comments": 6,
   "created_at": "2023-10-11T21:42:07Z",
-  "updated_at": "2024-01-05T22:47:44Z",
+  "updated_at": "2024-01-08T15:35:39Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -357,9 +357,9 @@
       "site_admin": false
     },
     "created_at": "2024-01-05T22:47:42Z",
-    "updated_at": "2024-01-05T22:47:42Z",
+    "updated_at": "2024-01-08T15:35:39Z",
     "author_association": "CONTRIBUTOR",
-    "body": "Some notes on current direction:\r\n\r\n- Constructor\r\n  - Follow `detectTokensController` usage of `restartTokenDetection` instead of `detectTokens`\r\n  - Subscribe to `AccountsController:selectedAccountChange` event\r\n  - Avoid triggering `TokenListController:stateChange` for empty tokens list\r\n- Replace `#disabled` checks with `isActive`\r\n- `detectTokens`:\r\n  - tokens-controller: apply messenger pattern\r\n    - Subscribe to tokens-controller: maintain cache of `ignoredTokens`, `detectedTokens`\r\n    - Exclude tokens already in `detectedTokens` list from `detectTokens` logic\r\n  - If `isTokenDetectionInactiveInMainnet` is true: early exit (handled by `#isDetectionEnabledFromPreferences`). \r\n    - OR copy logic for generating static mainnet token list? reach out to mobile team on importance of handling this case explicitly.\r\n  - Accept `_trackMetaMetricsEvent` callback\r\n    - Generate and pass `eventTokensDetails`\r\n  - throw error block is handled by `_safelyExecute()`\r\n- `restartTokenDetection`\r\n  - triggers `detectTokens` and resets interval length to default\r\n  - all other logic moved into `detectTokens`\r\n",
+    "body": "Notes:\r\n\r\n- Constructor\r\n  - Wherever `DetectTokensController` uses `restartTokenDetection`, replace `detectTokens`\r\n  - Subscribe to `AccountsController:selectedAccountChange` event\r\n  - Avoid triggering `TokenListController:stateChange` for empty tokens list (`TokenDetectionController`)\r\n- Replace `#disabled` checks with `isActive`\r\n- `detectTokens`:\r\n  - tokens-controller: apply messenger pattern\r\n    - Subscribe to tokens-controller: maintain cache of `ignoredTokens`, `detectedTokens`\r\n    - Exclude tokens already in `detectedTokens` list from `detectTokens` logic\r\n  - Replace `isTokenDetectionInactiveInMainnet` is true -> early exit with `detectTokens` check for `#isDetectionEnabledFromPreferences`. \r\n    - OR copy logic for generating static mainnet token list into core? reach out to mobile team on importance of handling this case explicitly.\r\n  - Accept `_trackMetaMetricsEvent` callback in constructor\r\n    - Generate and pass `eventTokensDetails`\r\n  - try-catch block is handled by `_safelyExecute()`\r\n- `restartTokenDetection`\r\n  - triggers `detectTokens` and resets interval length to default\r\n  - all other logic moved into `detectTokens`\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/MetaMask/core/issues/comments/1879349608/reactions",
       "total_count": 0,
