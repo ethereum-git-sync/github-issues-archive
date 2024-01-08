@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/5044",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/5044/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/5044/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/5044/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/5044",
+  "id": 2070308527,
+  "node_id": "I_kwDOCFeAzc57Zmav",
+  "number": 5044,
+  "title": "Beacon node reporting to a validator as \"available\" in a situation where it isn't available",
+  "user": {
+    "login": "Spacesider",
+    "id": 90861342,
+    "node_id": "MDQ6VXNlcjkwODYxMzQy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/90861342?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Spacesider",
+    "html_url": "https://github.com/Spacesider",
+    "followers_url": "https://api.github.com/users/Spacesider/followers",
+    "following_url": "https://api.github.com/users/Spacesider/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Spacesider/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Spacesider/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Spacesider/subscriptions",
+    "organizations_url": "https://api.github.com/users/Spacesider/orgs",
+    "repos_url": "https://api.github.com/users/Spacesider/repos",
+    "events_url": "https://api.github.com/users/Spacesider/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Spacesider/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-08T12:01:17Z",
+  "updated_at": "2024-01-08T12:01:17Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hey guys, I have a Lighthouse validator configured with two beacon node endpoints. One of these pairs is Teku - Besu, and the other pair is Lighthouse - Nethermind. The Teku is the primary, while the Lighthouse is the secondary, and the Lighthouse vc reports these accordingly as 2 synced and 2 available.\r\n\r\nDue to the recent Besu client bug, my primary node became unavailable and my lighthouse vc (As expected) then tried to reach out to my secondary Lighthouse bn.\r\n\r\nExcept that too was unavailable due to another unrelated issue which I will document below.\r\n\r\nIn my validator client, I have configured `--builder-proposals` but only on my primary Teku BN is MEV enabled. My secondary Lighthouse BN does not use MEV. So when the vc failed over from primary to secondary, duties were not able to be performed.\r\n\r\nThe related log messages can be seen below.\r\n\r\n```\r\nJan 06 12:32:23.002 DEBG Request to beacon node failed, error: ServerMessage(ErrorMessage { code: 500, message: \"UNHANDLED_ERROR: BuilderMissing\", stacktraces: [] }), node: http://<edited>:5052/, module: validator_client::beacon_node_fallback:523\r\nJan 06 12:32:23.002 WARN Unable to publish validator registrations to the builder network, error: Some endpoints failed, num_failed: 1 http://<edited>:5052/ => RequestFailed(ServerMessage(ErrorMessage { code: 500, message: \"UNHANDLED_ERROR: BuilderMissing\", stacktraces: [] })), service: preparation, module: validator_client::preparation_service:493\r\n```\r\n\r\nThe failure is due to the fact that my Lighthouse VC has builder proposals enabled while my Lighthouse BN does not. Which I understand why that would happen, but if the VC is unable to use the configured BN to perform its validating duties, then it also shouldn't show up in the logs as \"available\".\r\n\r\nI am using v4.5.0 > https://github.com/sigp/lighthouse/releases/tag/v4.5.0\r\n\r\nSpecifically, lighthouse-v4.5.0-x86_64-unknown-linux-gnu.tar.gz\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/5044/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/5044/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
