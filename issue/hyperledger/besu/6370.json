@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6370",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6370/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6370/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6370/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6370",
+  "id": 2070648935,
+  "node_id": "I_kwDODE2jmc57a5hn",
+  "number": 6370,
+  "title": "Transactions can get stuck in the pool in very specific scenarios (overdraft)",
+  "user": {
+    "login": "nkeywal",
+    "id": 1179343,
+    "node_id": "MDQ6VXNlcjExNzkzNDM=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1179343?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nkeywal",
+    "html_url": "https://github.com/nkeywal",
+    "followers_url": "https://api.github.com/users/nkeywal/followers",
+    "following_url": "https://api.github.com/users/nkeywal/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nkeywal/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nkeywal/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nkeywal/subscriptions",
+    "organizations_url": "https://api.github.com/users/nkeywal/orgs",
+    "repos_url": "https://api.github.com/users/nkeywal/repos",
+    "events_url": "https://api.github.com/users/nkeywal/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nkeywal/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-08T15:07:12Z",
+  "updated_at": "2024-01-08T15:07:12Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Possible scenario:\r\n- user sends 2 txs in a row.\r\n- The second one causes an overdraft, but is accepted in the pool because the first one is not executed yet.\r\n- Once the first one is executed, the second one cannot be executed, but cannot be replaced because to replace it you must increase the gas price, so it causes an overdraft and the tx is also rejected.\r\n\r\nExample: a user with a balance = 110 000 gwei\r\n1st tx: transfer 0 eth, gas price = 1 gwei\r\n2nd tx: transfer 0 eth, gas price = 5 gwei\r\n\r\n\r\nThere can be over race conditions like this one.\r\n\r\nWe have a few options to review:\r\n- do nothing, it is a user mistake, maybe better docs and awareness about the topic is needed.\r\n- can add a time expiration option to Besu, being aware that it is not deterministic that it works, because expiration is not synchronized and so the tx could still be around, and we have special txpool synchronization mechanism in place\r\n- try to detect the overdraft asap before adding the tx to the pool\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6370/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6370/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

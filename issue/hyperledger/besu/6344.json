@@ -40,7 +40,7 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "matthew1001",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2024-01-03T15:39:36Z",
-  "updated_at": "2024-01-03T15:51:34Z",
-  "closed_at": null,
+  "updated_at": "2024-01-08T09:20:36Z",
+  "closed_at": "2024-01-08T09:20:35Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Description\r\nRunning a moderately high workload using caliper, after ~ 2000 transactions `eth_estimateGas` returns `INTERNAL_ERROR` to the caliper WS client\r\n\r\n### Command that was run to start Besu (single validator):\r\n`besu --data-path=data --genesis-file=../genesis.json --min-gas-price=0  --sync-mode=FULL --rpc-http-enabled --rpc-ws-enabled --rpc-http-apis=DEBUG,TXPOOL,WEB3,ETH,TRACE,QBFT,ADMIN --tx-pool-limit-by-account-percentage=0.20 --rpc-ws-max-active-connections=300 --tx-pool=sequenced -l TRACE`\r\n\r\n### Logs\r\nI've pinned it down to this code block:\r\n\r\n```\r\nfinal BlockHeader blockHeader = blockHeader();\r\nif (blockHeader == null) {\r\n    return errorResponse(requestContext, RpcErrorType.INTERNAL_ERROR);\r\n}\r\n```\r\n\r\nhttps://github.com/hyperledger/besu/blob/e0cd89f9b5ca27763ba4b7b2589d486df81a9626/ethereum/api/src/main/java/org/hyperledger/besu/ethereum/api/jsonrpc/internal/methods/EthEstimateGas.java#L53\r\n\r\nIt was difficult to pin down the offending line using `TRACE` but adding a `new Exception().printStackTrace()` to the `JsonRpcErrorResponse(...)` constructor gave the stack trace:\r\n\r\n```\r\njava.lang.Exception\r\n        at org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse.<init>(JsonRpcErrorResponse.java:47)\r\n        at org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.AbstractEstimateGas.errorResponse(AbstractEstimateGas.java:135)\r\n        at org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.AbstractEstimateGas.errorResponse(AbstractEstimateGas.java:130)\r\n        at org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.EthEstimateGas.response(EthEstimateGas.java:53)\r\n        at org.hyperledger.besu.ethereum.api.jsonrpc.execution.BaseJsonRpcProcessor.process(BaseJsonRpcProcessor.java:44)\r\n        at org.hyperledger.besu.ethereum.api.jsonrpc.execution.JsonRpcExecutor.execute(JsonRpcExecutor.java:92)\r\n        at org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketMessageHandler.lambda$handle$1(WebSocketMessageHandler.java:90)\r\n        at io.vertx.core.impl.ContextBase.lambda$null$0(ContextBase.java:137)\r\n        at io.vertx.core.impl.ContextInternal.dispatch(ContextInternal.java:264)\r\n        at io.vertx.core.impl.ContextBase.lambda$executeBlocking$1(ContextBase.java:135)\r\n        at io.vertx.core.impl.TaskQueue.run(TaskQueue.java:76)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\r\n        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\r\n        at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n        at java.base/java.lang.Thread.run(Thread.java:833)\r\n```\r\n\r\nOnce I've got a fix in place I might add some additional `TRACE` logs in `EthEstimateGas` wherever an `INTERNAL_ERROR` is returned, to make diagnosing similar issues a little quicker.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "matthew1001",
+    "id": 6599269,
+    "node_id": "MDQ6VXNlcjY1OTkyNjk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6599269?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/matthew1001",
+    "html_url": "https://github.com/matthew1001",
+    "followers_url": "https://api.github.com/users/matthew1001/followers",
+    "following_url": "https://api.github.com/users/matthew1001/following{/other_user}",
+    "gists_url": "https://api.github.com/users/matthew1001/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/matthew1001/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/matthew1001/subscriptions",
+    "organizations_url": "https://api.github.com/users/matthew1001/orgs",
+    "repos_url": "https://api.github.com/users/matthew1001/repos",
+    "events_url": "https://api.github.com/users/matthew1001/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/matthew1001/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/6344/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6344/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
