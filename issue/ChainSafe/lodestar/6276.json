@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6276",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6276/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6276/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6276/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/6276",
+  "id": 2073167313,
+  "node_id": "I_kwDOCD5_Gc57kgXR",
+  "number": 6276,
+  "title": "Hive test failure due to voluntary exits not being included after Deneb",
+  "user": {
+    "login": "marioevz",
+    "id": 11726710,
+    "node_id": "MDQ6VXNlcjExNzI2NzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marioevz",
+    "html_url": "https://github.com/marioevz",
+    "followers_url": "https://api.github.com/users/marioevz/followers",
+    "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+    "organizations_url": "https://api.github.com/users/marioevz/orgs",
+    "repos_url": "https://api.github.com/users/marioevz/repos",
+    "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marioevz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-09T21:05:33Z",
+  "updated_at": "2024-01-09T21:05:33Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nWe found an issue on a hive test regarding voluntary exits that seems to only be happening in Lodestar, and it seems like lodestar does not want to include them in a block.\r\n\r\nThe issue only reproduces if the test starts in Capella, waits for the Deneb fork, and then sends the voluntary exits.\r\n\r\nIn both configurations we have two lodestar clients with all validators attached, and we see similar messages to this:\r\n```\r\nJan-09 15:32:21.955[rest]            \u001B[34mdebug\u001B[39m: Req req-1k 172.19.0.1 submitPoolVoluntaryExit\r\nJan-09 15:32:22.061[network]       \u001B[36mverbose\u001B[39m: Publish to topic topic=/eth2/383113c7/voluntary_exit/ssz_snappy, sentPeers=1\r\n```\r\n\r\nAfter submitting the (13) voluntary exits.\r\n\r\nOn Deneb genesis, the next produced block contains the exits:\r\n```\r\nJan-09 15:32:27.017[chain]         \u001B[36mverbose\u001B[39m: Produced beacon block body fork=deneb, blockType=Full, slot=3, attestations=1, deposits=0, voluntaryExits=13, attesterSlashings=0, proposerSlashings=0, feeRecipientType=requested, feeRecipient=0x0000000000000000000000000000000000000000, executionPayloadPrepType=Cached, transactions=40, blobs=0, blsToExecutionChanges=0, withdrawals=16, executionPayloadValue=840000000000000\r\n```\r\n\r\nBut on Capella genesis, the very next produced block (and all subsequent blocks) do not have any exits:\r\n```\r\nJan-09 18:10:26.011[chain]         \u001B[36mverbose\u001B[39m: Produced beacon block body fork=deneb, blockType=Full, slot=35, attestations=1, deposits=0, voluntaryExits=0, attesterSlashings=0, proposerSlashings=0, feeRecipientType=requested, feeRecipient=0x0000000000000000000000000000000000000000, executionPayloadPrepType=Cached, transactions=40, blobs=0, blsToExecutionChanges=0, withdrawals=16, executionPayloadValue=840000000000000\r\n```\r\n\n\n### Expected behavior\n\nVoluntary exits must be included.\n\n### Steps to reproduce\n\n```bash\r\ngit clone -b eth2-dencun https://github.com/marioevz/hive.git\r\ncd hive\r\ngo build -v .\r\n./hive --client-file ./configs/cancun.yaml --client nethermind,lodestar-bn,lodestar-vc --sim eth2/dencun --sim.limit \"eth2-deneb-testnet/test-deneb-fork\" --sim.loglevel 5\r\n```\r\nTest will fail because it times out waiting on validators to be set an exit epoch (which happens on all other clients).\n\n### Additional context\n\nLog files here: \r\n[lodestar_voluntary_exits_logs.tar.gz](https://github.com/ChainSafe/lodestar/files/13879010/lodestar_voluntary_exits_logs.tar.gz)\r\n\r\nSame test is passing on other clients, and we are signing the voluntary exits using Capella domain.\r\n\r\nOne thing to consider is we run using [unstable-linux-amd64](https://hub.docker.com/layers/ethpandaops/lodestar/unstable-linux-amd64/images/sha256-dff2f9fadbe3617786d0ed53a605c45d2ac6cecc58ffafe89aa9d688a77bda40?context=explore), but in the log files I cannot fully confirm that this is the branch used to compile because the line shows empty:\r\n```\r\nJan-09 20:30:43.875[]                 \u001B[32minfo\u001B[39m: Lodestar network=mainnet, version=v1.13.0, commit=\r\n```\r\n\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\ne51f495",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6276/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6276/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
