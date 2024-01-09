@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9179",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9179/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9179/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9179/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/9179",
+  "id": 2072260910,
+  "node_id": "I_kwDOC0FsAM57hDEu",
+  "number": 9179,
+  "title": "`erigon import` does not process PoS blocks",
+  "user": {
+    "login": "fjl",
+    "id": 6915,
+    "node_id": "MDQ6VXNlcjY5MTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6915?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fjl",
+    "html_url": "https://github.com/fjl",
+    "followers_url": "https://api.github.com/users/fjl/followers",
+    "following_url": "https://api.github.com/users/fjl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fjl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fjl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fjl/subscriptions",
+    "organizations_url": "https://api.github.com/users/fjl/orgs",
+    "repos_url": "https://api.github.com/users/fjl/repos",
+    "events_url": "https://api.github.com/users/fjl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fjl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-09T12:15:59Z",
+  "updated_at": "2024-01-09T13:39:13Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `v2.56.1`\r\n\r\n#### Expected behaviour\r\n\r\n`erigon import` with a chain file should run all blocks in the file and set the head to the last valid block.\r\n\r\n#### Actual behaviour\r\n\r\nRunning `erigon import chain.rlp` will only process blocks up to the merge. Blocks after the PoS transition are not imported.\r\n\r\nThis issue causes hive test failures. As we are continuing to update more hive tests to a PoS-enabled chain, erigon will not be able to execute those tests. So I'd appreciate getting this fixed.\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nDownloading the test chain:\r\n```\r\n~/d/e/erigon-testscript >> curl -L -o genesis.json https://github.com/ethereum/go-ethereum/raw/1010a79c7cbcdb4741e9f30e8cdc19c679ad7377/cmd/devp2p/internal/ethtest/testdata/genesis.json\r\n  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\r\n                                 Dload  Upload   Total   Spent    Left  Speed\r\n  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0\r\n100  4104  100  4104    0     0   8015      0 --:--:-- --:--:-- --:--:-- 15604\r\n~/d/e/erigon-testscript >> curl -L -o chain.rlp https://github.com/ethereum/go-ethereum/raw/1010a79c7cbcdb4741e9f30e8cdc19c679ad7377/cmd/devp2p/internal/ethtest/testdata/chain.rlp\r\n  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\r\n                                 Dload  Upload   Total   Spent    Left  Speed\r\n  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0\r\n100  333k  100  333k    0     0   513k      0 --:--:-- --:--:-- --:--:-- 3478k\r\n```\r\n\r\nInitializing the database:\r\n```\r\n~/d/e/erigon-testscript >> ./erigon init --datadir data genesis.json \r\nINFO[01-09|13:09:24.062] logging to file system                   log dir=data/logs file prefix=erigon log level=info json=false\r\nINFO[01-09|13:09:24.063] Opening Database                         label=chaindata path=/Users/fjl/develop/eth/erigon-testscript/data/chaindata\r\nINFO[01-09|13:09:24.066] [db] open                                lable=chaindata sizeLimit=2TB pageSize=16384\r\nINFO[01-09|13:09:24.076] Re-Opening DB in exclusive mode to apply migrations \r\nINFO[01-09|13:09:24.084] [db] open                                lable=chaindata sizeLimit=2TB pageSize=16384\r\nINFO[01-09|13:09:24.084] Apply migration                          name=db_schema_version5\r\nINFO[01-09|13:09:24.084] Applied migration                        name=db_schema_version5\r\nINFO[01-09|13:09:24.084] Apply migration                          name=txs_begin_end\r\nINFO[01-09|13:09:24.084] Applied migration                        name=txs_begin_end\r\nINFO[01-09|13:09:24.084] Apply migration                          name=txs_v3\r\nINFO[01-09|13:09:24.091] Applied migration                        name=txs_v3\r\nINFO[01-09|13:09:24.091] Apply migration                          name=prohibit_new_downloads_lock\r\nINFO[01-09|13:09:24.091] Applied migration                        name=prohibit_new_downloads_lock\r\nINFO[01-09|13:09:24.091] Updated DB schema to                     version=6.1.0\r\nINFO[01-09|13:09:24.099] [db] open                                lable=chaindata sizeLimit=2TB pageSize=16384\r\nINFO[01-09|13:09:24.116] Writing custom genesis block             hash=0x3d35e0b689cdd20720592d9a4d0d208de0612ebcb46e391141501e7d55d55b42\r\nINFO[01-09|13:09:24.124] Successfully wrote genesis state         hash=0x3d35e0b689cdd20720592d9a4d0d208de0612ebcb46e391141501e7d55d55b42\r\n```\r\n\r\nImporting chain.rlp. **Note that the import ends at block 72, which is incorrect.** The last block\r\nin chain.rlp is block 500.\r\n\r\n```\r\n~/d/e/erigon-testscript >> ./erigon --datadir data --fakepow import chain.rlp \r\nINFO[01-09|13:10:30.073] logging to file system                   log dir=data/logs file prefix=erigon log level=info json=false\r\nINFO[01-09|13:10:30.073] Starting Erigon on Ethereum mainnet... \r\nINFO[01-09|13:10:30.074] Maximum peer count                       ETH=100 total=100\r\nINFO[01-09|13:10:30.074] starting HTTP APIs                       APIs=eth,erigon,engine\r\nINFO[01-09|13:10:30.074] torrent verbosity                        level=WRN\r\nINFO[01-09|13:10:32.180] Set global gas cap                       cap=50000000\r\nINFO[01-09|13:10:32.234] [Downloader] Running with                ipv6-enabled=true ipv4-enabled=true download.rate=16mb upload.rate=4mb\r\nINFO[01-09|13:10:32.234] Opening Database                         label=chaindata path=/Users/fjl/develop/eth/erigon-testscript/data/chaindata\r\nINFO[01-09|13:10:32.236] [db] open                                lable=chaindata sizeLimit=12TB pageSize=16384\r\nINFO[01-09|13:10:32.236] Initialised chain configuration          config=\"{ChainID: 3503995874084926, Homestead: 0, DAO: <nil>, Tangerine Whistle: 6, Spurious Dragon: 12, Byzantium: 18, Constantinople: 24, Petersburg: 30, Istanbul: 36, Muir Glacier: 42, Berlin: 48, London: 54, Arrow Glacier: 60, Gray Glacier: 66, Terminal Total Difficulty: 9454784, Merge Netsplit: 72, Shanghai: 780, Cancun: 840, Prague: <nil>, Engine: ethash}\" genesis=0x3d35e0b689cdd20720592d9a4d0d208de0612ebcb46e391141501e7d55d55b42\r\nINFO[01-09|13:10:32.243] Initialising Ethereum protocol           network=1\r\nWARN[01-09|13:10:32.243] Ethash used in fake mode \r\nINFO[01-09|13:10:32.244] Starting private RPC server              on=127.0.0.1:9090\r\nINFO[01-09|13:10:32.244] new subscription to logs established \r\nINFO[01-09|13:10:32.245] rpc filters: subscribing to Erigon events \r\nINFO[01-09|13:10:32.245] new subscription to newHeaders established \r\nINFO[01-09|13:10:32.245] New txs subscriber joined \r\nINFO[01-09|13:10:32.245] Importing blockchain                     file=chain.rlp\r\nINFO[01-09|13:10:32.245] Reading JWT secret                       path=/Users/fjl/develop/eth/erigon-testscript/data/jwt.hex\r\nINFO[01-09|13:10:32.245] HTTP endpoint opened for Engine API      url=127.0.0.1:8551 ws=true ws.compression=true\r\nINFO[01-09|13:10:32.245] JsonRpc endpoint opened                  ws=false ws.compression=true grpc=false http.url=127.0.0.1:8545\r\nINFO[01-09|13:10:32.252] [2/15 Headers] Waiting for headers...    from=5\r\nINFO[01-09|13:10:32.255] [txpool] Started \r\nINFO[01-09|13:10:32.299] [2/15 Headers] Processed                 highest=72 age=54y9mo3w headers=67 in=0.047 blk/sec=1420\r\nINFO[01-09|13:10:32.299] [5/15 Bodies] Processing bodies...       from=5 to=72\r\nINFO[01-09|13:10:32.301] [5/15 Bodies] Processed                  highest=72 blocks=67 in=0.002 blk/sec=37911\r\nINFO[01-09|13:10:32.301] [6/15 Senders] Started                   from=0 to=72\r\nINFO[01-09|13:10:32.306] [7/15 Execution] Blocks execution        from=0 to=72\r\nINFO[01-09|13:10:32.310] [7/15 Execution] Completed on            block=72\r\nINFO[01-09|13:10:32.310] [8/15 HashState] Promoting plain state   from=0 to=72\r\nINFO[01-09|13:10:32.349] [9/15 IntermediateHashes] Generating intermediate hashes from=0 to=72\r\nINFO[01-09|13:10:32.349] [9/15 IntermediateHashes] Regeneration trie hashes started \r\nINFO[01-09|13:10:32.349] [9/15 IntermediateHashes] Trie root      hash=0x74035b613e4ea1072fd029f35d0fa5b26fbfaa54cabebcec88b9ee07cca321ae\r\nINFO[01-09|13:10:32.350] [9/15 IntermediateHashes] Regeneration ended \r\nWARN[01-09|13:10:32.361] NAT ExternalIP resolution has failed, try to pass a different --nat option err=\"no UPnP or NAT-PMP router discovered\"\r\nINFO[01-09|13:10:32.377] Started P2P networking                   version=68 self=enode://2c30e61eeaaf26a007d99d6db05d34867c0f7a8995970f10beb2c06b85b4b669eb6aadf74165b2748fe7273b0aa812de2a60fb384810dfa1f5d9b58707d207d8@127.0.0.1:30303 name=erigon/v2.56.1/darwin-arm64/go1.20.7\r\nWARN[01-09|13:10:32.396] NAT ExternalIP resolution has failed, try to pass a different --nat option err=\"no UPnP or NAT-PMP router discovered\"\r\nINFO[01-09|13:10:32.404] Started P2P networking                   version=67 self=enode://2c30e61eeaaf26a007d99d6db05d34867c0f7a8995970f10beb2c06b85b4b669eb6aadf74165b2748fe7273b0aa812de2a60fb384810dfa1f5d9b58707d207d8@127.0.0.1:30304 name=erigon/v2.56.1/darwin-arm64/go1.20.7\r\nINFO[01-09|13:10:32.404] RPC Daemon notified of new headers       from=5 to=72 hash=0xf0a50b18d597552b6ad8a711f4ac1f7ab225d59daa74137f689256a16a0ff809 header sending=65.5µs log sending=333ns\r\nINFO[01-09|13:10:32.404] [snapshots] Prune Blocks                 to=1 limit=100\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9179/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9179/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
