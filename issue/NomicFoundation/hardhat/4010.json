@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": null,
   "assignees": [
 
@@ -49,10 +49,10 @@
   "milestone": null,
   "comments": 12,
   "created_at": "2023-06-09T10:23:53Z",
-  "updated_at": "2023-10-10T18:49:49Z",
+  "updated_at": "2024-01-09T00:14:38Z",
   "closed_at": "2023-06-20T17:35:59Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\n\n2.15.0\n\n### What happened?\n\ndeploy error when on other network\n\n### Minimal reproduction steps\n\nThis is the example:  https://github.com/anbang/hardhat-deploy-example\r\n\r\n- install :\r\n  - `npm i`\r\n- create `.env` file in project root path\r\n  - mirror `.env.example`\r\n- compile :\r\n  - `npm run compile`\r\n- deploy on blockchain network\r\n  - ❌ run: `npm run d:o`  or  `npx hardhat run scripts/deploy.ts --network okchain`\r\n\r\nError info ：\r\n\r\n**ProviderError: too many arguments, want at most 1**\r\n    at HttpProvider.request (/Users/mac/Documents/xxxxxxxxxxxx/node_modules/hardhat/src/internal/core/providers/http.ts:88:21)\r\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\r\n    at async HardhatEthersProvider.estimateGas (/Users/mac/Documents/xxxxxxxxxxxx/node_modules/@nomicfoundation/hardhat-ethers/src/internal/hardhat-ethers-provider.ts:209:27)\r\n    at async /Users/mac/Documents/xxxxxxxxxxxx/node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:235:35\r\n    at async Promise.all (index 0)\r\n    at async HardhatEthersSigner._sendUncheckedTransaction (/Users/mac/Documents/xxxxxxxxxxxx/node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:256:7)\r\n    at async HardhatEthersSigner.sendTransaction (/Users/mac/Documents/xxxxxxxxxxxx/node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:125:18)\r\n    at async ContractFactory.deploy (/Users/mac/Documents/xxxxxxxxxxxx/node_modules/ethers/src.ts/contract/factory.ts:106:24)\r\n    at async main (/Users/mac/Documents/xxxxxxxxxxxx/scripts/deploy.ts:9:16)\r\n\r\n\n\n### Search terms\n\n_No response_",
   "closed_by": {
     "login": "fvictorio",
@@ -475,8 +475,8 @@
     "body": "@anbang @jveer634 Try adding explicit `gasLimit` to the deployment transaction like this:\r\n\r\n`const token = await ethers.deployContract(\"Token\", { gasLimit: \"0x1000000\" });`\r\n\r\nThe problem is most probably caused by an outdated ethereum node (geth < 1.9.22 or similar) which doesn't support `eth_estimateGas` 2'nd argument (quantity / type, see https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_estimategas). `hardhat-ethers` seem to be compliant with the current API so I don't think there's an issue here.",
     "reactions": {
       "url": "https://api.github.com/repos/NomicFoundation/hardhat/issues/comments/1617938235/reactions",
-      "total_count": 8,
-      "+1": 8,
+      "total_count": 10,
+      "+1": 10,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
