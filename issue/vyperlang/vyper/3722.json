@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3722",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3722/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3722/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3722/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3722",
+  "id": 2073285614,
+  "node_id": "I_kwDOBGDvrM57k9Pu",
+  "number": 3722,
+  "title": "VIP: stateful singleton modules with ownership hierarchy",
+  "user": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-09T22:39:35Z",
+  "updated_at": "2024-01-09T22:48:39Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Simple Summary\r\nextend the import system by allowing \"stateful modules\" (that is, modules with top-level state variables). introduce a constraint system on the import system which maximizes safety + usability.\r\n\r\nthis is one of two proposals exploring the stateful module design space; the other is https://github.com/vyperlang/vyper/issues/3723.\r\n\r\n## Motivation\r\nre-using code which encapsulates state is in general a useful feature to have for a language! however, in a contract-oriented programming context, this is a double edged sword because reasoning about storage is fundamentally difficult, especially when storage accesses are hidden behind a layer of abstraction. consider two basic approaches to the problem:\r\n\r\n1) each module gets a singleton instantiation in the storage allocator. this follows the [One-Def Rule](https://en.wikipedia.org/wiki/One_Definition_Rule) for modules and is probably the most intuitive for programmers. however, this hurts reasonability because a module's storage could be changed anywhere inside the import graph, as in the following example:\r\n```vyper\r\nimport dep1  # has a storage variable, counter\r\nimport dep2  # imports dep1. dep2.bar() modifies counter\r\n\r\n@external\r\ndef foo():\r\n    dep1.counter += 1\r\n    dep2.bar()  # tramples dep1.counter!\r\n```\r\nthis has a further issue which we will discuss in a bit, which is that access to `dep1`'s `__init__()` function is uncontrolled. that is, it could be called multiple times in the import graph. this is a correctness problem, because programmers expect constructors to be called at most one time.\r\n\r\n2) the user controls instantiations by explicitly instantiating instances of a module. each of these is a fresh instantiation in the storage allocater. this has multiple benefits. if you instantiate a module, you are guaranteed that nobody else in the import graph can modify it. however, it hurts sharing of global state, which is a design consideration for some use cases. the simplest example of this would be a library which encapsulates re-entrancy protection (note this is a straw-man, because vyper already has a builtin for reentrancy protection).\r\n```vyper\r\nimport Lock  # Lock.acquire() and Lock.release() modify Lock._key\r\nimport Foo  # Foo.foo() uses Lock by calling Lock.acquire()/Lock.release()\r\n\r\n_lock: Lock  # fresh instance of Lock\r\n_foo: Foo  # fresh instance of Foo\r\n\r\nexport _foo.foo  # hypothetical syntax, cf. https://github.com/vyperlang/vyper/pull/3698\r\n\r\n@external\r\ndef bar():\r\n    self._lock.acquire()\r\n    ...\r\n    call SomeContract  # !! can re-enter to Foo.foo, because Foo.Lock._key and Lock._key are separate\r\n    self._lock.release()\r\n```\r\nthe other benefit here would be clear access to imported `__init__()` functions. since each instantiation is local, it is straightforward to enforce that `__init__()` is called one time for each instantiation. (in the above example, `self._lock.__init__(...)` and `self._foo.__init__(...)` would have to be called in the main `__init__()` function.\r\n\r\nenumerated, the issues brought up above are:\r\n- state trampling\r\n- constraints on `__init__()`\r\n- state sharing\r\n\r\nthis proposal proposes a third option, which draws inspiration from [linear type systems](https://en.wikipedia.org/wiki/Substructural_type_system#Different_substructural_type_systems) and the [rust borrow checker](https://doc.rust-lang.org/1.8.0/book/references-and-borrowing.html).\r\n\r\nthe design proposed here is to enforce the one-def rule, but to address the issues above, additionally introduce an ownership system which allows the compiler to enforce constraints on how module state is written and initialized.\r\n\r\nnote on a design choice:\r\n- the new top-level statement type `owns: some_module` is a design requirement which allows the programmer to control where the module is laid out in storage.\r\n\r\n## Useful Definitions/Terminology\r\n- an _affine_ type is one that can be used _at most_ once\r\n- a _linear_ type is one that must be used _exactly_ once\r\n- the import graph is a directed acyclic graph which is traversed during import resolution\r\n- declaring variables produces a compile-time side effect in the storage allocator\r\n- a \"nested import\" is an import within an import\r\n- a \"region\" is an area of storage which can be touched by an effect\r\n- a module is a bundle of code-and-storage-layout functionality. there is currently a 1-to-1 correspondence in vyper between files and modules.\r\n- a compilation target is the module which is passed to the compiler as the \"main\" module.\r\n\r\n## Specification\r\n\r\nthis proposal introduces an effects hierarchy for interacting with modules: `owns` and `seals`. an alternative name for `owns` could be `initializes`. `owns` is used here since it is the terminology used in linear type systems.\r\n\r\nthe basic rules here are:\r\n1. ownership is modeled as an affine constraint, which is promoted to a linear constraint if any other effects are used from the module. that is,\r\n  - a module might be imported but no stateful functions are accessed, so initialization is allowed but not required.\r\n  - if a stateful function is reachable from the compilation target, then it must be `own`ed *exactly* one time in the import graph.\r\n2. there is a one-to-one correspondence between ownership and initialization. that is, if `module` owns `module2`, then `module2.__init__()` must be called in `module.__init__()` . declaring ownership \"seals off\" access to `module2.__init__()`. it is envisioned that it will probably be used sparingly or near the top of the import graph.\r\n3. you cannot touch modules from an `__init__()` function unless they are already owned.\r\n4. if a module seals `module2`, no other modules can write to it (or directly call mutating functions on `module2`).\r\n5. a module can only be `own`ed once. `seals:` implies ownership.\r\n\r\nnote that `seals:` can be considered as an extension to the ownership system. in other words, the `seals:` semantics is not required to be implemented.\r\n\r\nsome examples, with a tentative syntax:\r\n\r\n```vyper\r\nimport dep1  # has a storage variable, counter\r\nimport dep2  # imports dep1. dep2.bar() modifies counter\r\n\r\nseals: dep1\r\n\r\ndef __init__():\r\n    dep1.__init__(...)\r\n\r\n@external\r\ndef foo():\r\n    dep1.counter += 1\r\n\r\n@external\r\ndef foo1():\r\n    dep1.update_counter()\r\n\r\n# counterfactual example, this does not compile:\r\n@external\r\ndef foo2():\r\n    dep1.counter += 1\r\n    dep2.bar()  # not allowed! dep2.bar() modifies dep1\r\n```\r\n\r\n```vyper\r\n# Bar.vy\r\n\r\nimport Lock\r\nimport Foo\r\n\r\nx: uint256\r\n\r\n# declare ownership of Lock!\r\n# this would be an error if Foo declared ownership of Lock\r\n# this statement also controls the location of Lock in the storage layout -- it comes after `x`.\r\nowns: Lock  # own, but do not seal lock\r\n\r\nexports: Foo.foo\r\n\r\ndef __init__():\r\n    Lock.__init__(...)  # omitting this would be an error!\r\n\r\n@external\r\ndef bar():\r\n    Lock.acquire()\r\n    ...  # do stuff, maybe call an external contract\r\n    Lock.release()\r\n```\r\n\r\nan obligatory token example:\r\n```vyper\r\n###\r\n# Owned.vy\r\nowner: address\r\n\r\ndef __init__():\r\n    self.owner = msg.sender\r\n\r\ndef check_owner():\r\n    assert msg.sender == self.owner\r\n###\r\n\r\n###\r\n# BaseToken.vy\r\ntotalSupply: uint256\r\nbalances: HashMap[address, uint256]\r\n\r\ndef __init__(initial_supply: uint256):\r\n    self.totalSupply += initial_supply\r\n    self.balances[msg.sender] += initial_supply\r\n\r\n@external\r\ndef transfer(recipient: address, amount: uint256):\r\n    self.balances[msg.sender] -= amount  # safesub\r\n    self.balances[recipient] += amount\r\n###\r\n\r\n###\r\n# Mint.vy\r\nimport BaseToken\r\nimport Owned\r\n\r\n@external\r\ndef mint(recipient: address, amount: uint256):\r\n    Owned.check_owner()\r\n    self._mint_to(recipient, amount)\r\n\r\n@internal\r\ndef _mint_to(recipient: address, amount: uint256):\r\n    BaseToken.totalSupply += amount\r\n    BaseToken.balances[recipient] += amount\r\n###\r\n\r\n###\r\n# Contract.vy\r\nimport Owned\r\nimport Mint\r\nimport BaseToken\r\n\r\nowns: Owned\r\nowns: BaseToken\r\nseals: Mint  # hygiene - seal Mint\r\n\r\ndef __init__():\r\n    BaseToken.__init__(100)  # required by `owns: BaseToken`\r\n    Owned.__init__()  # required by `owns: Owned`\r\n    Mint.__init__()  # required by `seals: Mint`\r\n\r\nexport: Mint.mint\r\nexport: BaseToken.transfer\r\n```\r\nnote an alternative design for this hypothetical project could be for `Mint` to `own: Owned` and be responsible for calling its constructor. then `Contract.vy` would not be able to `own: Owned`. this is left as a design choice to library writers, when to \"seal\" ownership of modules and when to leave them open. for illustration, this is what that design would look like:\r\n```vyper\r\n# Owned and BaseToken look the same.\r\n###\r\n# Mint.vy\r\nimport Owned\r\nimport BaseToken\r\n\r\nown: Owned\r\nown: BaseToken\r\n\r\ndef __init__(initial_supply: uint256):\r\n    Owned.__init__()\r\n    BaseToken.__init__(initial_supply)\r\n\r\n\r\n@external\r\ndef mint(recipient: address, amount: uint256):\r\n    Owned.check_owner()\r\n    self._mint_to(recipient, amount)\r\n\r\n@internal\r\ndef _mint_to(recipient: address, amount: uint256):\r\n    BaseToken.totalSupply += amount\r\n    BaseToken.balances[recipient] += amount\r\n###\r\n\r\n###\r\n# Contract.vy\r\nimport Mint\r\nimport BaseToken\r\n\r\nowns: Mint\r\n\r\nowns: BaseToken  # this line will raise an error!\r\n\r\ndef __init__():\r\n    BaseToken.__init__()  # error! Mint already initializes BaseToken\r\n    Owned.__init__()  # error! Mint already initializes Owned\r\n\r\n    Mint.__init__(100)  # that's better\r\n```\r\n\r\n## Backwards Compatibility\r\ndoes not change any existing language features, fully backwards compatible\r\n\r\n## Dependencies\r\n- https://github.com/vyperlang/vyper/issues/2431 \r\n\r\n## References\r\n- https://en.wikipedia.org/wiki/One_Definition_Rule\r\n- https://en.wikipedia.org/wiki/Substructural_type_system\r\n- https://doc.rust-lang.org/1.8.0/book/references-and-borrowing.html\r\n- https://en.wikipedia.org/wiki/Effect_system\r\n- https://github.com/vyperlang/vyper/pull/3698\r\n- https://github.com/vyperlang/vyper/issues/3723\r\n\r\n## Copyright\r\nCopyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3722/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3722/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]

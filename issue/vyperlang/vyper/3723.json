@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/vyperlang/vyper/issues/3723",
+  "repository_url": "https://api.github.com/repos/vyperlang/vyper",
+  "labels_url": "https://api.github.com/repos/vyperlang/vyper/issues/3723/labels{/name}",
+  "comments_url": "https://api.github.com/repos/vyperlang/vyper/issues/3723/comments",
+  "events_url": "https://api.github.com/repos/vyperlang/vyper/issues/3723/events",
+  "html_url": "https://github.com/vyperlang/vyper/issues/3723",
+  "id": 2073287332,
+  "node_id": "I_kwDOBGDvrM57k9qk",
+  "number": 3723,
+  "title": "VIP: instantiable stateful modules",
+  "user": {
+    "login": "charles-cooper",
+    "id": 3867501,
+    "node_id": "MDQ6VXNlcjM4Njc1MDE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/3867501?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/charles-cooper",
+    "html_url": "https://github.com/charles-cooper",
+    "followers_url": "https://api.github.com/users/charles-cooper/followers",
+    "following_url": "https://api.github.com/users/charles-cooper/following{/other_user}",
+    "gists_url": "https://api.github.com/users/charles-cooper/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/charles-cooper/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/charles-cooper/subscriptions",
+    "organizations_url": "https://api.github.com/users/charles-cooper/orgs",
+    "repos_url": "https://api.github.com/users/charles-cooper/repos",
+    "events_url": "https://api.github.com/users/charles-cooper/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/charles-cooper/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-09T22:41:27Z",
+  "updated_at": "2024-01-09T22:48:45Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Simple Summary\r\nextend the import system by allowing \"stateful modules\" (that is, modules with top-level state variables). allow multiple instantiation of modules.\r\n\r\nthis is the second of two proposals exploring the stateful module design space; the other is https://github.com/vyperlang/vyper/issues/3722.\r\n\r\n## Motivation\r\nthe analysis here is substantially similar to the motivation presented in https://github.com/vyperlang/vyper/issues/3722. it is omitted here so that there is only one master copy of the analysis in case it undergoes edits or revision, but the discussion in #3722 should be considered requisite background for this proposal.\r\n\r\nthis proposal proposes an alternative design, which allows multiple instantiations of any given module, and solves the state sharing problem by allowing the programmer to share specific instances between modules. dependencies which are intended to be shared are marked as such at declaration time, and an instance needs to be provided before it can be compiled.\r\n\r\n## Specification\r\n\r\nsome examples, with a tentative syntax:\r\n\r\n```vyper\r\n###\r\n# dep1.vy\r\n\r\ncounter: uint256\r\n\r\n###\r\n\r\n###\r\n# dep2.vy\r\nimport dep1\r\n\r\n# mark d as being something which will be initialized by some other module\r\n# note that dep2.vy is not a compilable until self.d is resolved!\r\nd: dep1[noinit=True]\r\n\r\ndef __init__():\r\n    pass  # self.d.__init__() is *not* allowed, because `noinit` is set to `True`\r\n\r\n@internal\r\ndef bar():\r\n    self.d.counter += 1\r\n\r\n###\r\n\r\n###\r\n# contract.vy\r\n\r\nimport dep1\r\nimport dep2\r\n\r\nd1: dep1\r\nd2: dep2[d=dep1]  # resolve d2.d to our d1\r\n\r\ndef __init__():\r\n    self.d1.__init__()\r\n    self.d2.__init__()\r\n\r\n@external\r\ndef foo():\r\n    self.d1.counter += 1\r\n\r\n@external\r\ndef foo1():\r\n    self.d1.update_counter()\r\n\r\n@external\r\ndef foo2():\r\n    t: uint256 = self.d1.counter\r\n    self.d1.counter += 1\r\n    self.d2.bar()\r\n    assert self.d1.counter == t + 2\r\n```\r\n\r\n```vyper\r\n###\r\n# Foo.vy\r\n\r\nimport Lock\r\n\r\ncounter: uint256\r\nlock: Lock[noinit=True]\r\n\r\n@external\r\ndef foo():\r\n    self.lock.acquire()\r\n    self.counter += 1\r\n    raw_call(...)\r\n    self.lock.release()\r\n###\r\n\r\n###\r\n# Bar.vy\r\n\r\nimport Lock\r\nimport Foo\r\n\r\nfoo: Foo[lock=l]\r\n\r\nx: uint256\r\n# this statement also controls the location of Lock in the storage layout -- it comes after `x`.\r\nl: Lock\r\n\r\nexports: Foo.foo\r\n\r\ndef __init__():\r\n    self.l.__init__(...)  # omitting this would be an error!\r\n\r\n@external\r\ndef bar():\r\n    self.l.acquire()\r\n    ...  # do stuff, maybe call an external contract\r\n    self.l.release()\r\n```\r\n\r\nan obligatory token example:\r\n```vyper\r\n###\r\n# Owned.vy\r\nowner: address\r\n\r\ndef __init__():\r\n    self.owner = msg.sender\r\n\r\ndef check_owner():\r\n    assert msg.sender == self.owner\r\n###\r\n\r\n###\r\n# BaseToken.vy\r\ntotalSupply: uint256\r\nbalances: HashMap[address, uint256]\r\n\r\ndef __init__(initial_supply: uint256):\r\n    self.totalSupply += initial_supply\r\n    self.balances[msg.sender] += initial_supply\r\n\r\n@external\r\ndef transfer(recipient: address, amount: uint256):\r\n    self.balances[msg.sender] -= amount  # safesub\r\n    self.balances[recipient] += amount\r\n###\r\n\r\n###\r\n# Mint.vy\r\nimport BaseToken\r\nimport Owned\r\n\r\nownership: Owned[noinit=True]\r\nbase_token: BaseToken[noinit=True]\r\n\r\n@external\r\ndef mint(recipient: address, amount: uint256):\r\n    self.ownership.check_owner()\r\n    self._mint_to(recipient, amount)\r\n\r\n@internal\r\ndef _mint_to(recipient: address, amount: uint256):\r\n    self.base_token.totalSupply += amount\r\n    self.base_token.balances[recipient] += amount\r\n###\r\n\r\n###\r\n# Contract.vy\r\nimport Owned\r\nimport Mint\r\nimport BaseToken\r\n\r\n_base: BaseToken\r\nacl: Owned\r\ntoken: Mint[ownership=acl, base_token=_base]\r\n\r\ndef __init__():\r\n    self._base.__init__(100)\r\n    self.acl.__init__()\r\n    self.token.__init__()\r\n\r\nexport: token.mint\r\nexport: _base.transfer\r\n```\r\nnote an alternative design for this hypothetical project could be for `Mint` to instantiate `Owned` and `BaseToken` directly. then `Contract.vy` would use `minter.acl`. this would be a design decision left up to the library. for illustration, this is what that design would look like:\r\n```vyper\r\n# Owned and BaseToken look the same.\r\n###\r\n# Mint.vy\r\nimport Owned\r\nimport BaseToken\r\n\r\nacl: Owned\r\nbase_token: BaseToken\r\n\r\ndef __init__(initial_supply: uint256):\r\n    self.acl.__init__()\r\n    self.base_token.__init__(initial_supply)\r\n\r\n@external\r\ndef mint(recipient: address, amount: uint256):\r\n    self.acl.check_owner()\r\n    self._mint_to(recipient, amount)\r\n\r\n@internal\r\ndef _mint_to(recipient: address, amount: uint256):\r\n    self.base_token.totalSupply += amount\r\n    self.base_token.balances[recipient] += amount\r\n###\r\n\r\n###\r\n# Contract.vy\r\nimport Mint\r\n\r\ntoken: Mint\r\n\r\nexport: token.mint, token.base_token.transfer\r\n\r\ndef __init__():\r\n    self.token.base_token.__init__()  # error! Mint already initializes base_token\r\n    self.token.acl.__init__()  # error! Mint already initializes acl\r\n\r\n    self.token.__init__(100)  # that's better\r\n```\r\n\r\n## Backwards Compatibility\r\ndoes not change any existing language features, fully backwards compatible\r\n\r\n## Dependencies\r\n- https://github.com/vyperlang/vyper/issues/2431 \r\n\r\n## References\r\n- https://github.com/vyperlang/vyper/pull/3698\r\n- https://github.com/vyperlang/vyper/issues/3722\r\n\r\n## Copyright\r\nCopyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/vyperlang/vyper/issues/3723/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/vyperlang/vyper/issues/3723/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
