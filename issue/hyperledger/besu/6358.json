@@ -67,7 +67,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -76,12 +76,31 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2024-01-06T18:06:46Z",
-  "updated_at": "2024-01-08T22:30:14Z",
-  "closed_at": null,
-  "author_association": "NONE",
+  "updated_at": "2024-01-09T18:54:45Z",
+  "closed_at": "2024-01-09T18:54:45Z",
+  "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nAs an operator running Besu's official container image, I want the container's besu user UID to remain the same so that it can read & write persistent files after updating to a new container image. \r\n\r\n### Acceptance Criteria\r\n* Container image's besu user UID should remain the same in every version\r\n\r\n### Steps to Reproduce (Bug)\r\n1. Run `id` in current and past versions of Besu's container to see the UID of the besu user:\r\n\r\n```\r\n$ docker container run --rm --entrypoint id hyperledger/besu:23.10.2-openjdk-latest\r\nuid=1000(besu) gid=1000(besu) groups=1000(besu)\r\n\r\n$ docker container run --rm --entrypoint id hyperledger/besu:23.10.3-openjdk-latest\r\nuid=1001(besu) gid=1001(besu) groups=1001(besu),100(users)\r\n```\r\n\r\nSee that besu used to use UID 1000, but in 23.10.3 it uses 1001.\r\n\r\n**Expected behavior:** The besu user should have UID 1000 in 23.10.3\r\n\r\n**Actual behavior:** The besu user actually has UID 1001\r\n\r\n**Frequency:** 100%\r\n\r\n### Logs (if a bug)\r\n\r\nWith its data files from a past version owned by uid 1000, the 23.10.3 container will fail to start with non-obvious error message:\r\n\r\n```\r\n2024-01-06 17:32:38.521+00:00 | main | INFO  | Besu | Security Module: localfile\r\n2024-01-06 17:32:38.549+00:00 | main | INFO  | Besu | Using the native implementation of alt bn128\r\n2024-01-06 17:32:38.573+00:00 | main | INFO  | Besu | Using the native implementation of modexp\r\n2024-01-06 17:32:38.574+00:00 | main | INFO  | Besu | Using the native implementation of the signature algorithm\r\n2024-01-06 17:32:38.577+00:00 | main | INFO  | Besu | Using the native implementation of the blake2bf algorithm\r\n2024-01-06 17:32:38.663+00:00 | main | INFO  | Besu | 0 Bootnodes configured\r\n2024-01-06 17:32:38.753+00:00 | main | INFO  | KeyPairUtil | Attempting to load public key from /var/lib/besu/data/key\r\n2024-01-06 17:32:38.753+00:00 | main | ERROR | Besu | Failed to start Besu\r\npicocli.CommandLine$ExecutionException: Supplied file does not contain valid keyPair pair.\r\n        at org.hyperledger.besu.cli.BesuCommand.buildController(BesuCommand.java:2167)\r\n        at org.hyperledger.besu.cli.BesuCommand.initController(BesuCommand.java:2153)\r\n        at org.hyperledger.besu.cli.BesuCommand.run(BesuCommand.java:1463)\r\n        at picocli.CommandLine.executeUserObject(CommandLine.java:2026)\r\n        at picocli.CommandLine.access$1500(CommandLine.java:148)\r\n        at picocli.CommandLine$RunLast.executeUserObjectOfLastSubcommandWithSameParent(CommandLine.java:2461)\r\n        at picocli.CommandLine$RunLast.handle(CommandLine.java:2453)\r\n        at picocli.CommandLine$RunLast.handle(CommandLine.java:2415)\r\n        at picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2273)\r\n        at picocli.CommandLine$RunLast.execute(CommandLine.java:2417)\r\n        at picocli.CommandLine.execute(CommandLine.java:2170)\r\n        at org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler.handle(ConfigOptionSearchAndRunHandler.java:62)\r\n        at org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler.handle(ConfigOptionSearchAndRunHandler.java:33)\r\n        at picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2273)\r\n        at picocli.CommandLine$RunLast.execute(CommandLine.java:2417)\r\n        at picocli.CommandLine.execute(CommandLine.java:2170)\r\n        at org.hyperledger.besu.cli.BesuCommand.parse(BesuCommand.java:1628)\r\n        at org.hyperledger.besu.cli.BesuCommand.parse(BesuCommand.java:1423)\r\n        at org.hyperledger.besu.Besu.main(Besu.java:39)\r\nCaused by: java.lang.IllegalArgumentException: Supplied file does not contain valid keyPair pair.\r\n        at org.hyperledger.besu.crypto.KeyPairUtil.loadPrivateKey(KeyPairUtil.java:163)\r\n        at org.hyperledger.besu.crypto.KeyPairUtil.load(KeyPairUtil.java:146)\r\n        at org.hyperledger.besu.crypto.KeyPairUtil.loadKeyPair(KeyPairUtil.java:88)\r\n        at org.hyperledger.besu.cli.BesuCommand.loadKeyPair(BesuCommand.java:1608)\r\n        at org.hyperledger.besu.cli.BesuCommand.defaultSecurityModule(BesuCommand.java:1596)\r\n        at com.google.common.base.Suppliers$NonSerializableMemoizingSupplier.get(Suppliers.java:183)\r\n        at org.hyperledger.besu.cli.BesuCommand.securityModule(BesuCommand.java:3179)\r\n        at org.hyperledger.besu.cli.BesuCommand.getControllerBuilder(BesuCommand.java:2189)\r\n        at org.hyperledger.besu.cli.BesuCommand.buildController(BesuCommand.java:2165)\r\n        ... 18 more\r\nSupplied file does not contain valid keyPair pair.\r\nTo display full help:\r\nbesu [COMMAND] --help\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Besu 23.10.3\r\n\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n\r\nChanging file ownership fixes this, but ideally the container user UID should not change between versions, because it means updates require manual intervention to change file permissions.\r\n\r\n---\r\n\r\nEdit: I updated this to follow the template, was in a bit of a rush when reporting this yesterday, sorry!",
-  "closed_by": null,
+  "closed_by": {
+    "login": "fab-10",
+    "id": 91944855,
+    "node_id": "U_kgDOBXr3lw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/91944855?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/fab-10",
+    "html_url": "https://github.com/fab-10",
+    "followers_url": "https://api.github.com/users/fab-10/followers",
+    "following_url": "https://api.github.com/users/fab-10/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fab-10/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/fab-10/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fab-10/subscriptions",
+    "organizations_url": "https://api.github.com/users/fab-10/orgs",
+    "repos_url": "https://api.github.com/users/fab-10/repos",
+    "events_url": "https://api.github.com/users/fab-10/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/fab-10/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/6358/reactions",
     "total_count": 0,
@@ -96,7 +115,7 @@
   },
   "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6358/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -175,8 +194,8 @@
     "body": "Thank you for finding this and the report! ",
     "reactions": {
       "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1881923170/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
