@@ -40,21 +40,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-12-06T11:23:15Z",
-  "updated_at": "2023-12-06T13:19:38Z",
-  "closed_at": null,
+  "updated_at": "2024-01-10T12:18:06Z",
+  "closed_at": "2024-01-10T12:18:05Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "#### System information\r\n\r\n2.54.0 (but problem has existed probably from the start\r\n\r\nOS & Version: Linux\r\n\r\nChain/Network: Polygon\r\n\r\n#### Expected behaviour\r\n\r\nProxy Heimdall in nginx like this:\r\n\r\n```\r\nupstream polygon_heimdall_mainnet_full_proxy_1 {\r\n  least_conn;\r\n  #rpc origins\r\n  server  127.0.0.1:1317;\r\n}\r\n```\r\n\r\n```\r\nlocation ^~ /polygon_heimdall_mainnet_full_1/ {\r\n      auth_request /_validate_apikey;\r\n      proxy_http_version 1.1;\r\n      proxy_read_timeout 120s;\r\n      proxy_send_timeout 120s;\r\n      proxy_socket_keepalive on;\r\n      proxy_set_header Upgrade $http_upgrade;\r\n      proxy_set_header Connection \"upgrade\";\r\n      proxy_set_header X-Real-IP $remote_addr;\r\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\r\n      proxy_set_header Host $http_host;\r\n      proxy_set_header X-NginX-Proxy true;\r\n      proxy_pass    http://polygon_heimdall_mainnet_full_proxy_1/;\r\n\r\n      # Error responses\r\n      error_page 404 = @400;         # Treat invalid paths as bad requests\r\n      #proxy_intercept_errors on;     # Do not send backend errors to client\r\n      default_type application/json; # If no content-type, assume JSON\r\n  }\r\n```\r\n  \r\nand setting Erigon with \r\n```\r\n--bor.heimdall='https://domain.com/polygon_heimdall_mainnet_full_1'\r\n``` \r\nshould work\r\n\r\n#### Actual behaviour\r\n\r\nInstead in the logs we can see that Erigon is ignoring any path after the domain:port\r\n\r\n```\r\nan error while trying fetching from Heimdall path=/milestone/lastNoAck attempt=1 error=\"error while fetching data from Heimdall: https://domain.com/milestone/lastNoAck:response code 404\"\r\n```\r\n\r\nIf I proxy like this:\r\n\r\n```\r\nlocation ^~ / {\r\n      auth_request /_validate_apikey;\r\n      proxy_http_version 1.1;\r\n      proxy_read_timeout 120s;\r\n      proxy_send_timeout 120s;\r\n      proxy_socket_keepalive on;\r\n      proxy_set_header Upgrade $http_upgrade;\r\n      proxy_set_header Connection \"upgrade\";\r\n      proxy_set_header X-Real-IP $remote_addr;\r\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\r\n      proxy_set_header Host $http_host;\r\n      proxy_set_header X-NginX-Proxy true;\r\n      proxy_pass    http://polygon_heimdall_mainnet_full_proxy_1/;\r\n\r\n      # Error responses\r\n      error_page 404 = @400;         # Treat invalid paths as bad requests\r\n      #proxy_intercept_errors on;     # Do not send backend errors to client\r\n      default_type application/json; # If no content-type, assume JSON\r\n  }\r\n```\r\n  \r\n  It works fine because there is no path\r\n  \r\n  And yes, it is erigon because if I test the proxy like this:\r\n  ```\r\ncurl https://domain.com/polygon_heimdall_mainnet_full_1/milestone/lastNoAck\r\n``` \r\nit works just fine:\r\n  Result:\r\n  ```\r\n{\"height\":\"16652691\",\"result\":{\"result\":\"6cefcdca-03a3-4efa-bc1b-b7740422b144 - 0x5b6e64bd8c65eb44b86bdce431d1f17308c3e1c6\"}}\r\n```\r\n  \r\n  @mh0lt \r\n  \r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "taratorio",
+    "id": 94537774,
+    "node_id": "U_kgDOBaKILg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/94537774?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/taratorio",
+    "html_url": "https://github.com/taratorio",
+    "followers_url": "https://api.github.com/users/taratorio/followers",
+    "following_url": "https://api.github.com/users/taratorio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/taratorio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/taratorio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/taratorio/subscriptions",
+    "organizations_url": "https://api.github.com/users/taratorio/orgs",
+    "repos_url": "https://api.github.com/users/taratorio/repos",
+    "events_url": "https://api.github.com/users/taratorio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/taratorio/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8915/reactions",
     "total_count": 0,
@@ -69,8 +88,51 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8915/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1884742546",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/8915#issuecomment-1884742546",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/8915",
+    "id": 1884742546,
+    "node_id": "IC_kwDOC0FsAM5wVuOS",
+    "user": {
+      "login": "taratorio",
+      "id": 94537774,
+      "node_id": "U_kgDOBaKILg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/94537774?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/taratorio",
+      "html_url": "https://github.com/taratorio",
+      "followers_url": "https://api.github.com/users/taratorio/followers",
+      "following_url": "https://api.github.com/users/taratorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/taratorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/taratorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/taratorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/taratorio/orgs",
+      "repos_url": "https://api.github.com/users/taratorio/repos",
+      "events_url": "https://api.github.com/users/taratorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/taratorio/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-10T12:18:05Z",
+    "updated_at": "2024-01-10T12:18:05Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "should be fixed in 2.56.0+\r\nhere's the fix: https://github.com/ledgerwatch/erigon/pull/8940\r\nfeel free to re-open this issue if you still have problems",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1884742546/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
