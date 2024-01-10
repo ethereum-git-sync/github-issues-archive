@@ -47,13 +47,13 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2023-12-31T18:08:05Z",
-  "updated_at": "2023-12-31T18:08:05Z",
+  "updated_at": "2024-01-10T11:52:16Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
-  "body": "Hi i creating arbitrage bot using Solidity in Hardhat and i created smart contract which take aave flashloan make 2 swaps and repay flashloan itself and i got error when i tried to compile smart contract \r\nSolidity version ^0.6.12\r\nHardhat version ^2.19.4\r\nOperating System Windows 11\r\nCode:\r\n`// SPDX-License-Identifier: MIT\r\n\r\npragma solidity ^0.6.12;\r\nimport \"@aave/protocol-v2/contracts/interfaces/ILendingPool.sol\";\r\nimport \"@aave/protocol-v2/contracts/interfaces/ILendingPoolAddressesProvider.sol\";\r\nimport \"@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol\";\r\nimport \"@openzeppelin/contracts/math/SafeMath.sol\";\r\n\r\nimport \"@openzeppelin/contracts/token/ERC20/IERC20.sol\";\r\nimport \"@openzeppelin/contracts/utils/ReentrancyGuard.sol\";\r\nimport \"@openzeppelin/contracts/utils/Context.sol\";\r\n\r\ncontract ArbitrageBot1 is Context, ReentrancyGuard {\r\n    using SafeMath for uint256;\r\n\r\n    ILendingPoolAddressesProvider provider;\r\n    ILendingPool lendingPool;\r\n    IUniswapV2Router02 uniswapRouter;\r\n    IUniswapV2Router02 sushiSwapRouter;\r\n    address private owner;\r\n\r\n    constructor(\r\n        address _provider,\r\n        address _uniswapRouter,\r\n        address _sushiSwapRouter\r\n    ) public {\r\n        provider = ILendingPoolAddressesProvider(_provider);\r\n        lendingPool = ILendingPool(provider.getLendingPool());\r\n        uniswapRouter = IUniswapV2Router02(_uniswapRouter);\r\n        sushiSwapRouter = IUniswapV2Router02(_sushiSwapRouter);\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier OnlyOwner() {\r\n        require(msg.sender == owner);\r\n        _;\r\n    }\r\n\r\n    function borrowAndSwap(\r\n        uint256 _amount,\r\n        uint256 amountOutExpected,\r\n        uint256 amountOutExpected2,\r\n        address coin1,\r\n        address coin2\r\n    ) external nonReentrant {\r\n        lendingPool.borrow(coin1, _amount, 1, 0, address(this));\r\n\r\n        address[] memory path2 = new address[](2);\r\n        path2[0] = coin1;\r\n        path2[1] = coin2;\r\n\r\n        sushiSwapRouter.swapExactTokensForTokens(\r\n            _amount,\r\n            amountOutExpected,\r\n            path2,\r\n            address(this),\r\n            block.timestamp\r\n        );\r\n\r\n        address[] memory path = new address[](2);\r\n        path[0] = coin2;\r\n        path[1] = coin1;\r\n\r\n        uniswapRouter.swapExactTokensForTokens(\r\n            IERC20(coin2).balanceOf(address(this)),\r\n            amountOutExpected2,\r\n            path,\r\n            address(this),\r\n            block.timestamp\r\n        );\r\n\r\n        // Get the borrow rate\r\n        DataTypes.ReserveData memory reserveData = lendingPool.getReserveData(\r\n            coin1\r\n        );\r\n        uint256 borrowRate = reserveData.currentVariableBorrowRate;\r\n\r\n        // Calculate the amount of interest\r\n        uint256 interest = _amount.mul(borrowRate).div(1e27);\r\n\r\n        // Calculate the total amount to repay\r\n        uint256 amountToRepay = _amount.add(interest);\r\n\r\n        // Approve the lending pool to transfer the repayment amount\r\n        IERC20(coin1).approve(address(lendingPool), amountToRepay);\r\n\r\n        // Repay the borrowed amount\r\n        lendingPool.repay(coin1, amountToRepay, 1, address(this));\r\n    }\r\n\r\n    function withdrawWETH(address outCoin) external OnlyOwner {\r\n        require(\r\n            IERC20(outCoin).balanceOf(address(this)) > 0,\r\n            \"No funds to withdraw\"\r\n        );\r\n        IERC20(outCoin).transfer(\r\n            owner,\r\n            IERC20(outCoin).balanceOf(address(this))\r\n        );\r\n    }}\r\n\r\nAnd error:\r\n```\r\n $ npx hardhat compile \r\nInternalCompilerError: Internal compiler error (C:\\projects\\solidity\\libsolidity\\codegen\\CompilerUtils.cpp:1441)\r\nError HH600: Compilation failed\r\n\r\nFor more info go to https://hardhat.org/HH600 or run Hardhat with --show-stack-traces",
+  "body": "Hi i creating arbitrage bot using Solidity in Hardhat and i created smart contract which take aave flashloan make 2 swaps and repay flashloan itself and i got error when i tried to compile smart contract\r\n```\r\nSolidity version ^0.6.12\r\nHardhat version ^2.19.4\r\nOperating System Windows 11\r\n```\r\n\r\nCode:\r\n\r\n```Solidity\r\n// SPDX-License-Identifier: MIT\r\n\r\npragma solidity ^0.6.12;\r\nimport \"@aave/protocol-v2/contracts/interfaces/ILendingPool.sol\";\r\nimport \"@aave/protocol-v2/contracts/interfaces/ILendingPoolAddressesProvider.sol\";\r\nimport \"@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol\";\r\nimport \"@openzeppelin/contracts/math/SafeMath.sol\";\r\n\r\nimport \"@openzeppelin/contracts/token/ERC20/IERC20.sol\";\r\nimport \"@openzeppelin/contracts/utils/ReentrancyGuard.sol\";\r\nimport \"@openzeppelin/contracts/utils/Context.sol\";\r\n\r\ncontract ArbitrageBot1 is Context, ReentrancyGuard {\r\n    using SafeMath for uint256;\r\n\r\n    ILendingPoolAddressesProvider provider;\r\n    ILendingPool lendingPool;\r\n    IUniswapV2Router02 uniswapRouter;\r\n    IUniswapV2Router02 sushiSwapRouter;\r\n    address private owner;\r\n\r\n    constructor(\r\n        address _provider,\r\n        address _uniswapRouter,\r\n        address _sushiSwapRouter\r\n    ) public {\r\n        provider = ILendingPoolAddressesProvider(_provider);\r\n        lendingPool = ILendingPool(provider.getLendingPool());\r\n        uniswapRouter = IUniswapV2Router02(_uniswapRouter);\r\n        sushiSwapRouter = IUniswapV2Router02(_sushiSwapRouter);\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier OnlyOwner() {\r\n        require(msg.sender == owner);\r\n        _;\r\n    }\r\n\r\n    function borrowAndSwap(\r\n        uint256 _amount,\r\n        uint256 amountOutExpected,\r\n        uint256 amountOutExpected2,\r\n        address coin1,\r\n        address coin2\r\n    ) external nonReentrant {\r\n        lendingPool.borrow(coin1, _amount, 1, 0, address(this));\r\n\r\n        address[] memory path2 = new address[](2);\r\n        path2[0] = coin1;\r\n        path2[1] = coin2;\r\n\r\n        sushiSwapRouter.swapExactTokensForTokens(\r\n            _amount,\r\n            amountOutExpected,\r\n            path2,\r\n            address(this),\r\n            block.timestamp\r\n        );\r\n\r\n        address[] memory path = new address[](2);\r\n        path[0] = coin2;\r\n        path[1] = coin1;\r\n\r\n        uniswapRouter.swapExactTokensForTokens(\r\n            IERC20(coin2).balanceOf(address(this)),\r\n            amountOutExpected2,\r\n            path,\r\n            address(this),\r\n            block.timestamp\r\n        );\r\n\r\n        // Get the borrow rate\r\n        DataTypes.ReserveData memory reserveData = lendingPool.getReserveData(\r\n            coin1\r\n        );\r\n        uint256 borrowRate = reserveData.currentVariableBorrowRate;\r\n\r\n        // Calculate the amount of interest\r\n        uint256 interest = _amount.mul(borrowRate).div(1e27);\r\n\r\n        // Calculate the total amount to repay\r\n        uint256 amountToRepay = _amount.add(interest);\r\n\r\n        // Approve the lending pool to transfer the repayment amount\r\n        IERC20(coin1).approve(address(lendingPool), amountToRepay);\r\n\r\n        // Repay the borrowed amount\r\n        lendingPool.repay(coin1, amountToRepay, 1, address(this));\r\n    }\r\n\r\n    function withdrawWETH(address outCoin) external OnlyOwner {\r\n        require(\r\n            IERC20(outCoin).balanceOf(address(this)) > 0,\r\n            \"No funds to withdraw\"\r\n        );\r\n        IERC20(outCoin).transfer(\r\n            owner,\r\n            IERC20(outCoin).balanceOf(address(this))\r\n        );\r\n    }}\r\n```\r\n\r\nAnd error:\r\n```bash\r\n $ npx hardhat compile \r\nInternalCompilerError: Internal compiler error (C:\\projects\\solidity\\libsolidity\\codegen\\CompilerUtils.cpp:1441)\r\nError HH600: Compilation failed\r\n\r\nFor more info go to https://hardhat.org/HH600 or run Hardhat with --show-stack-traces",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/solidity/issues/14765/reactions",
@@ -72,5 +72,92 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1884488125",
+    "html_url": "https://github.com/ethereum/solidity/issues/14765#issuecomment-1884488125",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14765",
+    "id": 1884488125,
+    "node_id": "IC_kwDOAm_5kc5wUwG9",
+    "user": {
+      "login": "nikola-matic",
+      "id": 4415530,
+      "node_id": "MDQ6VXNlcjQ0MTU1MzA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4415530?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nikola-matic",
+      "html_url": "https://github.com/nikola-matic",
+      "followers_url": "https://api.github.com/users/nikola-matic/followers",
+      "following_url": "https://api.github.com/users/nikola-matic/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nikola-matic/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nikola-matic/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nikola-matic/subscriptions",
+      "organizations_url": "https://api.github.com/users/nikola-matic/orgs",
+      "repos_url": "https://api.github.com/users/nikola-matic/repos",
+      "events_url": "https://api.github.com/users/nikola-matic/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nikola-matic/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-10T09:32:28Z",
+    "updated_at": "2024-01-10T09:32:28Z",
+    "author_association": "MEMBER",
+    "body": "We always consider an internal compiler error (ICE) to be a bug (usually a low priority one), so thanks for the report.\r\n@Xardesso can you please post the exact version of the compiler you were using? `^0.6.12` just means higher than `0.6.12`, so I assume you weren't using `0.6.x`, since those are fairly old.",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1884488125/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1884705726",
+    "html_url": "https://github.com/ethereum/solidity/issues/14765#issuecomment-1884705726",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14765",
+    "id": 1884705726,
+    "node_id": "IC_kwDOAm_5kc5wVlO-",
+    "user": {
+      "login": "cameel",
+      "id": 137030,
+      "node_id": "MDQ6VXNlcjEzNzAzMA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/cameel",
+      "html_url": "https://github.com/cameel",
+      "followers_url": "https://api.github.com/users/cameel/followers",
+      "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+      "organizations_url": "https://api.github.com/users/cameel/orgs",
+      "repos_url": "https://api.github.com/users/cameel/repos",
+      "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/cameel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-10T11:52:15Z",
+    "updated_at": "2024-01-10T11:52:15Z",
+    "author_association": "MEMBER",
+    "body": "Well `^0.6.12` also means `<0.7.0` and 0.6.12 was the last in the 0.6.x series, so it must have been 0.6.12.\r\n\r\nIt looks like this assert: https://github.com/ethereum/solidity/blob/27d51765c0623c9f6aef7c00214e9fe705c331b1/libsolidity/codegen/CompilerUtils.cpp#L1439-L1441\r\n\r\nLooks like it might have already been reported in #12114 but that issue was closed by the user because they found a workaround. The ICE might still be there though - we should try to reproduce on 0.8.23 (but with abicoder v1 since it's no longer the default).",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1884705726/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
