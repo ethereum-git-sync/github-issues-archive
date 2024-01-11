@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14775",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14775/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14775/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14775/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14775",
+  "id": 2075176914,
+  "node_id": "I_kwDOAm_5kc57sK_S",
+  "number": 14775,
+  "title": "\"error\": \"Failed to decode output: Error: overflow [ See: https://links.ethers.org/v5-errors-NUMERIC_FAULT-overflow ]",
+  "user": {
+    "login": "qwe231cvb",
+    "id": 83327719,
+    "node_id": "MDQ6VXNlcjgzMzI3NzE5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/83327719?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/qwe231cvb",
+    "html_url": "https://github.com/qwe231cvb",
+    "followers_url": "https://api.github.com/users/qwe231cvb/followers",
+    "following_url": "https://api.github.com/users/qwe231cvb/following{/other_user}",
+    "gists_url": "https://api.github.com/users/qwe231cvb/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/qwe231cvb/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/qwe231cvb/subscriptions",
+    "organizations_url": "https://api.github.com/users/qwe231cvb/orgs",
+    "repos_url": "https://api.github.com/users/qwe231cvb/repos",
+    "events_url": "https://api.github.com/users/qwe231cvb/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/qwe231cvb/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-10T20:45:54Z",
+  "updated_at": "2024-01-10T20:45:54Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "I wrote a smart contract in the remix development environment, and then deployed the contract in the local test network. I clicked the button with the \"LowLevelPlateArmorFragments_addItem\" contract function on the left side of the editor, and then the following error was displayed on the right side of the editor，This error occurs after calling the “LowLevelPlateArmorFragments_addItem” contract function:，the error as follows:\r\n\r\n\"[vm]from: 0x5B3...eddC4to: GameItems.LowLevelPlateArmorFragments_addItem() 0xDA0...42B53value: 0 weidata: 0xf0f...bc9aclogs: 0hash: 0x6c3...28778\r\nStatus 0x0 The transaction has been packaged but failed to execute\r\nTransaction Hash 0x6c3358cf556129c9b942e455870c5f74aa666b8aebce93cd8732aaed34c28778\r\nBlock hash 0xd045bab08a0998bc409d3e4211a63e6e690ace8773b03c10aac7bbb9ebc31a23\r\nBlock number 7\r\nfrom 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4\r\nto GameItems.LowLevelPlateArmorFragments_addItem() 0xDA0bab807633f07f013f94DD0E6A4F96F8742B53\r\ngas 3000000 gas\r\nTransaction cost 46340 gas\r\nExecution cost 25276 gas\r\nEnter 0xf0f...bc9ac\r\nDecode input {}\r\ndecode output {\r\n\"error\": \"Failed to decode output: Error: overflow [ See: https://links.ethers.org/v5-errors-NUMERIC_FAULT-overflow ] (fault=\\\"overflow\\\", operation=\\\"toNumber\\\" , value=\\\"3963877391197344453575983046348115674221700746820753546331534351508065746944\\\", code=NUMERIC_FAULT, version=bignumber/5.7.0)\"\r\n}\r\nlog\t[]\"\r\n\r\nMy contract code is as follows:\r\n````\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\ncontract GameItems {\r\n    struct LowLevelPlateArmorFragments1 {\r\n        string name;\r\n        address owner;\r\n        uint index;\r\n        uint price;\r\n        string ipfsHash;\r\n    }\r\n    LowLevelPlateArmorFragments1[] public LowLevelPlateArmorFragments;\r\n    uint nonce = 0;\r\n    address contract_owner;\r\n    uint LowLevelPlateArmorFragments_currentIndex = 0;\r\n\r\n    constructor() {\r\n        contract_owner = msg.sender;\r\n    }\r\n\r\n    event IPFSHashChanged_LowLevelPlateArmorFragments(string newIPFSHash);\r\n\r\n    function LowLevelPlateArmorFragments_addItem() public returns (string memory){\r\n        if (LowLevelPlateArmorFragments_currentIndex <= 200000){\r\n            nonce++;\r\n            if (nonce > 20000)\r\n            {\r\n                nonce = 0;\r\n            }\r\n            require((nonce % 3) == 0, \"Random event not satisfied\");\r\n            address owner = msg.sender;\r\n            uint price = 1;\r\n            string memory name = \"LowLevelPlateArmorFragments\";\r\n            string memory ipfsHash = \"QmcKwm9cQgaipuy9cfdmGX7C5fdJKpic41cqCEBz8QPFR9\";\r\n            LowLevelPlateArmorFragments.push(LowLevelPlateArmorFragments1(name, owner, LowLevelPlateArmorFragments_currentIndex, price, ipfsHash));\r\n            LowLevelPlateArmorFragments_currentIndex++; \r\n            emit IPFSHashChanged_LowLevelPlateArmorFragments(ipfsHash);\r\n            return ipfsHash;\r\n        }\r\n        if (LowLevelPlateArmorFragments_currentIndex > 200000){\r\n            nonce++;\r\n            if (nonce > 20000)\r\n            {\r\n                nonce = 0;\r\n            }\r\n            require((nonce % 3) == 0, \"Random event not satisfied\");\r\n\t\t\trequire((nonce % 2) == 0, \"Random event not satisfied\");\r\n            for (uint p = 0; p < LowLevelPlateArmorFragments.length; p++){\r\n                if (LowLevelPlateArmorFragments[p].owner == contract_owner){\r\n                    LowLevelPlateArmorFragments[p].owner = msg.sender;\r\n                    emit IPFSHashChanged_LowLevelPlateArmorFragments(LowLevelPlateArmorFragments[p].ipfsHash);\r\n                    p = LowLevelPlateArmorFragments.length;\r\n                    return LowLevelPlateArmorFragments[p].ipfsHash;\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    function getItemsCount() public view returns (uint) {\r\n        return LowLevelPlateArmorFragments.length;\r\n    }\r\n\r\n    function getItem(uint index) public view returns (string memory, address, uint, uint) {\r\n        LowLevelPlateArmorFragments1 memory item = LowLevelPlateArmorFragments[index];\r\n        return (item.name, item.owner, item.index, item.price);\r\n    }\r\n}\r\n````\r\n\r\n\r\n\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14775/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14775/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
