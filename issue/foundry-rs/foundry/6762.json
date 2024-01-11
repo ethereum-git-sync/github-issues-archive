@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6762",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6762/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6762/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6762/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6762",
+  "id": 2077041309,
+  "node_id": "I_kwDOGBlvNc57zSKd",
+  "number": 6762,
+  "title": "Noticeable change in gas estimation when using `forge test --gas-report`",
+  "user": {
+    "login": "jalextowle",
+    "id": 34827329,
+    "node_id": "MDQ6VXNlcjM0ODI3MzI5",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34827329?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jalextowle",
+    "html_url": "https://github.com/jalextowle",
+    "followers_url": "https://api.github.com/users/jalextowle/followers",
+    "following_url": "https://api.github.com/users/jalextowle/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jalextowle/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jalextowle/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jalextowle/subscriptions",
+    "organizations_url": "https://api.github.com/users/jalextowle/orgs",
+    "repos_url": "https://api.github.com/users/jalextowle/repos",
+    "events_url": "https://api.github.com/users/jalextowle/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jalextowle/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-11T16:01:47Z",
+  "updated_at": "2024-01-11T16:01:47Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (68c3663 2024-01-11T00:37:40.946762000Z)\n\n### What command(s) is the bug in?\n\nforge test --gas-report\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nAfter Monday's release (d46bcb3ddc768b35da8d1d29f85886476f974128), I noticed that our Solidity benchmarks in CI got noticeably worse on a PR that shouldn't have a large impact on gas costs. After noticing this and being puzzled, I opened another PR with similarly minimal changes, and the benchmark had changes on the same order of magnitude. The benchmark below shows the difference (left is the newer commit using the new version of foundry and right is the old benchmark using the old version of foundry):\r\n\r\n## Hyperdrive Gas Benchmark\r\n\r\n| Benchmark suite | Current: 04cb6ca547fac568122625ee05c5189245314e37 | Previous: aadaa9950e44c58da81ccfaacc5f71e7158dd286 | Deviation | Status |\r\n|-|-|-|-|-|\r\n| `addLiquidity: min` | `1600` gas | `1600` gas | `0%` | 🟰 |\r\n| `addLiquidity: avg` | `66750` gas | `55098` gas | `21.1478%` | 🚨 |\r\n| `addLiquidity: max` | `275046` gas | `232446` gas | `18.3268%` | 🚨 |\r\n| `checkpoint: min` | `1172` gas | `1172` gas | `0%` | 🟰 |\r\n| `checkpoint: avg` | `48038` gas | `47937` gas | `0.2107%` | 🚨 |\r\n| `checkpoint: max` | `202123` gas | `202123` gas | `0%` | 🟰 |\r\n| `closeLong: min` | `1580` gas | `1580` gas | `0%` | 🟰 |\r\n| `closeLong: avg` | `27900` gas | `26510` gas | `5.2433%` | 🚨 |\r\n| `closeLong: max` | `147816` gas | `139624` gas | `5.8672%` | 🚨 |\r\n| `closeShort: min` | `1549` gas | `1549` gas | `0%` | 🟰 |\r\n| `closeShort: avg` | `29995` gas | `28777` gas | `4.2325%` | 🚨 |\r\n| `closeShort: max` | `147189` gas | `144389` gas | `1.9392%` | 🚨 |\r\n| `initialize: min` | `1538` gas | `1538` gas | `0%` | 🟰 |\r\n| `initialize: avg` | `214974` gas | `181786` gas | `18.2566%` | 🚨 |\r\n| `initialize: max` | `256760` gas | `256760` gas | `0%` | 🟰 |\r\n| `openLong: min` | `1509` gas | `1509` gas | `0%` | 🟰 |\r\n| `openLong: avg` | `50165` gas | `40502` gas | `23.8581%` | 🚨 |\r\n| `openLong: max` | `185904` gas | `162207` gas | `14.6091%` | 🚨 |\r\n| `openShort: min` | `1519` gas | `1519` gas | `0%` | 🟰 |\r\n| `openShort: avg` | `47392` gas | `47335` gas | `0.1204%` | 🚨 |\r\n| `openShort: max` | `161536` gas | `161536` gas | `0%` | 🟰 |\r\n| `redeemWithdrawalShares: min` | `1575` gas | `1575` gas | `0%` | 🟰 |\r\n| `redeemWithdrawalShares: avg` | `23340` gas | `18465` gas | `26.4013%` | 🚨 |\r\n| `redeemWithdrawalShares: max` | `105958` gas | `84767` gas | `24.9991%` | 🚨 |\r\n| `removeLiquidity: min` | `1661` gas | `1661` gas | `0%` | 🟰 |\r\n| `removeLiquidity: avg` | `148623` gas | `118880` gas | `25.0193%` | 🚨 |\r\n| `removeLiquidity: max` | `323560` gas | `258848` gas | `25%` | 🚨 |",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6762/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6762/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
