@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6398",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6398/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6398/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6398/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6398",
+  "id": 2079528336,
+  "node_id": "I_kwDODE2jmc578xWQ",
+  "number": 6398,
+  "title": "Block production degraded when 1 validator is down on private networks",
+  "user": {
+    "login": "refl3ction",
+    "id": 29067941,
+    "node_id": "MDQ6VXNlcjI5MDY3OTQx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29067941?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/refl3ction",
+    "html_url": "https://github.com/refl3ction",
+    "followers_url": "https://api.github.com/users/refl3ction/followers",
+    "following_url": "https://api.github.com/users/refl3ction/following{/other_user}",
+    "gists_url": "https://api.github.com/users/refl3ction/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/refl3ction/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/refl3ction/subscriptions",
+    "organizations_url": "https://api.github.com/users/refl3ction/orgs",
+    "repos_url": "https://api.github.com/users/refl3ction/repos",
+    "events_url": "https://api.github.com/users/refl3ction/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/refl3ction/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-12T19:13:56Z",
+  "updated_at": "2024-01-12T19:13:56Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nI'm running a private Besu network on EKS, and I'm facing an issue when one of my validators is down. Currently, I'm running 5 validators, but when I bring one of them down for DR testing, the block production is degraded. I noticed that with 5 nodes, the block production happens every 2 seconds, per `qbtf.blockperiodseconds` in the genesis file, but if one of the validators is down, the behavior is different: 3 blocks are produced, then Besu is stuck for the time set on `qbtf.requesttimeoutseconds`, then new 3 blocks are produced again.\r\n\r\nAccording to the docs:\r\n> QBFT requires four validators to be Byzantine fault tolerant. Byzantine fault tolerance is the ability for a blockchain network to function correctly and reach consensus despite nodes failing or propagating incorrect information to peers.\r\n\r\n**Expected behavior:**  Block production happens continuously.\r\n\r\n**Actual behavior:**  3 blocks are produced according to the block time, then it waits for the value of the `requesttimeoutseconds` property on the genesis file (shared below).\r\n\r\n### Logs (if a bug)\r\n\r\nYou can check the timestamps of the logs: \r\n\r\n#### Before shutting down 1 node\r\n```log\r\nbesu-node-validator-2-0 2024-01-12 19:05:34.016+00:00 | EthScheduler-Workers-0 | INFO  | PersistBlockTask | Block 300596 (0x6eb7de982c6878e7710df96d9d193eca5742aed52ed44dc582a7db08fdffb8f6) is already imported\r\nbesu-node-validator-2-0 2024-01-12 19:05:34.017+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,596 / 0 tx / 0 pending / 0 (0.0%) gas / (0x6eb7de982c6878e7710df96d9d193eca5742aed52ed44dc582a7db08fdffb8f6)\r\nbesu-node-validator-2-0 2024-01-12 19:05:36.015+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,597 / 0 tx / 0 pending / 0 (0.0%) gas / (0x67e5d542884e20a8068776f8518d235d9bd5d739eccef559af336dbbf8eef632)\r\nbesu-node-validator-2-0 2024-01-12 19:05:38.015+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,598 / 0 tx / 0 pending / 0 (0.0%) gas / (0x1f065b3dd54529f0295cc1ad3f0e861709d2bc407b5e8601e9c2d8b60196e363)\r\nbesu-node-validator-2-0 2024-01-12 19:05:40.013+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Produced #300,599 / 0 tx / 0 pending / 0 (0.0%) gas / (0x4026c40e004f4c7dfe87e437b63681583f0f14949b54df6d7653d910744a2d70)\r\nbesu-node-validator-2-0 2024-01-12 19:05:42.014+00:00 | EthScheduler-Workers-0 | INFO  | PersistBlockTask | Imported #300,600 / 0 tx / 0 om / 0 (0.0%) gas / (0x725b9fda60fc8a42817e2513a4e5f5d3ec1607f9eb336f5ceb2825b45899383c) in 0.001s. Peers: 8\r\nbesu-node-validator-2-0 2024-01-12 19:05:44.013+00:00 | EthScheduler-Workers-0 | INFO  | PersistBlockTask | Imported #300,601 / 0 tx / 0 om / 0 (0.0%) gas / (0x7b44eea29f4dba74692d9689bd73adb6095a8e4ac7a8f3bafd46a0094f4bfae6) in 0.001s. Peers: 8\r\nbesu-node-validator-2-0 2024-01-12 19:05:46.013+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,602 / 0 tx / 0 pending / 0 (0.0%) gas / (0x5aede29605134df6c2754121980e768ecb348bae8ef2d3c6f5906fd478fbdfc9)\r\nbesu-node-validator-2-0 2024-01-12 19:05:48.011+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Produced #300,603 / 0 tx / 0 pending / 0 (0.0%) gas / (0xf1af0d1fd188eaa769024ba24ef1014e5f1ff5b4418e37004e23ddefb5496f48)\r\nbesu-node-validator-2-0 2024-01-12 19:05:50.010+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,604 / 0 tx / 0 pending / 0 (0.0%) gas / (0x7bc5f09d51cb2a5d6b962d32635f61fe8f3d25f5a45cd62de7b221636ccaedbc)\r\n```\r\n\r\n#### After\r\n```log\r\nbesu-node-validator-2-0 2024-01-12 19:06:00.014+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,609 / 0 tx / 0 pending / 0 (0.0%) gas / (0xcfd135595a30dad87902698a1276ca838502d9abc1b69ec91a6a3ee6e093b5f2)\r\nbesu-node-validator-2-0 2024-01-12 19:06:02.011+00:00 | EthScheduler-Workers-0 | INFO  | PersistBlockTask | Block 300610 (0xf9d71b7677d1db6bb5c1f7975fa3b5ebe727a262b6bf74ac4ee4676401a3900d) is already imported\r\nbesu-node-validator-2-0 2024-01-12 19:06:02.012+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,610 / 0 tx / 0 pending / 0 (0.0%) gas / (0xf9d71b7677d1db6bb5c1f7975fa3b5ebe727a262b6bf74ac4ee4676401a3900d)\r\nbesu-node-validator-2-0 2024-01-12 19:06:04.014+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Produced #300,611 / 0 tx / 0 pending / 0 (0.0%) gas / (0x637595de5246c0bd08da5c21437373510e55bc4af2a53f1c47870e951695ef3a)\r\nbesu-node-validator-2-0 2024-01-12 19:06:26.022+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftRound | Importing proposed block to chain. round=ConsensusRoundIdentifier{Sequence=300612, Round=1}, hash=0x03463873cc9a14f47b17893bd2a22f6a4a709652ebc18876c6ffbbd0391bfd69\r\nbesu-node-validator-2-0 2024-01-12 19:06:26.028+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,612 / 0 tx / 0 pending / 0 (0.0%) gas / (0x03463873cc9a14f47b17893bd2a22f6a4a709652ebc18876c6ffbbd0391bfd69)\r\nbesu-node-validator-2-0 2024-01-12 19:06:28.010+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,613 / 0 tx / 0 pending / 0 (0.0%) gas / (0xb03735021030b12a532f33405fe3b2cef4d4fd2c1740d0ffb0d0a95a0d2df7b9)\r\nbesu-node-validator-2-0 2024-01-12 19:06:30.016+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Produced #300,614 / 0 tx / 0 pending / 0 (0.0%) gas / (0x62944ef8bd48ec018d3780a3ef60b3bc6c4b67cdd40d745fc80864b743976a5f)\r\nbesu-node-validator-2-0 2024-01-12 19:06:52.016+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftRound | Importing proposed block to chain. round=ConsensusRoundIdentifier{Sequence=300615, Round=1}, hash=0x503e0afcaec754ff7cdddc25d88046ae2785d2350e38b8f4e2dcbb165c20e534\r\nbesu-node-validator-2-0 2024-01-12 19:06:52.019+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,615 / 0 tx / 0 pending / 0 (0.0%) gas / (0x503e0afcaec754ff7cdddc25d88046ae2785d2350e38b8f4e2dcbb165c20e534)\r\nbesu-node-validator-2-0 2024-01-12 19:06:54.014+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Imported #300,616 / 0 tx / 0 pending / 0 (0.0%) gas / (0x3f0546f6d1f7250465b5b59d1c947f950743a11a06a40b3eda6e908cdef2e2fe)\r\nbesu-node-validator-2-0 2024-01-12 19:06:56.014+00:00 | BftProcessorExecutor-QBFT-0 | INFO  | QbftBesuControllerBuilder | Produced #300,617 / 0 tx / 0 pending / 0 (0.0%) gas / (0x94ac94f9a5c25ff1e68de8b08b02f80e075df06c8c123d359887d34dbca0a462)\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Software version: [`besu --version`] 23.10.0\r\n* Cloud VM, type, size: [Amazon Web Services I3-large] AWS EKS\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\n* Besu setup info - genesis file, config options\r\n\r\n```json\r\n      \"config\": {\r\n        \"chainId\": 1337,\r\n        \"homesteadBlock\": 0,\r\n        \"eip150Block\": 0,\r\n        \"eip150Hash\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n        \"eip155Block\": 0,\r\n        \"eip158Block\": 0,\r\n        \"byzantiumBlock\": 0,\r\n        \"constantinopleBlock\": 0,\r\n        \"petersburgBlock\": 0,\r\n        \"istanbulBlock\": 0,\r\n        \"muirglacierblock\": 0,\r\n        \"berlinBlock\": 0,\r\n        \"londonBlock\": 0,\r\n        \"zeroBaseFee\": true,\r\n        \"qbft\": {\r\n          \"blockperiodseconds\": 2,\r\n          \"epochlength\": 30000,\r\n          \"requesttimeoutseconds\": 20\r\n        }\r\n      },\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6398/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6398/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
