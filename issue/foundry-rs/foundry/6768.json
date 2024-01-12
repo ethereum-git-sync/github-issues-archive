@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6768",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6768/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6768/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6768/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6768",
+  "id": 2077794279,
+  "node_id": "I_kwDOGBlvNc572J_n",
+  "number": 6768,
+  "title": "Functions returning extra returndata unexpectedly revert",
+  "user": {
+    "login": "ernestognw",
+    "id": 33379285,
+    "node_id": "MDQ6VXNlcjMzMzc5Mjg1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/33379285?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ernestognw",
+    "html_url": "https://github.com/ernestognw",
+    "followers_url": "https://api.github.com/users/ernestognw/followers",
+    "following_url": "https://api.github.com/users/ernestognw/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ernestognw/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ernestognw/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ernestognw/subscriptions",
+    "organizations_url": "https://api.github.com/users/ernestognw/orgs",
+    "repos_url": "https://api.github.com/users/ernestognw/repos",
+    "events_url": "https://api.github.com/users/ernestognw/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ernestognw/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-11T23:57:01Z",
+  "updated_at": "2024-01-11T23:57:19Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [ ] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (05d6062 2024-01-10T00:17:37.314532000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nmacOS (Apple Silicon)\r\n\r\n### Describe the bug\r\n\r\n### Summary\r\n\r\nIn Solidity, when decoding returndata and calldata arguments, extra data is always ignored. This behavior is the same as using `abi.decode`:\r\n\r\n```solidity\r\nuint256 x = abi.decode(hex\"f000baar00000000000000000000000000000000000000000000000000000000\", (uint256))\r\nuint256 y = abi.decode(hex\"f000baar000000000000000000000000000000000000000000000000000000001234\", (uint256))\r\nassert(x != y);\r\n\r\nTraces:\r\n  [843] 0xBd770416a3345F91E4B34576cb804a576fa48EB1::run()\r\n    └─ ← panic: assertion failed (0x01)\r\n```\r\n\r\nHowever, when testing this behavior using Foundry, the transaction reverts instead of just ignoring the extra data.\r\nA simple [test in Sepolia confirms that the transaction actually goes through](https://sepolia.etherscan.io/tx/0xb9f6ba924004eb823bac818c9a28dfe1a14939726d05dcb367902b85dfa798d8).\r\n\r\n### Replication\r\n\r\nConsider the following two contracts:\r\n\r\n```solidity\r\n// src/ERC1271.sol\r\n// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\ninterface IERC1271 {\r\n    function isValidSignature(bytes32 hash, bytes memory signature) external view returns (bytes4 magicValue);\r\n}\r\n\r\ncontract ERC1271Wallet {\r\n    struct SignatureFailStruct {\r\n        bytes4 requested_code;\r\n        bytes4 fail_status;\r\n        bytes4 fail_reason;\r\n    }\r\n\r\n    function isValidSignature(\r\n        bytes32,\r\n        bytes memory\r\n    ) external pure returns (SignatureFailStruct memory) {\r\n        return SignatureFailStruct(0x1626ba7e, 0x00000000, 0xffffffff);\r\n    }\r\n}\r\n\r\ncontract VeryCriticalContract {\r\n    uint256 foo;\r\n\r\n    function callERC1271isValidSignature(\r\n        address _addr,\r\n        bytes32 _hash,\r\n        bytes calldata _signature\r\n    ) external {\r\n        bytes4 result = IERC1271(_addr).isValidSignature(_hash, _signature);\r\n        require(result == 0x1626ba7e, \"INVALID_SIGNATURE\");\r\n\r\n        foo++;\r\n    }\r\n}\r\n```\r\n\r\nWhen calling `callERC1271isValidSignature(address(wallet),bytes32(0),\"\")` in `VeryCriticalContract` the transaction doesn't revert when using a testnet, but it does revert when using `forge test` as the following test confirms:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity 0.8.22;\r\n\r\nimport {Test} from \"forge-std/Test.sol\";\r\nimport \"../src/ERC1271.sol\";\r\n\r\ncontract ERC1271Test is Test {\r\n    ERC1271Wallet public wallet;\r\n    VeryCriticalContract public someContract;\r\n\r\n    function setUp() public {\r\n        wallet = new ERC1271Wallet();\r\n    }\r\n\r\n    function testCallERC1271isValidSignature() public {\r\n        vm.expectRevert();\r\n        someContract.callERC1271isValidSignature(\r\n            address(wallet),\r\n            bytes32(0),\r\n            \"\"\r\n        );\r\n    }\r\n}\r\n```\r\n\r\n```shell\r\nRunning 1 test for test/ERC1271.t.sol:ERC1271Test\r\n[PASS] testCallERC1271isValidSignature() (gas: 10061)\r\nTraces:\r\n  [10061] ERC1271Test::testCallERC1271isValidSignature()\r\n    ├─ [0] VM::expectRevert(custom error f4844814:)\r\n    │   └─ ← ()\r\n    └─ ← EvmError: Revert\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 4.60ms\r\n\r\nRan 1 test suites: 1 tests passed, 0 failed, 0 skipped (1 total tests)\r\n```\r\n\r\n### Expected behavior\r\n\r\nWhen running `forge test`, the result should be the same as in the specified [Sepolia transaction](https://sepolia.etherscan.io/tx/0xb9f6ba924004eb823bac818c9a28dfe1a14939726d05dcb367902b85dfa798d8). Such transaction was also done with forge scripting:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.13;\r\n\r\nimport \"forge-std/Script.sol\";\r\nimport \"../src/ERC1271.sol\";\r\n\r\ncontract ERC1271Script is Script {\r\n    function setUp() public {}\r\n\r\n    function run() public {\r\n        vm.startBroadcast();\r\n        ERC1271Wallet wallet = new ERC1271Wallet();\r\n        VeryCriticalContract someContract = new VeryCriticalContract();\r\n        someContract.callERC1271isValidSignature(\r\n            address(wallet),\r\n            bytes32(0),\r\n            \"\"\r\n        );\r\n        vm.stopBroadcast();\r\n    }\r\n}\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6768/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6768/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
