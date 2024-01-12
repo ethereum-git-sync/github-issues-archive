@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6391",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6391/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6391/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6391/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6391",
+  "id": 2077942117,
+  "node_id": "I_kwDODE2jmc572uFl",
+  "number": 6391,
+  "title": "Suspicious block invalidation on hive `max-fee-per-blob-gas` test for Besu",
+  "user": {
+    "login": "marioevz",
+    "id": 11726710,
+    "node_id": "MDQ6VXNlcjExNzI2NzEw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/11726710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/marioevz",
+    "html_url": "https://github.com/marioevz",
+    "followers_url": "https://api.github.com/users/marioevz/followers",
+    "following_url": "https://api.github.com/users/marioevz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/marioevz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/marioevz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/marioevz/subscriptions",
+    "organizations_url": "https://api.github.com/users/marioevz/orgs",
+    "repos_url": "https://api.github.com/users/marioevz/repos",
+    "events_url": "https://api.github.com/users/marioevz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/marioevz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-12T02:17:14Z",
+  "updated_at": "2024-01-12T02:17:14Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nWe are adding validation error string check to all invalid block tests in https://github.com/ethereum/execution-spec-tests/ and therefore in hive too, so we can be sure that all clients are invalidating the block because of the correct reason, and not due to something else and we get a incorrect test-pass.\r\n\r\nAlmost all tests are passing for besu, with all exceptions making sense, and errors match what the test is expecting to verify, except for two tests that verify very similar things:\r\nThe blocks include a tx with a max-fee-per-blob-gas lower than the blob gas price for the block.\r\n\r\nThe rest of the clients invalidate the block with the proper exception, e.g. geth:\r\n```\r\ncould not apply tx 0 [...]: max fee per blob gas less than block blob gas fee: address 0xa..B blobGasFeeCap: 1, blobBaseFee: 2\r\n```\r\n\r\nBut Besu is invalidating due to, at least what seems like, a state root mismatch:\r\n```\r\nWorld State Root does not match expected value, header 0x242a63fa2afe3294022ba3f52bb2ffca13875b56352f17be8dcdfa72db330e4f calculated 0x98b25fddd3c355f73d63fe8a5f2f20ebfebcd6d4c06d4d98239b74fa13b7df02\r\n```\r\nThis is weird because:\r\n1) It's the only block on all tests that Besu invalidates with this error.\r\n2) If the failure only happened on the state root check, it means that besu applied the tx when executing the block, which should not even attempted to.\r\n\r\n### Steps to Reproduce (Bug)\r\nUsing branch https://github.com/marioevz/hive/tree/pyspec-check-tx-insertion-error, run:\r\n```bash=\r\n./hive --client-file\r\n./configs/cancun.yaml --client besu --sim ethereum/pyspec --sim.limit \"/cancun/eip4844_blobs/blo\r\nb_txs/invalid_tx_max_fee_per_blob_gas/tests/cancun/eip4844_blobs/test_blob_txs.py::test_invalid_tx_max_fee_per_blob_gas\"\r\n```\r\n\r\n**Expected behavior:** Besu should not try to apply the invalid transaction and invalidate the block earlier\r\n\r\n**Actual behavior:** Besu only invalidates the block after the state root mismatch\r\n\r\n**Frequency:** Every time\r\n\r\n### Logs (if a bug)\r\n```\r\njava.lang.RuntimeException: World State Root does not match expected value, header 0x242a63fa2afe3294022ba3f52bb2ffca13875b56352f17be8dcdfa72db330e4f calculated 0x98b25fddd3c355f73d63fe8a5f2f20ebfebcd6d4c06d4d98239b74fa13b7df02\r\n\tat org.hyperledger.besu.ethereum.trie.bonsai.worldview.BonsaiWorldState.verifyWorldStateRoot(BonsaiWorldState.java:459)\r\n\tat org.hyperledger.besu.ethereum.trie.bonsai.worldview.BonsaiWorldState.persist(BonsaiWorldState.java:417)\r\n\tat org.hyperledger.besu.ethereum.mainnet.AbstractBlockProcessor.processBlock(AbstractBlockProcessor.java:194)\r\n\tat org.hyperledger.besu.ethereum.mainnet.BlockProcessor.processBlock(BlockProcessor.java:79)\r\n\tat org.hyperledger.besu.ethereum.MainnetBlockValidator.processBlock(MainnetBlockValidator.java:207)\r\n\tat org.hyperledger.besu.ethereum.MainnetBlockValidator.validateAndProcessBlock(MainnetBlockValidator.java:135)\r\n\tat org.hyperledger.besu.ethereum.MainnetBlockValidator.validateAndProcessBlock(MainnetBlockValidator.java:83)\r\n\tat org.hyperledger.besu.consensus.merge.blockcreation.MergeCoordinator.validateBlock(MergeCoordinator.java:551)\r\n\tat org.hyperledger.besu.consensus.merge.blockcreation.MergeCoordinator.rememberBlock(MergeCoordinator.java:581)\r\n\tat org.hyperledger.besu.consensus.merge.blockcreation.TransitionCoordinator.rememberBlock(TransitionCoordinator.java:163)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.engine.AbstractEngineNewPayload.syncResponse(AbstractEngineNewPayload.java:302)\r\n\tat org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.ExecutionEngineJsonRpcMethod.lambda$response$0(ExecutionEngineJsonRpcMethod.java:90)\r\n\tat io.vertx.core.impl.ContextBase.lambda$null$0(ContextBase.java:137)\r\n\tat io.vertx.core.impl.ContextInternal.dispatch(ContextInternal.java:264)\r\n\tat io.vertx.core.impl.ContextBase.lambda$executeBlocking$1(ContextBase.java:135)\r\n\tat io.vertx.core.impl.TaskQueue.run(TaskQueue.java:76)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\r\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.base/java.lang.Thread.run(Thread.java:840)\r\n```\r\n### Versions\r\nCommit: https://github.com/hyperledger/besu/commit/d918baa4ae93be24a7a4988226d23f07cd190599\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6391/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6391/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
