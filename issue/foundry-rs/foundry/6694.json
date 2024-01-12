@@ -47,9 +47,9 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 2,
   "created_at": "2024-01-02T15:48:50Z",
-  "updated_at": "2024-01-11T14:12:52Z",
+  "updated_at": "2024-01-12T21:11:51Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
@@ -72,5 +72,92 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1889902748",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6694#issuecomment-1889902748",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6694",
+    "id": 1889902748,
+    "node_id": "IC_kwDOGBlvNc5wpaCc",
+    "user": {
+      "login": "keyneom",
+      "id": 1523791,
+      "node_id": "MDQ6VXNlcjE1MjM3OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1523791?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/keyneom",
+      "html_url": "https://github.com/keyneom",
+      "followers_url": "https://api.github.com/users/keyneom/followers",
+      "following_url": "https://api.github.com/users/keyneom/following{/other_user}",
+      "gists_url": "https://api.github.com/users/keyneom/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/keyneom/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/keyneom/subscriptions",
+      "organizations_url": "https://api.github.com/users/keyneom/orgs",
+      "repos_url": "https://api.github.com/users/keyneom/repos",
+      "events_url": "https://api.github.com/users/keyneom/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/keyneom/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-12T20:22:23Z",
+    "updated_at": "2024-01-12T20:22:23Z",
+    "author_association": "NONE",
+    "body": "I'm not positive but I think I have a similar issue. I have an assert that fails but the test still indicates that it passed. This is very concerning to me as I would not have realized things were broken if I hadn't been running with high verbosity for another issue. I can't seem to figure out what would cause it but I am somewhat new to using foundry for tests.\r\n\r\nI believe I have something pretty compact and reproducible running with the following settings and code.\r\n\r\n`forge test --mt statefulFuzz_testHasTimePassed -vvvvv`\r\n\r\nfoundry.toml\r\n```TOML\r\n[profile.default]\r\nsrc = \"src\"\r\nout = \"out\"\r\nlibs = [\"lib\"]\r\nffi = true\r\noptimizer = true\r\nevm_version = 'shanghai'\r\nfs_permissions = [{ access = \"read\", path = \"./\" }]\r\n\r\n[fuzz]\r\nruns = 256\r\nseed = '0x3'\r\n\r\n[invariant]\r\nruns = 64\r\ndepth = 32\r\nfail_on_revert = true\r\n```\r\n\r\nAssertTests.t.sol\r\n```Solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity 0.8.20;\r\n\r\nimport {Test, console2} from \"forge-std/Test.sol\";\r\nimport {StdInvariant} from \"forge-std/StdInvariant.sol\";\r\n\r\ncontract ContractTestSuite is StdInvariant, Test {\r\n    Mock mock;\r\n    MockHandler mockHandler;\r\n\r\n    uint256 id = 0;\r\n\r\n    function setUp() public {\r\n        mock = new Mock();\r\n        mockHandler = new MockHandler(address(mock));\r\n\r\n        targetContract(address(mockHandler));\r\n        bytes4[] memory selectors = new bytes4[](2);\r\n        selectors[0] = mockHandler.setTimeById.selector;\r\n        selectors[1] = mockHandler.hasRequiredTimePassed.selector;\r\n        \r\n        targetSelector(FuzzSelector({addr: address(mockHandler), selectors: selectors}));\r\n    }\r\n\r\n    function statefulFuzz_testHasTimePassed() public {\r\n        assert(mock.hasRequiredTimePassed(id));\r\n    }\r\n}\r\n\r\ncontract Mock {\r\n    uint256 public constant REQUIRED_TIME = 1 days;\r\n\r\n    mapping(uint256 id => uint256 timeStamp) public idsToTimestamps;\r\n\r\n    constructor() {}\r\n\r\n    function setTimeById(uint256 id) external {\r\n        idsToTimestamps[id] = block.timestamp;\r\n    }\r\n\r\n    function hasRequiredTimePassed(uint256 id) external view returns (bool) {\r\n        if (idsToTimestamps[id] <= block.timestamp - REQUIRED_TIME) {\r\n            return false;\r\n        }\r\n        return true;\r\n    }\r\n}\r\n\r\ncontract MockHandler is Test {\r\n    address private originalContract;\r\n    uint256 counter = 0;\r\n\r\n    constructor(address _originalContract) {\r\n        originalContract = _originalContract;\r\n        vm.warp(623095235);\r\n        Mock(originalContract).setTimeById(0);\r\n    }\r\n\r\n    function setTimeById() external {\r\n        ++counter;\r\n        uint256 rollForwardBy = counter % 2 == 0 ? 36 hours : 12 hours;\r\n        vm.warp(vm.getBlockTimestamp()+rollForwardBy);\r\n        vm.roll(vm.getBlockNumber()+1);\r\n        Mock(originalContract).setTimeById(0);\r\n    }\r\n\r\n    function hasRequiredTimePassed() external returns (bool) {\r\n        ++counter;\r\n        uint256 rollForwardBy = counter % 2 == 0 ? 36 hours : 12 hours;\r\n        vm.warp(vm.getBlockTimestamp()+rollForwardBy);\r\n        vm.roll(vm.getBlockNumber()+1);\r\n        return Mock(originalContract).hasRequiredTimePassed(0);\r\n    }\r\n}\r\n```\r\n\r\nOutput:\r\n```\r\n . . . \r\n  [9920] ContractTestSuite::statefulFuzz_testHasTimePassed()\r\n    ├─ [2579] Mock::hasRequiredTimePassed(0) [staticcall]\r\n    │   └─ ← false\r\n    └─ ← panic: assertion failed (0x01)\r\n\r\nTest result: ok. 1 passed; 0 failed; 0 skipped; finished in 163.58ms\r\n \r\nRan 1 test suites: 1 tests passed, 0 failed, 0 skipped (1 total tests)\r\n```\r\n\r\nIf I apply the following diff to the stateful fuzz test it appears as if the failed assertion is properly recognized:\r\n```diff\r\n    function statefulFuzz_testHasTimePassed() public {\r\n-        assert(mock.hasRequiredTimePassed(id));\r\n+        assert(mockHandler.hasRequiredTimePassed());\r\n    }\r\n```\r\n\r\nOutput:\r\n```\r\n . . . \r\n  [22629] ContractTestSuite::statefulFuzz_testHasTimePassed()\r\n    ├─ [17384] MockHandler::hasRequiredTimePassed()\r\n    │   ├─ [0] VM::getBlockTimestamp() [staticcall]\r\n    │   │   └─ ← 623138435 [6.231e8]\r\n    │   ├─ [0] VM::warp(623268035 [6.232e8])\r\n    │   │   └─ ← ()\r\n    │   ├─ [0] VM::getBlockNumber() [staticcall]\r\n    │   │   └─ ← 2\r\n    │   ├─ [0] VM::roll(3)\r\n    │   │   └─ ← ()\r\n    │   ├─ [2579] Mock::hasRequiredTimePassed(0) [staticcall]\r\n    │   │   └─ ← false\r\n    │   └─ ← false\r\n    └─ ← panic: assertion failed (0x01)\r\n\r\nTest result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 171.51ms\r\n \r\nRan 1 test suites: 0 tests passed, 1 failed, 0 skipped (1 total tests)\r\n\r\nFailing tests:\r\nEncountered 1 failing test in test/AssertTests.t.sol:ContractTestSuite\r\n[FAIL. Reason: panic: assertion failed (0x01)]\r\n        [Sequence]\r\n                sender=0x0000000000000000000000000000000000000308 addr=[test/AssertTests.t.sol:MockHandler]0x2e234DAe75C793f67A35089C9d99245E1C58470b calldata=setTimeById() args=[]\r\n statefulFuzz_testHasTimePassed() (runs: 64, calls: 2017, reverts: 0)\r\n\r\nEncountered a total of 1 failing tests, 0 tests succeeded\r\n```",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1889902748/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1889933033",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6694#issuecomment-1889933033",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6694",
+    "id": 1889933033,
+    "node_id": "IC_kwDOGBlvNc5wphbp",
+    "user": {
+      "login": "0xmp",
+      "id": 92998635,
+      "node_id": "U_kgDOBYsL6w",
+      "avatar_url": "https://avatars.githubusercontent.com/u/92998635?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/0xmp",
+      "html_url": "https://github.com/0xmp",
+      "followers_url": "https://api.github.com/users/0xmp/followers",
+      "following_url": "https://api.github.com/users/0xmp/following{/other_user}",
+      "gists_url": "https://api.github.com/users/0xmp/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/0xmp/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/0xmp/subscriptions",
+      "organizations_url": "https://api.github.com/users/0xmp/orgs",
+      "repos_url": "https://api.github.com/users/0xmp/repos",
+      "events_url": "https://api.github.com/users/0xmp/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/0xmp/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-12T20:50:23Z",
+    "updated_at": "2024-01-12T21:11:51Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "@keyneom Yes, I think we have the same issue.\r\n\r\n> This is very concerning to me as I would not have realized things were broken if I hadn't been running with high verbosity for another issue.\r\n\r\nSame here, from what I see `fail_on_revert` doesn't work when the invariant handler uses `vm.roll` or `vm.warp`. I think this is a pretty common situation so there may be a few projects not realizing that their invariant test suite is actually not reverting. For example, [Sablier](https://github.com/sablier-labs/v2-core) (considered as a good standard in terms of clean tests) relies on invariant tests with `fail_on_revert` and [does use `vm.warp`](https://github.com/sablier-labs/v2-core/blob/main/test/invariant/handlers/BaseHandler.sol#L66).\r\n\r\n@Evalir Really apologize for the tag, but not sure how else to draw attention to this issue and am a bit worried by the possibility of codebases relying on `fail_on_revert`",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1889933033/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
