@@ -40,7 +40,7 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "nalepae",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2024-01-12T10:34:12Z",
-  "updated_at": "2024-01-12T10:34:27Z",
-  "closed_at": null,
+  "updated_at": "2024-01-12T16:00:00Z",
+  "closed_at": "2024-01-12T16:00:00Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Describe the bug\r\n\r\nValidator client running with the `--web` AND not already existing `validator.db` database NEITHER wallet directory crashes.\r\n\r\n### Has this worked before in a previous version?\r\n\r\n```text\r\nWorked with `<v4.2.0`.\r\n```\r\n\r\n\r\n### 🔬 Minimal Reproduction\r\n\r\n1. Remove the `validator.db` file\r\n2. Remove the `prysm-wallet-v2` directory.\r\n3. Run the validator client with the `--web` option.\r\n\r\n### Error\r\n\r\n```text\r\n[2024-01-12 11:31:28] ERROR main: Runtime panic: runtime error: invalid memory address or nil pointer dereference\r\ngoroutine 1 [running]:\r\nruntime/debug.Stack()\r\n\tGOROOT/src/runtime/debug/stack.go:24 +0x64\r\nmain.main.func4()\r\n\tcmd/validator/main.go:197 +0x40\r\npanic({0x1047f9b80?, 0x1056f2570?})\r\n\tGOROOT/src/runtime/panic.go:914 +0x218\r\ngithub.com/prysmaticlabs/prysm/v4/validator/accounts/wallet.(*Wallet).AccountsDir(...)\r\n\tvalidator/accounts/wallet/wallet.go:318\r\ngithub.com/prysmaticlabs/prysm/v4/validator/node.(*ValidatorClient).getLegacyDatabaseLocation(0x140004abe60, 0xd0?, 0x0, {0x1400071e000, 0x18}, {0x14000736a20, 0x25}, {0x1400049a140, 0x32})\r\n\tvalidator/node/node.go:227 +0xe0\r\ngithub.com/prysmaticlabs/prysm/v4/validator/node.(*ValidatorClient).initializeForWeb(0x140004abe60, 0x140000b5e40, 0x1400068f978?)\r\n\tvalidator/node/node.go:353 +0x1d0\r\ngithub.com/prysmaticlabs/prysm/v4/validator/node.NewValidatorClient(0x140000b5e40)\r\n\tvalidator/node/node.go:140 +0x390\r\nmain.startNode(0x18?)\r\n\tcmd/validator/main.go:40 +0x2c\r\nmain.main.func1(0x1400044d1e0?)\r\n\tcmd/validator/main.go:125 +0x1c\r\ngithub.com/urfave/cli/v2.(*Command).Run(0x1400044d1e0, 0x140000b5e40, {0x1400004e230, 0x7, 0x7})\r\n\texternal/com_github_urfave_cli_v2/command.go:274 +0x730\r\ngithub.com/urfave/cli/v2.(*App).RunContext(0x140003b05a0, {0x104a970d0?, 0x105b4ce80}, {0x1400004e230, 0x7, 0x7})\r\n\texternal/com_github_urfave_cli_v2/app.go:332 +0x518\r\ngithub.com/urfave/cli/v2.(*App).Run(...)\r\n\texternal/com_github_urfave_cli_v2/app.go:309\r\nmain.main()\r\n\tcmd/validator/main.go:202 +0x1e8\r\n\r\npanic: runtime error: invalid memory address or nil pointer dereference [recovered]\r\n\tpanic: runtime error: invalid memory address or nil pointer dereference\r\n[signal SIGSEGV: segmentation violation code=0x2 addr=0x10 pc=0x103e9c520]\r\n\r\ngoroutine 1 [running]:\r\nmain.main.func4()\r\n\tcmd/validator/main.go:198 +0xc0\r\npanic({0x1047f9b80?, 0x1056f2570?})\r\n\tGOROOT/src/runtime/panic.go:914 +0x218\r\ngithub.com/prysmaticlabs/prysm/v4/validator/accounts/wallet.(*Wallet).AccountsDir(...)\r\n\tvalidator/accounts/wallet/wallet.go:318\r\ngithub.com/prysmaticlabs/prysm/v4/validator/node.(*ValidatorClient).getLegacyDatabaseLocation(0x140004abe60, 0xd0?, 0x0, {0x1400071e000, 0x18}, {0x14000736a20, 0x25}, {0x1400049a140, 0x32})\r\n\tvalidator/node/node.go:227 +0xe0\r\ngithub.com/prysmaticlabs/prysm/v4/validator/node.(*ValidatorClient).initializeForWeb(0x140004abe60, 0x140000b5e40, 0x1400068f978?)\r\n\tvalidator/node/node.go:353 +0x1d0\r\ngithub.com/prysmaticlabs/prysm/v4/validator/node.NewValidatorClient(0x140000b5e40)\r\n\tvalidator/node/node.go:140 +0x390\r\nmain.startNode(0x18?)\r\n\tcmd/validator/main.go:40 +0x2c\r\nmain.main.func1(0x1400044d1e0?)\r\n\tcmd/validator/main.go:125 +0x1c\r\ngithub.com/urfave/cli/v2.(*Command).Run(0x1400044d1e0, 0x140000b5e40, {0x1400004e230, 0x7, 0x7})\r\n\texternal/com_github_urfave_cli_v2/command.go:274 +0x730\r\ngithub.com/urfave/cli/v2.(*App).RunContext(0x140003b05a0, {0x104a970d0?, 0x105b4ce80}, {0x1400004e230, 0x7, 0x7})\r\n\texternal/com_github_urfave_cli_v2/app.go:332 +0x518\r\ngithub.com/urfave/cli/v2.(*App).Run(...)\r\n\texternal/com_github_urfave_cli_v2/app.go:309\r\nmain.main()\r\n\tcmd/validator/main.go:202 +0x1e8\r\n```\r\n```\r\n\r\n\r\n### Platform(s)\r\n\r\nMac (Apple Silicon)\r\n\r\n### What version of Prysm are you running? (Which release)\r\n\r\nv4.2.0",
-  "closed_by": null,
+  "closed_by": {
+    "login": "nalepae",
+    "id": 4943830,
+    "node_id": "MDQ6VXNlcjQ5NDM4MzA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4943830?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nalepae",
+    "html_url": "https://github.com/nalepae",
+    "followers_url": "https://api.github.com/users/nalepae/followers",
+    "following_url": "https://api.github.com/users/nalepae/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nalepae/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nalepae/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nalepae/subscriptions",
+    "organizations_url": "https://api.github.com/users/nalepae/orgs",
+    "repos_url": "https://api.github.com/users/nalepae/repos",
+    "events_url": "https://api.github.com/users/nalepae/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nalepae/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13458/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13458/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
