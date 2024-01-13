@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2020-05-29T20:18:56Z",
-  "updated_at": "2020-11-18T18:04:43Z",
-  "closed_at": null,
+  "updated_at": "2024-01-12T22:22:42Z",
+  "closed_at": "2024-01-12T22:22:42Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "* py-evm Version: not yet applicable, true only if/when PR #1940 is merged\r\n* OS: N/A\r\n* Python Version (python --version): N/A\r\n* Environment (relevant `diff` part for `setup.py` from linked PR):\r\n\r\n``` diff\r\n     'lint': [\r\n-        \"flake8==3.5.0\",\r\n-        \"flake8-bugbear==18.8.0\",\r\n-        \"mypy==0.701\",\r\n+        \"flake8==3.8.2\",\r\n+        \"flake8-bugbear==20.1.4\",\r\n+        \"mypy==0.750\",\r\n     ],\r\n```\r\n\r\n### What is wrong?\r\n\r\nThe PR added some `ignore`s to `tox.ini`, it was previously empty:\r\n\r\n```\r\n12 ignore =\r\n13     # E252 missing whitespace around parameter equals                                                               \r\n14     # Already used too much in the codebase at the point of introduction.                                           \r\n15     E252,\r\n16     # W503 line break before binary operator                                                                        \r\n17     # It's either this or W504 (line break _after_ binary operator), pick your poison.                              \r\n18     # W503 gets enabled when E252 gets ignored, see:                                                                \r\n19     # https://github.com/ethereum/py-evm/pull/1940#discussion_r432606845                                            \r\n20     W503\r\n```\r\n\r\nIt's quite a lot of lines to change (50? 150?..) in the current codebase, so I did the above instead. (Fiddling with styling shadows valuable `git` history...)\r\n\r\n[PEP8's note](https://www.python.org/dev/peps/pep-0008/#other-recommendations) (use search):\r\n\r\n> When combining an argument annotation with a default value, however, do use spaces around the = sign:\r\n> ```\r\n> # Correct:\r\n> def munge(sep: AnyStr = None): ...\r\n> def munge(input: AnyStr, sep: AnyStr = None, limit=1000): ...\r\n> \r\n> # Wrong:\r\n> def munge(input: AnyStr=None): ...\r\n> def munge(input: AnyStr, limit = 1000): ...\r\n> ```\r\n\r\n\r\nWe don't use spaces there, so `flake8` complains.\r\n\r\n### How can it be fixed\r\n\r\nRemove the `ignore` section, run `tox -e py3{6,7,8}-lint` and mass-replace `=` with `<space>=<space>` in functions where `flake8` complains.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "pacrob",
+    "id": 5199899,
+    "node_id": "MDQ6VXNlcjUxOTk4OTk=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5199899?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pacrob",
+    "html_url": "https://github.com/pacrob",
+    "followers_url": "https://api.github.com/users/pacrob/followers",
+    "following_url": "https://api.github.com/users/pacrob/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pacrob/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pacrob/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pacrob/subscriptions",
+    "organizations_url": "https://api.github.com/users/pacrob/orgs",
+    "repos_url": "https://api.github.com/users/pacrob/repos",
+    "events_url": "https://api.github.com/users/pacrob/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pacrob/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum/py-evm/issues/1942/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum/py-evm/issues/1942/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
