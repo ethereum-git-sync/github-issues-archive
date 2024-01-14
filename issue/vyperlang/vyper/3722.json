@@ -41,7 +41,7 @@
   "milestone": null,
   "comments": 8,
   "created_at": "2024-01-09T22:39:35Z",
-  "updated_at": "2024-01-14T14:19:37Z",
+  "updated_at": "2024-01-14T19:24:33Z",
   "closed_at": null,
   "author_association": "MEMBER",
   "active_lock_reason": null,
@@ -311,9 +311,9 @@
       "site_admin": false
     },
     "created_at": "2024-01-13T15:11:36Z",
-    "updated_at": "2024-01-13T15:24:15Z",
+    "updated_at": "2024-01-14T19:24:33Z",
     "author_association": "MEMBER",
-    "body": "> @DanielSchiavini suggests that ownership should be the default, whereas borrowing needs to be marked\r\n\r\nafter ruminating on this for a few days, i favor a system which marks ownership and additionally requires annotation of write dependencies as is proposed in #3723. borrowship may also be marked, although it this is a relatively small detail and can be added or removed in the future. in the following examples, i renamed the keywords `owns:` and `borrows` to `initializes:` and `uses:`, respectively. so the above example would look like\r\n\r\n```vyper\r\n# Library1.vy\r\nimport Library2 as library2\r\n\r\nuses: library2\r\n\r\ndef __init__():\r\n    pass\r\n\r\n# contract\r\nimport Library1 as lib1\r\nimport Library2 as lib2\r\n\r\ninitializes: lib2\r\ninitializes: lib1[library2 := lib2]\r\n\r\ndef __init__():\r\n    lib2.__init__()\r\n    lib1.__init__()\r\n```\r\n\r\nas an implementation detail, i settled on using the walrus operator (`:=`) for dependency annotation, since the assignment operator (`=`) is not allowed inside of brackets.\r\n\r\nas a larger example, i wrote up the token example using this syntax here: https://gist.github.com/charles-cooper/fb5caff4eee8bbf92ed86cefaa39a855",
+    "body": "> @DanielSchiavini suggests that ownership should be the default, whereas borrowing needs to be marked\r\n\r\nafter ruminating on this for a few days, i favor a system which marks ownership and additionally requires annotation of write dependencies as is proposed in #3723. borrowship may also be marked, although it this is a relatively small detail and can be added or removed in the future. in the following examples, i renamed the keywords `owns:` and `borrows` to `initializes:` and `uses:`, respectively. so the above example would look like\r\n\r\n```vyper\r\n# Library1.vy\r\nimport Library2 as library2\r\n\r\nuses: library2\r\n\r\ndef __init__():\r\n    pass\r\n\r\n# contract\r\nimport Library1 as lib1\r\nimport Library2 as lib2\r\n\r\ninitializes: lib2\r\ninitializes: lib1[library2 := lib2]\r\n\r\ndef __init__():\r\n    lib2.__init__()\r\n    lib1.__init__()\r\n```\r\n\r\nmore formally, the ownership hierarchy as exposed to the user is therefore:\r\n```\r\n- NO_OWNERSHIP\r\n- WRITES\r\n- INITIALIZES\r\n```\r\n\r\nas an implementation detail, i settled on using the walrus operator (`:=`) for dependency annotation, since the assignment operator (`=`) is not allowed inside of brackets.\r\n\r\nas a larger example, i wrote up the token example using this syntax here: https://gist.github.com/charles-cooper/fb5caff4eee8bbf92ed86cefaa39a855",
     "reactions": {
       "url": "https://api.github.com/repos/vyperlang/vyper/issues/comments/1890483617/reactions",
       "total_count": 0,
