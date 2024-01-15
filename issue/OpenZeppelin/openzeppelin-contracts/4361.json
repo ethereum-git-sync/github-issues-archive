@@ -41,7 +41,7 @@
   "milestone": null,
   "comments": 4,
   "created_at": "2023-06-16T15:58:50Z",
-  "updated_at": "2023-06-21T15:11:24Z",
+  "updated_at": "2024-01-15T12:48:06Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -49,8 +49,8 @@
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4361/reactions",
-    "total_count": 1,
-    "+1": 0,
+    "total_count": 2,
+    "+1": 1,
     "-1": 1,
     "laugh": 0,
     "hooray": 0,
@@ -92,7 +92,7 @@
     },
     "created_at": "2023-06-16T16:56:48Z",
     "updated_at": "2023-06-16T16:56:48Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": "I'm not sure that I understand the till metaphor. Is there an implementation in Uniswap v4 that could be used as reference?\r\n\r\nCan the same caller reenter via the till? Is the validation executed on entry as well? (If not, that seems risky?)",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1594981386/reactions",
@@ -140,8 +140,8 @@
     "body": "> I'm not sure that I understand the till metaphor. Is there an implementation in Uniswap v4 that could be used as reference?\r\n\r\nIt's a till, like a cash register, in that you open it, take some cash out, put some cash in, maybe change currencies (examples of actions you can perform while the till is open), but it has to be balanced (an example of the abstract validation) when you close it (the call returns). Another way to think of it is you don't perform validation of invariants un**til** the end.\r\n \r\n> Can the same caller reenter via the till? Is the validation executed on entry as well? (If not, that seems risky?)\r\n\r\nYes, any caller including the current caller can re-enter any number of times. Each call is assigned a unique ID--unique only within the context of that call stack--for each call to open the till. The abstract validation is only executed just before return. As long as the transient state you validate at the end is related only to that caller's ID, it's plenty safe.\r\n",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1595095135/reactions",
-      "total_count": 0,
-      "+1": 0,
+      "total_count": 1,
+      "+1": 1,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
@@ -180,7 +180,7 @@
     },
     "created_at": "2023-06-16T22:29:28Z",
     "updated_at": "2023-06-16T22:29:28Z",
-    "author_association": "MEMBER",
+    "author_association": "CONTRIBUTOR",
     "body": ">As long as the transient state you validate at the end is related only to that caller's ID, it's plenty safe.\r\n\r\nCan you elaborate on this?\r\n\r\nThis pattern seems to break some of my assumptions about what secure reentrancy looks like. It sounds like an invariant can be broken in the middle of the callback execution as long as it's restored at the end. But if you allow reentrancy while invariants are broken, the preconditions that you would normally use to prove that the code does what you intend may not hold. I'm not saying that the pattern can't work, but it seems to have big implications.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1595390567/reactions",
@@ -223,9 +223,9 @@
       "site_admin": false
     },
     "created_at": "2023-06-17T00:30:38Z",
-    "updated_at": "2023-06-17T00:30:38Z",
+    "updated_at": "2024-01-15T12:48:06Z",
     "author_association": "NONE",
-    "body": "> >As long as the transient state you validate at the end is related only to that caller's ID, it's plenty safe.\n> \n> \n> \n> Can you elaborate on this?\n> \n> \n> \n> This pattern seems to break some of my assumptions about what secure reentrancy looks like. It sounds like an invariant can be broken in the middle of the callback execution as long as it's restored at the end. But if you allow reentrancy while invariants are broken, the preconditions that you would normally use to prove that the code does what you intend may not hold. I'm not saying that the pattern can't work, but it seems to have big implications.\n\nYour invariants that you typically check are based on the state at the beginning of that specific call. The easiest way to do this is to only track the differences. This would be part of the abstract validation though.",
+    "body": "> >As long as the transient state you validate at the end is related only to that caller's ID, it's plenty safe.\r\n> \r\n> \r\n> \r\n> Can you elaborate on this?\r\n> \r\n> \r\n> \r\n> This pattern seems to break some of my assumptions about what secure reentrancy looks like. It sounds like an invariant can be broken in the middle of the callback execution as long as it's restored at the end. But if you allow reentrancy while invariants are broken, the preconditions that you would normally use to prove that the code does what you intend may not hold. I'm not saying that the pattern can't work, but it seems to have big implications.\r\n\r\nYour invariants that you typically check are based on the state at the beginning of that specific call. The easiest way to do this is to only track the differences. This would be the responsibility of the implementor, as part of the abstract validation.",
     "reactions": {
       "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/comments/1595514228/reactions",
       "total_count": 0,
