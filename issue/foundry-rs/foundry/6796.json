@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6796",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6796/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6796/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6796/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6796",
+  "id": 2081105040,
+  "node_id": "I_kwDOGBlvNc58CySQ",
+  "number": 6796,
+  "title": "forge script --broadcast hangs with \"waiting for receipts\"",
+  "user": {
+    "login": "norswap",
+    "id": 202175,
+    "node_id": "MDQ6VXNlcjIwMjE3NQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/202175?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/norswap",
+    "html_url": "https://github.com/norswap",
+    "followers_url": "https://api.github.com/users/norswap/followers",
+    "following_url": "https://api.github.com/users/norswap/following{/other_user}",
+    "gists_url": "https://api.github.com/users/norswap/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/norswap/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/norswap/subscriptions",
+    "organizations_url": "https://api.github.com/users/norswap/orgs",
+    "repos_url": "https://api.github.com/users/norswap/repos",
+    "events_url": "https://api.github.com/users/norswap/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/norswap/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-15T01:54:16Z",
+  "updated_at": "2024-01-15T01:54:16Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nForge, Cast\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (293fad7 2024-01-14T00:19:24.272194000Z)\n\n### What command(s) is the bug in?\n\n_No response_\n\n### Operating System\n\nmacOS (Apple Silicon)\n\n### Describe the bug\n\nI'm running a fairly heavy script (deploying the OP stack contracts), and when doing this, `forge script` sometimes hang on \"Waiting for receipts.\"\r\n\r\nAfter inspecting the geth logs, it seems that 5 out of the 50 sent transactions simply linger in the mempool (marked as \"executable\" but not \"queued\").\r\n\r\nMy hunch is that this is due to the basefee being set too low by forge. Some of the contracts being deployed are really large.\r\n\r\nThe problem does not appear every time, I believe it is due to how the transactions are split in blocks. In the instance I was debugging, there was one block with 7 txs and 4M gas and one block with 38 txs and 28M gas.\r\n\r\nBecause `geth --dev` doesn't produce blocks when there is no txs that can be included in a block, the basefee never goes down and the remaining txs are stuck in limbo forever.\r\n\r\nIt's possible that the problem is something else, but this seems like the simplest explanation.\r\n\r\nThe problem is also solved when setting `--dev.period 1` on the geth node. It could also probably be solved by manually specifying a high basefee with `--with-gas-price`on `forge script` (since it's a local devnet).\r\n\r\nNevertheless, it seems like a pretty annoying issue, and it's hard to debug, it would be great if `forge script` could poll the RPC for the basefee and check if it needs to reprice the transactions.\r\n\r\nThis *might*  also cause issues on non-dev setups. I'm usually not able to use this deploy script for deployments of the OP stack on testnets, resorting to using the `--slow` flag. I had those issues pinned on the RPC being flaky, but now I'm wondering if it's not the same problem after all.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6796/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6796/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
