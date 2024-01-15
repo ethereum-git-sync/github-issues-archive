@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6807",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6807/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6807/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6807/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6807",
+  "id": 2082541950,
+  "node_id": "I_kwDOGBlvNc58IRF-",
+  "number": 6807,
+  "title": "readFile / readAddress not consistent depending of OS (linux / Mac)",
+  "user": {
+    "login": "vjuge",
+    "id": 7443710,
+    "node_id": "MDQ6VXNlcjc0NDM3MTA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/7443710?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vjuge",
+    "html_url": "https://github.com/vjuge",
+    "followers_url": "https://api.github.com/users/vjuge/followers",
+    "following_url": "https://api.github.com/users/vjuge/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vjuge/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vjuge/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vjuge/subscriptions",
+    "organizations_url": "https://api.github.com/users/vjuge/orgs",
+    "repos_url": "https://api.github.com/users/vjuge/repos",
+    "events_url": "https://api.github.com/users/vjuge/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vjuge/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-14T09:30:21Z",
+  "updated_at": "2024-01-15T18:54:05Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "# Context\r\n\r\ni'm using this piece of code to persist contract addresses on a deploy script: \r\n\r\n```solidity \r\nfunction updateContractAddressJson(string memory contractName, string memory __chainid, address __address) private returns (string memory outputObj1) {\r\n        string memory deployments = vm.readFile(\"./contracts/broadcast/deployments.json\");\r\n\r\n        address contract31337 = deployments.readAddress(string.concat(\"$.\",contractName, \".31337\"));\r\n        address contract1 = deployments.readAddress(string.concat(\"$.\",contractName, \".1\"));\r\n        address contract80001 = deployments.readAddress(string.concat(\"$.\",contractName, \".80001\"));\r\n\r\n         // [...]       \r\n        vm.serializeAddress(obj, \"31337\", contract31337);\r\n         // [...]       \r\n        outputObj1 = vm.serializeAddress(obj, __chainid, __address);\r\n        console.log(outputObj1);\r\n\r\n}\r\n```\r\n\r\nto read/update the file `./contracts/broadcast/deployments.json`:\r\n```json \r\n{\r\n  \"DAOTreasury\": {\r\n    \"1\": \"0x0000000000000000000000000000000000000020\",\r\n    \"31337\": \"0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512\",\r\n    \"80001\": \"0x0000000000000000000000000000000000000020\"\r\n  },\r\n  \"MockERC20\": {\r\n    \"1\": \"0x0000000000000000000000000000000000000020\",\r\n    \"31337\": \"0x5FbDB2315678afecb367f032d93F642f64180aa3\",\r\n    \"80001\": \"0xdaAe8d27687155dD49B7D6dBc33369fd00081255\"\r\n  }\r\n}\r\n```\r\n\r\n# Issue\r\n\r\nI used to launch this script either from a **linux PC**(fedora) or from a **macbook**, and the json path is not interpreted the same depending of the OS the script runs from.\r\n\r\n> [!CAUTION]\r\n> in some case we need to have a prefix `\"$.\"`, in some case not.\r\n\r\nlinux working code:\r\n```solidity\r\n        address contract31337 = deployments.readAddress(string.concat(\"$.\",contractName, \".31337\"));\r\n\r\n```\r\n\r\nmacos working code:\r\n```solidity\r\n        address contract31337 = deployments.readAddress(string.concat(contractName, \".31337\"));\r\n\r\n```\r\n\r\nOtherwise, I have this kind of error (sample running without the `\"$.\"`prefix on linux): \r\n```bash\r\n    ├─ [0] VM::parseJson(<JSON file>, MockERC20.31337) [staticcall]\r\n    │   └─ ← \"path error: \r\n$MockERC20.31337\r\n\r\n```\r\n\r\nAs you can see, on linux we need to have the prefix `\"$.\"`.\r\n\r\nIs this something i'm missing or a bug ?\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6807/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6807/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
