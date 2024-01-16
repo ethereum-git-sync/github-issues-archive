@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": {
     "login": "ChristopherDedominici",
     "id": 18092467,
@@ -87,10 +87,10 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-09-27T04:19:57Z",
-  "updated_at": "2023-10-17T15:00:35Z",
+  "updated_at": "2024-01-16T00:14:15Z",
   "closed_at": "2023-10-17T15:00:34Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Describe the feature\r\n\r\nI'm running multiple hardhat nodes in different ports like: 0.0.0.0:8545, ...:8546, ...\r\nMy scripts is something like this and I use it in a nestjs project\r\n```\r\nimport * as hre from 'hardhat';\r\n\r\nasync execute(port: number, from: string, to: string, txData: any) {\r\n       // const provider = new hre.ethers.JsonRpcProvider(`http://0.0.00:${port}`);\r\n       // change hre.ethers.provider => provider\r\n        const sender = await hre.ethers.getImpersonatedSigner(from);\r\n        const txData = {\r\n          to: to,\r\n          data: txData,\r\n        };\r\n    const tx = await sender.sendTransaction(txData);\r\n}\r\n```\r\nhardhat.config.js\r\n```\r\nmodule.exports = {\r\n  defaultNetwork: \"localhost1\",\r\n  solidity: \"0.8.19\",\r\n  networks: {\r\n    localhost1: {\r\n      url: \"http://127.0.0.1:8545\",\r\n    },\r\n    localhost2: {\r\n      url: \"http://127.0.0.1:8546\",\r\n    },\r\n  },\r\n}\r\n```\r\nI tried: \r\n```\r\nhre.ethers.provider = provider;\r\n```\r\nand the issue is: \r\n```\r\nType 'JsonRpcProvider' is missing the following properties from type 'HardhatEthersProvider': _hardhatProvider, _networkName, _isHardhatNetworkCached, _latestBlockNumberPolled, and 25 more\r\n```\r\n\r\nMy issue is: I can't change hre.ethers.provider to my custom provider, it always point to the default network came from hardhat config is localhost1. Is there anyway to set provider for hre?\r\nI know we can change provider of sender by `sender.connect(provider)`, but `hre.ethers.getImpersonatedSigner` still point to localhost1 and I will get error `unknown account`. I want to change provider inside hre.\r\n\r\n### Search terms\r\n\r\n_No response_",
   "closed_by": {
     "login": "fvictorio",
