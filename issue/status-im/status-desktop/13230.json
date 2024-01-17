@@ -1,0 +1,94 @@
+{
+  "url": "https://api.github.com/repos/status-im/status-desktop/issues/13230",
+  "repository_url": "https://api.github.com/repos/status-im/status-desktop",
+  "labels_url": "https://api.github.com/repos/status-im/status-desktop/issues/13230/labels{/name}",
+  "comments_url": "https://api.github.com/repos/status-im/status-desktop/issues/13230/comments",
+  "events_url": "https://api.github.com/repos/status-im/status-desktop/issues/13230/events",
+  "html_url": "https://github.com/status-im/status-desktop/issues/13230",
+  "id": 2085801416,
+  "node_id": "I_kwDOD5KrTM58Us3I",
+  "number": 13230,
+  "title": "StatusQ: Create generic proxy model `AggregateModel`",
+  "user": {
+    "login": "micieslak",
+    "id": 20650004,
+    "node_id": "MDQ6VXNlcjIwNjUwMDA0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20650004?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/micieslak",
+    "html_url": "https://github.com/micieslak",
+    "followers_url": "https://api.github.com/users/micieslak/followers",
+    "following_url": "https://api.github.com/users/micieslak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/micieslak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/micieslak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/micieslak/subscriptions",
+    "organizations_url": "https://api.github.com/users/micieslak/orgs",
+    "repos_url": "https://api.github.com/users/micieslak/repos",
+    "events_url": "https://api.github.com/users/micieslak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/micieslak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 2087353959,
+      "node_id": "MDU6TGFiZWwyMDg3MzUzOTU5",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/ui-team",
+      "name": "ui-team",
+      "color": "1111ff",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 3047427135,
+      "node_id": "MDU6TGFiZWwzMDQ3NDI3MTM1",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/feature",
+      "name": "feature",
+      "color": "0E8A16",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 6192722821,
+      "node_id": "LA_kwDOD5KrTM8AAAABcR1zhQ",
+      "url": "https://api.github.com/repos/status-im/status-desktop/labels/E:Desktop%20Qt%20Proxy%20Models%20Library",
+      "name": "E:Desktop Qt Proxy Models Library",
+      "color": "F4790A",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-17T09:46:14Z",
+  "updated_at": "2024-01-17T09:46:15Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "# Description\r\n\r\nProxy allowing to compute single value from a submodel. E.g. when top-level model contains rows representing tokens by token symbol and has role holding submodel storing balances per chain, it's useful to have a sum of all per-chain balances as a top-level role. This proxy is intended to provide possibility of adding such roles based on submodels in an effective and dynamic way.\r\n\r\nPossible API/example of usage:\r\n\r\n```\r\nListModel {\r\n    id: srcModel\r\n    \r\n    ListElement {\r\n        tookenName: \"ETH\"\r\n\r\n        balances: [\r\n            ListElement { chainId: \"1\", balance: 3 },\r\n            ListElement { chainId: \"2\",  balance: 4 },\r\n            ListElement { chainId: \"31\", balance: 2 }\r\n        ]\r\n    }\r\n    \r\n    ListElement {\r\n        tookenName: \"SNT\"\r\n        color2: \"red2\"\r\n\r\n        balances: [\r\n            ListElement { chainId: \"2\", balance: 42 }\r\n        ]\r\n    }\r\n    \r\n    ListElement {\r\n        tookenName: \"DAI\"\r\n\r\n        balances: [\r\n            ListElement { chainId: \"1\",  balance: 4 },\r\n            ListElement { chainId: \"3\", balance: 9 }\r\n        ]\r\n    }\r\n}\r\n\r\n\r\nAggregationModel {\r\n    sourceModel: srcModel\r\n\r\n    aggregations: [\r\n        Aggregation {\r\n            submodelRole: \"balances\"\r\n            aggregateRoleName: \"totalBalance\"\r\n    \r\n            initialValue: 0\r\n    \r\n            submodelAggregationRule: function(accumulator, model) {\r\n                return accumulator + model.balance \r\n            }\r\n        }\r\n    ]\r\n}\r\n```\r\n\r\nExpected output model:\r\n```\r\nListModel {\r\n    ListElement {\r\n        tookenName: \"ETH\"\r\n\r\n        totalBalance: 9\r\n        balances: [\r\n            ListElement { chainId: \"1\", balance: 3 },\r\n            ListElement { chainId: \"2\",  balance: 4 },\r\n            ListElement { chainId: \"31\", balance: 2 }\r\n        ]\r\n    }\r\n    \r\n    ListElement {\r\n        tookenName: \"SNT\"\r\n        color2: \"red2\"\r\n\r\n        totalBalance: 42\r\n        balances: [\r\n            ListElement { chainId: \"2\", balance: 42 }\r\n        ]\r\n    }\r\n    \r\n    ListElement {\r\n        tookenName: \"DAI\"\r\n\r\n        totalBalance: 13\r\n        balances: [\r\n            ListElement { chainId: \"1\",  balance: 4 },\r\n            ListElement { chainId: \"3\", balance: 9 }\r\n        ]\r\n    }\r\n}\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/13230/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/13230/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
