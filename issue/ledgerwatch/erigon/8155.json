@@ -79,7 +79,7 @@
   "milestone": null,
   "comments": 7,
   "created_at": "2023-09-08T00:41:02Z",
-  "updated_at": "2024-01-17T00:37:16Z",
+  "updated_at": "2024-01-17T03:42:19Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -477,9 +477,9 @@
       "site_admin": false
     },
     "created_at": "2024-01-17T00:37:15Z",
-    "updated_at": "2024-01-17T00:37:15Z",
+    "updated_at": "2024-01-17T03:42:19Z",
     "author_association": "NONE",
-    "body": "Using v2.56.2 from the dockerhub image **thorax/erigon:v2.56.2**.\r\nBuild info from logs:\r\n\r\n```\r\nerigon-0 [INFO] [01-16|16:15:18.755] Build info                               git_branch=heads/v2.56.2 git_tag=v2.56.2-dirty git_commit=c9216ce10451a235af1cdde572642eac3640fadf\r\n```\r\n\r\nI'm seeing a connection refused on the metrics port+path from the logs even from within the host itself or from external hosts:\r\n\r\nIn the logs I see it attempted to enable metrics:\r\n```\r\nerigon-0 [INFO] [01-16|16:15:18.755] Enabling metrics export to prometheus    path=http://127.0.0.1:6060/debug/metrics/prometheus\r\n```\r\n\r\nYet, when I query that endpoint from within the container/pod I get this:\r\n\r\n```\r\n$ wget http://127.0.0.1:6060/debug/metrics/prometheus\r\nConnecting to 127.0.0.1:6060 (127.0.0.1:6060)\r\nwget: can't open 'prometheus': Permission denied\r\n\r\n# the port seems alive though:\r\n$ wget http://127.0.0.1:6060/foo\r\nConnecting to 127.0.0.1:6060 (127.0.0.1:6060)\r\nwget: server returned error: HTTP/1.1 404 Not Found\r\n```\r\n\r\n\r\nAny ideas?  \r\nHow can I help?",
+    "body": "EDIT: This was my mistake. In case anyone else has trouble, I had to set the following args to the erigon CLI:\r\n\r\n```\r\n'--metrics.addr=0.0.0.0'\r\n'--metrics.port=6060'\r\n```\r\nThen I saw in the logs `[INFO] [01-16|19:37:40.763] Enabling metrics export to prometheus    path=http://0.0.0.0:6060/debug/metrics/` (instead the notable bit being 0.0.0.0 instead of 127.0.0.1. And Prometheus worked.\r\n\r\nMy original issue below:\r\n---\r\nUsing v2.56.2 from the dockerhub image **thorax/erigon:v2.56.2**.\r\nBuild info from logs:\r\n\r\n```\r\nerigon-0 [INFO] [01-16|16:15:18.755] Build info                               git_branch=heads/v2.56.2 git_tag=v2.56.2-dirty git_commit=c9216ce10451a235af1cdde572642eac3640fadf\r\n```\r\n\r\nI'm seeing a connection refused on the metrics port+path from the logs even from within the host itself or from external hosts:\r\n\r\nIn the logs I see it attempted to enable metrics:\r\n```\r\nerigon-0 [INFO] [01-16|16:15:18.755] Enabling metrics export to prometheus    path=http://127.0.0.1:6060/debug/metrics/prometheus\r\n```\r\n\r\nYet, when I query that endpoint from within the container/pod I get this:\r\n\r\n```\r\n$ wget http://127.0.0.1:6060/debug/metrics/prometheus\r\nConnecting to 127.0.0.1:6060 (127.0.0.1:6060)\r\nwget: can't open 'prometheus': Permission denied\r\n\r\n# the port seems alive though:\r\n$ wget http://127.0.0.1:6060/foo\r\nConnecting to 127.0.0.1:6060 (127.0.0.1:6060)\r\nwget: server returned error: HTTP/1.1 404 Not Found\r\n```\r\n\r\n\r\nAny ideas?  \r\nHow can I help?",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1894742958/reactions",
       "total_count": 0,
