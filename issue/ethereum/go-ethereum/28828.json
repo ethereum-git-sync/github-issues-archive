@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28828",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28828/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28828/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28828/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28828",
+  "id": 2086411963,
+  "node_id": "I_kwDOAOvK9858XB67",
+  "number": 28828,
+  "title": "Unstable block generation rate of Ethereum private chain",
+  "user": {
+    "login": "lpx-single",
+    "id": 75900633,
+    "node_id": "MDQ6VXNlcjc1OTAwNjMz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/75900633?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lpx-single",
+    "html_url": "https://github.com/lpx-single",
+    "followers_url": "https://api.github.com/users/lpx-single/followers",
+    "following_url": "https://api.github.com/users/lpx-single/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lpx-single/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lpx-single/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lpx-single/subscriptions",
+    "organizations_url": "https://api.github.com/users/lpx-single/orgs",
+    "repos_url": "https://api.github.com/users/lpx-single/repos",
+    "events_url": "https://api.github.com/users/lpx-single/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lpx-single/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 268304226,
+      "node_id": "MDU6TGFiZWwyNjgzMDQyMjY=",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:docs",
+      "name": "type:docs",
+      "color": "fef2c0",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-17T15:17:22Z",
+  "updated_at": "2024-01-17T15:17:22Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "Hi, everyone. I recently built an Ethereum private chain(clique) with two nodes.  I want to measure the block rate of this private chain. The genesis file is as follows:\r\n```\r\n{\r\n  \"config\": {\r\n    \"chainId\": 53783,\r\n    \"homesteadBlock\": 0,\r\n    \"eip150Block\": 0,\r\n    \"eip155Block\": 0,\r\n    \"eip158Block\": 0,\r\n    \"byzantiumBlock\": 0,\r\n    \"constantinopleBlock\": 0,\r\n    \"petersburgBlock\": 0,\r\n    \"istanbulBlock\": 0,\r\n    \"muirGlacierBlock\": 0,\r\n    \"berlinBlock\": 0,\r\n    \"londonBlock\": 0,\r\n    \"arrowGlacierBlock\": 0,\r\n    \"grayGlacierBlock\": 0,\r\n    \"clique\": {\r\n      \"period\": 0,\r\n      \"epoch\": 30000\r\n    }\r\n  },\r\n  \"difficulty\": \"1\",\r\n  \"gasLimit\": \"80000000000000\",\r\n  \"extradata\": \"0x0000000000000000000000000000000000000000000000000000000000000000111111111111111111111111111111111111111122222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\r\n  \"alloc\": {\r\n    \"1111111111111111111111111111111111111111\": { \"balance\": \"500000000000000000000\" },\r\n    \"2222222222222222222222222222222222222222\": { \"balance\": \"500000000000000000000\" }\r\n  }\r\n}\r\n```\r\n\r\nThe topology of the private chain is as follows:\r\n![topology](https://github.com/ethereum/go-ethereum/assets/75900633/937990c0-0418-4f2e-98b7-75bac4edc688)\r\nMy idea is as follows: let Node1(server1) frequently initiate transactions to Node2(server2) for a certain period of time, I used the following code on server1 to achieve this behaviour:\r\n```\r\ni = 1\r\nnonce = 0\r\nwhile (i == 1) {\r\n  eth.sendTransaction({\r\n    from: eth.accounts[0],                                   //node1\r\n    to: '0x2222222222222222222222222222222222222222',        //node2\r\n    value: 10,\r\n    nonce: nonce++\r\n    })\r\n  for (let j = 0; j < 30000; ++j) {\r\n  }\r\n}\r\n```\r\nThen I count the block generation rate per minute during this period, and then obtain the block generation rate of the private chain.\r\n\r\nHowever, when I repeated the experiment, I found that the block rate fluctuated greatly for each experiment. Sometimes, the private chain generates blocks smoothly and records a smaller number of transactions per block. Sometimes, the block production speed of the private chain fluctuates greatly, and blocks that record a large number of transactions and are produced slowly appear frequently. In the first case, the block output rate is faster and the second case has a slower rate.\r\n\r\nMy questions are: 1) Why do the same experiments in the same experimental environment lead to different block generation situations. Is this a normal phenomenon?2) If this is normal, is there any way to more accurately measure the block production rate of the private chain I built?\r\n\r\n*More details:*\r\n***experiment enviroment:***\r\n```\r\nGeth\r\nVersion: 1.13.5-stable\r\nGit Commit: 916d6a441a866cb618ae826c220866de118899f7\r\nArchitecture: amd64\r\nGo Version: go1.21.4\r\nOperating System: linux\r\nGOPATH=\r\nGOROOT=\r\n```\r\n***Running private minners command:***\r\n```\r\ngeth --datadir node1 --port 30306 --bootnodes enode://410cccae8f204f84f5415d80dbf888ee76ddc59550846ccb9839e38ab285597c7fff7ddfd7200d0e7fb34e3018b87eee4d392c6ee0165f62adec40546fe3bd02@192.168.50.11:0?discport=30305 --networkid 53783 --unlock 0x1111111111111111111111111111111111111111 --password node1/password.txt --authrpc.port 8551 --mine --miner.etherbase 0x1111111111111111111111111111111111111111\r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28828/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28828/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
