@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6319",
+  "repository_url": "https://api.github.com/repos/ChainSafe/lodestar",
+  "labels_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6319/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6319/comments",
+  "events_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6319/events",
+  "html_url": "https://github.com/ChainSafe/lodestar/issues/6319",
+  "id": 2085883145,
+  "node_id": "I_kwDOCD5_Gc58VA0J",
+  "number": 6319,
+  "title": "CodeError: Handler already registered for protocol",
+  "user": {
+    "login": "nflaig",
+    "id": 38436224,
+    "node_id": "MDQ6VXNlcjM4NDM2MjI0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/38436224?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nflaig",
+    "html_url": "https://github.com/nflaig",
+    "followers_url": "https://api.github.com/users/nflaig/followers",
+    "following_url": "https://api.github.com/users/nflaig/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nflaig/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nflaig/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nflaig/subscriptions",
+    "organizations_url": "https://api.github.com/users/nflaig/orgs",
+    "repos_url": "https://api.github.com/users/nflaig/repos",
+    "events_url": "https://api.github.com/users/nflaig/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nflaig/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 5670219610,
+      "node_id": "LA_kwDOCD5_Gc8AAAABUfivWg",
+      "url": "https://api.github.com/repos/ChainSafe/lodestar/labels/meta-bug",
+      "name": "meta-bug",
+      "color": "E79553",
+      "default": false,
+      "description": "Issues that identify a bug and require a fix."
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-17T10:29:03Z",
+  "updated_at": "2024-01-17T10:29:04Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "### Describe the bug\n\nOn my Lodestar v1.14.0-rc.1 node I am also seeing a bunch of snappy errors\r\n\r\n```\r\nJan-17 06:32:00.009[network]         error: Error on ReqResp.registerProtocol protocolID=/eth2/beacon_chain/req/ping/1/ssz_snappy - Handler already registered for protocol /eth2/beacon_chain/req/ping/1/ssz_snappy\r\nCodeError: Handler already registered for protocol /eth2/beacon_chain/req/ping/1/ssz_snappy\r\n    at DefaultRegistrar.handle (file:///usr/app/node_modules/libp2p/dist/src/registrar.js:52:19)\r\n    at file:///usr/app/node_modules/libp2p/dist/src/libp2p.js:279:45\r\n    at Array.map (<anonymous>)\r\n    at Libp2pNode.handle (file:///usr/app/node_modules/libp2p/dist/src/libp2p.js:278:37)\r\n    at ReqRespBeaconNode.registerProtocol (file:///usr/app/packages/reqresp/lib/ReqResp.js:61:28)\r\n    at ReqRespBeaconNode.registerProtocolsAtFork (file:///usr/app/packages/beacon-node/lib/network/reqresp/ReqRespBeaconNode.js:70:18)\r\n    at NetworkCore.onEpoch (file:///usr/app/packages/beacon-node/lib/network/core/networkCore.js:73:42)\r\n    at Clock.emit (node:events:526:35)\r\n    at Clock.onNextSlot [as _onTimeout] (file:///usr/app/packages/beacon-node/lib/util/clock.js:34:26)\r\n    at listOnTimeout (node:internal/timers:573:17)\r\nJan-17 06:32:00.010[network]         error: Error on ReqResp.registerProtocol protocolID=/eth2/beacon_chain/req/metadata/2/ssz_snappy - Handler already registered for protocol /eth2/beacon_chain/req/metadata/2/ssz_snappy\r\nCodeError: Handler already registered for protocol /eth2/beacon_chain/req/metadata/2/ssz_snappy\r\n    at DefaultRegistrar.handle (file:///usr/app/node_modules/libp2p/dist/src/registrar.js:52:19)\r\n    at file:///usr/app/node_modules/libp2p/dist/src/libp2p.js:279:45\r\n    at Array.map (<anonymous>)\r\n    at Libp2pNode.handle (file:///usr/app/node_modules/libp2p/dist/src/libp2p.js:278:37)\r\n    at ReqRespBeaconNode.registerProtocol (file:///usr/app/packages/reqresp/lib/ReqResp.js:61:28)\r\n    at ReqRespBeaconNode.registerProtocolsAtFork (file:///usr/app/packages/beacon-node/lib/network/reqresp/ReqRespBeaconNode.js:70:18)\r\n    at NetworkCore.onEpoch (file:///usr/app/packages/beacon-node/lib/network/core/networkCore.js:73:42)\r\n    at Clock.emit (node:events:526:35)\r\n    at Clock.onNextSlot [as _onTimeout] (file:///usr/app/packages/beacon-node/lib/util/clock.js:34:26)\r\n    at listOnTimeout (node:internal/timers:573:17)\r\n\r\n\r\n.... there are a bunch more\r\n```\r\n\r\nThis was right before the dencun fork epoch log\r\n```\r\nJan-17 06:32:02.218[chain]            info: Activating blobs epoch=231680\r\n```\r\n\r\n\r\nMaybe related on how we subscribe / unsubscribe?\r\n\r\n```\r\nJan-17 06:19:12.004[network]          info: Subscribing gossip topics before fork nextFork=deneb\r\nJan-17 06:19:12.007[network]          info: Suscribing to long lived attnets to next fork nextFork=deneb, subnets=49,50\r\nJan-17 06:19:12.008[network]          info: Suscribing to random attnets to next fork nextFork=deneb\r\n...\r\nJan-17 06:44:48.002[network]          info: Unsubscribing gossip topics from prev fork prevFork=capella\r\nJan-17 06:44:48.004[network]          info: Unsuscribing to long lived attnets from prev fork prevFork=capella\r\nJan-17 06:44:48.007[network]          info: Unsuscribing to random attnets from prev fork prevFork=capella\r\n```\r\n\n\n### Expected behavior\n\nNo \"CodeError: Handler already registered for protocol\" errors\n\n### Steps to reproduce\n\nRun Lodestar beacon node through capella <> deneb fork transition\n\n### Additional context\n\n_No response_\n\n### Operating system\n\nLinux\n\n### Lodestar version or commit hash\n\nv1.14.0-rc.1",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6319/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ChainSafe/lodestar/issues/6319/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
