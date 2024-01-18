@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2024-01-17T18:06:19Z",
-  "updated_at": "2024-01-17T18:06:19Z",
-  "closed_at": null,
+  "updated_at": "2024-01-18T03:04:36Z",
+  "closed_at": "2024-01-18T03:04:36Z",
   "author_association": "NONE",
   "active_lock_reason": null,
-  "body": "I downloaded the latest archive snapshots \r\n\r\n`https://datadirs.optimism.io/mainnet-2024-01-03.tar.zst`\r\n\r\nbelow are the errors \r\n\r\n**OP-geth error**\r\n\r\n```\r\n systemd[1]: op-geth.service: Scheduled restart job, restart counter is at 3.\r\n systemd[1]: Stopped Optimism Geth Node Service.\r\n systemd[1]: Started Optimism Geth Node Service.\r\n geth[802120]: INFO [01-17|16:53:47.463] Starting geth on an OP network...        network=op-mainnet\r\n geth[802120]: INFO [01-17|16:53:47.464] Bumping default cache on mainnet         provided=1024 updated=4096\r\n geth[802120]: INFO [01-17|16:53:47.465] Maximum peer count                       ETH=0 LES=0 total=0\r\n geth[802120]: INFO [01-17|16:53:47.467] Smartcard socket not found, disabling    err=\"stat /run/pcscd/pcscd.comm: no such file or directory\"\r\ngeth[802120]: INFO [01-17|16:53:47.469] Enabling recording of key preimages since archive mode is used\r\n geth[802120]: WARN [01-17|16:53:47.470] Disabled transaction unindexing for archive node\r\n geth[802120]: INFO [01-17|16:53:47.470] Set global gas cap                       cap=50,000,000\r\n geth[802120]: INFO [01-17|16:53:47.471] Initializing the KZG library             backend=gokzg\r\n geth[802120]: INFO [01-17|16:53:47.490] Allocated trie memory caches             clean=1.20GiB dirty=0.00B\r\n geth[802120]: INFO [01-17|16:53:47.490] Using pebble as the backing database\r\n geth[802120]: INFO [01-17|16:53:47.490] Allocated cache and file handles         database=/data/datadir/geth/chaindata cache=2.00GiB handles=2048\r\n geth[802120]: INFO [01-17|16:53:47.504] Opened ancient database                  database=/data/datadir/geth/chaindata/ancient/chain readonly=false\r\n geth[802120]: INFO [01-17|16:53:47.504] State scheme set to already existing     scheme=hash\r\n geth[802120]: Fatal: Failed to register the Ethereum service: database contains incompatible genesis (have d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3, new 7ca38a1916c42007829c55e69d3e9a73265554b586a499015373241b8a3fa48b)\r\n systemd[1]: op-geth.service: Main process exited, code=exited, status=1/FAILURE\r\n systemd[1]: op-geth.service: Failed with result 'exit-code'.\r\n```\r\n\r\n\r\nService file flags (I have separate l2geth ndoe too.)\r\n\r\n`ExecStart=/home/ubuntu/op-geth/build/bin/geth --datadir=/data/datadir --http --http.port=8545 --http.addr=0.0.0.0 --authrpc.addr=localhost --authrpc.jwtsecret=./jwt.txt --verbosity=3 --rollup.sequencerhttp=https://mainnet-sequencer.optimism.io/ --nodiscover --syncmode=full --maxpeers=0  --op-network=op-mainnet --rollup.historicalrpc=http://10.199.11.3:8546 --gcmode archive\r\n`\r\n\r\n\r\n**Op-node error**\r\n\r\n```\r\n systemd[1]: Started Optimism Node Service.\r\n op-node[801494]: t=2024-01-17T16:51:03+0000 lvl=info msg=\"Not opted in to ProtocolVersions signal loading, disabling ProtocolVersions contract now.\"\r\n op-node[801494]: t=2024-01-17T16:51:03+0000 lvl=info msg=\"Rollup Config\" l2_chain_id=10 l2_network=OP-Mainnet l1_chain_id=1 l1_network=mainnet l2_start_time=1,686,068,903 l2_block_hash=0xdbf6a80fef073de06add9b0d14026d6e5a86c85f6d102c36d3d8e9cf89c2afd3 l2_block_number=105,235,063 l1_block_hash=0x438335a20d98863a4c0c97999eb2481921ccd28553eac6f913af7c12aec04108 l1_block_number=17,422,590 regolith_time=\"@ genesis\" canyon_time=\"@ 1704992401 ~ Thu Jan 11 17:00:01 UTC 2024\" delta_time=\"(not configured)\" eclipse_time=\"(not configured)\" fjord_time=\"(not configured)\" interop_time=\"(not configured)\"\r\n op-node[801494]: t=2024-01-17T16:51:03+0000 lvl=info msg=\"Initializing rollup node\" version=v0.0.0-f2229b8b-1703194093\r\n op-node[801494]: t=2024-01-17T16:51:04+0000 lvl=eror msg=\"Error initializing the rollup node\" err=\"failed to init L2: failed to get L2 genesis blockhash: failed to determine L2BlockRef of height 105235063, could not get payload: not found\"\r\n op-node[801494]: t=2024-01-17T16:51:04+0000 lvl=crit msg=\"Application failed\"                 message=\"failed to setup: unable to create the rollup node: failed to init L2: failed to get L2 genesis blockhash: failed to determine L2BlockRef of height 105235063, could not get payload: not found\"\r\nsystemd[1]: op-node.service: Main process exited, code=exited, status=1/FAILURE\r\nsystemd[1]: op-node.service: Failed with result 'exit-code'.\r\n```\r\n\r\n\r\n**Service file flags'**\r\n\r\n`ExecStart=/home/ubuntu/optimism/op-node/bin/op-node         --l1=https://ethereum.xxxx.xyz/ethmainnetnvl?apikey=xxxxxx         --l1.rpckind=basic         --l2=ws://localhost:8551         --l2.jwt-secret=./jwt.txt         --network=op-mainnet         --rpc.addr=0.0.0.0         --rpc.port=8547`\r\n\r\n\r\nplease advice ",
-  "closed_by": null,
+  "body": "I downloaded the latest archive snapshots \r\n\r\n`https://datadirs.optimism.io/mainnet-2024-01-03.tar.zst`\r\n\r\nbelow are the errors \r\n\r\n**OP-geth error**\r\n\r\n```\r\n  geth[802120]: Fatal: Failed to register the Ethereum service: database contains incompatible genesis (have d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3, new 7ca38a1916c42007829c55e69d3e9a73265554b586a499015373241b8a3fa48b)\r\n\r\n```\r\n\r\n\r\nService file flags (I have separate l2geth ndoe too.)\r\n\r\n`ExecStart=/home/ubuntu/op-geth/build/bin/geth --datadir=/data/datadir --http --http.port=8545 --http.addr=0.0.0.0 --authrpc.addr=localhost --authrpc.jwtsecret=./jwt.txt --verbosity=3 --rollup.sequencerhttp=https://mainnet-sequencer.optimism.io/ --nodiscover --syncmode=full --maxpeers=0  --op-network=op-mainnet --rollup.historicalrpc=http://10.199.11.3:8546 --gcmode archive\r\n`\r\n\r\n\r\n**Op-node error**\r\n\r\n```\r\nl1_block_number=17,422,590 regolith_time=\"@ genesis\" canyon_time=\"@ 1704992401 ~ Thu Jan 11 17:00:01 UTC 2024\" delta_time=\"(not configured)\" eclipse_time=\"(not configured)\" fjord_time=\"(not configured)\" interop_time=\"(not configured)\"\r\n op-node[801494]: t=2024-01-17T16:51:03+0000 lvl=info msg=\"Initializing rollup node\" version=v0.0.0-f2229b8b-1703194093\r\n op-node[801494]: t=2024-01-17T16:51:04+0000 lvl=eror msg=\"Error initializing the rollup node\" err=\"failed to init L2: failed to get L2 genesis blockhash: failed to determine L2BlockRef of height 105235063, could not get payload: not found\"\r\n op-node[801494]: t=2024-01-17T16:51:04+0000 lvl=crit msg=\"Application failed\"                 message=\"failed to setup: unable to create the rollup node: failed to init L2: failed to get L2 genesis blockhash: failed to determine L2BlockRef of height 105235063, could not get payload: not found\"\r\n.\r\n```\r\n\r\n\r\n**Service file flags'**\r\n\r\n`ExecStart=/home/ubuntu/optimism/op-node/bin/op-node         --l1=https://ethereum.xxxx.xyz/ethmainnetnvl?apikey=xxxxxx         --l1.rpckind=basic         --l2=ws://localhost:8551         --l2.jwt-secret=./jwt.txt         --network=op-mainnet         --rpc.addr=0.0.0.0         --rpc.port=8547`\r\n\r\n\r\nplease advice ",
+  "closed_by": {
+    "login": "danlix2000",
+    "id": 51103503,
+    "node_id": "MDQ6VXNlcjUxMTAzNTAz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/51103503?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/danlix2000",
+    "html_url": "https://github.com/danlix2000",
+    "followers_url": "https://api.github.com/users/danlix2000/followers",
+    "following_url": "https://api.github.com/users/danlix2000/following{/other_user}",
+    "gists_url": "https://api.github.com/users/danlix2000/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/danlix2000/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/danlix2000/subscriptions",
+    "organizations_url": "https://api.github.com/users/danlix2000/orgs",
+    "repos_url": "https://api.github.com/users/danlix2000/repos",
+    "events_url": "https://api.github.com/users/danlix2000/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/danlix2000/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/9044/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ethereum-optimism/optimism/issues/9044/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
