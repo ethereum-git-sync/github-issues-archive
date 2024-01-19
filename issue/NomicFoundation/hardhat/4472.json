@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": {
     "login": "fvictorio",
     "id": 417134,
@@ -87,10 +87,10 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2023-10-13T07:37:02Z",
-  "updated_at": "2023-10-20T14:10:34Z",
+  "updated_at": "2024-01-19T00:14:23Z",
   "closed_at": "2023-10-20T14:10:33Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\n\n2.18.1\n\n### What happened?\n\nGenerated typechain-types code has multiple events error!\r\n\r\n**My suggestion is to perform deduplication before generating the code.**\n\n### Minimal reproduction steps\n\n```solidity\r\nlibrary LibDiamond {\r\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\r\n\r\n    function setContractOwner(address _newOwner) internal {\r\n        emit OwnershipTransferred(previousOwner, _newOwner);\r\n    }\r\n\r\n    function contractOwner() internal view returns (address contractOwner_) {\r\n        contractOwner_ = diamondStorage().contractOwner;\r\n    }\r\n}\r\n\r\ncontract OwnershipFacet is IERC173 {\r\n    function transferOwnership(address _newOwner) external override {\r\n        LibDiamond.setContractOwner(_newOwner);\r\n    }\r\n\r\n    function owner() external override view returns (address owner_) {\r\n        owner_ = LibDiamond.contractOwner();\r\n    }\r\n}\r\n```\n\n### Search terms\n\n_No response_",
   "closed_by": {
     "login": "fvictorio",
