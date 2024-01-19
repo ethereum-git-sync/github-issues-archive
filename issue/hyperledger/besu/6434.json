@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6434",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6434/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6434/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6434/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6434",
+  "id": 2089772240,
+  "node_id": "I_kwDODE2jmc58j2TQ",
+  "number": 6434,
+  "title": "Implementing Account abstraction[ERC-4337] in besu",
+  "user": {
+    "login": "bhargav55",
+    "id": 10611664,
+    "node_id": "MDQ6VXNlcjEwNjExNjY0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10611664?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/bhargav55",
+    "html_url": "https://github.com/bhargav55",
+    "followers_url": "https://api.github.com/users/bhargav55/followers",
+    "following_url": "https://api.github.com/users/bhargav55/following{/other_user}",
+    "gists_url": "https://api.github.com/users/bhargav55/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/bhargav55/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/bhargav55/subscriptions",
+    "organizations_url": "https://api.github.com/users/bhargav55/orgs",
+    "repos_url": "https://api.github.com/users/bhargav55/repos",
+    "events_url": "https://api.github.com/users/bhargav55/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/bhargav55/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-19T06:59:29Z",
+  "updated_at": "2024-01-19T07:24:43Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Description\r\nI am trying to implement Account abstraction in Besu but it  doesnt seem to work. Getting transaction reverted error. I am not using bundlers for now, I am directly interacting with entrypoint just to check the support of erc-4337. \r\n\r\n\r\n### Steps to Reproduce (Bug)\r\n1. install besu 23.10.3 or 23.4.4\r\n2. setup besu network with 4 nodes\r\n3. deploy entryPoint, paymaster and simple account contracts from here https://github.com/eth-infinitism/account-abstraction\r\n4. Deposit funds to entrypoint from paymaster, create userop object and interact with entrypoint contract method handleOps.\r\n\r\n**Expected behavior:** \r\nTransaction should execute using funds from entry point\r\n\r\n**Actual behavior:** [What actually happens]\r\nTransaction is reverted with error \"Executed Reverted\"/ \"CALL_EXCEPTION\"\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\n100%\r\n\r\n### Logs (if a bug)\r\nPlease post relevant logs from Besu (and the consensus client, if running proof of stake) from before and after the issue. \r\nNo transaction error logs from besu, transaction is committed in a block without any error, I changed logging level to TRACE and checked the logs. below are the logs,\r\n`2024-01-17 11:32:36.049+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MainnetTransactionProcessor | Incremented sender 0x0819bbae96c2c0f15477d212e063303221cf24b9 nonce (105 -> 106)\r\n2024-01-17 11:32:36.049+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MainnetTransactionProcessor | Deducted sender 0x0819bbae96c2c0f15477d212e063303221cf24b9 upfront gas cost 0x0000000000000000000000000000000000000000000000000000e00230021800 (0x0000000000000000000000000000000000000000000000010c5c89e679bd4e00 -> 0x0000000000000000000000000000000000000000000000010c5ba9e449bb3600)\r\n2024-01-17 11:32:36.049+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MainnetTransactionProcessor | Gas available for execution 137004 = 164200 - 27196 - 0 (limit -intrinsic - accessList)\r\n2024-01-17 11:32:36.049+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Executing message-call\r\n2024-01-17 11:32:36.049+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Message call from 0x0819bbae96c2c0f15477d212e063303221cf24b9 to 0xbecb383c5f24a4b73d57b78e5335bf781587bc41 has zero value: no fund transferred\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Executing message-call\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Message call from 0xbecb383c5f24a4b73d57b78e5335bf781587bc41 to 0x1e78983374ca282e20ab085adc448ff6b6d91b73 has zero value: no fund transferred\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Executing message-call\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Message call from 0xbecb383c5f24a4b73d57b78e5335bf781587bc41 to 0x1e78983374ca282e20ab085adc448ff6b6d91b73 has zero value: no fund transferred\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Executing message-call\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Message call from 0x1e78983374ca282e20ab085adc448ff6b6d91b73 to 0x0000000000000000000000000000000000000001 has zero value: no fund transferred\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Successful message call of 0xbecb383c5f24a4b73d57b78e5335bf781587bc41 to 0x1e78983374ca282e20ab085adc448ff6b6d91b73 (Gas remaining: 104850)\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Successful message call of 0xbecb383c5f24a4b73d57b78e5335bf781587bc41 to 0x1e78983374ca282e20ab085adc448ff6b6d91b73 (Gas remaining: 106585)\r\n2024-01-17 11:32:36.050+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Executing message-call\r\n2024-01-17 11:32:36.051+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MessageCallProcessor | Message call from 0xbecb383c5f24a4b73d57b78e5335bf781587bc41 to 0xbecb383c5f24a4b73d57b78e5335bf781587bc41 has zero value: no fund transferred\r\n2024-01-17 11:32:36.051+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MainnetTransactionProcessor | Gas used by transaction: 86449, by message call/contract creation: 59253\r\n2024-01-17 11:32:36.051+00:00 | BftProcessorExecutor-QBFT-0 | TRACE | MainnetTransactionProcessor | refunded sender 0x0819bbae96c2c0f15477d212e063303221cf24b9  0x00000000000000000000000000000000000000000000000000006a12391a9900 wei (0x0000000000000000000000000000000000000000000000010c5ba9e449bb3600 -> 0x0000000000000000000000000000000000000000000000010c5c13f682d5cf00)\r\n2024-01-17 11:32:36.052+00:00 | EthScheduler-Services-0 | TRACE | LayeredPendingTransactions | Managing new added block 220295 (0xdc269f1fb9169fed0831f58ea350d2c4ecb429496e7fb3f84e5fd50f4387031b)\r\n`\r\n\r\n### Versions (Add all that apply)\r\n* Software version: besu version 23.10.3 or 23.4.4\r\n* Java version: openjdk version \"21.0.1\" \r\n* OS Name & Version: AWS Linux\r\n\r\n### Smart contract information (If you're reporting an issue arising from deploying or calling a smart contract, please supply related information)\r\n* Solidity version : 0.8.12\r\n\r\n### Additional Information (Add any of the following or anything else that may be relevant)\r\nattached configFile for the network\r\n[config.json](https://github.com/hyperledger/besu/files/13985568/config.json)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6434/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6434/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
