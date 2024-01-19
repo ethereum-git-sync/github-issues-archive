@@ -32,21 +32,40 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 1,
+  "comments": 2,
   "created_at": "2024-01-11T09:21:38Z",
-  "updated_at": "2024-01-11T09:23:04Z",
-  "closed_at": null,
+  "updated_at": "2024-01-19T13:06:10Z",
+  "closed_at": "2024-01-19T13:06:10Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "The debug log is spammed with thousands of messages like these:\r\n\r\n```\r\n[DBUG] [01-10|22:39:27.032] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.032] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.032] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.032] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.229] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.230] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.328] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.379] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.379] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.428] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.429] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.429] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n[DBUG] [01-10|22:39:27.500] Could not retrieve state: Missing header missing=0xba54b1a82f935d0508f7fd6a5c523ec38295c16ab28f5a8f7bba60c530eb7e0b\r\n```\r\n\r\nIn this case the header is the same, but it is produced for other headers as well.\r\nThe timestamps are very close like if it was a live loop polling.\r\n\r\nThe log has missing 63 headers with 268764 total log messages during 4 hours of running.\r\n\r\nRunning devel @ 95109d980058ddb327e4199eae362184580bf1cb on mainnet with:\r\n\r\n```\r\n--prune=htrc\r\n--internalcl\r\n```\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Giulio2002",
+    "id": 29233688,
+    "node_id": "MDQ6VXNlcjI5MjMzNjg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29233688?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Giulio2002",
+    "html_url": "https://github.com/Giulio2002",
+    "followers_url": "https://api.github.com/users/Giulio2002/followers",
+    "following_url": "https://api.github.com/users/Giulio2002/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Giulio2002/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Giulio2002/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Giulio2002/subscriptions",
+    "organizations_url": "https://api.github.com/users/Giulio2002/orgs",
+    "repos_url": "https://api.github.com/users/Giulio2002/repos",
+    "events_url": "https://api.github.com/users/Giulio2002/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Giulio2002/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9207/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9207/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -96,6 +115,50 @@
     "body": "CC @Giulio2002 ",
     "reactions": {
       "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1886698014/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1900397151",
+    "html_url": "https://github.com/ledgerwatch/erigon/issues/9207#issuecomment-1900397151",
+    "issue_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9207",
+    "id": 1900397151,
+    "node_id": "IC_kwDOC0FsAM5xRcJf",
+    "user": {
+      "login": "Giulio2002",
+      "id": 29233688,
+      "node_id": "MDQ6VXNlcjI5MjMzNjg4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29233688?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Giulio2002",
+      "html_url": "https://github.com/Giulio2002",
+      "followers_url": "https://api.github.com/users/Giulio2002/followers",
+      "following_url": "https://api.github.com/users/Giulio2002/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Giulio2002/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Giulio2002/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Giulio2002/subscriptions",
+      "organizations_url": "https://api.github.com/users/Giulio2002/orgs",
+      "repos_url": "https://api.github.com/users/Giulio2002/repos",
+      "events_url": "https://api.github.com/users/Giulio2002/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Giulio2002/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-19T13:06:10Z",
+    "updated_at": "2024-01-19T13:06:10Z",
+    "author_association": "COLLABORATOR",
+    "body": "Fixed",
+    "reactions": {
+      "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/comments/1900397151/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
