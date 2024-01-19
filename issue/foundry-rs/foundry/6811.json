@@ -40,21 +40,40 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2024-01-16T06:32:48Z",
-  "updated_at": "2024-01-17T10:38:05Z",
-  "closed_at": null,
+  "updated_at": "2024-01-19T13:49:39Z",
+  "closed_at": "2024-01-19T13:49:39Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nForge\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (293fad7 2024-01-14T00:19:14.283768427Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nforge test\r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nIt seems the speed of createSelectFork when using it like `createSelectFork(rpcUrl, transactionHash)` heavily depends on the the order of set transaction within the block. In the below test the [0xe55 transaction](https://etherscan.io/tx/0xe55a899b252090c71988e0c069e75b7df468d7110993e89937cec29a2d503a9d) is the first transaction in eth mainnet block [19017590](https://etherscan.io/block/19017590) and [0x8e4 transaction](https://etherscan.io/tx/0x8e456439e743e9d85b4444e6221d395f4e6079acc4a392c0b1ca03e11a4f0e2b) is the last (137th) transaction in that same block. the code below attempts to create a fork at each of these transactions. the output of the code will be something like:\r\n\r\n![image](https://github.com/foundry-rs/foundry/assets/5106107/f493687f-30da-414b-b0b5-61703f5565ba)\r\n\r\n~340ms for last transaction, ~10ms for first transaction a significant degradation for later transactions.\r\n\r\nP.S. replace `valid-rpc-url` by your rpc url\r\n\r\nP.S. depending on your eth node's history retention and the time you run the below test the test might fail if the node does not keep the whole blockchain history. so to test just go to [ethscan blocks](https://etherscan.io/blocks) select latest block and then select first transaction hash and last transaction hash and replace below.\r\n\r\n```solidity\r\n// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.21;\r\n\r\nimport {console,Test} from \"forge-std/Test.sol\";\r\n\r\ncontract EntryTest is Test {\r\n\r\n    function testStart() public {\r\n        uint s1 = vm.unixTime();\r\n        vm.createSelectFork('ws://valid-rpc-url', vm.parseBytes32('0x8e456439e743e9d85b4444e6221d395f4e6079acc4a392c0b1ca03e11a4f0e2b')); // last tx\r\n        uint s2 = vm.unixTime();\r\n        vm.createSelectFork('ws://valid-rpc-url', vm.parseBytes32('0xe55a899b252090c71988e0c069e75b7df468d7110993e89937cec29a2d503a9d')); // first tx\r\n        uint s3 = vm.unixTime();\r\n        console.log(\"T1\", s2 - s1); // ~340ms\r\n        console.log(\"T2\", s3 - s2); // ~10ms\r\n    }\r\n}\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "DaniPopes",
+    "id": 57450786,
+    "node_id": "MDQ6VXNlcjU3NDUwNzg2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/57450786?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/DaniPopes",
+    "html_url": "https://github.com/DaniPopes",
+    "followers_url": "https://api.github.com/users/DaniPopes/followers",
+    "following_url": "https://api.github.com/users/DaniPopes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/DaniPopes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/DaniPopes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/DaniPopes/subscriptions",
+    "organizations_url": "https://api.github.com/users/DaniPopes/orgs",
+    "repos_url": "https://api.github.com/users/DaniPopes/repos",
+    "events_url": "https://api.github.com/users/DaniPopes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/DaniPopes/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6811/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6811/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -192,6 +211,50 @@
     "body": "when a tx is executed we need to fetch every unknown slot, so basically every SLOAD and account access is translated into rpc requests, which can easily lead to ratelimiting by the provider",
     "reactions": {
       "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1895536868/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1900459585",
+    "html_url": "https://github.com/foundry-rs/foundry/issues/6811#issuecomment-1900459585",
+    "issue_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6811",
+    "id": 1900459585,
+    "node_id": "IC_kwDOGBlvNc5xRrZB",
+    "user": {
+      "login": "DaniPopes",
+      "id": 57450786,
+      "node_id": "MDQ6VXNlcjU3NDUwNzg2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57450786?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/DaniPopes",
+      "html_url": "https://github.com/DaniPopes",
+      "followers_url": "https://api.github.com/users/DaniPopes/followers",
+      "following_url": "https://api.github.com/users/DaniPopes/following{/other_user}",
+      "gists_url": "https://api.github.com/users/DaniPopes/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/DaniPopes/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/DaniPopes/subscriptions",
+      "organizations_url": "https://api.github.com/users/DaniPopes/orgs",
+      "repos_url": "https://api.github.com/users/DaniPopes/repos",
+      "events_url": "https://api.github.com/users/DaniPopes/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/DaniPopes/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-19T13:49:39Z",
+    "updated_at": "2024-01-19T13:49:39Z",
+    "author_association": "MEMBER",
+    "body": "Closing as expected behavior due to rate limiting.",
+    "reactions": {
+      "url": "https://api.github.com/repos/foundry-rs/foundry/issues/comments/1900459585/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
