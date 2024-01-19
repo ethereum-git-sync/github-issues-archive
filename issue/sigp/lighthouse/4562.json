@@ -49,7 +49,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "realbigsean",
@@ -94,14 +94,33 @@
     }
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-08-02T00:07:26Z",
-  "updated_at": "2023-10-17T02:34:42Z",
-  "closed_at": null,
+  "updated_at": "2024-01-19T18:02:28Z",
+  "closed_at": "2024-01-19T18:02:27Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\n#4426 shifts a lot of the network configuration constants into the configuration file. There are some configurations still remaining to shift. One is the `max_request_blocks` configuration. \r\n\r\nThis one is a little bit trickier because we have specified a `MaxRequestBlocks` type as `typenum::U1024` and we use it inside an `ssz_types::VariableList`. \r\n\r\nThe way that I see we can remedy this, is in most cases to use a `VariableList<_,Usize::max>` kind of deal. The second type parameter just sets an upper bound on how many elements we can ssz decode. Although it would be nice to set this to whatever is in the configuration file, this might not be easy to do. There are two easy paths:\r\n1. We can set some upper limit, which the configuration file cannot exceed. i.e `U1024`. The configuration can set lower bounds and it will be fine. \r\n2. We leave the struct unbounded by setting the largest possible value there. \r\n\r\nIn principle, if we are careful, we shouldn't need to rely on this type to limit the number of elements to decode. The inbound RPC should be bounded by the configuration file and we shouldn't be adding excess elements anyway. So although this type bound is nice, it shouldn't be strictly necessary, provided we have the checks when reading or requesting these objects on the RPC. \r\n\r\nThis needs to be checked. \r\n\r\nAlso open to any other solutions people may have. Maybe we can convert an arbitrary uint from configuration to its closest (rounded up) typenum and use that value?",
-  "closed_by": null,
+  "closed_by": {
+    "login": "realbigsean",
+    "id": 5160426,
+    "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/realbigsean",
+    "html_url": "https://github.com/realbigsean",
+    "followers_url": "https://api.github.com/users/realbigsean/followers",
+    "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+    "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+    "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+    "repos_url": "https://api.github.com/users/realbigsean/repos",
+    "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4562/reactions",
     "total_count": 0,
@@ -116,7 +135,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4562/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -195,6 +214,50 @@
     "body": "I've started working on this. Essentially going with this suggestion:\r\n\r\n> We leave the struct unbounded by setting the largest possible value there.\r\n\r\nExcept in implementation, I'm making a wrapper around a vec that does the length check and requires it at construction and during decoding. Looks like this:\r\n\r\n**EDIT: I initially had `from_ssz_bytes` wrong here (corrected now), it's a little more complicated than I thought. Could be made easier if we made a helper method in the ssz crate. But I'm no longer sure this is worth doing over using a really big vec**\r\n\r\n```\r\nuse ssz::{Decode, Encode};\r\nuse ssz_derive::Encode;\r\n\r\n#[derive(Debug, Clone, PartialEq, Encode)]\r\n#[ssz(struct_behaviour = \"transparent\")]\r\npub struct RuntimeVariableList<T: Encode> {\r\n    vec: Vec<T>,\r\n    #[ssz(skip_serializing, skip_deserializing)]\r\n    max_len: usize,\r\n}\r\n\r\nimpl<T: Encode + Decode + Clone> RuntimeVariableList<T> {\r\n    pub fn new(vec: Vec<T>, max_len: usize) -> Result<Self, ssz_types::Error> {\r\n        if vec.len() <= max_len {\r\n            Ok(Self { vec, max_len })\r\n        } else {\r\n            Err(ssz_types::Error::OutOfBounds {\r\n                i: vec.len(),\r\n                len: max_len,\r\n            })\r\n        }\r\n    }\r\n\r\n    pub fn to_vec(&self) -> Vec<T> {\r\n        self.vec.clone()\r\n    }\r\n\r\n    pub fn len(&self) -> usize {\r\n        self.vec.len()\r\n    }\r\n\r\n    pub fn from_ssz_bytes(bytes: &[u8], max_len: usize) -> Result<Self, ssz::DecodeError> {\r\n        let vec = if bytes.is_empty() {\r\n            vec![]\r\n        } else if T::is_ssz_fixed_len() {\r\n            let num_items = bytes\r\n                .len()\r\n                .checked_div(T::ssz_fixed_len())\r\n                .ok_or(ssz::DecodeError::ZeroLengthItem)?;\r\n\r\n            if num_items > max_len {\r\n                return Err(ssz::DecodeError::BytesInvalid(format!(\r\n                    \"VariableList of {} items exceeds maximum of {}\",\r\n                    num_items, max_len\r\n                )));\r\n            }\r\n\r\n            bytes\r\n                .chunks(T::ssz_fixed_len())\r\n                .try_fold(Vec::with_capacity(num_items), |mut vec, chunk| {\r\n                    vec.push(T::from_ssz_bytes(chunk)?);\r\n                    Ok(vec)\r\n                })\r\n                .map(Into::into)\r\n        } else {\r\n            ssz::decode_list_of_variable_length_items(bytes, Some(max_len))?\r\n        };\r\n        Ok(Self { vec, max_len })\r\n    }\r\n}\r\n\r\n``` ",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1760312725/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1900856270",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4562#issuecomment-1900856270",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4562",
+    "id": 1900856270,
+    "node_id": "IC_kwDOCFeAzc5xTMPO",
+    "user": {
+      "login": "realbigsean",
+      "id": 5160426,
+      "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/realbigsean",
+      "html_url": "https://github.com/realbigsean",
+      "followers_url": "https://api.github.com/users/realbigsean/followers",
+      "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+      "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+      "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+      "repos_url": "https://api.github.com/users/realbigsean/repos",
+      "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-19T18:02:28Z",
+    "updated_at": "2024-01-19T18:02:28Z",
+    "author_association": "COLLABORATOR",
+    "body": "implemented in https://github.com/sigp/lighthouse/pull/4841",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1900856270/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
