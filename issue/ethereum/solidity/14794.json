@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14794",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14794/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14794/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14794/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14794",
+  "id": 2092594371,
+  "node_id": "I_kwDOAm_5kc58unTD",
+  "number": 14794,
+  "title": "Add nuances of .codehash usage to the documentation",
+  "user": {
+    "login": "ustas-eth",
+    "id": 82833595,
+    "node_id": "MDQ6VXNlcjgyODMzNTk1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/82833595?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ustas-eth",
+    "html_url": "https://github.com/ustas-eth",
+    "followers_url": "https://api.github.com/users/ustas-eth/followers",
+    "following_url": "https://api.github.com/users/ustas-eth/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ustas-eth/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ustas-eth/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ustas-eth/subscriptions",
+    "organizations_url": "https://api.github.com/users/ustas-eth/orgs",
+    "repos_url": "https://api.github.com/users/ustas-eth/repos",
+    "events_url": "https://api.github.com/users/ustas-eth/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ustas-eth/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 275027668,
+      "node_id": "MDU6TGFiZWwyNzUwMjc2Njg=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/documentation%20:book:",
+      "name": "documentation :book:",
+      "color": "006b75",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-21T13:49:39Z",
+  "updated_at": "2024-01-21T13:49:39Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Page\r\n\r\nhttps://docs.soliditylang.org/en/v0.8.23/types.html#members-of-addresses\r\n\r\n## Abstract\r\n`addr.codehash` output depends on the `addr` balance. It'll output 0 if the balance is 0 (and `addr` doesn't have any code, of course). Otherwise, if the balance is > 0, it'll output `keccak256(\"\")`.\r\n\r\nThe issue might be considered a bug because the existing documentation treats `.codehash` as an equivalent of `keccak256(addr.code)`, which, as you can see below in the PoC, has a different output.\r\n\r\nPoC:\r\n```solidity\r\npragma solidity 0.8.23;\r\n\r\ncontract Test1 {\r\n    address subject = address(123);\r\n\r\n    function getCodehash()\r\n        external\r\n        payable\r\n        returns (\r\n            bytes32 codeHashBefore,\r\n            bytes32 codeHashAfter,\r\n            bytes32 hashBefore,\r\n            bytes32 hashAfter\r\n        )\r\n    {\r\n        hashBefore = subject.codehash;\r\n        codeHashBefore = keccak256(subject.code);\r\n\r\n        payable(subject).transfer(1);\r\n\r\n        hashAfter = subject.codehash;\r\n        codeHashAfter = keccak256(subject.code);\r\n    }\r\n}\r\n```\r\n\r\nThe function's output:\r\n```json\r\n{\r\n\t\"0\": \"bytes32: codeHashBefore 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\",\r\n\t\"1\": \"bytes32: codeHashAfter 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\",\r\n\t\"2\": \"bytes32: hashBefore 0x0000000000000000000000000000000000000000000000000000000000000000\",\r\n\t\"3\": \"bytes32: hashAfter 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\"\r\n}\r\n```\r\n\r\nAlso, see this report: https://code4rena.com/reports/2023-10-wildcat#h-02-codehash-check-in-factory-contracts-does-not-account-for-non-empty-addresses\r\n\r\n## Pull request\r\n\r\nhttps://github.com/ethereum/solidity/pull/14793\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14794/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14794/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
