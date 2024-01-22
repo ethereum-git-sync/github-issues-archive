@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6873",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6873/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6873/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6873/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6873",
+  "id": 2093136064,
+  "node_id": "I_kwDOGBlvNc58wrjA",
+  "number": 6873,
+  "title": "Anvil's gas response for trace_debugTransaction is inconsistent with geth's responses for tracer 'callTracer'",
+  "user": {
+    "login": "prasincs",
+    "id": 40477,
+    "node_id": "MDQ6VXNlcjQwNDc3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/40477?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/prasincs",
+    "html_url": "https://github.com/prasincs",
+    "followers_url": "https://api.github.com/users/prasincs/followers",
+    "following_url": "https://api.github.com/users/prasincs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/prasincs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/prasincs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/prasincs/subscriptions",
+    "organizations_url": "https://api.github.com/users/prasincs/orgs",
+    "repos_url": "https://api.github.com/users/prasincs/repos",
+    "events_url": "https://api.github.com/users/prasincs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/prasincs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-22T05:49:54Z",
+  "updated_at": "2024-01-22T05:50:20Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nAnvil\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [ ] Foundry\r\n- [ ] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nforge 0.2.0 (03f5a95 2024-01-17T16:52:30.332226795Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nanvil \r\n\r\n### Operating System\r\n\r\nLinux\r\n\r\n### Describe the bug\r\n\r\nThe original behavior here is inconsistent with geth. To validate this - I ran geth devnet and ran two curl commands after making a trivial transfer in geth console \r\n\r\n```\r\neth.sendTransaction({from: eth.coinbase, to: \"0xb26Dc5174FFBeDD212247f258F53d16A1FECa444\", value: web3.toWei(5, \"ether\")})\r\n\"0xe75c4a7d51af886595c16d531f11d71675d73deca3b81a41b235f20c63c0bcac\"\r\n```\r\n\r\nWhen you call `debug_traceTransaction` without any additional params, note that the gas is in uint64 without hex encoding\r\ncurl -H \"Content-Type: application/json\" --data '{\"method\":\"debug_traceTransaction\",\"params\":[\"0xe75c4a7d51af886595c16d531f11d71675d73deca3b81a41b235f20c63c0bcac\"], \"id\":1,\"jsonrpc\":\"2.0\"}' http://localhost:8545\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"gas\":21000,\"failed\":false,\"returnValue\":\"\",\"structLogs\":[]}}\r\n\r\n\r\nHowever, when you call with calltracer, gas is in hex\r\n```\r\ncurl -H \"Content-Type: application/json\" --data '{\"method\":\"debug_traceTransaction\",\"params\":[\"0xe75c4a7d51af886595c16d531f11d71675d73deca3b81a41b235f20c63c0bcac\", {\"tracer\": \"callTracer\"}], \"id\":1,\"jsonrpc\":\"2.0\"}' http://localhost:8545\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"from\":\"0x6bf51811c63eba59c232a07bd89c37016ad2620f\",\"gas\":\"0x5208\",\"gasUsed\":\"0x5208\",\"to\":\"0xb26dc5174ffbedd212247f258f53d16a1feca444\",\"input\":\"0x\",\"value\":\"0x4563918244f40000\",\"type\":\"CALL\"}}\r\n```\r\n\r\nHowever, when you use anvil (and I'll jump to mainnet impersonation test described in https://book.getfoundry.sh/tutorials/forking-mainnet-with-cast-anvil)\r\nthe instructions have gotten slightly outdated as the `$LUCKY_USER` has drained their $DAI, but we can still use the old block\r\n\r\n```\r\nanvil --fork-url https://mainnet.infura.io/v3/$INFURA_KEY@19013589\r\n```\r\n\r\nin another window \r\n```\r\nexport ALICE=0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266\r\nexport DAI=0x6b175474e89094c44da98b954eedeac495271d0f\r\nexport LUCKY_USER=0xad0135af20fa82e106607257143d0060a7eb5cbf\r\ncast rpc anvil_impersonateAccount $LUCKY_USER\r\ncast send $DAI \\\r\n—unlocked \\\r\n--from $LUCKY_USER \\\r\n  \"transfer(address,uint256)(bool)\" \\\r\n  $ALICE \\\r\n  300000000000000000000000\r\n```\r\n\r\nreturns\r\n\r\n```\r\nblockHash               0xa71fa8906bcc76873601589c94e7e54296633147eed17a49c3660602e9c88f8e\r\nblockNumber             19013590\r\ncontractAddress\r\ncumulativeGasUsed       47030\r\neffectiveGasPrice       26422153696\r\ngasUsed                 47030\r\nlogs                    [{\"address\":\"0x6b175474e89094c44da98b954eedeac495271d0f\",\"topics\":[\"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef\",\"0x000000000000000000000000ad0135af20fa82e106607257143d0060a7eb5cbf\",\"0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266\"],\"data\":\"0x000000000000000000000000000000000000000000003f870857a3e0e3800000\",\"blockHash\":\"0xa71fa8906bcc76873601589c94e7e54296633147eed17a49c3660602e9c88f8e\",\"blockNumber\":\"0x1221fd6\",\"transactionHash\":\"0xd4d6860b4e84f876ad942ae68de859789cc56e8cbc22ec90df88cd3a9b2aee7d\",\"transactionIndex\":\"0x0\",\"logIndex\":\"0x0\",\"removed\":false}]\r\nlogsBloom               0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800800000000000000000000000000000000000001000000000000000000000010000000000000000000000004000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000020000000000000000000000200200000000000000000000\r\n```\r\nso far good..\r\n\r\nNow if I trace this transaction, I get gas as a number - good.\r\n```\r\ncurl -H \"Content-Type: application/json\" --data '{\"method\":\"debug_traceTransaction\",\"params\": [\"0xd4d6860b4e84f876ad942ae68de859789cc56e8cbc22ec90df88cd3a9b2aee7d\"], \"id\":1,\"jsonrpc\":\"2.0\"}' http://localhost:8545\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"failed\":false,\"gas\":47030,\"returnValue\":\"0000000000000000000000000000000000000000000000000000000000000001\",\"structLogs\":[]}}\r\n```\r\nHowever with callTracer it's still a number and not in hex\r\n```\r\ncurl -H \"Content-Type: application/json\" --data '{\"method\":\"debug_traceTransaction\",\"params\": [\"0xd4d6860b4e84f876ad942ae68de859789cc56e8cbc22ec90df88cd3a9b2aee7d\", {\"tracer\": \"callTracer\"}], \"id\":1,\"jsonrpc\":\"2.0\"}' http://localhost:8545\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"failed\":false,\"gas\":47030,\"returnValue\":\"0000000000000000000000000000000000000000000000000000000000000001\",\"structLogs\":[]}}\r\n ```\r\nThis means any Go RPC Clients using the go-ethereum hexutil.Big or hexutil.Uint64 will fail because they expect the numbers to be in hex. This means that ansible cannot be used as a drop in replacement for clients using geth currently without also changing the type for gas to accept both int and hex string. \r\nI'm aware this is a quirk of geth and perhaps related to the calltracer being a javascript function, but if the goal is to make anvil drop in replacement for geth for development, it'd be good to replicate the behavior geth has. I'd love to fix geth upstream too but I'm not sure if the breakage for clients relying on this behavior is worth it.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6873/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6873/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
