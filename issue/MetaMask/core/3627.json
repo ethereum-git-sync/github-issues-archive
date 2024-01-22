@@ -8,7 +8,7 @@
   "id": 2029333079,
   "node_id": "I_kwDOCBB0Cc549SpX",
   "number": 3627,
-  "title": "Improve `ComposableController` typing for child controllers and allow lists",
+  "title": "[composable-controller] Make class and messenger generic upon child controllers",
   "user": {
     "login": "MajorLift",
     "id": 34228073,
@@ -47,13 +47,13 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2023-12-06T20:30:19Z",
-  "updated_at": "2024-01-22T14:36:09Z",
+  "updated_at": "2024-01-22T18:06:44Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "## Explanation\r\n\r\nEach `ComposableController` instance needs typing and allow lists that are specific to its set of child controllers.\r\n\r\nThis is new behavior that isn't supported by the `BaseController`, as controller-messenger allow lists are defined for the controller class singleton, not controller instances.\r\n\r\nTo achieve this, `ComposableController` and `ComposableControllerMessenger` need to be made polymorphic upon the `controllers` constructor property, which represents the list of child controllers to be composed. \r\n\r\n- A generic parameter `ControllerList` (or maybe `ChildControllers`) needs to be added to the `ComposableController` class.\r\n- `ControllerList` should be constrained, but not defined by the least supertype for all base-controller instances (currently `ControllerInstance`).\r\n- `ControllerList` should be used to derive the return type of `flatState()` at the type level.\r\n- `ControllerList` should be used to derive the allow lists of `ComposableControllerMessenger`. \r\n  - The allow lists should at minimum include the `stateChange` events for all child controllers that are used in the `#updateChildController()` method. \r\n\r\n## References\r\n\r\n- See https://github.com/MetaMask/core/issues/2082",
+  "body": "## Explanation\r\n\r\nCurrently, the allow lists of `ComposableControllerMessenger` are set to `string`, which is too permissive. Each `ComposableController` instance needs typing and allow lists that are specific to its set of input child controllers.\r\n\r\nHowever, there's no simple way to achieve this using `BaseController`, as controller-messenger allow lists are defined for the controller class singleton, not controller instances.\r\n\r\nInstead, `ComposableController` and `ComposableControllerMessenger` need to be made polymorphic upon the `controllers` constructor property, which represents the list of child controllers to be composed. \r\n\r\n## Requirements\r\n\r\n- A generic parameter `ControllerList` (or maybe `ChildControllers`) needs to be added to the `ComposableController` class and `ComposableControllerMessenger` type.\r\n- `ControllerList` should be constrained, but not defined by the least supertype for all base-controller instances (currently `ControllerInstance`).\r\n- ~`ControllerList` should be used to derive the return type of `flatState()` at the type level.~\r\n- `ControllerList` should be used to derive the state type for `ComposableController` instances.\r\n- `ControllerList` should be used to derive the allow lists of `ComposableControllerMessenger`. \r\n  - The allow lists should at minimum include the `stateChange` events for all child controllers that are subscribed to in the `#updateChildController()` method. \r\n\r\n## References\r\n\r\n- See https://github.com/MetaMask/core/pull/3590#discussion_r1414460107",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/MetaMask/core/issues/3627/reactions",
@@ -72,5 +72,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/MetaMask/core/issues/comments/1904514497",
+    "html_url": "https://github.com/MetaMask/core/issues/3627#issuecomment-1904514497",
+    "issue_url": "https://api.github.com/repos/MetaMask/core/issues/3627",
+    "id": 1904514497,
+    "node_id": "IC_kwDOCBB0Cc5xhJXB",
+    "user": {
+      "login": "desi",
+      "id": 15041,
+      "node_id": "MDQ6VXNlcjE1MDQx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15041?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/desi",
+      "html_url": "https://github.com/desi",
+      "followers_url": "https://api.github.com/users/desi/followers",
+      "following_url": "https://api.github.com/users/desi/following{/other_user}",
+      "gists_url": "https://api.github.com/users/desi/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/desi/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/desi/subscriptions",
+      "organizations_url": "https://api.github.com/users/desi/orgs",
+      "repos_url": "https://api.github.com/users/desi/repos",
+      "events_url": "https://api.github.com/users/desi/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/desi/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-22T17:52:26Z",
+    "updated_at": "2024-01-22T17:52:26Z",
+    "author_association": "NONE",
+    "body": "Hey team! Please [add your planning poker estimate](https://app.zenhub.com/workspaces/Shared-Libraries-621e46b4d7103800171d1b02/issues/MetaMask/core/3627?planning-poker) with Zenhub @Gudahtt @kanthesha @MajorLift @mcmire @mikesposito",
+    "reactions": {
+      "url": "https://api.github.com/repos/MetaMask/core/issues/comments/1904514497/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
