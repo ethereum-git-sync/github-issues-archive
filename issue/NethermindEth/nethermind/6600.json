@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6600",
+  "repository_url": "https://api.github.com/repos/NethermindEth/nethermind",
+  "labels_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6600/labels{/name}",
+  "comments_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6600/comments",
+  "events_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6600/events",
+  "html_url": "https://github.com/NethermindEth/nethermind/issues/6600",
+  "id": 2096421756,
+  "node_id": "I_kwDOBggaLc589Nt8",
+  "number": 6600,
+  "title": "No subtraces for transactions with multiple traces in `trace_filter` since 1.25.0",
+  "user": {
+    "login": "gituser",
+    "id": 104405,
+    "node_id": "MDQ6VXNlcjEwNDQwNQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/104405?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gituser",
+    "html_url": "https://github.com/gituser",
+    "followers_url": "https://api.github.com/users/gituser/followers",
+    "following_url": "https://api.github.com/users/gituser/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gituser/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gituser/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gituser/subscriptions",
+    "organizations_url": "https://api.github.com/users/gituser/orgs",
+    "repos_url": "https://api.github.com/users/gituser/repos",
+    "events_url": "https://api.github.com/users/gituser/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gituser/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-23T16:02:38Z",
+  "updated_at": "2024-01-23T16:42:09Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "**Description**\r\nI've found some weird issue in new Nethermind version 1.25.0.\r\n\r\nI'm getting only 1 subtrace by using `trace_filter` RPC call for transactions that usually generate a lot of subtraces, here is an example transaction: https://etherscan.io/tx/0xcd7474cf81adceb434710155f1cba74a39ea7af126df15acfd717ed13e56ed0e there should be like 12 subtraces, but I can see only 1.\r\n\r\nHere you can see traces for this particular transaction:\r\nv1.22.0: https://textbin.net/gx65samawt\r\nv1.25.0: https://textbin.net/cciqcn1dbr\r\n\r\nI'm running currently 1.22.0 as this is the only safe version to run due to the recent critical bug, but I've tested 1.23.0 and 1.24.0 and in both those versions tracing such transactions still worked fine.\r\nAlso could be that not only `trace_filter` is affected but other calls to, e.g. `trace_transaction`.\r\n\r\n**Steps to Reproduce**\r\n\r\nTo reproduce the issue:\r\n* first activate TraceStore plugin by adding\r\n```\r\n\"TraceStore\": {\r\n    \"Enabled\": true,\r\n    \"BlocksToKeep\": 50000,\r\n    \"TraceTypes\": \"Trace,Rewards\"\r\n  }\r\n``` \r\n\r\ninto your nethermind.cfg\r\n* then do a RPC call to `trace_filter` to get a trace for block [19070176](https://etherscan.io/block/19070176):\r\n```\r\nnm_version=1.22.0; start_block=19070176; end_block=$(($start_block)); start_block_hex=$(echo \"obase=16;$start_block\"|bc); end_block_hex=$(echo \"obase=16;$end_block\"|bc); time curl -s --data '{\"method\":\"trace_filter\",\"params\":[{\"fromBlock\":\"0x'$start_block_hex'\",\"toBlock\":\"0x'$end_block_hex'\"}],\"id\":1,\"jsonrpc\":\"2.0\"}' -H \"Content-Type: application/json\" -X POST localhost:8545 |json_pp> test_${start_block}_${end_block}_${nm_version}\r\n```\r\n\r\n* in case of testing to quickly get new blocks just get transactions from this page https://etherscan.io/address/0x7830c87c02e56aff27fa8ab1241711331fa86f43 transactions should transfer multiple tokens in 1 transaction\r\n\r\nThe regression is likely somewhere here: \r\nhttps://github.com/NethermindEth/nethermind/compare/1.24.0...1.25.0\r\nMost likely in this pull request - https://github.com/NethermindEth/nethermind/pull/6152\r\n\r\n**Actual behavior**\r\nTracing for multi subtrace transactions is broken in >=1.25.0.\r\n\r\n**Expected behavior**\r\nTracing should be same as it was in 1.22.0 or in 1.24.0.\r\n1.25.0 broke it.\r\n\r\n**Desktop (please complete the following information):**\r\nPlease provide the following information regarding your setup:\r\n - Operating System: Linux (Ubuntu 22.04 Jammy)\r\n - Version: >=1.25.0\r\n - Installation Method: source\r\n - Consensus Client: lighthouse\r\n\r\n**Additional context**\r\nI'm also attaching to this issue how entire block was traced in 1.22.0 vs 1.25.0 so you can pinpoint the differences and find out what broke it.\r\n\r\n**Logs**\r\nPlease include any relevant logs that may help identify the issue.\r\n[block_19070176_19070176_1.22.0.txt](https://github.com/NethermindEth/nethermind/files/14026757/block_19070176_19070176_1.22.0.txt)\r\n[block_19070176_19070176_1.25.0.txt](https://github.com/NethermindEth/nethermind/files/14026759/block_19070176_19070176_1.25.0.txt)\r\n[diff_block_19070176_1.22.0_1.25.0.txt](https://github.com/NethermindEth/nethermind/files/14026770/diff_block_19070176_1.22.0_1.25.0.txt)\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6600/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6600/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
