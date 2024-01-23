@@ -41,7 +41,7 @@
     }
   ],
   "state": "closed",
-  "locked": false,
+  "locked": true,
   "assignee": {
     "login": "schaable",
     "id": 1165424,
@@ -87,10 +87,10 @@
   "milestone": null,
   "comments": 2,
   "created_at": "2023-10-24T15:01:11Z",
-  "updated_at": "2023-10-24T15:19:22Z",
+  "updated_at": "2024-01-23T00:14:49Z",
   "closed_at": "2023-10-24T15:15:51Z",
   "author_association": "NONE",
-  "active_lock_reason": null,
+  "active_lock_reason": "resolved",
   "body": "### Version of Hardhat\n\n2.18.2\n\n### What happened?\n\nI'm writing test for my contract and all transferFrom call are failing with insuficient allowance even if the allowance is returning the correct value.\r\n\r\nThese transferFrom are tested by directly calling the contract as an account or as a contract and both fail.\r\n\r\nAll the logs indicate that the allowance is set.\r\n\r\nFor instance:\r\n\r\n```\r\n                const balance = await www3Shares.balanceOf(owner)\r\n                console.log(\"owner balance:\", balance)\r\n\r\n                await www3Shares.connect(owner).approve(www3Shares.target, ethers.parseEther(\"100\"))\r\n                const allowance = await www3Shares.allowance(owner.address, www3Shares.target)\r\n\r\n                console.log(\"allowance:\",allowance)\r\n                expect(await www3Shares.connect(owner).sellShares(ethers.parseEther(\"25\")))\r\n```\r\n\r\nThe logs are showing the correct balance and allowance.\r\n\r\nEven inside the contract itself;\r\n```\r\n        console.log(allowance(_msgSender(), address(this)));  // <-- log the same allowance as the test\r\n        transferFrom(_msgSender(), address(this), amount);\r\n```\r\nThe error i'm getting is (depending on the OZ version)\r\nInsufficient allowance with OZ < 5.0.0\r\nand \r\n`reverted with an unrecognized custom error (return data: 0xfb8f41b2000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000015af1d78b58c40000)`\r\n\r\nWith OZ 5.0.0\r\n\r\n\r\n\n\n### Minimal reproduction steps\n\nThis repo his a minimal example of the situation\r\n\r\n\r\nhttps://github.com/Madeindreams/transfer-case/tree/main\n\n### Search terms\n\n_No response_",
   "closed_by": {
     "login": "Madeindreams",
