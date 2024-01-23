@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 6,
   "created_at": "2024-01-06T19:38:21Z",
-  "updated_at": "2024-01-14T18:16:39Z",
-  "closed_at": null,
+  "updated_at": "2024-01-23T11:16:42Z",
+  "closed_at": "2024-01-23T11:16:42Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "Description\r\nWe are experiencing a high number of CLOSE_WAIT statuses on our Nethermind node. As observed using the command netstat -an | grep -i wait | wc -l, the count is at 1335. This issue indicates that while the remote client has closed the connection, our server-side Nethermind process has not yet acknowledged this closure, leading to a potential resource exhaustion.\r\n\r\nSteps to Reproduce\r\nTo replicate this issue, follow these steps:\r\n\r\nRun the Nethermind node normally.\r\nAfter some uptime, execute the command netstat -an | grep -i wait | wc -l to check the number of CLOSE_WAIT connections.\r\nObserve the number of connections that are in the CLOSE_WAIT status.\r\nActual behavior\r\nUpon executing the above steps, we observe a high number of CLOSE_WAIT statuses (1335). This is concerning as it suggests that the Nethermind node is not properly closing connections, leading to potential memory and resource leaks.\r\n\r\nExpected behavior\r\nThe expected behavior is that after a client closes a connection, the Nethermind node should properly close its end of the connection too, resulting in a very low number of CLOSE_WAIT statuses, ideally close to zero.\r\n\r\nScreenshots\r\nN/A (This issue is related to server-side network connection statuses and might not be adequately captured in screenshots.)\r\n\r\nDesktop (please complete the following information):\r\n\r\nOperating System: Ubuntu 22.04\r\nNethermind Version: 1.24.0\r\nInstallation Method: systemd\r\nConsensus Client: Lighthouse v4.5.0\r\n\r\nAdditional context\r\nThis issue seems to manifest after the node has been running for an extended period, suggesting it might be related to how long-running connections are managed.\r\n\r\nLogs\r\n2024-01-06 13:34:49.3910|INFO|Consensus.Processing.BlockchainProcessor|24|- Block throughput   82.99 MGas/s |   1014.21 t/s |          7.99 Blk/s | recv        0 | proc        0 \r\n2024-01-06 13:34:49.5910|INFO|Merge.Plugin.Handlers.ForkchoiceUpdatedHandler|94|Received ForkChoice: Head: 18949949 (0x451f3c...0eb329), Safe: 18949897 (0x176809...735e60), Finalized: 18949866 (0x398d75...5462d8) \r\n2024-01-06 13:34:49.5910|INFO|Merge.Plugin.Handlers.ForkchoiceUpdatedHandler|94|Synced chain Head to 18949949 (0x451f3c...0eb329) \r\n2024-01-06 13:34:57.9717|INFO|Network.PeerManager|5701|Removing 950 out of 10950 peer candidates (candidates cleanup). \r\n2024-01-06 13:34:58.9688|INFO|JsonRpc.JsonRpcLocalStats|5434|***** JSON RPC report *****\r\n-------------------------------------------------------------------------------------------------------------------------------------------------------------\r\nmethod                                  | successes |  avg time (µs) |  max time (µs) |    errors |  avg time (µs) |  max time (µs) | avg size | total size |\r\n-------------------------------------------------------------------------------------------------------------------------------------------------------------\r\nengine_forkchoiceUpdatedV2              |        26 |          40568 |         981417 |         0 |              0 |              0 |        0 |          0 | \r\nengine_getPayloadBodiesByRangeV1        |        56 |         375044 |        1270799 |         0 |              0 |              0 |        0 |          0 | \r\nengine_newPayloadV2                     |        25 |         488666 |         932409 |         0 |              0 |              0 |        0 |          0 | \r\neth_chainId                             |         5 |            145 |            178 |         0 |              0 |              0 |        0 |          0 | \r\neth_getBlockByNumber                    |        30 |          35266 |         402499 |         0 |              0 |              0 |        0 |          0 | \r\neth_getLogs                             |         5 |          13135 |          44512 |         0 |              0 |              0 |        0 |          0 | \r\neth_syncing                             |        25 |            167 |            328 |         0 |              0 |              0 |        0 |          0 | \r\n-------------------------------------------------------------------------------------------------------------------------------------------------------------\r\nTOTAL                                   |       172 |         205828 |        1270799 |         0 |              0 |              0 |        0 |          0 | \r\n-------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n \r\n2024-01-06 13:35:00.3859|INFO|Merge.Plugin.Handlers.NewPayloadHandler|5434|Received new block:  18949950 (0xdcbe11...d6ed57) \r\n2024-01-06 13:35:00.5735|INFO|Consensus.Processing.BlockchainProcessor|24|Processed            18949950     |    185.53 ms  |  slot     11,183 ms | Gas gwei: 18.53 .. 18.53 (19.96) .. 33.41 \r\n2024-01-06 13:35:00.5735|INFO|Consensus.Processing.BlockchainProcessor|24|- Block              12.14 MGas   |    135    txs |  calls    603 ( 13) | sload   2,109 | sstore    685 | create   0 \r\n2024-01-06 13:35:00.5735|INFO|Consensus.Processing.BlockchainProcessor|24|- Block throughput   65.45 MGas/s |    727.64 t/s |          5.39 Blk/s | recv        0 | proc        0 \r\n2024-01-06 13:35:00.7823|INFO|Merge.Plugin.Handlers.ForkchoiceUpdatedHandler|662|Received ForkChoice: Head: 18949950 (0xdcbe11...d6ed57), Safe: 18949897 (0x176809...735e60), Finalized: 18949866 (0x398d75...5462d8) \r\n2024-01-06 13:35:00.7823|INFO|Merge.Plugin.Handlers.ForkchoiceUpdatedHandler|662|Synced chain Head to 18949950 (0xdcbe11...d6ed57) \r\n2024-01-06 13:35:06.0722|INFO|Synchronization.Reporting.SyncReport|366|Peers | with best block: 101 | all: 101 | eth66 (4 %), eth67 (4 %), eth68 (92 %) | Active: None | Sleeping: All | Geth (52 %), Nethermind (37 %), Besu (5 %), Erigon (3 %), Reth (2 %), Unknown (1 %) \r\n2024-01-06 13:35:13.2348|INFO|Merge.Plugin.Handlers.NewPayloadHandler|94|Received new block:  18949951 (0xa9cdaf...6b352c) \r\n2024-01-06 13:35:13.5748|INFO|Consensus.Processing.BlockchainProcessor|24|Processed            18949951     |    337.59 ms  |  slot     13,001 ms | Gas gwei: 18.09 .. 18.22 (20.25) .. 64.90 \r\n2024",
-  "closed_by": null,
+  "closed_by": {
+    "login": "benaadams",
+    "id": 1142958,
+    "node_id": "MDQ6VXNlcjExNDI5NTg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1142958?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/benaadams",
+    "html_url": "https://github.com/benaadams",
+    "followers_url": "https://api.github.com/users/benaadams/followers",
+    "following_url": "https://api.github.com/users/benaadams/following{/other_user}",
+    "gists_url": "https://api.github.com/users/benaadams/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/benaadams/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/benaadams/subscriptions",
+    "organizations_url": "https://api.github.com/users/benaadams/orgs",
+    "repos_url": "https://api.github.com/users/benaadams/repos",
+    "events_url": "https://api.github.com/users/benaadams/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/benaadams/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6465/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/NethermindEth/nethermind/issues/6465/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
