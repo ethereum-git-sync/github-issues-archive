@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4850",
+  "repository_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts",
+  "labels_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4850/labels{/name}",
+  "comments_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4850/comments",
+  "events_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4850/events",
+  "html_url": "https://github.com/OpenZeppelin/openzeppelin-contracts/issues/4850",
+  "id": 2094904089,
+  "node_id": "I_kwDOA9tCBs583bMZ",
+  "number": 4850,
+  "title": "Redundant SSTORE in BeaconProxy constructor",
+  "user": {
+    "login": "kadenzipfel",
+    "id": 30579067,
+    "node_id": "MDQ6VXNlcjMwNTc5MDY3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/30579067?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kadenzipfel",
+    "html_url": "https://github.com/kadenzipfel",
+    "followers_url": "https://api.github.com/users/kadenzipfel/followers",
+    "following_url": "https://api.github.com/users/kadenzipfel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kadenzipfel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kadenzipfel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kadenzipfel/subscriptions",
+    "organizations_url": "https://api.github.com/users/kadenzipfel/orgs",
+    "repos_url": "https://api.github.com/users/kadenzipfel/repos",
+    "events_url": "https://api.github.com/users/kadenzipfel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kadenzipfel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-22T22:44:42Z",
+  "updated_at": "2024-01-22T22:44:42Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "https://github.com/OpenZeppelin/openzeppelin-contracts/pull/4435 introduced the usage of an immutable implementation address. However, it still makes use of `ERC1967Utils.upgradeBeaconToAndCall`, which sets the `BEACON_SLOT` to `newBeacon`. \r\n\r\n```solidity\r\nconstructor(address beacon, bytes memory data) payable {\r\n    ERC1967Utils.upgradeBeaconToAndCall(beacon, data);\r\n    _beacon = beacon;\r\n}\r\n```\r\n\r\n```solidity\r\nfunction upgradeBeaconToAndCall(address newBeacon, bytes memory data) internal {\r\n    _setBeacon(newBeacon);\r\n    emit BeaconUpgraded(newBeacon);\r\n\r\n    if (data.length > 0) {\r\n        Address.functionDelegateCall(IBeacon(newBeacon).implementation(), data);\r\n    } else {\r\n        _checkNonPayable();\r\n    }\r\n}\r\n```\r\n\r\n```solidity\r\nfunction _setBeacon(address newBeacon) private {\r\n    if (newBeacon.code.length == 0) {\r\n        revert ERC1967InvalidBeacon(newBeacon);\r\n    }\r\n\r\n    StorageSlot.getAddressSlot(BEACON_SLOT).value = newBeacon;\r\n\r\n    address beaconImplementation = IBeacon(newBeacon).implementation();\r\n    if (beaconImplementation.code.length == 0) {\r\n        revert ERC1967InvalidImplementation(beaconImplementation);\r\n    }\r\n}\r\n```\r\n\r\nSetting `BEACON_SLOT` here is redundant since we use an immutable implementation address.\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4850/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/OpenZeppelin/openzeppelin-contracts/issues/4850/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
