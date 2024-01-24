@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 3,
   "created_at": "2024-01-24T00:49:21Z",
-  "updated_at": "2024-01-24T04:33:55Z",
-  "closed_at": null,
+  "updated_at": "2024-01-24T17:29:21Z",
+  "closed_at": "2024-01-24T17:29:21Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "In the latest commit, `dbcf5c29cdbfd24757a1d6b4d67d76e9c56bd167`, we encountered an error that prevents the beacon node from starting up. To reproduce it, first run `--enable-experimental-backfill` `--force-clear-db`, then run `--enable-experimental-backfill` only for the second run. \r\n\r\nIt seems to me that the original root state was deleted during backfilling.\r\n\r\nLog:\r\n```\r\n[2024-01-23 09:12:03]  INFO Starting pprof server addr=http://127.0.0.1:6060/debug/pprof\r\n[2024-01-23 09:12:03]  INFO Finished reading JWT secret from /tmp/jwt.hex\r\n[2024-01-23 09:12:03]  WARN flags: Running on the Prater Testnet\r\n[2024-01-23 09:12:03]  WARN flags: Enabled feature flag enable-eip-4881=Enables the deposit tree specified in EIP-4881.\r\n[2024-01-23 09:12:03]  WARN node: In order to receive transaction fees from proposing blocks, you must provide flag --suggested-fee-recipient with a valid ethereum address when starting your beacon node. Please see our documentation for more information on this requirement (https://docs.prylabs.network/docs/execution-node/fee-recipient).\r\n[2024-01-23 09:12:03] DEBUG node: Starting DB\r\n[2024-01-23 09:12:03]  INFO node: Checking DB database-path=/Users/t/goerli/beaconchaindata\r\n[2024-01-23 09:12:03]  INFO db: Opening Bolt DB at /Users/t/goerli/beaconchaindata/beaconchain.db\r\n[2024-01-23 09:12:03]  WARN genesis: database contains genesis with htr=0x895390e92edc03df7096e9f51e51896e8dbe6e7e838180dadbfd869fdd77a659, ignoring remote genesis state parameter\r\n[2024-01-23 09:12:03]  WARN origin checkpoint root 0xb43ed4b7062d88a72ae9c087b36b12d9dbbb36101dbe57329f664ad7b6d24876 found in db, ignoring checkpoint sync flags\r\n[2024-01-23 09:12:03]  INFO node: Deposit contract: 0xff50ed3d0ec03ac01d4c79aad74928bff48a7b2b\r\n[2024-01-23 09:12:03] DEBUG node: Starting Slashing DB\r\n[2024-01-23 09:12:03] DEBUG node: Registering P2P Service\r\n[2024-01-23 09:12:03]  INFO p2p: Running node with peer id of 16Uiu2HAmQLbbtyP3mk3JWmBy7QT1ntoSntA6koJsrcXvETCgwPoG\r\n[2024-01-23 09:12:03] DEBUG p2p: ECDSA private key generated\r\n[2024-01-23 09:12:03] DEBUG node: Starting State Gen\r\n[2024-01-23 09:12:04] DEBUG state-gen: Replaying state diff=352 endSlot=7457120 startSlot=7456768\r\n[2024-01-23 09:12:05] DEBUG Warmed up pruner cache duration=2.083647792s\r\n[2024-01-23 09:12:12] DEBUG state-gen: Replayed state diff=352 duration=8.5425385s endSlot=7457120 startSlot=7456768\r\n[2024-01-23 09:12:12] DEBUG node: Registering POW Chain Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering Attestation Pool Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering Deterministic Genesis Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering Blockchain Service\r\n[2024-01-23 09:12:14] DEBUG blockchain: --weak-subjectivity-checkpoint not provided\r\n[2024-01-23 09:12:14] DEBUG node: Registering Initial Sync Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering Sync Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering Slasher Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering builder service\r\n[2024-01-23 09:12:14]  INFO Builder has been configured endpoint=https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-goerli.flashbots.net/\r\n[2024-01-23 09:12:14]  WARN Outsourcing block construction to external builders adds non-trivial delay to block propagation time.  Builder-constructed blocks or fallback blocks may get orphaned. Use at your own risk!\r\n[2024-01-23 09:12:14] DEBUG node: Registering RPC Service\r\n[2024-01-23 09:12:14]  INFO rpc: gRPC server listening on port address=127.0.0.1:4000\r\n[2024-01-23 09:12:14]  WARN rpc: You are using an insecure gRPC server. If you are running your beacon node and validator on the same machines, you can ignore this message. If you want to know how to enable secure connections, see: https://docs.prylabs.network/docs/prysm-usage/secure-grpc\r\n[2024-01-23 09:12:14] DEBUG node: Registering GRPC Gateway Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering Validator Monitoring Service\r\n[2024-01-23 09:12:14] DEBUG node: Registering Prometheus Service\r\n[2024-01-23 09:12:14]  INFO node: Starting beacon node version=Prysm/Unknown/Local build. Built at: Moments ago\r\n[2024-01-23 09:12:14] DEBUG registry: Starting 11 services: [*p2p.Service *backfill.Service *execution.Service *attestations.Service *blockchain.Service *initialsync.Service *sync.Service *builder.Service *rpc.Service *gateway.Gateway *prometheus.Service]\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *p2p.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *backfill.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *execution.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *attestations.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *blockchain.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *initialsync.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *sync.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *builder.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *rpc.Service\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *gateway.Gateway\r\n[2024-01-23 09:12:14] DEBUG registry: Starting service type *prometheus.Service\r\n[2024-01-23 09:12:14]  INFO blockchain: Blockchain data already exists in DB, initializing...\r\n[2024-01-23 09:12:14]  INFO initial-sync: Waiting for state to be initialized\r\n[2024-01-23 09:12:14] DEBUG state-gen: Populating pubkey cache\r\n[2024-01-23 09:12:14] DEBUG prometheus: Starting prometheus service address=127.0.0.1:8080\r\n[2024-01-23 09:12:14]  INFO rpc: Enabled debug gRPC endpoints\r\n[2024-01-23 09:12:14]  INFO gateway: Starting gRPC gateway address=127.0.0.1:3500\r\n[2024-01-23 09:12:15]  INFO initial-sync: Received state initialized event\r\n[2024-01-23 09:12:15]  INFO initial-sync: Starting initial chain sync...\r\n[2024-01-23 09:12:15] FATAL Unable to initialize backfill verifier, quitting. error=no state with blockroot=0xb43ed4b7062d88a72ae9c087b36b12d9dbbb36101dbe57329f664ad7b6d24876: state not found: not found in db\r\n```",
-  "closed_by": null,
+  "closed_by": {
+    "login": "terencechain",
+    "id": 21316537,
+    "node_id": "MDQ6VXNlcjIxMzE2NTM3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21316537?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/terencechain",
+    "html_url": "https://github.com/terencechain",
+    "followers_url": "https://api.github.com/users/terencechain/followers",
+    "following_url": "https://api.github.com/users/terencechain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/terencechain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/terencechain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/terencechain/subscriptions",
+    "organizations_url": "https://api.github.com/users/terencechain/orgs",
+    "repos_url": "https://api.github.com/users/terencechain/repos",
+    "events_url": "https://api.github.com/users/terencechain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/terencechain/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13515/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13515/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
