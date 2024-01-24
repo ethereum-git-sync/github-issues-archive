@@ -67,21 +67,40 @@
       "description": "ETA Q1 2024"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2024-01-23T06:14:47Z",
-  "updated_at": "2024-01-23T17:22:28Z",
-  "closed_at": null,
+  "updated_at": "2024-01-24T01:11:26Z",
+  "closed_at": "2024-01-24T01:11:25Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nBlobs stored during backfill are being stored in the hot DB. This is wrong, as they _should_ be in the dedicated `blobs_db` (see: https://github.com/sigp/lighthouse/pull/4892). Prior to that they should have been in the `freezer_db`, so this seems to have been messed up for a while.\r\n\r\nThe incorrect code is:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/5851027bfde24bc372c5143221c5e4d695197f82/beacon_node/beacon_chain/src/historical_blocks.rs#L123-L128\r\n\r\nThat batch is committed straight to the hot DB directly here:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/5851027bfde24bc372c5143221c5e4d695197f82/beacon_node/beacon_chain/src/historical_blocks.rs#L202\r\n\r\nThere's no usage of `do_atomically_with_block_and_blobs_cache`, which would have handled the division of ops between the blobs DB and the hot DB.\r\n\r\n## Version\r\n\r\nLighthouse v4.6.0-rc.0\r\n\r\n## Steps to resolve\r\n\r\nThis is reasonably involved to fix, we need to:\r\n\r\n- Write the blobs to the blobs DB in `import_historical_block_batch`.\r\n- Think about concurrency and crash safety for the _three_ different writes that need to happen in backfill. I think the safest order might be: blobs, hot, cold. Or we could use `do_atomically_with_block_and_blobs_cache`.\r\n- Increment the schema version to v19\r\n- Write a database migration for v18 -> v19 that copies blobs errantly stored in the hot DB to the blobs DB, and then deletes them from the hot DB.\r\n\r\nThe DB migration is required to fix up the databases of nodes on Goerli that were recently checkpoint synced and put the blobs in the wrong DB.\r\n\r\nI think we should block the v4.6.0 release for Sepolia/Holesky until we at least have a fix for where the blocks are written. It's _probably OK_ to do the schema migration later, as it will just affect some Goerli nodes. But the sooner we do it the better in some sense, as more data will accumulate.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/5114/reactions",
     "total_count": 0,
@@ -96,7 +115,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/5114/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -221,6 +240,50 @@
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1906557767/reactions",
       "total_count": 2,
       "+1": 2,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1907182273",
+    "html_url": "https://github.com/sigp/lighthouse/issues/5114#issuecomment-1907182273",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/5114",
+    "id": 1907182273,
+    "node_id": "IC_kwDOCFeAzc5xrUrB",
+    "user": {
+      "login": "michaelsproul",
+      "id": 4452260,
+      "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/michaelsproul",
+      "html_url": "https://github.com/michaelsproul",
+      "followers_url": "https://api.github.com/users/michaelsproul/followers",
+      "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+      "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+      "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+      "repos_url": "https://api.github.com/users/michaelsproul/repos",
+      "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-24T01:11:25Z",
+    "updated_at": "2024-01-24T01:11:25Z",
+    "author_association": "MEMBER",
+    "body": "Fixed by #5119",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1907182273/reactions",
+      "total_count": 0,
+      "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
