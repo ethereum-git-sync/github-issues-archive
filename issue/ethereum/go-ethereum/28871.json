@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28871",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28871/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28871/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28871/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28871",
+  "id": 2098471538,
+  "node_id": "I_kwDOAOvK9859FCJy",
+  "number": 28871,
+  "title": "Ethclient Log Subscription - Indefinite events on error channel after Unsubscribe()",
+  "user": {
+    "login": "vdamle",
+    "id": 5338861,
+    "node_id": "MDQ6VXNlcjUzMzg4NjE=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5338861?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vdamle",
+    "html_url": "https://github.com/vdamle",
+    "followers_url": "https://api.github.com/users/vdamle/followers",
+    "following_url": "https://api.github.com/users/vdamle/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vdamle/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vdamle/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vdamle/subscriptions",
+    "organizations_url": "https://api.github.com/users/vdamle/orgs",
+    "repos_url": "https://api.github.com/users/vdamle/repos",
+    "events_url": "https://api.github.com/users/vdamle/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vdamle/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-24T15:04:30Z",
+  "updated_at": "2024-01-24T15:04:30Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nGeth version: `v1.13.7`\r\nCL client & version: N/A (reporting a bug in the library)\r\nOS & Version: Linux\r\nCommit hash : N/A\r\n\r\n#### Expected behaviour\r\n\r\nAfter calling `Unsubscribe()` on a `ClientSubscription`, the caller expects to receive [one notification](https://github.com/ethereum/go-ethereum/blob/master/interfaces.go#L38-L42) on the error channel.\r\n\r\n#### Actual behaviour\r\n\r\nFor a `ClientSubscription` that is setup on a websocket instance of `ethclient` to  [SubscribeFilterLogs](https://github.com/ethereum/go-ethereum/blob/master/ethclient/ethclient.go#L437), after a call to `Unsubscribe()`, a loop to consume the error channel receives events indefinitely.\r\n\r\nOne interesting point, this behavior only occurs when using `SubscribeFilterLogs` and does not occur for [SubscribeNewHead](https://github.com/ethereum/go-ethereum/blob/master/ethclient/ethclient.go#L337).\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nSee sample program below (websocket URL has been removed for obvious reasons, one can reproduce this by connecting to any node's websocket interface). We'd expect to see one occurrence of `error received on subscription`, but it's logged indefinitely.\r\n\r\n```\r\npackage main\r\n\r\nimport (\r\n\t\"context\"\r\n\t\"sync\"\r\n\t\"time\"\r\n\r\n\t\"github.com/ethereum/go-ethereum\"\r\n\t\"github.com/ethereum/go-ethereum/common\"\r\n\t\"github.com/ethereum/go-ethereum/core/types\"\r\n\t\"github.com/ethereum/go-ethereum/crypto\"\r\n\t\"github.com/ethereum/go-ethereum/ethclient\"\r\n\t\"github.com/ethereum/go-ethereum/rpc\"\r\n\t\"go.uber.org/zap\"\r\n)\r\n\r\nvar log *zap.SugaredLogger\r\n\r\nvar (\r\n\twebsocketURL = \"\"\r\n)\r\n\r\nfunc InitLogger() {\r\n\tlogger, _ := zap.NewProduction()\r\n\tdefer logger.Sync() // flushes buffer, if any\r\n\tlog = logger.Sugar()\r\n}\r\n\r\nfunc processLogs(sub ethereum.Subscription, logNotif chan types.Log) {\r\n\tfor {\r\n\t\tselect {\r\n\t\tcase <-sub.Err():\r\n\t\t\tlog.Error(\"error received on subscription\")\r\n\t\tcase contractLog := <-logNotif:\r\n\t\t\tlog.Info(\"Received log with topics from subscription\", \"topics\", contractLog.Topics)\r\n\t\t}\r\n\t}\r\n}\r\n\r\nfunc main() {\r\n\r\n\tInitLogger()\r\n\tlog.Info(\"Connecting to node url\")\r\n\r\n\tctx := context.Background()\r\n\r\n\tconnWS, err := rpc.DialWebsocket(ctx, websocketURL, \"\")\r\n\tif err != nil {\r\n\t\tlog.Errorf(\"Unable to create websocket connection to NODE url\", err)\r\n\t}\r\n\twsClient := ethclient.NewClient(connWS)\r\n\r\n\t// setup a subscription\r\n\t// v3 pool contracts for ETH/USDC and DAI/USDC\r\n\taddresses := []common.Address{\r\n\t\tcommon.HexToAddress(\"0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640\"),\r\n\t\tcommon.HexToAddress(\"0x5777d92f208679db4b9778590fa3cab3ac9e2168\"),\r\n\t}\r\n\r\n\ttopics := []common.Hash{}\r\n\tfilterTopics := [][]common.Hash{}\r\n\teventSignatures := []string{\r\n\t\t\"Swap(address,address,int256,int256,uint160,uint128,int24)\",\r\n\t}\r\n\tfor _, e := range eventSignatures {\r\n\t\ttopics = append(topics, crypto.Keccak256Hash([]byte(e)))\r\n\t}\r\n\tfilterTopics = append(filterTopics, topics)\r\n\r\n\tfilterQuery := ethereum.FilterQuery{\r\n\t\tTopics:    filterTopics,\r\n\t\tAddresses: addresses,\r\n\t}\r\n\r\n\tlogNotif := make(chan types.Log)\r\n\r\n\tsub, err := wsClient.SubscribeFilterLogs(context.Background(), filterQuery, logNotif)\r\n\tif err != nil {\r\n\t\tlog.Errorf(\"unable to subscribe for filter logs: %s\", err)\r\n\t}\r\n\r\n\tvar wg sync.WaitGroup\r\n\twg.Add(1)\r\n\tgo processLogs(sub, logNotif)\r\n\r\n\t// unsubscribe after a few seconds\r\n\ttime.Sleep(10 * time.Second)\r\n\tlog.Info(\"Unsubscribe from log subscription\")\r\n\tsub.Unsubscribe()\r\n\r\n\t// do other stuff\r\n\ttime.Sleep(10 * time.Second)\r\n\twg.Done()\r\n}\r\n```\r\n\r\n#### Backtrace\r\n\r\nN/A\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28871/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28871/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
