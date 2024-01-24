@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9304",
+  "repository_url": "https://api.github.com/repos/ledgerwatch/erigon",
+  "labels_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9304/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9304/comments",
+  "events_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9304/events",
+  "html_url": "https://github.com/ledgerwatch/erigon/issues/9304",
+  "id": 2098531161,
+  "node_id": "I_kwDOC0FsAM59FQtZ",
+  "number": 9304,
+  "title": "Valid block appears to become invalid",
+  "user": {
+    "login": "xrchz",
+    "id": 181254,
+    "node_id": "MDQ6VXNlcjE4MTI1NA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/181254?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/xrchz",
+    "html_url": "https://github.com/xrchz",
+    "followers_url": "https://api.github.com/users/xrchz/followers",
+    "following_url": "https://api.github.com/users/xrchz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/xrchz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/xrchz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/xrchz/subscriptions",
+    "organizations_url": "https://api.github.com/users/xrchz/orgs",
+    "repos_url": "https://api.github.com/users/xrchz/repos",
+    "events_url": "https://api.github.com/users/xrchz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/xrchz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-24T15:33:06Z",
+  "updated_at": "2024-01-24T15:40:49Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\n\r\nErigon version: `./erigon --version`\r\n\r\n2.56.2\r\n\r\nOS & Version: Windows/Linux/OSX\r\n\r\nLinux\r\n\r\nCommit hash: \r\n\r\nc9216ce10451a235af1cdde572642eac3640fadf (2.56.2 release)\r\n\r\nErigon Command (with flags/config):\r\n\r\n```\r\nerigon --datadir=/home/ramana/9be5/erigon --nat=none --db.size.limit=8TB \\\r\n--http --http.addr=0.0.0.0 --http.api=engine,erigon,eth,net,web3,ots --p2p.allowed-ports=30303,30304,30306 \\\r\n--rpc.returndata.limit 1048576 \\\r\n--http.corsdomain=<redacted> \\\r\n--authrpc.addr=0.0.0.0 --authrpc.jwtsecret=/home/ramana/9be5/erigon/jwt.hex \\\r\n--torrent.download.rate=512mb --torrent.upload.rate=128mb\r\n```\r\n\r\nConsensus Layer:\r\nNimbus\r\n\r\nConsensus Layer Command (with flags/config):\r\n```\r\nnimbus_beacon_node \\\r\n --el=http://<redacted> \\\r\n --data-dir=/home/ramana/lh/nimbus \\\r\n --external-beacon-api-url=http://<redacted> \\\r\n --nat=none --history=archive \\\r\n --jwt-secret=/home/ramana/jwt.hex \\\r\n --rest=true --rest-address=:: --rest-statecache-size=16 \\\r\n --payload-builder=true --payload-builder-url=http://<redacted>\r\n```\r\n\r\nChain/Network: \r\nmainnet\r\n\r\n#### Expected behaviour\r\n\r\nNimbus should not get a change of state of a block from VALID to ACCEPTED/SYNCING. Once VALID the block should stay VALID.\r\n\r\n#### Actual behaviour\r\n\r\nHere are the relevant logs on Erigon and Nimbus:\r\n\r\n```\r\nINFO[01-24|15:05:37.826] RPC Daemon notified of new headers       from=19077277 to=19077278 hash=0xde5df95011d5fd2f97ff0ab7f75c03101559dd93f5c11556f68122a9cd649422 header sending=13.66µs log sending=200ns\r\nINFO[01-24|15:05:37.826] head updated                             hash=0xde5df95011d5fd2f97ff0ab7f75c03101559dd93f5c11556f68122a9cd649422 number=19077278\r\nINFO[01-24|15:05:37.826] [snapshots] Prune Blocks                 to=18987000 limit=100\r\nINFO[01-24|15:05:49.361] [NewPayload] Handling new payload        height=19077279 hash=0x3a5c925499ac4488957114d082279eff79b53fdd550befc1143524429fcdf37a\r\nINFO[01-24|15:05:52.408] [updateForkchoice] Fork choice update: flushing in-memory state (built by previous newPayload)\r\nINFO[01-24|15:05:54.306] RPC Daemon notified of new headers       from=19077278 to=19077279 hash=0x3a5c925499ac4488957114d082279eff79b53fdd550befc1143524429fcdf37a header sending=24.41µs log sending=300ns\r\nINFO[01-24|15:05:54.306] head updated                             hash=0x3a5c925499ac4488957114d082279eff79b53fdd550befc1143524429fcdf37a number=19077279\r\nINFO[01-24|15:05:54.314] [snapshots] Prune Blocks                 to=18987000 limit=100\r\nINFO[01-24|15:06:14.301] [NewPayload] Handling new payload        height=19077280 hash=0x4ac0e3137708d4305dc6d13e670fa3c494122c6114886eb91eaa60fc6b9dd70c\r\nINFO[01-24|15:06:16.024] [updateForkchoice] Fork choice update: flushing in-memory state (built by previous newPayload)\r\nINFO[01-24|15:06:16.842] RPC Daemon notified of new headers       from=19077279 to=19077280 hash=0x4ac0e3137708d4305dc6d13e670fa3c494122c6114886eb91eaa60fc6b9dd70c header sending=12.05µs log sending=330ns\r\nINFO[01-24|15:06:16.842] head updated                             hash=0x4ac0e3137708d4305dc6d13e670fa3c494122c6114886eb91eaa60fc6b9dd70c number=19077280\r\nINFO[01-24|15:06:16.842] [snapshots] Prune Blocks                 to=18987000 limit=100\r\n```\r\n\r\n```\r\nINF 2024-01-24 15:05:35.000+00:00 Slot start                                 topics=\"beacnde\" slot=8273726 epoch=258553 sync=synced peers=159 head=94636007:8273725 finalized=258551:d9e8b666 delay=547us747ns\r\nINF 2024-01-24 15:05:45.071+00:00 Slot end                                   topics=\"beacnde\" slot=8273726 nextActionWait=1s928ms814us276ns nextAttestationSlot=8273727 nextProposalSlot=-1 syncCommitteeDuties=none head=8796d06d:8273726\r\nINF 2024-01-24 15:05:47.001+00:00 Slot start                                 topics=\"beacnde\" slot=8273727 epoch=258553 sync=synced peers=159 head=8796d06d:8273726 finalized=258551:d9e8b666 delay=1ms69us609ns\r\nINF 2024-01-24 15:05:52.347+00:00 State replayed                             topics=\"chaindag\" blocks=0 slots=1 current=ae4a6b80:8273695@8273696 ancestor=729238b0:8273727 target=729238b0:8273727@8273728 ancestorStateRoot=0b845ed3 targetStateRoot=bf28dbc5 found=true assignDur=17ms738us232ns replayDur=244ms639us227ns\r\nINF 2024-01-24 15:05:53.409+00:00 execution payload forkChoiceUpdated status ACCEPTED/SYNCING, but was previously VALID topics=\"gossip_blocks\" payloadExecutionStatus=SYNCING headBlockHash=3a5c9254 safeBlockHash=cd747946 finalizedBlockHash=73b837b5 receivedBlock=\"(blck: (slot: 8273727, proposer_index: 580283, parent_root: \\\"8796d06d\\\", state_root: \\\"0b845ed3\\\", eth1data: (deposit_root: cec9c99bb4070b00b46b85702dfbd9120256328f283da5dfa4dc11c0f41cc134, deposit_count: 1190475, block_hash: ffc06d0611d54b4773d5189768f056e318eb40149634959d837ef4eaab6d98d3), graffiti: \\\"Lighthouse/v4.4.1-2841f60\\\", proposer_slashings_len: 0, attester_slashings_len: 0, attestations_len: 64, deposits_len: 0, voluntary_exits_len: 0, sync_committee_participants: 504, block_number: 19077279, block_hash: \\\"0x3a5c925499ac4488957114d082279eff79b53fdd550befc1143524429fcdf37a\\\", parent_hash: \\\"0xde5df95011d5fd2f97ff0ab7f75c03101559dd93f5c11556f68122a9cd649422\\\", fee_recipient: \\\"0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5\\\", bls_to_execution_changes_len: 0, blob_kzg_commitments_len: 0), signature: \\\"93c16d25\\\")\"\r\nINF 2024-01-24 15:05:57.068+00:00 Slot end                                   topics=\"beacnde\" slot=8273727 nextActionWait=1s931ms294us4ns nextAttestationSlot=8273728 nextProposalSlot=-1 syncCommitteeDuties=none head=729238b0:8273727\r\n```\r\n\r\nAttached are full logs for the past hour or so before these snippets:\r\n[erilogs.txt](https://github.com/ledgerwatch/erigon/files/14040433/erilogs.txt)\r\n[nimlogs.txt](https://github.com/ledgerwatch/erigon/files/14040434/nimlogs.txt)\r\n\r\n#### Steps to reproduce the behaviour\r\n\r\nIt happens on several blocks - just run both clients and wait.\r\n\r\n#### Backtrace\r\n\r\nN/A\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9304/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9304/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
