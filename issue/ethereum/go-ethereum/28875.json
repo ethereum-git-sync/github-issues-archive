@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28875",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28875/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28875/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28875/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28875",
+  "id": 2099834084,
+  "node_id": "I_kwDOAOvK9859KOzk",
+  "number": 28875,
+  "title": "Refactor state journalling system",
+  "user": {
+    "login": "holiman",
+    "id": 142290,
+    "node_id": "MDQ6VXNlcjE0MjI5MA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/142290?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/holiman",
+    "html_url": "https://github.com/holiman",
+    "followers_url": "https://api.github.com/users/holiman/followers",
+    "following_url": "https://api.github.com/users/holiman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/holiman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/holiman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/holiman/subscriptions",
+    "organizations_url": "https://api.github.com/users/holiman/orgs",
+    "repos_url": "https://api.github.com/users/holiman/repos",
+    "events_url": "https://api.github.com/users/holiman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/holiman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233652,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1Mg==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:feature",
+      "name": "type:feature",
+      "color": "84b6eb",
+      "default": false,
+      "description": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-25T08:26:00Z",
+  "updated_at": "2024-01-25T08:26:34Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "The journal is our appendable tracker for changes to state, making it possible to revert callscopes. \r\n\r\nOriginally, we did copy-on-write: whenever we entered a new call, we copied the entire statedb and all objects, and operated on the copy. This bit us back in the shanghai attacks, and we switched to a journal. Every time we do a modification, we add e.g. \r\n```\r\n0: account 0xA balancechange, was 1\r\n1: account 0xA balancechange, was 2\r\n2: account 0xA storagechange, key 0x123, was 0x00\r\n3: account 0xA storagechange, key 0x123, was 0x01\r\n```\r\nAnd at any point, we can revert, applying the changes in the reverse order. \r\n\r\nThe journal is not aware of different scopes; it is just aware of a long list. The statedb tracks which indexes correlate to scopes: \r\n\r\n```golang\r\nfunc (s *StateDB) Snapshot() int {\r\n\tid := s.nextRevisionId\r\n\ts.nextRevisionId++\r\n\ts.validRevisions = append(s.validRevisions, revision{id, s.journal.length()})\r\n\treturn id\r\n}\r\n```\r\nAlso, the journal is very basic, the events are added by the `state` package: \r\n```golang\r\nfunc (s *stateObject) SetNonce(nonce uint64) {\r\n\ts.db.journal.append(nonceChange{\r\n\t\taccount: &s.address,\r\n\t\tprev:    s.data.Nonce,\r\n\t})\r\n\ts.setNonce(nonce)\r\n}\r\n```\r\n\r\n## Changing the API of the journal\r\n\r\nIn order to make changes to the journal possible, a few changes should be introduced. First of all, instead of external callers just `append`ing changes, they should invoke methods, such as: \r\n\r\n```golang\r\ntype ChangeJournal interface {\r\n\t// Changes involving accounts\r\n\tJournalCreateObject(common.Address)\r\n\tJournalSelfDestruct(a common.Address, prev bool, prevBalance uint256.Int)\r\n\tJournalBalance(a common.Address, prev uint256.Int)\r\n\tJournalNonce(a common.Address, prev uint64)\r\n\tJournalStorage(a common.Address, key, prevValue common.Hash)\r\n\tJournalTStorage(a common.Address, key, prevValue common.Hash)\r\n\tJournalCode(a common.Address, key, prvCode, prevHash []byte)\r\n\r\n\t// Changes involving other state values\r\n\tJournalRefund(prev uint64)\r\n\tJournalLog(txHash common.Hash)\r\n\tJournalTouch(hash common.Hash)\r\n\tJournalAccessListAddAccount(address common.Address)\r\n\tJournalAccessListAddSlot(address common.Address, slot common.Hash)\r\n}\r\n```\r\n(the method `JournalReset` has been left out, I'm thinking we'll merge https://github.com/ethereum/go-ethereum/pull/28666 ) . \r\n\r\nThen external callers would do \r\n```golang\r\nfunc (s *stateObject) SetNonce(nonce uint64) {\r\n\ts.db.journal.JournalNonce(s.address, data.Nonce)\r\n\ts.setNonce(nonce)\r\n}\r\n```\r\nBy doing this, we leave it up to the journal internals exactly how to store changes. \r\n\r\n## Marking scopes\r\n\r\nSecondly, we should move the scope-awareness into the Journal. \r\n\r\n```golang\r\n\t// Marks that a new scope has started. This methord returns an identifier,\r\n\t// which can be used to revert the changes in this scope\r\n\tNewScope() int\r\n\t// Marks that the scope has ended. An ended scope is either not reverted,\r\n\t// or reverted in full when/if the parent scope reverts.\r\n\tEndScope(int)\r\n\t// RevertScope reverts the changes in the given scope.\r\n\tRevertScope(*StateDB, int)\r\n```\r\nSo the callers would change from \r\n```golang\r\nfunc (s *StateDB) Snapshot() int {\r\n\tid := s.nextRevisionId\r\n\ts.nextRevisionId++\r\n\ts.validRevisions = append(s.validRevisions, revision{id, s.journal.length()})\r\n\treturn id\r\n}\r\n\r\n// RevertToSnapshot reverts all state changes made since the given revision.\r\nfunc (s *StateDB) RevertToSnapshot(revid int) {\r\n\t// Find the snapshot in the stack of valid snapshots.\r\n\tidx := sort.Search(len(s.validRevisions), func(i int) bool {\r\n\t\treturn s.validRevisions[i].id >= revid\r\n\t})\r\n\tif idx == len(s.validRevisions) || s.validRevisions[idx].id != revid {\r\n\t\tpanic(fmt.Errorf(\"revision id %v cannot be reverted\", revid))\r\n\t}\r\n\tsnapshot := s.validRevisions[idx].journalIndex\r\n\r\n\t// Replay the journal to undo changes and remove invalidated snapshots\r\n\ts.journal.revert(s, snapshot)\r\n\ts.validRevisions = s.validRevisions[:idx]\r\n}\r\n\r\n```\r\ninto\r\n```golang\r\n// Snapshot returns an identifier for the current revision of the state.\r\nfunc (s *StateDB) Snapshot() int {\r\n\treturn s.journal.NewScope()\r\n}\r\n// RevertToSnapshot reverts all state changes made since the given revision.\r\nfunc (s *StateDB) RevertToSnapshot(revid int) {\r\n\ts.journal.Revert(s, snapshot)\r\n}\r\n```\r\n## Using Sets\r\n\r\nAfter these changes are in place, we can start collecting changesets based on scope, instead of linearly. For example, a contract which re-uses a storage slot will have several journal-entries \r\n\r\n```\r\n2: account 0xA storagechange, key 0x123, was 0x00\r\n3: account 0xA storagechange, key 0x123, was 0x01\r\n4: account 0xA storagechange, key 0x123, was 0x02\r\n```\r\nThese can all be represented by only one journal-entry. Either naively by merging journal-entries, or by using a more elaborate scope. For example:\r\n```golang\r\n\r\ntype storageChanges map[common.Hash]common.Hash\r\n\r\ntype ScopeChanges struct{\r\n  storageChanges map[common.Address]storageChanges\r\n  nonceChanges map[common.Address]uint64\r\n  balanceChanges map[common.Address]uint256.Int\r\n  ... \r\n}\r\n```\r\nThese changes are possible as long as the changes do not interfere with eachother. It does not matter whether nonceChange is reverted before or after the balanceChange. Some care needs to be taken with selfdestruct-change in this respect. \r\n\r\nAlso, the case when a child-scope finished is a bit finicky. It can be \"merged up\" to the parent scope, which is possibly wasted work. However, if it is _not_ \"merged up\", then the work performed after the call returns needs to be considered it's own, new, scope. \r\n```\r\n1. sstore(0,1)\r\n2. call( b)  // might call sstore(0,2) on this same adress, \r\n3. sstore(0,3) \r\n```\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28875/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28875/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
