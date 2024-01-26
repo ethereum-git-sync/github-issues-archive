@@ -32,7 +32,7 @@
   "labels": [
 
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -41,12 +41,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2024-01-26T02:49:02Z",
-  "updated_at": "2024-01-26T02:49:02Z",
-  "closed_at": null,
+  "updated_at": "2024-01-26T14:25:03Z",
+  "closed_at": "2024-01-26T14:25:03Z",
   "author_association": "COLLABORATOR",
   "active_lock_reason": null,
   "body": "```\r\nfatal error: concurrent map iteration and map write\r\n\r\ngoroutine 21502 [running]:\r\ngithub.com/ledgerwatch/erigon/cl/phase1/core/state/raw.(*BeaconState).CopyInto(0xc000fae240, 0xc05d294900)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/core/state/raw/copy.go:67 +0xdaa\r\ngithub.com/ledgerwatch/erigon/cl/phase1/core/state.(*CachingBeaconState).CopyInto(0xc0902b7bc0, 0xc05ad61f20)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/core/state/copy.go:12 +0x74\r\ngithub.com/ledgerwatch/erigon/cl/phase1/core/state.(*CachingBeaconState).Copy(0xc0902b7bc0)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/core/state/copy.go:50 +0x37\r\ngithub.com/ledgerwatch/erigon/cl/phase1/forkchoice/fork_graph.(*forkGraphDisk).GetState(0xc079d28600, {0x2, 0x1b, 0xf8, 0xa8, 0x4b, 0xaf, 0x5a, 0x6a, 0x85, ...}, ...)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/forkchoice/fork_graph/fork_graph_disk.go:337 +0x8b\r\ngithub.com/ledgerwatch/erigon/cl/phase1/forkchoice.(*ForkChoiceStore).getCheckpointState(0xc092231200, {0xc05dd4ed5c, 0x28, 0x88})\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/forkchoice/utils.go:103 +0x10e\r\ngithub.com/ledgerwatch/erigon/cl/phase1/forkchoice.(*ForkChoiceStore).OnAggregateAndProof(0xc092231200, 0xc063a936c0, 0xf8?)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/forkchoice/on_attestation.go:91 +0xd6\r\ngithub.com/ledgerwatch/erigon/cl/phase1/network.operationsContract[...]({0x31caff8, 0xc05079b810}, 0xc06d39f340, 0x0, 0xc08e42bf20?, 0x671, {0x2a74cfd?, 0x13}, 0xc05b7b5e08)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/network/gossip_manager.go:79 +0x229\r\ngithub.com/ledgerwatch/erigon/cl/phase1/network.(*GossipManager).onRecv(0xc06d39f340, {0x31caff8, 0xc05079b810}, 0xc08e42bf20, 0xc05b7b5f78?)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/network/gossip_manager.go:194 +0xd05\r\ngithub.com/ledgerwatch/erigon/cl/phase1/network.(*GossipManager).Start(0xc06d39f340, {0x31caff8, 0xc05079b810})\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/network/gossip_manager.go:217 +0xec\r\ncreated by github.com/ledgerwatch/erigon/cmd/caplin/caplin1.RunCaplinPhase1 in goroutine 11003\r\n\tgithub.com/ledgerwatch/erigon/cmd/caplin/caplin1/run.go:155 +0xa5b\r\n\r\ngoroutine 1 [chan receive, 10 minutes]:\r\ngithub.com/ledgerwatch/erigon/node.(*Node).Wait(...)\r\n\tgithub.com/ledgerwatch/erigon/node/node.go:268\r\ngithub.com/ledgerwatch/erigon/turbo/node.(*ErigonNode).Serve(0xc010ec05a0)\r\n\tgithub.com/ledgerwatch/erigon/turbo/node/node.go:34 +0x6e\r\nmain.runErigon(0xc00109ee00)\r\n\tgithub.com/ledgerwatch/erigon/cmd/erigon/main.go:75 +0x405\r\ngithub.com/ledgerwatch/erigon/turbo/app.MakeApp.func1(0xc00109ee00)\r\n\tgithub.com/ledgerwatch/erigon/turbo/app/make_app.go:52 +0x19f\r\ngithub.com/urfave/cli/v2.(*Command).Run(0xc000147ce0, 0xc00109ee00, {0xc000146000, 0x15, 0x16})\r\n\tgithub.com/urfave/cli/v2@v2.27.1/command.go:279 +0x9dd\r\ngithub.com/urfave/cli/v2.(*App).RunContext(0xc001001c00, {0x31caaf0?, 0x53a5c80}, {0xc000146000, 0x15, 0x16})\r\n\tgithub.com/urfave/cli/v2@v2.27.1/app.go:337 +0x5db\r\ngithub.com/urfave/cli/v2.(*App).Run(...)\r\n\tgithub.com/urfave/cli/v2@v2.27.1/app.go:311\r\nmain.main()\r\n\tgithub.com/ledgerwatch/erigon/cmd/erigon/main.go:34 +0x85\r\n\r\n\r\n\r\ngoroutine 404895 [chan send, 6 minutes]:\r\ngithub.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8.1({0x31c73a0?, 0xc076910040?})\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:371 +0x1c5\r\ncreated by github.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8 in goroutine 404893\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:355 +0x3b9\r\n\r\ngoroutine 21501 [select]:\r\ngithub.com/ledgerwatch/erigon/cmd/caplin/caplin1.RunCaplinPhase1.func2()\r\n\tgithub.com/ledgerwatch/erigon/cmd/caplin/caplin1/run.go:143 +0xb9\r\ncreated by github.com/ledgerwatch/erigon/cmd/caplin/caplin1.RunCaplinPhase1 in goroutine 11003\r\n\tgithub.com/ledgerwatch/erigon/cmd/caplin/caplin1/run.go:140 +0x9e5\r\n\r\ngoroutine 228070 [chan send, 8 minutes]:\r\ngithub.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8.1({0x31c73a0?, 0xc076910040?})\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:371 +0x1c5\r\ncreated by github.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8 in goroutine 228068\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:355 +0x3b9\r\n\r\ngoroutine 1186368 [chan send]:\r\ngithub.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8.1({0x31c73a0?, 0xc076910040?})\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:371 +0x1c5\r\ncreated by github.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8 in goroutine 1186366\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:355 +0x3b9\r\n\r\ngoroutine 163397 [chan send, 9 minutes]:\r\ngithub.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8.1({0x31c73a0?, 0xc076910040?})\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:371 +0x1c5\r\ncreated by github.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8 in goroutine 163395\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:355 +0x3b9\r\n\r\ngoroutine 1283382 [select]:\r\ngithub.com/anacrolix/torrent/tracker/udp.(*Client).requestWriter(0x31cb068?, {0x31caff8, 0xc011be1b30}, 0xb9c91840?, {0x0, 0x0, 0x0}, 0xe0b6a0c?)\r\n\tgithub.com/anacrolix/torrent@v1.53.2/tracker/udp/client.go:177 +0x147\r\ngithub.com/anacrolix/torrent/tracker/udp.(*Client).request.func2()\r\n\tgithub.com/anacrolix/torrent@v1.53.2/tracker/udp/client.go:205 +0x3e\r\ncreated by github.com/anacrolix/torrent/tracker/udp.(*Client).request in goroutine 1283381\r\n\tgithub.com/anacrolix/torrent@v1.53.2/tracker/udp/client.go:204 +0x27c\r\n\r\ngoroutine 21923 [chan receive, 10 minutes]:\r\ngithub.com/ledgerwatch/erigon/cl/phase1/network.(*GossipManager).SubscribeSignedBeaconBlocks.func1()\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/network/gossip_manager.go:63 +0x35\r\ncreated by github.com/ledgerwatch/erigon/cl/phase1/network.(*GossipManager).SubscribeSignedBeaconBlocks in goroutine 11003\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/network/gossip_manager.go:62 +0x10f\r\n\r\ngoroutine 1289830 [runnable, locked to thread]:\r\ngithub.com/ledgerwatch/erigon/cl/transition/impl/eth2/statechange.ProcessInactivityScores({0x3217eb0?, 0xc0902b7bc0}, {0xc0f18b6000, 0x2b330, 0x3?}, {0xc0647e0370, 0x3, 0x0?})\r\n\tgithub.com/ledgerwatch/erigon/cl/transition/impl/eth2/statechange/process_inactivity_scores.go:17 +0xc2\r\ngithub.com/ledgerwatch/erigon/cl/transition/impl/eth2/statechange.ProcessEpoch({0x3217eb0, 0xc0902b7bc0})\r\n\tgithub.com/ledgerwatch/erigon/cl/transition/impl/eth2/statechange/process_epoch.go:41 +0x199\r\ngithub.com/ledgerwatch/erigon/cl/transition/impl/eth2.(*impl).ProcessSlots(0x7f744a00e3c8?, {0x3217eb0, 0xc0902b7bc0}, 0xcd35b0)\r\n\tgithub.com/ledgerwatch/erigon/cl/transition/impl/eth2/operations.go:843 +0x196\r\ngithub.com/ledgerwatch/erigon/cl/transition/machine.TransitionState({0x31e75d0, 0xc07000dbd0}, {0x3217eb0, 0xc0902b7bc0}, 0xc07e6d71f0)\r\n\tgithub.com/ledgerwatch/erigon/cl/transition/machine/transition.go:11 +0x4d\r\ngithub.com/ledgerwatch/erigon/cl/transition.TransitionState(...)\r\n\tgithub.com/ledgerwatch/erigon/cl/transition/compat.go:18\r\ngithub.com/ledgerwatch/erigon/cl/phase1/forkchoice/fork_graph.(*forkGraphDisk).AddChainSegment(0xc079d28600, 0xc07e6d71f0, 0x1)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/forkchoice/fork_graph/fork_graph_disk.go:183 +0x211\r\ngithub.com/ledgerwatch/erigon/cl/phase1/forkchoice.(*ForkChoiceStore).OnBlock(0xc092231200, 0xc07e6d71f0, 0x1, 0x39?)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/forkchoice/on_block.go:80 +0x5ba\r\ngithub.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func1({0x31fc720, 0xc070857ce0}, 0xc07e6d71f0, 0xc0?, 0x41?)\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:189 +0x65\r\ngithub.com/ledgerwatch/erigon/cl/phase1/stages.ConsensusClStages.func8({0x31caff8, 0xc0642713b0}, {0x31dee20, 0xc000f5f880}, 0xc075de99a0, {0x4, 0xcd35a, 0xcd35a, 0xcd35b0, 0xcd35af, ...})\r\n\tgithub.com/ledgerwatch/erigon/cl/phase1/stages/clstages.go:408 +0xae3\r\ngithub.com/ledgerwatch/erigon/cl/clstages.(*StageGraph[...]).StartWithStage.func1()\r\n\tgithub.com/ledgerwatch/erigon/cl/clstages/clstages.go:40 +0xd9\r\ncreated by github.com/ledgerwatch/erigon/cl/clstages.(*StageGraph[...]).StartWithStage in goroutine 11003\r\n\tgithub.com/ledgerwatch/erigon/cl/clstages/clstages.go:34 +0x3c9\r\n\r\n\r\n```\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "Giulio2002",
+    "id": 29233688,
+    "node_id": "MDQ6VXNlcjI5MjMzNjg4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/29233688?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Giulio2002",
+    "html_url": "https://github.com/Giulio2002",
+    "followers_url": "https://api.github.com/users/Giulio2002/followers",
+    "following_url": "https://api.github.com/users/Giulio2002/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Giulio2002/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Giulio2002/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Giulio2002/subscriptions",
+    "organizations_url": "https://api.github.com/users/Giulio2002/orgs",
+    "repos_url": "https://api.github.com/users/Giulio2002/repos",
+    "events_url": "https://api.github.com/users/Giulio2002/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Giulio2002/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9316/reactions",
     "total_count": 0,
@@ -61,7 +80,7 @@
   },
   "timeline_url": "https://api.github.com/repos/ledgerwatch/erigon/issues/9316/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
