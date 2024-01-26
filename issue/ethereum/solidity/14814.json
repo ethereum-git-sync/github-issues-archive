@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14814",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14814/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14814/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14814/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14814",
+  "id": 2101826005,
+  "node_id": "I_kwDOAm_5kc59R1HV",
+  "number": 14814,
+  "title": "Incoherence in compiler output and CHC encoding produced by SolCMC",
+  "user": {
+    "login": "BritikovKI",
+    "id": 31989062,
+    "node_id": "MDQ6VXNlcjMxOTg5MDYy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/31989062?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BritikovKI",
+    "html_url": "https://github.com/BritikovKI",
+    "followers_url": "https://api.github.com/users/BritikovKI/followers",
+    "following_url": "https://api.github.com/users/BritikovKI/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BritikovKI/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BritikovKI/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BritikovKI/subscriptions",
+    "organizations_url": "https://api.github.com/users/BritikovKI/orgs",
+    "repos_url": "https://api.github.com/users/BritikovKI/repos",
+    "events_url": "https://api.github.com/users/BritikovKI/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BritikovKI/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-26T08:52:06Z",
+  "updated_at": "2024-01-26T08:52:06Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nSolCMC can be used to specifically only produce the CHC encoding of the `.sol` file. Though, for the following `.sol` code snippet:\r\n```solidity\r\n    function withdraw(uint wad) public {\r\n        require(balanceOf[msg.sender] >= wad);\r\n        balanceOf[msg.sender] -= wad;\r\n        payable(msg.sender).transfer(wad);\r\n        emit Withdrawal(msg.sender, wad);\r\n    }\r\n```\r\nSolCMC doesn't add a limitation for the line `payable(msg.sender).transfer(wad);`, specifically it would be expected that CHC encoding would contain `wad > 0` somewhere in the encoding, as `wad = 0` lead to the transaction revert.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.24\r\n- Target EVM version (as per compiler settings):\r\n- Framework/IDE (e.g. Truffle or Remix): Forge (but doesn't matter)\r\n- EVM execution environment / backend / blockchain client: Doesn't apply\r\n- Operating system: Manjaro Linux/ Mac OS\r\n\r\n## Steps to Reproduce\r\n\r\nRun SolCMC encoder on the following Solidity code:\r\n\r\n```solidity\r\npragma solidity ^0.8.18;\r\n\r\ncontract WETH9 {\r\n\r\n    mapping (address => uint)                       public  balanceOf;\r\n    mapping (address => mapping (address => uint))  public  allowance;\r\n\r\n    function withdraw(uint wad) public {\r\n            require(balanceOf[msg.sender] >= wad);\r\n            balanceOf[msg.sender] -= wad;\r\n            payable(msg.sender).transfer(wad);\r\n            assert(balanceOf[msg.sender] >= 0);\r\n        }\r\n}\r\n```\r\n\r\nExpected behaviour is to have some limitation on `wad` as a part of CHC encoding.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14814/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14814/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
