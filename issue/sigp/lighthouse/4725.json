@@ -58,21 +58,40 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 3,
+  "comments": 4,
   "created_at": "2023-09-12T05:45:22Z",
-  "updated_at": "2023-12-18T00:12:12Z",
-  "closed_at": null,
+  "updated_at": "2024-01-26T14:37:38Z",
+  "closed_at": "2024-01-26T14:37:38Z",
   "author_association": "MEMBER",
   "active_lock_reason": null,
   "body": "## Description\r\n\r\nThe `broadcast_validation` flag exists during block publishing so that block builders/relays can guard against invalid and equivocating blocks, and halt publishing.\r\n\r\nThe addition of blobs in Deneb requires careful consideration to ensure that a malicious proposer does not gain any more avenues for tricking the relay into publishing an invalid/equivocating block.\r\n\r\nI think it's probably sufficient to just return the same kind of duplicate error that we return for blocks whenever the gossip cache for blobs is tripped, but want to just make a note of this so that we can revisit it properly.\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "realbigsean",
+    "id": 5160426,
+    "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/realbigsean",
+    "html_url": "https://github.com/realbigsean",
+    "followers_url": "https://api.github.com/users/realbigsean/followers",
+    "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+    "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+    "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+    "repos_url": "https://api.github.com/users/realbigsean/repos",
+    "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/sigp/lighthouse/issues/4725/reactions",
     "total_count": 2,
@@ -87,7 +106,7 @@
   },
   "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/4725/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -210,6 +229,50 @@
     "body": "I think our decision in #4995 is sensible. When `broadcast_validation=consensus_and_equivocation`:\r\n\r\n- Do not publish if the block's header is slashable wrt to any block header that has been seen on gossip on _either_ the block topic _or_ a blob topic.\r\n- Do not publish if the block's header is slashable wrt to a block fetched via RPC. Accomplished by this observation: https://github.com/sigp/lighthouse/blob/b0c374c1cabd7fd960b4dde9ec9b0b26a960ca0c/beacon_node/beacon_chain/src/block_verification.rs#L1244-L1248\r\n\r\nI think the only case we're missing is **blobs received via RPC**. As far as I can tell we never write these to `observed_blob_sidecars` because the only call to `observe_sidecar` is in `validate_blob_sidecar_for_gossip`. I also don't think we can guarantee that any blobs received on RPC have already had their block header added to `observed_block_producers` or `observed_blob_sidecars`? We trigger single blob RPC alongside single block RPC for events like unknown parent, etc, and can't guarantee that the blobs we get back necessarily match the block's header because A) we may not know the block header B) the peer may send us blobs with a mismatched block header (which is invalid, but still slashable).",
     "reactions": {
       "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1859338866/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1912169347",
+    "html_url": "https://github.com/sigp/lighthouse/issues/4725#issuecomment-1912169347",
+    "issue_url": "https://api.github.com/repos/sigp/lighthouse/issues/4725",
+    "id": 1912169347,
+    "node_id": "IC_kwDOCFeAzc5x-WOD",
+    "user": {
+      "login": "realbigsean",
+      "id": 5160426,
+      "node_id": "MDQ6VXNlcjUxNjA0MjY=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5160426?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/realbigsean",
+      "html_url": "https://github.com/realbigsean",
+      "followers_url": "https://api.github.com/users/realbigsean/followers",
+      "following_url": "https://api.github.com/users/realbigsean/following{/other_user}",
+      "gists_url": "https://api.github.com/users/realbigsean/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/realbigsean/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/realbigsean/subscriptions",
+      "organizations_url": "https://api.github.com/users/realbigsean/orgs",
+      "repos_url": "https://api.github.com/users/realbigsean/repos",
+      "events_url": "https://api.github.com/users/realbigsean/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/realbigsean/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-26T14:37:38Z",
+    "updated_at": "2024-01-26T14:37:38Z",
+    "author_association": "COLLABORATOR",
+    "body": "I think slashability is now well covered with https://github.com/sigp/lighthouse/pull/5033\r\n\r\nSo I'm going to close this",
+    "reactions": {
+      "url": "https://api.github.com/repos/sigp/lighthouse/issues/comments/1912169347/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
