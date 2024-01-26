@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6910",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6910/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6910/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6910/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6910",
+  "id": 2102405031,
+  "node_id": "I_kwDOGBlvNc59UCen",
+  "number": 6910,
+  "title": "Add an \"Authentic\" execution mode for tests & scripts",
+  "user": {
+    "login": "Philogy",
+    "id": 21957732,
+    "node_id": "MDQ6VXNlcjIxOTU3NzMy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21957732?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Philogy",
+    "html_url": "https://github.com/Philogy",
+    "followers_url": "https://api.github.com/users/Philogy/followers",
+    "following_url": "https://api.github.com/users/Philogy/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Philogy/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Philogy/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Philogy/subscriptions",
+    "organizations_url": "https://api.github.com/users/Philogy/orgs",
+    "repos_url": "https://api.github.com/users/Philogy/repos",
+    "events_url": "https://api.github.com/users/Philogy/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Philogy/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3593644820,
+      "node_id": "LA_kwDOGBlvNc7WMqsU",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-feature",
+      "name": "T-feature",
+      "color": "BFD4F2",
+      "default": false,
+      "description": "Type: feature"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-26T15:25:34Z",
+  "updated_at": "2024-01-26T15:25:55Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\r\n\r\nForge\r\n\r\n### Describe the feature you would like\r\n\r\n## Core Description\r\n\r\nI'd like a fundamentally different execution method in foundry. One that executes individual view calls using actual independent `eth_calls` against the environment and non-view calls as top-level transactions. This is unlike the current default and only execution mode which is all executed within 1 top-level transaction leading to several (often) undesirable side effects:\r\n- arguably incorrect or at least unintuitive gas accounting between transactions due to:\r\n    - missing intrinsic gas cost (21k gas)\r\n    - missing calldata costs\r\n    - inability to pre-warm slots with access lists (and accounting their cost)\r\n    - capped gas refunds dependent on tx gas usage (#6578)\r\n    - addresses and slots accessed in previous slots remaining warm (#4900)\r\n- inability to simulate/test things easily related to self-destruct (#1543)\r\n- (newly relevant) transient storage slots not being reset ([comment](https://github.com/foundry-rs/foundry/issues/6903#issuecomment-1911833977) in #6903)\r\n\r\nThere are likely more issues that I'm missing. The pain of the above issues is compounded when attempting to use foundry scripts for more special transaction sequences as this mismatch may lead to false positive reverts preventing the script runner from submitting transactions (#6825).\r\n\r\nThere are a bunch of separate feature requests attempting to address different aspects of this:\r\n- `vm.cool` (#5830)\r\n- `meterTxGas` (#6590)\r\n- `vm.clearTransientStorage` (#6908)\r\n\r\nWhile the current execution mode (using one big tx to run tests and simulations) is desirable for many use cases & reasons (faster test & sim execution, testing intra-tx changes). It's undesirable in many others. Instead of solving the different symptoms by adding new cheat codes I suggest taking a more holistic approach: **adding a new execution mode.**\r\n\r\n## The new Execution Mode\r\n\r\nI'm likely oversimplifying (due to a lack of knowledge of revm and foundry internals please correct where required) but I wanted to offer a potential design/approach for this new mode. In this mode you'd run 2, separate instances of revm within foundry. One that runs the actual test/script and the other that maintains the actual simulated/forked state. CALLs and STATICCALLs made in the simulation environment are dispatched as `eth_call`s and actual top-level transactions into the second \"world\" environment. Results are relayed into the first.\r\n\r\nWhile this does add some overhead this solves all the aforementioned issues with one 1 (all be it larger) change without requiring the addition of many separate cheat codes and requiring devs to manually adds this everywhere just so their tests can accurately account gas.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6910/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 1
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6910/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
