@@ -1,0 +1,121 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14818",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14818/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14818/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14818/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14818",
+  "id": 2102597690,
+  "node_id": "I_kwDOAm_5kc59Uxg6",
+  "number": 14818,
+  "title": "Emscripten binaries in solc npm package and in solc-bin are not identical",
+  "user": {
+    "login": "cameel",
+    "id": 137030,
+    "node_id": "MDQ6VXNlcjEzNzAzMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/137030?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/cameel",
+    "html_url": "https://github.com/cameel",
+    "followers_url": "https://api.github.com/users/cameel/followers",
+    "following_url": "https://api.github.com/users/cameel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/cameel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/cameel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/cameel/subscriptions",
+    "organizations_url": "https://api.github.com/users/cameel/orgs",
+    "repos_url": "https://api.github.com/users/cameel/repos",
+    "events_url": "https://api.github.com/users/cameel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/cameel/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 437863668,
+      "node_id": "MDU6TGFiZWw0Mzc4NjM2Njg=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/build%20system%20:building_construction:",
+      "name": "build system :building_construction:",
+      "color": "1d76db",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 2685863294,
+      "node_id": "MDU6TGFiZWwyNjg1ODYzMjk0",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/solcbin",
+      "name": "solcbin",
+      "color": "3B8CF5",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 3306843671,
+      "node_id": "MDU6TGFiZWwzMzA2ODQzNjcx",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/solcjs",
+      "name": "solcjs",
+      "color": "C0BF81",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4438003076,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIaNhA",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20effort",
+      "name": "medium effort",
+      "color": "ff7df7",
+      "default": false,
+      "description": "Default level of effort"
+    },
+    {
+      "id": 4438155599,
+      "node_id": "LA_kwDOAm_5kc8AAAABCIjhTw",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/medium%20impact",
+      "name": "medium impact",
+      "color": "314aff",
+      "default": false,
+      "description": "Default level of impact"
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-26T17:34:33Z",
+  "updated_at": "2024-01-26T17:34:34Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "The `soljson` binary that we include in the [`solc` npm package](https://www.npmjs.com/package/solc) differs from the one we include in the github releases and distribute in solc-bin.\r\n\r\nThis makes it hard to verify the binary, since the checksum won't match the ones we publish.\r\n\r\nThis seems to be caused by some automatic formatter that runs as a part of the TypeScript build process. This should be disabled so that the binary is published exactly as is.\r\n\r\n## Environment\r\n\r\n- Compiler version: noticed around 0.8.23, but earlier versions are affected too.\r\n\r\n## Steps to Reproduce\r\n\r\nDownload the binaries to compare:\r\n```\r\nwget https://registry.npmjs.org/solc/-/solc-0.8.24.tgz\r\nwget https://binaries.soliditylang.org/emscripten-wasm32/solc-emscripten-wasm32-v0.8.24+commit.e11b9ed9.js\r\ntar --extract --file solc-0.8.24.tgz package/soljson.js\r\n```\r\n\r\nThe base64-encoded payload inside both files is exactly the same:\r\n```\r\ndiff --unified \\\r\n    <(sed -n 's|^\"\\(.*\\)\",$|\\1|p' solc-emscripten-wasm32-v0.8.24+commit.e11b9ed9.js | fold --width 120) \\\r\n    <(sed -n 's|^})(\"\\(.*\\)\", 21944772);$|\\1|p' package/soljson.js | fold --width 120)\r\n```\r\n\r\nThe JS differs, possibly only in how it is formatted formatting:\r\n```\r\ndiff --unified \\\r\n    <(sed -e 's|^\"\\(.*\\)\",$||' solc-emscripten-wasm32-v0.8.24+commit.e11b9ed9.js | head -n 25) \\\r\n    <(sed -e 's|^})(\"\\(.*\\)\", 21944772);$||' package/soljson.js | head -n 25)\r\n```\r\n\r\n```diff\r\n@@ -1,25 +1,25 @@\r\n-var Module = Module || {}; Module[\"wasmBinary\"] = (function(source, uncompressedSize) {function base64DecToArr (sBase64) {\r\n-function b64ToUint6 (nChr) {\r\n-\r\n-  return nChr > 64 && nChr < 91 ?\r\n-      nChr - 65\r\n-    : nChr > 96 && nChr < 123 ?\r\n-      nChr - 71\r\n-    : nChr > 47 && nChr < 58 ?\r\n-      nChr + 4\r\n-    : nChr === 43 ?\r\n-      62\r\n-    : nChr === 47 ?\r\n-      63\r\n-    :\r\n-      0;\r\n-\r\n-}\r\n-\r\n-  var\r\n-    nInLen = sBase64.length,\r\n-    nOutLen = nInLen * 3 + 1 >> 2, taBytes = new Uint8Array(nOutLen);\r\n-\r\n-  for (var nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {\r\n-    nMod4 = nInIdx & 3;\r\n-    nUint24 |= b64ToUint6(sBase64.charCodeAt(nInIdx)) << 6 * (3 - nMod4);\r\n+var Module = Module || {};\r\n+Module[\"wasmBinary\"] = (function (source, uncompressedSize) {\r\n+    function base64DecToArr(sBase64) {\r\n+        function b64ToUint6(nChr) {\r\n+            return nChr > 64 && nChr < 91 ?\r\n+                nChr - 65\r\n+                : nChr > 96 && nChr < 123 ?\r\n+                    nChr - 71\r\n+                    : nChr > 47 && nChr < 58 ?\r\n+                        nChr + 4\r\n+                        : nChr === 43 ?\r\n+                            62\r\n+                            : nChr === 47 ?\r\n+                                63\r\n+                                :\r\n+                                    0;\r\n+        }\r\n+        var nInLen = sBase64.length, nOutLen = nInLen * 3 + 1 >> 2, taBytes = new Uint8Array(nOutLen);\r\n+        for (var nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {\r\n+            nMod4 = nInIdx & 3;\r\n+            nUint24 |= b64ToUint6(sBase64.charCodeAt(nInIdx)) << 6 * (3 - nMod4);\r\n+            if (nMod4 === 3 || nInLen - nInIdx === 1) {\r\n+                for (nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {\r\n+                    taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;\r\n+                }\r\n```",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14818/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14818/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
