@@ -1,0 +1,68 @@
+{
+  "url": "https://api.github.com/repos/hyperledger/besu/issues/6475",
+  "repository_url": "https://api.github.com/repos/hyperledger/besu",
+  "labels_url": "https://api.github.com/repos/hyperledger/besu/issues/6475/labels{/name}",
+  "comments_url": "https://api.github.com/repos/hyperledger/besu/issues/6475/comments",
+  "events_url": "https://api.github.com/repos/hyperledger/besu/issues/6475/events",
+  "html_url": "https://github.com/hyperledger/besu/issues/6475",
+  "id": 2103704646,
+  "node_id": "I_kwDODE2jmc59Y_xG",
+  "number": 6475,
+  "title": "IPv6 peer discovery errors",
+  "user": {
+    "login": "garyschulte",
+    "id": 1238512,
+    "node_id": "MDQ6VXNlcjEyMzg1MTI=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1238512?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/garyschulte",
+    "html_url": "https://github.com/garyschulte",
+    "followers_url": "https://api.github.com/users/garyschulte/followers",
+    "following_url": "https://api.github.com/users/garyschulte/following{/other_user}",
+    "gists_url": "https://api.github.com/users/garyschulte/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/garyschulte/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/garyschulte/subscriptions",
+    "organizations_url": "https://api.github.com/users/garyschulte/orgs",
+    "repos_url": "https://api.github.com/users/garyschulte/repos",
+    "events_url": "https://api.github.com/users/garyschulte/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/garyschulte/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-27T18:08:48Z",
+  "updated_at": "2024-01-27T18:11:39Z",
+  "closed_at": null,
+  "author_association": "CONTRIBUTOR",
+  "active_lock_reason": null,
+  "body": "<!-- Have you done the following? -->\r\n<!--   * read the Code of Conduct? By filing an Issue, you are expected to -->  \r\n<!--     comply with it, including treating everyone with respect: -->\r\n<!--     https://github.com/hyperledger/besu/blob/main/CODE_OF_CONDUCT.md -->\r\n<!--   * Reproduced the issue in the latest version of the software -->\r\n<!--   * Read the debugging docs: https://besu.hyperledger.org/en/stable/HowTo/Monitor/Logging/ -->\r\n<!--   * Duplicate Issue check:  https://github.com/search?q=+is%3Aissue+repo%3Ahyperledger/Besu -->\r\n<!-- Note:  Not all sections will apply to all issue types. -->\r\n\r\n### Description\r\nSince #6224, we are seeing a lot of ipv6 protocol errors from ping packet data with an ipv6 from address, e.g.:\r\n```\r\nVertxPeerDiscoveryAgent | Sending to peer DiscoveryPeer\r\n{ \r\n  status=bonding,  \r\n enode=enode://018794617924fd5bc2b207aaa0073279a3bb77e0c5e6285797a262ec7c3dcb05d0bfca64696abc7bdd5dd04730b5bf80d059dc45b9c20fd61557f9ad4716e77c@[2a01:4f9:4b:4f55::2:11]:30303?discport=58267,\r\n  firstDiscovered=1706378307270, \r\n  lastContacted=0, \r\n  lastSeen=1706378322275\r\n} failed, \r\nnative error code -97, \r\npacket: 0x943174d51399b001708462c9a3c361eba66ac98e3505906a1e9090bd9f3b2e6da40e86e7aa16e840b60b2eb56982e620af0aedb39909564c3088db9f1284e8e274d99f1aa06785b8887955cdd4cd9ec7ffae6b1ac05bd9cfe1df9449aee37e770101eb05cb847f000001829d6f829d6fd7902a0104f9004b4f55000000000002001182e39b82765f8465b5448f16,\r\nstacktrace: io.netty.channel.unix.Errors$NativeIoException: sendToAddress(..) failed: Address family not supported by protocol\r\n```\r\n\r\n### Acceptance Criteria\r\n* Survey the current state of IPv6 support in besu\r\n* Decide whether to fix IPv6 discovery or fall back to IPv4 source address when we encounter it\r\n\r\n### Steps to Reproduce (Bug)\r\n1. run on mainnet for a while with the PeerDiscoveryAgent currently in `main`\r\n2. observe ipv6 protocol errors in the logs\r\n\r\n**Expected behavior:** [What you expect to happen]\r\nNo errors responding to peer discoveruy\r\n\r\n**Actual behavior:** [What actually happens]\r\nping packets with ipv6 from addresses fail\r\n\r\n**Frequency:** [What percentage of the time does it occur?]\r\n100%\r\n\r\n### Logs (if a bug)\r\n```\r\n2024-01-27 17:58:43.521+00:00 | vert.x-eventloop-thread-1 | WARN  | VertxPeerDiscoveryAgent | Sending to peer DiscoveryPeer{status=bonding, enode=enode://018794617924fd5bc2b207aaa0073279a3bb77e0c5e6285797a262ec7c3dcb05d0bfca64696abc7bdd5dd04730b5bf80d059dc45b9c20fd61557f9ad4716e77c@[2a01:4f9:4b:4f55::2:11]:30303?discport=58267, firstDiscovered=1706378307270, lastContacted=0, lastSeen=1706378322275} failed, native error code -97, packet: 0x943174d51399b001708462c9a3c361eba66ac98e3505906a1e9090bd9f3b2e6da40e86e7aa16e840b60b2eb56982e620af0aedb39909564c3088db9f1284e8e274d99f1aa06785b8887955cdd4cd9ec7ffae6b1ac05bd9cfe1df9449aee37e770101eb05cb847f000001829d6f829d6fd7902a0104f9004b4f55000000000002001182e39b82765f8465b5448f16, stacktrace: io.netty.channel.unix.Errors$NativeIoException: sendToAddress(..) failed: Address family not supported by protocol\r\n```\r\n\r\n### Versions (Add all that apply)\r\n* Software version: 24.1.2-SNAPSHOT\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/6475/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/hyperledger/besu/issues/6475/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
