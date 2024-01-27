@@ -40,21 +40,40 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2024-01-15T11:11:02Z",
-  "updated_at": "2024-01-16T08:03:09Z",
-  "closed_at": null,
+  "updated_at": "2024-01-27T11:27:47Z",
+  "closed_at": "2024-01-27T11:27:47Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Describe the bug\r\n\r\nWe observed a case where the `suggested-fee-recipient` on BN /default `fee-recipient` on VC is not always taken into account at the time a beacon is restarted.\r\n\r\n### Has this worked before in a previous version?\r\n\r\nUnsure as this happens at a high scale/low occurence, it may have been present in previous versions.\r\n\r\n### 🔬 Minimal Reproduction\r\n\r\nThe timeline is as follows:\r\n\r\n- VC is configured with an external builder and has a default `fee-recipient` set (non-null address)\r\n- corresponding BN is restarted with a non-null `suggested-fee-recipient`\r\n- VC registers to the beacon, for some reason the external builder errors so that VC/BN have to fallback to local block building\r\n- one of the validator key of the VC has to propose a block during the epoch the BN restart happens\r\n- it proposes a block with `0x000.000` as a fee-recipient\r\n\r\n#### Logs\r\n\r\nValidator (v4.0):\r\n\r\n```\r\n2024-01-11 22:46:14.923\t\r\ntime=\"2024-01-11 22:46:14\" level=info msg=\"Submitted new block\" blockRoot=0x6efd618dddbb fork=capella gasUtilized=0.9979254666666667 graffiti=\"...\" numAttestations=128 numDeposits=0 parentHash=0x2a26d72119c0 payloadHash=0x64bb1d5637a6 prefix=validator pubKey=0xae675c466327 slot=759231 txCount=33 withdrawalCount=16\r\n```\r\n\r\nBeacon (v4.2):\r\n\r\n```\r\ntime=\"2024-01-11 22:46:14\" level=info msg=\"Begin building block\" prefix=\"rpc/validator\" sinceSlotStartTime=2.308701105s slot=759231\r\ntime=\"2024-01-11 22:46:14\" level=warning msg=\"could not find tracked proposer index\" headRoot=0xacbe38c88a5f2b3607326b372317ce98ed6b431dfcfc635c3855a67f325b71f7 slot=759231 validatorIndex=560809\r\ntime=\"2024-01-11 22:46:14\" level=info msg=\"Finished building block\" prefix=\"rpc/validator\" sinceSlotStartTime=2.494683942s slot=759231 validator=560809\r\n```\r\n\r\nLooking at the code around the `could not find tracked proposer index` warning, I guess some internal cache with the validator configuration is not filled at this stage (maybe it depends on the validator having attested before?), so it defaults to a default struct with a zeroed fee-recipient.\r\n\r\n```\r\nval, tracked := vs.TrackedValidatorsCache.Validator(vIdx)\r\n        if !tracked {\r\n                logrus.WithFields(logFields).Warn(\"could not find tracked proposer index\")\r\n        }\r\n\r\n[...]\r\n\r\n                attr, err = payloadattribute.New(&enginev1.PayloadAttributesV2{\r\n                        Timestamp:             uint64(t.Unix()),\r\n                        PrevRandao:            random,\r\n                        SuggestedFeeRecipient: val.FeeRecipient[:],\r\n                        Withdrawals:           withdrawals,\r\n                })\r\n\r\n```\r\n\r\n### Error\r\n\r\nThis leads to proposing a block with a null fee-recipient, example of such a block: https://holesky.beaconcha.in/slot/759231\r\n\r\n### Platform(s)\r\n\r\nLinux (x86)\r\n\r\n### What version of Prysm are you running? (Which release)\r\n\r\nv4.2.0\r\n\r\n### Anything else relevant (validator index / public key)?\r\n\r\nThis happened twice during a restart of about 100K validators on holesky, so fairly confident I can narrow it a bit more if needed.",
-  "closed_by": null,
+  "closed_by": {
+    "login": "aimxhaisse",
+    "id": 149659,
+    "node_id": "MDQ6VXNlcjE0OTY1OQ==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/149659?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/aimxhaisse",
+    "html_url": "https://github.com/aimxhaisse",
+    "followers_url": "https://api.github.com/users/aimxhaisse/followers",
+    "following_url": "https://api.github.com/users/aimxhaisse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/aimxhaisse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/aimxhaisse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/aimxhaisse/subscriptions",
+    "organizations_url": "https://api.github.com/users/aimxhaisse/orgs",
+    "repos_url": "https://api.github.com/users/aimxhaisse/repos",
+    "events_url": "https://api.github.com/users/aimxhaisse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/aimxhaisse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13469/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13469/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -148,6 +167,50 @@
     "body": "Thanks for the quick response, this actually happened during an upgrade following the recommendations (i.e: just after upgrading the beacon to v4.2.0 and before upgrading the validators). I'll try to trigger it with both BN and VC in v4.2.0.",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1893235737/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1913124628",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/13469#issuecomment-1913124628",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13469",
+    "id": 1913124628,
+    "node_id": "IC_kwDOBvuov85yB_cU",
+    "user": {
+      "login": "aimxhaisse",
+      "id": 149659,
+      "node_id": "MDQ6VXNlcjE0OTY1OQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/149659?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aimxhaisse",
+      "html_url": "https://github.com/aimxhaisse",
+      "followers_url": "https://api.github.com/users/aimxhaisse/followers",
+      "following_url": "https://api.github.com/users/aimxhaisse/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aimxhaisse/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aimxhaisse/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aimxhaisse/subscriptions",
+      "organizations_url": "https://api.github.com/users/aimxhaisse/orgs",
+      "repos_url": "https://api.github.com/users/aimxhaisse/repos",
+      "events_url": "https://api.github.com/users/aimxhaisse/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aimxhaisse/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-27T11:27:47Z",
+    "updated_at": "2024-01-27T11:27:47Z",
+    "author_association": "NONE",
+    "body": "We weren't able to reproduce it so far, marking as closed but may re-open if we see it again.",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1913124628/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
