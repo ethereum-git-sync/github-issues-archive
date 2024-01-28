@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28890",
+  "repository_url": "https://api.github.com/repos/ethereum/go-ethereum",
+  "labels_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28890/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28890/comments",
+  "events_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28890/events",
+  "html_url": "https://github.com/ethereum/go-ethereum/issues/28890",
+  "id": 2103998138,
+  "node_id": "I_kwDOAOvK9859aHa6",
+  "number": 28890,
+  "title": "build dependency download URL contains invalid control character",
+  "user": {
+    "login": "AwaitFuture",
+    "id": 63843573,
+    "node_id": "MDQ6VXNlcjYzODQzNTcz",
+    "avatar_url": "https://avatars.githubusercontent.com/u/63843573?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/AwaitFuture",
+    "html_url": "https://github.com/AwaitFuture",
+    "followers_url": "https://api.github.com/users/AwaitFuture/followers",
+    "following_url": "https://api.github.com/users/AwaitFuture/following{/other_user}",
+    "gists_url": "https://api.github.com/users/AwaitFuture/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/AwaitFuture/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/AwaitFuture/subscriptions",
+    "organizations_url": "https://api.github.com/users/AwaitFuture/orgs",
+    "repos_url": "https://api.github.com/users/AwaitFuture/repos",
+    "events_url": "https://api.github.com/users/AwaitFuture/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/AwaitFuture/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 72233650,
+      "node_id": "MDU6TGFiZWw3MjIzMzY1MA==",
+      "url": "https://api.github.com/repos/ethereum/go-ethereum/labels/type:bug",
+      "name": "type:bug",
+      "color": "FF5E5E",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-28T06:37:23Z",
+  "updated_at": "2024-01-28T06:37:23Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "#### System information\r\nOS: Windows 10\r\nGeth version: Master branch\r\nGo version: go1.21.6 windows/amd64\r\ncommit hash: 2e947b7a0041f087ce4945303f3dd267b6296a14\r\n\r\n#### Expected behaviour\r\n`make test` should download all dependencies and build without issue.\r\n\r\n#### Actual behaviour\r\n```\r\n>>> \"C:\\\\Program Files\\\\Go\\\\bin\\\\go\" build -ldflags \"-X github.com/ethereum/go-ethereum/internal/version.gitCommit=2e947b7a0041f087ce4945303f3dd267b6296a14 -X github.com/ethereum/go-ethereum/internal/version.gitDate=20240127\" -tags urfave_cli_no_docs,ckzg -trimpath -v -o F:\\geth\\go-ethereum\\build\\bin\\rlpdump.exe ./cmd/rlpdump\r\ngithub.com/ethereum/go-ethereum/cmd/rlpdump\r\ngo run build/ci.go test\r\nbuild\\cache\\fixtures_develop.tar.gz is stale\r\n/fixtures_develop.tar.gz/github.com/ethereum/execution-spec-tests/releases/download/v1.0.6\r\nci.go:349: download error: parse \"https://github.com/ethereum/execution-spec-tests/releases/download/v1.0.6\\r/fixtures_develop.tar.gz\": net/url: invalid control character in URL\r\nexit status 1\r\nmake: *** [Makefile:20: test] Error 1\r\n```\r\n\r\n#### Steps to reproduce the behaviour\r\n```\r\nmake clean\r\nmake test\r\n```\r\n\r\n### Solution\r\nchanging ci.go line 346 to:\r\n```\r\nurl := fmt.Sprintf(\"https://github.com/ethereum/execution-spec-tests/releases/download/v%s/%s%s\", strings.TrimSpace(executionSpecTestsVersion), base, ext)\r\n```\r\nwas enough to solve the problem; should probably trim all version strings to avoid strange whitespace issues in the future.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28890/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/go-ethereum/issues/28890/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
