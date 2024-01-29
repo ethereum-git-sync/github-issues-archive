@@ -1,0 +1,95 @@
+{
+  "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6938",
+  "repository_url": "https://api.github.com/repos/foundry-rs/foundry",
+  "labels_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6938/labels{/name}",
+  "comments_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6938/comments",
+  "events_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6938/events",
+  "html_url": "https://github.com/foundry-rs/foundry/issues/6938",
+  "id": 2105998165,
+  "node_id": "I_kwDOGBlvNc59hvtV",
+  "number": 6938,
+  "title": "cast call --trace --debug does not open the debugger",
+  "user": {
+    "login": "henry-hz",
+    "id": 1010008,
+    "node_id": "MDQ6VXNlcjEwMTAwMDg=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1010008?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/henry-hz",
+    "html_url": "https://github.com/henry-hz",
+    "followers_url": "https://api.github.com/users/henry-hz/followers",
+    "following_url": "https://api.github.com/users/henry-hz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/henry-hz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/henry-hz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/henry-hz/subscriptions",
+    "organizations_url": "https://api.github.com/users/henry-hz/orgs",
+    "repos_url": "https://api.github.com/users/henry-hz/repos",
+    "events_url": "https://api.github.com/users/henry-hz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/henry-hz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 3334394228,
+      "node_id": "MDU6TGFiZWwzMzM0Mzk0MjI4",
+      "url": "https://api.github.com/repos/foundry-rs/foundry/labels/T-bug",
+      "name": "T-bug",
+      "color": "d73a4a",
+      "default": false,
+      "description": "Type: bug"
+    }
+  ],
+  "state": "closed",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-29T17:05:45Z",
+  "updated_at": "2024-01-29T22:35:34Z",
+  "closed_at": "2024-01-29T22:35:34Z",
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "### Component\n\nCast\n\n### Have you ensured that all of these are up to date?\n\n- [X] Foundry\n- [X] Foundryup\n\n### What version of Foundry are you on?\n\nforge 0.2.0 (caef136 2024-01-29T00:20:25.410303708Z)\n\n### What command(s) is the bug in?\n\ncast call\n\n### Operating System\n\nLinux\n\n### Describe the bug\n\nAfter deploying this huff code in anvil:\r\n```assembly\r\n#define function addTwo(uint256,uint256) view returns(uint256)\r\n#define macro MAIN() = takes(0) returns(0) {\r\n\r\n    // Get the function selector\r\n    0x00\r\n    calldataload\r\n    0xE0\r\n    shr\r\n\r\n    // Jump to the implementation of the ADD_TWO function\r\n    // if the calldata matches the function selector\r\n    __FUNC_SIG(addTwo) eq addTwo jumpi\r\n\r\n    addTwo:\r\n        ADD_TWO()\r\n}\r\n\r\n// cast sig 'addTwo(uint256,uint256)'\r\n#define macro ADD_TWO() = takes(0) returns(0) {\r\n    0x04 calldataload     // load first 32 bytes onto the stack - number 1\r\n    0x24 calldataload     // load second 32 bytes onto the stack - number 2\r\n    add                   // add number 1 and 2 and put the result onto the stack\r\n\r\n    0x00 mstore           // place the result in memory\r\n    0x20 0x00 return      // return the result\r\n}\r\n```\r\n\r\nI can get the call working well, but can't see the debugger window opening\r\n\r\n\r\n```bash\r\n# deploy\r\ncast send --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --create 601d8060093d393df35f3560e01c630f52d66e1461000f575b600435602435015f5260205ff3\r\n\r\n# call \r\ncast call --trace --debug 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 0x0f52d66e00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000008\r\nTraces:\r\n  [59] 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512::addTwo(1, 8)\r\n    └─ ← 0x0000000000000000000000000000000000000000000000000000000000000009\r\n```",
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "reactions": {
+    "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6938/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6938/timeline",
+  "performed_via_github_app": null,
+  "state_reason": "completed"
+}
+[
+
+]
