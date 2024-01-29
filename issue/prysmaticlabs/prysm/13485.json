@@ -40,7 +40,7 @@
       "description": "Something isn't working"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "potuz",
@@ -85,14 +85,33 @@
     }
   ],
   "milestone": null,
-  "comments": 7,
+  "comments": 8,
   "created_at": "2024-01-18T15:15:30Z",
-  "updated_at": "2024-01-25T07:46:27Z",
-  "closed_at": null,
+  "updated_at": "2024-01-29T16:15:32Z",
+  "closed_at": "2024-01-29T16:15:32Z",
   "author_association": "NONE",
   "active_lock_reason": null,
   "body": "### Describe the bug\r\n\r\nAfter the hard fork \"Cancun\" described in the [new version](https://github.com/ethereum/go-ethereum/releases/tag/v1.13.10) of go-etherium, stopped synchronizing in the Goerli network.\r\nSynchronization stopped due to the prism container being turned off.\r\n\r\n### Has this worked before in a previous version?\r\n\r\n```text\r\nEverything worked on versions:\r\ngeth - v1.13.9\r\nprysm - v4.1.1\r\n```\r\n\r\n\r\n### 🔬 Minimal Reproduction\r\n\r\n<details closed> \r\n<summary> 1. I'm started container like below: </summary>\r\n\r\n```\r\n  prysm:\r\n    container_name: ${PRYSM_CONTAINER_NAME}\r\n    image: ${PRYSM_IMAGE}\r\n    depends_on:\r\n      - geth\r\n    volumes: \r\n      - ${HOST_DATADIR}:${DATADIR}\r\n    ports:\r\n      - \"${PRYSM_PEER_LISTEN_ADDR}:${PRYSM_PEER_LISTEN_PORT}:13000\"\r\n      - \"${PRYSM_NODE_LISTEN_ADDR}:${PRYSM_NODE_LISTEN_PORT}:12000/udp\"\r\n    stop_grace_period: 1m30s\r\n    command: \r\n      --datadir=${DATADIR}\r\n      --jwt-secret=${JWTSECRET_PATH}\r\n      --rpc-host=0.0.0.0\r\n      --grpc-gateway-host=0.0.0.0\r\n      --monitoring-host=0.0.0.0\r\n      --execution-endpoint=${PRYSM_EXECUTION_ENDPOINT}\r\n      --accept-terms-of-use\r\n      --${BLOCKCHAIN_NET}\r\n      ${PRYSM_ADDITIONAL_COMMAND}\r\n```\r\n\r\n</details>\r\n\r\n<details closed>\r\n<summary> 2. Prism works for 5-10 minutes with logs like: </summary>\r\n\r\n```                                                                                 \r\ntime=\"2024-01-18 14:27:02\" level=info msg=\"Node started p2p server\" multiAddr=\"/ip4/172.18.0.3/tcp/13000/p2p/[secret_string???]\" prefix=p2p                                                                                                                  \r\ntime=\"2024-01-18 14:27:07\" level=info msg=\"Waiting for enough suitable peers before syncing\" prefix=initial-sync required=3 suitable=0          \r\ntime=\"2024-01-18 14:27:12\" level=info msg=\"Waiting for enough suitable peers before syncing\" prefix=initial-sync required=3 suitable=0          \r\ntime=\"2024-01-18 14:27:12\" level=info msg=\"Connected to new endpoint: /***\" prefix=execution                                                    \r\ntime=\"2024-01-18 14:27:17\" level=info msg=\"Waiting for enough suitable peers before syncing\" prefix=initial-sync required=3 suitable=0\r\ntime=\"2024-01-18 14:27:26\" level=info msg=\"Processing block batch of size 22 starting from  0xf2c2e73c... 7413698/7423337 - estimated time remai\r\nning 2h26m2s\" blocksPerSecond=1.1 peers=4 prefix=initial-sync\r\ntime=\"2024-01-18 14:28:02\" level=info msg=\"Waiting for enough suitable peers before syncing\" prefix=initial-sync required=3 suitable=0\r\ntime=\"2024-01-18 14:28:02\" level=info msg=\"Peer summary\" activePeers=2 inbound=0 outbound=1 prefix=p2p\r\ntime=\"2024-01-18 14:28:07\" level=info msg=\"Waiting for enough suitable peers before syncing\" prefix=initial-sync required=3 suitable=2\r\ntime=\"2024-01-18 14:29:02\" level=info msg=\"Peer summary\" activePeers=15 inbound=0 outbound=15 prefix=p2p\r\ntime=\"2024-01-18 14:29:46\" level=info msg=\"Processing block batch of size 42 starting from  0x60ab3457... 7413727/7423348 - estimated time remai\r\nning 1h16m21s\" blocksPerSecond=2.1 peers=14 prefix=initial-sync\r\ntime=\"2024-01-18 14:30:02\" level=info msg=\"Peer summary\" activePeers=12 inbound=2 outbound=7 prefix=p2p\r\ntime=\"2024-01-18 14:30:05\" level=info msg=\"Called new payload with optimistic block\" payloadBlockHash=0x8db647a21226 prefix=blockchain slot=7413\r\n762\r\ntime=\"2024-01-18 14:30:05\" level=info msg=\"Called new payload with optimistic block\" payloadBlockHash=0xfebe087b7de5 prefix=blockchain slot=7413\r\n763\r\n```\r\n\r\n</details>\r\n\r\n3. I get an error and prism is disabled\r\n\r\n### Error\r\n\r\n```text\r\ntime=\"2024-01-18 14:30:05\" level=info msg=\"Called new payload with optimistic block\" payloadBlockHash=0xfebe087b7de5 prefix=blockchai[3508/7353]\r\n763                                                                                                                                             \r\ntime=\"2024-01-18 14:30:05\" level=info msg=\"Called new payload with optimistic block\" payloadBlockHash=0x9ccb3ba48b23 prefix=blockchain slot=7413\r\n766                                                                                                                                             \r\ntime=\"2024-01-18 14:30:06\" level=info msg=\"Called new payload with optimistic block\" payloadBlockHash=0x9e1658245657 prefix=blockchain slot=7413\r\n769                                                                                                                                             \r\nSIGILL: illegal instruction                                                                                                                     \r\nPC=0x215949c m=5 sigcode=2\r\ninstruction bytes: 0xc5 0x7a 0x6f 0x2d 0xbc 0xe9 0xbb 0xfe 0xc5 0x7a 0x6f 0x15 0x24 0x9e 0xb9 0xfe\r\ngoroutine 29952 [running]:\r\ngithub.com/prysmaticlabs/gohashtree._hash(0xc04704fc80, {0xc04704fc80, 0x2, 0x2}, 0x1)\r\n        external/com_github_prysmaticlabs_gohashtree/hash_amd64.s:1061 +0x79dc fp=0xc04045b568 sp=0xc04045b1b8 pc=0x215949c\r\ncreated by github.com/prysmaticlabs/prysm/v4/runtime.(*ServiceRegistry).StartAll in goroutine 1\r\n        runtime/service_registry.go:46 +0xe7\r\ngoroutine 1 [chan receive, 3 minutes]:\r\nruntime.gopark(...)\r\n        GOROOT/src/runtime/proc.go:398\r\nruntime.chanrecv(0xc000538900, 0x0, 0x1)\r\n        GOROOT/src/runtime/chan.go:583 +0x5ae fp=0xc043e47840 sp=0xc043e47778 pc=0x1c978ce\r\nruntime.chanrecv1(0xc0004ae6a8?, 0xc000000004?)\r\n        GOROOT/src/runtime/chan.go:442 +0x12 fp=0xc043e47868 sp=0xc043e47840 pc=0x1c972f2\r\ngithub.com/prysmaticlabs/prysm/v4/beacon-chain/node.(*BeaconNode).Start(0xc0004ae680)\r\n        beacon-chain/node/node.go:375 +0x1a8 fp=0xc043e47a08 sp=0xc043e47868 pc=0x3258908\r\nmain.startNode(0x1c9fb25?, 0x18?)\r\n        cmd/beacon-chain/main.go:305 +0x76a fp=0xc043e47b90 sp=0xc043e47a08 pc=0x326b5ca\r\nmain.main.func1(0xc000416160?)\r\n```\r\n\r\n\r\n### Platform(s)\r\n\r\n_No response_\r\n\r\n### What version of Prysm are you running? (Which release)\r\n\r\n4.2.0\r\n\r\n### Anything else relevant (validator index / public key)?\r\n\r\nI tried using other versions suggested in other issues:\r\n1. [Comment](https://github.com/prysmaticlabs/prysm/issues/13478#issuecomment-1895509660) - Image `gcr.io/prysmaticlabs/prysm/beacon-chain:HEAD-fe431b`\r\n2. [Comment](https://github.com/prysmaticlabs/prysm/issues/13483#issuecomment-1897991073) - version [v4.2.1-rc.0](https://github.com/prysmaticlabs/prysm/releases/tag/v4.2.1-rc.0)\r\n\r\nBut I get the same errors.\r\n\r\nI'm running a node on a virtual machine QEMU KVM with 4 threads of `Intel(R) Xeon(R) Gold 6348 CPU @ 2.60GHz`\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "potuz",
+    "id": 16044918,
+    "node_id": "MDQ6VXNlcjE2MDQ0OTE4",
+    "avatar_url": "https://avatars.githubusercontent.com/u/16044918?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/potuz",
+    "html_url": "https://github.com/potuz",
+    "followers_url": "https://api.github.com/users/potuz/followers",
+    "following_url": "https://api.github.com/users/potuz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/potuz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/potuz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/potuz/subscriptions",
+    "organizations_url": "https://api.github.com/users/potuz/orgs",
+    "repos_url": "https://api.github.com/users/potuz/repos",
+    "events_url": "https://api.github.com/users/potuz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/potuz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13485/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13485/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -406,6 +425,50 @@
     "body": "@potuz \r\nSure.\r\nHost's processor:\r\n```\r\n$ cat /proc/cpuinfo | grep \"model name\" | sort | uniq\r\nmodel name      : Intel(R) Xeon(R) Gold 6348 CPU @ 2.60GHz\r\n```\r\n\r\nI wrote about this in the ticket, at the very bottom.\r\nOr did I misunderstand your question?",
     "reactions": {
       "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1909502987/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1915042102",
+    "html_url": "https://github.com/prysmaticlabs/prysm/issues/13485#issuecomment-1915042102",
+    "issue_url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/13485",
+    "id": 1915042102,
+    "node_id": "IC_kwDOBvuov85yJTk2",
+    "user": {
+      "login": "potuz",
+      "id": 16044918,
+      "node_id": "MDQ6VXNlcjE2MDQ0OTE4",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16044918?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/potuz",
+      "html_url": "https://github.com/potuz",
+      "followers_url": "https://api.github.com/users/potuz/followers",
+      "following_url": "https://api.github.com/users/potuz/following{/other_user}",
+      "gists_url": "https://api.github.com/users/potuz/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/potuz/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/potuz/subscriptions",
+      "organizations_url": "https://api.github.com/users/potuz/orgs",
+      "repos_url": "https://api.github.com/users/potuz/repos",
+      "events_url": "https://api.github.com/users/potuz/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/potuz/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-29T16:12:33Z",
+    "updated_at": "2024-01-29T16:12:33Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "@Jony321 thanks for the report, this happens in Deneb on unsuported CPUs, I'm a bit surprised the Xeon would fail, but \r\n\r\n1. This issue itself is fixed in the gohashtree linked PR\r\n2. If you could send me the output of `cat /proc/cpuinfo | grep flags` on that CPU that'd be awesome. ",
+    "reactions": {
+      "url": "https://api.github.com/repos/prysmaticlabs/prysm/issues/comments/1915042102/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
