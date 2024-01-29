@@ -31,6 +31,15 @@
   },
   "labels": [
     {
+      "id": 4438481746,
+      "node_id": "LA_kwDOAm_5kc8AAAABCI3bUg",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/must%20have%20eventually",
+      "name": "must have eventually",
+      "color": "ffb04d",
+      "default": false,
+      "description": "Something we consider essential but not enough to prevent us from releasing Solidity 1.0 without it."
+    },
+    {
       "id": 4726043980,
       "node_id": "LA_kwDOAm_5kc8AAAABGbG1TA",
       "url": "https://api.github.com/repos/ethereum/solidity/labels/feature",
@@ -47,9 +56,9 @@
 
   ],
   "milestone": null,
-  "comments": 2,
+  "comments": 3,
   "created_at": "2024-01-19T17:33:59Z",
-  "updated_at": "2024-01-24T14:18:01Z",
+  "updated_at": "2024-01-29T12:41:46Z",
   "closed_at": null,
   "author_association": "NONE",
   "active_lock_reason": null,
@@ -148,6 +157,50 @@
     "body": "Thank you very much, @cameel! \r\n\r\nUnderstood re #9628. I think we will likely wait for a version with `MCOPY` to be there and see how we fare with verification, and also whether or not that version would be applicable to our current engagements.\r\n\r\nIf it does not, then I will come back to you on inlining/no inlining annotations directly in Yul code.",
     "reactions": {
       "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1908221913/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1914618796",
+    "html_url": "https://github.com/ethereum/solidity/issues/14789#issuecomment-1914618796",
+    "issue_url": "https://api.github.com/repos/ethereum/solidity/issues/14789",
+    "id": 1914618796,
+    "node_id": "IC_kwDOAm_5kc5yHsOs",
+    "user": {
+      "login": "ekpyron",
+      "id": 1347491,
+      "node_id": "MDQ6VXNlcjEzNDc0OTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1347491?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ekpyron",
+      "html_url": "https://github.com/ekpyron",
+      "followers_url": "https://api.github.com/users/ekpyron/followers",
+      "following_url": "https://api.github.com/users/ekpyron/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ekpyron/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ekpyron/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ekpyron/subscriptions",
+      "organizations_url": "https://api.github.com/users/ekpyron/orgs",
+      "repos_url": "https://api.github.com/users/ekpyron/repos",
+      "events_url": "https://api.github.com/users/ekpyron/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ekpyron/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-29T12:41:25Z",
+    "updated_at": "2024-01-29T12:41:25Z",
+    "author_association": "MEMBER",
+    "body": "Just as an additional piece of information here: the optimizer is already quite configurable via the StandardJSON interface (https://docs.soliditylang.org/en/v0.8.20/using-the-compiler.html#compiler-input-and-output-json-description) - we perform inlining at two stages, on the Yul level and on the level of EVM assembly (although the latter inliner is more limited than the former and will only inline very small functions with non-complex control flow). The low-level inliner on the EVM assembly level can be disabled by setting ``\"inliner\": false`` in ``settings.optimizer.details``. The Yul-level inliner can be disabled by adjusting the ``settings.optimizer.details.yulDetails.optimizerSteps``:\r\n\r\nThe default Yul optimizer step sequence is ``\"dhfoDgvulfnTUtnIf[xa[r]EscLMcCTUtTOntnfDIulLculVcul[j]Tpeulxa[rul]xa[r]cLgvifCTUca[r]LSsTFOtfDnca[r]Iulc]jmul[jul]VcTOculjmul\"`` - the individual letters are documented at https://docs.soliditylang.org/en/v0.8.20/internals/optimizer.html#optimizer-steps. The Yul-level-inliner is ``i`` in the sequence, so ``\"\"dhfoDgvulfnTUtnIf[xa[r]EscLMcCTUtTOntnfDIulLculVcul[j]Tpeulxa[rul]xa[r]cLgvfCTUca[r]LSsTFOtfDnca[r]Iulc]jmul[jul]VcTOculjmul\"`` would run the Yul optimizer in its default settings but without inlining. It may also be interesting which other transformations cause issues for you in verification (``F``, the \"FunctionSpecializer\", is a candidate, for example - when a function is called with a constant as one of its arguments, it can create a new copy of that function with that constant inlined into the function).\r\n\r\nHowever, this doesn't allow to selectively prevent inlining on specific functions only, but disables it entirely. But it would be an interesting data point if disabling inlining (and/or other steps) like that solves your issues!",
+    "reactions": {
+      "url": "https://api.github.com/repos/ethereum/solidity/issues/comments/1914618796/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
