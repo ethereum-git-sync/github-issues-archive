@@ -40,7 +40,7 @@
       "description": "Type: bug"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": null,
   "assignees": [
@@ -49,12 +49,31 @@
   "milestone": null,
   "comments": 0,
   "created_at": "2024-01-29T04:53:33Z",
-  "updated_at": "2024-01-29T05:07:26Z",
-  "closed_at": null,
+  "updated_at": "2024-01-29T13:39:08Z",
+  "closed_at": "2024-01-29T13:39:08Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "### Component\r\n\r\nAnvil\r\n\r\n### Have you ensured that all of these are up to date?\r\n\r\n- [X] Foundry\r\n- [X] Foundryup\r\n\r\n### What version of Foundry are you on?\r\n\r\nanvil 0.2.0 (caef136 2024-01-29T00:23:41.917496000Z)\r\n\r\n### What command(s) is the bug in?\r\n\r\nanvil\r\n\r\n### Operating System\r\n\r\nNone\r\n\r\n### Describe the bug\r\n\r\nUpgrading [Viem](https://github.com/wevm/viem) to use the latest Anvil, and seem to be running into a regression where more than one transaction cannot be mined on the same block. This seemed to work before. \r\n\r\n### Steps to reproduce:\r\n\r\n#### 1. Start up Anvil\r\n\r\nStart an Anvil instance w/ fork url and automining disabled.\r\n\r\n```bash\r\nanvil --fork-url https://cloudflare-eth.com --no-mining\r\n```\r\n\r\n#### 2. Send some transactions\r\n\r\n```bash\r\ncurl -X POST -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"eth_sendTransaction\",\"params\":[{\"from\":\"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266\"}]}' http://127.0.0.1:8545\r\ncurl -X POST -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"eth_sendTransaction\",\"params\":[{\"from\":\"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266\"}]}' http://127.0.0.1:8545\r\n```\r\n\r\n#### 3. Mine block\r\n\r\n```bash\r\ncurl -X POST -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"anvil_mine\",\"params\":[\"0x1\",\"0x0\"]}' http://127.0.0.1:8545\r\n```\r\n\r\n#### 4. Get transaction receipts\r\n\r\n```bash\r\ncurl -X POST -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"eth_getTransactionReceipt\",\"params\":[\"TX_HASH_1\"]}' http://127.0.0.1:8545\r\n# ✅ first transaction is successfully mined, and we get a receipt\r\n# > {\"jsonrpc\":\"2.0\",\"id\":6,\"result\":{ ... }}\r\n\r\ncurl -X POST -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"eth_getTransactionReceipt\",\"params\":[\"TX_HASH_2\"]}' http://127.0.0.1:8545\r\n# ❌ second transaction still in txpool. get `null` as the receipt. expected an obj like above.\r\n# > {\"jsonrpc\":\"2.0\",\"id\":6,\"result\":null}\r\n```\r\n\r\n",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mattsse",
+    "id": 19890894,
+    "node_id": "MDQ6VXNlcjE5ODkwODk0",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19890894?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mattsse",
+    "html_url": "https://github.com/mattsse",
+    "followers_url": "https://api.github.com/users/mattsse/followers",
+    "following_url": "https://api.github.com/users/mattsse/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mattsse/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mattsse/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mattsse/subscriptions",
+    "organizations_url": "https://api.github.com/users/mattsse/orgs",
+    "repos_url": "https://api.github.com/users/mattsse/repos",
+    "events_url": "https://api.github.com/users/mattsse/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mattsse/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/foundry-rs/foundry/issues/6931/reactions",
     "total_count": 0,
@@ -69,7 +88,7 @@
   },
   "timeline_url": "https://api.github.com/repos/foundry-rs/foundry/issues/6931/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
 
