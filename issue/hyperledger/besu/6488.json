@@ -30,7 +30,60 @@
     "site_admin": false
   },
   "labels": [
-
+    {
+      "id": 1537362490,
+      "node_id": "MDU6TGFiZWwxNTM3MzYyNDkw",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/bug",
+      "name": "bug",
+      "color": "d73a4a",
+      "default": true,
+      "description": "Something isn't working"
+    },
+    {
+      "id": 1921587647,
+      "node_id": "MDU6TGFiZWwxOTIxNTg3NjQ3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamGroot",
+      "name": "TeamGroot",
+      "color": "1d76db",
+      "default": false,
+      "description": "GH issues worked on by Groot Team"
+    },
+    {
+      "id": 2051683573,
+      "node_id": "MDU6TGFiZWwyMDUxNjgzNTcz",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/P3",
+      "name": "P3",
+      "color": "ffff00",
+      "default": false,
+      "description": "Medium (ex: JSON-RPC request not working with a specific client library due to loose spec assumtion)"
+    },
+    {
+      "id": 2152224197,
+      "node_id": "MDU6TGFiZWwyMTUyMjI0MTk3",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamRevenant",
+      "name": "TeamRevenant",
+      "color": "78e298",
+      "default": false,
+      "description": "GH issues worked on by Revenant Team"
+    },
+    {
+      "id": 3013559202,
+      "node_id": "MDU6TGFiZWwzMDEzNTU5MjAy",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/mainnet",
+      "name": "mainnet",
+      "color": "9D578C",
+      "default": false,
+      "description": ""
+    },
+    {
+      "id": 4328706977,
+      "node_id": "LA_kwDODE2jmc8AAAABAgLToQ",
+      "url": "https://api.github.com/repos/hyperledger/besu/labels/TeamChupa",
+      "name": "TeamChupa",
+      "color": "fbca04",
+      "default": false,
+      "description": "GH issues worked on by Chupacabara Team"
+    }
   ],
   "state": "open",
   "locked": false,
@@ -39,13 +92,13 @@
 
   ],
   "milestone": null,
-  "comments": 0,
+  "comments": 1,
   "created_at": "2024-01-29T20:28:44Z",
-  "updated_at": "2024-01-29T20:29:00Z",
+  "updated_at": "2024-01-30T02:28:53Z",
   "closed_at": null,
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
-  "body": "See https://discord.com/channels/593655374469660673/593655641445367808/1200195786672185438",
+  "body": "See https://discord.com/channels/593655374469660673/593655641445367808/1200195786672185438\r\n\r\nFrom @g11tech\r\n> Ok from logs I understand the issue: lodestar tries to download all the forks, and some peers which accepted the 19056922, hash: 0x5970f4b49ecfba  must be serving the same, which lodestar would send to besu for the validation, and as expected besu would reply with invalid, but here is the problem:\r\n\r\n> Jan 21 13:14:17 nuc13 besu[59010]: 2024-01-21 13:14:17.083-05:00 | vert.x-worker-thread-0 | WARN  | AbstractEngineNewPayload | Invalid new payload: number: 19056922, hash: 0x5970f4b49ecfbad6b02a1cc8fad8a0e47382576b1b28eeb4ec2a8c1649fa6c90, parentHash: 0x932123bf49f6ffce68aac29820bda6028d3bf7aebbebd5fdc758dac9d1c81c46, latestValidHash: 0x0000000000000000000000000000000000000000000000000000000000000000, status: INVALID, validationError: Block already present in bad block manager.\r\n\r\n\r\n> besu is not supposed to send: latestValidHash: 0x0000000000000000000000000000000000000000000000000000000000000000, it can send it null, this response (0x0000000000000000000000000000000000000000000000000000000000000000) if only reserved if the valid block in besu's forkchoice is PREMERGE, which obviously is incorrect at this point of time.\r\n\r\n> This causes us to invalidate the all post merge forkchoice, although we can add check for the same and prevent this issue on our side, but this is still essentially besu bug\r\n\r\n> here are the specs: https://github.com/ethereum/execution-apis/blob/main/src/engine/paris.md#response\r\n\r\n> wemeetagain — 28/01/2024 02:22\r\nok, and for besu, they really should send a real LVH if feasible, if they don't want to do that, send null instead of 0x0.\r\ng11tech — 28/01/2024 02:24\r\nyes, correct\r\nwemeetagain — 28/01/2024 02:24\r\nI mean, sending a real LVH is definitely possible, afaik other ELs sent a real LVH in this scenario, so i'm assuming its just an oversight.\r\ng11tech — 28/01/2024 02:25\r\nyes, these are unfinalized blocks and its this invalid block's parent would still be in their non pruned tree",
   "closed_by": null,
   "reactions": {
     "url": "https://api.github.com/repos/hyperledger/besu/issues/6488/reactions",
@@ -64,5 +117,48 @@
   "state_reason": null
 }
 [
-
+  {
+    "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1915681418",
+    "html_url": "https://github.com/hyperledger/besu/issues/6488#issuecomment-1915681418",
+    "issue_url": "https://api.github.com/repos/hyperledger/besu/issues/6488",
+    "id": 1915681418,
+    "node_id": "IC_kwDODE2jmc5yLvqK",
+    "user": {
+      "login": "siladu",
+      "id": 2893793,
+      "node_id": "MDQ6VXNlcjI4OTM3OTM=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2893793?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/siladu",
+      "html_url": "https://github.com/siladu",
+      "followers_url": "https://api.github.com/users/siladu/followers",
+      "following_url": "https://api.github.com/users/siladu/following{/other_user}",
+      "gists_url": "https://api.github.com/users/siladu/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/siladu/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/siladu/subscriptions",
+      "organizations_url": "https://api.github.com/users/siladu/orgs",
+      "repos_url": "https://api.github.com/users/siladu/repos",
+      "events_url": "https://api.github.com/users/siladu/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/siladu/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-29T22:24:08Z",
+    "updated_at": "2024-01-29T22:24:08Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Verify corresponding Hive tests are failing, this could be a regression.",
+    "reactions": {
+      "url": "https://api.github.com/repos/hyperledger/besu/issues/comments/1915681418/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  }
 ]
