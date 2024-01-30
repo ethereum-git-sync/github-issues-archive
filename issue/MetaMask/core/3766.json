@@ -40,7 +40,7 @@
       "description": ""
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "mikesposito",
@@ -87,12 +87,31 @@
   "milestone": null,
   "comments": 1,
   "created_at": "2024-01-11T12:42:00Z",
-  "updated_at": "2024-01-23T15:57:32Z",
-  "closed_at": null,
+  "updated_at": "2024-01-30T09:03:06Z",
+  "closed_at": "2024-01-30T09:03:06Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "We should merge `EthKeyringController` functionalities into `KeyringController`, without changing any of the features exposed to clients by `KeyringController`. \r\n\r\nThis issue does not (necessarily) cover the work needed to keep test coverage at the 100% threshold, which is tracked by #3767 instead.\r\n\r\nThe planned work is described in #2043.\r\n\r\n## Details\r\n\r\n### Constructor & Class properties\r\n1. We can retain the KeyringController constructor, merging EthKeyringController's init logic in it\r\n2. `KeyringController.#keyring` will have to be removed, and `EthKeyringController.keyrings` should be moved to `KeyringController.#keyrings`\r\n3. In addition to the above, all public class properties of EthKeyringController should be moved to KeyringController (if necessary) as sharp private properties, so that they are inaccessible from outside KeyringController\r\n4. `EthKeyringController.#cacheEncryptionKey` and `.#encryptor` should be moved to `KeyringController.#cacheEncryptionKey` and `.#encryptor`\r\n\r\n### Controller State & Messenger\r\n1. We can retain the current state metadata and all (and only) the messenger actions & events from core KeyringController: this should be reasonably easy and non-breaking, as we can assume that currently no client uses (or have access to)  the _internal_ EthKeyringController, and all other controllers don’t have access to events emitted by EthKeyringController already.\r\n2. Any update logic for EthKeyringController's store and memStore, should update the KeyringController state instead \r\n\r\n#### State\r\n<details>\r\n  <summary>(same as current KeyringController)</summary>\r\n\r\n```typescript\r\n{\r\n  vault: { persist: true, anonymous: false },\r\n  isUnlocked: { persist: false, anonymous: true },\r\n  keyrings: { persist: false, anonymous: false },\r\n  encryptionKey: { persist: false, anonymous: false },\r\n  encryptionSalt: { persist: false, anonymous: false },\r\n}\r\n```\r\n</details>\r\n\r\n#### Events\r\n<details>\r\n  <summary>(same as current KeyringController)</summary>\r\n\r\n- KeyringControllerStateChangeEvent\r\n- KeyringControllerLockEvent\r\n- KeyringControllerUnlockEvent\r\n- KeyringControllerAccountRemovedEvent\r\n- KeyringControllerQRKeyringStateChangeEvent\r\n</details>\r\n\r\n#### Actions\r\n<details>\r\n  <summary>(same as current KeyringController)</summary>\r\n\r\n- KeyringControllerGetStateAction\r\n- KeyringControllerSignMessageAction\r\n- KeyringControllerSignPersonalMessageAction\r\n- KeyringControllerSignTypedMessageAction\r\n- KeyringControllerDecryptMessageAction\r\n- KeyringControllerGetEncryptionPublicKeyAction\r\n- KeyringControllerGetAccountsAction\r\n- KeyringControllerGetKeyringsByTypeAction\r\n- KeyringControllerGetKeyringForAccountAction\r\n- KeyringControllerPersistAllKeyringsAction\r\n</details>\r\n\r\n### Public Methods\r\n1. For the same reason as above, the minimum API coverage should be represented by the current KeyringController public API.\r\n2. All current public & private methods in EthKeyringController can be considered as _potential_ private methods in the resulting new KeyringController API\r\n3. Some of the KeyringController public methods have a direct counterpart in  EthKeyringController, most of the times even with the same name: there are instances of these where we can merge (or cut-paste :D) the logic from the EthKeyringController method into the KeyringController’s counterpart (which will be the one we’ll retain).\r\n4. There is some logic in the current KeyringController which is directly related to maintaining the two controller state in sync (e.g. `fullUpdate`): we can remove this logic completely, as the resulting single controller will have a single state, and all external clients can use the KeyringController messenger to subscribe to state updates\r\n\r\n**The resulting API should look like this:**\r\n<details>\r\n  <summary>(same as current KeyringController)</summary>\r\n\r\n- addNewAccount\r\n- addNewAccountForKeyring\r\n- addNewAccountWithoutUpdate\r\n- createNewVaultWithKeyring\r\n- addNewKeyring\r\n- verifyPassword\r\n- isUnlocked\r\n- exportSeedPhrase\r\n- exportAccount\r\n- getAccounts\r\n- getEncryptionPublicKey\r\n- decryptMessage\r\n- getKeyringForAccount\r\n- getKeyringsByType\r\n- persistAllKeyrings\r\n- importAccountWithStrategy\r\n- removeAccount\r\n- setLocked\r\n- signMessage\r\n- signPersonalMessage\r\n- signTypedMessage\r\n- signTransaction\r\n- submitEncryptionKey\r\n- submitPassword\r\n- verifySeedPhrase\r\n- getQRKeyring\r\n- getOrAddQRKeyring\r\n- restoreQRKeyring\r\n- resetQRKeyringState\r\n- getQRKeyringState\r\n- submitQRCryptoHDKey\r\n- submitQRCryptoAccount\r\n- submitQRSignature\r\n- cancelQRSignRequest\r\n- cancelQRSynchronization\r\n- connectQRHardware\r\n- unlockQRHardwareWalletAccount\r\n- getAccountKeyringType\r\n- forgetQRDevice\r\n</details>\r\n\r\n### Types & Utils\r\n1. The keyring builder factory should be migrated to the `@metamask/keyring-controller` package\r\n2. Types related to the Encryptor should also be migrated\r\n\r\n## Blockers\r\nThis issue is blocked by these prerequisites:\r\n- [x] All clients use KeyringController, EthKeyringController is used by KeyringController only\r\n- [x] KeyringController uses the latest version of EthKeyringController\r\n- [x] EthKeyringController has no unpublished changes\r\n- [x] EthKeyringController has no open PRs\r\n  - [This PR](https://github.com/MetaMask/KeyringController/pull/222) will be opened again later on `core` repo, targeting `KeyringController`",
-  "closed_by": null,
+  "closed_by": {
+    "login": "mikesposito",
+    "id": 34438276,
+    "node_id": "MDQ6VXNlcjM0NDM4Mjc2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/34438276?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mikesposito",
+    "html_url": "https://github.com/mikesposito",
+    "followers_url": "https://api.github.com/users/mikesposito/followers",
+    "following_url": "https://api.github.com/users/mikesposito/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mikesposito/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mikesposito/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mikesposito/subscriptions",
+    "organizations_url": "https://api.github.com/users/mikesposito/orgs",
+    "repos_url": "https://api.github.com/users/mikesposito/repos",
+    "events_url": "https://api.github.com/users/mikesposito/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mikesposito/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/MetaMask/core/issues/3766/reactions",
     "total_count": 0,
@@ -107,7 +126,7 @@
   },
   "timeline_url": "https://api.github.com/repos/MetaMask/core/issues/3766/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
