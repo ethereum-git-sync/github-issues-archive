@@ -76,7 +76,7 @@
       "description": "Manage & Display Token"
     }
   ],
-  "state": "open",
+  "state": "closed",
   "locked": false,
   "assignee": {
     "login": "alexjba",
@@ -127,7 +127,7 @@
     "id": 8739485,
     "node_id": "MI_kwDOD5KrTM4AhVqd",
     "number": 61,
-    "title": "0.16",
+    "title": "2.27.0 Alpha",
     "description": "## Messaging & Communities team\r\n\r\n**1.  Fix bug and stabilise Communities and Messaging functionality** \r\n\r\n**2.  Reduce size of community description metadata**\r\n- better compressions, less duplication\r\n\r\n**3. Use data sync layer (or other mechanism) to improve community description reliability**\r\n- Every time a new user joins the community, the Control Node updates and signs the description.\r\n- Random back off to stop it being too chatty \r\n\r\n**4. Continue work on profile showcase**\r\n\r\n&nbsp;\r\n\r\n## Wallet Team\r\n\r\n**1. Complete support for Community minted assets**\r\n\r\n**2. Complete token visibility management screens**\r\n\r\n**3. Continue working on WalletConnect support**\r\n\r\n**4. Minor updates to Asset screens**\r\n\r\n**5. Continue fixing bugs, making optimisations and keeping tech debt low**\r\n\r\n\r\n\r\n\r\n",
     "creator": {
       "login": "iurimatias",
@@ -149,22 +149,41 @@
       "type": "User",
       "site_admin": false
     },
-    "open_issues": 73,
-    "closed_issues": 262,
+    "open_issues": 27,
+    "closed_issues": 281,
     "state": "open",
     "created_at": "2022-12-09T15:06:43Z",
-    "updated_at": "2024-01-26T10:45:30Z",
+    "updated_at": "2024-01-30T12:08:59Z",
     "due_on": "2024-01-31T08:00:00Z",
     "closed_at": null
   },
-  "comments": 2,
+  "comments": 3,
   "created_at": "2023-12-18T12:17:54Z",
-  "updated_at": "2024-01-26T12:08:07Z",
-  "closed_at": null,
+  "updated_at": "2024-01-30T10:32:59Z",
+  "closed_at": "2024-01-30T10:29:52Z",
   "author_association": "CONTRIBUTOR",
   "active_lock_reason": null,
   "body": "This crash is currently hidden by using a StackLayout instead of a Loader to keep the collectibles view in memory (See https://github.com/status-im/status-desktop/pull/12953/commits/78800bdcdfef405277a703efd555a069dad3e166).\r\nThe downside of the StackLayout is the memory consumption and there's also a chance for the app to crash on other flows even this change.\r\n\r\nThis task is to investigate the root cause of the crash.\r\n\r\nThe crashing flows point to the same call stack. The crash is always reported in the QQmlEngine while getting the QNAM. Seems to be related to the destruction of delegates, possible the animated images where we load the collectibles URLs:\r\n> \r\n> ```\r\n> Thread 0 Crashed::  Dispatch queue: com.apple.main-thread\r\n> 0   QtQml                         \t       0x1059cb280 QQmlEngine::networkAccessManager() const + 16\r\n> 1   QtQuick                       \t       0x104a62bc4 0x1048a8000 + 1813444\r\n> 2   QtQuick                       \t       0x104a6283c 0x1048a8000 + 1812540\r\n> 3   QtQuick                       \t       0x104a62d74 0x1048a8000 + 1813876\r\n> 4   QtCore                        \t       0x106a74b24 0x106878000 + 2083620\r\n> 5   QtNetwork                     \t       0x104eb4c6c 0x104e4c000 + 429164\r\n> 6   QtCore                        \t       0x106a6dbb0 QObject::event(QEvent*) + 596\r\n> 7   QtCore                        \t       0x106a467b8 QCoreApplicationPrivate::notify_helper(QObject*, QEvent*) + 124\r\n> 8   QtCore                        \t       0x106a46410 QCoreApplication::notifyInternal2(QObject*, QEvent*) + 292\r\n> 9   QtCore                        \t       0x106a47524 QCoreApplicationPrivate::sendPostedEvents(QObject*, int, QThreadData*) + 464\r\n> 10  libqcocoa.dylib               \t       0x13593dbd8 0x135900000 + 252888\r\n> 11  libqcocoa.dylib               \t       0x13593e490 0x135900000 + 255120\r\n> 12  CoreFoundation                \t       0x189f91cfc __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__ + 28\r\n> 13  CoreFoundation                \t       0x189f91c90 __CFRunLoopDoSource0 + 176\r\n> 14  CoreFoundation                \t       0x189f91a00 __CFRunLoopDoSources0 + 244\r\n> 15  CoreFoundation                \t       0x189f905f0 __CFRunLoopRun + 828\r\n> 16  CoreFoundation                \t       0x189f8fc5c CFRunLoopRunSpecific + 608\r\n> 17  HIToolbox                     \t       0x194509448 RunCurrentEventLoopInMode + 292\r\n> 18  HIToolbox                     \t       0x1945090d8 ReceiveNextEventCommon + 220\r\n> 19  HIToolbox                     \t       0x194508fdc _BlockUntilNextEventMatchingListInModeWithFilter + 76\r\n> 20  AppKit                        \t       0x18d76ac54 _DPSNextEvent + 660\r\n> 21  AppKit                        \t       0x18df40ebc -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 716\r\n> 22  AppKit                        \t       0x18d75e100 -[NSApplication run] + 476\r\n> 23  libqcocoa.dylib               \t       0x13593d25c 0x135900000 + 250460\r\n> 24  QtCore                        \t       0x106a429a4 QEventLoop::exec(QFlags<QEventLoop::ProcessEventsFlag>) + 544\r\n> 25  QtCore                        \t       0x106a46a24 QCoreApplication::exec() + 132\r\n> 26  nim_status_client             \t       0x102bb5690 0x102a24000 + 1644176\r\n> 27  nim_status_client             \t       0x10378d474 0x102a24000 + 14062708\r\n> 28  nim_status_client             \t       0x103842224 0x102a24000 + 14803492\r\n> 29  nim_status_client             \t       0x103842390 main + 68\r\n> 30  dyld                          \t       0x189b390e0 start + 2360\r\n> ```\r\n\r\n\r\n- When pressing `Create Custom Order` the app crashes more or less systematically.\r\n\r\nhttps://github.com/status-im/status-desktop/assets/97019400/719ee06f-6d95-4147-9b87-ce4280538797\r\n\r\n- Not sure if related to this PR but navigating back and forth from/to collection details to/from main wallet layout, the application crashes.\r\n\r\nhttps://github.com/status-im/status-desktop/assets/97019400/49af5b10-9f38-4e1f-aa53-e72bc6738240\r\n\r\n_Originally posted by @noeliaSD in https://github.com/status-im/status-desktop/pull/12953#pullrequestreview-1780499366_\r\n            ",
-  "closed_by": null,
+  "closed_by": {
+    "login": "alexjba",
+    "id": 47811206,
+    "node_id": "MDQ6VXNlcjQ3ODExMjA2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/47811206?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/alexjba",
+    "html_url": "https://github.com/alexjba",
+    "followers_url": "https://api.github.com/users/alexjba/followers",
+    "following_url": "https://api.github.com/users/alexjba/following{/other_user}",
+    "gists_url": "https://api.github.com/users/alexjba/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/alexjba/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/alexjba/subscriptions",
+    "organizations_url": "https://api.github.com/users/alexjba/orgs",
+    "repos_url": "https://api.github.com/users/alexjba/repos",
+    "events_url": "https://api.github.com/users/alexjba/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/alexjba/received_events",
+    "type": "User",
+    "site_admin": false
+  },
   "reactions": {
     "url": "https://api.github.com/repos/status-im/status-desktop/issues/13027/reactions",
     "total_count": 1,
@@ -179,7 +198,7 @@
   },
   "timeline_url": "https://api.github.com/repos/status-im/status-desktop/issues/13027/timeline",
   "performed_via_github_app": null,
-  "state_reason": null
+  "state_reason": "completed"
 }
 [
   {
@@ -258,6 +277,50 @@
     "body": "In this task the StackLayout should be replaced with a lazy loading mechanism.",
     "reactions": {
       "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1911971850/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1916540120",
+    "html_url": "https://github.com/status-im/status-desktop/issues/13027#issuecomment-1916540120",
+    "issue_url": "https://api.github.com/repos/status-im/status-desktop/issues/13027",
+    "id": 1916540120,
+    "node_id": "IC_kwDOD5KrTM5yPBTY",
+    "user": {
+      "login": "alexjba",
+      "id": 47811206,
+      "node_id": "MDQ6VXNlcjQ3ODExMjA2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47811206?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/alexjba",
+      "html_url": "https://github.com/alexjba",
+      "followers_url": "https://api.github.com/users/alexjba/followers",
+      "following_url": "https://api.github.com/users/alexjba/following{/other_user}",
+      "gists_url": "https://api.github.com/users/alexjba/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/alexjba/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/alexjba/subscriptions",
+      "organizations_url": "https://api.github.com/users/alexjba/orgs",
+      "repos_url": "https://api.github.com/users/alexjba/repos",
+      "events_url": "https://api.github.com/users/alexjba/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/alexjba/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2024-01-30T10:29:52Z",
+    "updated_at": "2024-01-30T10:29:52Z",
+    "author_association": "CONTRIBUTOR",
+    "body": "Cannot reproduce anymore. Probably fixed by the double grid view implementation.\nProbably fixed by https://github.com/status-im/status-desktop/issues/13045",
+    "reactions": {
+      "url": "https://api.github.com/repos/status-im/status-desktop/issues/comments/1916540120/reactions",
       "total_count": 0,
       "+1": 0,
       "-1": 0,
