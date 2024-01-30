@@ -1,0 +1,85 @@
+{
+  "url": "https://api.github.com/repos/sigp/lighthouse/issues/5145",
+  "repository_url": "https://api.github.com/repos/sigp/lighthouse",
+  "labels_url": "https://api.github.com/repos/sigp/lighthouse/issues/5145/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sigp/lighthouse/issues/5145/comments",
+  "events_url": "https://api.github.com/repos/sigp/lighthouse/issues/5145/events",
+  "html_url": "https://github.com/sigp/lighthouse/issues/5145",
+  "id": 2106999115,
+  "node_id": "I_kwDOCFeAzc59lkFL",
+  "number": 5145,
+  "title": "`fsync` more",
+  "user": {
+    "login": "michaelsproul",
+    "id": 4452260,
+    "node_id": "MDQ6VXNlcjQ0NTIyNjA=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4452260?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/michaelsproul",
+    "html_url": "https://github.com/michaelsproul",
+    "followers_url": "https://api.github.com/users/michaelsproul/followers",
+    "following_url": "https://api.github.com/users/michaelsproul/following{/other_user}",
+    "gists_url": "https://api.github.com/users/michaelsproul/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/michaelsproul/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/michaelsproul/subscriptions",
+    "organizations_url": "https://api.github.com/users/michaelsproul/orgs",
+    "repos_url": "https://api.github.com/users/michaelsproul/repos",
+    "events_url": "https://api.github.com/users/michaelsproul/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/michaelsproul/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 1999784343,
+      "node_id": "MDU6TGFiZWwxOTk5Nzg0MzQz",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/optimization",
+      "name": "optimization",
+      "color": "f9de40",
+      "default": false,
+      "description": "Something to make Lighthouse run more efficiently."
+    },
+    {
+      "id": 2336798682,
+      "node_id": "MDU6TGFiZWwyMzM2Nzk4Njgy",
+      "url": "https://api.github.com/repos/sigp/lighthouse/labels/database",
+      "name": "database",
+      "color": "C01C9D",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-30T05:43:35Z",
+  "updated_at": "2024-01-30T05:43:36Z",
+  "closed_at": null,
+  "author_association": "MEMBER",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nIn our quest against database corruption, I think we should start calling `fsync` in more places. The problem is that this could cause serious performance degradation if we do it too liberally.\r\n\r\nThis PR for tree-states (https://github.com/sigp/lighthouse/pull/5144) adds some fsyncs to prevent issues during backfill. I suspect that fsync will be most useful when coordinating changes across multiple databases e.g. hot & freezer, or hot & blobs. On `stable` we currently only have one synchronisation point, which is during the hot -> cold database migration:\r\n\r\nhttps://github.com/sigp/lighthouse/blob/c7e5dd1098a145c0d2174dc65bd23faeb5074249/beacon_node/store/src/hot_cold_store.rs#L2487-L2498\r\n\r\nThis synchronisation was added by @adaszko, and I reckon it has probably saved us from many more instances of DB corruption.\r\n\r\n## Steps to resolve\r\n\r\n1. Add fsyncs during all database transactions that involve >1 database. Likely candidates for a re-work are `do_atomically_with_block_and_blobs_cache` and backfill (the tree-states PR).\r\n2. Measure the impact of these `fsync` additions on performance. For backfill the metric is #blocks/sec speed, although this is a little hard to control when network factors also play a role (we could import Era files to remove this variability).\r\n3. (Optional) Consider adding more `fsync`s after database operations involving a single database. The \"early attester cache\" in block processing should mean that it's OK for us to spend a little more time on the database write (it is _off the hot path_). \r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sigp/lighthouse/issues/5145/reactions",
+    "total_count": 1,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 1,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sigp/lighthouse/issues/5145/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
