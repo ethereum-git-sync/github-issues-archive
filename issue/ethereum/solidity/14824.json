@@ -1,0 +1,76 @@
+{
+  "url": "https://api.github.com/repos/ethereum/solidity/issues/14824",
+  "repository_url": "https://api.github.com/repos/ethereum/solidity",
+  "labels_url": "https://api.github.com/repos/ethereum/solidity/issues/14824/labels{/name}",
+  "comments_url": "https://api.github.com/repos/ethereum/solidity/issues/14824/comments",
+  "events_url": "https://api.github.com/repos/ethereum/solidity/issues/14824/events",
+  "html_url": "https://github.com/ethereum/solidity/issues/14824",
+  "id": 2108904116,
+  "node_id": "I_kwDOAm_5kc59s1K0",
+  "number": 14824,
+  "title": "ABI is different for functions defined in libraries as compared to contracts.",
+  "user": {
+    "login": "bmarwritescode",
+    "id": 21374392,
+    "node_id": "MDQ6VXNlcjIxMzc0Mzky",
+    "avatar_url": "https://avatars.githubusercontent.com/u/21374392?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/bmarwritescode",
+    "html_url": "https://github.com/bmarwritescode",
+    "followers_url": "https://api.github.com/users/bmarwritescode/followers",
+    "following_url": "https://api.github.com/users/bmarwritescode/following{/other_user}",
+    "gists_url": "https://api.github.com/users/bmarwritescode/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/bmarwritescode/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/bmarwritescode/subscriptions",
+    "organizations_url": "https://api.github.com/users/bmarwritescode/orgs",
+    "repos_url": "https://api.github.com/users/bmarwritescode/repos",
+    "events_url": "https://api.github.com/users/bmarwritescode/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/bmarwritescode/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 249074435,
+      "node_id": "MDU6TGFiZWwyNDkwNzQ0MzU=",
+      "url": "https://api.github.com/repos/ethereum/solidity/labels/bug%20:bug:",
+      "name": "bug :bug:",
+      "color": "fc1313",
+      "default": false,
+      "description": ""
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2024-01-30T22:26:33Z",
+  "updated_at": "2024-01-30T22:26:33Z",
+  "closed_at": null,
+  "author_association": "NONE",
+  "active_lock_reason": null,
+  "body": "## Description\r\n\r\nWhen compiling a function which takes an interface as an argument, if that function is defined in a contract, the ABI indicates that the `type` of that interface argument is `address` (additional information that it is a contract is stored in the `internalType` field). However, when the same function which takes an interface as an argument is defined in a library, the ABI indicates that the `type` of that interface argument is the name of the interface (and not `address`) -- the `internalType` field remains unchanged.\r\n\r\n## Environment\r\n\r\n- Compiler version: 0.8.24+commit.e11b9ed9.Darwin.appleclang\r\n- Target EVM version (as per compiler settings): whatever default is (I believe `shanghai`)\r\n- Framework/IDE (e.g. Truffle or Remix): N/A (compilinig command line)\r\n- EVM execution environment / backend / blockchain client: N/A\r\n- Operating system: macOS Monterey (version 12.3)\r\n\r\n## Steps to Reproduce\r\n\r\nConsider the following contract `Example`:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity ^0.8.10;\r\n\r\nimport \"./Library.sol\";\r\n\r\ncontract Example {\r\n    function baz(InterfaceExample i) external pure returns (uint) {\r\n        return 0;\r\n    }\r\n}\r\n```\r\n\r\nalong with the following library implementation:\r\n\r\n```solidity\r\n// SPDX-License-Identifier: GPL-3.0\r\npragma solidity ^0.8.10;\r\n\r\ninterface InterfaceExample {}\r\n\r\nlibrary Library {\r\n    function bar(InterfaceExample i) external pure returns (uint) {\r\n        return 0;\r\n    }\r\n}\r\n```\r\nWhen we run `solc Example.sol --combined-json abi` the following is output:\r\n\r\n```\r\n{\"contracts\":{\"Example.sol:Example\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract InterfaceExample\",\"name\":\"i\",\"type\":\"address\"}],\"name\":\"baz\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}]},\"Library.sol:InterfaceExample\":{\"abi\":[]},\"Library.sol:Library\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract InterfaceExample\",\"name\":\"i\",\"type\":\"InterfaceExample\"}],\"name\":\"bar\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}]}},\"version\":\"0.8.24+commit.e11b9ed9.Darwin.appleclang\"}\r\n```\r\n\r\nAs shown in the above results, the type for the argument of `baz` in the contract is `{\"internalType\":\"contract InterfaceExample\",\"name\":\"i\",\"type\":\"address\"}` but the argument of `bar` in the library is `{\"internalType\":\"contract InterfaceExample\",\"name\":\"i\",\"type\":\"InterfaceExample\"}`.\r\n\r\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/ethereum/solidity/issues/14824/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/ethereum/solidity/issues/14824/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null
+}
+[
+
+]
